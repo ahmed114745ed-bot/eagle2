@@ -91,6 +91,23 @@ class User extends Authenticatable
 
      ];*/
 
+    public function agencyUserJob(){
+        return $this->hasOne (AgencyUserJob::class,'user_id','id');
+    }
+
+    public function agencyJoinRequest(){
+        return $this->hasMany(AgencyJoinRequest::class,"user_id");
+    }
+
+    public function timeLog(){
+        return $this->hasMany(TimeLog::class,"user_id");
+    }
+
+    public function vipImage()
+    {
+        return $this->hasOne(Vip::class, 'level', 'total_received_level')
+                    ->where('type', 1);
+    }
  
 
     public function getTotalDays()

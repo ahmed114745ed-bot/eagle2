@@ -168,6 +168,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('check_wapel', [HomeController::class, 'check_wapel']);
     
             Route::get('getUserHides', [HomeController::class, 'getUserHides']);
+
+            // user info
+            Route::get ('my-data',[\App\Http\Controllers\Api\V1\UserController::class,'my_data']);
+
         }
     );
 

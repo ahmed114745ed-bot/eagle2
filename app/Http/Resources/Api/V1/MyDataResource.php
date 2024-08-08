@@ -4,217 +4,188 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Models\Pack;
 use App\Models\Room;
-use App\Models\User;
-use App\Models\Family;
-use App\Helpers\Common;
-use App\Models\ImageColor;
-use App\Helpers\UserCommon;
-use App\Facades\UserHandling;
-use App\Models\AgencyJoinRequest;
-use Modules\FixedTarget\Entities\SpecialUser;
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\MangerTypeResource;
-use Modules\Public\Http\Services\UserCounterServices;
-use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use App\Models\Ware;
 use App\Models\Agency;
-use Modules\AgencyApp\Entities\AgencyUserJob;
+use App\Helpers\Common;
+use App\Models\GiftLog;
+use App\Models\TimeLog;
+use App\Models\FamilyUser;
+use App\Models\FamilyLevel;
+use App\Facades\UserHandling;
+use App\Models\AgencyUserJob;
+use App\Models\AgencyJoinRequest;
+use App\Models\Config;
+use App\Models\UserSetting;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataResource extends JsonResource
 {
-
-    /**
-     * Transform the resource into an array.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
     public function toArray($request)
     {
+        $family = DB::table('families')->where('id', @$this->family_id)->first();
+        $f = null;
 
-        Pack::query()
-            ->where('expire', '!=', 0)
-            ->where('expire', '<', time())->delete();
-
-
-        $agency_joined = $this->agency;
-        if ($agency_joined != null) {
-            //            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
-            if ($this->agency != null) {
-                $agency_joined = [
-                    'id'     => $this->agency->id,
-                    'name'   => $this->agency->name,
-                    'status' => $this->agency->status,
-                    // 'owner'=>$owner,
-                ];
-            } else {
-                $agency_joined = null;
-            }
-        }
-        $pass_status = false;
-        $now_room    = Room::query()->where('uid', $this->now_room_uid)->first();
-        if ($now_room) {
-            if ($now_room->room_pass) {
-                $pass_status = true;
-            }
-        }
-
-        $f      = null;
-        $family = Family::query()->where('id', @$this->family_id)->first();
         if ($family) {
+            $fu = FamilyUser::where('family_id', $family->id)->where('status', 1)->count();
+            $giftLogs = GiftLog::where(function ($q) {
+                $q->where('receiver_family_id', $this->id)->orWhere('sender_family_id', $this->id);
+            })->sum('giftPrice');
+
+            $cur_level = FamilyLevel::where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
+            $next_level = FamilyLevel::where('exp', '>', $giftLogs)->orderBy('exp')->first();
+
+            $min_exp = @$cur_level->exp ?: 0;
+            $over = $giftLogs - $min_exp;
+            $diff = @$next_level->exp - @$cur_level->exp;
+            $lev = [
+                'level_exp' => (integer)$cur_level->exp ?: 0,
+                'level_name' => @$cur_level->name ?: '',
+                'level_img' => @$cur_level->img ?: '',
+                'family_exp' => (integer)$giftLogs,
+                'over_current_level_exp' => (integer)$over,
+                'next_exp' => (integer)$next_level->exp,
+                'next_name' => @$next_level->name,
+                'next_img' => @$next_level->img,
+                'per' => $diff == 0 ? 0 : (double)($over / $diff),
+                'rem' => (integer)($diff - $over)
+            ];
+
             $f = [
-                'owner_id'    => $family->user_id,
+                'owner_id' => $family->user_id,
                 'family_name' => $family->name,
-                'max_num'     => $family->num,
-                //                'img'           =>$family->image,
-                'members_num' => $family->members_count,
-                //                'level'         =>$family->level
+                'max_num' => $family->num,
+                'img' => $family->image,
+                'members_num' => $fu,
+                'level' => $lev
             ];
         }
 
-        /*$packs = Pack::query()
-            ->where ('user_id',$this->id)
-            ->where (function ($q){
-                $q->where('expire',0)->orWhere('expire','>=',now ()->timestamp);
-            })
-            ->where('is_used', 1)
-            ->get()
-            ->pluck('type')
-            ->toArray();
-        $previliges = [];
-        $previliges['no_kick']            = in_array(9, $packs);
-        $previliges['intro_animation']    = in_array(11, $packs);
-        $previliges['vip_gifts']          = in_array(14, $packs);
-        $previliges['no_pan']             = in_array(15, $packs);
-        $previliges['anonymous_man']      = in_array(17, $packs);
-        $previliges['colored_name']       = in_array(18, $packs);
+        $user_id = $this->id;
 
+        $pack = $this->packs
+            ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
+            ->where('is_used', 1);
 
-//        $previliges = [
-//            'no_kick'=>Common::pack_get (9,$this->id),
-//            'intro_animation'=>Common::pack_get (11,$this->id),
-//            'vip_gifts'=>Common::pack_get (14,$this->id),
-//            'no_pan'=>Common::pack_get (15,$this->id),
-//            'anonymous_man'=>Common::pack_get (17,$this->id),
-//            'colored_name'=>Common::pack_get (18,$this->id),
-//        ];*/
+        Pack::where('expire', '!=', 0)->where('expire', '<', time())->delete();
 
-        $color_image = ImageColor::select("id", "image", "color")->find($this->image_color_id);
-
-        $frame              =
-            Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
-        $bubble             =
-            Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
-        $intro              =
-            Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
-        $isHideCountry      = Common::hasInPack($this->id, 13, true);
-
-        $show_user_setting = \App\Models\UserSetting::where("user_id", $this->id)->first();
-        if ($show_user_setting == null) {
-            $show_user_setting = \App\Models\UserSetting::create([
-                'user_id'     => $this->id,
-                'show_git'    => 1,
-                'show_intro'  => 1,
-                'show_banner' => 1,
-            ]);
-        }
-        $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag','mall'];
-        $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-        $user = User::find($this->id);
-
-        $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
-            return [$item => $userCounterServices->getUserCounts($user, $item)];
-        });
+        $time_log = $this->timeLog()->latest()->first();
 
         $agency_joined = $this->agency;
-        if ($agency_joined != null) {
+        if ($agency_joined) {
             $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
-            if ($this->agency != null) {
-                $agency_joined = [
-                    'id' => $this->agency->id,
-                    'name' => $this->agency->name,
-                    'status' => $this->agency->status,
-                    'owner' => $owner,
-                ];
-            } else {
-                $agency_joined = null;
+            $agency_joined = [
+                'id' => $agency_joined->id,
+                'name' => $agency_joined->name,
+                'status' => $agency_joined->status,
+                'owner' => $owner,
+            ];
+        }
+
+        $pass_status = false;
+        $now_room = Room::where('uid', $this->now_room_uid)->first();
+        if ($now_room && $now_room->room_pass) {
+            $pass_status = true;
+        }
+
+        $admin = $this->agencyUserJob;
+        $owner = $this->ownAgency;
+
+        $dress_1_data = Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
+        $dress_1_fallback = Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
+        $frame = $dress_1_data ?: $dress_1_fallback;
+
+        $bubble = Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
+
+        $dress_3_data = Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
+        $dress_3_fallback = Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
+        $intro = $dress_3_data ?: $dress_3_fallback;
+
+        $TypeIntro = Ware::where('id', $this->dress_3)->first();
+
+        $isHideCountry = Common::hasInPack($this->id, 13, true);
+
+        $show_user_setting = $this->userSetting;
+        if ($show_user_setting == null) {
+            $show_user_setting = UserSetting::firstOrCreate(['user_id' => $this->id], [
+                    'show_git' => 1,
+                    'show_intro' => 1,
+                    'show_banner' => 1,
+                ]);
+        }
+
+        $achievement_images = [];
+        if ($this->medals) {
+            foreach ($this->medals as $medal) {
+                if ($medal->achievementLevel) {
+                    $achievement_images[] = $medal->achievementLevel->valid_image;
+                }
             }
         }
-        $owner = Agency::where('app_owner_id', $this->id)->first();
-        $admin = AgencyUserJob::where('user_id', $this->id)->where('type', 'requestManger')->first();
 
-       // \Log::info('counter '. $counters);
-        $data               = [
-            'id'                   => @$this->id, // both
-            'notification_id'      => @$this->notification_id ?: "", // both
-            'name'                 => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid, // both
-            'unread_message_count' => $this->unread_count_message,
-            'phone'                => (string)@$this->phone ?: '1', // both     stirng
-            'frame'                => $frame, // both
-            'intro'                => $intro, // both
-            'bubble'               => $bubble, // both
-            //            'is_gold_id'           => false,
-            //            'image_color'          => $color_image,
-            'bubble_id'            => @$bubble != '' ? $this->dress_2 : 0, // both
-            'frame_id'             => $frame != '' ? @$this->dress_1 : 0, // both
-            'intro_id'             => $intro != '' ? @$this->dress_3 : 0, // both
-            'vip_target_id'        => $this->UserVip?->id ?? 0,
-            'is_first'             => @(bool)$this->is_points_first, // my data
-            'is_agency_request'    => (bool)AgencyJoinRequest::where('user_id', @$this->id)->where('status', '!=', 2)->count(),
-            'game_Available'             => (bool)UserHandling::chickLevelToPlay($this->resource),
-            // my
-            'has_room'             => $this->hasRoom(), // my
-            'facebook_bind'        => @$this->facebook_id ? true : false, // my
-            'google_bind'          => @$this->google_id ? true : false, // my
-            'phone_bind'           => @$this->phone ? true : false, // my
-            'vip'                  => @Common::ovip_center($this), // both
-            'family_id'            => @$this->family_id, // both
-            'uuid'                 => @$this->uuid, // both
-            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
-            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
-
-            'bio'                  => @$this->bio ?: '', // both
-            'number_of_fans'       => $this->followers_ids()->count(), // both
-            'number_of_followings' => $this->followeds_ids()->count(), // both
-            'number_of_friends'    => $this->numberOfFriends(), // both
-            'profile_visitors'     => $this->profileVisits()->count(), // both
-            'profile'              => new ProfileResource(@$this->profile), // both
-            'level'                => Common::level_center(@$this->id), // both
-            'my_store'             => [
-                'id'           => $this->id,
-                'coins'        => $this->di,
-                'diamonds'     => $this->total_diamond_received,
+        $data = [
+            'id' => @$this->id,
+            'notification_id' => @$this->notification_id ?: "",
+            'name' => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
+            'phone' => (string)@$this->phone ?: '',
+            'frame' => $frame,
+            'intro' => $intro,
+            'intro_type' => @$TypeIntro?->image_type ?? '',
+            'bubble' => $bubble,
+            'bubble_id' => @$bubble ? $this->dress_2 : 0,
+            'frame_id' => $frame ? @$this->dress_1 : 0,
+            'intro_id' => $intro ? @$this->dress_3 : 0,
+            'is_first' => (bool)$this->is_points_first,
+            'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
+            'has_room' => $this->hasRoom(),
+            'google_bind' => (bool)@$this->google_id,
+            'phone_bind' => (bool)@$this->phone,
+            'vip' => Common::ovip_center($this),
+            'family_id' => @$this->family_id,
+            'uuid' => @$this->uuid,
+            'bio' => @$this->bio ?: '',
+            'number_of_fans' => $this->followers_ids()->count(),
+            'number_of_followings' => $this->followeds_ids()->count(),
+            'number_of_friends' => $this->numberOfFriends(),
+            'profile_visitors' => $this->profileVisits()->count(),
+            'profile' => new ProfileResource(@$this->profile),
+            'level' => Common::level_center(@$this->id),
+            'charge_level' => Common::chargeLevel(@$this->id),
+            'game_Available' => (bool)UserHandling::chickLevelToPlay($this->resource),
+            'my_store' => [
+                'id' => $this->id,
+                'coins' => (int)$this->di,
+                'diamonds' => $this->monthly_diamond_received,
                 'silver_coins' => $this->gold,
-                'usd'          => (float)$this->salary,
-            ], // my
-            'family_data'          => $f, // refactor
-            'agency'               => @$agency_joined ?? new \stdClass(), // both
-            'has_color_name'       => Common::hasInPack($this->id, 18, true), // both
-            'anonymous'            => Common::hasInPack($this->id, 17, true), // both
-            'room_hidden'          => Common::hasInPack($this->id, 16, true), // both
-            'allow_upload_gif'                  => Common::hasInPack($this->id, 22, true), // both
-            'country'              => ($this->country ?? ''),
-            'chat_id'              => @$this->chat_id ?: "", // both
-            'country_hidden'       => $isHideCountry, // both
-            'is_special_user'      => SpecialUser::query()->where('user_id', $this->id)->where('status', true)->exists(),
-            'view_invitation'      => UserCommon::CheckUserNew(@$this->id),
-            "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
-            'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          => new MangerTypeResource(@$this->mangerType),
-            'sound_effect_color'   => UserHandling::soundEffect($this->resource),
-            'user_agency_status' => isset($owner) ? 2 : ($admin ? 1 : 3),
-
-            $this->mergeWhen($request->show_counter == true, [
-                'unread_counter'       =>  $counters,
-            ]),
-
+                'usd' => (double)$this->sallary,
+            ],
+            'family_data' => $f,
+            'agency' => $agency_joined,
+            'Last_seen' => @$time_log->time ?? 0,
+            'type_user' => intval(@$this->type_user) ?: 0,
+            'user_jobs' => $this->jobs,
+            'has_color_name' => $pack->where('type', 18)->count() >= 1,
+            'anonymous' => $pack->where('type', 17)->count() >= 1,
+            'country' => $this->country,
+            'country_hidden' => $isHideCountry,
+            'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
+            "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
+            'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
+            'achievement_images' => $achievement_images,
         ];
-        $data['auth_token'] = @$this->auth_token;
-        if (@$this->is_mic == '0' || @$this->is_mic == '1') {
+
+        $data['auth_token'] = $this->auth_token;
+        if (isset($this->is_mic)) {
             $data['is_mic'] = $this->is_mic;
         }
-        if ($this->pivot) {
-            $data['visit_time'] = $this->pivot->updated_at;
+        if ($this->first_login_date) {
+            $data['first_login_date'] = $this->first_login_date->format('Y-m-d H:i:s');
         }
+        if ($pass_status) {
+            $data['pass_status'] = $pass_status;
+        }
+
         return $data;
     }
+
 }

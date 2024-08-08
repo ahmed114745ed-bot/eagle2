@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\Api\V1\MyDataResource;
 
 class UserController extends Controller
 {
@@ -53,5 +54,18 @@ class UserController extends Controller
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
         return Common::apiResponse(1, 'bind successful', new UserResource($user));
+    }
+
+    public function my_data(Request $request)
+    {
+        $user = $request->user();
+        $user->enableSaving = false;
+
+        $userWithMedals = $this->userService->processUserData($user, $request->header('device'));
+
+        $this->userService->unlockDressHand($user->id);
+
+        $data = new MyDataResource($userWithMedals);
+        return Common::apiResponse(true, '', $data, 200);
     }
 }

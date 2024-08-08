@@ -807,6 +807,63 @@ Trait CalcsTrait
     }
 
 
+    public static function chargeLevel($user_id)
+    {
+        $user = User::find($user_id);
+        if(!$user){
+            return [
+                'current_level'  =>  0,
+                'current_exp'    =>  0,
+                'current_img'    =>  '',
+                'next_level'     =>  0,
+                'next_exp'       =>  0,
+                'next_img'       =>  '',
+                'remaining'      =>  0,
+                'progress'       =>  0,
+            ];
+        }
+        $expLevel = $user->total_charge_coins + $user->sub_charger_coins;
+        $currentLevel = Vip::where("level", $user->charge_level)->where('type', 5)->orderByDesc('level')->first();
+        if ($currentLevel) {
+            $secondLevel = Vip::where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('id')->first();
+        } else {
+            $secondLevel = Vip::where("type", 5)->orderBy('level')->first();
+        }
+
+
+        if ($secondLevel != null && $currentLevel != null) {
+            $remaining = $secondLevel?->exp  - $user->total_charge_coins;
+            $exactlyValue = @$secondLevel?->exp ;
+            $progressCurrent = $expLevel - $currentLevel->exp;
+            $progressNext = $secondLevel->exp  - $currentLevel->exp;
+           // $progress = $exactlyValue == 0 ? 1 : ($expLevel / $exactlyValue);
+            $progress = $exactlyValue == 0 ? 1 : ($progressCurrent / $progressNext);
+        }elseif($currentLevel != null) {
+            $remaining = $secondLevel?->exp == null ? 0: $secondLevel?->exp - $user?->total_charge_coins ;
+            $exactlyValue = $secondLevel?->exp ??0;
+            $progressCurrent = $expLevel - $currentLevel?->exp??0;
+            $progressNext = @$secondLevel?->exp - $currentLevel?->exp??0;
+           // $progress = $exactlyValue == 0 ? 1 : ($expLevel / $exactlyValue);
+            $progress = $exactlyValue == 0 ? 1 : ($progressCurrent / $progressNext);
+
+        }else{
+            $progress =1;
+            $remaining =0;
+        }
+        $chargeLevel = [
+            'current_level'  => $currentLevel->level ?? 0,
+            'current_exp'    => $currentLevel->exp ?? 0,
+            'current_img'    => $currentLevel->img ?? '',
+            'next_level'     => @$secondLevel->level ?? 0,
+            'next_exp'       => @$secondLevel->exp ?? 0,
+            'next_img'       => @$secondLevel->img ?? '',
+            'remaining'         => @$remaining ?? 0,
+            'progress'          => @$progress ?? 0,
+        ];
+
+        return $chargeLevel;
+    }
+
 
 }
 

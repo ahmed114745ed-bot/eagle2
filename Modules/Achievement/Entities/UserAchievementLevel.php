@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Achievement\Entities\Achievement;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Achievement\Enums\AchievementType;
 use Modules\Achievement\Http\Services\AchievementLevelsService;
 
 class UserAchievementLevel extends Model
@@ -47,5 +48,11 @@ class UserAchievementLevel extends Model
             },
             'Achievement'
         ]);
+    }
+
+    
+    public function scopeUserPickProfile(Builder $builder): Builder
+    {
+        return $builder->where("picked",1)->whereDoesntHave('achievement', fn($q) => $q->where('type' , AchievementType::ROOM_TARGET->getValue()));
     }
 }
