@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    allow:
+      - dependency-type: "direct"
+    labels:
+      - "🧱 Dependencies"
+    reviewers:
+      - "imdhemy"
+    versioning-strategy: auto

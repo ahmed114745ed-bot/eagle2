@@ -1,0 +1,56 @@
+{
+  "name": "imdhemy/appstore-iap",
+  "description": "PHP Appstore In-App Purchase implementation",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "imdhemy",
+      "email": "imdhemy@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.0",
+    "ext-json": "*",
+    "ext-sodium": "*",
+    "ext-openssl": "*",
+    "guzzlehttp/guzzle": "^7.6.0",
+    "lcobucci/jwt": "^4.3",
+    "nesbot/carbon": "^2.66|^3.1"
+  },
+  "require-dev": {
+    "fakerphp/faker": "^1.22",
+    "friendsofphp/php-cs-fixer": "^3.16",
+    "phpunit/phpunit": "^9.6",
+    "roave/security-advisories": "dev-latest",
+    "vimeo/psalm": "^5.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "Imdhemy\\AppStore\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Imdhemy\\AppStore\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "psalm": "vendor/bin/psalm",
+    "psalm-info": "vendor/bin/psalm --show-info=true",
+    "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes",
+    "check-style": "vendor/bin/php-cs-fixer fix --dry-run",
+    "test": "vendor/bin/phpunit --testdox",
+    "keygen": "sh ./bin/keygen.sh",
+    "security-advice": "composer update --dry-run roave/security-advisories",
+    "post-autoload-dump": [
+      "@keygen"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {},
+    "platform": {
+      "php": "8.0"
+    }
+  }
+}

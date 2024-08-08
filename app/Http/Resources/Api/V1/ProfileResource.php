@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Resources\Api\V1;
+
+use Carbon\Carbon;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ProfileResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     */
+    public function toArray($request)
+    {
+
+        return [
+            'image'=>$this->avatar?:'',
+            'image_id' => $this->image_id?:'',
+            'gender'=>$this->gender !== null ? intval($this->gender) : 2,
+            'birthday'=>$this->birthday?Carbon::parse($this->birthday)->format ('Y-m-d'):'',
+            'age'=>Carbon::parse ($this->birthday)->age,
+            'province'=>$this->province?:'',
+            'city'=>$this->city?:'',
+        ];
+    }
+}

@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Admin\Actions;
+
+
+use App\Models\User;
+use Encore\Admin\Actions\Action;
+use Encore\Admin\Actions\RowAction;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
+
+
+class SoftDeleteUserAccount extends RowAction
+{
+    public $name ;
+    public $id;
+    protected $selector = '.delete_user_account';
+
+    public function __construct($id = 0)
+    {
+        $this->id = $id;
+        $this->name = __("dashboard.removeAccount");
+
+        parent::__construct();
+    }
+
+    public function handle(Model $model,Request $request)
+    {
+        $user = User::query()->onlyTrashed()->find($request->id);
+        $user->forceDelete();
+        return $this->response()->success('success')->refresh();
+    }
+
+
+    public function form()
+    {
+        $this->hidden('id', __('id'))->value($this->id);
+    }
+
+
+
+    public function html()
+    {
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')"  ></a>
+<script>
+function pu(val) {
+
+  $("#vid").val(val)
+}
+</script>
+';
+    }
+}

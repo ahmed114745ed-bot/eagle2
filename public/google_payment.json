@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "r-star-shop",
+  "private_key_id": "293dd56fa4e7bb84856d11a5a67d6911df73c807",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/ZGFTcwssW5j1\nNTTii1tlIj4iRvciwdM8sDjWxKHWSDt6WfHN3NuWj7+x0CGEom2X6QwpdHy9x5a2\nH2hNgf5XGg4+eOjHWMDeK2Rj1TcsjkoF7M8m2JaYsfTJhVSRMUE8cbG73mNrIbV3\nYOOSxhZ2joxf8uO+6qR9rNBkt+HIFOLnFyC1p3WeGGE1HV33BqWK0cGB7wgXO9lZ\nyXfeGVFsRbmDI7WIxn3vXNDRM8QL6ifTxZ7Q6mNMuvLXmLq0bBEs2uDODNjSbfZC\n6HGpc6NhU325UFSwjeWJ/Q/dFF1krvXX5Uj/bX0aYwHLBjurI4ls/yFyeyYjJw14\nnDAvavhTAgMBAAECggEAQDXKHTgUgI4+c82k73g3cmeZluBeG1ARsWOhvhP8A6r6\nIWM5p4o4NXwGoP4lsJzZzcRG60WEcBsc6f8BfDdngAtiyfzAg9i35BGEvaWTvCQE\nm5ZGLU8uvw29BTrxE0EGFORD77Z9fjyx59oen2hLsvzCBZK0a6HHC87Fn3S9j+U1\nLhN2Ly1hd1dJGvJt8lT9p+YtUhkiIWIbI8DjzPa6mP34PvFitlRH9GoeijdcctT7\nXRhav+9Dky3hffo8CgmJ5LJVA/U3XjT2rM4rOqSFDmwII2BXkaGCRWbwz9U1biw7\nmLqhOs2fWjccqbpJuURc3vY4kU+rnZOoEG1VR7RvoQKBgQDq0qQUFSVBP9JfYzLx\nAAe/iQfK+XxzS6QnQ7Uyt0nM5FoGaL3giBIiV9nTAmkcIDRr9Wxg75crGHzjOOkl\nqPY7tB0Qdqh9OZwrupl1IR6kljp6WZ31j2q+oZMObiJe1IRXobKMBYTVlhHdbVdt\n3Kjt7EkFoLmIw9O7cJlFaGaugwKBgQDQpw29CbjWvI08Oz708vTK0kBiRsBJG7IA\n18CnTkxfkR+4B3tXVDLD4kii0tU+WWVYvLD2tpsZWCUXD8Gv7/+w0OPMJXyDhEbm\nd6Amruuvht4FoLr3Bws85ypxUOHXlrm9TLOzASoNeof+qsAB5FgMdjVFH5av2+Sz\nwIdlt81l8QKBgGf1dTqG2gV3EdW0/xp+3u9G5TJRHW2VsUjIyvF2/6878TchK965\nnv2hUwf96zbOcybQcni/2Xb00mVuDpnjoY9w/+UIAzPdS2x4ofOfBAftkloUTsAm\nDCX1NjuPOpwtDaIWLgubbeF5HNOg0rIKnKcoknNxYnJP7+7tvI1j2QGtAoGBAKfT\nBjjbngGSbSNaH/xTgtO0Izco4zaqgRUudHXdg46GovWZhvqp7Z8i3fuhCwX4T4z9\nUHVQURYkkMio0shZiNbGXcNxD2KVPZXX+EfFACsRlnj+XAOfdcmJwdidDtoiEMmS\n7SL4t8NZoBMVchTTfoKffZ9YlhJjEuQF4qHNIfdxAoGAKLEc0Q21jEgppHpYTBJs\nFpLOPAA6UJTdUevQ5rjP8tQYGiMWV+Y27ZuldwA+CSHy+tpl5OUnZpl2+EIeeZkB\ncqhg2k2fK4xkVEWEKUapY6KiCMCaJrR5DKHbS2rd6U7NEnN8b5f1Jzfs7JHKYLa0\n4hbrOJPqBYleXWtTFuucUs8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-pay-new-key@r-star-shop.iam.gserviceaccount.com",
+  "client_id": "117035396320000506898",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-pay-new-key%40r-star-shop.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

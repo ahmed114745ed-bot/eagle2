@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/cp",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CP\\": ""
+        }
+    },
+    "scripts": {
+        "cp-helper": [
+            "@php ../../artisan clear-compiled",
+            "@php ../../artisan ide-helper:generate",
+            "@php ../../artisan ide-helper:model --dir=\"Modules/Cp/Entities\""
+        ]
+    }
+}

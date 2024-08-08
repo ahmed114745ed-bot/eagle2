@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use Carbon\Carbon;
+use App\Models\User;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\HomeCarousel;
+use Encore\Admin\Layout\Content;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
+
+class HomeCarouselController extends MainController
+{
+    use HasResourceActions;
+    public $permission_name = 'carousel';
+    public $hiddenColumns = [];
+
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new HomeCarousel);
+
+        $grid->id( __ ('ID'));
+        $grid->column('img',trans ('img'))->image ('',30);
+        $grid->column('contents',trans ('contents'));
+        $grid->column('url',trans ('url'))->url ();
+        $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ())->display(function($enable, $column) {
+            if($this->duration > carbon::now()->timestamp ||$this->duration == null )
+            {
+              return $enable;
+            }
+            return null;
+        });
+
+
+        $grid->column('sort',trans ('sort'))->editable();
+        $this->extendGrid ($grid);
+        $grid->disableExport();
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(HomeCarousel::findOrFail($id));
+
+        //        $show->id('ID');
+        //        $show->img('img');
+        //        $show->contents('contents');
+        //        $show->url('url');
+        //        $show->enable('enable');
+        //        $show->sort('sort');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new HomeCarousel);
+
+        $form->display(__('admin.ID'));
+        $form->number('sort',__('sort'));
+
+        $form->image('img', trans('img'))->required();
+        $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ())->default(true);
+
+
+        $form->select('form', trans('form'))->options([0 => __(''), 1 => __('hours'), 2 => __('days'), 3 => __('month')])
+        ->when(1, function (Form $form) {
+            $form->text('input', trans('input'));
+        })->when(2, function (Form $form) {
+            $form->text('input', trans('input'));
+        })->when(3, function (Form $form) {
+            $form->text('input', trans('input'));
+        });
+
+
+        $form->select ('type',trans ('type'))
+//                ->addElementClass('roomlist')
+                ->options(['room'=>__ ('Room'),'normal'=>__ ('normal'),'link'=>__ ('url'),'event'=>__('events')])
+                ->when('room', function(Form $form){
+                    // $form->select('owner_id', __('owner'))->options(function($_){
+                    //     $all = User::withoutAppends()->select(['id', 'name', 'uuid'])->get();
+                    //     return $all->mapWithKeys(function($item){
+                    //         return [
+                    //             $item['id'] => $item['name'] . ' - ' . $item['uuid']
+                    //         ];
+                    //     });
+                    // });
+
+                    $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
+                })->when('link', function (Form $form) {
+                    $form->url('url', trans('url'))->rules('required|url');
+
+                })->when('event', function(Form $form){
+                    $form->select ('event_type',trans ('events'))->options(['event'=>__ ('events'),'pk_event'=>__ ('pk_event'),'weekly_star'=>__ ('weekly_star'),'charge_event' =>__('charge_event'),'event_period' =>__('event_period')])->when('event', function(Form $form){
+                        $form->url('url', trans('url'));
+                    });
+                    
+                });
+
+            return $form;
+        }
+
+
+
+}

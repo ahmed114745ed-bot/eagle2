@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/whatsapp",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Whatsapp\\": ""
+        }
+    },
+    "scripts": {
+        "whatsapp-helper": [
+            "@php ../../artisan clear-compiled",
+            "@php ../../artisan ide-helper:generate",
+            "@php ../../artisan ide-helper:model --dir=\"Modules/Whatsapp/Entities\""
+        ]
+    }
+}

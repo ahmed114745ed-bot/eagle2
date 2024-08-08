@@ -1,0 +1,83 @@
+<?php
+
+namespace Modules\Public\Http\Controllers\web;
+
+use App\Models\Config;
+use App\Admin\Controllers\MainController;
+use Database\Seeders\config as SeedersConfig;
+use Illuminate\Http\Request;
+
+class UpgradeLevelController extends MainController
+{
+
+    public function ovipConfig(Request $request)
+    {
+        $conf = Config::where('name','buy_aristocracy')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'buy_aristocracy',
+                'value' => $request->number,
+            ]);
+        }else{
+            $conf->value = $request->number;
+            $conf->save();
+        }
+
+        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+
+    }
+    public function group_chat_config(Request $request)
+    {
+        $conf = Config::where('name','send_world_chat')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'send_world_chat',
+                'value' => $request->number,
+            ]);
+        }else{
+            $conf->value = $request->number;
+            $conf->save();
+        }
+
+        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+
+    }
+
+    public function reelConfig(Request $request)
+    {
+        $conf = Config::where('name','upload_reel')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'upload_reel',
+                'value' => $request->number,
+            ]);
+        }else{
+            $conf->value = $request->number;
+            $conf->save();
+        }
+
+        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+
+    }
+    public function momentConfig(Request $request)
+    {
+        $conf = Config::where('name','upload_moment')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'upload_moment',
+                'value' => $request->number,
+            ]);
+        }else{
+            $conf->value = $request->number;
+            $conf->save();
+        }
+
+        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+
+    }
+
+}

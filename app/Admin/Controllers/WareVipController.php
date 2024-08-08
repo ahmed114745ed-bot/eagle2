@@ -1,0 +1,239 @@
+<?php
+
+namespace App\Admin\Controllers;
+
+use App\Models\Ware;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Controllers\HasResourceActions;
+
+class WareVipController extends MainController
+{
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'wares vips';
+    use HasResourceActions;
+    public $permission_name = 'wares-vips';
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new Ware());
+
+        $grid->model()->where('get_type', 1)->orderByDesc('is_active_for_vip');
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('level', __('level'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+
+                $filter->equal('type', __('type'))->select([
+                    1 => trans('Gemstone'),
+                    3 => trans('Card Scroll'),
+                    4 => trans('Avatar Frame'),
+                    5 => trans('Bubble Frame'),
+                    6 => trans('Entering Special Effects'),
+                    7 => trans('Microphone Aperture'),
+                    8 => trans('Badge'),
+                    9 => trans('NoKick'),
+                    10 => trans('Icon'),
+                    11 => trans('intro animation'),
+                    12 => trans('wapel'),
+                    13 => trans('hide country and last login'),
+                    14 => trans('vip gifts'),
+                    15 => trans('no pan'),
+                    16 => trans('hidden room'),
+                    17 => trans('anonymous man'),
+                    18 => trans('colored name'),
+                    19 => trans('profile visitors hide in'),
+                    20 => trans('hide last active'),
+                    21 => trans('sound effect'),
+                    22 => trans('upload GIF image')
+
+                ]);
+            });
+        });
+
+        $grid->id(__('ID'));
+        $grid->column('get_type', __('get_type'))->select(
+            [
+                1 => trans('vip level automatic acquisition'),
+                //               2=>trans ('activity'),
+                //               3=>trans ('treasure box'),
+                4 => trans('purchase'),
+                //               5=>trans ('background modification'),
+                6 => trans('limited time purchase'),
+                //               7=>trans ('treasure box point exchange'),
+                //               8=>trans ('cp level unlock'),
+            ]
+        );
+        $grid->column('type', __('type'))->select(
+            [
+                1 => trans('Gemstone'),
+                3 => trans('Card Scroll'),
+                4 => trans('Avatar Frame'),
+                5 => trans('Bubble Frame'),
+                6 => trans('Entering Special Effects'),
+                7 => trans('Microphone Aperture'),
+                8 => trans('Badge'),
+                9 => trans('NoKick'),
+                10 => trans('Icon'),
+                11 => trans('intro animation'),
+                12 => trans('wapel'),
+                13 => trans('hide country and last login'),
+                14 => trans('vip gifts'),
+                15 => trans('no pan'),
+                16 => trans('hidden room'),
+                17 => trans('anonymous man'),
+                18 => trans('colored name'),
+                19 => trans('profile visitors hide in'),
+                20 => trans('hide last active'),
+                21 => trans('sound effect'),
+                22 => trans('upload GIF image')
+
+            ]
+        );
+        $grid->column('name', __('name'))->editable();
+        $grid->title(__('title'));
+        $grid->column('price', __('price'))->currency();
+        //        $grid->score('score');
+        $grid->level(__('level'));
+        $grid->column('show_img', __('show_img'))->image('', 30);
+        $grid->column('color', __('color'));
+        $grid->expire(__('expire'));
+        $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+        $grid->column('is_active_for_vip', __('active_for_vip'))->switch(Common::getSwitchStates());
+        $grid->sort(__('sort'), __('sort'));
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(Ware::findOrFail($id));
+
+        $show->field('id', __('Id'));
+        $show->field('get_type', __('Get type'));
+        $show->field('type', __('Type'));
+        $show->field('name', __('Name'));
+        $show->field('title', __('Title'));
+        $show->field('price', __('Price'));
+        $show->field('score', __('Score'));
+        $show->field('level', __('Level'));
+        $show->field('show_img', __('Show img'));
+        $show->field('img1', __('Img1'));
+        $show->field('img2', __('Img2'));
+        $show->field('img3', __('Img3'));
+        $show->field('color', __('Color'));
+        $show->field('expire', __('Expire'));
+        $show->field('enable', __('Enable'));
+        $show->field('sort', __('Sort'));
+        $show->field('created_at', __('Created at'));
+        $show->field('updated_at', __('Updated at'));
+        $show->field('num', __('Num'));
+        $show->field('is_active_for_vip', __('Is active for vip'));
+        $show->field('name_en', __('Name en'));
+        $show->field('title_en', __('Title en'));
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new Ware());
+
+        $form->display('ID');
+        $form->select('get_type', trans('get_type'))->options(
+            [
+                1 => trans('vip level automatic acquisition'),
+                //               2=>trans ('activity'),
+                //               3=>trans ('treasure box'),
+                //  4=>trans ('purchase'),
+                //               5=>trans ('background modification'),
+                //   6=>trans ('limited time purchase'),
+                //               7=>trans ('treasure box point exchange'),
+                //               8=>trans ('cp level unlock'),
+            ]
+        )->default(1);
+        $form->select('type', trans('type'))->options(
+            [
+                1 => trans('Gemstone'),
+                3 => trans('Card Scroll'),
+                4 => trans('Avatar Frame'),
+                5 => trans('Bubble Frame'),
+                6 => trans('Entering Special Effects'),
+                7 => trans('Microphone Aperture'),
+                8 => trans('Badge'),
+                9 => trans('NoKick'),
+                10 => trans('Icon'),
+                11 => trans('intro animation'),
+                12 => trans('wapel'),
+                13 => trans('hide country'),
+                14 => trans('vip gifts'),
+                15 => trans('no pan'),
+                16 => trans('hidden room'),
+                17 => trans('anonymous man'),
+                18 => trans('colored name'),
+                19 => trans('profile visitors hide in'),
+                20 => trans('hide last active'),
+                21 => trans('sound effect'),
+                22 => trans('upload GIF image')
+
+            ]
+        )->rules('required');
+        //        ->rules (function ($form){
+        //            if (!$id = $form->model()->id) {
+        //                return 'required';
+        //            }
+        //        });
+        $form->text('name', trans('name'));
+        $form->text('name_en', trans('Name en'));
+        $form->text('title', trans('title'));
+        $form->text('title_en', trans('Title en'));
+        $form->currency('price', trans('price'))->symbol('💰');
+        //        $form->number('score', trans('score'));
+        $form->number('level', trans('level'))->rules(
+               'required|numeric|min:1',[
+                'min'   => 'levels can not be 0',
+            ]);
+        $form->image('show_img', trans('img'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        })->default('1.png');
+        //        $form->image('img1', trans('img'));
+        $form->file('img2', trans('svg'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+        //        $form->file('img3', trans('video'));
+        $form->color('color', trans('color'));
+        $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+        $form->switch('is_active_for_vip', __('active_for_vip'))->states(Common::getSwitchStates());
+        //        $form->number('sort', 'sort');
+        $form->number('num', __('num'));
+
+        return $form;
+    }
+}

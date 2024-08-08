@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "tikchat-874b7",
+  "private_key_id": "877c646af4188774744503df487c703fa7d7ad13",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQDSatAQgmmOvtIr\nPvN9+8pEja15pOaYj0U/p0gDA6TB33iZWLbOqFj6hjoGdArUC6uMRBVRqeaOJZMu\nAccCSsfcXuug9g8MBNm/JCwNsIhvlryReoJTY7aWp5FRMf+Q0S6GiW902pUNHOV3\ny+6Ufn6HJPq2kPMIgb8iBS6kKlAywItaD1hA3X8vOCTFGdiCR38mgLbRyGLWvZRk\nbHIQwfLHceW8c61fkoi//+bWoqvkXLf01n3MVSwcjO2QBGZLpNbuWkhk0Bz5ZtZg\nlWB0f5RP89CA02pZRbd99xbT3PrHar4scwFha8qaP2ErocsjIyOBM8nAte1qsWPj\nAcLn9f89AgMBAAECggEAHVyMRhF8m0+jUieJoKXW9rPyZgwNpXIwjo5QLSOABRGi\n6XsIn1O8ftDmHeppbGdoe70wYGHd6y3xGLVkyLwYoXaZWK+dL+cpX1Oz1gExOKkH\nDSHUN8CtRN6DF5preBDIdjuNUvgBXoAOwSWy2APCsicF2R3m2+QHAL9KX9wLrtkQ\njVobVko1Ut2/XfwCrCI4DmCHyB1AsdTuQOxZX4ChFhl46OMZ/78zN+9N8jz49Gi4\noNDcy2FpDEYt3IiV4tDgXTJ4tqV5Bi9wD7rkmdLWq9UlDDh4ZcMgmFghsR23TsJz\naTEPooc+Q3Hn9eDvJqslaHPi9J9FF6srRih4TpCSHQKBgQDuQYuLIx9ME6FAEVH1\n2zKnj0qKYKkB6M2BpZ3eisAKVmSkPSlBsnCD7Eb2eRu36GxYuoUpC0geETtoAtOm\nWH9/iuJ1Mj94RnU4nsygVtNtFQK8cAlQyKCWxLP+blEqTKl6eeOkKtD5MFADj7AK\n99OVcNd2ag0FmbebvAiV34TN4wKBgQDiFoJFMmozv+GEcLnXnoS6A05MrBqRsRAC\n57dq2mhY9G/14HvN4avGibFwpOJ8eC7TBYlNBWe92hJWMdXX5qOy3nnQpZW4Kfyq\nr2v4jwFvdmepdNLRBwrm525Q770D1YtfTx02M7Jk8q2gLv8vykb1dHT58PQMQ/cm\n7co3yA+IXwKBgQDTW34JDj1DZd6UUUkeCzgigPElVJ5ZPUahjmQ/+WJnSUC6mi8x\nQrShs0c4ezNlsF/9Tmm2gXWWhr7mhCtx0+w3HuPKB6tabVarxePNEXk5uXvV4qXA\n7lnXpePu/7otBhkKt3qENh9wD7XLkvoeoL8oQRRCzc2DfFvvYZ1UJxdO9QKBgC7R\nIGq51Noges+VFDa9IZjvRFCGNv5CXyFq4EVlMsRw4ZpVwO1SNOLo8nB0BF5n+LJD\n7Dmhy+i5dqCYs0KBBRbuEOWO1GENeL/TkZUn79EoALFLerhEMBK+i86AxnA70R+M\nX20w6VkUE7Ye5UL9LRJ46hwztCWyEUTjasOATw8bAn9eGqESvFwSgXqkGaXh32ND\ntANAfsvUBYbCCvlTim2wTVxIgQJ0dAjtY4ALL23oXaVKdUGHcnl1fbZeJYArtbBw\nvyMV0hm7BOCgvpBGuHwh/vUsYPMlIe0gutd3mV3KoD/nIQsMUlcIvmBwcBnCjQvr\n9jdHZpXa/H2oABWx3H/n\n-----END PRIVATE KEY-----\n",
+  "client_email": "test-301@tikchat-874b7.iam.gserviceaccount.com",
+  "client_id": "111588492343511836670",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/test-301%40tikchat-874b7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

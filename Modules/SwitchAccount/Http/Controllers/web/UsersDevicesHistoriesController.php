@@ -1,0 +1,87 @@
+<?php
+
+namespace Modules\SwitchAccount\Http\Controllers\web;
+
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use Modules\SwitchAccount\Entities\UserDevicesHistory;
+
+class UsersDevicesHistoriesController extends AdminController
+{
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'UserDevicesHistory';
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new UserDevicesHistory());
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('device_token', __('Device token'));
+            });
+        });
+
+      
+        $grid->column('user.name', __('name'));
+        $grid->column('user.uuid', __('uuid'));
+        $grid->column('device_token', __('Device token'));
+
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            $actions->disableEdit();
+            $actions->disableView();
+        });
+        $grid->disableCreateButton();
+
+        
+
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     *
+     * @param mixed $id
+     * @return Show
+     */
+    protected function detail($id)
+    {
+        $show = new Show(UserDevicesHistory::findOrFail($id));
+
+        $show->field('id', __('Id'));
+        $show->field('user_id', __('User id'));
+        $show->field('device_token', __('Device token'));
+        $show->field('created_at', __('Created at'));
+        $show->field('updated_at', __('Updated at'));
+        $show->field('device_name', __('Device name'));
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     *
+     * @return Form
+     */
+    protected function form()
+    {
+        $form = new Form(new UserDevicesHistory());
+
+        $form->number('user_id', __('User id'));
+        $form->textarea('device_token', __('Device token'));
+        $form->text('device_name', __('Device name'));
+
+        return $form;
+    }
+}
