@@ -43,6 +43,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])->group(
         function () {
+            // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/', [RoomController::class, 'index']);
                 Route::post('/create', [RoomController::class, 'store']);
@@ -78,6 +79,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
             });
     
+            Route::get('/room-countries', [\App\Http\Controllers\Api\V1\RoomController::class, 'room_countries']);
+            // end rooms api 
+            
+            
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 

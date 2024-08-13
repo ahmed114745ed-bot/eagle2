@@ -49,6 +49,7 @@ use function App\Http\Controllers\Api\V1\input;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use App\Tik\Services\CountryService;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -60,13 +61,16 @@ class RoomController extends Controller
     protected $repo;
 
     protected $roomService;
+    protected $countryService;
 
     public function __construct(
         RoomRepoInterface $repo,
         RoomRepoService $roomService,
+        CountryService $countryService
     ) {
         $this->repo = $repo;
         $this->roomService = $roomService;
+        $this->countryService = $countryService;
     }
 
     public function sendPrivateComment(Request $request, int $ownerId)
@@ -97,12 +101,6 @@ class RoomController extends Controller
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
     public function index(Request $request)
     {
         $result = $this->repo->all($request);
@@ -112,7 +110,7 @@ class RoomController extends Controller
 
     public function room_countries()
     {
-        $data = Country::/*whereHas('users.ownerRoom')->*/select('id', 'name', 'e_name', 'flag')->orderByDesc('id')->get();
+        $data = $this->countryService->index2();
         return RoomCountriesResource::collection($data);
     }
     /**

@@ -24,7 +24,7 @@ class CountryRepository extends AbstractRepository
 
     public function countryGet()
     {
-        return $this->model->select('id', 'name', 'e_name', 'flag')->get();
+        return $this->model->select('id', 'name', 'e_name', 'flag')->orderByDesc('id')->get();
     }
 
     public function findById($id)
