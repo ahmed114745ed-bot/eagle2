@@ -1,12 +1,23 @@
 <?php
 
+use App\Admin\Controllers\ColorController;
 use App\Helpers\Common;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\ChargeController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\ExchangeController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\Room\PKController;
+use App\Http\Controllers\Api\V1\RoomCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\ColorController;
+
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 
@@ -37,7 +48,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('recall-account', [AuthController::class, 'recallAccount']);
-    
+
     });
 
     // all route with auth
@@ -61,15 +72,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('quit_room', [RoomController::class, 'quit_room']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
-    
+
                 //Pk
                 Route::post('create-pk', [PkController::class, 'createPK']);
                 Route::post('close-pk', [PkController::class, 'closePK']);
                 Route::post('show-pk', [PkController::class, 'showPK']);
                 Route::post('hide-pk', [PkController::class, 'hidePk']);
-    
+
                 // Microphone
-    
+
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
                 Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
                 Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
@@ -78,32 +89,32 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
             });
-    
+
             Route::get('/room-countries', [\App\Http\Controllers\Api\V1\RoomController::class, 'room_countries']);
-            // end rooms api 
-            
-            
+            // end rooms api
+
+
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
-                
+
             });
-    
+
             Route::prefix('search')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Api\v1\CommunityController::class, 'merge_search']);
                 Route::get('user-friends', [\App\Http\Controllers\Api\v1\CommunityController::class, 'user_friends']);
                 Route::get('/history', [\App\Http\Controllers\Api\v1\CommunityController::class, 'searchList']);
                 Route::get('/clean_search_history', [\App\Http\Controllers\Api\v1\CommunityController::class, 'cleanSearchList']);
             });
-    
+
             Route::prefix('merge_search')->group(function () {
                 Route::post('/', [\App\Http\Controllers\Api\v1\CommunityController::class, 'merge_search']);
             });
-    
+
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [\App\Http\Controllers\Api\v1\CommunityController::class, 'officialMessages']);
             });
-    
-    
+
+
             Route::prefix('families')->group(function () {
                 Route::get('all', [FamilyController::class, 'index']);
                 Route::get('show/{id}', [FamilyController::class, 'show']);
@@ -121,7 +132,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('getFamilyRooms', [FamilyController::class, 'getFamilyRooms']);
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
-    
+
             Route::post('charge_to', [ChargeController::class, 'chargeTo']);
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::prefix('agencies')->group(function () {
@@ -130,48 +141,48 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
             });
-    
-    
+
+
             Route::prefix('group-chat')->group(function () {
                 Route::get('/', [GroupChatController::class, 'index']);
                 Route::post('/send', [GroupChatController::class, 'store']);
             });
-    
+
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
             });
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
-    
-    
-    
+
+
+
             Route::prefix('room_category')->group(function () {
                 Route::get('classes', [RoomCategoryController::class, 'allClasses']);
                 Route::get('types', [RoomCategoryController::class, 'getTypes']);
                 Route::get('types_by_class/{id}', [RoomCategoryController::class, 'getClassChildren']);
             });
-    
+
             Route::prefix('backgrounds')->group(function () {
                 Route::get('/', [BackgroundController::class, 'allBackgrounds']);
                 Route::get('/me', [BackgroundController::class, 'allMyBackgrounds']);
             });
-    
+
             Route::prefix('user_info')->group(function () {
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
-    
+
             Route::prefix('exchange')->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
                 Route::post('/make', [ExchangeController::class, 'exchangeSave']);
                 Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
             });
-    
+
             Route::get('trxs', [ChargeController::class, 'trxLog']);
             Route::get('images', [HomeController::class, 'getImages']);
-    
+
             Route::post('check_wapel', [HomeController::class, 'check_wapel']);
-    
+
             Route::get('getUserHides', [HomeController::class, 'getUserHides']);
 
             // user info
