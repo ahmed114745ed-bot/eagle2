@@ -1,11 +1,9 @@
 <?php
 
-use App\Admin\Controllers\ColorController;
-use App\Helpers\Common;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\ColorController as V1ColorController;
+use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\FamilyController;
@@ -32,7 +30,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
     });
 
-    Route::get('colors',[V1ColorController::class,'index']);
+    Route::get('colors',[ColorController::class,'index']);
     Route::get('all-servers', [\App\Http\Controllers\Api\v1\Auth\RegisterController::class, 'all_servers']);
 
     // v2
