@@ -12,7 +12,7 @@ use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\Room\PKController;
+// use App\Http\Controllers\Api\V1\Room\PKController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\RoomController;

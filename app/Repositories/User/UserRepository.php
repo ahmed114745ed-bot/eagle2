@@ -42,7 +42,6 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-
     public function updateDeviceToken($user, $deviceToken = null)
     {
         if ($user->device_token != $deviceToken) {
@@ -67,6 +66,12 @@ class UserRepository extends Repository
                     ->find($userId);
     }
 
-
+    public function updateLocation($userId,$lat,$long)
+    {
+        User::whereId($userId)->update([
+            "lat"   => $lat,
+            "long"  => $long,
+        ]);
+    }
 
 }

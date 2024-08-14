@@ -65,6 +65,12 @@ class UserController extends Controller
 
         $this->userService->unlockDressHand($user->id);
 
+        // update location
+        $lat = $request->header("lat");
+        $long = $request->header("long");
+        $this->userService->updateLocation($user->id,$lat, $long);
+        // end update location
+
         $data = new MyDataResource($userWithMedals);
         return Common::apiResponse(true, '', $data, 200);
     }

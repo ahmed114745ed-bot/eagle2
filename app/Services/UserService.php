@@ -121,4 +121,9 @@ class UserService
         }
         return count($wares);
     }
+
+    public function updateLocation($userId,$lat,$log)
+    {
+        $this->userRepository->updateLocation($userId,$lat,$log);
+    }
 }
