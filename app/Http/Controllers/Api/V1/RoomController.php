@@ -103,9 +103,8 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-        $result = $this->repo->all($request);
-
-        return Common::apiResponse(true, '', RoomResource::collection($result), 200, Common::getPaginates($result));
+        $rooms = $this->roomService->getAllRooms($request);
+        return Common::apiResponse(true, '', RoomResource::collection($rooms), 200, Common::getPaginates($rooms));
     }
 
     public function room_countries()

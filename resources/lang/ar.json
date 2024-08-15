@@ -740,6 +740,10 @@
    "Color":"الألوان",
    "This feature has not been activated for you":"!لم يتم تفعيل هذه الميزه لك",
    "The maximum price allowed is 9 hundred million":"الحد الأقصى للسعر المسموح به هو 9 مائة مليون",
+   "liked deleted successfully": "تمت الغاء الاعجاب بنجاح",
+   "liked added successfully": "تمت اضافه الاعجاب بنجاح",
+   "ignored deleted successfully": "تمت الغاء التجنب بنجاح",
+   "ignored added successfully": "تمت اضافه التجنب بنجاح",
    "agency_id": "معرف الوكالة"
 
 }

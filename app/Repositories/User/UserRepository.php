@@ -89,4 +89,42 @@ class UserRepository extends Repository
         ]);
     }
 
+    public function hasLiked($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        return $user->likes()->where('liked_user_id', $likedUserId)->exists();
+    }
+
+
+    public function attachLike($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        $user->likes()->attach($likedUserId);
+    }
+
+    public function detachLike($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        $user->likes()->detach($likedUserId);
+    }
+    
+    public function hasIgnored($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        return $user->ignores()->where('ignore_user_id', $likedUserId)->exists();
+    }
+
+
+    public function attachIgnored($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        $user->ignores()->attach($likedUserId);
+    }
+
+    public function detachIgnored($userId, $likedUserId)
+    {
+        $user = $this->findUserById($userId);
+        $user->ignores()->detach($likedUserId);
+    }
+
 }

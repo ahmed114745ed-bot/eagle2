@@ -17,11 +17,9 @@ class RoomResource extends JsonResource
     public function toArray($request)
     {
         // Common::setHourHot($this->uid);
-
         $pk = $this->lastPk;
         
         $have_luck_box = $this->boxUse;
-        
         $data = [
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
@@ -50,6 +48,7 @@ class RoomResource extends JsonResource
                     'phone_code' => ''
                 ],
             'have_luck_box' => (bool) $have_luck_box,
+            'distance' => $this->distance,
         ];
         
         if ($request['show']) {

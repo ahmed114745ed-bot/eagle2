@@ -90,6 +90,29 @@ class User extends Authenticatable
          'frame',
 
      ];*/
+     public function ignores()
+     {
+         return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')
+                     ->withTimestamps();
+     }
+ 
+     public function ignoredBy()
+     {
+         return $this->belongsToMany(User::class, 'profile_user_ignores', 'ignore_user_id', 'user_id')
+                     ->withTimestamps();
+     }
+
+     public function likes()
+     {
+         return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
+                     ->withTimestamps();
+     }
+ 
+     public function likedBy()
+     {
+         return $this->belongsToMany(User::class, 'profile_user_likes', 'liked_user_id', 'user_id')
+                     ->withTimestamps();
+     }
 
     public function agencyUserJob(){
         return $this->hasOne (AgencyUserJob::class,'user_id','id');

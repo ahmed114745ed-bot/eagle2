@@ -61,15 +61,9 @@ class UserController extends Controller
         $user = $request->user();
         $user->enableSaving = false;
 
-        $userWithMedals = $this->userService->processUserData($user, $request->header('device'));
+        $userWithMedals = $this->userService->processUserData($user, $request->header('device'),$request->header('lat'),$request->header('long'));
 
         $this->userService->unlockDressHand($user->id);
-
-        // update location
-        $lat = $request->header("lat");
-        $long = $request->header("long");
-        $this->userService->updateLocation($user->id,$lat, $long);
-        // end update location
 
         $data = new MyDataResource($userWithMedals);
         return Common::apiResponse(true, '', $data, 200);

@@ -29,6 +29,11 @@ class RoomRepoService
     ) {
     }
 
+    public function getAllRooms($request)
+    {
+        return $this->repository->all($request);
+    }
+    
     public function create($request, $userId)
     { 
         $data = array_merge($request->all(), ['uid' => $userId]);

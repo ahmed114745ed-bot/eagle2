@@ -81,7 +81,7 @@ class UserService
         return true;
     }
 
-    public function processUserData($user, $deviceToken)
+    public function processUserData($user, $deviceToken, $lat, $long)
     {
         $this->userRepository->updateDeviceToken($user, $deviceToken);
 
@@ -89,6 +89,11 @@ class UserService
         // $this->dailyPrizeService->reset(Carbon::createFromTimestamp($user->real_online_time), $user->id);
 
         $this->userRepository->updateOnlineTime($user, $currentTime);
+        // update location
+        if (is_numeric($lat) && $lat >= -90 && $lat <= 90 && is_numeric($long) && $long >= -180 && $long <= 180) {
+            $this->userRepository->updateLocation($user->id, $lat, $long);
+        }
+        // end update location
 
         $userWithMedals = $this->userRepository->getUserWithMedals($user->id);
 
@@ -125,5 +130,31 @@ class UserService
     public function updateLocation($userId,$lat,$log)
     {
         $this->userRepository->updateLocation($userId,$lat,$log);
+    }
+
+    public function toggleLike($userId, $likedUserId)
+    {
+        $hasLiked = $this->userRepository->hasLiked($userId, $likedUserId);
+
+        if ($hasLiked) {
+            $this->userRepository->detachLike($userId, $likedUserId);
+            return __("liked deleted successfully");
+        } else {
+            $this->userRepository->attachLike($userId, $likedUserId);
+            return __("liked added successfully");
+        }
+    }
+  
+    public function toggleIgnored($userId, $likedUserId)
+    {
+        $hasLiked = $this->userRepository->hasIgnored($userId, $likedUserId);
+
+        if ($hasLiked) {
+            $this->userRepository->detachIgnored($userId, $likedUserId);
+            return __("ignored deleted successfully");
+        } else {
+            $this->userRepository->attachIgnored($userId, $likedUserId);
+            return __("ignored added successfully");
+        }
     }
 }

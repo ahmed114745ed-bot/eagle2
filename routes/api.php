@@ -192,6 +192,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('get/{id}', [ProfileController::class, 'show']);
                 Route::post('update', [ProfileController::class, 'update']);
                 Route::get('visitors', [ProfileController::class, 'myProfileVisitorsList']);
+                Route::post('liked', [ProfileController::class, 'liked']);
+                Route::post('ignored', [ProfileController::class, 'ignored']);
             });
             // end user api
         }
