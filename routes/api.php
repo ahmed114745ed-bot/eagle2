@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 // use App\Http\Controllers\Api\V1\Room\PKController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
@@ -184,9 +185,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::get('getUserHides', [HomeController::class, 'getUserHides']);
 
-            // user info
+            // user api
             Route::get ('my-data',[\App\Http\Controllers\Api\V1\UserController::class,'my_data']);
 
+            Route::prefix('profile')->group(function () {
+                Route::get('get/{id}', [ProfileController::class, 'show']);
+                Route::post('update', [ProfileController::class, 'update']);
+                Route::get('visitors', [ProfileController::class, 'myProfileVisitorsList']);
+            });
+            // end user api
         }
     );
 

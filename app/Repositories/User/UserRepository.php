@@ -74,4 +74,19 @@ class UserRepository extends Repository
         ]);
     }
 
+    public function findUserById($id)
+    {
+        return User::find($id);
+    }
+
+    public function logProfileVisit($user, $visitorId)
+    {
+        $user->profileVisits()->syncWithoutDetaching([
+            $visitorId => [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+    }
+
 }
