@@ -4,11 +4,19 @@ namespace Modules\Public\Http\Controllers\web;
 
 use App\Models\Config;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
+use App\Services\LevelService;
 use Database\Seeders\config as SeedersConfig;
 use Illuminate\Http\Request;
 
 class UpgradeLevelController extends MainController
 {
+    protected $levelService;
+
+    public function __construct(LevelService $levelService)
+    {
+        $this->levelService = $levelService;
+    }
 
     public function ovipConfig(Request $request)
     {
@@ -62,6 +70,7 @@ class UpgradeLevelController extends MainController
         return redirect()->back()->with('message', 'تم التعديل بنجاح!');
 
     }
+
     public function momentConfig(Request $request)
     {
         $conf = Config::where('name','upload_moment')->first();
@@ -79,5 +88,15 @@ class UpgradeLevelController extends MainController
         return redirect()->back()->with('message', 'تم التعديل بنجاح!');
 
     }
+
+    
+
+    public function getLevelsRange()
+    {
+        $data = $this->levelService->getAllLevelsRanges();
+        return Common::apiResponse(true, 'success', $data);
+    }
+
+
 
 }

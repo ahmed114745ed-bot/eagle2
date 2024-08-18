@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\UserController;
 
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
+use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -216,6 +217,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send-to-user', [MallController::class, 'vip_send']);
             });
             // end vips
+
+            // start levels
+
+            Route::get ('levels-ranges',[UpgradeLevelController::class,'getLevelsRange']);
+
+            // end levels
         }
     );
 
