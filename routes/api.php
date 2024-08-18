@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\FamilyController;
@@ -112,7 +113,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('community')->group(function () {
-                Route::get('official_messages', [\App\Http\Controllers\Api\v1\CommunityController::class, 'officialMessages']);
+                Route::get('official_messages', [CommunityController::class, 'officialMessages']);
             });
 
 
