@@ -34,7 +34,8 @@ use App\Repositories\User\UserRepo;
 use App\Repositories\User\UserRepoInterface;
 use App\Services\RedisService;
 use Illuminate\Support\ServiceProvider;
-
+use App\Repositories\Community\SearchRepository;
+use App\Repositories\Community\SearchRepositoryInterface;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -66,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind ('ManagerHelper',function($app){
             return new ManagerHelper();
         });
+        $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
+
     }
 
     /**
