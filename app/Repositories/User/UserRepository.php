@@ -79,6 +79,11 @@ class UserRepository extends Repository
         return User::find($id);
     }
 
+    public function findUserByUuid($uuid)
+    {
+        return User::where('uuid', $uuid)->first();
+    }
+
     public function logProfileVisit($user, $visitorId)
     {
         $user->profileVisits()->syncWithoutDetaching([
@@ -125,6 +130,11 @@ class UserRepository extends Repository
     {
         $user = $this->findUserById($userId);
         $user->ignores()->detach($likedUserId);
+    }
+
+    public function decrementBalance(User $user, $amount)
+    {
+        $user->decrement('di', $amount);
     }
 
 }

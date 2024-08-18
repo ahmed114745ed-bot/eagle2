@@ -140,7 +140,7 @@ class UserService
             $this->userRepository->detachLike($userId, $likedUserId);
             return __("liked deleted successfully");
         } else {
-            $this->userRepository->attachLike($userId, $likedUserId);
+            $this->userRepository->attachLike($userId, $likedUserId);   
             return __("liked added successfully");
         }
     }

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\MallController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
@@ -194,8 +195,26 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('visitors', [ProfileController::class, 'myProfileVisitorsList']);
                 Route::post('liked', [ProfileController::class, 'liked']);
                 Route::post('ignored', [ProfileController::class, 'ignored']);
+                Route::get('users', [ProfileController::class, 'users']);
             });
             // end user api
+
+            //start rankin
+            Route::prefix('ranking')->group(function () {
+                Route::post('/', [\App\Http\Controllers\Api\V1\UserController::class, 'ranking']);
+                Route::post('/room', [\App\Http\Controllers\Api\V1\UserController::class, 'ranking_room']);
+                Route::get('/top_user_ranking', [UserController::class, 'topUserRanking']);
+            });
+            // end ranking
+
+            // start vips
+            Route::prefix('vips')->group(function () {
+                Route::get('/list', [MallController::class, 'vipList']);
+                Route::post('/buyVip', [MallController::class, 'buyVip']);
+                Route::post('/use', [MallController::class, 'vip_use']);
+                Route::post('/send-to-user', [MallController::class, 'vip_send']);
+            });
+            // end vips
         }
     );
 

@@ -6,10 +6,12 @@ use App\Helpers\Common;
 use App\Services\ProfileService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
+use App\Http\Resources\Api\V1\NewProfileResource;
 use App\Models\User;
 use App\Services\UserService;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
@@ -53,6 +55,23 @@ class ProfileController extends Controller
         $message = $this->userService->toggleIgnored($userId, $ignoreUserId);
 
         return Common::apiResponse(true, $message, 200);
+    }
+
+    public function users(Request $request)
+    {
+        $user = Auth::user();
+        $latitude = $user->lat;
+        $longitude = $user->long;
+        $distance = $request->input('distance', 50);
+
+        $users = User::select('users.*')
+        ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
+        ->where('users.id', '!=', $user->id)
+        ->having('distance', '<=', $distance)
+        ->with(['likes', 'ignores'])
+        ->get();
+
+        return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
     }
 }
 

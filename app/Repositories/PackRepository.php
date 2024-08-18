@@ -31,4 +31,12 @@ class PackRepository
             ->selectRaw('id,type,expire')
             ->get();
     }
+
+    public function deleteExpiredPacks($userId)
+    {
+        return Pack::where('user_id', $userId)
+            ->where('expire', '<=', time())
+            ->where('expire', '!=', 0)
+            ->delete();
+    }
 }
