@@ -68,4 +68,20 @@ class UserController extends Controller
         $data = new MyDataResource($userWithMedals);
         return Common::apiResponse(true, '', $data, 200);
     }
+
+    public function userFriend(Request $request)
+    {
+        $user = $request->user();
+        return $this->userService->handleUserRelations($user, $request->type);
+    }
+
+    public function follow(Request $request)
+    {
+        return $this->userService->followUser($request);
+    }
+
+    public function unfollow(Request $request)
+    {
+        return $this->userService->unfollowUser($request);
+    }
 }

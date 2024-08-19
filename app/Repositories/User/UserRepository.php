@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\User;
 
+use App\Models\Follow;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository; 
@@ -135,6 +136,34 @@ class UserRepository extends Repository
     public function decrementBalance(User $user, $amount)
     {
         $user->decrement('di', $amount);
+    }
+
+    public function getFollowers($user, $type)
+    {
+        // Query to get followers based on the type
+        return User::whereHas('followers', function($q) use($user){
+            $q->where('user_id', $user->id);
+        })->paginate(15);
+    }
+
+    public function getFolloweds($user)
+    {
+        return $user->onRoomFolloweds();
+    }
+
+    public function getFollowRooms($userId)
+    {
+        return Follow::query()->whereHas('room', function ($query) {
+            $query->withoutAppends()->where('count_room_socket', '!=', 0);
+        })->with([
+            'room' => function ($query) use ($userId) {
+                $query->withoutAppends()->with([
+                    'owner' => function ($query) {
+                        $query->withoutAppends();
+                    }
+                ]);
+            }
+        ])->where('user_id', $userId)->orderByDesc('id')->paginate(10)->pluck('room');
     }
 
 }

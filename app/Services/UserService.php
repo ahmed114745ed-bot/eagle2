@@ -2,22 +2,29 @@
 
 namespace App\Services;
 
+use App\Facades\CustomNotification;
 use App\Facades\UserHandling;
 use App\Helpers\Common;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Http\Services\WhatsappOtp;
 use App\Http\Services\WhatsappWebhook;
+use App\Repositories\FollowRepository;
 use App\Repositories\User\UserRepository;
 use App\Repositories\PackRepository;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class UserService
 {
     protected $userRepository;
     protected $packRepository;
+    protected $followRepository;
 
-    public function __construct(UserRepository $userRepository,PackRepository $packRepository)
+    public function __construct(UserRepository $userRepository,PackRepository $packRepository, FollowRepository $followRepository)
     {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
+        $this->followRepository = $followRepository;
 
     }
 
@@ -156,5 +163,76 @@ class UserService
             $this->userRepository->attachIgnored($userId, $likedUserId);
             return __("ignored added successfully");
         }
+    }
+
+    public function handleUserRelations($user, $type)
+    {
+        switch ($type) {
+            case '1':
+            case '2':
+            case '3':
+                (new UserCounterServices)->UpgradeDateForType($user, 'friend');
+                return Common::apiResponse(true, '', $this->userRepository->getFollowers($user, $type), 200);
+                
+            case '4':
+                (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
+                return Common::apiResponse(true, '', UserRelationsResource::collection($this->userRepository->getFolloweds($user)), 200);
+                
+            case '5':
+                $followRooms = $this->userRepository->getFollowRooms($user->id);
+                return Common::apiResponse(true, '', RoomResource::collection($followRooms), 200);
+
+            default:
+                return Common::apiResponse(false, 'please select type', null, 422);
+        }
+    }
+
+    public function followUser($request)
+    {
+        $userId = $request->user()->id;
+        $followedUserId = $request->user_id;
+
+        if ($userId == $followedUserId) {
+            return Common::apiResponse(false, 'cant follow your self', null, 403);
+        }
+
+        $receiver = $this->followRepository->findUserById($followedUserId);
+        if (!$receiver) {
+            return Common::apiResponse(false, 'this user not found', null, 404);
+        }
+
+        $follow = $this->followRepository->findFollow($userId, $followedUserId);
+
+        if (!$follow) {
+            $this->followRepository->createFollow([
+                'user_id' => $userId,
+                'followed_user_id' => $followedUserId,
+                'status' => 1
+            ]);
+
+            $this->handleFollowBack($request->user(), $receiver);
+        } else {
+            $this->followRepository->updateFollowStatus($follow, 1);
+        }
+
+        return Common::apiResponse(true, 'follow done', null, 201);
+    }
+
+    public function unfollowUser($request)
+    {
+        $this->followRepository->deleteFollow($request->user()->id, $request->user_id);
+        return Common::apiResponse(true, 'unFollow done', null, 201);
+    }
+
+    protected function handleFollowBack($user, $receiver)
+    {
+        if ($user->followBack($receiver)) {
+            CustomNotification::followBack($receiver, $user);
+            (new UserCounterServices)->eventUser($receiver, 'friend', 1);
+        } else {
+            CustomNotification::follow($receiver, $user);
+            (new UserCounterServices)->eventUser($receiver, 'follow', 1);
+        }
+        (new UserCounterServices)->eventUser($receiver, 'follower', 1);
     }
 }
