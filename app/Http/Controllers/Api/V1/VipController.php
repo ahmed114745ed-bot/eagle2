@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Http\Resources\Api\V1\VipResource;
-use App\Http\Resources\Api\V2\OVipResource;
+use App\Http\Resources\Api\V1\OVipResource;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 
