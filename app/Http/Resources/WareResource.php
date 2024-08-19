@@ -21,7 +21,7 @@ class WareResource extends JsonResource
         }
         return [
             'id'        =>  $this->id,
-            'name'      =>  app()->getLocale() == 'ar' ? ($this->name?:'') : $this->name_en,
+            'name'      =>  app()->getLocale() == 'ar' ? ($this->name?:'') : ($this->name_en ??''),
             'title'     =>  $title,
             'price'     =>  $this->price?:0,
             'color'     =>  $this->color?:'',
