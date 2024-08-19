@@ -70,7 +70,7 @@ class GroupChatController extends Controller
         try {
             event(new \Modules\Chat\Events\GroupChat($resourceData));
         } catch (\Throwable $th) {
-            return $th->getMessage();
+           // return $th->getMessage();
         }
         dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
 
