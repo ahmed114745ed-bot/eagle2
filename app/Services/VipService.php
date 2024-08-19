@@ -2,185 +2,133 @@
 
 namespace App\Services;
 
+
 use App\Helpers\Common;
-use App\Repositories\VipPrivilegeRepository;
-use App\Repositories\OVipRepository;
-use App\Repositories\WareRepository;
-use App\Http\Resources\WareResource;
-use App\Models\User;
-use App\Models\Ware;
-use App\Repositories\PackRepository;
-use App\Repositories\User\UserRepository;
-use App\Repositories\UserVipRepository;
-use DB;
-use Modules\Public\Http\Services\UpgradeLevelServices;
-use Modules\Public\Http\Services\UserCounterServices;
+use App\Tik\Repositories\VipRepository;
+use App\Tik\Repositories\OvipRepository;
+use App\Tik\Repositories\PackRepository;
+use App\Tik\Repositories\UserRepository;
+use App\Tik\Repositories\WareRepository;
+use App\Tik\Repositories\UserVipRepository;
+use App\Tik\Repositories\VipPrivilegeRepository;
+
+
 
 class VipService
 {
-    protected $vipPrivilegeRepo;
-    protected $oVipRepo;
-    protected $wareRepo;
-    protected $packRepo;
-    protected $userVipRepo;
-    protected $userRepo;
-
     public function __construct(
-        VipPrivilegeRepository $vipPrivilegeRepo,
-        OVipRepository $oVipRepo,
-        WareRepository $wareRepo,
-        UserRepository $userRepo,
-        UserVipRepository $userVipRepo,
-        PackRepository $packRepo
-    ) {
-        $this->vipPrivilegeRepo = $vipPrivilegeRepo;
-        $this->oVipRepo     = $oVipRepo;
-        $this->wareRepo     = $wareRepo;
-        $this->packRepo     = $packRepo;
-        $this->userRepo     = $userRepo;
-        $this->userVipRepo  = $userVipRepo;
+        private readonly VipRepository $vipRepository,
+        private readonly OvipRepository $ovipRepository,
+        private readonly VipPrivilegeRepository $vipPrivilegeRepository,
+        private readonly UserRepository $userRepository,
+        private readonly UserVipRepository $userVipRepository,
+        private readonly PackRepository $packRepository,
+        private readonly WareRepository $wareRepository,
+
+    ) {}
+
+    public function vipIndex($type)
+    {
+        return $this->vipRepository->getByType($type);
     }
 
-    public function getVipList()
+    public function vipList()
     {
-        $vipPrivileges = $this->vipPrivilegeRepo->getAllPrivileges();
-        $oVips = $this->oVipRepo->getAllWithPrivileges();
-        $wares = $this->wareRepo->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
+        $vipPrivileges = $this->vipPrivilegeRepository->all();
+        $oVips = $this->ovipRepository->getBySortLevel();
 
-        $list = [];
-        foreach ($oVips as $i) {
-            $privs = [];
-            $mp = $i->privilegs->pluck('id')->toArray();
-            foreach ($vipPrivileges as $p1) {
-                $p = clone $p1;
-                $p->name = app()->getLocale() == 'en' ? ($p->en_name ?? $p->name) : $p->name;
-                $p->active = in_array($p->id, $mp);
-                
-                $ware = $wares->where('level', $i->level)->where('type', $p->type)->first() ?? $wares->where('level', 8)->where('type', $p->type)->first();
-                
-                if ($ware) {
-                    $p->item = new WareResource($ware);
-                } else {
-                    $p->item = new \stdClass();
-                }
-                
-                $privs[] = $p;
-            }
 
-            array_multisort(array_column($privs, 'active'), SORT_DESC, $privs);
-            unset($i->privilegs);
-            $i->privilegs = $privs;
-
-            $list[] = $i;
-        }
-
-        return $list;
+        $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
+        return $oVips->each->setRelation('wares', $wares);
     }
 
     public function buyVip($request)
     {
-        if (!$request->vip_id) return Common::apiResponse(0, 'missing param', null, 422);
-
-        $vip = $this->oVipRepo->findVipById($request->vip_id);
-        if (!$vip) return Common::apiResponse(0, 'not found', null, 404);
-
+        $vip = $this->ovipRepository->findById($request->vip_id);
+        if (!$vip) throw new \Exception('not found');
         $qty = $request->qty ?: 1;
         $total = $vip->price * $qty;
         $expire = $vip->expire;
-        $ex = $expire == 0 ? 0 : now()->addDays($expire * $qty)->timestamp;
-
-        $type = $request->type == 1 ? 1 : 0;
-        $user = $type == 1 ? $this->userRepo->findUserByUuid($request->to_user) : $request->user();
-
-        if (!$user) return Common::apiResponse(0, 'not found', null, 404);
-        if ($type == 0 && $user->di < $total) return Common::apiResponse(0, 'balance low', null, 407);
-
-        DB::beginTransaction();
-        try {
-            if ($type == 0) {
-                $this->userRepo->decrementBalance($user, $total);
-            }
-
-            $this->packRepo->deleteExpiredPacks($user->id);
-
-            $this->userVipRepo->createUserVip([
-                'type' => $type,
-                'sender_id' => $type == 1 ? $request->user()->id : 0,
-                'user_id' => $user->id,
-                'vip_id' => $vip->id,
-                'level' => $vip->level,
-                'expire' => $ex,
-                'qty' => $qty,
-                'price' => $vip->price,
-                'total' => $total,
-                'is_used' => 0
-            ]);
-            $user = $this->userRepo->findUserById($request->user()->id);
-            (new UpgradeLevelServices())->buyAristocracy($user, $vip->exp);
-            $countWares = Ware::where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->where('is_active_for_vip', 1)->count();
-            (new UserCounterServices)->eventUser($user, 'mybag', $countWares);
-
-            DB::commit();
-            return Common::apiResponse(1, 'done', null, 201);
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        if ($expire == 0) {
+            $ex = 0;
+        } else {
+            $ex = now()->addDays($expire * $qty)->timestamp;
         }
+        if ($request->type == 1) {
+            $type = 1;
+            if (!$request->to_user) throw new \Exception('missing param');
+            $userUuId = $request->to_user;
+            $user = $this->userRepository->searchUser($userUuId);
+            if (!$user) throw new \Exception('not found');
+            if ($user->phone == null || $user->phone == '') throw new \Exception(__('api.phone'));
+            $user_id = $user->id;
+            $sender = $request->user();
+            $sender_id = $sender->id;
+            $from = $sender;
+        } else {
+            $type = 0;
+            $user = $request->user();
+            $user_id = $user->id;
+            $sender_id = 0;
+            if ($user->di < $total) throw new \Exception('balance low');
+            $from = $user;
+        }
+        $this->userRepository->decrementUserCoins($from, $total);
+        $this->packRepository->deleteExpirePack();
+
+
+        $data = [
+            'type' => $type,
+            'sender_id' => $sender_id,
+            'user_id' => $user_id,
+            'vip_id' => $vip->id,
+            'level' => $vip->level,
+            'expire' => $ex,
+            'qty' => $qty,
+            'price' => $vip->price,
+            'total' => $total,
+            'is_used' => 0
+        ];
+        $this->userVipRepository->create($data);
+        $countWares = $this->wareRepository->countWareByLevel($vip->level);
+        return [$user, $countWares, $request->user(), $vip->exp];
     }
 
-    public function useVip($request)
+    public function userVip($request)
     {
-        if (!$request->vip_id) {
-            return Common::apiResponse(false, __("api_responses.missing_params"), null, 422);
-        }
+        $user_vip = $this->userVipRepository->findByIdWithOVip($request->vip_id);
 
-        $userVip = $this->userVipRepo->findUserVipWithOVip($request->vip_id);
-        if (!$userVip) {
-            return Common::apiResponse(false, __("api_responses.vip_not_found"), null, 422);
-        }
+        if (!$user_vip)  throw new \Exception(__("api_responses.vip_not_found"));
 
         $user = $request->user();
-        $isUsed = (bool) $request->type;
 
-        if ($isUsed) {
-            $this->userVipRepo->updateUserVipIsUsed($user->id, 0);
-        }
+        $isUsed = (bool)$request->type;
+        if ($isUsed) $this->userVipRepository->updateIsUsedForUser($user->id);
 
-        $userVip->is_used = $isUsed;
-        $userVip->num_used += 1;
-        $this->userVipRepo->saveUserVip($userVip);
+        // update is used
+        $this->userVipRepository->updateIsUsedWithNum($user_vip, $isUsed);
 
-        $vip = $userVip->OVip;
-        if ($userVip->num_used <= 1) {
+        $vip = $user_vip->OVip;
+        if ($user_vip->num_used <= 1) {
+            // add vip data to user
             Common::handelVip($vip, $user);
         }
-
-        $data['target_id'] = $userVip->id;
-        return Common::apiResponse(1, 'success', $data);
+        return  $data['target_id'] = $user_vip->id;
     }
 
     public function sendVip($request)
     {
-        if (!$request->user_id || !$request->vip_id) {
-            return Common::apiResponse(false, __("api_responses.missing_params"), null, 422);
-        }
-
         $from = $request->user();
-        $userVip = $this->userVipRepo->findUserVipById($request->vip_id);
+        $user_vip = $this->userVipRepository->findById($request->vip_id);
+        if (!$user_vip || $user_vip->user_id != $from->id)  throw new \Exception(__("api_responses.vip_not_found"));
 
-        if (!$userVip || $userVip->user_id != $from->id) {
-            return Common::apiResponse(false, __("api_responses.vip_not_found"), null, 422);
-        }
+        if ($user_vip->is_used == 1  || $user_vip->num_used >= 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
 
-        if ($userVip->is_used == 1 || $userVip->num_used >= 1) {
-            return Common::apiResponse(false, 'الـ VIP مستخدم من قبل ولا يمكن إهداؤه', null, 422);
-        }
-
-        $userVip->sender_id = $from->id;
-        $userVip->user_id = $request->user_id;
-
-        $this->userVipRepo->saveUserVip($userVip);
-
-        return Common::apiResponse(1, 'success', $userVip);
+        $data = [
+            'sender_id' => $from->id,
+            'user_id' => $request->user_id,
+        ];
+        $this->userVipRepository->update($data, $user_vip->id);
+        return $user_vip;
     }
 }

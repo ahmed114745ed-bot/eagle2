@@ -211,10 +211,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // start vips
             Route::prefix('vips')->group(function () {
-                Route::get('/list', [MallController::class, 'vipList']);
-                Route::post('/buyVip', [MallController::class, 'buyVip']);
-                Route::post('/use', [MallController::class, 'vip_use']);
-                Route::post('/send-to-user', [MallController::class, 'vip_send']);
+                Route::get('/list', [VipController::class, 'vipList']);
+                Route::post('/buyVip', [VipController::class, 'buyVip']);
+                Route::post('/use', [VipController::class, 'vip_use']);
+                Route::post('/send-to-user', [VipController::class, 'vip_send']);
             });
             // end vips
 

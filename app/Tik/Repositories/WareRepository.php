@@ -40,4 +40,48 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->where('type', $type)->exists();
     }
+    public function all($userId, $type)
+    {
+        $wares = $this->model->query()
+            ->where('enable', 1)
+            ->whereIn('get_type', [4, 6])
+            ->where('type', $type);
+        if ($type == 25) {
+
+            $wares = $wares->isNotUsedInPacks()->showUserCustom($userId);
+        }
+        return $wares->get();
+    }
+
+    public function getById($wareId)
+    {
+        return $this->model->query()->where('id', $wareId)
+            ->where('enable', 1)->whereIn('get_type', [4, 6])->first();
+    }
+
+    public function getWaresByConditions($vipLevel, array $types, array $ids)
+    {
+        return $this->model
+            ->where(['get_type' => 1, 'enable' => 1])
+            ->where('level', '<=', $vipLevel)
+            ->whereIn('type', $types)
+            ->whereNotIn('id', $ids)
+            ->selectRaw('id,type,expire')
+            ->get();
+    }
+
+    public function countWareByLevel($level)
+    {
+        return $this->model->query()->where('get_type', 1)->where('enable', 1)->where('level', $level)->where('is_active_for_vip', 1)->count();
+    }
+
+    public function getOVip($levels = [], $types = [])
+    {
+        return $this->model->query()->where ('get_type',1)->whereIn('type',$types)->whereIn('level',$levels)/*->where('enable', true)*/->get();
+    }
+
+    public function getOVipNew($levels = [], $types = [])
+    {
+        return$this->model->query()->where ('get_type',1)->whereIn('type',$types)->whereIn('level',$levels)->where('enable', true)->get();
+    }
 }
