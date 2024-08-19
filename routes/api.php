@@ -1,28 +1,29 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\BackgroundController;
-use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\ExchangeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\MallController;
-use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-// use App\Http\Controllers\Api\V1\Room\PKController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\ChargeController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\ExchangeController;
+// use App\Http\Controllers\Api\V1\Room\PKController;
+use App\Http\Controllers\Api\V1\CommunityController;
+use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\RoomCategoryController;
 
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -216,6 +217,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
             });
+            Route::get('levels', [VipController::class, 'index']);
             // end vips
 
             // start levels
