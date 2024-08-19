@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GroupChat extends Model
 {
     protected $table = 'group_chat';
+    protected $guarded = ['id'];
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
