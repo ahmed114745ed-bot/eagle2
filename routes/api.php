@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\MallController;
-use App\Http\Controllers\Api\V1\;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
