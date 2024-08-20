@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use App\Services\UserCounterServices;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
+use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Repositories\User\UserRepository;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
 
@@ -14,11 +15,13 @@ class ProfileService
 {
     protected $profileRepo;
     protected $userRepository;
+    protected $profileRelationService;
 
-    public function __construct(ProfileRepository $profileRepo,UserRepository $userRepository)
+    public function __construct(ProfileRepository $profileRepo,UserRepository $userRepository,ProfileRelationService $profileRelationService)
     {
         $this->profileRepo = $profileRepo;
         $this->userRepository = $userRepository;
+        $this->profileRelationService = $profileRelationService;
     }
 
     public function updateProfile(ProfileRequest $request)
@@ -67,5 +70,23 @@ class ProfileService
             return Common::apiResponse(true, '', new V1UserResource($user), 200);
         }
         return Common::apiResponse(false, 'user not found', [], 404);
+    }
+
+    public function getProfileVisitorsList($user)
+    {
+        (new ServicesUserCounterServices)->UpgradeDateForType($user, 'visitor');
+
+        $profileVisitors = $this->profileRepo->getProfileVisits($user);
+
+        [$userFollowers, $senderLevels, $receivedImage] = $this->profileRelationService->getHelperArrays($user, $profileVisitors);
+
+        UserVisitorResource::initializeData($senderLevels, $receivedImage, $userFollowers);
+
+        $visitors = UserVisitorResource::collection($profileVisitors);
+        $jsonResponse = Common::apiResponse(1, '', $visitors);
+
+        UserVisitorResource::clear();
+
+        return $jsonResponse;
     }
 }

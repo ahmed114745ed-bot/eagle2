@@ -2,8 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Models\Follow;
 use App\Models\Profile;
 use App\Models\User;
+use App\Models\Vip;
 
 class ProfileRepository
 {
@@ -38,4 +40,15 @@ class ProfileRepository
         return $profile;
     }
     
+    public function getProfileVisits(User $user)
+    {
+        return $user->profileVisits()->with([
+            'room' => function ($query) {
+                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+            },
+            'followPacks', 'profile', 'ware', 'UserVip'
+        ])->paginate(15);
+    }
+
+   
 }
