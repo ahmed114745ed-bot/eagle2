@@ -169,7 +169,7 @@ class ChatMessagesController extends Controller
                         $this->extract_frame($videoPath, $thumbnailPath);
 
                     } catch (\Throwable $e) {
-                       return $e->getMessage();
+                    //    return $e->getMessage();
 
                     }
                     $album->frame =  $thumbnailPath;
@@ -251,7 +251,7 @@ class ChatMessagesController extends Controller
                             $this->extract_frame($videoPath, $thumbnailPath);
 
                         } catch (\Throwable $e) {
-                           return $e->getMessage();
+                        //    return $e->getMessage();
 
                         }
                         $album->frame =  $thumbnailPath;
@@ -294,7 +294,7 @@ class ChatMessagesController extends Controller
         event(new Conversation( $message_resource->toResponse(request())->getData()->data  , $user2 , $room_resource ));
         event(new Chat($room_resource->toResponse(request())->getData()->data , $user2));
     } catch (\Throwable $th) {
-        return $th->getMessage();
+        // return $th->getMessage();
      }
         return [
          'message'=>    $message_resource,
@@ -384,7 +384,7 @@ class ChatMessagesController extends Controller
         event(new DeleteMessage( $ids , $user2 , $room_resource ));
         event(new CardDeleteMessage($room_resource->toResponse(request())->getData()->data , $user2));
     } catch (\Throwable $th) {
-        return $th->getMessage();
+        // return $th->getMessage();
      }
         return response()->json([
             'status' => 200,
