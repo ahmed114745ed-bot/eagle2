@@ -5,8 +5,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class OVipResource extends JsonResource
 {
+
+
+
     public function toArray($request)
     {
+
+        $activePrivilegeIds = $this->privilegs->pluck('id')->toArray();
+
         return [
             'id' => $this->id,
             'level' => $this->level,
@@ -17,10 +23,11 @@ class OVipResource extends JsonResource
             "expire"=> $this->expire,
             "exp"=> $this->exp,
             'privilegs' => VipPrivilegeResource::collection(
-                $this->privilegs->map(function ($priv) {
-                    $priv->oVipPrivilegIds = $this->privilegs->pluck('id')->toArray();
-                    $priv->wares = $this->wares;
+                $request->vipPrivileges->map(function ($p) use ($activePrivilegeIds) {
+                    $priv = clone  $p;
+                    $priv->item = $this->wares->where('type', $priv->type)->first();
                     $priv->level = $this->level;
+                    $priv->active = in_array($priv->id, $activePrivilegeIds);
                     return $priv;
                 })->sortByDesc('active')
             ),
