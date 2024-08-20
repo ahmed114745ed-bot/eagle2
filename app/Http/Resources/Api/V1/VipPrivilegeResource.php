@@ -20,8 +20,11 @@ class VipPrivilegeResource extends JsonResource
             'id' => $this->id,
             'name' => app()->getLocale() == 'en' ? ($this->en_name ?? $this->name) : $this->name,
             'active' => in_array($this->id, $mp),
-            'item' => $ware ? new WareResource($ware) : new \stdClass(),
             'type' => $this->type,
+            "title"=> $this->title,
+            "img1"=> $this->imag1,
+            "img2"=> $this->img2,
+            'item' => $ware ? new WareResource($ware) : new \stdClass(),
         ];
     }
 }
