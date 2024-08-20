@@ -39,7 +39,11 @@ class VipService
 
 
         $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
-        return $oVips->each->setRelation('wares', $wares);
+        return $oVips->map(function($oVip) use ($wares)  {
+            
+            $filteredWares = $wares->where('level', $oVip->level);
+            return $oVip->setRelation('wares', $filteredWares);
+        });
     }
 
     public function buyVip($request)
