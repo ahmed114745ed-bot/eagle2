@@ -9,7 +9,8 @@ class VipPrivilegeResource extends JsonResource
     public function toArray($request)
     {
         $mp = $this->oVipPrivilegIds;
-        $ware = $this->wares->where('level', $this->level)
+        $ware = $this->wares
+        //->where('level', $this->level)
                             ->where('type', $this->type)
                             ->first() ??
                 $this->wares->where('level', 8)
