@@ -8,11 +8,8 @@ class VipPrivilegeResource extends JsonResource
 {
     public function toArray($request)
     {
-//        $mp = $this->oVipPrivilegIds;
+
         $ware = $this->item;
-
-
-        
 
         return [
             'id' => $this->id,

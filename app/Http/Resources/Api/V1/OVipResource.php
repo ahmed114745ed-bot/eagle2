@@ -6,8 +6,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class OVipResource extends JsonResource
 {
 
-
-
     public function toArray($request)
     {
 
