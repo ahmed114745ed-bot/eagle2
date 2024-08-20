@@ -165,8 +165,8 @@ class ChatRoomController extends Controller
             if($user2)event(new OpenChat($room_resource->toResponse(request())->getData()->data , $user2, $check_room));
             
         } catch (\Throwable $th) {
-            Log::info($th->getMessage());
-            return $th->getMessage();
+            // Log::info($th->getMessage());
+            // return $th->getMessage();
         }
 
         return[

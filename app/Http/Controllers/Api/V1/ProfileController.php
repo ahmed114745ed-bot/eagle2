@@ -73,5 +73,11 @@ class ProfileController extends Controller
 
         return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
     }
+
+    public function myProfileVisitorsList(Request $request)
+    {
+        $user = $request->user();
+        return $this->profileService->getProfileVisitorsList($user);
+    }
 }
 
