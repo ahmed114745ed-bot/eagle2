@@ -80,7 +80,7 @@ class ChatReactsController extends Controller
                     event(new ReactMessageEvent( $item->toResponse(request())->getData()->data  , $user2 , $room_resource ));
 
                 } catch (\Throwable $th) {
-                   return $th->getMessage();
+                //    return $th->getMessage();
                 }
             }
     
