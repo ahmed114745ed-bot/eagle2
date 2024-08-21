@@ -11,7 +11,7 @@ use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
 use App\Tik\Repositories\VipPrivilegeRepository;
-
+use Illuminate\Database\Eloquent\Collection;
 
 
 class VipService
@@ -39,11 +39,18 @@ class VipService
 
 
         $wares = $this->wareRepository->getOVip($oVips->pluck('level'), $vipPrivileges->pluck('type'));
-        return $oVips->map(function($oVip) use ($wares)  {
-            
+        $oVips = $oVips->map(function ($oVip) use ($wares) {
             $filteredWares = $wares->where('level', $oVip->level);
-            return $oVip->setRelation('wares', $filteredWares);
+            $oVip->setRelation('wares', $filteredWares);
+            return $oVip;
         });
+
+
+        $data = [
+            'all_privileges' => $vipPrivileges,
+            'o_vips' => $oVips,
+        ];
+        return $data;
     }
 
     public function buyVip($request)
