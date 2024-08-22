@@ -2,16 +2,20 @@
 
 namespace App\Services;
 
-use App\Facades\CustomNotification;
-use App\Facades\UserHandling;
+use App\Models\Vip;
+use App\Models\User;
+use App\Models\Follow;
 use App\Helpers\Common;
-use App\Http\Resources\Api\V1\RoomResource;
-use App\Http\Resources\Api\V1\UserRelationsResource;
+use App\Facades\UserHandling;
 use App\Http\Services\WhatsappOtp;
+use App\Facades\CustomNotification;
+use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
 use App\Repositories\User\UserRepository;
-use App\Repositories\PackRepository;
+use Illuminate\Database\Query\JoinClause;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class UserService
@@ -172,7 +176,7 @@ class UserService
             case '2':
             case '3':
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
-                return Common::apiResponse(true, '', $this->userRepository->getFollowers($user, $type), 200);
+                return Common::apiResponse(true, '', $this->getData($user, $type), 200);
                 
             case '4':
                 (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
@@ -234,5 +238,86 @@ class UserService
             (new UserCounterServices)->eventUser($receiver, 'follow', 1);
         }
         (new UserCounterServices)->eventUser($receiver, 'follower', 1);
+    }
+
+
+    public function getData(User $user, $type = 1)
+    {
+        $userId = $user->id;
+
+        if ($type == 1){
+            $data = Follow::query()->where('user_id' , $userId)->whereHas('followed')->with('followed', function ($query) {
+                $query->with([
+                                 'room' => function ($query) {
+                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
+                             ]);
+            })->orderByDesc('id')->paginate(15);
+            $collect = collect($data->items());
+            $users    = $collect->pluck('followed');
+            // dd($users);
+
+
+        }elseif ($type == 2){
+            $data = Follow::query()->whereHas('follower')->where('followed_user_id' , $userId)->whereHas('follower')->with('follower', function ($query) {
+                $query->with([
+                                 'room' => function ($query) {
+                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
+                             ]);
+            })->orderByDesc('id')->paginate(15);
+            $collect = collect($data->items());
+            $users    = $collect->pluck('follower');
+        } elseif ($type == 3) {
+            $data = Follow::query()->whereHas('followed')->whereHas('follower')->join('follows as f1', function (JoinClause $join){
+                $join->on('follows.user_id', '=', 'f1.followed_user_id')
+                     ->on('f1.user_id', '=','follows.followed_user_id');
+            })->where('follows.user_id', $userId)->with('follower', function ($query) {
+                $query->with([
+                                 'room' => function ($query) {
+                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
+                             ]);
+            })->orderByDesc('follows.id')->paginate(15);
+
+            $collect = collect($data->items());
+            $users    = $collect->pluck('follower');
+        }else{
+            $users = collect([]);
+        }
+
+
+        [$userFollowers, $vipsSenderImages, $vipsReceivedImages] = $this->getHelperArrays($user, $users);
+
+
+        UserRelationsResource::initializeData($vipsReceivedImages, $vipsSenderImages, $userFollowers);
+
+        return UserRelationsResource::collection($users);
+    }
+
+    public function getHelperArrays(User $user, $data): array
+    {
+        $userFollowers      = Follow::query()->where('user_id',$user->id)->pluck('followed_user_id')->toArray();
+
+
+        [$vipsSenderImages, $vipsReceivedImages] =
+            $this->getLevelsSenderAndReceiver($data);
+
+        return [$userFollowers, $vipsSenderImages, $vipsReceivedImages];
+    }
+
+    public function getLevelsSenderAndReceiver($data): array
+    {
+        $vipsSenderImages   = $data->pluck('total_sender_level');
+        $vipsReceivedImages = $data->pluck('total_received_level');
+
+        $vipsSenderImages   = $this->getLevel($vipsSenderImages, 2);
+        $vipsReceivedImages = $this->getLevel($vipsReceivedImages);
+        return [$vipsSenderImages, $vipsReceivedImages];
+    }
+    public function getLevel($levelsList, $type = 1)
+    {
+        return Vip::query()->whereIn('level', $levelsList)
+                  ->where('type', $type)->select('img', 'level')->get();
     }
 }
