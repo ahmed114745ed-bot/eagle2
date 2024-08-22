@@ -166,4 +166,10 @@ class UserRepository extends Repository
         ])->where('user_id', $userId)->orderByDesc('id')->paginate(10)->pluck('room');
     }
 
+    public function updateUserGame($user, $gameId)
+    {
+        $user->game_id = $gameId;
+        return $user->save();
+    }
+
 }

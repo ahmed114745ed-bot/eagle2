@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AllGameController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -231,10 +232,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end vips
 
             // start levels
-
             Route::get ('levels-ranges',[UpgradeLevelController::class,'getLevelsRange']);
-
             // end levels
+
+            //start games
+            Route::prefix('all-games1')->group(function () {
+                Route::get('/', [AllGameController::class, 'index']);
+                Route::post('update-game', [AllGameController::class, 'updateGame']);
+            });
+            // end games
         }
     );
 
