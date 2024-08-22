@@ -35,11 +35,11 @@ class ChargeAction extends Action
             if (!$user){
                 return $this->response()->error(__('user not found'))->refresh();
             }
-            $agency = Agency::where('app_owner_id',$user->id )->first();
+            // $agency = Agency::where('app_owner_id',$user->id )->first();
 
-            if($agency && $agency->status == 0){
-                return $this->response()->error( __('api_responses.canNotCharge'))->refresh();
-            }
+            // if($agency && $agency->status == 0){
+            //     return $this->response()->error( __('api_responses.canNotCharge'))->refresh();
+            // }
 
         }elseif ($request->user_type == 'dash'){
             $user = Admin::query ()->find ($request->user_id);
@@ -140,7 +140,7 @@ class ChargeAction extends Action
 
     }
 
-    public function form()
+    public function form() 
     {
         $this->name = __ ('Charge');
         $this->hidden('charger_id', 'charger id')->value (Auth::id ());
