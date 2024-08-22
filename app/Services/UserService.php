@@ -13,6 +13,7 @@ use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\Public\Http\Services\UserCounterServices;
