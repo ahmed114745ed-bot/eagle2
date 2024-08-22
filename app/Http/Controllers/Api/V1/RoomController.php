@@ -26,7 +26,7 @@ use Illuminate\Http\Response;
 use App\Exceptions\NotInfCoins;
 use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
-use App\Http\Services\RoomService;
+use App\Services\RoomService;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
 use App\Models\RoomPrivateMessages;
@@ -62,15 +62,18 @@ class RoomController extends Controller
 
     protected $roomService;
     protected $countryService;
+    protected $roomServiceMain;
 
     public function __construct(
         RoomRepoInterface $repo,
         RoomRepoService $roomService,
+        RoomService $roomServiceMain,
         CountryService $countryService
     ) {
         $this->repo = $repo;
         $this->roomService = $roomService;
         $this->countryService = $countryService;
+        $this->roomServiceMain = $roomServiceMain;
     }
 
     public function sendPrivateComment(Request $request, int $ownerId)
@@ -1675,5 +1678,12 @@ class RoomController extends Controller
         Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
         return Common::apiResponse(true, __('success process'));
+    }
+
+    public function gameRoom()
+    {
+        $game_id = request("game_id");
+        $rooms = $this->roomServiceMain->getRoomsForGame($game_id);
+        return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
 }

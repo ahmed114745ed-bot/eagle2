@@ -64,6 +64,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/', [RoomController::class, 'index']);
+                Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
                 Route::post('/create', [RoomController::class, 'store']);
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
