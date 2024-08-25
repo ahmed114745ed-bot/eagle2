@@ -27,7 +27,7 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request)
     {
        $out = $this->profileService->updateProfile($request);
- 
+
         return Common::apiResponse(true, 'profile updated successfully', $out, 200);
     }
 
@@ -46,7 +46,7 @@ class ProfileController extends Controller
 
         return Common::apiResponse(true, $message, 200);
     }
-    
+
     public function ignored(Request $request)
     {
         $userId = Auth::id();
@@ -62,7 +62,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         $latitude = $user->lat;
         $longitude = $user->long;
-        $distance = $request->input('distance', 50);
+        $distance = $request->input('distance', INF);
 
         $users = User::select('users.*')
         ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
