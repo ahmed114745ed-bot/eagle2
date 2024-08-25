@@ -67,7 +67,6 @@ class ProfileController extends Controller
         $users = User::query()->select('users.*')
         ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
         ->where('users.id', '!=', $user->id)
-        ->having('distance', '!=', null)
         ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id",$user->id))
         ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id",$user->id)])
             ->orderBy('distance')
