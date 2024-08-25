@@ -70,7 +70,7 @@ class ProfileController extends Controller
 //        ->having('distance', '<=', $distance)
         ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id",$user->id))
         ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id",$user->id)])
-        ->get();
+        ->paginate(10);
 
         return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
     }
