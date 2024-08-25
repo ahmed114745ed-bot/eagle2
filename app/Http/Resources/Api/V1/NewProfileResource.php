@@ -18,7 +18,7 @@ class NewProfileResource extends JsonResource
             'name' => $this->name,
             'image'=>@$this->profile?->avatar,
             'bio'=>@$this->bio,
-            'distance'=>$this->distance,
+            'distance'=>$this->distance ?? 3.3,
             'liked'=>$this->likes_exists ?? false,
         ];
     }
