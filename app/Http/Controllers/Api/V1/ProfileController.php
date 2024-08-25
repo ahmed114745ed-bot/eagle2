@@ -64,7 +64,7 @@ class ProfileController extends Controller
         $longitude = $user->long;
         $distance = $request->input('distance', INF);
 
-        $users = User::query()->select('users.*')
+        $users = User::withoutAppends()->select('users.*')
         ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
         ->where('users.id', '!=', $user->id)
 //        ->having('distance', '<=', $distance)
