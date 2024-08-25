@@ -21,8 +21,7 @@ class RoomService
         return $this->roomRepo->all($request);
     }
 
-    public function getRoomsForGame($gameId)
-    {
-        return $this->roomRepository->getRoomsByGameId($gameId);
-    }
+
+
+
 }

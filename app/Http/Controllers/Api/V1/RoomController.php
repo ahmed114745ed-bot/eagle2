@@ -1268,7 +1268,7 @@ class RoomController extends Controller
         $str     = implode(",", $adm_arr);
 
         $res  = DB::table('rooms')->where(['uid' => $uid])->update(['room_admin' => $str]);
-        
+
         $a    = User::find($admin_id);
         $n    = 'nan';
         if ($a) {
@@ -1683,7 +1683,7 @@ class RoomController extends Controller
     public function gameRoom()
     {
         $game_id = request("game_id");
-        $rooms = $this->roomServiceMain->getRoomsForGame($game_id);
+        $rooms = $this->roomService->getRoomsForGame($game_id);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
 }

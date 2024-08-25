@@ -33,9 +33,9 @@ class RoomRepoService
     {
         return $this->repository->all($request);
     }
-    
+
     public function create($request, $userId)
-    { 
+    {
         $data = array_merge($request->all(), ['uid' => $userId]);
         $room = $this->repository->create($data);
         if ($request->hasFile('room_cover')) {
@@ -215,5 +215,11 @@ class RoomRepoService
             $allData = $allData->merge($anotherData);
         }
         return [$allData, $roomAdminActive];
+    }
+
+
+    public function getRoomsForGame($gameId)
+    {
+        return $this->repository->getRoomsByGameId(gameId: $gameId, with: ['game', 'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1), 'backgroundImage']);
     }
 }

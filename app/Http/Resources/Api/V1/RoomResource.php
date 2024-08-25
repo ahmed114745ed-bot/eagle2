@@ -18,7 +18,7 @@ class RoomResource extends JsonResource
     {
         // Common::setHourHot($this->uid);
         $pk = $this->lastPk;
-        
+
         $have_luck_box = $this->boxUse;
         $data = [
             'id' => $this->id,
@@ -38,8 +38,8 @@ class RoomResource extends JsonResource
             'is_recommended' => $this->is_recommended ?: 0,
             'lang' => $this->lang ?: '',
             'is_pk' => (bool) $pk,
-            'country' => $this->country 
-                ? new CountryResource($this->country) 
+            'country' => $this->country
+                ? new CountryResource($this->country)
                 : [
                     'id' => 0,
                     'name' => '',
@@ -49,12 +49,15 @@ class RoomResource extends JsonResource
                 ],
             'have_luck_box' => (bool) $have_luck_box,
             'distance' => $this->distance,
+            $this->mergeWhen($this->relationLoaded('game'), [
+                'game' => $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
+            ]),
         ];
-        
+
         if ($request['show']) {
             $requestBackground = $this->backgroundImage;
 
-                
+
             $data = array_merge($data, [
                 'room_users' => Common::get_room_users($this->owner()?->id, $request->user()->id),
                 'background' => $requestBackground?->img ?: $this->room_background,
