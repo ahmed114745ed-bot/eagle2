@@ -64,12 +64,13 @@ class ProfileController extends Controller
         $longitude = $user->long;
         $distance = $request->input('distance', INF);
 
-        $users = User::withoutAppends()->select('users.*')
+        $users = User::query()->select('users.*')
         ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
         ->where('users.id', '!=', $user->id)
-//        ->having('distance', '<=', $distance)
+        ->having('distance', '!=', null)
         ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id",$user->id))
         ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id",$user->id)])
+            ->orderBy('distance')
         ->paginate(10);
 
         return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
