@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
+use Modules\Chat\Jobs\SendMessageToAllUsers;
 
 
 class UserRepository extends AbstractRepository
@@ -176,5 +177,121 @@ class UserRepository extends AbstractRepository
     public function checkByPhone($userId,$phone)
     {
         return $this->model->query()->where('phone', $phone)->where('id', '!=', $userId)->exists();
+    }
+    public function updateTypeUser($user)
+    {
+        $user->type_user = 1;
+        $this->updateUser($user);
+    }
+
+    public function findUsersByAgencyId($agencyId, $perPage, $page)
+    {
+        return $this->model->where('agency_id', $agencyId)->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function getIdsByAgencyId($agencyId)
+    {
+        return $this->model->query()->where('agency_id', $agencyId)->pluck("id")->toArray();
+    }
+
+    public function getAgencyMangerByFilter($keyword)
+    {
+        return $this->model->query()->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$keyword}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->has('ownAgency')->where(function ($q) use ($keyword) {
+            $q->where('uuid', 'like', '%' . $keyword . '%')
+                ->orWhereHas('ownAgency', function ($query) use ($keyword) {
+                    $query->where('id', 'like', '%' . $keyword . '%');
+                });
+        })->orderBy('matching_percentage', 'desc')->take(10)->get();
+    }
+
+    public function getUsersByJoinAgency($agencyId)
+    {
+        return $this->model->where("agency_id", $agencyId)->where("type_user", '!=', 0)->whereMonth("join_agency_date", date("m"))->get();
+    }
+
+    public function getByHost($agencyId, $hostId = null)
+    {
+        $hosts = $this->model->where("agency_id", $agencyId)->where("type_user", '!=', 0);
+        if ($hostId != null) {
+            $hosts = $hosts->where("id", $hostId);
+        }
+        $hosts = $hosts->get();
+    }
+
+    public function updateShowGift($user)
+    {
+        $user->stopshow_gift = !$user->stopshow_gift;
+        $this->updateUser($user);
+    }
+
+    public function logout($user)
+    {
+        $user->is_logout = 1;
+        $this->updateUser($user);
+        $user->currentAccessToken()->delete();
+        return true;
+    }
+
+    public function updateDress($user, $dressType, $packType, $wareId)
+    {
+        $user->update(['dress_' . $dressType[$packType] => $wareId]);
+        return true;
+    }
+
+    public function nullDress($user, $type)
+    {
+        $user->update(['dress_' . $type => null]);
+        return true;
+    }
+
+    public function getUsersById($ids, $coins)
+    {
+        return $this->model->whereIn("id", $ids)->where("di", "<", $coins)->pluck("name")->toArray();
+    }
+
+    public function findUser($id)
+    {
+        return $this->model->whereId($id)->first();
+    }
+
+    public function pluckUsersByIds($ids, $type)
+    {
+        return $this->model->whereIn("id", $ids)->pluck($type)->toArray();
+    }
+
+    public function getChatIds($user)
+    {
+        return $user->chats->pluck('id')->toArray();
+    }
+
+    public function updateCurrentChat($user, $chatRoomId)
+    {
+        $user->current_room_chat = $chatRoomId;
+        $this->updateUser($user);
+    }
+
+    public function getByName($name)
+    {
+        return $this->model->where('name', 'LIKE', '%' . $name . '%')->select('id', 'name', 'img')->get();
+    }
+
+    public function userChatRoom($userId,$data,$exceptId)
+    {
+        $this->model->query()
+        ->select('id')
+        ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
+        ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId))
+        ->whereNotIn('id', $exceptId)
+        ->chunk(400, function($userIds) use($userId, $data){
+            $userIds = $userIds->pluck('id')->toArray();
+            $this->sendMessageToUsers($userId, $userIds, $data);
+        });
+    }
+
+    public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
+    {
+        $timeZone = request()->hasHeader('tz') ? request()->header()['tz'][0] : 'UTC';
+        dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
+
     }
 }

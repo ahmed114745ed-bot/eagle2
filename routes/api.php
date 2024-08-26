@@ -1,32 +1,32 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AllGameController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\MallController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RankingController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-// use App\Http\Controllers\Api\V1\Room\PKController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\ExchangeController;
 // use App\Http\Controllers\Api\V1\Room\PKController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
+// use App\Http\Controllers\Api\V1\Room\PKController;
 use App\Http\Controllers\Api\V1\BackgroundController;
-
+use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
+
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -235,7 +235,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // start levels
             Route::get ('levels-ranges',[UpgradeLevelController::class,'getLevelsRange']);
             // end levels
-
+            Route::prefix('mall')->group(function () {
+                Route::get('wares', [MallController::class, 'index']);
+                Route::post('buy', [MallController::class, 'buyWare']);
+                Route::post('send', [MallController::class, 'sendWare']);
+            });
             //start games
             Route::prefix('all-games1')->group(function () {
                 Route::get('/', [AllGameController::class, 'index']);
