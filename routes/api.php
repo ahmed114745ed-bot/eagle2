@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\PackController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -177,6 +178,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
             Route::prefix('user_info')->group(function () {
+
+                Route::get('my_pack', [PackController::class, 'my_pack']);
+                Route::post('use_pack_item', [PackController::class, 'usePackItem']);
+                Route::post('takeOff', [PackController::class, 'takeOff']);
+//                Route::get('my_store', [UserController::class, 'my_store']);
+//                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
 
