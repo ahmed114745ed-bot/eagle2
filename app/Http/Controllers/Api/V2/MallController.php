@@ -12,7 +12,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 
 class MallController extends Controller
 {
-    // wares 
+    // wares
 
     public function __construct(private MallService $mallService) {}
 
@@ -34,7 +34,7 @@ class MallController extends Controller
         $user    = $request->user();
         $wareId = $request->ware_id;
         $quantity     = $request->qty ?: 1;
-        $this->mallService->buyWares($user, $wareId, $quantity);
+        return $this->mallService->buyWares($user, $wareId, $quantity);
     }
 
     public function sendWare(Request $request)
