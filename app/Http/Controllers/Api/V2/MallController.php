@@ -47,6 +47,6 @@ class MallController extends Controller
         $quantity = $request->qty ?: 1;
         if (!$wareId || !$toUserId) return Common::apiResponse(0, 'missing params', null, 422);
 
-        $this->mallService->sendWare($user, $wareId, $toUserId, $quantity);
+        return $this->mallService->sendWare($user, $wareId, $toUserId, $quantity);
     }
 }
