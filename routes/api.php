@@ -213,6 +213,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // user api
             Route::get ('my-data',[\App\Http\Controllers\Api\V1\UserController::class,'my_data']);
 
+            // Todo Refact
+            Route::get('my-store', [\App\Http\Controllers\Api\V1\UserController::class, 'my_store_all']);
+
             Route::prefix('profile')->group(function () {
                 Route::get('get/{id}', [ProfileController::class, 'show']);
                 Route::post('update', [ProfileController::class, 'update']);

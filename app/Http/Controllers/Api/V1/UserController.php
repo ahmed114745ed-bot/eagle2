@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\MyStoreResource;
+use App\Http\Services\RoomGameServices;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
@@ -9,6 +11,7 @@ use App\Services\UserService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use Modules\FixedTarget\Services\FixedTargetService;
 
 class UserController extends Controller
 {
@@ -83,5 +86,33 @@ class UserController extends Controller
     public function unfollow(Request $request)
     {
         return $this->userService->unfollowUser($request);
+    }
+
+    public function my_store_all(Request $request)
+    {
+        $user = $request->user();
+        $cacheKey = 'cache-data-mystore-' . $user->id;
+        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+
+            $targetService = new FixedTargetService($user);
+            $targetService->calculateTarget();
+            if($user->ownerRoom != null){
+                $roomTarget = new RoomGameServices();
+                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
+            }
+        }
+
+        if ($user->device_token  != $request->header('device')) {
+            $user->enableSaving = true;
+            $user->device_token = $request->header('device');
+            $user->save();
+        }
+
+        /* if(($user->type_user == 2 || $user->type_user == 4 ) && $user->agency){
+            $targetService->updateAgencySalaries($user->agency_id);
+        } */
+
+        $data = new MyStoreResource($user);
+        return Common::apiResponse(true, '', $data, 200);
     }
 }
