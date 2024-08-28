@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use Exception;
 use App\Models\User;
 use App\Helpers\Common;
@@ -204,6 +205,21 @@ class ChargeController extends Controller
         }
         return Common::apiResponse(1, '', ChargeResource::collection($charge->orderByDesc('created_at')->get()), 200);
     }
+
+
+    public function userChargeCoins(Request $request)
+    {
+        $userId = $request->user()->id;
+        $searchKey = $request->search_key ?? null;
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', 'Host agent');
+
+        $charge = $charge->with(['sender'])->whereHas('sender' , fn($q) => $q->where('uuid', 'like', $searchKey));
+        if ($request->by_date) {
+            $charge = $charge->where('created_at', 'like', "%$request->by_date%");
+        }
+        return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge->orderByDesc('created_at')->get()), 200);
+    }
+
 
 
     public function trxLog(Request $request)
