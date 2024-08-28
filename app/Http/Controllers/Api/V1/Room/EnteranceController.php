@@ -205,7 +205,6 @@ class EnteranceController extends Controller
     }
     public function enter_room(Request $request)
     {
-        $this->authorize('enter-room-endpoint');
         $room_pass = $request['room_pass'];
         $owner_id  = $request['owner_id'];
 
