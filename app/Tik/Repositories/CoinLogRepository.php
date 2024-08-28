@@ -8,7 +8,7 @@ use App\Models\CoinLog;
 class CoinLogRepository extends AbstractRepository
 {
 
-   
+
     /**
      * @param Model $model
      */
@@ -17,8 +17,10 @@ class CoinLogRepository extends AbstractRepository
         parent::__construct(new CoinLog());
     }
 
-    public function getCoinsByUserId($userId)
+    public function getCoinsByUserId($userId, string $searchKey = null)
     {
-        return $this->model->where('user_id', $userId)->orderByDesc('id')->get();
+        return $this->model::where('user_id', $userId)
+            ->when($searchKey, fn($q) => $q->where('trx', 'like', $searchKey))
+            ->orderByDesc('id')->get();
     }
 }

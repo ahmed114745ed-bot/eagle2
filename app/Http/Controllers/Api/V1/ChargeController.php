@@ -209,7 +209,8 @@ class ChargeController extends Controller
     public function trxLog(Request $request)
     {
         $user = $request->user();
-        $trx = $this->chargeService->getCoinLogs($user->id);
+        $searchKey = $request->search_key ?? null;
+        $trx = $this->chargeService->getCoinLogs($user->id, $searchKey);
         return Common::apiResponse(1, '', TrxResource::collection($trx), 200);
     }
 }

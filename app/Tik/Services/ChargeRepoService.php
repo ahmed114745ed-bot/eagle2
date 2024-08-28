@@ -191,8 +191,8 @@ class ChargeRepoService
         $this->create($data);
     }
 
-    public function getCoinLogs($userId)
+    public function getCoinLogs($userId,string $searchKey = null)
     {
-        return $this->coinLogRepository->getCoinsByUserId($userId);
+        return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
     }
 }
