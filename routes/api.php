@@ -97,6 +97,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
+
+                //todo refact
+                Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
 
             Route::get('/room-countries', [\App\Http\Controllers\Api\V1\RoomController::class, 'room_countries']);
