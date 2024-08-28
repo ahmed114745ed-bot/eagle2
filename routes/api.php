@@ -102,6 +102,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
 
+
+            // Todo need refact all group
+            Route::prefix('coins')->group(function () {
+                Route::get('/list', [\App\Http\Controllers\Api\V1\MallController::class, 'coinList']);
+                Route::post('/buyCoins', [\App\Http\Controllers\Api\V1\MallController::class, 'buyCoins']);
+            });
+
             Route::get('/room-countries', [\App\Http\Controllers\Api\V1\RoomController::class, 'room_countries']);
             // end rooms api
 
