@@ -32,7 +32,7 @@ class MallController extends Controller
     public function coinList(Request $request){
         $user = $request->user ();
         $data = Coin::query ()->select ('id','usd','coin')->get ();
-        return Common::apiResponse (1,$user->di,$data,200);
+        return Common::apiResponse (1,(string) $user->di,$data,200);
     }
 
     public function buyCoins(Request $request){
@@ -80,6 +80,6 @@ class MallController extends Controller
             return Common::apiResponse (0,'fail',null,400);
         }
     }
-    
+
 
 }
