@@ -9,41 +9,41 @@ use Illuminate\Database\QueryException;
 
 use Illuminate\Http\Request;
 
-class Report_userController extends Controller
+class ReportUserController extends Controller
 {
    public function ReportUser(Request $request){
 
     $reporter_id = $request->user ()->id;
     if (!$reporter_id) return Common::apiResponse (0, 'un_auth');
-   
-    
+
+
 
 
     $user_id=$request->id;
     $type_report=$request->type_report;
     $report_content=$request->report_content;
 
-    
+
     if ($request->hasFile ('image')){
         $img = $request->file ('image');
         $image = Common::upload ('profile',$img);
         // $profile->avatar = $image;
     }
 
-  
-   
+
+
         $add =Report_user::create([
-         
+
             'type'=>$type_report,
             'report_details' => $report_content,
             'user_id' => $user_id,
             'Reporter_id' => $reporter_id,
             'image' => @$image,
-            
-    
+
+
          ]);
 
-    
+
 
 
     if($add){
@@ -55,7 +55,7 @@ class Report_userController extends Controller
 
 
 
-  
+
 }
 public function getrepo(){
 

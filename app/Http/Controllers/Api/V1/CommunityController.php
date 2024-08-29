@@ -3,16 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Models\User;
-use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
-use App\Tik\Services\BackgroundService;
-use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class CommunityController extends Controller
@@ -37,10 +32,7 @@ class CommunityController extends Controller
 
         $this->searchRepository->saveSearchHistory($user_id, $keywords);
 
-        $result = [
-            'user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)),
-            'rooms' => array_slice($this->searchRepository->searchRooms($user_id, (int)$keywords), 0, 2),
-        ];
+        $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => array_slice($this->searchRepository->searchRooms($user_id, (int)$keywords), 0, 2),];
 
         return Common::apiResponse(1, '', $result);
     }
@@ -56,10 +48,7 @@ class CommunityController extends Controller
         $users = $this->searchRepository->getUserFriends($userId, $keywords, $perPage, $currentPage);
         $countUsers = $users->total();
 
-        return Common::apiResponse(1, 'success', [
-            'user' => UserResourceSerche::collection($users),
-            'number_of_friends' => $countUsers,
-        ]);
+        return Common::apiResponse(1, 'success', ['user' => UserResourceSerche::collection($users), 'number_of_friends' => $countUsers,]);
     }
 
     // search history
@@ -70,7 +59,7 @@ class CommunityController extends Controller
 
         return Common::apiResponse(1, '', $data);
     }
-   
+
     //clear search history
     public function cleanSearchList(Request $request)
     {
