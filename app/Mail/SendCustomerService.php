@@ -13,41 +13,19 @@ class SendCustomerService extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    public $messageContent;
+
+    public function __construct($messageContent)
     {
-        //
+        $this->messageContent = $messageContent;
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: 'Send Customer Service',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+        return $this->view('admin.emails.custom')
+                    ->with([
+                        'messageContent' => $this->messageContent,
+                    ])
+                    ->subject('رساله من عميل');
     }
 }

@@ -276,7 +276,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // questions
             Route::get('questions', [QuestionController::class, 'questions']);
-            Route::get('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
+            Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
             // end questions
 
         }
