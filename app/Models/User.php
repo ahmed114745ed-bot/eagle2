@@ -90,6 +90,12 @@ class User extends Authenticatable
          'frame',
 
      ];*/
+
+     public function images()
+     {
+        return $this->hasMany(ProfileGallary::class);
+     }
+
      public function ignores()
      {
          return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')

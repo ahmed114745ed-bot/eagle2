@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Kreait\Firebase\Factory;
 use Twilio\Rest\Client as TwilioClint;
+use Illuminate\Support\Facades\Storage;
 
 class Common{
 
@@ -156,13 +157,21 @@ class Common{
         return $confs ?: null;
     }
 
-    public static function upload($folder,$file){
-        //        $file->store('/',$folder);
-        //        $fileName = $file->hashName();
-        $extension = $file->getClientOriginalExtension(); // Get the file extension
-        $fileName = Str::random(10).'.'.$extension; // Generate a random filename and append the extension
-        $file->storeAs($folder.DIRECTORY_SEPARATOR,$fileName, \config('filesystems.default')); // Store the file with the generated filename
+    public static function upload($folder,$file)
+    {
+        $extension = $file->getClientOriginalExtension();
+        $fileName = Str::random(10).'.'.$extension;
+        $file->storeAs($folder.DIRECTORY_SEPARATOR,$fileName, \config('filesystems.default'));
         return $folder.DIRECTORY_SEPARATOR.$fileName;
+    }
+
+    public static function deleteImage($filePath)
+    {
+        if (Storage::exists($filePath)) {
+            Storage::delete($filePath);
+            return true; 
+        }
+        return false;
     }
 
 

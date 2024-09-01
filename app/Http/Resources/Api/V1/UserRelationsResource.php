@@ -84,7 +84,8 @@ class UserRelationsResource extends JsonResource
             'is_follow'      => $isFollow,
             "is_gold_id" => (bool)$this->is_gold_id,
             'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType)
+            "manger_type"          =>new MangerTypeResource(@$this->mangerType),
+            "multi_images"          => $this->images?->select("img"),
         ];
 
         return $data;
