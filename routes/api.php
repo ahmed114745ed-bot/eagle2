@@ -14,7 +14,6 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V1\FollowController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ProfileController;
