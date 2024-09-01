@@ -104,7 +104,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
 
-            /// Todo need refact all group
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
@@ -155,7 +154,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::post('charge_to', [ChargeController::class, 'chargeTo']);
 
-            // TODO re refact and resource and make enum @eriny
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             // TODO re refact and resource and make enum @eriny
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);

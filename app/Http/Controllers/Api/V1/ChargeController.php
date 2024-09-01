@@ -199,11 +199,9 @@ class ChargeController extends Controller
     public function chargeHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, 'Host agent');
-        if ($request->by_date) {
-            $charge = $charge->where('created_at', 'like', "%$request->by_date%");
-        }
-        return Common::apiResponse(1, '', ChargeResource::collection($charge->orderByDesc('created_at')->get()), 200);
+        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type,$request->by_date, 'Host agent');
+
+        return Common::apiResponse(1, '', ChargeResource::collection($charge), 200);
     }
 
 

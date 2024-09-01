@@ -17,46 +17,30 @@ class ChargeResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->charger_type == 'app'){
-            // $sender = User::find($this->charger_id);
-            // $s_type = 'user';
-        }else{
-            // $sender = Admin::find($this->charger_id);
-            // $s_type = 'management';
-        }
-        if ($this->user_type == 'app'){
-            // $receiver =  User::find($this->user_id);
-            // $r_type = 'user';
-        }else{
-            // $receiver =  Admin::find($this->user_id);
-            // $r_type = 'management';
-        }
-        $sender  =  User::find($this->charger_id);
         $s_type = 'user';
-        $receiver =  User::find($this->user_id);
         $r_type = 'user';
 
         $sender_data = [
-            'id'=>@$sender->id??0,
-            'uuid'=>@$sender->uuid?:0,
-            'name'=>@$sender->name??"",
-            'img'=>@$sender->img??"",
-            'type'=>$s_type
+            'id' => @$this->sender->id ?? 0,
+            'uuid' => @$this->sender->uuid ?: 0,
+            'name' => @$this->sender->name ?? "",
+            'img' => @$this->sender->img ?? "",
+            'type' => $s_type
         ];
         $receiver_data = [
-            'id'=>@$receiver->id??0,
-            'uuid'=>@$receiver->uuid?:0,
-            'name'=>@$receiver->name??"",
-            'img'=>@$receiver->img??"",
-            'type'=>$r_type
+            'id' => @$this->receiver->id ?? 0,
+            'uuid' => @$this->receiver->uuid ?: 0,
+            'name' => @$this->receiver->name ?? "",
+            'img' => @$this->receiver->img ?? "",
+            'type' => $r_type
         ];
         return [
-            'id'=>$this->id,
-            'sender'=>$sender_data,
-            'receiver'=>$receiver_data,
-            'value'=>$this->amount,
-            'usd'=> $this->usd,
-            'time'=>$this->created_at->format('Y-m-d h:i:s A')
+            'id' => $this->id,
+            'sender' => $sender_data,
+            'receiver' => $receiver_data,
+            'value' => $this->amount,
+            'usd' => $this->usd,
+            'time' => $this->created_at->format('Y-m-d h:i:s A')
         ];
     }
 }
