@@ -26,8 +26,7 @@ class ChargeRepoService
         private readonly AgencyRepository $agencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly CoinLogRepository $coinLogRepository
-    ) {
-    }
+    ) {}
 
     public function create(array $data)
     {
@@ -133,7 +132,7 @@ class ChargeRepoService
         }
     }
 
-    public function getChargeUserHistory($userId, $type,$chargeType = null)
+    public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null,$searchKey = null)
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
         if ($type == 'received') {
@@ -142,8 +141,15 @@ class ChargeRepoService
         if ($type == 'sent') {
             $charge = $charge/*->where('charger_type', $charger_type)*/->where('charger_id', $userId);
         }
+        if($searchKey != null )
+        {
+            $charge = $charge->when( $searchKey, fn($query) => $query->whereHas('sender' , fn($q) => $q->where('uuid', 'like', $searchKey)));
+        }
+        if ($by_date) {
+            $charge = $charge->where('created_at', 'like', "%$by_date%");
+        }
 
-        return $charge;
+        return $charge->orderByDesc('created_at')->get();
     }
 
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
@@ -184,14 +190,19 @@ class ChargeRepoService
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
-            'charger_id'  => $sender->id, 'charger_type' => $chargeType,
-            'user_id'     => $receiver->id, 'user_type' => $type, 'amount' => $amount,
-            'amount_type' => 2, "usd" => $usd != null ? $usd : $amount, 'is_used_transferred' => $transferred,
+            'charger_id'  => $sender->id,
+            'charger_type' => $chargeType,
+            'user_id'     => $receiver->id,
+            'user_type' => $type,
+            'amount' => $amount,
+            'amount_type' => 2,
+            "usd" => $usd != null ? $usd : $amount,
+            'is_used_transferred' => $transferred,
         ];
         $this->create($data);
     }
 
-    public function getCoinLogs($userId,string $searchKey = null)
+    public function getCoinLogs($userId, string $searchKey = null)
     {
         return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
     }

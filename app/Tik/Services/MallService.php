@@ -11,8 +11,6 @@ use App\Tik\Repositories\WareRepository;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 
-
-
 class MallService
 {
     public function __construct(

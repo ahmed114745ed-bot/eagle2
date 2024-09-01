@@ -14,20 +14,9 @@ class RoomRepository extends AbstractRepository
     }
 
 
-    // public function create($request, $userId)
-    // {
-    //     $room = $this->model->create(array_merge($request->all(), ['uid' => $userId]));
-    //     if ($request->hasFile('room_cover')) {
-    //         $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
-    //         $room->save();
-    //     }
-
-    //     return $room;
-    // }
-
     public function findRoomUser($userId)
     {
-        return $this->model->withoutAppends()->where('uid', $userId)->first();
+        return $this->model->withoutAppends()->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
 
     public function updateRoom($room)
@@ -66,7 +55,7 @@ class RoomRepository extends AbstractRepository
         return true;
     }
 
-    public function updateRoomStatus($userId,$isAvailable)
+    public function updateRoomStatus($userId, $isAvailable)
     {
         return $this->model->query()->where('uid', $userId)->update(['room_status' => $isAvailable ? 2 : 1]);
     }
@@ -77,7 +66,7 @@ class RoomRepository extends AbstractRepository
         return true;
     }
 
-    public function all ( $req )
+    public function all($req)
     {
         $user = $req->user();
         $result = $this->model->with([
@@ -85,16 +74,16 @@ class RoomRepository extends AbstractRepository
             'backgroundImage',
             'lastPk'
         ])
-        ->whereHas('owner')
-        ->where(function ($query) {
-            $query->where(function ($q) {
-                $q->where('count_room_socket', '!=', 0)
-                  ->where('top_room', 1);
-            })->orWhere(function ($q) {
-                $q->where('count_room_socket', '!=', 0);
-            });
-        })
-        ->where('room_status', 1);
+            ->whereHas('owner')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('count_room_socket', '!=', 0)
+                        ->where('top_room', 1);
+                })->orWhere(function ($q) {
+                    $q->where('count_room_socket', '!=', 0);
+                });
+            })
+            ->where('room_status', 1);
 
         // Filter by country if provided
         if (!is_null($req->country_id)) {
@@ -136,10 +125,10 @@ class RoomRepository extends AbstractRepository
 
                 // Use lat/long from the related `owner` (User) model
                 $result->selectRaw(
-                        '*,
+                    '*,
                         ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
-                        [$userLat, $userLong, $userLat]
-                    )
+                    [$userLat, $userLong, $userLat]
+                )
                     ->join('users as owner', 'rooms.uid', '=', 'owner.id')
                     ->orderBy('distance');
                 break;
@@ -160,8 +149,22 @@ class RoomRepository extends AbstractRepository
             ->where('mode', 4)
             ->when(isset($gameId) && $gameId != 'null', function ($query) use ($gameId) {
                 $query->where('game_id', $gameId);
-            })
-            ->get();
+            })->get();
     }
 
+    public function randomOwner()
+    {
+        return $this->model->query()
+            ->where('room_status', 1)
+            ->where('uid', '!=', null)
+            ->where(function ($q) {
+                $q->where('count_room_socket', '!=', 0)->orWhere('is_afk', 1);
+            })->pluck('uid')->random();
+    }
+
+    public function updateRoomBlack($room, $roomBlack)
+    {
+        $room->room_black = trim($roomBlack, ',');
+        $this->updateRoomUser($room);
+    }
 }

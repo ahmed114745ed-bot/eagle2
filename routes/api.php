@@ -1,35 +1,36 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AllGameController;
-use App\Http\Controllers\Api\v1\Auth\RegisterController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VersionController;
+use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\BackgroundController;
-use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\ExchangeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V1\FollowController;
-use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PackController;
-use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\QuestionController;
-use App\Http\Controllers\Api\V1\RankingController;
-use App\Http\Controllers\Api\V1\ReportUserController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\Room\EnteranceController;
-use App\Http\Controllers\Api\V1\Room\MicrophoneController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\VersionController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\ChargeController;
+use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\FollowController;
+use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\Api\V1\ExchangeController;
+use App\Http\Controllers\Api\V1\QuestionController;
+use App\Http\Controllers\Api\V1\CommunityController;
+use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\RoomCategoryController;
+use App\Http\Controllers\Api\v1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Room\EnteranceController;
+use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -99,16 +100,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
-
-                /// todo refact
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
 
 
-            /// Todo need refact all group
             Route::prefix('coins')->group(function () {
-                Route::get('/list', [\App\Http\Controllers\Api\V1\MallController::class, 'coinList']);
-                Route::post('/buyCoins', [\App\Http\Controllers\Api\V1\MallController::class, 'buyCoins']);
+                Route::get('/list', [CoinController::class, 'coinList']);
+                Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -156,10 +154,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::post('charge_to', [ChargeController::class, 'chargeTo']);
 
-            // TODO re refact and resource and make enum @eriny
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             // TODO re refact and resource and make enum @eriny
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
+            Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
             Route::prefix('agencies')->group(function () {
                 Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
