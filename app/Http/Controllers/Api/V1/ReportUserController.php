@@ -3,64 +3,22 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Models\Report_user;
-use Illuminate\Database\QueryException;
-
 use Illuminate\Http\Request;
+
+
+use App\Http\Controllers\Controller;
+use App\Tik\Services\ReportUserSerVice;
 
 class ReportUserController extends Controller
 {
-   public function ReportUser(Request $request){
+    public function __construct(private ReportUserSerVice $reportUserSerVice) {}
 
-    $reporter_id = $request->user ()->id;
-    if (!$reporter_id) return Common::apiResponse (0, 'un_auth');
-
-
-
-
-    $user_id=$request->id;
-    $type_report=$request->type_report;
-    $report_content=$request->report_content;
-
-
-    if ($request->hasFile ('image')){
-        $img = $request->file ('image');
-        $image = Common::upload ('profile',$img);
-        // $profile->avatar = $image;
+    public function ReportUser(Request $request)
+    {
+        $reporter_id = $request->user()->id;
+        if (!$reporter_id) return Common::apiResponse(0, 'un_auth', 400);
+        $user_id = $request->id;
+        $this->reportUserSerVice->reportUser($reporter_id, $user_id, $request);
+        return Common::apiResponse(true, 'has been sent', 200);
     }
-
-
-
-        $add =Report_user::create([
-
-            'type'=>$type_report,
-            'report_details' => $report_content,
-            'user_id' => $user_id,
-            'Reporter_id' => $reporter_id,
-            'image' => @$image,
-
-
-         ]);
-
-
-
-
-    if($add){
-        return Common::apiResponse (true,'has been sent',200);
-    }
-    return Common::apiResponse (false,'user not found',[],404);
-
-
-
-
-
-
-}
-public function getrepo(){
-
-//   $add = Report_user::latest()->get();
-
-
-}
 }

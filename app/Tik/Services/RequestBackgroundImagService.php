@@ -3,13 +3,8 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
-
-
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
-
-
-
 
 class RequestBackgroundImagService
 {
