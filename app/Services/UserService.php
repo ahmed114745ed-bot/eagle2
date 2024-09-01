@@ -13,6 +13,7 @@ use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
 use App\Http\Services\RoomGameServices;
+use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -26,8 +27,12 @@ class UserService
     protected $packRepository;
     protected $followRepository;
 
-    public function __construct(UserRepository $userRepository, PackRepository $packRepository, FollowRepository $followRepository)
-    {
+    public function __construct(
+        private readonly VipRepository $vipRepository,
+        UserRepository $userRepository,
+        PackRepository $packRepository,
+        FollowRepository $followRepository
+    ) {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
         $this->followRepository = $followRepository;
@@ -247,52 +252,15 @@ class UserService
         $userId = $user->id;
 
         if ($type == 1) {
-            $data = Follow::query()->where('user_id', $userId)->whereHas('followed')->with('followed', function ($query) {
-                $query->with([
-                    'room' => function ($query) {
-                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                    },
-                    'followPacks',
-                    'profile',
-                    'ware',
-                    'UserVip'
-                ]);
-            })->orderByDesc('id')->paginate(15);
+            $data = $this->followRepository->getByFollowed($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('followed');
-            // dd($users);
-
-
         } elseif ($type == 2) {
-            $data = Follow::query()->whereHas('follower')->where('followed_user_id', $userId)->whereHas('follower')->with('follower', function ($query) {
-                $query->with([
-                    'room' => function ($query) {
-                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                    },
-                    'followPacks',
-                    'profile',
-                    'ware',
-                    'UserVip'
-                ]);
-            })->orderByDesc('id')->paginate(15);
+            $data = $this->followRepository->getByFollower($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
         } elseif ($type == 3) {
-            $data = Follow::query()->whereHas('followed')->whereHas('follower')->join('follows as f1', function (JoinClause $join) {
-                $join->on('follows.user_id', '=', 'f1.followed_user_id')
-                    ->on('f1.user_id', '=', 'follows.followed_user_id');
-            })->where('follows.user_id', $userId)->with('follower', function ($query) {
-                $query->with([
-                    'room' => function ($query) {
-                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                    },
-                    'followPacks',
-                    'profile',
-                    'ware',
-                    'UserVip'
-                ]);
-            })->orderByDesc('follows.id')->paginate(15);
-
+            $data = $this->followRepository->getByFriends($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
         } else {
@@ -310,9 +278,7 @@ class UserService
 
     public function getHelperArrays(User $user, $data): array
     {
-        $userFollowers      = Follow::query()->where('user_id', $user->id)->pluck('followed_user_id')->toArray();
-
-
+        $userFollowers = $this->followRepository->getFollowedIds($user->id);
         [$vipsSenderImages, $vipsReceivedImages] =
             $this->getLevelsSenderAndReceiver($data);
 
@@ -330,8 +296,7 @@ class UserService
     }
     public function getLevel($levelsList, $type = 1)
     {
-        return Vip::query()->whereIn('level', $levelsList)
-            ->where('type', $type)->select('img', 'level')->get();
+        return $this->vipRepository->getByLevels($levelsList,$type);
     }
 
     public function myStore($user, $request)

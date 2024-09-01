@@ -15,4 +15,10 @@ class VipRepository extends AbstractRepository
     {
         return $this->model->where('type', $type)->paginate(15);
     }
+
+    public function getByLevels($levelsList,$type)
+    {
+        return $this->model->query()->whereIn('level', $levelsList)
+        ->where('type', $type)->select('img', 'level')->get();
+    }
 }
