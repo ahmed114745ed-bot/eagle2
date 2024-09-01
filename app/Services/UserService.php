@@ -222,7 +222,7 @@ class UserService
         return Common::apiResponse(true, 'follow done', null, 201);
     }
 
-    public function unfollowUser($request)
+    public function unFollowUser($request)
     {
         $this->followRepository->deleteFollow($request->user()->id, $request->user_id);
         return Common::apiResponse(true, 'unFollow done', null, 201);

@@ -83,9 +83,9 @@ class UserController extends Controller
         return $this->userService->followUser($request);
     }
 
-    public function unfollow(Request $request)
+    public function unFollow(Request $request)
     {
-        return $this->userService->unfollowUser($request);
+        return $this->userService->unFollowUser($request);
     }
 
     public function my_store_all(Request $request)
@@ -107,10 +107,6 @@ class UserController extends Controller
             $user->device_token = $request->header('device');
             $user->save();
         }
-
-        /* if(($user->type_user == 2 || $user->type_user == 4 ) && $user->agency){
-            $targetService->updateAgencySalaries($user->agency_id);
-        } */
 
         $data = new MyStoreResource($user);
         return Common::apiResponse(true, '', $data, 200);

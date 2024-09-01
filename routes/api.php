@@ -155,7 +155,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('charge_to', [ChargeController::class, 'chargeTo']);
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
-            // TODO re refact and resource and make enum @eriny
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
@@ -232,8 +231,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // TODO refact @eriny
             Route::prefix('relations')->group(function () {
                 Route::get('/', [UserController::class, 'userFriend']);
-                Route::post('follow', [FollowController::class, 'follow']);
-                Route::post('un-follow', [FollowController::class, 'unFollow']);
+                Route::post('follow', [UserController::class, 'follow']);
+                Route::post('un-follow', [UserController::class, 'unFollow']);
                 Route::post('is_user_friend', [HomeController::class, 'check_if_friend']);
                 Route::post('report_user', [ReportUserController::class, 'ReportUser']);
             });
