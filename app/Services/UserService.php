@@ -12,10 +12,12 @@ use App\Facades\CustomNotification;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
+use App\Http\Services\RoomGameServices;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserRelationsResource;
+use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class UserService
@@ -24,12 +26,11 @@ class UserService
     protected $packRepository;
     protected $followRepository;
 
-    public function __construct(UserRepository $userRepository,PackRepository $packRepository, FollowRepository $followRepository)
+    public function __construct(UserRepository $userRepository, PackRepository $packRepository, FollowRepository $followRepository)
     {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
         $this->followRepository = $followRepository;
-
     }
 
     public function searchUsers($key)
@@ -116,9 +117,9 @@ class UserService
         $vip = Common::getLevel($userId, 3);
         $types = [4, 5, 6, 7, 8];
         $ids = $this->packRepository->getTargetIdsByUserAndType($userId, $types);
-        
+
         $wares = $this->packRepository->getWaresByConditions($vip, $types, $ids);
-        
+
         if ($wares->isEmpty()) return 0;
 
         foreach ($wares as $ware) {
@@ -138,9 +139,9 @@ class UserService
         return count($wares);
     }
 
-    public function updateLocation($userId,$lat,$log)
+    public function updateLocation($userId, $lat, $log)
     {
-        $this->userRepository->updateLocation($userId,$lat,$log);
+        $this->userRepository->updateLocation($userId, $lat, $log);
     }
 
     public function toggleLike($userId, $likedUserId)
@@ -151,11 +152,11 @@ class UserService
             $this->userRepository->detachLike($userId, $likedUserId);
             return __("liked deleted successfully");
         } else {
-            $this->userRepository->attachLike($userId, $likedUserId);   
+            $this->userRepository->attachLike($userId, $likedUserId);
             return __("liked added successfully");
         }
     }
-  
+
     public function toggleIgnored($userId, $likedUserId)
     {
         $hasLiked = $this->userRepository->hasIgnored($userId, $likedUserId);
@@ -177,11 +178,11 @@ class UserService
             case '3':
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
                 return Common::apiResponse(true, '', $this->getData($user, $type), 200);
-                
+
             case '4':
                 (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
                 return Common::apiResponse(true, '', UserRelationsResource::collection($this->userRepository->getFolloweds($user)), 200);
-                
+
             case '5':
                 $followRooms = $this->userRepository->getFollowRooms($user->id);
                 return Common::apiResponse(true, '', RoomResource::collection($followRooms), 200);
@@ -222,7 +223,7 @@ class UserService
         return Common::apiResponse(true, 'follow done', null, 201);
     }
 
-    public function unfollowUser($request)
+    public function unFollowUser($request)
     {
         $this->followRepository->deleteFollow($request->user()->id, $request->user_id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
@@ -245,44 +246,56 @@ class UserService
     {
         $userId = $user->id;
 
-        if ($type == 1){
-            $data = Follow::query()->where('user_id' , $userId)->whereHas('followed')->with('followed', function ($query) {
+        if ($type == 1) {
+            $data = Follow::query()->where('user_id', $userId)->whereHas('followed')->with('followed', function ($query) {
                 $query->with([
-                                 'room' => function ($query) {
-                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
-                             ]);
+                    'room' => function ($query) {
+                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                    },
+                    'followPacks',
+                    'profile',
+                    'ware',
+                    'UserVip'
+                ]);
             })->orderByDesc('id')->paginate(15);
             $collect = collect($data->items());
             $users    = $collect->pluck('followed');
             // dd($users);
 
 
-        }elseif ($type == 2){
-            $data = Follow::query()->whereHas('follower')->where('followed_user_id' , $userId)->whereHas('follower')->with('follower', function ($query) {
+        } elseif ($type == 2) {
+            $data = Follow::query()->whereHas('follower')->where('followed_user_id', $userId)->whereHas('follower')->with('follower', function ($query) {
                 $query->with([
-                                 'room' => function ($query) {
-                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
-                             ]);
+                    'room' => function ($query) {
+                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                    },
+                    'followPacks',
+                    'profile',
+                    'ware',
+                    'UserVip'
+                ]);
             })->orderByDesc('id')->paginate(15);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
         } elseif ($type == 3) {
-            $data = Follow::query()->whereHas('followed')->whereHas('follower')->join('follows as f1', function (JoinClause $join){
+            $data = Follow::query()->whereHas('followed')->whereHas('follower')->join('follows as f1', function (JoinClause $join) {
                 $join->on('follows.user_id', '=', 'f1.followed_user_id')
-                     ->on('f1.user_id', '=','follows.followed_user_id');
+                    ->on('f1.user_id', '=', 'follows.followed_user_id');
             })->where('follows.user_id', $userId)->with('follower', function ($query) {
                 $query->with([
-                                 'room' => function ($query) {
-                                     return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                                 }, 'followPacks', 'profile', 'ware', 'UserVip'
-                             ]);
+                    'room' => function ($query) {
+                        return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                    },
+                    'followPacks',
+                    'profile',
+                    'ware',
+                    'UserVip'
+                ]);
             })->orderByDesc('follows.id')->paginate(15);
 
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
-        }else{
+        } else {
             $users = collect([]);
         }
 
@@ -297,7 +310,7 @@ class UserService
 
     public function getHelperArrays(User $user, $data): array
     {
-        $userFollowers      = Follow::query()->where('user_id',$user->id)->pluck('followed_user_id')->toArray();
+        $userFollowers      = Follow::query()->where('user_id', $user->id)->pluck('followed_user_id')->toArray();
 
 
         [$vipsSenderImages, $vipsReceivedImages] =
@@ -318,6 +331,28 @@ class UserService
     public function getLevel($levelsList, $type = 1)
     {
         return Vip::query()->whereIn('level', $levelsList)
-                  ->where('type', $type)->select('img', 'level')->get();
+            ->where('type', $type)->select('img', 'level')->get();
+    }
+
+    public function myStore($user, $request)
+    {
+        $cacheKey = 'cache-data-mystore-' . $user->id;
+        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+
+            $targetService = new FixedTargetService($user);
+            $targetService->calculateTarget();
+            if ($user->ownerRoom != null) {
+                $roomTarget = new RoomGameServices();
+                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
+            }
+        }
+
+        if ($user->device_token  != $request->header('device')) {
+            $user->enableSaving = true;
+            $user->device_token = $request->header('device');
+            $user->save();
+        }
+
+        return $user;
     }
 }

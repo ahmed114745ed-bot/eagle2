@@ -64,7 +64,7 @@ class UserController extends Controller
         $user = $request->user();
         $user->enableSaving = false;
 
-        $userWithMedals = $this->userService->processUserData($user, $request->header('device'),$request->header('lat'),$request->header('long'));
+        $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
 
         $this->userService->unlockDressHand($user->id);
 
@@ -83,35 +83,15 @@ class UserController extends Controller
         return $this->userService->followUser($request);
     }
 
-    public function unfollow(Request $request)
+    public function unFollow(Request $request)
     {
-        return $this->userService->unfollowUser($request);
+        return $this->userService->unFollowUser($request);
     }
 
     public function my_store_all(Request $request)
     {
         $user = $request->user();
-        $cacheKey = 'cache-data-mystore-' . $user->id;
-        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
-
-            $targetService = new FixedTargetService($user);
-            $targetService->calculateTarget();
-            if($user->ownerRoom != null){
-                $roomTarget = new RoomGameServices();
-                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
-            }
-        }
-
-        if ($user->device_token  != $request->header('device')) {
-            $user->enableSaving = true;
-            $user->device_token = $request->header('device');
-            $user->save();
-        }
-
-        /* if(($user->type_user == 2 || $user->type_user == 4 ) && $user->agency){
-            $targetService->updateAgencySalaries($user->agency_id);
-        } */
-
+        $user = $this->userService->myStore($user, $request);
         $data = new MyStoreResource($user);
         return Common::apiResponse(true, '', $data, 200);
     }
