@@ -132,7 +132,7 @@ class ChargeRepoService
         }
     }
 
-    public function getChargeUserHistory($userId, $type, $by_date, $chargeType = null)
+    public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null,$searchKey = null)
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
         if ($type == 'received') {
@@ -140,6 +140,10 @@ class ChargeRepoService
         }
         if ($type == 'sent') {
             $charge = $charge/*->where('charger_type', $charger_type)*/->where('charger_id', $userId);
+        }
+        if($searchKey != null )
+        {
+            $charge = $charge->when( $searchKey, fn($query) => $query->whereHas('sender' , fn($q) => $q->where('uuid', 'like', $searchKey)));
         }
         if ($by_date) {
             $charge = $charge->where('created_at', 'like', "%$by_date%");

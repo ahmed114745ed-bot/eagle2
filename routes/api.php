@@ -157,6 +157,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             // TODO re refact and resource and make enum @eriny
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
+            Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
             Route::prefix('agencies')->group(function () {
                 Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);

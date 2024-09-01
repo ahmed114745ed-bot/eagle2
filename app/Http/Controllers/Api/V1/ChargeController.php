@@ -6,13 +6,11 @@ use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use Exception;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\RoomSalary;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\ChargeRepoService;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\TrxResource;
 use App\Http\Resources\Api\V1\ChargeResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
@@ -152,8 +150,8 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
-        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, 'freight forwarder');
-        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge->orderByDesc('created_at')->get()), 200);
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'freight forwarder');
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
 
@@ -192,14 +190,14 @@ class ChargeController extends Controller
 
         $userId = $request->user()->id;
         if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
-        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, 'Host agent');
-        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge->orderByDesc('created_at')->get()), 200);
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'Host agent');
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
     public function chargeHistory(Request $request)
     {
         $userId = $request->user()->id;
-        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type,$request->by_date, 'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory($userId, $request->type, $request->by_date, 'Host agent');
 
         return Common::apiResponse(1, '', ChargeResource::collection($charge), 200);
     }
@@ -211,11 +209,19 @@ class ChargeController extends Controller
         $searchKey = $request->search_key ?? null;
         $charge = $this->chargeService->getChargeUserHistory($userId, 'received', 'Host agent');
 
-        $charge = $charge->with(['sender'])->when( $searchKey, fn($query) => $query->whereHas('sender' , fn($q) => $q->where('uuid', 'like', $searchKey)));
+        $charge = $charge->with(['sender'])->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         if ($request->by_date) {
             $charge = $charge->where('created_at', 'like', "%$request->by_date%");
         }
         return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge->orderByDesc('created_at')->get()), 200);
+    }
+    public function userChargeCoinsII(Request $request)
+    {
+        $userId = $request->user()->id;
+        $searchKey = $request->search_key ?? null;
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', $request->by_date, 'Host agent', $searchKey);
+
+        return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge), 200);
     }
 
 
