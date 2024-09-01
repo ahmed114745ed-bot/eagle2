@@ -48,7 +48,7 @@ class ProfileRepository
             },
             'followPacks', 'profile', 'ware', 'UserVip'
         ])->paginate(15);
-    }
+    } 
 
    
 }

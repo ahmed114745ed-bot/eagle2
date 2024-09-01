@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\UserResource as V1UserResource;
 use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
 
 class ProfileService
@@ -40,6 +41,21 @@ class ProfileService
             }
             $imagePath = Common::upload('profile', $img);
             $this->profileRepo->updateAvatar($profile, $imagePath);
+        }
+
+        if ($request->hasFile('multi_image')) {
+            foreach ($user->images as $image) {
+                Storage::delete('profile/'.$image->img);
+                $image->delete();
+            }
+
+            foreach ($request->file('multi_image') as $file) {
+                $imagePath = Common::upload('profile', $file);
+
+                $user->images()->create([
+                    'img' => $imagePath,
+                ]);
+            }
         }
 
         $out = new V1UserResource($user);
