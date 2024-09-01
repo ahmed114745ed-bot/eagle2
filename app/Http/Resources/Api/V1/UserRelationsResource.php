@@ -86,6 +86,12 @@ class UserRelationsResource extends JsonResource
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             "manger_type"          =>new MangerTypeResource(@$this->mangerType),
             "multi_images"          => $this->images?->select("img"),
+            "statistic"     => [
+                "visitors" => count($this->profileVisits),
+                "licked" => count($this->likes),
+                "followers" => count($this->followers),
+                "bio" => $this->bio,
+            ]
         ];
 
         return $data;

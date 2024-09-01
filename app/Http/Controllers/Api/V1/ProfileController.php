@@ -7,6 +7,7 @@ use App\Services\ProfileService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\NewProfileResource;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
 use App\Services\UserService;
 use Auth;
@@ -79,6 +80,13 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         return $this->profileService->getProfileVisitorsList($user);
+    }
+
+    public function related()
+    {
+        $randomUsers = $this->profileService->getRelatedUsers(20);
+
+        return Common::apiResponse(true,'',  UserRelationsResource::collection($randomUsers), 200);
     }
 }
 

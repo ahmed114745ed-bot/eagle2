@@ -50,5 +50,9 @@ class ProfileRepository
         ])->paginate(15);
     } 
 
+    public function getRandomUsers($limit = 10)
+    {
+        return User::inRandomOrder()->where("online",1)->limit($limit)->get();
+    }
    
 }

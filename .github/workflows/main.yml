@@ -1,0 +1,29 @@
+name: SSh
+on:
+  push:
+    branches: ["main"]
+  pull_request: 
+     branches: ["main"]
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Eagle
+      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      with:
+        host: "34.18.89.75"
+        user: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        first_ssh: |
+          echo "$USER"
+          pwd
+          whoami
+          echo "$USER"
+          cd /var/www/Eagle
+          pwd
+          cat /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          php artisan migrate
+          
