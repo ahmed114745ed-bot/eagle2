@@ -744,6 +744,8 @@
    "liked added successfully": "تمت اضافه الاعجاب بنجاح",
    "ignored deleted successfully": "تمت الغاء التجنب بنجاح",
    "ignored added successfully": "تمت اضافه التجنب بنجاح",
+   "question": "السؤال",
+   "answer": "الجواب",
    "agency_id": "معرف الوكالة"
 
 }
