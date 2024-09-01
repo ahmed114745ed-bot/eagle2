@@ -47,6 +47,7 @@ use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 
 Admin::routes();
@@ -92,6 +93,7 @@ Route::group(
              Route::get('login', MultiLanguageController::class.'@getLogin');
 
         }
+        $router->resource('questions', QuestionController::class);
         $router->resource('user-online-history', UserOnlineHistoryController::class);
 
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');

@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
@@ -272,6 +273,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('update-game', [AllGameController::class, 'updateGame']);
             });
             // end games
+
+            // questions
+            Route::get('questions', [QuestionController::class, 'questions']);
+            Route::get('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
+            // end questions
+
         }
     );
 
