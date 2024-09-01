@@ -1,9 +1,9 @@
 name: SSh
 on:
   push:
-    branches: ["test"]
+    branches: ["main"]
   pull_request: 
-     branches: ["test"]
+     branches: ["main"]
 jobs:
   run_example_job:
     runs-on: ubuntu-latest
