@@ -2,17 +2,21 @@
 
 namespace App\Tik\Services;
 
-use App\Facades\UserHandling;
-use App\Helpers\Common;
 use App\Models\Room;
-use App\Models\RoomVisitor;
 use App\Models\User;
-use App\Tik\Repositories\EnteranceRoomRepository;
+use App\Helpers\Common;
+use App\Jobs\ResetCharisma;
+use App\Models\EnteredRoom;
+use App\Models\RoomVisitor;
+use Illuminate\Http\Request;
+use App\Facades\UserHandling;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Jobs\SendNotificationToAllFollowers;
+use App\Tik\Repositories\EnteranceRoomRepository;
+use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class EnteranceRoomServices
@@ -32,12 +36,12 @@ class EnteranceRoomServices
         if (!class_exists($modelClass) || !is_subclass_of($modelClass, Model::class)) {
             throw new \InvalidArgumentException('Invalid model class');
         }
-    
+
         $modelInstance = new $modelClass;
         $enternaceRepo = new EnteranceRoomRepository($modelInstance);
         return $enternaceRepo;
     }
-    
+
 
     ///////////////////////////////////////pusher////////////////////////////////////
     public function updateRoomCountFromPusher(Request $request)
@@ -50,7 +54,7 @@ class EnteranceRoomServices
         $name = $event['name'];
         $channelName = $event['channel'];
         $parts = explode('-', $channelName);
-        if(count($parts) >= 3) {
+        if (count($parts) >= 3) {
             $roomId = $parts[1];
             $userId = $parts[2];
         } else {
@@ -193,7 +197,7 @@ class EnteranceRoomServices
             $visitors[] = $userId;
         } elseif ($event == 'room_logout') {
             UserHandling::calcTime($userId);
-            $this->updateMicrophone($room->uid,$userId);
+            $this->updateMicrophone($room->uid, $userId);
             $visitors = array_diff($visitors, [$userId]);
         }
 
@@ -219,23 +223,146 @@ class EnteranceRoomServices
         Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
     }
 
-    private function updateMicrophone($room_uid,$user_id)
+    private function updateMicrophone($room_uid, $user_id)
     {
         $user = User::query()->find($user_id);
-        if (!$user) return ;
-        $result  =Common::go_microphone_hand($room_uid, $user_id);
+        if (!$user) return;
+        $result  = Common::go_microphone_hand($room_uid, $user_id);
 
-        $room = Room::query ()->where ('uid',$room_uid)->first ();
+        $room = Room::query()->where('uid', $room_uid)->first();
 
-        if (!$room) return ;
-        if($result){
-            (new UserCharismaService())-> RemoveUserRoomWhenLeaveMic($user_id, $room ->id);
+        if (!$room) return;
+        if ($result) {
+            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
 
     ///////////////////////////////
 
 
+    public function enterRoom($user, $request, $room_pass, $owner_id)
+    {
+        $messageBlack = null;
+        $remainingTime = null;
+        if ($request->type == 'random') {
+            $owner_id = $this->roomRepository->randomOwner();
+        }
 
-  
+        // if owner id not path throw error
+        if (!$owner_id) return Common::apiResponse (0,'not found',null,404);
+        //check if this user in black-list
+        $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
+        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 423);
+
+
+        // get room by owner_id
+        $room = $this->roomRepository->findRoomUser($owner_id);
+        if (!$room)return Common::apiResponse (false,'No room yet, please create first',null,404);
+        // if(($room->count_room_socket == 0 ) && $room->uid != $user_id && $room->pin != 1 )return Common::apiResponse(false, __('api_responses.closedRoom'), null, 402);
+
+        $roomBlack = $room->room_black;
+        if (!empty($roomBlack)) {
+            $is_black = explode(',', $roomBlack);
+            foreach ($is_black as $k => &$v) {
+                $arr = explode("#", $v);
+                $sjc = time() - $arr[1];
+                $rt = $arr[2] - $sjc;
+                $h = floor($rt / 3600);
+                $r = $rt % 3600;
+                $m = floor($r / 60);
+                $s = $r % 60;
+                if ($sjc < $arr[2] && $arr[0] == $user->id) {
+                    $messageBlack = __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room');
+                    $remainingTime = ['remaining_time' => "$h:$m:$s"];
+                    
+                    return [$messageBlack,$remainingTime];
+                    Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'), ['remaining_time' => "$h:$m:$s"], 200);
+                }
+
+                if ($sjc >= $arr[2]) {
+                    unset($is_black[$k]);
+                }
+            }
+            $roomBlack = implode(",", $is_black);
+            $this->roomRepository->updateRoomBlack($room, $roomBlack);
+        }
+
+
+        if ($room->room_pass &&  $owner_id != $user->id) {
+            if (!$room_pass)  return Common::apiResponse(false,__('The room is locked, please enter the password'),null,409);
+            if ($room->room_pass != $room_pass) return Common::apiResponse(false,__('Password is incorrect, please re-enter'),null,410);
+        }
+
+
+        /*if (!$request->is_update){
+            if ($request->sendToZego != 'no') {
+                dispatch(new EnterRoomZigoRequest($user, $room->id, $request->have_vip))->onQueue('enterRoomQueue');
+            }
+        }*/
+        //        $this->getRoomTwoLastPk($room->id);
+
+        if ($user->id == $owner_id) {
+            $room->is_afk = 1;
+            $room->save();
+            if ($room->count_room_socket == 0) {
+                dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
+            }
+        }
+        $room_info = (new EnterRoomCollection($room,$user->id));
+
+        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
+        $room_info = $room_info->toArray($request);
+        $room_info['zego_keys'] = $keys->mapWithKeys(function ($item){
+            return [$item['name'] => (($item['name'] == 'zego_app_id') ? (integer)$item['value'] :$item['value'])];
+        });
+
+
+        $this->updateRoom($user->id, $owner_id, $room);
+        $this->enterTheRoomCreateOrUpdate($$user->id, $owner_id, $room->id);
+       // $this->updateRoomVisitor($user_id, $owner_id, $room);
+
+
+        //$this->updateRoomVisitor($user_id, $owner_id, $room);
+
+        //send to zego
+        $user->enableSaving = false;
+        $user->now_room_uid = (integer)$owner_id;
+        $user->save();
+
+        if (config('app.env') != "production") {
+            RoomVisitor::firstOrCreate([
+                'user_id'=>$user->id,
+                'room_id'=>$room->id,
+            ]);
+        }
+     
+        return Common::apiResponse(true, '', $room_info);
+
+       
+    }
+    private function updateRoom($user_id, $owner_id, Room &$room)
+    {
+       // $this->updateRoomVisitors($user_id, $owner_id, $room);
+
+        if ($room->charizma_status && ($room->charizma_timestamp  + 86400) < now()->timestamp ){
+            $room->charizma_timestamp = null;
+            $room->charizma_status = false;
+            dispatch(new ResetCharisma($room->id));
+        }
+
+        $room->save();
+    }
+    private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
+    {
+        EnteredRoom::query ()->updateOrCreate (
+            [
+                'uid'=>$user_id,
+                'ruid'=>$owner_id,
+                'rid'=>$room_id
+            ],
+            [
+                'entered_at'=>now ()
+            ]
+        );
+    }
 }
