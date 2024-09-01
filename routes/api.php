@@ -227,6 +227,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('liked', [ProfileController::class, 'liked']);
                 Route::post('ignored', [ProfileController::class, 'ignored']);
                 Route::get('users', [ProfileController::class, 'users']);
+                Route::get('related', [ProfileController::class, 'related']);
             });
 
             // TODO refact @eriny

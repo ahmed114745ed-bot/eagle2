@@ -105,4 +105,12 @@ class ProfileService
 
         return $jsonResponse;
     }
+
+    public function getRelatedUsers($limit = 10)
+    {
+        return $this->profileRepo->getRandomUsers($limit);
+    }
+
+
+
 }
