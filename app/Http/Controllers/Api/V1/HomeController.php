@@ -252,4 +252,13 @@ class HomeController extends Controller
             ]
         ];
     }
+
+    public function check_if_friend(Request $request){
+        $me = $request->user ();
+        $user_id = $request->user_id;
+        if (in_array ($user_id,$me->friends_ids()->toArray())){
+            return Common::apiResponse (1,'exists',true);
+        }
+        return Common::apiResponse (1,'does not exists',false);
+    }
 }
