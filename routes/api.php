@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V2\AgencyController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -275,6 +276,23 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('questions', [QuestionController::class, 'questions']);
             Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
             // end questions
+
+            Route::prefix('agencies')->group(function () {
+                Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
+                Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
+                Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
+                Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
+    
+                Route::post('join_request', [AgencyController::class, 'joinRequest']);
+                Route::get('show', [AgencyController::class, 'view']);
+                Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
+                Route::get('show_request', [AgencyController::class, 'show_request']);
+                Route::post('actions_request', [AgencyController::class, 'Accept_request']);
+                Route::get('list_options_his', [AgencyController::class, 'list_options_his']);
+                Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
+                Route::post('{id}', [AgencyController::class, 'update']);
+                Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
+            });
 
         }
     );

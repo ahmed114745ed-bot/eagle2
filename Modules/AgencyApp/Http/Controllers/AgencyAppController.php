@@ -44,6 +44,7 @@ class AgencyAppController extends Controller
     public function get_user(Request $request) {
         if($request->user_id){
             $admin = ModelsAdmin::find($request->user()->id);
+            $user = User::find($request->user_id);
             if(isset($admin)&& $admin->isRole("admin")){
                 $user = User::find($request->user_id);
             }else{
@@ -55,11 +56,10 @@ class AgencyAppController extends Controller
         }
         return $user;
     }
-
     public function actionInvitation(Request $request)
     {
         if (!$request->invite_id || !$request->status) {
-            return Common::apiResponse(0, 'البيانات غير مكتمله',  200);
+            return Common::apiResponse(0, 'البيانات غير مكتمله',  423);
         }
         $user = $this->get_user(request());
         if (!$user) {
@@ -68,7 +68,7 @@ class AgencyAppController extends Controller
         $invitation = AgencyHostInvite::findOrFail($request->invite_id);
         if ($invitation->created_at->addDays(7) < now()) {
             $invitation->update(['status'=>3]);
-            return Common::apiResponse(0, 'لقد مر اكثر من 7 ايام علي الدعوه',  200);
+            return Common::apiResponse(0, 'لقد مر اكثر من 7 ايام علي الدعوه',  423);
         }
         $invitation->update(['status'=>$request->status]);
         if ($request->status == 1) {
@@ -77,7 +77,7 @@ class AgencyAppController extends Controller
         return Common::apiResponse(1, 'تم التعديل بنجاح',[],  200);
     }
 
-    public function agencyHostInvitation()
+    public function agencyHostInvitation(Request $request)
     {
         $user = $this->get_user(request());
         if (!$user) {
@@ -89,21 +89,21 @@ class AgencyAppController extends Controller
 
     public function invite_user_to_hostAgency(Request $request)
     {
-        if (!$request->user_id) {
-            return Common::apiResponse(0, 'المستخدم مطلوب!',  200);
+        if (!$request->user_id2) {
+            return Common::apiResponse(0, 'المستخدم مطلوب!',  423);
         }
         $user = $this->get_user($request);
         if (!$user) {
             return Common::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
-        $newhost = User::find($request->user_id);
+        $newhost = User::find($request->user_id2);
 
         if ($newhost->agency_id != 0) {
-            return Common::apiResponse(0, 'المستخدم موجود في وكاله!',  200);
+            return Common::apiResponse(0, 'المستخدم موجود في وكاله!',  423);
         }
         $check = AgencyHostInvite::where([ 'agency_id' => $user->agency_id,'user_id'  => $newhost->id])->latest('id')->first();
         if ($check!=null && $check->created_at->addDays(7) > now() && $check->status == 0) {
-            return Common::apiResponse(0, 'لم يمر علي اخر دعوه 7 ايام!',  200);
+            return Common::apiResponse(0, 'لم يمر علي اخر دعوه 7 ايام!',  423);
         }
         AgencyHostInvite::create([
             'user_invite_id' => $user->id,
@@ -200,9 +200,9 @@ class AgencyAppController extends Controller
                 ->where('uid', $host->id)
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('hours');
-        
+
             $total_hours += $hours;
-        
+
             if ($total_hours >= 2) {
                 $days++;
                 $total_hours = 0;
@@ -218,7 +218,7 @@ class AgencyAppController extends Controller
             ];
         }
 
-       
+
         $data=[
             'monthly_diamond' => $host->monthly_diamond_received,
             'last_month_diamond' => $last_month_di,
@@ -228,15 +228,22 @@ class AgencyAppController extends Controller
             'total_hours' =>  $total_total_hours,
             'total_diamonds' =>  $total_diamonds,
             'dailyReport' =>  $dAilyReport,
+            'host' => [
+                'id' => $host->id,
+                'uuid' => $host->uuid,
+                'name' => $host->name,
+                'img' => $host->profile->avatar,
+            ]
         ];
 
         return Common::apiResponse(1, '', $data,  200);
     }
 
-    public function agency_data()
+    public function agency_data(Request $request)
     {
         // $user = Auth::user();
         $user = $this->get_user(request());
+        // return $user;
         if (!$user) {
             return Common::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
@@ -273,7 +280,7 @@ class AgencyAppController extends Controller
                                 ->whereYear('created_at', now()->year)->count();
 
         $data=[
-          
+
         ];
 
         $hosts = $agency->mempers->where("type_user",'!=',0);
@@ -285,7 +292,7 @@ class AgencyAppController extends Controller
         $month_hosts = AgencyMonthlyHostResource::collection($monthlyHost);
         $totalSalary = $agency->salary;
         $last_salary = $agency->last_month_salary;
-        $current_salary = $agency->agencySalary->sum(\DB::raw('sallary - cut_amount'));
+        $current_salary = $agency->agencySalary ? $agency->agencySalary->sum(\DB::raw('sallary - cut_amount')) : 0;
         $userSallaries= UserSallary::whereIn("user_id",$hosts->pluck("id")->toArray())->where("month",date("m"))->where("year",date("Y"))->get();
         $total_hosts_achieve= $userSallaries->sum("sallary");
         $total_hosts_percentages= $userSallaries->sum("agency_sallary");
@@ -316,6 +323,30 @@ class AgencyAppController extends Controller
         return Common::apiResponse(1, '', $data,  200);
     }
 
+
+
+    public function host_agency_edit(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'phone' => 'required',
+            'notice' => 'nullable',
+        ]);
+        // $user = Auth::user();
+        $user = $this->get_user(request());
+        if (!$user) {
+            return Common::apiResponse(0, 'لا يوجد مستخدم!',  200);
+        }
+        if (!$user->ownAgency) {
+            return Common::apiResponse(0, 'هذا المستخدم لا يمتلك وكاله!',  200);
+        }
+        $agency = Agency::where("id",$user->agency_id)->first();
+        $agency->name = $request->name;
+        $agency->notice = $request->notice;
+        $agency->phone = $request->phone;
+        $agency->save();
+        return Common::apiResponse(1, '', $agency,  200);
+    }
     public function createAgency(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -336,7 +367,7 @@ class AgencyAppController extends Controller
             'country' => 'nullable',
             'apps' => 'required',
             'salary' => 'required|integer',
-            'host' => 'required|integer', 
+            'host' => 'required|integer',
             'uuid'=> 'nullable|exists:users,uuid',
             'video'=>'nullable|file|mimes:mp4,ogx,oga,ogv,ogg,webm'
         ]);

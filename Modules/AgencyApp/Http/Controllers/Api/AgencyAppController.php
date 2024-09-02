@@ -51,9 +51,9 @@ class AgencyAppController extends Controller
         $hours= LiveTime::query()->where('uid', $user->id)->whereBetween('created_at', [$startDate, $endDate]);
         $diamonds=GiftLog::query()->whereBetween('created_at', [$startDate, $endDate])->where("receiver_id",$user->id);
         for ($date = $startDate; $date->lessThanOrEqualTo($endDate); $date->addDay()) {
-            $day        = $days->wheredate('created_at',$date->toDateString())->sum("days") ?? 0;
-            $hour       = $hours->wheredate('created_at',$date->toDateString())->sum("hours");
-            $diamond    = $diamonds->wheredate('created_at',$date->toDateString())->sum("giftPrice");
+            $day        = $days->whereDate('created_at',$date->toDateString())->sum("days") ?? 0;
+            $hour       = $hours->whereDate('created_at',$date->toDateString())->sum("hours");
+            $diamond    = $diamonds->whereDate('created_at',$date->toDateString())->sum("giftPrice");
 
             $total_days += $day;
             $total_hours += $hour;
@@ -342,7 +342,7 @@ class AgencyAppController extends Controller
             'active_days' => $totalDays,
             'daly_reports' => []
         ];
-        for (; $startDay <= $endDay; $startDay++) {
+        for ($startDay; $startDay <= $endDay; $startDay++) {
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
