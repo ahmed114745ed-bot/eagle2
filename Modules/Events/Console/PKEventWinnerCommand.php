@@ -2,15 +2,16 @@
 
 namespace Modules\Events\Console;
 
-use App\Helpers\UserCommon;
-use App\Models\GiftLog;
+use Carbon\Carbon;
 use App\Models\OVip;
 use App\Models\Ware;
+use App\Models\GiftLog;
+use App\Helpers\UserCommon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Events\Entities\PkEvent;
 use Modules\Events\Entities\PkWinner;
+use Modules\Achievement\Entities\UserAchievementLevel;
 
 class PKEventWinnerCommand extends Command
 {
@@ -33,7 +34,7 @@ class PKEventWinnerCommand extends Command
     protected function getCurrentPkEvent()
     {
         return PkEvent::endToday()->with('rewards')
-                      ->first();
+            ->first();
     }
 
     protected function processEventParticipants(PkEvent $pkEvent, $participantType, $pkType)
@@ -53,42 +54,42 @@ class PKEventWinnerCommand extends Command
         $column = $participantType === 'roomowner' ? 'roomowner_id' : $participantType . '_id';
         $notZero = $participantType === 'roomowner' ? '!=' : '=';
         return GiftLog::whereBetween('created_at', [$pkEvent->start_date, $pkEvent->end_date])
-                      ->with([$participantType])
-                      ->where('pk', 1)
-                      ->select(DB::raw('SUM(giftPrice) AS total_gift_num'), $column)
-                      ->groupBy($column)
-                      ->orderByDesc('total_gift_num')
-                      ->take(3)
-                      ->get();
+            ->with([$participantType])
+            ->where('pk', 1)
+            ->select(DB::raw('SUM(giftPrice) AS total_gift_num'), $column)
+            ->groupBy($column)
+            ->orderByDesc('total_gift_num')
+            ->take(3)
+            ->get();
     }
 
     protected function isAlreadyWinner($pkEventId, $userId)
     {
         return PkWinner::where([
-                                   'pk_event_id' => $pkEventId,
-                                   'user_id' => $userId,
-                               ])->exists();
+            'pk_event_id' => $pkEventId,
+            'user_id' => $userId,
+        ])->exists();
     }
 
     protected function createWinner($pkEventId, $userId, $level, $pkType)
     {
         return PkWinner::create([
-                                    'pk_event_id' => $pkEventId,
-                                    'user_id' => $userId,
-                                    'level' => $level,
-                                    'pk_type' => $pkType,
-                                ]);
+            'pk_event_id' => $pkEventId,
+            'user_id' => $userId,
+            'level' => $level,
+            'pk_type' => $pkType,
+        ]);
     }
 
     protected function assignRewards($winner, $rewardIds, $user)
     {
         foreach ($rewardIds as $reward) {
             DB::table('reward_winner_pks')->insert([
-                                                       'pk_winner_id' => $winner->user_id,
-                                                       'pk_reward_id' => $reward->id,
-                                                       'created_at' => now(),
-                                                       'updated_at' => now(),
-                                                   ]);
+                'pk_winner_id' => $winner->user_id,
+                'pk_reward_id' => $reward->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
             switch ($reward->type) {
                 case "coins":
@@ -104,15 +105,15 @@ class PKEventWinnerCommand extends Command
                     UserCommon::addWareToUser($user, $ware, $reward->expire);
                     break;
                 case "achievement":
+                    $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                     $attributes = [
-                        'user_id'       =>$user->id,
+                        'user_id'       => $user->id,
                         'custom_image' => $reward->target,
+                        'end_at' => $dateTimestamp,
                     ];
                     UserAchievementLevel::create($attributes);
                     break;
             }
-
-
         }
     }
 }

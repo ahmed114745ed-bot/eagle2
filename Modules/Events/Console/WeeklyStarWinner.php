@@ -71,9 +71,11 @@ class WeeklyStarWinner extends Command
                             $ware=Ware::query()->find($rewad->target);
                             UserCommon::addWareToUser($entry->sender,$ware,$rewad->expire);
                         }elseif ($rewad->type == "achievement"){
+                            $dateTimestamp = Carbon::parse($rewad->expire)->format("Y-m-d H:i:s");
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
                                 'custom_image' => $rewad->target,
+                                'end_at' => $dateTimestamp,
                             ];
 
                             UserAchievementLevel::create($attributes);

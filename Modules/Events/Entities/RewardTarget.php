@@ -30,47 +30,47 @@ class RewardTarget extends Model
 
     protected static function boot() {
         parent::boot();
-        // static::creating(function ($model) {
-        //     if ($model->type == "ware"){
-        //         $model->target = request('target1', $model->target);
-        //     }elseif ($model->type == "vip"){
-        //         $model->target = request('target2', $model->target);
-        //     }elseif ($model->type == "coins"){
-        //         $model->target = request('target3', $model->target);
-        //     }elseif ($model->type == "achievement"){
-        //         $file       = request('target4', $model->target);
+        static::creating(function ($model) {
+            if ($model->type == "ware"){
+                $model->target = request('target1', $model->target);
+            }elseif ($model->type == "vip"){
+                $model->target = request('target2', $model->target);
+            }elseif ($model->type == "coins"){
+                $model->target = request('target3', $model->target);
+            }elseif ($model->type == "achievement"){
+                $file       = request('target4', $model->target);
 
-        //         if ($file instanceof  UploadedFile){
-        //             $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
-        //         }
-        //         $model->target = $url ?? '';
-        //     }
-        //     unset($model->target1);
-        //     unset($model->target2);
-        //     unset($model->target3);
-        //     unset($model->target4);
-        // });
+                if ($file instanceof  UploadedFile){
+                    $url = Common::upload('events', $file);
+                }
+                $model->target = $url ?? '';
+            }
+            unset($model->target1);
+            unset($model->target2);
+            unset($model->target3);
+            unset($model->target4);
+        });
 
-        // static::updating(function ($model) {
-        //     if ($model->type == "ware"){
-        //         $model->target = request('target1', $model->target);
-        //     }elseif ($model->type == "vip"){
-        //         $model->target = request('target2', $model->target);
-        //     }elseif ($model->type == "coins"){
-        //         $model->target = request('target3', $model->target);
-        //     }elseif ($model->type == "achievement"){
-        //         $file       = request('target4', $model->target);
-        //         if ($file instanceof  UploadedFile){
-        //             $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
-        //             Storage::delete($model->target);
-        //         }
-        //         $model->target = $url ?? '';
-        //     }
-        //     unset($model->target1);
-        //     unset($model->target2);
-        //     unset($model->target3);
-        //     unset($model->target4);
-        // });
+        static::updating(function ($model) {
+            if ($model->type == "ware"){
+                $model->target = request('target1', $model->target);
+            }elseif ($model->type == "vip"){
+                $model->target = request('target2', $model->target);
+            }elseif ($model->type == "coins"){
+                $model->target = request('target3', $model->target);
+            }elseif ($model->type == "achievement"){
+                $file       = request('target4', $model->target);
+                if ($file instanceof  UploadedFile){
+                    $url = Common::upload( 'events', $file);
+                    Storage::delete($model->target);
+                }
+                $model->target = $url ?? '';
+            }
+            unset($model->target1);
+            unset($model->target2);
+            unset($model->target3);
+            unset($model->target4);
+        });
     }
 
     public function ware()

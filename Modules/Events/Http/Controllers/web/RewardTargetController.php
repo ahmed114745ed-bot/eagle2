@@ -84,7 +84,7 @@ class RewardTargetController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-                $value = getDriverUrl()  . @$this->target;
+                $value = getDriverUrl() . '/'. @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
 

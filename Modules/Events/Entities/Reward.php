@@ -47,7 +47,7 @@ class Reward extends Model
                 $file       = request('target4', $model->target);
 
                 if ($file instanceof  UploadedFile){
-                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
+                    $url = Common::upload('events', $file);
                 }
                 $model->target = $url ?? '';
             }
@@ -67,7 +67,7 @@ class Reward extends Model
             }elseif ($model->type == "achievement"){
                 $file       = request('target4', $model->target);
                 if ($file instanceof  UploadedFile){
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
+                    $url = Common::upload( 'events', $file);
                     Storage::delete($model->target);
                 }
                 $model->target = $url ?? '';

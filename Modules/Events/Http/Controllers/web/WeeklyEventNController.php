@@ -199,7 +199,7 @@ class WeeklyEventNController extends MainController
                   $vip = OVip::find($target);
                   return $vip->name;
                 }else{
-                    $value = getDriverUrl(). $target;
+                    $value = getDriverUrl() . '/'. @$this->target;
                     return "<img src='$value' width='80' height='80'>";
                 }
 
