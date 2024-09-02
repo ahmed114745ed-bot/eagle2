@@ -172,6 +172,7 @@ class MyDataResource extends JsonResource
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
+            "multi_images"          => $this->images?->select("img"),
         ];
 
         $data['auth_token'] = $this->auth_token;
