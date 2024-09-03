@@ -318,7 +318,7 @@ class EnteranceRoomServices
 
 
         $this->updateRoom($user->id, $owner_id, $room);
-        $this->enterTheRoomCreateOrUpdate($$user->id, $owner_id, $room->id);
+        $this->enterTheRoomCreateOrUpdate($user->id, $owner_id, $room->id);
        // $this->updateRoomVisitor($user_id, $owner_id, $room);
 
 
