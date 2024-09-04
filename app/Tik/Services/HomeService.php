@@ -11,6 +11,7 @@ use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
+use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\UserVipRepository;
 use App\Tik\Repositories\LiveTimeRepository;
@@ -27,7 +28,8 @@ class HomeService
         private readonly WareRepository $wareRepository,
         private readonly RoomRepository $roomRepository,
         private readonly PackRepository $packRepository,
-        private readonly UserVipRepository $userVipRepository
+        private readonly UserVipRepository $userVipRepository,
+        private readonly TicketRepository $ticketRepository,
     ) {
     }
 
@@ -98,5 +100,25 @@ class HomeService
             $ware = $this->wareRepository->findById($wapel->target_id);
         }
         return [$level, $expire, $ware, $room->id,$wapel];
+    }
+
+    public function openTicket($request)
+    {
+        $data = [
+            'user_id' => $request->user_id,
+            'contact_num' => $request->contact,
+            'problem' => $request->txt,
+            'description' => $request->description,
+            'status' => 1
+        ];
+        $tkt = $this->ticketRepository->create($data);
+        if ($request->hasFile('img')) {
+            $img = $request->file('img');
+            $path = Common::upload('ticket', $img);
+            $tkt->img = $path;
+            $tkt->save();
+        }
+
+        return  $tkt;
     }
 }

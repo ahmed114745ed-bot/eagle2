@@ -297,4 +297,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         }
     );
 
+    Route::prefix('tickets')->group(function () {
+        Route::post('open', [HomeController::class, 'openTicket']);
+    });
+
 });

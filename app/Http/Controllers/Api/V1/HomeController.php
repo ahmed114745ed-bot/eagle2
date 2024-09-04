@@ -41,9 +41,7 @@ class HomeController extends Controller
 {
 
 
-    public function __construct(private HomeService $homeService)
-    {
-    }
+    public function __construct(private HomeService $homeService) {}
 
 
     public function one_page(Request $request)
@@ -91,21 +89,7 @@ class HomeController extends Controller
             return Common::apiResponse(0, 'missing params');
         }
 
-        $tkt = Ticket::query()->create(
-            [
-                'user_id' => $request->user_id,
-                'contact_num' => $request->contact,
-                'problem' => $request->txt,
-                'description' => $request->description,
-                'status' => 1
-            ]
-        );
-        if ($request->hasFile('img')) {
-            $img = $request->file('img');
-            $path = Common::upload('ticket', $img);
-            $tkt->img = $path;
-            $tkt->save();
-        }
+        $tkt = $this->homeService->openTicket($request);
         $out = [
             'contact' => $tkt->contact_num,
             'txt' => $tkt->problem,
@@ -192,7 +176,7 @@ class HomeController extends Controller
         }
     }
 
-   
+
 
     public function getUserHides(Request $request)
     {
@@ -213,7 +197,7 @@ class HomeController extends Controller
     }
 
 
-   
+
 
     /**
      * @param mixed $user_hours
@@ -253,12 +237,13 @@ class HomeController extends Controller
         ];
     }
 
-    public function check_if_friend(Request $request){
-        $me = $request->user ();
+    public function check_if_friend(Request $request)
+    {
+        $me = $request->user();
         $user_id = $request->user_id;
-        if (in_array ($user_id,$me->friends_ids()->toArray())){
-            return Common::apiResponse (1,'exists',true);
+        if (in_array($user_id, $me->friends_ids()->toArray())) {
+            return Common::apiResponse(1, 'exists', true);
         }
-        return Common::apiResponse (1,'does not exists',false);
+        return Common::apiResponse(1, 'does not exists', false);
     }
 }
