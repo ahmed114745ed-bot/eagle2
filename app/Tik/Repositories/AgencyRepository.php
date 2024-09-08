@@ -42,7 +42,7 @@ class AgencyRepository extends AbstractRepository
 
     public function getWithSelectMonthAndYear($agencyId)
     {
-        return $this->model->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year')->where('id', $agencyId)->first();
+        return $this->model->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, created_at')->where('id', $agencyId)->first();
     }
 
     public function updateAgency($agency)

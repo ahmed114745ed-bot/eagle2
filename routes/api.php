@@ -162,12 +162,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
-            Route::prefix('agencies')->group(function () {
-                Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
-                Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
-                Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
-            });
             Route::prefix('gifts')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
 //                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);

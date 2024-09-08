@@ -145,14 +145,15 @@ class AgencyService
     public function listOption($agencyId)
     {
         $agency = $this->agencyRepository->getWithSelectMonthAndYear($agencyId);
+       
         $createdAt   = $agency->created_at;
         $currentDate = now();
-
+      
         $monthsToInclude = [];
         while ($createdAt <= $currentDate) {
             $month = $createdAt->format('m');
             $year  = $createdAt->format('Y');
-
+    
             // Only add if the month and year are not the same as the current date
             if ($month !== $currentDate->format('m') || $year !== $currentDate->format('Y')) {
                 $monthsToInclude[] = [

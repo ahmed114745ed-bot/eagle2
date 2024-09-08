@@ -100,7 +100,7 @@ class AgencyController extends Controller
 
     public function list_options_his(Request $request)
     {
-        $agencyId      = $request->user()->agency_Id;
+        $agencyId      = $request->user()->agency_id;
         // Add the current month and year
         $monthsToInclude = $this->agencyService->listOption($agencyId);
         return Common::apiResponse(1, '', $monthsToInclude);
