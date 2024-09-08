@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
+use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\ExchangeController;
@@ -165,7 +167,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
             });
+            Route::prefix('gifts')->group(function () {
+                Route::get('/', [GiftController::class, 'index']);
+//                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);
+                Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
+                Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
+               // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
+                //Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu','appFeatureEnable:lucky']);
 
+            });
 
             Route::prefix('group-chat')->group(function () {
                 Route::get('/', [GroupChatController::class, 'index']);
