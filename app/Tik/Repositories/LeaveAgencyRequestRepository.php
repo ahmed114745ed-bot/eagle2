@@ -2,7 +2,8 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\LeaveAgencyRequest;
+use Modules\AgencyApp\Entities\LeaveAgencyRequest;
+
 
 class LeaveAgencyRequestRepository extends AbstractRepository
 {
