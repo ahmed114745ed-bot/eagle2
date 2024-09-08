@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
+use App\Http\Controllers\Api\V1\EmojiController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
@@ -257,6 +258,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('levels', [VipController::class, 'index']);
             // end vips
 
+
+
+            Route::prefix('emojis')->group(function () {
+                Route::get('/', [EmojiController::class, 'index']);
+                Route::get('/{id}', [EmojiController::class, 'show']);
+            });
             // start levels
             Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
             // end levels
