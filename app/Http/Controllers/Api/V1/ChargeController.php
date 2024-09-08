@@ -107,7 +107,6 @@ class ChargeController extends Controller
 
     public function sendMoneyFoeHost(Request $request)
     {
-        //        return Common::apiResponse(0, 'try again');
 
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
@@ -139,10 +138,7 @@ class ChargeController extends Controller
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
             return Common::apiResponse(1, 'your recharge was successful');
         } catch (Exception $e) {
-            // If an error occurs during the update process
-            echo $e->getMessage();
-
-            return Common::apiResponse(0, 'an error occurred, please try again later');
+            return Common::apiResponse(0,  $e->getMessage());
         }
     }
 

@@ -137,6 +137,19 @@ class User extends Authenticatable
         return $this->hasOne(Vip::class, 'level', 'total_received_level')
                     ->where('type', 1);
     }
+
+    public function getUserTypeAttribute()
+    {
+       return  match (intval($this->type_user)) {
+            0 => 'user',
+            1 => 'host',
+            2 => 'Host agent',
+            3 => 'freight forwarder',
+            4 => 'freight forwarder and Host agent',
+            5 => 'Administrative',
+            default => 'user',
+        };
+    }
  
 
     public function getTotalDays()
