@@ -79,6 +79,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
                 Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
                 Route::get('/{id}', [RoomController::class, 'show']);
+                Route::post('/{id}/edit', [EnteranceController::class, 'update']);
                 Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
                 Route::post('admins', [RoomController::class, 'getAdmins']);
                 Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
@@ -310,6 +311,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('{id}', [AgencyController::class, 'update']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
             });
+
+            
 
         }
     );

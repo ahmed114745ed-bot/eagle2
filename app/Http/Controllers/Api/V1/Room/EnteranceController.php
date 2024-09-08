@@ -378,9 +378,6 @@ class EnteranceController extends Controller
 
     public function update(EditRoomRequest $request, $id)
     {
-
-
-
         try {
             $room = $this->repo->find ($id);
             if(!$room){
