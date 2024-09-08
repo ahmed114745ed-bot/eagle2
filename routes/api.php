@@ -106,7 +106,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
-
+            Route::post('change_room_mode', [RoomController::class, 'changeMode']);
 
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);

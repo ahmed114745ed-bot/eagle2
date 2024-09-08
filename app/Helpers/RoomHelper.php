@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RoomHelper
 {
-    public function checkUserIsAdminOrOwner(string $admins, $ownerId): bool
+    public static function checkUserIsAdminOrOwner(string $admins, $ownerId): bool
     {
         $userId = Auth::id();
         $admins = explode (',',$admins);

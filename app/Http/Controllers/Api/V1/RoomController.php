@@ -157,7 +157,7 @@ class RoomController extends Controller
     private function getBoxes($ownerId, $userId)
     {
         return BoxUse::query()
-            ->with('user', fn ($q) => $q->with('profile')->withoutAppends()->select(['id', 'name', 'uuid']))
+            ->with('user', fn($q) => $q->with('profile')->withoutAppends()->select(['id', 'name', 'uuid']))
             ->where('room_uid', $ownerId)
             ->where('not_used_num', '>', 0)
             //            ->where('unused_coins', '>', 0)
@@ -429,7 +429,8 @@ class RoomController extends Controller
             $mic[]          = $ar;
         }
         $wait_user_id      = DB::table('mics')->where([
-            'roomowner_id' => $uid, 'type' => 1
+            'roomowner_id' => $uid,
+            'type' => 1
         ])->orderBy('id', 'asc')->limit(1)->value('user_id');
         $arr['user_id']    = !$wait_user_id ? '' : $wait_user_id;
         $arr['microphone'] = $mic;
@@ -540,13 +541,17 @@ class RoomController extends Controller
 
             if (!$t) {
                 LiveTime::query()->create([
-                    'uid' => $user_id, 'start_time' => time()
+                    'uid' => $user_id,
+                    'start_time' => time()
                 ]);
             }
 
             $ms   = [
                 'messageContent' => [
-                    'message' => 'upMic', 'userId' => $user_id, 'position' => $position, 'userName' => @$u->name
+                    'message' => 'upMic',
+                    'userId' => $user_id,
+                    'position' => $position,
+                    'userName' => @$u->name
                 ]
             ];
             $json = json_encode($ms);
@@ -644,9 +649,12 @@ class RoomController extends Controller
 
             $data               = [
                 "messageContent" => [
-                    "message"   => "changeBackground", "imgbackground" => $room->room_background ?: $background_me,
-                    "roomIntro" => $room->room_intro ?: "", "roomImg" => $room->room_cover ?: "",
-                    "room_type" => @$room->myType->name ?: "", "room_name" => @$room->room_name ?: ""
+                    "message"   => "changeBackground",
+                    "imgbackground" => $room->room_background ?: $background_me,
+                    "roomIntro" => $room->room_intro ?: "",
+                    "roomImg" => $room->room_cover ?: "",
+                    "room_type" => @$room->myType->name ?: "",
+                    "room_name" => @$room->room_name ?: ""
                 ]
             ];
             $json               = json_encode($data);
@@ -719,7 +727,9 @@ class RoomController extends Controller
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
         EnteredRoom::query()->updateOrCreate([
-            'uid' => $user_id, 'ruid' => $owner_id, 'rid' => $room_id
+            'uid' => $user_id,
+            'ruid' => $owner_id,
+            'rid' => $room_id
         ], [
             'entered_at' => now()
         ]);
@@ -777,7 +787,9 @@ class RoomController extends Controller
         if (true) {
             $ms   = [
                 'messageContent' => [
-                    'message' => 'muteMic', 'userId' => $request->user()->id, 'position' => $data['position']
+                    'message' => 'muteMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
                 ]
             ];
             $json = json_encode($ms);
@@ -815,7 +827,9 @@ class RoomController extends Controller
             $room = Room::query()->where('uid', $data['owner_id'])->first();
             $ms   = [
                 'messageContent' => [
-                    'message' => 'unmuteMic', 'userId' => $request->user()->id, 'position' => $data['position']
+                    'message' => 'unmuteMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
                 ]
             ];
             $json = json_encode($ms);
@@ -853,7 +867,9 @@ class RoomController extends Controller
         if ($res) {
             $ms   = [
                 'messageContent' => [
-                    'message' => 'lockMic', 'userId' => $request->user()->id, 'position' => $data['position']
+                    'message' => 'lockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
                 ]
             ];
             $json = json_encode($ms);
@@ -892,7 +908,9 @@ class RoomController extends Controller
             $room = Room::query()->where('uid', $data['owner_id'])->first();
             $ms   = [
                 'messageContent' => [
-                    'message' => 'unLockMic', 'userId' => $request->user()->id, 'position' => $data['position']
+                    'message' => 'unLockMic',
+                    'userId' => $request->user()->id,
+                    'position' => $data['position']
                 ]
             ];
             $json = json_encode($ms);
@@ -926,7 +944,8 @@ class RoomController extends Controller
             $room = Room::query()->where('uid', $uid)->first();
             $ms   = [
                 'messageContent' => [
-                    'message' => 'muteMic', 'userId' => $user_id,
+                    'message' => 'muteMic',
+                    'userId' => $user_id,
                 ]
             ];
             $json = json_encode($ms);
@@ -959,7 +978,8 @@ class RoomController extends Controller
             $room = Room::query()->where('uid', $uid)->first();
             $ms   = [
                 'messageContent' => [
-                    'message' => 'UnMuteMic', 'userId' => $user_id,
+                    'message' => 'UnMuteMic',
+                    'userId' => $user_id,
                 ]
             ];
             $json = json_encode($ms);
@@ -1013,7 +1033,8 @@ class RoomController extends Controller
             }
             $mc   = [
                 'messageContent' => [
-                    'message' => 'kickout', 'duration' => $duration
+                    'message' => 'kickout',
+                    'duration' => $duration
                 ]
             ];
             $json = json_encode($mc);
@@ -1106,8 +1127,10 @@ class RoomController extends Controller
         $my_id   = $request->user()->id;
 
         $room_info                 = DB::table('rooms')->where('uid', $uid)->select([
-            'room_admin', 'room_speak',
-            'room_judge', 'room_sound'
+            'room_admin',
+            'room_speak',
+            'room_judge',
+            'room_sound'
         ])->get()->toArray();
         $room_info[0]              = (array)$room_info[0];
         $room_info[0]['user_type'] = 5;
@@ -1195,36 +1218,36 @@ class RoomController extends Controller
     }
 
 
-    //can you speak
-    public function not_speak_status()
-    {
-        $uid     = input('uid/d', 0);
-        $user_id = $this->user_id;
-        if (!$uid) $this->ApiReturn(0, '缺少参数');
-        $roomSpeak = DB::name('rooms')->where('uid', $uid)->value('roomSpeak');
-        $spe_arr   = !$roomSpeak ? [] : explode(',', $roomSpeak);
+    // //can you speak
+    // public function not_speak_status()
+    // {
+    //     $uid     = input('uid/d', 0);
+    //     $user_id = $this->user_id;
+    //     if (!$uid) $this->ApiReturn(0, '缺少参数');
+    //     $roomSpeak = DB::name('rooms')->where('uid', $uid)->value('roomSpeak');
+    //     $spe_arr   = !$roomSpeak ? [] : explode(',', $roomSpeak);
 
-        $is_speak = 1;
-        foreach ($spe_arr as $k => &$v) {
-            $arr      = explode("#", $v);
-            $new_time = $arr[1] + 180;
-            if (time() - $new_time < 0) {
-                if ($arr[0] == $user_id) {
-                    $is_speak = 0;
-                }
-            } else {
-                unset($spe_arr[$k]);
-            }
-        }
-        $str = trim(implode(",", $spe_arr), ",");
-        DB::name('rooms')->where(['uid' => $uid])->update(['roomSpeak' => $str]);
+    //     $is_speak = 1;
+    //     foreach ($spe_arr as $k => &$v) {
+    //         $arr      = explode("#", $v);
+    //         $new_time = $arr[1] + 180;
+    //         if (time() - $new_time < 0) {
+    //             if ($arr[0] == $user_id) {
+    //                 $is_speak = 0;
+    //             }
+    //         } else {
+    //             unset($spe_arr[$k]);
+    //         }
+    //     }
+    //     $str = trim(implode(",", $spe_arr), ",");
+    //     DB::name('rooms')->where(['uid' => $uid])->update(['roomSpeak' => $str]);
 
-        if ($is_speak) {
-            $this->ApiReturn(1, '可以发言');
-        } else {
-            $this->ApiReturn(0, '不能发言');
-        }
-    }
+    //     if ($is_speak) {
+    //         $this->ApiReturn(1, '可以发言');
+    //     } else {
+    //         $this->ApiReturn(0, '不能发言');
+    //     }
+    // }
 
 
 
@@ -1274,7 +1297,7 @@ class RoomController extends Controller
         if ($a) {
             $n = $a->name ?: 'nan';
         }
-        Common::sendToZego_2('SendBroadcastMessage',$room->id, $uid, 'room', " اصبح ادمن $n");
+        Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
         if ($res) {
             return Common::apiResponse(1, 'Set administrator successfully', $adm_arr, 200);
         } else {
@@ -1301,7 +1324,8 @@ class RoomController extends Controller
         $rid  = DB::table('rooms')->where(['uid' => $uid])->value('id');
         $ms   = [
             'messageContent' => [
-                'message' => 'updateAdmins', 'admins' => array_values($adm_arr)
+                'message' => 'updateAdmins',
+                'admins' => array_values($adm_arr)
             ]
         ];
         $resu = Common::sendToZego('SendCustomCommand', $rid, $uid, json_encode($ms));
@@ -1346,7 +1370,8 @@ class RoomController extends Controller
         if ($res) {
             $ms = [
                 'messageContent' => [
-                    'message' => 'banFromWriting', 'userId' => $user_id
+                    'message' => 'banFromWriting',
+                    'userId' => $user_id
                 ]
             ];
             Common::sendToZego('SendCustomCommand', $room->id, $user_id, json_encode($ms));
@@ -1379,7 +1404,8 @@ class RoomController extends Controller
         if ($res) {
             $ms = [
                 'messageContent' => [
-                    'message' => 'removeBanFromWriting', 'userId' => $user_id
+                    'message' => 'removeBanFromWriting',
+                    'userId' => $user_id
                 ]
             ];
             Common::sendToZego('SendCustomCommand', $room->id, $user_id, json_encode($ms));
@@ -1420,13 +1446,17 @@ class RoomController extends Controller
         $ex = Pk::query()->where('room_id', $room->id)->where('status', 1)->exists();
         if ($ex) Pk::query()->where('status', 1)->update(['status' => 0]);
         Pk::query()->create([
-            'room_id'  => $room->id, 'status' => 1, 'mics' => $room->microphone,
+            'room_id'  => $room->id,
+            'status' => 1,
+            'mics' => $room->microphone,
             //                'prize_value'=>$request->prize_value,
-            'start_at' => Carbon::now(), 'end_at' => Carbon::now()->addMinutes($request->minutes),
+            'start_at' => Carbon::now(),
+            'end_at' => Carbon::now()->addMinutes($request->minutes),
         ]);
         $mc   = [
             'messageContent' => [
-                'message' => 'startPK', 'PkTime' => $request->minutes
+                'message' => 'startPK',
+                'PkTime' => $request->minutes
             ]
         ];
         $json = json_encode($mc);
@@ -1457,8 +1487,12 @@ class RoomController extends Controller
 
         $mc   = [
             'messageContent' => [
-                'message'            => 'closePk', 'scoreTeam1' => $pk->t1_score, 'scoreTeam2' => $pk->t2_score,
-                'percentagepk_team1' => $pk->t1_per, 'percentagepk_team2' => $pk->t2_per, 'winner_Team' => $winner,
+                'message'            => 'closePk',
+                'scoreTeam1' => $pk->t1_score,
+                'scoreTeam2' => $pk->t2_score,
+                'percentagepk_team1' => $pk->t1_per,
+                'percentagepk_team2' => $pk->t2_per,
+                'winner_Team' => $winner,
             ]
         ];
         $json = json_encode($mc);
@@ -1511,7 +1545,8 @@ class RoomController extends Controller
         }
         $ms   = [
             'messageContent' => [
-                'message' => 'roomMode', 'mode' => $mode
+                'message' => 'roomMode',
+                'mode' => $mode
             ]
         ];
         $json = json_encode($ms);
@@ -1523,51 +1558,7 @@ class RoomController extends Controller
     {
         $currentMode = $request->mode;
         if ($currentMode == null || !$request->owner_id) return Common::apiResponse(0, 'missing param', null, 422);
-        $room = Room::query()->where('uid', $request->owner_id)->first();
-        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-        //get last mode of rooms to if is cinema mode and change it update room background
-        $lastMode = $room->mode;
-        $room->mode = $currentMode;
-        $room->save();
-        $jsons = [];
-        $map = [];
-        if ($currentMode == '1') {
-            $mode = 'party';
-        } elseif ($currentMode == '2') {
-            $mode = 'seats12';
-        } elseif ($currentMode == '3') {
-            $mode = 'cinema';
-            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
-            $jsons[] = $json;
-        } elseif ($currentMode == '4') {
-            $mode = 'game';
-            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
-            $game = AllGame::find($request->game_id);
-            if (!$game) return Common::apiResponse(false, 'this game does not exists');
-
-            $room->game_id = $request->game_id;
-            $room->save();
-            $map['game_url'] = $game->mini_url;
-        } else {
-            $mode = 'topCenter';
-        }
-        $ms   = [
-            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
-        ];
-        $json = json_encode($ms);
-        $jsons[] = $json;
-        //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-
-        if ($lastMode == '3' && $currentMode != '3') {
-            $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
-        }
-        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
-
-        try {
-            Utils::unwrap($promises);
-        } catch (\Throwable $e) {
-        }
-        return Common::apiResponse(1, 'done', null, 201);
+        return $this->roomService->changeMode($request, $currentMode);
     }
 
 

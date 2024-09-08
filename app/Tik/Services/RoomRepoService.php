@@ -2,9 +2,13 @@
 
 namespace App\Tik\Services;
 
+use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Models\AllGame;
 use App\Facades\UserHandling;
+use GuzzleHttp\Promise\Utils;
+use App\Http\Services\RoomService;
 use App\Traits\MultiQueryPagination;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
@@ -26,8 +30,7 @@ class RoomRepoService
         private readonly UserRepository $userRepository,
         private readonly GiftLogRepository $giftLogRepository,
         private readonly RequestBackgroundImageRepository $requestBackgroundImageRepository,
-    ) {
-    }
+    ) {}
 
     public function getAllRooms($request)
     {
@@ -221,5 +224,71 @@ class RoomRepoService
     public function getRoomsForGame($gameId)
     {
         return $this->repository->getRoomsByGameId(gameId: $gameId, with: ['game', 'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1), 'backgroundImage']);
+    }
+
+    public function changeMode($request, $currentMode)
+    {
+        $room =  $this->findRoomUser($request->owner_id);
+        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        //get last mode of rooms to if is cinema mode and change it update room background
+        $lastMode = $room->mode;
+        $room->mode = $currentMode;
+        $room->save();
+        $jsons = [];
+        $map = [];
+        if ($currentMode == '1') {
+            $mode = 'party';
+        } elseif ($currentMode == '2') {
+            $mode = 'seats12';
+        } elseif ($currentMode == '3') {
+            $mode = 'cinema';
+            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
+            $jsons[] = $json;
+        } elseif ($currentMode == '4') {
+            $mode = 'game';
+            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+            $game = AllGame::find($request->game_id);
+            if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+            $room->game_id = $request->game_id;
+            $room->save();
+            $map['game_url'] = $game->mini_url;
+        } else {
+            $mode = 'topCenter';
+        }
+        $ms   = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+        //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+
+        if ($lastMode == '3' && $currentMode != '3') {
+            $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        }
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
+        return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function changeBackground(Room $room, int $owner_id, string $image = ''): string|false
+    {
+        $data = [
+            "messageContent" => [
+                "message"       => "changeBackground",
+                "imgbackground" => $image ?: "",
+                "roomIntro"     => $room->room_intro ?: "",
+                "roomImg"       => $room->room_cover ?: "",
+                "room_type"     => @$room->myType->name ?: "",
+                "room_name"     => @$room->room_name ?: ""
+            ]
+        ];
+        $json = json_encode($data);
+        //        Common::sendToZego('SendCustomCommand', $room->id, $owner_id, $json);
+        return $json;
     }
 }
