@@ -305,6 +305,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('{id}', [AgencyController::class, 'update']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
             });
+            Route::prefix('payment-gateway')->group(function () {
+                Route::get('/', [PaymentGetWayController::class, 'index']);
+                Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
+            });
 
             
 

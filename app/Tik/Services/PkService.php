@@ -7,9 +7,6 @@ use App\Tik\Repositories\PkRepository;
 use App\Tik\Repositories\RoomRepository;
 
 
-
-
-
 class PkService
 {
     public function __construct(
