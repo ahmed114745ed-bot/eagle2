@@ -28,6 +28,10 @@ class AgencyRepository extends AbstractRepository
     {
         return $this->model->with('additionalInfo')->where('id', $id)->first();
     }
+    public function findByStatus($id)
+    {
+        return $this->model->with('additionalInfo')->where('id', $id)->where('status',1)->first();
+    }
 
     public function members($agency)
     {

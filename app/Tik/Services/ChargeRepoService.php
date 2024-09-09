@@ -155,7 +155,7 @@ class ChargeRepoService
             $receiver = $this->userRepository->searchUser($receiverUuid);
             if (!$receiver)   throw new \Exception('this user not found');
 
-            $agency = $this->agencyRepository->findById($sender->agency_id);
+            $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('agency not founded');
 
@@ -173,7 +173,7 @@ class ChargeRepoService
             $numDi     = $coinPrise * $count;
             $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
-            return [$receiver, $numDi];
+            return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
             \DB::rollBack();
             throw new \Exception($e->getMessage());

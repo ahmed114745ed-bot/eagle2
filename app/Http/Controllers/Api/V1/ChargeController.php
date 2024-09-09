@@ -177,7 +177,7 @@ class ChargeController extends Controller
         }
 
         try {
-            [$receiver, $amount]  = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
+            [$receiver, $amount, $salary]  = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
             DB::commit();
             if ($user instanceof User) {
                 (new UserAchievementService())->insertCharging($receiver, $amount);
@@ -185,7 +185,7 @@ class ChargeController extends Controller
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
             $data = [
                 'coins' => $user->di,
-                'usd' => $user->salary,
+                'usd' =>  $salary,
             ];
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
