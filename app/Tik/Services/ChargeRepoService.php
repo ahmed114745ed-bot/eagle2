@@ -113,9 +113,9 @@ class ChargeRepoService
 
     public function sendMoney(User $sender, $receiverUuid, $count)
     {
-       
-            $agency =  $this->agencyRepository->findAgencyByOwnerId($sender->id);
-            if ($agency && $agency->status == 0)  throw new \Exception(__('api_responses.canNotCharge'));
+
+            $agency =  $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
+            if (!$agency || $agency->status == 0)  throw new \Exception(__('api_responses.canNotCharge'));
             $userReceiver = $this->userRepository->searchUser($receiverUuid);
             if (!$userReceiver)   throw new \Exception('this user not found');
 
@@ -126,7 +126,7 @@ class ChargeRepoService
 
             $this->charge($sender, $userReceiver, 'freight forwarder', $count, $usd);
             return $userReceiver;
-        
+
     }
 
     public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null,$searchKey = null)
