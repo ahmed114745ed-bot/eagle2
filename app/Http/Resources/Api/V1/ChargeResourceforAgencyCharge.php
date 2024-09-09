@@ -20,17 +20,28 @@ class ChargeResourceforAgencyCharge extends JsonResource
         $sender = $this->sender;
         $receiver = $this->receiver;
         $sender_data   = [
-            'id'  => @$sender->id ?: 0, 'uuid' => @$sender->uuid ?: '', 'name' => @$sender->name ?: "",
-            'img' => @$sender->img ?: "", 'type' => @$this->charger_type
+            'id'  => @$sender->id ?: 0,
+            'uuid' => @$sender->uuid ?: '',
+            'name' => @$sender->name ?: "",
+            'img' => @$sender->img ?: "",
+            'type' => @$this->charger_type
         ];
         $receiver_data = [
-            'id'  => $receiver?->id ?: 0, 'uuid' => @$receiver?->uuid ?: '', 'name' => $receiver?->name ?: "",
-            'img' => $receiver?->img ?: "", 'type' => $this->user_type
+            'id'  => $receiver?->id ?: 0,
+            'uuid' => @$receiver?->uuid ?: '',
+            'name' => $receiver?->name ?: "",
+            'img' => $receiver?->img ?: "",
+            'type' => $this->user_type
         ];
 
         return [
-            'id'   => $this->id ?: 0, 'sender' => $sender_data, 'receiver' => $receiver_data, 'value' => (int) $this->amount,
-            'time' => ($this->created_at ? $this->created_at->format('Y-m-d h:i:s A') : null)
+            'id'   => $this->id ?: 0,
+            'sender' => $sender_data,
+            'receiver' => $receiver_data,
+            'value' => (int) $this->amount,
+            'time' => ($this->created_at ? $this->created_at->format('Y-m-d h:i:s A') : null),
+            'coins' =>  (int)$this->amount ?? 0,
+            'usd' => $this->usd ?? 0,
         ];
     }
 }
