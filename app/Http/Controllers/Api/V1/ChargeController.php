@@ -95,8 +95,13 @@ class ChargeController extends Controller
         try {
 
             $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
+            $data = [
+                'coins' => $from->di,
+                'usd' => $from->salary,
+            ];
+          
             DB::commit();
-            return Common::apiResponse(1, 'success', null, 201);
+            return Common::apiResponse(1, 'success',  $data, 201);
         } catch (Exception $exception) {
             // Log::info('this from charge to - ' . $exception->getMessage());
             DB::rollBack();
@@ -136,7 +141,11 @@ class ChargeController extends Controller
             }
             // Increment recipient's coins
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
-            return Common::apiResponse(1, 'your recharge was successful');
+            $data = [
+                'coins' => $user->di,
+                'usd' => $user->salary,
+            ];
+            return Common::apiResponse(1, 'your recharge was successful',$data,200 );
         } catch (Exception $e) {
             return Common::apiResponse(0,  $e->getMessage());
         }
@@ -174,7 +183,11 @@ class ChargeController extends Controller
                 (new UserAchievementService())->insertCharging($receiver, $amount);
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
-            return Common::apiResponse(1, 'Your recharge was successful');
+            $data = [
+                'coins' => $user->di,
+                'usd' => $user->salary,
+            ];
+            return Common::apiResponse(1, 'Your recharge was successful',$data,200);
         } catch (Exception $e) {
             DB::rollBack();
             return Common::apiResponse(0, 'An error occurred, please try again later', $e->getMessage());
