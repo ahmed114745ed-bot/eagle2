@@ -96,8 +96,8 @@ class ChargeController extends Controller
 
             $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
             $data = [
-                'coins' => $from->di,
-                'usd' => $from->salary,
+                'coins' =>(string) $from->di,
+                'usd' => (string)$from->salary,
             ];
 
             DB::commit();
@@ -142,8 +142,8 @@ class ChargeController extends Controller
             // Increment recipient's coins
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
             $data = [
-                'coins' => $user->di,
-                'usd' => $user->salary,
+                'coins' =>(string) $user->di,
+                'usd' => (string)$user->salary,
             ];
             return Common::apiResponse(1, 'your recharge was successful', $data, 200);
         } catch (Exception $e) {
@@ -184,8 +184,8 @@ class ChargeController extends Controller
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
             $data = [
-                'coins' => $user->di,
-                'usd' =>  $salary,
+                'coins' => (string)$user->di,
+                'usd' => (string) $salary,
             ];
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
