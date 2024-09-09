@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Facades\UserHandling;
@@ -182,11 +183,13 @@ class AgencyService
         $year         = $request->year;
         $CurrentMonth = date('m'); // Get the current month as a two-digit number (e.g., 08 for August)
         $CurrentYear  = date('Y');
-
         if ($CurrentYear == $year && $CurrentMonth == $month) {
             $perPage = 15;                 // Number of items per page
             $page    = request('page', 1); // Get the current page number from the request, default to 1
-            $paginatedData = $this->userRepository->findUsersByAgencyId($agencyId, $perPage, $page);
+            $dataQuery = $this->userRepository->findUsersByAgencyIdI($agencyId);
+          $paginatedData = $dataQuery->paginate($perPage, ['*'], 'page', $page);
+            $data =  $dataQuery->with('userSallary')->get();
+            $totalDiamond = $data->sum('monthly_diamond_received');
         } else {
             $data = $this->historyRepository->getByMonthAndYear($agencyId, $month, $year);
             $totalDiamond = $data->sum('diamond');

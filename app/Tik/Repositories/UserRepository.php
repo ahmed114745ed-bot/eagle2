@@ -188,6 +188,10 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->where('agency_id', $agencyId)->orderBy('monthly_diamond_received', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
+    public function findUsersByAgencyIdI($agencyId)
+    {
+        return $this->model->where('agency_id', $agencyId)->orderBy('monthly_diamond_received', 'desc');
+    }
 
     public function getIdsByAgencyId($agencyId)
     {
