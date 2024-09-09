@@ -2,6 +2,8 @@
 
 namespace App\Tik\Services;
 
+use App\Tik\Repositories\PaymentGatewayRepository;
+
 
 class PaymentGatewayService
 {
