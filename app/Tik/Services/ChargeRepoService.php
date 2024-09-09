@@ -176,7 +176,7 @@ class ChargeRepoService
             return [$receiver, $numDi];
         } catch (\Exception $e) {
             \DB::rollBack();
-            throw new \Exception('An error occurred, please try again later');
+            throw new \Exception($e->getMessage());
         }
     }
 
