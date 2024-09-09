@@ -146,15 +146,15 @@ class AgencyService
     public function listOption($agencyId)
     {
         $agency = $this->agencyRepository->getWithSelectMonthAndYear($agencyId);
-       
+
         $createdAt   = $agency->created_at;
         $currentDate = now();
-      
+
         $monthsToInclude = [];
         while ($createdAt <= $currentDate) {
             $month = $createdAt->format('m');
             $year  = $createdAt->format('Y');
-    
+
             // Only add if the month and year are not the same as the current date
             if ($month !== $currentDate->format('m') || $year !== $currentDate->format('Y')) {
                 $monthsToInclude[] = [
@@ -187,7 +187,7 @@ class AgencyService
             $perPage = 15;                 // Number of items per page
             $page    = request('page', 1); // Get the current page number from the request, default to 1
             $dataQuery = $this->userRepository->findUsersByAgencyIdI($agencyId);
-          $paginatedData = $dataQuery->paginate($perPage, ['*'], 'page', $page);
+            $paginatedData = $dataQuery->paginate($perPage, ['*'], 'page', $page);
             $data =  $dataQuery->with('userSallary')->get();
             $totalDiamond = $data->sum('monthly_diamond_received');
         } else {
