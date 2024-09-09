@@ -99,7 +99,7 @@ class ChargeController extends Controller
                 'coins' => $from->di,
                 'usd' => $from->salary,
             ];
-          
+
             DB::commit();
             return Common::apiResponse(1, 'success',  $data, 201);
         } catch (Exception $exception) {
@@ -145,7 +145,7 @@ class ChargeController extends Controller
                 'coins' => $user->di,
                 'usd' => $user->salary,
             ];
-            return Common::apiResponse(1, 'your recharge was successful',$data,200 );
+            return Common::apiResponse(1, 'your recharge was successful', $data, 200);
         } catch (Exception $e) {
             return Common::apiResponse(0,  $e->getMessage());
         }
@@ -187,10 +187,10 @@ class ChargeController extends Controller
                 'coins' => $user->di,
                 'usd' => $user->salary,
             ];
-            return Common::apiResponse(1, 'Your recharge was successful',$data,200);
+            return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
             DB::rollBack();
-            return Common::apiResponse(0, 'An error occurred, please try again later', $e->getMessage());
+            return Common::apiResponse(0, $e->getMessage(), 400);
         }
     }
 
