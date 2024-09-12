@@ -66,6 +66,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
     });
 
+    // utd apis
+    Route::prefix('utd')->group(function () {
+        Route::get('configs', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
+        Route::post('update-config', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig']);
+    });
+
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
