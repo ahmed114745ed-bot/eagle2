@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Api\V1;
-use App\Http\Controllers\Controller;
-use App\Services\AllGameService;
+
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Services\AllGameService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class AllGameController extends Controller
 {
@@ -25,5 +27,63 @@ class AllGameController extends Controller
     {
         $result = $this->allGameService->updateGame($request->game_id, $request->user());
         return Common::apiResponse($result['status'], $result['message'], $result['code']);
+    }
+
+    public function utdGameIndex()
+    {
+        $data = $this->allGameService->utdIndex();
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function utdGameCreate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'image' => 'sometimes|image|mimes:jpeg,png,gif,bmp,tiff,webp',
+            'mini_url' => 'nullable|string|max:255',
+            'type' => 'nullable',
+            'is_enable' => 'nullable',
+            'hight_image' => 'nullable',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+
+        $this->allGameService->createUtd($request);
+        return Common::apiResponse(1, 'created successfully');
+    }
+    public function utdGameUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
+            'url' => 'required|string|max:255',
+            'image' => 'sometimes|image|mimes:jpeg,png,gif,bmp,tiff,webp',
+            'mini_url' => 'nullable|string|max:255',
+            'type' => 'nullable',
+            'is_enable' => 'nullable',
+            'hight_image' => 'nullable',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+
+        $this->allGameService->updateUtd($request);
+        return Common::apiResponse(1, 'updated successfully');
+    }
+    public function utdGameSwitchUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'is_enable' => 'nullable',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+        $this->allGameService->updateSwitch($request);
+        return Common::apiResponse(1, 'updated successfully');
     }
 }

@@ -63,13 +63,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('recall-account', [AuthController::class, 'recallAccount']);
-
     });
 
     // utd apis
     Route::prefix('utd')->group(function () {
+        //configs
         Route::get('configs', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
         Route::post('update-config', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig']);
+        //games
+        Route::get('all-games', [AllGameController::class, 'utdGameIndex']);
+        Route::post('create-game', [AllGameController::class, 'utdGameCreate']);
+        Route::post('update-game', [AllGameController::class, 'utdGameUpdate']);
+        Route::post('update-switch-game', [AllGameController::class, 'utdGameSwitchUpdate']);
     });
 
     // all route with auth
@@ -126,7 +131,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
-
             });
 
             Route::prefix('search')->group(function () {
@@ -171,10 +175,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('gifts')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
-//                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);
+                //                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
-               // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
+                // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 //Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu','appFeatureEnable:lucky']);
 
             });
@@ -208,8 +212,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('my_pack', [PackController::class, 'my_pack']);
                 Route::post('use_pack_item', [PackController::class, 'usePackItem']);
                 Route::post('takeOff', [PackController::class, 'takeOff']);
-//                Route::get('my_store', [UserController::class, 'my_store']);
-//                Route::get('my_income', [UserController::class, 'my_income']);
+                //                Route::get('my_store', [UserController::class, 'my_store']);
+                //                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
 
@@ -301,7 +305,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
-    
+
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
@@ -316,14 +320,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
-
-            
-
         }
     );
 
     Route::prefix('tickets')->group(function () {
         Route::post('open', [HomeController::class, 'openTicket']);
     });
-
 });
