@@ -37,6 +37,7 @@ class AllGameController extends Controller
 
     public function utdGameCreate(Request $request)
     {
+        try{
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
@@ -51,8 +52,12 @@ class AllGameController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
+    
 
         $this->allGameService->createUtd($request);
+    } catch (\Throwable $th) {
+         return $th->getMessage();
+     }
         return Common::apiResponse(1, 'created successfully');
     }
     public function utdGameUpdate(Request $request)
