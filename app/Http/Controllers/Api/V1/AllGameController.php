@@ -45,7 +45,7 @@ class AllGameController extends Controller
             'mini_url' => 'nullable|string|max:255',
             'type' => 'nullable',
             'is_enable' => 'nullable',
-            'hight_image' => 'nullable',
+           // 'hight_image' => 'nullable',
 
         ]);
         if ($validator->fails()) {
@@ -65,7 +65,7 @@ class AllGameController extends Controller
             'mini_url' => 'nullable|string|max:255',
             'type' => 'nullable',
             'is_enable' => 'nullable',
-            'hight_image' => 'nullable',
+           // 'hight_image' => 'nullable',
 
         ]);
         if ($validator->fails()) {
