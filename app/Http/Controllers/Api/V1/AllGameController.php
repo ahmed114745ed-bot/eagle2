@@ -49,9 +49,9 @@ class AllGameController extends Controller
             'custom_id' => 'nullable',
 
         ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
-        }
+        // if ($validator->fails()) {
+        //     return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        // }
     
 
         $this->allGameService->createUtd($request);
