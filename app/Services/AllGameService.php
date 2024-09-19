@@ -63,7 +63,7 @@ class AllGameService
     {
         $image = null;
         if ($request->hasFile('image')) {
-            $image = Common::upload('games', $request->file('image'));
+            $image = Common::upload('images', $request->file('image'));
         }
         $data = [
             'name' => $request->name,
@@ -82,7 +82,7 @@ class AllGameService
     {
         $image = null;
         if ($request->hasFile('image')) {
-            $image = Common::upload('games', $request->file('image'));
+            $image = Common::upload('images', $request->file('image'));
         }
         $data = [
             'name' => $request->name,
