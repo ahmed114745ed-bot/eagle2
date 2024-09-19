@@ -78,12 +78,13 @@ class AllGameController extends Controller
     public function utdGameSwitchUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'is_enable' => 'nullable',
+            'is_enable' => 'required',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
-        $this->allGameService->updateSwitch($request);
+      $value =   $this->allGameService->updateSwitch($request);
+      if( !$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
     }
 }
