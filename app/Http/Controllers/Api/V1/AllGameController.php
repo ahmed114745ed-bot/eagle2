@@ -37,20 +37,20 @@ class AllGameController extends Controller
 
     public function utdGameCreate(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'name' => 'required|string|max:255',
-        //     'name_en' => 'required|string|max:255',
-        //     'url' => 'required',
-        //     'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        //     'mini_url' => 'nullable',
-        //     'type' => 'nullable',
-        //     'is_enable' => 'nullable',
-        //     'custom_id' => 'nullable',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'name_en' => 'required|string|max:255',
+            'url' => 'required',
+            'image' => 'nullable',
+            'mini_url' => 'nullable',
+            'type' => 'nullable',
+            'is_enable' => 'nullable',
+            'custom_id' => 'nullable',
 
-        // ]);
-        // if ($validator->fails()) {
-        //     return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
-        // }
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
 
         $this->allGameService->createUtd($request);
         return Common::apiResponse(1, 'created successfully');
@@ -61,7 +61,7 @@ class AllGameController extends Controller
             'name' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'url' => 'required',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'nullable',
             'mini_url' => 'nullable',
             'type' => 'nullable',
             'is_enable' => 'nullable',
