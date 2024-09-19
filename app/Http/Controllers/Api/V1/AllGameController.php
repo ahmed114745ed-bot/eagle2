@@ -38,7 +38,6 @@ class AllGameController extends Controller
     public function utdGameCreate(Request $request)
     {
         $this->allGameService->createUtd($request);
-    
         return Common::apiResponse(1, 'created successfully');
     }
     public function utdGameUpdate(Request $request)
@@ -47,7 +46,7 @@ class AllGameController extends Controller
             'name' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'url' => 'required',
-            'image' => 'nullable',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'mini_url' => 'nullable',
             'type' => 'nullable',
             'is_enable' => 'nullable',
