@@ -74,7 +74,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('all-games', [AllGameController::class, 'utdGameIndex']);
         Route::post('create-game', [AllGameController::class, 'utdGameCreate']);
         Route::post('update-game', [AllGameController::class, 'utdGameUpdate']);
-        Route::post('update-switch-game', [AllGameController::class, 'utdGameSwitchUpdate']);
+        Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
     });
 
     // all route with auth
