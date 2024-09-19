@@ -73,7 +73,7 @@ class AllGameService
             'mini_url' => $request->mini_url,
             'type' => $request->type,
             'is_enable' => $request->is_enable,
-            'hight_image' => $request->hight_image,
+            'custom_id' => $request->custom_id,
         ];
         return $this->allGameRepository->create($data);
     }
@@ -92,7 +92,7 @@ class AllGameService
             'mini_url' => $request->mini_url,
             'type' => $request->type,
             'is_enable' => $request->is_enable,
-            'hight_image' => $request->hight_image,
+            'custom_id' => $request->custom_id,
         ];
         return $this->allGameRepository->update($request->game_id, $data);
     }
