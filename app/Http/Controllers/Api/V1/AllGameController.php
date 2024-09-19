@@ -42,21 +42,6 @@ class AllGameController extends Controller
     }
     public function utdGameUpdate(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
-            'url' => 'required',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'mini_url' => 'nullable',
-            'type' => 'nullable',
-            'is_enable' => 'nullable',
-            'custom_id' => 'nullable',
-
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
-        }
-
         $this->allGameService->updateUtd($request);
         return Common::apiResponse(1, 'updated successfully');
     }
