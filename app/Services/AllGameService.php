@@ -94,7 +94,7 @@ class AllGameService
             'is_enable' => $request->is_enable,
             'hight_image' => $request->hight_image,
         ];
-        return $this->allGameRepository->update($request->id, $data);
+        return $this->allGameRepository->update($request->game_id, $data);
     }
 
     public function updateSwitch($request)
@@ -102,6 +102,6 @@ class AllGameService
         $data = [
             'is_enable' => $request->is_enable,
         ];
-        return $this->allGameRepository->updateSwitch($request->id, $data);
+        return $this->allGameRepository->updateSwitch($request->game_id, $data);
     }
 }
