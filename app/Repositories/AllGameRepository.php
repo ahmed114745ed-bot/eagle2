@@ -39,15 +39,20 @@ class AllGameRepository
         return true;
     }
 
-    public function update($id,$data)
+    public function update($id, $data)
     {
         AllGame::find($id)->update($data);
         return true;
     }
 
-    public function updateSwitch($id,$data)
+    public function updateSwitch($id, $data)
     {
         AllGame::find($id)->update($data);
         return true;
+    }
+
+    public function findById($game_id)
+    {
+        return AllGame::find($game_id);
     }
 }

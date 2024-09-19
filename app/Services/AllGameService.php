@@ -104,4 +104,9 @@ class AllGameService
         ];
         return $this->allGameRepository->updateSwitch($request->game_id, $data);
     }
+
+    public function show($game_id)
+    {
+        return $this->allGameRepository->findById($game_id);
+    }
 }

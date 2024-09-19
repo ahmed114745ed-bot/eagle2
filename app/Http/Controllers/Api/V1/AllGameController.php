@@ -68,8 +68,20 @@ class AllGameController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
-      $value =   $this->allGameService->updateSwitch($request);
-      if( !$value)  return Common::apiResponse(1, 'failed');
+        $value =   $this->allGameService->updateSwitch($request);
+        if (!$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function showGame(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'game_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+        $data = $this->allGameService->show($request->game_id);
+        return Common::apiResponse(1, '', $data);
     }
 }
