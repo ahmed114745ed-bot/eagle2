@@ -30,7 +30,7 @@ class AllGameRepository
 
     public function all()
     {
-        return AllGame::get();
+        return AllGame::orderBy('id')->get();
     }
 
     public function create($data)
