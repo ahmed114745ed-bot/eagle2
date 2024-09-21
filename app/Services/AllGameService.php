@@ -62,8 +62,8 @@ class AllGameService
     public function createUtd($request)
     {
         $image = null;
-        if ($request->hasFile('image')) {
-            $image = Common::upload('images', $request->file('image'));
+        if ($request->image) {
+            $image = Common::upload('images', $request->image);
         }
         $data = [
             'name' => $request->name,
@@ -81,8 +81,8 @@ class AllGameService
     public function updateUtd($request)
     {
         $image = null;
-        if ($request->hasFile('image')) {
-            $image = Common::upload('images', $request->file('image'));
+        if ($request->image) {
+            $image = Common::upload('images', $request->image);
         }
         $data = [
             'name' => $request->name,
