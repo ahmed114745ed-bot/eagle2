@@ -61,15 +61,11 @@ class AllGameService
 
     public function createUtd($request)
     {
-        $image = null;
-        if ($request->image) {
-            $image = Common::upload('images', $request->image);
-        }
         $data = [
             'name' => $request->name,
             'name_en' => $request->name_en,
             'url' => $request->url,
-            'image' => $image ?? '',
+            'image' => $request->image,
             'mini_url' => $request->mini_url,
             'type' => $request->type,
             'is_enable' => $request->is_enable,
@@ -80,15 +76,11 @@ class AllGameService
 
     public function updateUtd($request)
     {
-        $image = null;
-        if ($request->image) {
-            $image = Common::upload('images', $request->image);
-        }
         $data = [
             'name' => $request->name,
             'name_en' => $request->name_en,
             'url' => $request->url,
-            'image' => $image ?? '',
+            'image' => $request->image,
             'mini_url' => $request->mini_url,
             'type' => $request->type,
             'is_enable' => $request->is_enable,
