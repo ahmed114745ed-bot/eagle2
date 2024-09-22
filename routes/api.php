@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
+use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V2\AgencyController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
@@ -76,6 +77,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('update-game', [AllGameController::class, 'utdGameUpdate']);
         Route::post('show-game', [AllGameController::class, 'showGame']);
         Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
+        Route::resource('targets', TargetController::class);
     });
 
     // all route with auth

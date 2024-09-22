@@ -21,4 +21,15 @@ class TargetRepository extends AbstractRepository
     {
         return $this->model->query()->where('diamonds', '>', $diamond)->orderBy('diamonds')->first();
     }
+
+    public function all()
+    {
+        return $this->model->orderBy('diamonds')->get();
+    }
+
+    public function findById($id)
+    {
+        return $this->model->find($id);
+    }
+
 }
