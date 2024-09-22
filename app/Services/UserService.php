@@ -17,6 +17,7 @@ use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -29,6 +30,7 @@ class UserService
 
     public function __construct(
         private readonly VipRepository $vipRepository,
+        private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository
@@ -318,6 +320,38 @@ class UserService
             $user->save();
         }
 
+        return $user;
+    }
+
+    public function showUser($userId, $auth, $request, $isVisit)
+    {
+        $user = $this->userRepository->findById($userId);
+        if (!$user) throw new \Exception('not found');
+        if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
+        if (in_array($auth->id, Common::getUserBlackList($user->id))) throw new \Exception('in black list');
+        $request['user_id'] = $userId;
+
+        if ($auth->id != $user->id && $isVisit == true) {
+            if (!Common::checkPackPrev($auth->id, 19)) {
+                $previousVisit = $this->ProfileVisitorRepository->checkVisit($auth->id, $user->id);
+                $user->profileVisits()->syncWithoutDetaching(
+                    [
+                        $auth->id => [
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]
+                    ]
+                );
+
+                if ($isVisit == true) {
+
+                    if (!$previousVisit) {
+                        CustomNotification::visitProfile($user, $auth);
+                        (new UserCounterServices)->eventUser($user, 'visit-profile');
+                    }
+                }
+            }
+        }
         return $user;
     }
 }

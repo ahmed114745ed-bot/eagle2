@@ -131,6 +131,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
             });
 
+            Route::prefix('users')->group(function () {
+                Route::get('/{id}', [UserController::class, 'show']);
+    
+            });
+
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
             // end rooms api
 
@@ -185,7 +190,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
-                //Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu','appFeatureEnable:lucky']);
+                Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu','appFeatureEnable:lucky']);
 
             });
 
