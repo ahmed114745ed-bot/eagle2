@@ -8,6 +8,7 @@ use App\Helpers\Common;
 
 use App\Rules\ValidUsd;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Tik\Services\TargetService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -60,8 +61,16 @@ class TargetController extends Controller
         $id = $request->target_id;
 
         $validator = Validator::make($request->all(), [
-            'level'       => 'required|numeric|unique:targets,level,' . $id,
-            'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $id,
+            'level' => [
+                'required',
+                'numeric',
+                Rule::unique('targets')->ignore($request->target_id),
+            ],
+            'diamonds' => [
+                'required',
+                'numeric',
+                Rule::unique('targets')->ignore($request->target_id),
+            ],
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',
