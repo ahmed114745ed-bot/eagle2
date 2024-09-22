@@ -18,9 +18,9 @@ class TargetController extends Controller
 {
     public function __construct(private TargetService $targetService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->targetService->index();
+        $data = $this->targetService->index($request);
         return Common::apiResponse(1, '', $data);;
     }
 

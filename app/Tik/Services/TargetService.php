@@ -11,9 +11,9 @@ class TargetService
         private readonly TargetRepository $targetRepository,
     ) {}
 
-    public function index()
+    public function index($request)
     {
-        return $this->targetRepository->all();
+        return $this->targetRepository->all($request);
     }
 
     public function create($request)

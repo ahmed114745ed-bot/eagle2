@@ -22,9 +22,11 @@ class TargetRepository extends AbstractRepository
         return $this->model->query()->where('diamonds', '>', $diamond)->orderBy('diamonds')->first();
     }
 
-    public function all()
+    public function all($request)
     {
-        return $this->model->orderBy('diamonds')->get();
+        $page = $request->page;
+        $perPage = $request->per_page;
+        return $this->model->orderBy('diamonds')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function findById($id)
