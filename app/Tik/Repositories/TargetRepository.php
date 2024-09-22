@@ -24,7 +24,7 @@ class TargetRepository extends AbstractRepository
 
     public function all()
     {
-        return $this->model->orderBy('diamonds')->get();
+        return $this->model->orderBy('diamonds')->paginate(15);
     }
 
     public function findById($id)
