@@ -69,18 +69,18 @@ class TargetController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
-    public function show(string $id)
+    public function show(Request $request)
     {
 
-        return $this->targetService->show($id);
+        return $this->targetService->show($request->target_id);
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, )
     {
 
         $request->validate([
-            'level'       => 'required|numeric|unique:targets,level,' . $id,
-            'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $id,
+            'level'       => 'required|numeric|unique:targets,level,' . $request->target_id,
+            'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $request->target_id,
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',
@@ -89,7 +89,7 @@ class TargetController extends Controller
             'reel'        => 'nullable|array',
         ]);
         try {
-            $this->targetService->update($id, $request);
+            $this->targetService->update($request->target_id, $request);
             return 200;
         } catch (\Exception $exception) {
 
