@@ -21,7 +21,7 @@ class TargetController extends Controller
     public function index()
     {
         $data = $this->targetService->index();
-        return $data;
+        return Common::apiResponse(1, '', $data);;
     }
 
 
@@ -39,31 +39,8 @@ class TargetController extends Controller
             'reel'        => 'nullable|array',
         ]);
         try {
-            if (isset($request->moment)) {
-                $arrayMoment = array_values($request->moment);
-                // Convert the values to a comma-separated string
-                $moment = implode(',', $arrayMoment);
-            }
-            if (isset($request->reel)) {
-                $arrayReel = array_values($request->reel);
-                // Convert the values to a comma-separated string
-                $reel = implode(', ', $arrayReel);
-            }
-
-
-            Target::insert([
-                'level'       => $request->level,
-                'diamonds'        => $request->diamonds,
-                'usd' => $request->usd,
-                'hours'        => $request->hours,
-                'days'        => $request->days,
-                'agency_share'        => $request->agency_share,
-                'moment'        => $moment ?? null,
-                'reel'        => $reel ?? null,
-            ]);
-            return response()->json([
-                'status' => 200,
-            ]);
+            $this->targetService->create($request);
+            return Common::apiResponse(1, 'created successfully');
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -71,8 +48,8 @@ class TargetController extends Controller
     }
     public function show(Request $request)
     {
-
-        return $this->targetService->show($request->target_id);
+        $data = $this->targetService->show($request->target_id);
+        return Common::apiResponse(1, '', $data);
     }
 
     public function update(Request $request, )
@@ -90,7 +67,7 @@ class TargetController extends Controller
         ]);
         try {
             $this->targetService->update($request->target_id, $request);
-            return 200;
+            return Common::apiResponse(1, 'updated successfully');
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
