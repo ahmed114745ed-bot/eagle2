@@ -60,17 +60,18 @@ class TargetController extends Controller
     {
         $id = $request->target_id;
 
-        $validator = Validator::make($request->all(), [
-            'level' => [
-                'required',
-                'numeric',
-                Rule::unique('targets')->ignore($request->target_id),
-            ],
-            'diamonds' => [
-                'required',
-                'numeric',
-                Rule::unique('targets')->ignore($request->target_id),
-            ],
+       $validator = Validator::make($request->all(), [
+        'level' => [
+            'required',
+            'numeric',
+            Rule::unique('targets')->ignore($id, 'id'), 
+        ],
+        'diamonds' => [
+            'required',
+            'numeric',
+            Rule::unique('targets')->ignore($id, 'id'), 
+        ],
+
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',
