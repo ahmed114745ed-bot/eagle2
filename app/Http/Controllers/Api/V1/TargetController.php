@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Target;
+use Exception;
 
 use App\Helpers\Common;
-use App\Rules\ValidUsd;
 
+use App\Rules\ValidUsd;
 use Illuminate\Http\Request;
 use App\Tik\Services\TargetService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\Dashboard\Target\AdminTargetResource;
 
 
 class TargetController extends Controller
@@ -28,7 +27,7 @@ class TargetController extends Controller
     public function store(Request $request)
     {
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'level'       => 'required|numeric|unique:targets,level',
             'diamonds'        => 'required|numeric|unique:targets,diamonds',
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
@@ -38,10 +37,14 @@ class TargetController extends Controller
             'moment'        => 'nullable|array',
             'reel'        => 'nullable|array',
         ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
         try {
             $this->targetService->create($request);
             return Common::apiResponse(1, 'created successfully');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
@@ -52,10 +55,10 @@ class TargetController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function update(Request $request, )
+    public function update(Request $request,)
     {
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'level'       => 'required|numeric|unique:targets,level,' . $request->target_id,
             'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $request->target_id,
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
@@ -65,6 +68,9 @@ class TargetController extends Controller
             'moment'        => 'nullable|array',
             'reel'        => 'nullable|array',
         ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         try {
             $this->targetService->update($request->target_id, $request);
             return Common::apiResponse(1, 'updated successfully');
