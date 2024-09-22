@@ -57,10 +57,11 @@ class TargetController extends Controller
 
     public function update(Request $request,)
     {
+        $id = $request->target_id;
 
         $validator = Validator::make($request->all(), [
-            'level'       => 'required|numeric|unique:targets,level,' . $request->target_id,
-            'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $request->target_id,
+            'level'       => 'required|numeric|unique:targets,level,' . $id,
+            'diamonds'        => 'required|numeric|unique:targets,diamonds,' . $id,
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',
