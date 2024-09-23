@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use Exception;
+use App\Helpers\Common;
 use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\VipPrivilegeRepository;
@@ -23,10 +24,14 @@ class OvipService
 
     public function create($request)
     {
+        $image = null;
+        if ($request->hasFile('img')) {
+            $image = Common::upload('images', $request->file('img'));
+        }
         $dataOvip = [
             'name' => $request->name,
             'level' => $request->level,
-            'img' => $request->img,
+            'img' => $image?? '',
             'price' => $request->price,
             'expire' => $request->expire,
             'exp' => $request->exp
@@ -54,10 +59,14 @@ class OvipService
 
     public function update($request)
     {
+        $image = null;
+        if ($request->hasFile('img')) {
+            $image = Common::upload('images', $request->file('img'));
+        }
         $dataOvip = [
             'name' => $request->name,
             'level' => $request->level,
-            'img' => $request->img,
+            'img' =>  $image,
             'price' => $request->price,
             'expire' => $request->expire,
             'exp' => $request->exp
