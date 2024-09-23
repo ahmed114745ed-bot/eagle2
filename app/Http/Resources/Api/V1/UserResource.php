@@ -72,8 +72,10 @@ class UserResource extends JsonResource
         }
         if ($request->user()) {
             $fArr = $request->user()->friends_ids()->toArray();
+            // $ferArr = $request->user()->followers()->toArray();
         } else {
             $fArr = [];
+            // $ferArr = [];
         }
 
         $onlineTime      = Carbon::createFromTimestamp($this->online_time);
@@ -137,6 +139,7 @@ class UserResource extends JsonResource
             'number_of_followings' => $this->numberOfFollowings(), // both  ---
             'number_of_friends'    => $this->numberOfFriends(), // both  ------
             'profile_visitors'     => $this->profileVisits()->count(), // both  -------
+            'is_followed'            => (@(bool)Common::IsFollow(@$request->user()->id, $this->id) == true && in_array($this->id, $fArr) == true ? true : false),
             'is_follow'            => @(bool)Common::IsFollow(@$request->user()->id, $this->id), // user data  ----
             'is_friend'            => in_array($this->id, $fArr),  //  -------
             'is_in_live'           => $this->is_in_live(), // user data
