@@ -77,8 +77,8 @@ class OvipService
         return true;
     }
 
-    public function allVIP($request)
+    public function allVIP($search)
     {
-        return $this->vipPrivilegeRepository->listVip($request);
+        return $this->vipPrivilegeRepository->listVip($search);
     }
 }

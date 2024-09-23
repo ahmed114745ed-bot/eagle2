@@ -80,7 +80,7 @@ class OvipController extends Controller
 
     public function allVIP(Request $request)
     {
-        $data = $this->ovipService->allVIP($request);
+        $data = $this->ovipService->allVIP($request->search);
         return Common::apiResponse(1, '', $data);
     }
 }
