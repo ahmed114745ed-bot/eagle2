@@ -8,6 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class OVip extends Model
 {
     protected $table = 'o_vips';
+    protected $fillable = [
+        'name', 
+        'level', 
+        'price', 
+        'exp', 
+        'expire', 
+        'privileges', 
+        'img'  // If you are saving the image path in the database, add 'img' as well.
+    ];
 
     protected $hidden = ['privileges'];
 
