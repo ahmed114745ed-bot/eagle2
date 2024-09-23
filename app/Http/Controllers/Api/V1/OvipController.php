@@ -31,7 +31,7 @@ class OvipController extends Controller
             'expire'        => 'nullable|numeric',
             'name'         => 'nullable|string|max:255',
             'privileges'   => 'nullable|array',
-            'img'          => 'nullable',
+            'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
         ]);
         if ($validator->fails()) {
@@ -61,7 +61,7 @@ class OvipController extends Controller
             'expire'        => 'nullable|numeric',
             'name'         => 'nullable|string|max:255',
             'privileges'   => 'nullable',
-            'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'ovip_id'      => 'required'
 
         ]);

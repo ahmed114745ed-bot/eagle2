@@ -25,8 +25,8 @@ class OvipService
     public function create($request)
     {
         $image = null;
-        if ($request->hasFile('img')) {
-            $image = Common::upload('images', $request->file('img'));
+        if ($request->hasFile('image')) {
+            $image = Common::upload('images', $request->file('image'));
         }
         $dataOvip = [
             'name' => $request->name,
@@ -60,8 +60,8 @@ class OvipService
     public function update($request)
     {
         $image = null;
-        if ($request->hasFile('img')) {
-            $image = Common::upload('images', $request->file('img'));
+        if ($request->hasFile('image')) {
+            $image = Common::upload('images', $request->file('image'));
         }
         $dataOvip = [
             'name' => $request->name,
