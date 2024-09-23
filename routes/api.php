@@ -89,7 +89,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('create-ovip', [OvipController::class, 'store']);
         Route::post('update-ovip', [OvipController::class, 'update']);
         Route::post('show-ovip', [OvipController::class, 'show']);
-        Route::get('all-vip', [OvipController::class, 'allVIP']);
+        Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
 
 

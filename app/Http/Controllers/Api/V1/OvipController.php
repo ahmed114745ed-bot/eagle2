@@ -78,9 +78,9 @@ class OvipController extends Controller
         }
     }
 
-    public function allVIP()
+    public function allVIP(Request $request)
     {
-        $data = $this->ovipService->allVIP();
+        $data = $this->ovipService->allVIP($request);
         return Common::apiResponse(1, '', $data);
     }
 }

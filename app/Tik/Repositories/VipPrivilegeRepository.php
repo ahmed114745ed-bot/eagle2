@@ -20,4 +20,14 @@ class VipPrivilegeRepository extends AbstractRepository
     {
         return $this->model->find($id);
     }
+
+    public function listVip($request)
+    {
+        $search = $request->input('search');
+        return $this->model->query()
+        ->where('name', 'like', "%{$search}%")
+        ->orWhere('id', $search)
+        ->select('id', 'name', 'img1') // Include 'img' in the query
+        ->get();
+    }
 }
