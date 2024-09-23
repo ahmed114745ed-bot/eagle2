@@ -15,4 +15,9 @@ class VipPrivilegeRepository extends AbstractRepository
     {
        return $this->model->query()->get();
     }
+
+    public function findById($id)
+    {
+        return $this->model->find($id);
+    }
 }

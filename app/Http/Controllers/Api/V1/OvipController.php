@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use Exception;
+use App\Helpers\Common;
+use Illuminate\Http\Request;
+use App\Tik\Services\OvipService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+
+
+class OvipController extends Controller
+{
+
+    public function __construct(private OvipService $ovipService) {}
+
+    public function index()
+    {
+        $data = $this->ovipService->index();
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function store(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'level'       => 'required|numeric|unique:o_vips,level',
+            'price'        => 'required|numeric',
+            'exp'        => 'required|numeric',
+            'expire'        => 'nullable|numeric',
+            'name'         => 'nullable|string|max:255',
+            'privileges'   => 'nullable',
+            'img'          => 'nullable',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->ovipService->create($request);
+            return Common::apiResponse(1, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        $data = $this->ovipService->show($request->ovip_id);
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'level'       => 'required|numeric|unique:o_vips,level',
+            'price'        => 'required|numeric',
+            'exp'        => 'required|numeric',
+            'expire'        => 'nullable|numeric',
+            'name'         => 'nullable|string|max:255',
+            'privileges'   => 'nullable',
+            'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'ovip_id'      => 'required'
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $this->ovipService->update($request);
+            return Common::apiResponse(1, 'updated successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function allVIP()
+    {
+        $data = $this->ovipService->allVIP();
+        return Common::apiResponse(1, '', $data);
+    }
+}

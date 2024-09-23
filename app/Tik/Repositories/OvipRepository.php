@@ -7,8 +7,6 @@ use App\Models\OVip;
 class OvipRepository extends AbstractRepository
 {
 
-
-
     public function __construct()
     {
         parent::__construct(new OVip());
@@ -25,6 +23,6 @@ class OvipRepository extends AbstractRepository
 
     public function findById($oVipId)
     {
-        return $this->model->query()->find($oVipId);
+        return $this->model->query()->with('privilegs')->find($oVipId);
     }
 }

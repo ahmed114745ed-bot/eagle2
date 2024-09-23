@@ -9,8 +9,6 @@ use App\Models\Ware;
 class WareRepository extends AbstractRepository
 {
 
-
-
     public function __construct()
     {
         parent::__construct(new Ware());
@@ -84,4 +82,19 @@ class WareRepository extends AbstractRepository
     {
         return$this->model->query()->where ('get_type',1)->whereIn('type',$types)->whereIn('level',$levels)->where('enable', true)->get();
     }
+
+    public function notActive($level)
+    {
+       return  $this->model->where('level', $level)->update([
+            'is_active_for_vip'=>false
+        ]);
+    }
+
+    public function updateActiveWithType($type,$level)
+    {
+        return $this->model->where('type', $type)->where('level',$level)->update([
+            'is_active_for_vip'=>true
+        ]);
+    }
+
 }

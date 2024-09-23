@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\HomeController;
+use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -77,10 +78,24 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('update-game', [AllGameController::class, 'utdGameUpdate']);
         Route::post('show-game', [AllGameController::class, 'showGame']);
         Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
+        // target
         Route::get('all-targets', [TargetController::class, 'index']);
         Route::post('create-target', [TargetController::class, 'store']);
         Route::post('update-target', [TargetController::class, 'update']);
         Route::post('show-target', [TargetController::class, 'show']);
+
+        //ovip
+        Route::get('all-ovips', [OvipController::class, 'index']);
+        Route::post('create-ovip', [OvipController::class, 'store']);
+        Route::post('update-ovip', [OvipController::class, 'update']);
+        Route::post('show-ovip', [OvipController::class, 'show']);
+        Route::get('all-vip', [OvipController::class, 'allVIP']);
+
+
+
+
+
+
     });
 
     // all route with auth
