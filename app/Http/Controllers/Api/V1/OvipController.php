@@ -30,7 +30,7 @@ class OvipController extends Controller
             'exp'        => 'required|numeric',
             'expire'        => 'nullable|numeric',
             'name'         => 'nullable|string|max:255',
-            'privileges'   => 'nullable',
+            'privileges'   => 'nullable|array',
             'img'          => 'nullable',
 
         ]);
