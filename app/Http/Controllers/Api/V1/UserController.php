@@ -113,6 +113,7 @@ class UserController extends Controller
         $isVisit = @$request->is_visit == 'true' ? true : false;
         $auth   = $request->user();
         try {
+            
             $user = $this->userService->showUser($id, $auth, $request, $isVisit);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);

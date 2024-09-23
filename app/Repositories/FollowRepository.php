@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Follow;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
 
 class FollowRepository
 {
