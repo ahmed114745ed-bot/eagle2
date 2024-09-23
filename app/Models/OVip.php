@@ -14,8 +14,8 @@ class OVip extends Model
         'price', 
         'exp', 
         'expire', 
-        'privileges', 
-        'img'  // If you are saving the image path in the database, add 'img' as well.
+        
+        'img' 
     ];
 
     protected $hidden = ['privileges'];
