@@ -11,6 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Models\ImageColor;
 use App\Http\Resources\Api\V1\ChatSettingResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use App\Models\Follow;
 
 class UserResource extends JsonResource
 {
@@ -139,7 +140,7 @@ class UserResource extends JsonResource
             'number_of_followings' => $this->numberOfFollowings(), // both  ---
             'number_of_friends'    => $this->numberOfFriends(), // both  ------
             'profile_visitors'     => $this->profileVisits()->count(), // both  -------
-            'is_followed'            => (@(bool)Common::IsFollow(@$request->user()->id, $this->id) == true && in_array($this->id, $fArr) == true ? true : false),
+            'is_followed'            => Follow::where(['user_id' => $request->user()->id ,"followed_user_id" => $this->id])->first() != null ? true : false,
             'is_follow'            => @(bool)Common::IsFollow(@$request->user()->id, $this->id), // user data  ----
             'is_friend'            => in_array($this->id, $fArr),  //  -------
             'is_in_live'           => $this->is_in_live(), // user data
