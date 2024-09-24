@@ -21,11 +21,10 @@ class WhatsAppJob implements ShouldQueue
     private $message;
     private $token;
 
-    public function __construct($phone, $message, $token)
+    public function __construct($phone, $message)
     {
         $this->phone = $phone;
         $this->message = $message;
-        $this->token = $token;
     }
 
     public function handle(): void
@@ -35,9 +34,11 @@ class WhatsAppJob implements ShouldQueue
         // $to =  $this->phone;
         // $body =$this->message ;
         $safwaUrl = config('whatsappauth.base_url'). '/api/send-code-service';
+
+        $token = config('whatsappauth.whatsapp_token');
         try {
             Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->token,
+                'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
             ])->post($safwaUrl, [
                 'code' => (string) $this->message,

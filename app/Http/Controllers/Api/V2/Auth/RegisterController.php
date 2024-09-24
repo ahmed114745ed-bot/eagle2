@@ -77,7 +77,7 @@ class RegisterController extends Controller
         //        if (User::query ()->where ('phone',$phone)->exists ()){
         //            return Common::apiResponse (0,'already exists',null,405);
         //        }
-        (new WhatsappOtp())->sendOtpMessage($phone,$token);
+        (new WhatsappOtp())->sendOtpMessage($phone);
 
         return Common::apiResponse(true, __('messages.code_is_sent_to_your_phone'));
     }

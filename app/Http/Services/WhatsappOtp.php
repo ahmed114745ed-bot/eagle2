@@ -14,7 +14,7 @@ class WhatsappOtp
     /**
      * @throws ValidationException
      */
-    public function sendOtpMessage(string $phone,$token)
+    public function sendOtpMessage(string $phone)
     {
         $data = $this->getCodeInfo($phone);
 
@@ -27,10 +27,10 @@ class WhatsappOtp
 
         $delay   = now();
         $otp     = $this->generateOtp($phone);
-//       
+//
         $message = $otp->code;
        // $message ='verification code is : '. $otp->code;
-        dispatch(new WhatsAppJob($phone ,$message,$token));
+        dispatch(new WhatsAppJob($phone ,$message));
 
     }
 
