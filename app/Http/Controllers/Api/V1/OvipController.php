@@ -55,7 +55,7 @@ class OvipController extends Controller
 
     public function update(Request $request)
     {
-        $id = $request->ovip_id;
+        $id = $request->o_vip_id;
         $validator = Validator::make($request->all(), [
             'level' => [
                 'required',
