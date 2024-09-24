@@ -68,8 +68,6 @@ class OvipController extends Controller
             'name'         => 'nullable|string|max:255',
             'privileges'   => 'nullable',
             'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'ovip_id'      => 'required'
-
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
