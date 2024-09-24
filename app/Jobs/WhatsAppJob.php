@@ -37,13 +37,14 @@ class WhatsAppJob implements ShouldQueue
 
         $token = config('whatsappauth.whatsapp_token');
         try {
-            Http::withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Content-Type' => 'application/json',
             ])->post($safwaUrl, [
                 'code' => (string) $this->message,
                 'phone' => (string) $this->phone,
             ]);
+            Log::info($response->body());
         } catch (RequestException $e) {
             Log::info($e->getMessage());
         }
