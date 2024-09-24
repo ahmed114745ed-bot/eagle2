@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Tik\Services\OvipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 
 class OvipController extends Controller
@@ -54,8 +55,13 @@ class OvipController extends Controller
 
     public function update(Request $request)
     {
+        $id = $request->ovip_id;
         $validator = Validator::make($request->all(), [
-            'level'       => 'required|numeric|unique:o_vips,level',
+           'level' => [
+            'required',
+            'numeric',
+            Rule::unique('o_vips')->ignore($id, 'id'), 
+        ],
             'price'        => 'required|numeric',
             'exp'        => 'required|numeric',
             'expire'        => 'nullable|numeric',
