@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api\V1;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Tik\Services\OvipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+
 
 
 class OvipController extends Controller
