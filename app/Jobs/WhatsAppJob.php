@@ -2,47 +2,65 @@
 
 namespace App\Jobs;
 
-use Database\Seeders\config;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use Database\Seeders\config;
 use Illuminate\Bus\Queueable;
+use PHPUnit\Event\Telemetry\Info;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class WhatsAppJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $phone ;
-    private $message ;
+    private $phone;
+    private $message;
+    private $token;
 
-    public function __construct( $phone , $message  )
+    public function __construct($phone, $message, $token)
     {
         $this->phone = $phone;
         $this->message = $message;
+        $this->token = $token;
     }
 
     public function handle(): void
     {
-        $url = (string)config('view.whatsapp_url');
-        $token = (string)config('view.whatsapp_token');
-        $to =  $this->phone;
-        $body =$this->message ;
-        $client = new Client();
+       // $url = (string)config('view.whatsapp_url');
+        // $token = (string)config('view.whatsapp_token');
+        // $to =  $this->phone;
+        // $body =$this->message ;
+        $safwaUrl = config('whatsappauth.base_url');
         try {
-                $client->post($url, [
-                'form_params' => [
-                    'token' => (string)$token,
-                    'to' =>(string) $to,
-                    'body' => (string)$body,
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
+            Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->token,
+                'Content-Type' => 'application/json',
+            ])->post($safwaUrl, [
+                'code' => (string) $this->message,
+                'phone' => (string) $this->phone,
             ]);
         } catch (RequestException $e) {
-
+            Log::info($e->getMessage());
         }
+
+        // $client = new Client();
+        // try {
+        //         $client->post($url, [
+        //         'form_params' => [
+        //             'token' => (string)$token,
+        //             'to' =>(string) $to,
+        //             'body' => (string)$body,
+        //         ],
+        //         'headers' => [
+        //             'Content-Type' => 'application/x-www-form-urlencoded',
+        //         ],
+        //     ]);
+        // } catch (RequestException $e) {
+        //   //  Log::info($e->getMessage());
+        // }
     }
 }
