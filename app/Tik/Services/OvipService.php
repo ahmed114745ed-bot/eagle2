@@ -71,7 +71,8 @@ class OvipService
             'expire' => $request->expire,
             'exp' => $request->exp
         ];
-        $ovip = $this->ovipRepository->update($dataOvip, $request->ovip_id);
+         $this->ovipRepository->update($dataOvip, $request->ovip_id);
+         $ovip = $this->ovipRepository->findById($request->ovip_id);
         $ovip->privilegs()->sync($request->privileges);
 
         $notActive = $this->wareRepository->notActive($request->level);
