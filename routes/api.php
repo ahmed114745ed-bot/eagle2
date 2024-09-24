@@ -65,6 +65,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('recall-account', [AuthController::class, 'recallAccount']);
+        Route::post ('forget_password',[\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class,'reset']);
+        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
     });
 
     // utd apis
@@ -157,6 +159,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
+                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
+                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
             });
 
             Route::prefix('search')->group(function () {

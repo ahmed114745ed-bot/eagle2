@@ -427,4 +427,17 @@ class UserService
 
         return  $data->toArray();
     }
+
+    public function resetWhatsapp($request, $whatsappWebhook)
+    {
+        $phone = $request->phone;
+        $whatsappWebhookValidate = $whatsappWebhook->getLastValidatedPhone($phone);
+        if (!$whatsappWebhookValidate)throw new \Exception( __('current phone not verified'));
+        
+        $user = User::query ()->where ('phone', $phone)->first ();
+
+        $user->password = $request->password;
+        $user->save();
+        return $user;
+    }
 }

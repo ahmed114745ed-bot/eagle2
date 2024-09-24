@@ -3,21 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Exception;
-use Carbon\Carbon;
-use App\Models\User;
 use App\Helpers\Common;
-use App\Models\GiftLog;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Http\Controllers\Controller;
-use App\Http\Services\RoomGameServices;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
-use App\Http\Resources\Api\V1\MangerTypeResource;
-use Modules\FixedTarget\Services\FixedTargetService;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Illuminate\Support\Facades\Validator;
+use Modules\WhatsappAuth\Services\WhatsappWebhook;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -120,5 +115,60 @@ class UserController extends Controller
         }
         $data = new UserResource($user);
         return Common::apiResponse(true, '', $data, 200);
+    }
+
+
+    public function changePhoneWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook)
+    {
+        $phone = $request->phone;
+        if (!$phone) return Common::apiResponse(0, 'missing params', null, 422);
+        $user = $request->user();
+        $rules = [
+            'phone' => [
+                'required',
+                Rule::unique('users', 'phone')->withoutTrashed()->ignore($user->id),
+            ],
+        ];
+        if ($user->phone == $phone) return Common::apiResponse(0, 'Old phone is wrong', null, 404);
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
+        }
+
+        $whatsappWebhookValidate = $whatsappWebhook->getLastValidatedPhone($phone);
+        if (!$whatsappWebhookValidate) {
+            return Common::apiResponse(false, __('current phone not verified'));
+        }
+
+        $user->phone = $phone;
+
+        $user->save();
+        return Common::apiResponse(1, 'reset successful', new UserResource($user));
+    }
+
+    public function resetWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook){
+        $phone = $request->phone;
+        if (!$phone || !$request->password) return Common::apiResponse (0, 'missing params', null, 422);
+        $user = $request->user ();
+
+
+        if ($user->phone != $phone) return Common::apiResponse (0, 'phone number not register with your account', null, 404);
+
+        $rules = [
+            'phone' => [
+                'required',
+                Rule::unique('users', 'phone')->ignore($user->id),
+            ],
+        ];
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
+        }
+        try{
+        $this->userService->resetWhatsapp($request, $whatsappWebhook);
+    } catch (Exception $e) {
+        return Common::apiResponse(false, $e->getMessage(), null, 407);
+    }
+        return Common::apiResponse (1,'reset successful',new UserResource($user));
     }
 }
