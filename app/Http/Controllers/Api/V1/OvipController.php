@@ -58,11 +58,8 @@ class OvipController extends Controller
     {
         $id = $request->o_vip_id;
         $validator = Validator::make($request->all(), [
-            'level' => [
-                'required',
-                'numeric',
-                Rule::unique('o_vips')->ignore($id),
-            ],
+            'level' =>  'required|unique:o_vips,level,'.$id,
+
             'price'        => 'required|numeric',
             'exp'        => 'required|numeric',
             'expire'        => 'nullable|numeric',
