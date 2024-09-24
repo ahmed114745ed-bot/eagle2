@@ -61,7 +61,7 @@ class OvipController extends Controller
             'level' => [
                 'required',
                 'numeric',
-                Rule::unique('o_vips')->ignore($id, 'id'),
+                Rule::unique('o_vips')->ignore($id),
             ],
             'price'        => 'required|numeric',
             'exp'        => 'required|numeric',
