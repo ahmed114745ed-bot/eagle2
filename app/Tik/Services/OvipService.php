@@ -59,18 +59,27 @@ class OvipService
 
     public function update($request)
     {
-        $image = null;
+        
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
+            $dataOvip = [
+                'name' => $request->name,
+                'level' => $request->level,
+                'img' =>  $image,
+                'price' => $request->price,
+                'expire' => $request->expire,
+                'exp' => $request->exp
+            ];
+        }else{
+            $dataOvip = [
+                'name' => $request->name,
+                'level' => $request->level,
+                'price' => $request->price,
+                'expire' => $request->expire,
+                'exp' => $request->exp
+            ];
         }
-        $dataOvip = [
-            'name' => $request->name,
-            'level' => $request->level,
-            'img' =>  $image,
-            'price' => $request->price,
-            'expire' => $request->expire,
-            'exp' => $request->exp
-        ];
+       
          $this->ovipRepository->update($dataOvip, $request->o_vip_id);
          $ovip = $this->ovipRepository->findById($request->o_vip_id);
         $ovip->privilegs()->sync($request->privileges);
