@@ -34,7 +34,7 @@ class WhatsAppJob implements ShouldQueue
         // $token = (string)config('view.whatsapp_token');
         // $to =  $this->phone;
         // $body =$this->message ;
-        $safwaUrl = config('whatsappauth.base_url');
+        $safwaUrl = config('whatsappauth.base_url'). '/api/send-code-service';
         try {
             Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->token,

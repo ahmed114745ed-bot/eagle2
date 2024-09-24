@@ -7,5 +7,5 @@ return [
     'username' => env('WHATSAPP_USERNAME'),
     'password' => env('WHATSAPP_PASSWORD'),
     'whatsapp_token' => env('WHATSAPP_TOKEN'),
-    'base_url' => env('BASE_URL','http://127.0.0.1:8001/api/send-code-service'),
+    'base_url' => env('WHATSAPP_BASE_URL','http://127.0.0.1:8001'),
 ];
