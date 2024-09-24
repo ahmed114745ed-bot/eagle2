@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Facades\RedisService;
 use GuzzleHttp\Client;
 use Database\Seeders\config;
 use Illuminate\Bus\Queueable;
@@ -35,7 +36,7 @@ class WhatsAppJob implements ShouldQueue
         // $body =$this->message ;
         $safwaUrl = config('whatsappauth.base_url'). '/api/send-code-service';
 
-        $token = config('whatsappauth.whatsapp_token');
+        $token = RedisService::get('whatsapp_token');
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
