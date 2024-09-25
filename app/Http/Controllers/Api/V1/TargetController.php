@@ -71,7 +71,7 @@ class TargetController extends Controller
             'numeric',
             Rule::unique('targets')->ignore($id, 'id'), 
         ],
-
+            'target_id'=> 'required|integer|exists:targets,id',
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',
