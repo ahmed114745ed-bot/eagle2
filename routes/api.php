@@ -125,11 +125,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
 
                 //Pk
+                Route::middleware(['appFeatureEnable:pk'])->group (function (){
                 Route::post('create-pk', [PkController::class, 'createPK']);
                 Route::post('close-pk', [PkController::class, 'closePK']);
                 Route::post('show-pk', [PkController::class, 'showPK']);
                 Route::post('hide-pk', [PkController::class, 'hidePk']);
-
+            });
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
@@ -179,7 +180,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
 
-            Route::prefix('families')->group(function () {
+            Route::prefix('families')->middleware(['appFeatureEnable:families'])->group(function () {
                 Route::get('all', [FamilyController::class, 'index']);
                 Route::get('show/{id}', [FamilyController::class, 'show']);
                 Route::post('create', [FamilyController::class, 'store']);
@@ -295,7 +296,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end ranking
 
             // start vips
-            Route::prefix('vips')->group(function () {
+            Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
@@ -313,7 +314,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // start levels
             Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
             // end levels
-            Route::prefix('mall')->group(function () {
+            Route::prefix('mall')->middleware(['appFeatureEnable:mall'])->group(function () {
                 Route::get('wares', [MallController::class, 'index']);
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
@@ -330,7 +331,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
             // end questions
 
-            Route::prefix('agencies')->group(function () {
+            Route::prefix('agencies')->middleware(['appFeatureEnable:agencies'])->group(function () {
                 Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
                 Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);

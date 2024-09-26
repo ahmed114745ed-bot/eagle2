@@ -1,25 +1,30 @@
 <?php
 namespace App\Admin\Controllers;
-use App\Admin\Extensions\AgencyExporter;
-use App\Admin\Extensions\UserExporter;
-use App\Helpers\Common;
-use App\Models\Agency;
-use App\Models\AgencyMangerPullingOut;
-use App\Models\Config;
-use App\Models\SalaryTrx;
 use App\Models\User;
+use App\Models\Agency;
+use App\Models\Config;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Request;
+use App\Helpers\Common;
+use App\Models\SalaryTrx;
 use Encore\Admin\Facades\Admin;
-
-
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Services\AppFeatureService;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Extensions\UserExporter;
+
+
+use App\Models\AgencyMangerPullingOut;
+use Illuminate\Support\Facades\Request;
+use App\Admin\Extensions\AgencyExporter;
 
 class AgencyMangerTaregetController extends MainController {
 
     public $permission_name = "agency";
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("agencies");
+    }
     public function index ( Content $content )
     {
         return $content

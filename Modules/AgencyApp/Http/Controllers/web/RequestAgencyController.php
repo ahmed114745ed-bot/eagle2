@@ -8,6 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use Encore\Admin\Controllers\AdminController;
@@ -15,6 +16,11 @@ use Encore\Admin\Widgets\Table as WidgetsTable;
 
 class RequestAgencyController extends AdminController
 {
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("agencies");
+    }
     /**
      * Title for current resource.
      *

@@ -2,18 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
-use App\Models\VipAuth;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\VipAuth;
+use Encore\Admin\Layout\Content;
+use App\Services\AppFeatureService;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class VipAuthController extends Controller
 {
     use HasResourceActions;
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("vips");
+    }
 
     /**
      * Index interface.

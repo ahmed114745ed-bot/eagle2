@@ -1,12 +1,18 @@
 <?php
 namespace Modules\Events\Http\Controllers\web;
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Modules\Events\Entities\RewardWinnerPk;
+use App\Services\AppFeatureService;
+use App\Admin\Controllers\MainController;
 use Modules\Events\Entities\WinnerReward;
+use Modules\Events\Entities\RewardWinnerPk;
 
 class EventReportController extends MainController {
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("event_report");
+    }
 
     public function index ( Content $content )
     {

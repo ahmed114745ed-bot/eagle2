@@ -2,22 +2,23 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-use App\Helpers\Common;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Encore\Admin\Actions\Response;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\Auth;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
+use App\Models\AgencyJoinRequest;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Services\AppFeatureService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class AgencyJoinRequestController extends AdminController
 {
@@ -25,7 +26,10 @@ class AgencyJoinRequestController extends AdminController
 
 
 
-
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("agencies");
+    }
 
 
     public function update ( $id )

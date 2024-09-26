@@ -16,7 +16,7 @@ use Modules\AgencyApp\Http\Controllers\Api\V2\Dashboard\AgencyAppController as A
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(function () {
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureEnable:agencies'])->group(function () {
     Route::post('create-agency', [AgencyAppController::class, 'createAgency']);
     Route::post('action-request-agency', [AgencyAppController::class, 'actionRequestAgency']);
     Route::get('all-agency-request', [AgencyAppController::class, 'allAgencyRequest']);

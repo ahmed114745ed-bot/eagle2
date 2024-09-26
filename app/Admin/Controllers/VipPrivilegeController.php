@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\VipPrivilege;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Models\VipPrivilege;
+use Encore\Admin\Layout\Content;
+use App\Services\AppFeatureService;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class VipPrivilegeController extends MainController
 {
@@ -18,6 +19,11 @@ class VipPrivilegeController extends MainController
     public $hiddenColumns = [
 
     ];
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("vips");
+    }
     /**
      * Make a grid builder.
      *
