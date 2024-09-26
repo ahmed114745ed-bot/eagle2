@@ -198,7 +198,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
 
-            Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+           
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
@@ -346,6 +346,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('{id}', [AgencyController::class, 'update']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
+                Route::post('charge_to', [ChargeController::class, 'chargeTo']);
             });
             Route::prefix('payment-gateway')->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
