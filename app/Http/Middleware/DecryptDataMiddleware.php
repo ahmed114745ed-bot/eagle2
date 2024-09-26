@@ -23,14 +23,24 @@ class DecryptDataMiddleware
      public function handle(Request $request, Closure $next)
      {
          if ($request->has('encrypted_data')) {
+             $encryptedHex = $request->encrypted_data;
+ 
+             // Validate that the encrypted_data is a valid hex string
+             if (!ctype_xdigit($encryptedHex)) {
+                 return response()->json(['error' => 'Invalid hexadecimal string'], 400);
+             }
+ 
+             // Convert the hex string to binary
+             $encryptedBinary = hex2bin($encryptedHex);
+ 
              // Decrypt the data using the private key
-             $decryptedData = $this->privateDecrypt2048(hex2bin($request->encrypted_data), $this->privateKey);
-             
+             $decryptedData = $this->privateDecrypt2048($encryptedBinary, $this->privateKey);
+ 
              if ($decryptedData) {
                  // Merge decrypted data into the request
                  $request->merge($decryptedData);
              } else {
-                 return response()->json(['error' => 'Invalid encrypted data'], 400);
+                 return response()->json(['error' => 'Decryption failed'], 400);
              }
          }
  
@@ -53,7 +63,7 @@ class DecryptDataMiddleware
  
          foreach ($enArray as $va) {
              $decryptedTemp = "";
-             $ciphertext = hex2bin($va);
+             $ciphertext = $va;
  
              $return_de = openssl_private_decrypt($ciphertext, $decryptedTemp, $key, OPENSSL_PKCS1_PADDING);
              if (!$return_de) {
