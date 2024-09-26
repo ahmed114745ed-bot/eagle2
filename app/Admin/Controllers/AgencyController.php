@@ -22,11 +22,12 @@ use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
+use App\Services\AppFeatureService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Traits\AdminTraits\AdminUserTrait;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\Facades\Auth;
 use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
 
 class AgencyController extends MainController
@@ -35,7 +36,10 @@ class AgencyController extends MainController
 
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
-
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("agencies");
+    }
 
     public function update($id)
     {

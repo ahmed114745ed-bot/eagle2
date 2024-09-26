@@ -7,14 +7,20 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Table;
+use App\Services\AppFeatureService;
+
 use Encore\Admin\Controllers\AdminController;
 use Modules\AgencyApp\Entities\AdditionalInfo;
-
-use Encore\Admin\Widgets\Table;
 
 
 class RecommendationAgencyController extends AdminController
 {
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("agencies");
+    }
     /**
      * Title for current resource.
      *

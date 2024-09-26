@@ -2,21 +2,22 @@
 
 namespace App\Admin\Controllers;
 
+use Exception;
 use App\Models\OVip;
-use App\Http\Controllers\Controller;
-use App\Models\VipPrivilege;
 use App\Models\Ware;
-use App\Selectables\Privileges;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Exception;
-use Illuminate\Support\Facades\Session;
-use Encore\Admin\Widgets\Box;
+use App\Models\VipPrivilege;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
+use App\Selectables\Privileges;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use App\Services\AppFeatureService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class OVipController extends MainController
 {
@@ -25,6 +26,10 @@ class OVipController extends MainController
     public $hiddenColumns = [
 
     ];
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("vips");
+    }
 
     public function index(Content $content)
     {

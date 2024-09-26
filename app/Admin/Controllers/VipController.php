@@ -3,10 +3,11 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Vip;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\AdminController;
 
 class VipController extends MainController
 {
@@ -22,6 +23,7 @@ class VipController extends MainController
 
     public function __construct()
     {
+        (new AppFeatureService)->validateStatusEnable("vips");
         $this->title = __('Levels');
     }
 

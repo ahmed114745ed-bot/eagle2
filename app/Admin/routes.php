@@ -20,6 +20,7 @@ use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\WithdrawController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
@@ -43,12 +44,12 @@ use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\ImportExcelReportController;
+use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\TrashedUserAccountController;
+use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\QuestionController;
-use App\Admin\Controllers\UserOnlineHistoryController;
 
 Admin::routes();
 
