@@ -21,57 +21,75 @@ class DecryptDataMiddleware
      */
 
      public function handle(Request $request, Closure $next)
-     {
-         if ($request->has('encrypted_data')) {
-             $encryptedHex = $request->encrypted_data;
- 
-             // Validate that the encrypted_data is a valid hex string
-             if (!ctype_xdigit($encryptedHex)) {
-                 return response()->json(['error' => 'Invalid hexadecimal string'], 400);
-             }
- 
-             // Convert the hex string to binary
-             $encryptedBinary = hex2bin($encryptedHex);
- 
-             // Decrypt the data using the private key
-             $decryptedData = $this->privateDecrypt2048($encryptedBinary, $this->privateKey);
- 
-             if ($decryptedData) {
-                 // Merge decrypted data into the request
-                 $request->merge($decryptedData);
-             } else {
-                 return response()->json(['error' => 'Decryption failed'], 400);
-             }
-         }
- 
-         return $next($request);
-     }
- 
-     protected function privateDecrypt2048($encrypted = '', $privateKey)
-     {
-         if (!is_string($encrypted)) {
-             return false;
-         }
- 
-         extension_loaded('openssl') or die('PHP requires OpenSSL extension support');
- 
-         $private_key = "-----BEGIN PRIVATE KEY-----\n" . $privateKey . "\n-----END PRIVATE KEY-----";
-         $key = openssl_pkey_get_private($private_key);
- 
-         $decrypted = "";
-         $enArray = str_split($encrypted, 2048 / 8);
- 
-         foreach ($enArray as $va) {
-             $decryptedTemp = "";
-             $ciphertext = $va;
- 
-             $return_de = openssl_private_decrypt($ciphertext, $decryptedTemp, $key, OPENSSL_PKCS1_PADDING);
-             if (!$return_de) {
-                 return false;
-             }
-             $decrypted .= $decryptedTemp;
-         }
- 
-         return json_decode($decrypted, true);
-     }
- }
+    {
+        if ($request->has('encrypted_data')) {
+            $encryptedHex = $request->encrypted_data;
+
+            // Convert the hex string to binary
+            $encryptedBinary = hex2bin($encryptedHex);
+
+            // Decrypt the data using the private key
+            $decryptedData = $this->privateDecrypt2048($encryptedBinary, $this->privateKey);
+
+            if ($decryptedData) {
+                // Merge decrypted data into the request
+                $request->merge($decryptedData);
+            } else {
+                return response()->json(['error' => 'Decryption failed'], 400);
+            }
+        }
+
+        return $next($request);
+    }
+
+    protected function privateDecrypt2048($encrypted = '', $privateKeyFile)
+    {
+        if (!is_string($encrypted)) {
+            return false;
+        }
+
+        extension_loaded('openssl') or die('PHP requires OpenSSL extension support');
+
+        // Load the private key resource
+        $key = $this->loadPrivateKey($privateKeyFile);
+
+        $decrypted = "";
+
+        // Split the encrypted data into chunks
+        $enArray = str_split($encrypted, 2048 / 8);
+
+        foreach ($enArray as $va) {
+            $decryptedTemp = "";
+            $ciphertext = $va;
+
+            // Decrypt each chunk using the private key
+            $return_de = openssl_private_decrypt($ciphertext, $decryptedTemp, $key, OPENSSL_PKCS1_PADDING);
+            if (!$return_de) {
+                return false;
+            }
+            $decrypted .= $decryptedTemp;
+        }
+
+        return json_decode($decrypted, true);
+    }
+
+    // Helper method to load the private key
+    protected function loadPrivateKey($privateKeyFile)
+    {
+        // Load the private key from a file
+        $privateKey = file_get_contents($privateKeyFile);
+
+        // Ensure the key is valid
+        if (!$privateKey) {
+            throw new \Exception("Private key file could not be read.");
+        }
+
+        $private_key_resource = openssl_pkey_get_private($privateKey);
+
+        if (!$private_key_resource) {
+            throw new \Exception("Private key is not valid or could not be loaded.");
+        }
+
+        return $private_key_resource;
+    }
+}
