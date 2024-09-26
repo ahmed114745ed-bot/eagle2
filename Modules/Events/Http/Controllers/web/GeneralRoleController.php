@@ -2,17 +2,22 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainController;
-use Modules\Events\Entities\GeneralRole;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Services\AppFeatureService;
+use Modules\Events\Entities\GeneralRole;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class GeneralRoleController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'general-roles';
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("event_role");
+    }
     protected function grid()
     {
         $grid = new Grid(new GeneralRole());

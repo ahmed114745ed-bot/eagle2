@@ -80,20 +80,31 @@ class AllGameService
 
     public function updateUtd($request)
     {
-        $image = null;
+        
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
+            $data = [
+                'name' => $request->name,
+                'name_en' => $request->name_en,
+                'url' => $request->url,
+                'image' => $image,
+                'mini_url' => $request->mini_url,
+                'type' => $request->type,
+                'is_enable' => $request->is_enable,
+                'custom_id' => $request->custom_id,
+            ];
+        }else{
+            $data = [
+                'name' => $request->name,
+                'name_en' => $request->name_en,
+                'url' => $request->url,
+                'mini_url' => $request->mini_url,
+                'type' => $request->type,
+                'is_enable' => $request->is_enable,
+                'custom_id' => $request->custom_id,
+            ];
         }
-        $data = [
-            'name' => $request->name,
-            'name_en' => $request->name_en,
-            'url' => $request->url,
-            'image' => $image ?? '',
-            'mini_url' => $request->mini_url,
-            'type' => $request->type,
-            'is_enable' => $request->is_enable,
-            'custom_id' => $request->custom_id,
-        ];
+        
         return $this->allGameRepository->update($request->game_id, $data);
     }
 

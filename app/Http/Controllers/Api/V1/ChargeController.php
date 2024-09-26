@@ -216,7 +216,7 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         $searchKey = $request->search_key ?? null;
-        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', 'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received',null,'Host agent');
 
         $charge = $charge->with(['sender'])->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         if ($request->by_date) {

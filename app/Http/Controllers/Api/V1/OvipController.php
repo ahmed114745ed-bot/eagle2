@@ -32,7 +32,7 @@ class OvipController extends Controller
             'exp'        => 'required|numeric',
             'expire'        => 'nullable|numeric',
             'name'         => 'nullable|string|max:255',
-            'privileges'   => 'nullable|array',
+            'privileges'   => 'nullable',
             'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
         ]);
@@ -59,7 +59,7 @@ class OvipController extends Controller
         $id = $request->o_vip_id;
         $validator = Validator::make($request->all(), [
             'level' =>  'required|unique:o_vips,level,'.$id,
-
+            'o_vip_id' => 'required|integer|exists:o_vips,id',
             'price'        => 'required|numeric',
             'exp'        => 'required|numeric',
             'expire'        => 'nullable|numeric',

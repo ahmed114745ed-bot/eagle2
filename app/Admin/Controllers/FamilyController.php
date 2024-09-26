@@ -3,13 +3,14 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Family;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+use App\Services\AppFeatureService;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyController extends MainController
 {
@@ -18,6 +19,11 @@ class FamilyController extends MainController
     public $hiddenColumns = [
 
     ];
+
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("families");
+    }
 
 
     /**

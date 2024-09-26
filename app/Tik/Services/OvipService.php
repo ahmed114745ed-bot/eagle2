@@ -28,6 +28,7 @@ class OvipService
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
         }
+        $privileges = json_decode($request->privileges);
         $dataOvip = [
             'name' => $request->name,
             'level' => $request->level,
@@ -38,11 +39,11 @@ class OvipService
         ];
         $ovip =  $this->ovipRepository->create($dataOvip);
 
-        $ovip->privilegs()->sync($request->privileges);
+        $ovip->privilegs()->sync($privileges);
 
         $notActive = $this->wareRepository->notActive($request->level);
         if ($notActive) {
-            foreach ($request->privileges as $privilege) {
+            foreach ($privileges as $privilege) {
                 $vip = $this->vipPrivilegeRepository->findById($privilege);
                 if (isset($vip->type)) {
                     $this->wareRepository->updateActiveWithType($vip->type, $request->level);
@@ -59,25 +60,34 @@ class OvipService
 
     public function update($request)
     {
-        $image = null;
+        
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
+            $dataOvip = [
+                'name' => $request->name,
+                'level' => $request->level,
+                'img' =>  $image,
+                'price' => $request->price,
+                'expire' => $request->expire,
+                'exp' => $request->exp
+            ];
+        }else{
+            $dataOvip = [
+                'name' => $request->name,
+                'level' => $request->level,
+                'price' => $request->price,
+                'expire' => $request->expire,
+                'exp' => $request->exp
+            ];
         }
-        $dataOvip = [
-            'name' => $request->name,
-            'level' => $request->level,
-            'img' =>  $image,
-            'price' => $request->price,
-            'expire' => $request->expire,
-            'exp' => $request->exp
-        ];
+        $privileges = json_decode($request->privileges);
          $this->ovipRepository->update($dataOvip, $request->o_vip_id);
          $ovip = $this->ovipRepository->findById($request->o_vip_id);
-        $ovip->privilegs()->sync($request->privileges);
+        $ovip->privilegs()->sync( $privileges);
 
         $notActive = $this->wareRepository->notActive($request->level);
         if ($notActive) {
-            foreach ($request->privileges as $privilege) {
+            foreach ( $privileges as $privilege) {
                 $vip = $this->vipPrivilegeRepository->findById($privilege);
                 if (isset($vip->type)) {
                     $this->wareRepository->updateActiveWithType($vip->type, $request->level);
