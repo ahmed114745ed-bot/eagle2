@@ -75,12 +75,12 @@ class EnterRoomCollection extends JsonResource
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name","youtube_key")->first()?->value ?? "",
             'room_keys' => [
-                "comment_room_key" => Common::getConfig('comment_room_key') ?? 13456489535
+                "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
             ],
             'writing_disabled'    => ($this->writing_disabled)? true : false,
             'charisma_status'    => ($this->charizma_status)? true : false,
             'show_welcom_animation'=> settings()->get('show_welcom_enmation') == 'on' ? true : false,
-            'private_comment_price' => Common::getConfig('private_comment_price') ?? 100,
+            'private_comment_price' => (Common::getConfig('private_comment_price') ?? 100),
             'game'               =>  $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
             "game_key" => (string)Common::getConfig('comment_room_key') ??  (string)13456489535,
             'room_level'   =>[
