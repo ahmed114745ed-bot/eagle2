@@ -12,7 +12,6 @@ use App\Http\Middleware\AdminGeneralBanMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use KevinSoft\MultiLanguage\Middlewares\MultiLanguageMiddleware;
 use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
-use Modules\Whatsapp\Http\Middleware\Whatsapp;
 
 
 class Kernel extends HttpKernel
@@ -85,9 +84,10 @@ class Kernel extends HttpKernel
         'userBan'=>UserBanMiddleware::class,
         'rate_limiting' => \App\Http\Middleware\RateLimitingMiddleware::class,
         'checkCpu' => \App\Http\Middleware\CheckCpu::class,
-        'whatsapp' => Whatsapp::class,
         'configM' => ConfigMiddleware::class,
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
-        'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class
+        'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
+        'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
+
     ];
 }

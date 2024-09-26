@@ -82,8 +82,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
         // target
         Route::get('all-targets', [TargetController::class, 'index']);
-        Route::post('create-target', [TargetController::class, 'store']);
-        Route::post('update-target', [TargetController::class, 'update']);
+        Route::post('create-target', [TargetController::class, 'store'])->middleware('decrypt.data');
+        Route::post('update-target', [TargetController::class, 'update'])->middleware('decrypt.data');
         Route::post('show-target', [TargetController::class, 'show']);
 
         //ovip
