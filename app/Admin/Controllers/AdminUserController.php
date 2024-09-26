@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\Common;
 use App\Models\Admin;
 use App\Models\Agency;
+use App\Models\Agent;
 use App\Models\Country;
 use App\Models\User;
 use Encore\Admin\Auth\Database\Administrator;
@@ -42,7 +43,11 @@ class AdminUserController extends \Encore\Admin\Controllers\UserController
     {
         $user = Admin::query ()->findOrFail ($id);
         if (\request ('password') != $user->password){
+            Agent::where("id",$user->id)->update([
+                "remember_token" => null
+            ]);
             DB::table ('sessions')->where ('user_id',$user->id)->delete ();
+
         }
         return parent ::update ($id);
     }
