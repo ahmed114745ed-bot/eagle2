@@ -42,12 +42,11 @@ class AdminUserController extends \Encore\Admin\Controllers\UserController
     public function update ( $id )
     {
         $user = Admin::query ()->findOrFail ($id);
-        if (\request ('password') != $user->password){
+        if (\request ('password') != $user->password || \request ('username') != $user->username){
             Agent::where("id",$user->id)->update([
                 "remember_token" => null
             ]);
             DB::table ('sessions')->where ('user_id',$user->id)->delete ();
-
         }
         return parent ::update ($id);
     }
