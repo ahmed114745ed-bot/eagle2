@@ -77,7 +77,7 @@ class DecryptDataMiddleware
     protected function loadPrivateKey($privateKeyFile)
     {
         // Load the private key from a file
-        $privateKey = file_get_contents($privateKeyFile);
+        $privateKey = $privateKeyFile;
 
         // Ensure the key is valid
         if (!$privateKey) {
