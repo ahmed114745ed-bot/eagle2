@@ -73,11 +73,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::prefix('utd')->group(function () {
         //configs
         Route::get('configs', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
-        Route::post('update-config', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig']);
+        Route::post('update-config', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
         //games
         Route::get('all-games', [AllGameController::class, 'utdGameIndex']);
-        Route::post('create-game', [AllGameController::class, 'utdGameCreate']);
-        Route::post('update-game', [AllGameController::class, 'utdGameUpdate']);
+        Route::post('create-game', [AllGameController::class, 'utdGameCreate'])->middleware('decrypt.data');
+        Route::post('update-game', [AllGameController::class, 'utdGameUpdate'])->middleware('decrypt.data');
         Route::post('show-game', [AllGameController::class, 'showGame']);
         Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
         // target
@@ -88,8 +88,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
         //ovip
         Route::get('all-ovips', [OvipController::class, 'index']);
-        Route::post('create-ovip', [OvipController::class, 'store']);
-        Route::post('update-ovip', [OvipController::class, 'update']);
+        Route::post('create-ovip', [OvipController::class, 'store'])->middleware('decrypt.data');
+        Route::post('update-ovip', [OvipController::class, 'update'])->middleware('decrypt.data');
         Route::post('show-ovip', [OvipController::class, 'show']);
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
