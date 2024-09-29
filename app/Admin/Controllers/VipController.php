@@ -18,7 +18,7 @@ class VipController extends MainController
      */
     protected $title = 'المستويات';
 
-    public $permission_name = 'app-editing';
+    public $permission_name = 'level';
     public $hiddenColumns = [];
 
     public function __construct()

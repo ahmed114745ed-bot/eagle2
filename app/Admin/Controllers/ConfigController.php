@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 class ConfigController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'app-editing';
+    public $permission_name = 'config';
     public $hiddenColumns = [
 
     ];

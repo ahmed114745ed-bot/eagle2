@@ -15,7 +15,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 class WareController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'app-editing';
+    public $permission_name = 'wares';
     public $hiddenColumns = [
 
     ];
