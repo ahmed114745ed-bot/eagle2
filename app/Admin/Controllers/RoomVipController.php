@@ -18,7 +18,7 @@ class RoomVipController extends MainController
      */
     protected $title = 'المستويات';
 
-    public $permission_name = 'rooms';
+    public $permission_name = 'room-vip';
     public $hiddenColumns = [
 
     ];

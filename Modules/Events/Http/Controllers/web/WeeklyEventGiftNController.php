@@ -24,7 +24,7 @@ use Modules\Events\Entities\WeeklyStar;
 class WeeklyEventGiftNController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'event';
+    public $permission_name = 'weekly_star_rewards';
     public function __construct()
     {
         $weekly_event_id = request('weekly_event_id');

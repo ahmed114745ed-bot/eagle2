@@ -8,7 +8,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 
-class WithdrawController extends AdminController
+class WithdrawController extends  MainController
 {
     /**
      * Title for current resource.
@@ -16,6 +16,7 @@ class WithdrawController extends AdminController
      * @var string
      */
     protected $title = 'PaymentWithdrawType';
+    public $permission_name = 'withdraw-type';
 
     /**
      * Make a grid builder.

@@ -29,7 +29,6 @@ class RewardTargetController extends MainController
     {
         (new AppFeatureService)->validateStatusEnable("target_events");
     }
-    public $permission_name = 'event';
     public function index(Content $content)
     {
         return $content

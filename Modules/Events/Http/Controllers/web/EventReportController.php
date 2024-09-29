@@ -13,7 +13,7 @@ class EventReportController extends MainController {
     {
         (new AppFeatureService)->validateStatusEnable("event_report");
     }
-    public $permission_name = 'event';
+     
     public function index ( Content $content )
     {
         return $content

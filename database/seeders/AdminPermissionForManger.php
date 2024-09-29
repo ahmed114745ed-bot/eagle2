@@ -40,7 +40,17 @@ class AdminPermissionForManger extends Seeder
             'special-Ware',
             'special-frame',
             'event',
-            'app-editing',
+            'ovip',
+            'room-vip',
+            'withdraw-type',
+            'weekly-star',
+            'general-roles',
+            'pk-event',
+            'pk-event-rewards',
+            'target-event',
+            'weekly_star_rewards',
+            'weekly-star',
+            
         ];
 
         $methods = [

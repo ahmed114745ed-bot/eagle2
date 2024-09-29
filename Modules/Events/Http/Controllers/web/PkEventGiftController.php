@@ -19,7 +19,7 @@ class PkEventGiftController extends MainController
 {
 
     use HasResourceActions;
-    public $permission_name = 'event';
+    public $permission_name = 'pk-event-rewards';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("pk_event");

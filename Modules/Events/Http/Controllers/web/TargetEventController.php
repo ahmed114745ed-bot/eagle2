@@ -21,11 +21,11 @@ class TargetEventController extends MainController
      * @var string
      */
     protected $title = 'TargetEvent';
+    public $permission_name = 'target-event';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("target_events");
     }
-    public $permission_name = 'event';
     protected function grid()
     {
 //        dd(ChargeTargetEvent::with('rewards.ware')->first());

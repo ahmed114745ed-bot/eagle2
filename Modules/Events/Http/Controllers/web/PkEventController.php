@@ -29,7 +29,7 @@ class PkEventController extends MainController
    
     protected $title = 'PkEvent';
 
-    public $permission_name = 'event';
+    public $permission_name = 'pk-event';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("pk_event");
