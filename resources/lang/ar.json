@@ -746,6 +746,8 @@
    "ignored added successfully": "تمت اضافه التجنب بنجاح",
    "question": "السؤال",
    "answer": "الجواب",
-   "agency_id": "معرف الوكالة"
+   "agency_id": "معرف الوكالة",
+   "app-editing": "اعدادات التطبيق",
+   "configs" : "التكوينات"
 
 }
