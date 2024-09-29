@@ -3,12 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Offer;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Controllers\MainController;
 
-class OfferController extends AdminController
+class OfferController extends MainController
 {
     /**
      * Title for current resource.

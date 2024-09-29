@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ParentUsersController extends MainController {
+    public $permission_name = 'user-parent';
 
     public function index ( Content $content )
     {

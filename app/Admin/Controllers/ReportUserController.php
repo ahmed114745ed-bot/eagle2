@@ -2,16 +2,17 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class ReportUserController extends AdminController
+class ReportUserController extends MainController
 {
     /**
      * Title for current resource.
@@ -19,6 +20,7 @@ class ReportUserController extends AdminController
      * @var string
      */
     protected $title = 'User';
+    public $permission_name = 'report-user';
 
     /**
      * Make a grid builder.

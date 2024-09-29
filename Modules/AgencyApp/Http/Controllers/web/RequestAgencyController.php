@@ -11,12 +11,13 @@ use App\Helpers\Common;
 use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 
-class RequestAgencyController extends AdminController
+class RequestAgencyController extends MainController
 {
-
+    public $permission_name = 'request-agencies';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");

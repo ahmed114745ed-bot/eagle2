@@ -16,10 +16,11 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Extensions\UserExporter;
 use Illuminate\Support\Facades\Request;
 use App\Admin\Extensions\AgencyExporter;
+use App\Admin\Controllers\MainController;
 
 class ReportController extends MainController
 {
-
+    public $permission_name = 'report';
     public function index(Content $content)
     {
         return $content

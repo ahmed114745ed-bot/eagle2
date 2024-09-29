@@ -23,6 +23,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\Config;
 
 class AllStatisticController extends MainController {
+    public $permission_name = 'all-statistic';
 
     public function index ( Content $content )
     {

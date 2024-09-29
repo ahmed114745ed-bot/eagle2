@@ -2,13 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Http\Controllers\Controller;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
+use App\Http\Controllers\Controller;
+use App\Admin\Controllers\MainController;
 
 
-class TargetPercentageController extends Controller
+class TargetPercentageController extends MainController
 {
+    public $permission_name = 'target-percentage';
     public function index(Content $content)
     {
         $route = 'target-percentage';

@@ -24,7 +24,7 @@ class AdminUsersController extends MainController
 
 
 
-    public $permission_name = 'manger-agency-manager';
+    public $permission_name = 'admin-users';
     public function show($id, Content $content)
     {
 

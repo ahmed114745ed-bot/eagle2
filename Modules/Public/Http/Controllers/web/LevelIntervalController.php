@@ -5,13 +5,15 @@ namespace Modules\Public\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Controllers\MainController;
 use Modules\Public\Entities\LevelInterval;
 use Encore\Admin\Controllers\AdminController;
 
 
 
-class LevelIntervalController extends AdminController
+class LevelIntervalController extends MainController
 {
+    public $permission_name = 'level-interval';
     /**
      * Title for current resource.
      *

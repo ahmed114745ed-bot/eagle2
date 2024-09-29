@@ -13,7 +13,7 @@ use Encore\Admin\Show;
 class BoxUseController extends MainController
 {
     use HasResourceActions;
-
+    public $permission_name = 'box-use';
     /**
      * Index interface.
      *

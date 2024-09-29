@@ -11,8 +11,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class BoxController extends Controller
+class BoxController extends MainController
 {
+    public $permission_name = 'boxes';
     use HasResourceActions;
 
     /**

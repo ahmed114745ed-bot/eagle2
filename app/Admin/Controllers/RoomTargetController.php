@@ -15,7 +15,7 @@ use Encore\Admin\Show;
 class RoomTargetController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'rooms';
+    public $permission_name = 'room-target';
 
     protected function grid()
     {

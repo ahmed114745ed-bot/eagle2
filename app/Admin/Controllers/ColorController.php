@@ -3,12 +3,13 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Color;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class ColorController extends AdminController
+class ColorController extends MainController
 {
     /**
      * Title for current resource.
@@ -16,6 +17,7 @@ class ColorController extends AdminController
      * @var string
      */
     protected $title = 'Color';
+    public $permission_name = 'color';
 
     /**
      * Make a grid builder.

@@ -32,6 +32,7 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
+use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\GiftRoomLevelController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;

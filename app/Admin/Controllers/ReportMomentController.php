@@ -2,17 +2,18 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Extensions\CheckRow;
-use App\Admin\Extensions\DeleteMoment;
 use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Extensions\CheckRow;
 use Modules\Moment\Entities\Moment;
+use App\Admin\Extensions\DeleteMoment;
+use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
+use Encore\Admin\Controllers\AdminController;
 
-class ReportMomentController extends AdminController
+class ReportMomentController extends MainController
 {
     /**
      * Title for current resource.
@@ -20,6 +21,7 @@ class ReportMomentController extends AdminController
      * @var string
      */
     protected $title = 'ReportMoment';
+    public $permission_name = 'report-moment';
 
     /**
      * Make a grid builder.

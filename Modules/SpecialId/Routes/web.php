@@ -1,6 +1,7 @@
 <?php
 
 use Modules\SpecialId\Http\Controllers\web\SpecialWareController;
+use Modules\SpecialId\Http\Controllers\web\SpecialIdFramController;
 use Modules\SpecialId\Http\Controllers\web\SpecialHistoryController;
 
 /*

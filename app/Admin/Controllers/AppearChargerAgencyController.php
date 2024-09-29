@@ -3,20 +3,23 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class AppearChargerAgencyController extends AdminController
+class AppearChargerAgencyController extends MainController
 {
     /**
+     * 
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'User';
+    public $permission_name = 'appear-charger-agency';
 
     /**
      * Make a grid builder.

@@ -2,22 +2,23 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DedicateAction;
-use App\Helpers\Common;
 use App\Models\Ware;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Admin;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Admin;
+use Encore\Admin\Layout\Content;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DedicateAction;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class DedicateWareController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'wares-dedicate';    /**
+    public $permission_name = 'vips-dedicate';    /**
      * Make a grid builder.
      *
      * @return Grid

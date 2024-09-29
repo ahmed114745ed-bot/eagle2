@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Request;
 use App\Admin\Extensions\AgencyExporter;
 
 class ChargeReportController extends MainController {
+    public $permission_name = 'charger-report';
 
     public function index ( Content $content )
     {

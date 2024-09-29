@@ -50,7 +50,38 @@ class AdminPermissionForManger extends Seeder
             'target-event',
             'weekly_star_rewards',
             'weekly-star',
+            'get-salary-requests',
+            'request-agencies',
+            'color',
+            "agencies-tareget-manger",
+           'managers',
+           'report',
+           'special-id-request',
+           'background-image-request',
+           'report-moment',
+           'admin-users',
+           'appear-charger-agency',
+           'charger-report',
+            'report-user',
+            'target-percentage',
+            'core-wallets',
+            'auth-user',
+            'all-statistic',
+            'level-interval',
+            'user-parent',
+            'Real',
+            'sailer',
+            'group-chat',
+            'image-color',
+            'users-devices',
+            'user-target',
+            'room-target',
+            'exchange',
+            'boxes',
+            'box-use'
+
             
+
         ];
 
         $methods = [

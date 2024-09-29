@@ -2,21 +2,23 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\RequestBackgroundImage;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
 use App\Models\Room;
 use App\Models\User;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
 use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Models\RequestBackgroundImage;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
-class RequestBackgroundImageController extends Controller
+class RequestBackgroundImageController extends MainController
 {
     use HasResourceActions;
+    public $permission_name = 'background-image-request';
 
     /**
      * Index interface.

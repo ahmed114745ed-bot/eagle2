@@ -14,9 +14,10 @@ use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
 
-class BanController extends Controller
+class BanController extends MainController
 {
     use HasResourceActions;
+    public $permission_name = 'bans';
 
     /**
      * Index interface.

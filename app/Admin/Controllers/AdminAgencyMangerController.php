@@ -24,7 +24,7 @@ use function Doctrine\Common\Cache\Psr6\get;
 class  AdminAgencyMangerController extends MainController
 {
 
-    public $permission_name = '*';
+    public $permission_name = 'managers';
 
     protected $model;
 

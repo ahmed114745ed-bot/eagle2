@@ -2,31 +2,33 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Http\Controllers\Controller;
-use App\Models\Config;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use Encore\Admin\Actions\Response;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Agency;
+use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Support\Facades\Auth;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
+use App\Models\AgencyJoinRequest;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use Modules\Public\Http\Services\UpgradeLevelServices;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Modules\SpecialId\Entities\UserWare;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UpgradeLevelServices;
 
-class SpecialIdRequestController extends AdminController
+class SpecialIdRequestController extends MainController
 {
 
+    public $permission_name = 'special-id-request';
 //    protected function grid()
 //    {
 //

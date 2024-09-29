@@ -20,7 +20,7 @@ use App\Admin\Extensions\AgencyExporter;
 
 class AgencyMangerTaregetController extends MainController {
 
-    public $permission_name = "agency";
+    public $permission_name = "agencies-tareget-manger";
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("agencies");

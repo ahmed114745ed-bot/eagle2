@@ -12,10 +12,10 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 
-class GroupChatController extends Controller
+class GroupChatController extends MainController
 {
     use HasResourceActions;
-
+    public $permission_name = 'group-chat';
     /**
      * Index interface.
      *
