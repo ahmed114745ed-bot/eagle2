@@ -27,7 +27,7 @@ class WeeklyEventNController extends MainController
 {
     use HasResourceActions;
 
-        public $permission_name = 'weekly-star';
+    public $permission_name = 'event';
     public $hiddenColumns = [
 
     ];

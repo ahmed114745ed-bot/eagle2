@@ -22,7 +22,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class OVipController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'vips';
+    public $permission_name = 'app-editing';
     public $hiddenColumns = [
 
     ];

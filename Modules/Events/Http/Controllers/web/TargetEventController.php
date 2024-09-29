@@ -3,16 +3,17 @@
 namespace Modules\Events\Http\Controllers\web;
 
 
-use App\Selectables\Gifts;
-use App\Services\AppFeatureService;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Events\Entities\ChargeTargetEvent;
+use App\Selectables\Gifts;
+use App\Services\AppFeatureService;
 use Modules\Events\Entities\TargetEvent;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
+use Modules\Events\Entities\ChargeTargetEvent;
 
-class TargetEventController extends AdminController
+class TargetEventController extends MainController
 {
     /**
      * Title for current resource.
@@ -24,6 +25,7 @@ class TargetEventController extends AdminController
     {
         (new AppFeatureService)->validateStatusEnable("target_events");
     }
+    public $permission_name = 'event';
     protected function grid()
     {
 //        dd(ChargeTargetEvent::with('rewards.ware')->first());

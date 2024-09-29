@@ -38,7 +38,9 @@ class AdminPermissionForManger extends Seeder
             'trashed-account-user',
             'special-history',
             'special-Ware',
-            'special-frame'
+            'special-frame',
+            'event',
+            'app-editing',
         ];
 
         $methods = [

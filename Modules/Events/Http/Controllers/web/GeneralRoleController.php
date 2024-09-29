@@ -13,7 +13,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class GeneralRoleController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'general-roles';
+    public $permission_name = 'event';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("event_role");

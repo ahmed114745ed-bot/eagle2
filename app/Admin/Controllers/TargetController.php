@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Request;
 class TargetController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'target';
+    public $permission_name = 'agencies';
     public $hiddenColumns = [
 
     ];
