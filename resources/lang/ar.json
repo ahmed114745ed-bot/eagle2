@@ -755,5 +755,49 @@
     "targets" :"الأهداف",
     "wares-vips":"سلع مستويلت",
     "colors":"الألوان",
-    "payment-gateways":"بوابات الدفع"
+    "payment-gateways":"بوابات الدفع",
+    "Types of Managers" :"أنواع المديرين",
+    "Application settings" :"اعدادات التطبيق",
+    "List of levels":"List of levels",
+    "Room categories":"فئات الغرف",
+    "Complaints":"الشكاوي",
+    "Target events":"الأحداث المستهدفة",
+    "pk event" : "الاحدات pk",
+    "General rules" :"قواعد عامة",
+    "events reports":"تقارير الاحداث",
+    "Events of the weeks":"احداث الاسابيع",
+    "frams":"اطارات",
+    "Featured ids" :"مميز ids",
+    "Details of unique identifiers":"تفاصيل المعرفات المميزة",
+    "wares dedicate":"اهداء سلع",
+    "dedicate special id" : "اهداء special id",
+    "Requests to establish the agency" :"طلبات انشاء الوكاله",
+    "Target users" :"تارجت المستخدمين",
+    "agency join requests" : "طلبات الانضمام للوكالات",
+    "charges" : "شحنات",
+    "charge agents":" وكلاء شحن",
+    "charge reports" : " تقارير الشحن",
+    "permissions" : "صلاحيات",
+    "Control panel" :"لوحة التحكم",
+    "Developer panel":"لوحة المطور",
+    "Updates":"التحديثات",
+    "privacy policy" :"سياسة الخصوصية",
+    "Invitation code" :"كود الدعوة",
+    "reels" : " فديوهات",
+    "Conversation groups" :"مجموعات المحادثات",
+    "ID color" :"لون المعرف",
+    "User levels" :"مستويات المستخدمين",
+    "Deleted account users" :"مستخدمي الحسابات المحذوفه",
+    "User devices" :"أجهزة المستخدم",
+    "Add user tags":"اضافه اوسمة المستخدمين",
+    "Exchange currencies":"تبديل العملات",
+    "Dumped boxes":"الصناديق الملقاة",
+    "Phone codes":"اكواد الهواتف"
+
+
+   
+  
+    
+  
+    
 }
