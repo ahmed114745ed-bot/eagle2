@@ -105,6 +105,7 @@ Route::group(
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
+        $router->resource('test-test', 'TestTestController');
 
         $router->resource ('auth/users','AdminUserController');
         $router->resource ('/agencies/managers',AdminAgencyMangerController::class);
