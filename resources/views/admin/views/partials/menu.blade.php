@@ -29,7 +29,7 @@
 @php
 
 
-            $isVisible = ((( $roles && Admin::user()->visible($roles) ) || (!empty(\Illuminate\Support\Arr::get($item, 'permission'))  &&Admin::user()->can(\Illuminate\Support\Arr::get($item, 'permission') ))) || @$anyChild ?? false);
+            $isVisible = ((( $roles && Admin::user()->visible($roles) ) || (!empty(\Illuminate\Support\Arr::get($item, 'permission'))  &&(Admin::user()->can(\Illuminate\Support\Arr::get($item, 'permission') ))) || Admin::user()->can('*')) || @$anyChild ?? false);
 @endphp
 
 @if($isVisible)
