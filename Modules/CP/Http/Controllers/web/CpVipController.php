@@ -18,7 +18,7 @@ class CpVipController extends MainController
      */
     protected $title = 'المستويات';
 
-    public $permission_name = 'level';
+    public $permission_name = 'level-cp';
     public $hiddenColumns = [
 
     ];

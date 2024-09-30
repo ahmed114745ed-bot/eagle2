@@ -8,7 +8,7 @@ use Modules\Events\Entities\WinnerReward;
 use Modules\Events\Entities\RewardWinnerPk;
 
 class EventReportController extends MainController {
-
+    public $permission_name = 'event_report';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("event_report");

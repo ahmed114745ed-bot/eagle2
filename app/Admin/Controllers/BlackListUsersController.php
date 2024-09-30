@@ -15,6 +15,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class BlackListUsersController extends MainController
 {
     use HasResourceActions;
+    public $permission_name = 'black-list';
    
     public function index(Content $content)
     {

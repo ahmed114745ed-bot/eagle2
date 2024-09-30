@@ -78,7 +78,10 @@ class AdminPermissionForManger extends Seeder
             'room-target',
             'exchange',
             'boxes',
-            'box-use'
+            'box-use',
+            'level-cp',
+            'event_report',
+            'payment-gat-way'
 
             
 

@@ -21,6 +21,7 @@ class CPGiftController extends MainController
      * @var string
      */
     protected $title = 'Gift';
+    public $permission_name = 'level-cp';
 
     /**
      * Make a grid builder.

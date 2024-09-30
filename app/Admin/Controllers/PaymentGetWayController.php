@@ -7,9 +7,10 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\PaymentGateway;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 
-class PaymentGetWayController extends AdminController
+class PaymentGetWayController extends MainController
 {
     /**
      * Title for current resource.
@@ -17,6 +18,7 @@ class PaymentGetWayController extends AdminController
      * @var string
      */
     protected $title = 'paymentGateway';
+    public $permission_name = 'payment-gat-way';
 
     /**
      * Make a grid builder.
