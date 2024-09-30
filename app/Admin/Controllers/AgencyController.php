@@ -139,6 +139,11 @@ class AgencyController extends MainController
                 }
             );
         })->orderByDesc('id');
+        if (request("active") == true) {
+            $grid->model()->whereHas("agencySalaries", function ($q){
+                $q->where('month', now()->month)->where('year', now()->year);
+            });
+        }
         $grid->id(__('ID'));
         $grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
             return Common::getusersShow($model->owner_id);
