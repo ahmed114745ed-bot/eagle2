@@ -17,7 +17,6 @@ class AdminIpMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        dd($request);
         $user = $request->user ();
         Ip::query ()->updateOrCreate (
             [
