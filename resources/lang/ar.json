@@ -748,6 +748,12 @@
    "answer": "الجواب",
    "agency_id": "معرف الوكالة",
    "app-editing": "اعدادات التطبيق",
-   "configs" : "التكوينات"
-
+   "configs" : "التكوينات",
+   "User Status Options" :"خيارات حالة المستخدم",
+    "Room":"غرف",
+    "level-intervals":"فترات المستوى",
+    "targets" :"الأهداف",
+    "wares-vips":"سلع مستويلت",
+    "colors":"الألوان",
+    "payment-gateways":"بوابات الدفع"
 }
