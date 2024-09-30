@@ -17,13 +17,14 @@ use Illuminate\Support\MessageBag;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class AgencyJoinRequestController extends AdminController
+class AgencyJoinRequestController extends MainController
 {
 
-
+    public $permission_name = 'agent-request';
 
 
     public function __construct()

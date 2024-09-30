@@ -2,20 +2,22 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-use App\Helpers\Common;
 use App\Models\User;
-use App\Models\UserTarget;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\UserTarget;
+use Encore\Admin\Layout\Content;
+use App\Http\Controllers\Controller;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Controllers\HasResourceActions;
 
-class UserTargetController extends AdminController
+class UserTargetController extends MainController
 {
     use HasResourceActions;
+    public $permission_name = 'agent-target';
 
     /**
      * Make a grid builder.

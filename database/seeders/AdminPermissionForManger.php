@@ -81,7 +81,10 @@ class AdminPermissionForManger extends Seeder
             'box-use',
             'level-cp',
             'event_report',
-            'payment-gat-way'
+            'payment-gat-way',
+            'agent-target',
+            'agent-request',
+            'agent-user',
 
             
 

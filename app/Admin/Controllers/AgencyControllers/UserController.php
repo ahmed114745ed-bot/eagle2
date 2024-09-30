@@ -21,7 +21,7 @@ use Encore\Admin\Show;
 use Illuminate\Support\Facades\App;
 
 
-class UserController extends AdminController
+class UserController extends MainController
 {
     /**
      * Title for current resource.
@@ -29,6 +29,7 @@ class UserController extends AdminController
      * @var string
      */
     protected $title;
+    public $permission_name = 'agent-user';
 
 
 
