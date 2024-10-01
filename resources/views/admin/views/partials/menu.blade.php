@@ -33,7 +33,7 @@
     $hasPermission = !empty(Arr::get($item, 'permission')) && Admin::user()->can(Arr::get($item, 'permission'));
     $anyChildExists = $anyChild ?? false;
     $allPermission = Admin::user()->can('*');
-    $isVisible = ($hasRoles || $hasPermission || $anyChildExists || $allPermission);
+    $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
 
 @endphp
 
