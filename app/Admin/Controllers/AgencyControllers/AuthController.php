@@ -1,6 +1,6 @@
 <?php
 
-namespace Encore\Admin\Controllers;
+namespace App\Admin\Controllers\AgencyControllers;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -52,8 +52,8 @@ class AuthController extends Controller
         }
 
         return back()->withInput()->withErrors([
-                                                   $this->username() => $this->getFailedLoginMessage(),
-                                               ]);
+            $this->username() => $this->getFailedLoginMessage(),
+        ]);
     }
 
     /**
@@ -178,7 +178,7 @@ class AuthController extends Controller
             return $this->redirectTo();
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : config('admin.agency_route.prefix');
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : config('admin.route.prefix');
     }
 
     /**

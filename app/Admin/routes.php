@@ -61,7 +61,7 @@ Route::group(
         'namespace'     => '',
         'middleware'    => [
             'web',
-            'admin',
+            'authWeb',
             'adminIp',
 //            'adminGeneralBan',
             'multiLanguage',
@@ -69,7 +69,7 @@ Route::group(
         'as'            => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::post('login', Encore\Admin\Controllers\AuthController::class.'@postLogin');
+        Route::post('login', App\Admin\Controllers\AuthController::class.'@postLogin');
 
 
     });
@@ -82,7 +82,7 @@ Route::group(
         'namespace'     => config('admin.route.namespace'),
         'middleware'    => [
             'web',
-            'admin',
+            'authWeb',
             'adminIp',
 //            'adminGeneralBan',
             'multiLanguage',
