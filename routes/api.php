@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\AgencyStatisticController;
+use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -94,6 +96,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
 
+        // agency statistic
+        Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic']);
 
 
 

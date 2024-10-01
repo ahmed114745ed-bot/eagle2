@@ -8,39 +8,6 @@
             <div class="col-md-4 mb-4">
                 <div class="card" style="background-color: #e9dbdb; border: 1px solid #dee2e6; border-radius: 0.5rem; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px;    padding-left: 10px;background-color: #e9dbdb;">
                     <div class="card-body">
-                        {{-- <h5 class="card-title">{{ __('Target No:') }} {{ $target->level }}</h5>
-                        <p class="card-text">
-                            <strong>{{ __('Diamonds:') }}</strong> {{ number_format($target->diamonds) }}<br>
-                            <strong>{{ __('USD:') }}</strong> {{ $target->usd }}<br>
-                            <strong>{{ __('Hours:') }}</strong> {{ $target->hours }}<br>
-                            <strong>{{ __('Days:') }}</strong> {{ $target->days }}<br>
-                        </p>
-                
-                        <!-- Reel Information -->
-                        @php
-                            $reel = explode(',', $target->reel);
-                            $update = isset($reel[0]) ? $reel[0] : 0;
-                            $like = isset($reel[1]) ? $reel[1] : 0;
-                            $comment = isset($reel[2]) ? $reel[2] : 0;
-                        @endphp
-                        <p class="card-text">
-                            <strong>{{ __('Reel Update:') }}</strong> {{ $update }}<br>
-                            <strong>{{ __('Reel Likes:') }}</strong> {{ $like }}<br>
-                            <strong>{{ __('Reel Comments:') }}</strong> {{ $comment }}<br>
-                        </p>
-                
-                        <!-- Moment Information -->
-                        @php
-                            $moment = explode(',', $target->moment);
-                            $moment_update = isset($moment[0]) ? $moment[0] : 0;
-                            $moment_like = isset($moment[1]) ? $moment[1] : 0;
-                            $moment_comment = isset($moment[2]) ? $moment[2] : 0;
-                        @endphp
-                        <p class="card-text">
-                            <strong>{{ __('Moment Update:') }}</strong> {{ $moment_update }}<br>
-                            <strong>{{ __('Moment Likes:') }}</strong> {{ $moment_like }}<br>
-                            <strong>{{ __('Moment Comments:') }}</strong> {{ $moment_comment }}<br>
-                        </p> --}}
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="dropdown" style="padding-top:10px;text-align:end">
@@ -117,15 +84,9 @@
                                     
                                 </div>
                             </div>
-                           
-                            
                         </div>
-                        
-                
-                       
                     </div>
                 </div>
-                
             </div>
         @endforeach
     </div>
