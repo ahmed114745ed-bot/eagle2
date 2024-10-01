@@ -97,7 +97,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
 
         // agency statistic
-        Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic']);
+        Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
 
 
 

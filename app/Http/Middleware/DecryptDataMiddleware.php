@@ -10,7 +10,7 @@ class DecryptDataMiddleware
 {
 
     protected $privateKey;
-    public function __construct()
+    public function __construct() 
     {
         $this->privateKey = file_get_contents(public_path('PrivetKey.txt'));
     }
