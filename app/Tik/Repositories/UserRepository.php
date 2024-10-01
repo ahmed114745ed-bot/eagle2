@@ -19,7 +19,7 @@ class UserRepository extends AbstractRepository
 
     public function create(array $data): mixed
     {
-        return  '';
+        return  $this->model->create($data);
     }
 
 
@@ -37,7 +37,7 @@ class UserRepository extends AbstractRepository
     }
 
     public function decrementCoins($userUuIdOrId, $coins)
-    { 
+    {
         $user =$this->searchUser($userUuIdOrId) ?? $this->findById($userUuIdOrId);
         $this->decrementUserCoins($user, $coins);
         return true;
