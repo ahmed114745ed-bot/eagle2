@@ -25,7 +25,7 @@ class AuthenticateWeb
 
         // If the user is not authenticated, redirect to login and pass the $test variable as a query parameter
         if (Admin::guard()->guest() && !$this->shouldPassThrough($request)) {
-            return redirect()->to($redirectTo . '?test=' . urlencode($test));
+            return redirect()->to($redirectTo . '?redirect_url=' . urlencode($test));
         }
 
         return $next($request);
