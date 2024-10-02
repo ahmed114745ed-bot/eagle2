@@ -71,6 +71,8 @@ class DedicateWareController extends MainController
                     18=>trans ('colored name'),
                     19=>trans ('profile visitors hide in'),
                     25=>trans ('Special Id'),
+                    21 => trans('sound effect'),
+                    22 => trans('upload GIF image')
                 ]
             );
         }
@@ -154,7 +156,9 @@ class DedicateWareController extends MainController
                 17=>trans ('anonymous man'),
                 18=>trans ('colored name'),
                 19=>trans ('profile visitors hide in'),
-                20=>trans ('hide last active')
+                20=>trans ('hide last active'),
+                21 => trans('sound effect'),
+                22 => trans('upload GIF image')
             ]
         )->rules ('required');
         //        ->rules (function ($form){
