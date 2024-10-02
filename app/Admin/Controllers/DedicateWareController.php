@@ -104,11 +104,11 @@ class DedicateWareController extends MainController
         });
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools) use ($typeSpecial) {
+        $grid->tools(function (Grid\Tools $tools)  {
             $url = '/admin/wares/create';
-            if ($typeSpecial) {
-                $url = "/admin/special-wares/create";
-            }
+            // if ($typeSpecial) {
+            //     $url = "/admin/special-wares/create";
+            // }
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;Create New</a>';
             $tools->append($button);
         });
