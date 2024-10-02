@@ -100,7 +100,7 @@ class DedicateWareController extends MainController
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-            $actions->add(new DedicateAction());
+          //  $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
 
