@@ -26,7 +26,7 @@ class MultiLanguageController extends Controller
 
     public function getLogin()
     {
-        $test = request()->query('test');
+        $test = request()->query('redirect_url');
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
 
