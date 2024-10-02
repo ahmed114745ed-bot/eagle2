@@ -4,15 +4,14 @@ namespace App\Http;
 
 //use App\Http\Middleware\AdminOneMiddleware;
 use App\Http\Middleware\IpMiddleware;
-use App\Http\Middleware\AuthenticateWeb;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
 use KevinSoft\MultiLanguage\Middlewares\MultiLanguageMiddleware;
+use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
 
 
 class Kernel extends HttpKernel
@@ -89,7 +88,6 @@ class Kernel extends HttpKernel
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
         'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
-        'authWeb' => AuthenticateWeb::class,
 
     ];
 }

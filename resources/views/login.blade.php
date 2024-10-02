@@ -57,7 +57,6 @@
                 <div class="checkbox icheck text-center" dir="rtl">
                     <label>
                         <input type="checkbox" name="remember" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
-                        <input type="hidden" name="url"  value="{{ @$test }}">
                         {{ __('dashboard.login.remember') }}
                     </label>
                 </div>

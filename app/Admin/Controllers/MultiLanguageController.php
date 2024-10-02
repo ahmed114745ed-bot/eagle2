@@ -24,7 +24,6 @@ class MultiLanguageController extends Controller
     }
 
     public function getLogin() {
-        $test = request()->query('test');
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
 
@@ -32,7 +31,7 @@ class MultiLanguageController extends Controller
         if(Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("login", compact('languages', 'current','test'));
+        return view("login", compact('languages', 'current'));
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers\AgencyControllers;
+namespace Encore\Admin\Controllers;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -52,8 +52,8 @@ class AuthController extends Controller
         }
 
         return back()->withInput()->withErrors([
-            $this->username() => $this->getFailedLoginMessage(),
-        ]);
+                                                   $this->username() => $this->getFailedLoginMessage(),
+                                               ]);
     }
 
     /**

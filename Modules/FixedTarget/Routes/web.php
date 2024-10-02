@@ -19,7 +19,7 @@ Route::group(
         'namespace'  => 'Web',
         'middleware' => [
             'web',
-            'authWeb',
+            'admin',
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',

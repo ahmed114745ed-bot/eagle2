@@ -14,7 +14,7 @@ Route::group(
         'prefix'        => config('admin.route.prefix'),
         'middleware'    => [
             'web',
-            'authWeb',
+            'admin',
             'adminIp',
 //            'adminGeneralBan',
             'multiLanguage',
