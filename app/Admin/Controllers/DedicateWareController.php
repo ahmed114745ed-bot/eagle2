@@ -31,7 +31,7 @@ class DedicateWareController extends MainController
         // if ($request !=null && ($request == 25)) {
         //     $typeSpecial = true;
         // }
-        // $grid = new Grid(new Ware);
+         $grid = new Grid(new Ware);
         // $grid->model()->orderByDesc('created_at');
         // if ($typeSpecial) {
         //     $grid->model()->where('type', '=', 25);
