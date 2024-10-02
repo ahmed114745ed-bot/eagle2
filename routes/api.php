@@ -109,6 +109,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         function () {
             // rooms api
             Route::prefix('rooms')->group(function () {
+                Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/', [RoomController::class, 'index']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
                 Route::post('/create', [RoomController::class, 'store']);
@@ -127,7 +128,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('quit_room', [RoomController::class, 'quit_room']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
-
+                
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group (function (){
                 Route::post('create-pk', [PkController::class, 'createPK']);

@@ -1677,4 +1677,14 @@ class RoomController extends Controller
         $rooms = $this->roomService->getRoomsForGame($game_id);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
+
+    public function userRooms()
+    {
+        $user = \Auth::user();
+        $room =$this->roomService->userRooms($user->id);
+        if ($room != null) {
+            $room = new RoomResource($room);
+        }
+        return Common::apiResponse(true, '', $room, 200);
+    }
 }

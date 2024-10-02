@@ -291,4 +291,9 @@ class RoomRepoService
         //        Common::sendToZego('SendCustomCommand', $room->id, $owner_id, $json);
         return $json;
     }
+
+    public function userRooms($userId)
+    {
+        return  $this->repository->roomUsers($userId);
+    }
 }

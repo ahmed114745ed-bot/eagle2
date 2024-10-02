@@ -172,4 +172,9 @@ class RoomRepository extends AbstractRepository
         $room->room_black = trim($roomBlack, ',');
         $this->updateRoomUser($room);
     }
+
+    public function roomUsers($userId)
+    {
+        return $this->model->withoutAppends()->withCount('roomVisitors')->where('uid', $userId)->first();
+    }
 }
