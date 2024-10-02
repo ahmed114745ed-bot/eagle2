@@ -34,23 +34,23 @@ class DedicateWareController extends MainController
          $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
         if ($typeSpecial) {
-            $grid->model()->where('type', '=', 25);
+            $grid->model()->whereNotNull('get_type')->where('type', '=', 25);
         } else {
-            $grid->model()->where('type', '!=', 25);
+            $grid->model()->whereNotNull('get_type')->where('type', '!=', 25);
         }
          $grid->id('ID');
-        // $grid->column('get_type', __('get_type'))->select(
-        //     [
-        //         1 => trans('vip level automatic acquisition'),
-        //         //    2=>trans ('activity'),
-        //         //    3=>trans ('treasure box'),
-        //         4 => trans('purchase'),
-        //         // 5=>trans ('background modification'),
-        //         6 => trans('limited time purchase'),
-        //         // 7=>trans ('treasure box point exchange'),
-        //         // 8=>trans ('cp level unlock'),
-        //     ]
-        // );
+        $grid->column('get_type', __('get_type'))->select(
+            [
+                1 => trans('vip level automatic acquisition'),
+                //    2=>trans ('activity'),
+                //    3=>trans ('treasure box'),
+                4 => trans('purchase'),
+                // 5=>trans ('background modification'),
+                6 => trans('limited time purchase'),
+                // 7=>trans ('treasure box point exchange'),
+                // 8=>trans ('cp level unlock'),
+            ]
+        );
         if (!$typeSpecial) {
             $grid->column('type', __('type'))->select(
                 [
