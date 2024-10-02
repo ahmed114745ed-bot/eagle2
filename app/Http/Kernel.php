@@ -88,6 +88,7 @@ class Kernel extends HttpKernel
         'appFeatureEnable' => \App\Http\Middleware\AppFeatureEnable::class,
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
         'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
+        'admin.auth' => AuthenticateWeb::class,
 
     ];
 }
