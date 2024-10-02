@@ -38,19 +38,19 @@ class DedicateWareController extends MainController
         // } else {
         //     $grid->model()->where('type', '!=', 25);
         // }
-        // $grid->id('ID');
-        // $grid->column('get_type', __('get_type'))->select(
-        //     [
-        //         1 => trans('vip level automatic acquisition'),
-        //         //    2=>trans ('activity'),
-        //         //    3=>trans ('treasure box'),
-        //         4 => trans('purchase'),
-        //         // 5=>trans ('background modification'),
-        //         6 => trans('limited time purchase'),
-        //         // 7=>trans ('treasure box point exchange'),
-        //         // 8=>trans ('cp level unlock'),
-        //     ]
-        // );
+         $grid->id('ID');
+        $grid->column('get_type', __('get_type'))->select(
+            [
+                1 => trans('vip level automatic acquisition'),
+                //    2=>trans ('activity'),
+                //    3=>trans ('treasure box'),
+                4 => trans('purchase'),
+                // 5=>trans ('background modification'),
+                6 => trans('limited time purchase'),
+                // 7=>trans ('treasure box point exchange'),
+                // 8=>trans ('cp level unlock'),
+            ]
+        );
         // if (!$typeSpecial) {
         //     $grid->column('type', __('type'))->select(
         //         [
@@ -78,7 +78,7 @@ class DedicateWareController extends MainController
         //         ]
         //     );
         // }
-        // $grid->column('name', __('name'))->editable();
+        $grid->column('name', __('name'))->editable();
         // if (!$typeSpecial) {
         //     $grid->title(__('title'));
         // } else {
