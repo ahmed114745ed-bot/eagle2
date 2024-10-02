@@ -69,7 +69,7 @@ Route::group(
         'as'            => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::post('login', Encore\Admin\Controllers\AuthController::class.'@postLogin');
+        Route::post('login', App\Admin\Controllers\AuthController::class.'@postLogin');
 
 
     });

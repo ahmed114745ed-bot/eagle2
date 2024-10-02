@@ -44,6 +44,7 @@
                     @endforeach
                 @endif
                 <input type="text" class="form-control input-lg  text-center" placeholder="{{ trans('admin.username') }}" name="username" value="{{ old('username') }}">
+                <input type="hidden" name="url"  value="{{ @$test }}">
             </div>
             <div class="form-group has-feedback {!! !$errors->has('password') ?: 'has-error' !!}">
                 @if($errors->has('password'))
