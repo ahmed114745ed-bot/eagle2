@@ -24,6 +24,7 @@ class AdminUserShowResource extends JsonResource
             'id' => $this->id,
             'name' => @$this->name ?? '', // both
             'notice' => @$this->notice ?? '',
+            'owner_id' => @$this->app_owner_id??0,
             'owner_name' => @$this->owner->name  ?? '',
             'phone' => @$this->phone ?? 0,
             'img' => $this->img ?? '',
