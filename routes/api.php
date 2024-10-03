@@ -106,6 +106,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
        Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
        Route::post('show_admin_user', [AdminUsersController::class, 'show']);
 
+       Route::get('all-users', [UserController::class, 'userWithSearch']);
+
 
 
     });

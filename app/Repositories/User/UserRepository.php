@@ -172,4 +172,12 @@ class UserRepository extends Repository
         return $user->save();
     }
 
+    public function UsersWithSearch($search)
+    {
+        return $this->model->query()
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")->orWhere('id', $search)->orWhere('uuid', $search);
+            })->select('id', 'name', 'uuid')->get();
+    }
+
 }
