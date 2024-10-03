@@ -80,4 +80,9 @@ class AgencyRepository extends AbstractRepository
                     });
             })->take(10)->get();
     }
+
+    public function countAgencyUserAdmin($userId)
+    {
+        return $this->model->where('agency_manger_id', $userId)->count();
+    }
 }

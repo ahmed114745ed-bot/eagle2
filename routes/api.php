@@ -1,7 +1,5 @@
 <?php
 
-use App\Admin\Controllers\AgencyStatisticController;
-use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -28,8 +26,10 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
+use App\Admin\Controllers\AgencyStatisticController;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
+use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -99,6 +100,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         // agency statistic
         Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
 
+
+       //admin users
+       Route::get('all_admin_users', [AdminUsersController::class, 'index']);
+       Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
+       Route::post('show_admin_user', [AdminUsersController::class, 'show']);
 
 
 

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use Exception;
+use App\Helpers\Common;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\AdminUsersService;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\V1\AdminUsersResource;
+
+class AdminUsersController extends Controller
+{
+    public function __construct(private AdminUsersService $adminUsersService) {}
+
+    public function index()
+    {
+        $data = $this->adminUsersService->index();
+        return Common::apiResponse(1, '', AdminUsersResource::collection($data));
+    }
+
+    public function store(Request $request)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'username'       => 'required|unique:admin_users,username',
+            'name'           => 'required|string',
+            'password'       => 'required',
+            'app_id'         => 'required|unique:admin_users,app_id|exists:users,id',
+            'avatar'         => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->adminUsersService->create($request);
+            return Common::apiResponse(1, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        
+    }
+}
