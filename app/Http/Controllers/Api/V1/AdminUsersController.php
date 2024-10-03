@@ -29,7 +29,7 @@ class AdminUsersController extends Controller
             'name'           => 'required|string',
             'password'       => 'required',
             'app_id'         => 'required|unique:admin_users,app_id|exists:users,id',
-            'avatar'         => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image'         => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
         ]);
         if ($validator->fails()) {
