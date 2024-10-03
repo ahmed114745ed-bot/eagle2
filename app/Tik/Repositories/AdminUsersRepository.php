@@ -21,4 +21,9 @@ class AdminUsersRepository extends AbstractRepository
         return $this->model->with('user', 'managerAgencies')->get();
         
     }
+
+    public function findById($id)
+    {
+        return $this->model->find($id);
+    }
 }

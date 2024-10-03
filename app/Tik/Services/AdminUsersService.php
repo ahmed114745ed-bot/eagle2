@@ -47,4 +47,14 @@ class AdminUsersService
         $userModel->roles()->attach(['role_id' => 13, 'user_id' => $userModel->id]);
         return true;
     }
+
+    public function show($adminUserId)
+    {
+        $adminUser = $this->adminUsersRepository->findById($adminUserId);
+        $agencies = $this->agencyRepository->getByAgencyMangerId($adminUser->app_id);
+        $agencies->each(function ($agency) {
+            $agency->userCount = $this->userRepository->countByAgencyId($agency->id);
+        });
+        return $agencies;
+    }
 }

@@ -306,4 +306,9 @@ class UserRepository extends AbstractRepository
         ]);
         return true;
     }
+
+    public function countByAgencyId($agencyId)
+    {
+        return $this->model->where('agency_id',$agencyId)->count();
+    }
 }

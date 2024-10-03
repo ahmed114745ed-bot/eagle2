@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\AdminUsersService;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\AdminUsersResource;
+use App\Http\Resources\Api\V1\AdminUserShowResource;
 
 class AdminUsersController extends Controller
 {
@@ -45,6 +46,8 @@ class AdminUsersController extends Controller
 
     public function show(Request $request)
     {
-        
+        $data = $this->adminUsersService->show($request->admin_user_id);
+        return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
+        
 }
