@@ -18,7 +18,8 @@ class AdminUsersRepository extends AbstractRepository
 
     public function all()
     {
-        return $this->model->with('user', 'managerAgencies')->get();
+        return $this->model->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
+        ->where('app_id','!=',0)->with(['user' => fn ($q) => $q->withCount('agencies')])->with([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')])->get();
         
     }
 
