@@ -44,6 +44,8 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
+use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\UtdUserController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -109,6 +111,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('all_admin_users', [AdminUsersController::class, 'index']);
         Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
         Route::post('show_admin_user', [AdminUsersController::class, 'show']);
+        // roles 
+        Route::resource('roles', RoleController::class)->middleware('decrypt.data');
+        Route::get('permissions', [RoleController::class,"permissions"])->middleware('decrypt.data');
+
+        // users
+        Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
+
+
 
         Route::get('all-users', [UserController::class, 'userWithSearch']);
 
