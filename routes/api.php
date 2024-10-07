@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Admin\Controllers\AgencyStatisticController;
@@ -31,7 +33,9 @@ use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
@@ -68,7 +72,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('register', [AuthController::class, 'register']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('recall-account', [AuthController::class, 'recallAccount']);
-        Route::post ('forget_password',[\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class,'reset']);
+        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset']);
         Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
     });
 
@@ -101,15 +105,33 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
 
 
-       //admin users
-       Route::get('all_admin_users', [AdminUsersController::class, 'index']);
-       Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
-       Route::post('show_admin_user', [AdminUsersController::class, 'show']);
+        //admin users
+        Route::get('all_admin_users', [AdminUsersController::class, 'index']);
+        Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
+        Route::post('show_admin_user', [AdminUsersController::class, 'show']);
 
-       Route::get('all-users', [UserController::class, 'userWithSearch']);
+        Route::get('all-users', [UserController::class, 'userWithSearch']);
 
+        //mangerType
 
+        Route::get('all-manger-types', [MangerTypeController::class, 'index']);
+        Route::post('create-manger-type', [MangerTypeController::class, 'store'])->middleware('decrypt.data');
+        Route::post('update-manger-type', [MangerTypeController::class, 'update'])->middleware('decrypt.data');
+        Route::post('show-manger-type', [MangerTypeController::class, 'show']);
 
+        //target Percentage
+        Route::post('create-target-Percentage', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
+        Route::post('show-target-Percentage', [AddTargetToJsonController::class, 'show']);
+
+        //setting config
+        Route::post('create-setting-config', [addTOjesonController::class, 'create'])->middleware('decrypt.data');
+        Route::post('show-setting-config', [addTOjesonController::class, 'show']);
+        //CoreWallets
+
+        Route::get('all-core-wallets', [CoreWalletsController::class, 'index']);
+        Route::post('create-core-wallet', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
+        Route::post('update-core-wallet', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
+        Route::post('show-core-wallet', [CoreWalletsController::class, 'show']);
     });
 
     // all route with auth
@@ -136,14 +158,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('quit_room', [RoomController::class, 'quit_room']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
-                
+
                 //Pk
-                Route::middleware(['appFeatureEnable:pk'])->group (function (){
-                Route::post('create-pk', [PkController::class, 'createPK']);
-                Route::post('close-pk', [PkController::class, 'closePK']);
-                Route::post('show-pk', [PkController::class, 'showPK']);
-                Route::post('hide-pk', [PkController::class, 'hidePk']);
-            });
+                Route::middleware(['appFeatureEnable:pk'])->group(function () {
+                    Route::post('create-pk', [PkController::class, 'createPK']);
+                    Route::post('close-pk', [PkController::class, 'closePK']);
+                    Route::post('show-pk', [PkController::class, 'showPK']);
+                    Route::post('hide-pk', [PkController::class, 'hidePk']);
+                });
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
@@ -164,7 +186,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show']);
-    
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -211,7 +232,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
 
-           
+
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
@@ -223,8 +244,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
-                Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu','appFeatureEnable:lucky']);
-
+                Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
 
             Route::prefix('group-chat')->group(function () {

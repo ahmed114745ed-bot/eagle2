@@ -445,4 +445,9 @@ class UserService
     {
         return $this->userRepository->UsersWithSearch($search);
     }
+
+    public function userInfoWithRoles($ownerId)
+    {
+       $user = $this->userRepository->findUserById($ownerId);
+    }
 }

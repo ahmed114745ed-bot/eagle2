@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CoreWallets extends Model
 {
     use HasFactory;
+    protected $guarded = ['id'];
 
     protected $casts = ['updated_at' => 'datetime:Y-m-d H:i:s'];
     protected $appends = ['update_for_human'];

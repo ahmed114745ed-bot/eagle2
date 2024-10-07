@@ -177,4 +177,9 @@ class UserController extends Controller
         $data = $this->userService->allUsers($request->search);
         return Common::apiResponse(1, '', $data);
     }
+
+    public function userInfoWithRole(Request $request)
+    {
+        
+    }
 }
