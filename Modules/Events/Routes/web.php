@@ -38,10 +38,10 @@ Route::group(
         $router->resource ('weekly-events-new','WeeklyEventNController');
         $router->resource('target-events', TargetEventController::class);
         $router->resource('pk-events', PkEventController::class);
-        Route::prefix('weekly-events-gift/{type}/{weekly_event_id}')->group(function () {
+        Route::prefix('weekly-events-gift/{weekly_event_id}')->group(function () {
             Route::get('/', [WeeklyEventGiftNController::class, 'index']);
-            Route::get('/create', [WeeklyEventGiftNController::class, 'create']);
-            Route::post('/', [WeeklyEventGiftNController::class, 'store']);
+            Route::get('/{level}/create', [WeeklyEventGiftNController::class, 'create']);
+            Route::post('/{level}', [WeeklyEventGiftNController::class, 'store']);
             Route::get('/{id}', [WeeklyEventGiftNController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [WeeklyEventGiftNController::class, 'edit'])->where('id', '[0-9]+');
             Route::put('/{id}', [WeeklyEventGiftNController::class, 'update'])->where('id', '[0-9]+');
@@ -49,7 +49,7 @@ Route::group(
         });
 
         Route::prefix('pk-events-gift/{pk_type}/{pk_event_id}')->group(function () {
-            Route::get('/', [PkEventGiftController::class, 'index'])->name('event-gift.index');;
+            Route::get('/', [PkEventGiftController::class, 'index']);
             Route::get('/{level}/create', [PkEventGiftController::class, 'create']);
             Route::post('/{level}', [PkEventGiftController::class, 'store']);
             Route::get('/{id}', [PkEventGiftController::class, 'show'])->where('id', '[0-9]+');

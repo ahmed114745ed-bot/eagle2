@@ -31,16 +31,31 @@ class WeeklyEventGiftNController extends MainController
         $data = WeeklyStar::find($weekly_event_id);
         if ($data->type == "event_period") {
             (new AppFeatureService)->validateStatusEnable("period_event");
-        }else{
+        } else {
             (new AppFeatureService)->validateStatusEnable("weekly_star");
         }
     }
     public function index(Content $content)
     {
+        $url = url('/admin/weekly-events-new'); // Define your button URL
+
+        $buttonHTML = <<<HTML
+    <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+        <i class="fa fa-arrow-left"></i> رجوع
+    </a>
+    HTML;
         return $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
-            ->body($this->grid());
+            ->breadcrumb(
+                ['text' => trans('admin.eventGift')]
+            )
+            ->row($buttonHTML)
+            ->row($this->grid1()) // First grid
+            ->row($this->grid2()) // Second grid
+            ->row($this->grid3()); // Third grid
+
+
     }
     public function create(Content $content)
     {
@@ -72,32 +87,125 @@ class WeeklyEventGiftNController extends MainController
             ->description(trans('admin.description'))
             ->body($this->detail($id));
     }
-    protected function grid()
+    protected function grid1()
     {
-        $type = request('type');
+        $type = 1;
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_star_id",$weekly_event_id)->where("level",$type);
+        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function (){
-            if ($this->type == "ware"){
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
                 return @$this->ware->name;
-            }elseif ($this->type == "vip"){
+            } elseif ($this->type == "vip") {
                 return @$this->vip->name;
-            }elseif ($this->type == "coins"){
+            } elseif ($this->type == "coins") {
                 return @$this->target;
-            }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
-
         });
         $grid->column('created_at', __('Created at'));
 
-        $grid->actions (function ($actions){
+        $grid->actions(function ($actions) {
             $actions->disableView();
+        });
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = request()->route('weekly_event_id') . "/1/create";
+            $customButtonHTML = <<<HTML
+            
+                <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                    <i class="fa fa-plus"></i> ضيف
+                </a>
+                <h3 style="margin-right: 10px;">جوائز للفائز الأول</h3>
+        
+            HTML;
+            $tools->append($customButtonHTML);
+        });
+        return $grid;
+    }
+
+    protected function grid2()
+    {
+        $type = 2;
+        $weekly_event_id = request('weekly_event_id');
+        $grid = new Grid(new Reward());
+        $grid->column('created_at')->hide();
+        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'));
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name;
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name;
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('created_at', __('Created at'));
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = request()->route('weekly_event_id') . "/2/create";
+            $customButtonHTML = <<<HTML
+            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                <i class="fa fa-plus"></i>ضيف
+            </a>
+            <h3 style="margin-right: 10px;">جوائز للفائز الثاني</h3>
+            HTML;
+            $tools->append($customButtonHTML);
+        });
+
+        return $grid;
+    }
+
+    protected function grid3()
+    {
+        $type = 3;
+        $weekly_event_id = request('weekly_event_id');
+        $grid = new Grid(new Reward());
+        $grid->column('created_at')->hide();
+        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'));
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name;
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name;
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+        $grid->column('created_at', __('Created at'));
+
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = request()->route('weekly_event_id') . "/3/create";
+            $customButtonHTML = <<<HTML
+            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                <i class="fa fa-plus"></i>ضيف
+            </a>
+            <h3 style="margin-right: 10px;"> جوائز للفائز الثالث </h3>
+            HTML;
+            $tools->append($customButtonHTML);
         });
 
         return $grid;
@@ -107,44 +215,48 @@ class WeeklyEventGiftNController extends MainController
     {
         $form = new Form(new Reward());
         $form->hidden('weekly_star_id')->value(request('weekly_event_id'));
-        $form->hidden('level')->value(request('type'));
+        $form->hidden('level')->value(request('level'));
 
-        $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
-            ->when("ware" ,function () use ($form){
-                $form->select('target1', trans('wares'))->options(function (){
-                    $ops = [0=>''];
-                    $wares = Ware::query()->select(['id','name', 'type'])->whereIn('type',[4,5,6])->get();
-                    foreach ($wares as  $ware){
-                        $ops[$ware->id]=$ware->name.'_'.$ware->id;
+        $form->select('type', trans('type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+            ->when("ware", function () use ($form) {
+                $form->select('target1', trans('wares'))->options(function () {
+                    $ops = [0 => ''];
+                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
+                    foreach ($wares as  $ware) {
+                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
 
                         if ($ware->type == 4) {
-                            $ops[$ware->id] .='_' .'bubble';
+                            $ops[$ware->id] .= '_' . 'bubble';
                         } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' .'intro';
+                            $ops[$ware->id] .= '_' . 'intro';
                         } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' .'frame';
+                            $ops[$ware->id] .= '_' . 'frame';
                         }
                     }
                     return $ops;
                 });
             })
-        ->when("vip",function () use ($form){
-            $form->select('target2', trans('vips'))->options(function (){
-                $vips = OVip::query()->select('id','name')->get();
-                foreach ($vips as  $vip){
-                    $ops[$vip->id]=$vip->name;
-                }
-                return $ops;
+            ->when("vip", function () use ($form) {
+                $form->select('target2', trans('vips'))->options(function () {
+                    $vips = OVip::query()->select('id', 'name')->get();
+                    foreach ($vips as  $vip) {
+                        $ops[$vip->id] = $vip->name;
+                    }
+                    return $ops;
+                });
+            })
+            ->when("coins", function () use ($form) {
+                $form->number("target3", __("coins"));
+            })->when("achievement", function () use ($form) {
+                $form->image("target4", __('image'))->name(function ($file) {
+                    return now()->timestamp . '.' . $file->guessExtension();
+                })->disk('gcs');
             });
-        })
-         ->when("coins",function () use ($form){
-            $form->number("target3",__("coins"));
-        })->when("achievement",function () use ($form){
-            $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp.'.'.$file->guessExtension();
-            })->disk('gcs');
-        });
         $form->number('expire', __('expire'));
+        $form->saved(function (Form $form) {
+            $route = url('admin/weekly-events-gift/'.request('weekly_event_id'));
+            return redirect($route);
+        });
         return $form;
     }
 }
