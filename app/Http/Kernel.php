@@ -90,6 +90,7 @@ class Kernel extends HttpKernel
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
         'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
+        'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
 
     ];
 }
