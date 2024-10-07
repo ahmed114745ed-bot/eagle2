@@ -799,7 +799,12 @@
     "vip_privilege":"vip_privilege",
     "room-vips" :" مستويات الغرف",
     "room-target": " اهداف الغرف",
-    "Manger" :" المدير"
+    "Manger" :" المدير",
+    "App Owner" :"مالك التطبيق",
+    "agency_count" : "عدد الوكالات",
+    "owner":"ماليك",
+    "Users Count" :"عدد المستخدمين"
+    
 
 
 

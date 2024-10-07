@@ -12,9 +12,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form as AdminForm;
 use Encore\Admin\Layout\Content;
 
-class AppSitiingCOnfigController extends Controller
+class AppSitiingCOnfigController extends MainController
 {
-
+    public $permission_name = 'updates';
     public function index(Content $content)
     {
         // return view('admin/updatePage');

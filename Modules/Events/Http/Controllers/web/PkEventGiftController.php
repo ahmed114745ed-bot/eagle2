@@ -26,14 +26,23 @@ class PkEventGiftController extends MainController
     }
 
     public function index(Content $content)
-    {
-        return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
-            ->row($this->grid1())
-            ->row($this->grid2())
-            ->row($this->grid3());
-    }
+{
+    $url = url('/admin/pk-events'); // Define your button URL
+
+    $buttonHTML = <<<HTML
+    <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+        <i class="fa fa-arrow-left"></i> رجوع
+    </a>
+    HTML;
+
+    return $content
+        ->header(trans('admin.index'))
+        ->description(trans('admin.description'))
+        ->row($buttonHTML) // Add the button row
+        ->row($this->grid1()) // First grid
+        ->row($this->grid2()) // Second grid
+        ->row($this->grid3()); // Third grid
+}
     public function create(Content $content)
     {
         return $content
@@ -111,9 +120,12 @@ class PkEventGiftController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('pk_event_id')."/1/create";
             $customButtonHTML = <<<HTML
-            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                <i class="fa fa-plus"></i>ضيف
-            </a>
+            
+                <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
+                    <i class="fa fa-plus"></i> ضيف
+                </a>
+                <h3 style="margin-right: 10px;">جوائز للفائز الأول</h3>
+        
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -154,6 +166,7 @@ class PkEventGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>ضيف
             </a>
+            <h3 style="margin-right: 10px;">جوائز للفائز الثاني</h3>
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -196,6 +209,7 @@ class PkEventGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>ضيف
             </a>
+            <h3 style="margin-right: 10px;"> جوائز للفائز الثالث </h3>
             HTML;
             $tools->append($customButtonHTML);
         });

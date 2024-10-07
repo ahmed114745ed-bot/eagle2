@@ -66,7 +66,7 @@ class AdminUsersController extends MainController
         // $admin = \App\Models\AdminUser::with(['user'=> fn($q) => $q->withCount('agencies')])->get();
         // dd($admin);
 
-        $grid->column('id', __('Dashboard_Id'));
+        $grid->column('id', __('Id'));
 
         $grid->column('user.name', __('App Owner'))->display(function () {
             if ($this->user) {
@@ -86,7 +86,7 @@ class AdminUsersController extends MainController
             return 0;
         });
 
-        $grid->column('managerAgencies.total_salaries', __('Salary'))->display(function ($_){
+        $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_){
             return ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
         });
 
@@ -202,7 +202,7 @@ class AdminUsersController extends MainController
         });
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
-        $grid->column('owner.name', trans('Owner'));
+        $grid->column('owner.name', trans('owner'));
         $grid->column('phone', trans('phone'));
         $grid->column('img', trans('img'))->image('', 30);
         $grid->column('', trans('Users Count'))->display(function () {
