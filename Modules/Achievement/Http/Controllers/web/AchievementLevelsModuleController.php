@@ -44,7 +44,7 @@ class AchievementLevelsModuleController extends Controller
                     'message' => __('this user not found'),
                 ]);
 
-                return redirect()->route('admin.get-view-page', compact('error')); // Error message added
+                return redirect()->route(nameRoute('admin.get-view-page'), compact('error')); // Error message added
             }
         }elseif($achievementLevel_id == null && $gift){
             $attributes = [
@@ -56,7 +56,7 @@ class AchievementLevelsModuleController extends Controller
             UserAchievementLevel::create($attributes);
         }
 
-        return redirect()->route('admin.user-achievement-levels.index');
+        return redirect()->route(nameRoute('admin.user-achievement-levels.index'));
     }
 
     public function getAchievementLevels($achievementId)
@@ -97,7 +97,7 @@ class AchievementLevelsModuleController extends Controller
      */
     public function viewPage()
     {
-        return redirect('admin/user-achievement-levels');
+        return redirect(nameRoute('admin/user-achievement-levels'));
     }
 
     /**

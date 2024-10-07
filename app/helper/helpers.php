@@ -216,4 +216,23 @@ if (!function_exists( 'getPusherConfig')) {
             ];
         });
     }
+
+
+    if (!function_exists('nameRoute')){
+        function nameRoute (string $name): string
+        {
+            $separators = ['.', '/'];
+            $separator = null;
+            $requestPath = \Request::path();
+
+            if (\Str::startsWith($requestPath, 'preview')) {//admin.route.prefix,admin.auth.controller
+                foreach ($separators as $s) {
+                    $valuesCount = count(explode($s, $name));
+                    if ($valuesCount > 1) $separator = $s;
+                }
+            }
+
+            return $separator ? ('preview' . $separator . $name) : $name;
+        }
+    }
 }

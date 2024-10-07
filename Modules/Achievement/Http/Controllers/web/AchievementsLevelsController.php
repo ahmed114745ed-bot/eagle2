@@ -53,7 +53,7 @@ class AchievementsLevelsController extends MainController
         $grid->disableRowSelector();
         $id = request()->input('achievement_id');
         if(!$id) {
-            return  redirect()->route('admin.achievements.index');
+            return  redirect()->route(nameRoute('admin.achievements.index'));
         }
         $grid->model()->where('achievement_id', $id);
 
@@ -100,7 +100,7 @@ class AchievementsLevelsController extends MainController
         if ($id) {
             return $grid;
         }else {
-            return route('admin.achievements');
+            return route(nameRoute('admin.achievements'));
         }
 
     }
@@ -141,7 +141,7 @@ class AchievementsLevelsController extends MainController
     protected function form($id = null)
     {
         if(!$id) {
-            return  redirect()->route('admin.achievements.index');
+            return  redirect()->route(nameRoute('admin.achievements.index'));
         }
         $form = new Form(new AchievementLevel());
 
