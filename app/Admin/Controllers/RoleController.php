@@ -8,8 +8,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class RoleController extends AdminController
+class RoleController extends MainController
 {
+    public $permission_name = 'roles';
     /**
      * {@inheritdoc}
      */
