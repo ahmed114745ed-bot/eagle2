@@ -27,6 +27,7 @@ use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\ChatLetterController;
 use App\Admin\Controllers\ImageColorController;
+use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
@@ -111,6 +112,7 @@ Route::group(
         $router->resource ('auth/users','AdminUserController');
         $router->resource ('/agencies/managers',AdminAgencyMangerController::class);
         $router->resource ('auth/roles','RoleController');
+        $router->resource ('auth/permissions',PermissionController::class);
         $router->resource('colors', ColorController::class);
         $router->resource('app-features', AppFeatureController::class);
         //resources
