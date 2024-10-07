@@ -49,6 +49,11 @@ return [
             'driver' => 'session',
             'provider' => 'whatsapp',
         ],
+
+        'preview-admin' => [
+            'driver'   => 'session',
+            'provider' => 'preview-admin',
+        ],
     ],
 
     /*
@@ -87,6 +92,12 @@ return [
         'whatsapp' => [
             'driver' => 'eloquent',
             'model' => \Modules\Whatsapp\Entities\WhatsappApp::class,
+        ],
+
+        'preview-admin' => [
+            'driver' => 'eloquent',
+            'model'  => \App\Models\PreviewAdmin::class,
+//                'model'  => Encore\Admin\Auth\Database\Administrator::class,
         ],
 
         // 'users' => [

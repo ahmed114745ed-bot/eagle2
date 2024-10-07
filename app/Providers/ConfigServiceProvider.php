@@ -31,6 +31,14 @@ class ConfigServiceProvider extends ServiceProvider
              Config::set('broadcasting.connections.pusher.app_id', @$config['app_id']);
              Config::set('broadcasting.connections.pusher.options.cluster', @$config['app_cluster']);
          }
+        $requestPath = \Request::path();
+
+         if (\Str::startsWith($requestPath, 'preview')){//admin.route.prefix,admin.auth.controller
+             Config::set('session.cookie', 'laravel_preview');
+             Config::set('admin.route.prefix', 'preview/admin');
+             Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
+         }
+
     }
 
     public function getReceivedAndSanderPercentage(): array

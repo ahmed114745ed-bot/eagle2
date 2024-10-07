@@ -50,12 +50,19 @@ class RoleController extends AdminController
      */
     protected function grid()
     {
+        \Admin::js('js/admin/preview.js');
         $roleModel = config('admin.database.roles_model');
 
         $grid = new Grid(new $roleModel());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
        $grid->column('name', trans('admin.name'));
+        $grid->column('preview', trans('admin.preview'))->display(function () {
+            $id = $this->id; // Assuming 'id' is the record ID field
+            return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">
+                <i class="fa fa-eye"></i>
+            </a>';
+        });
 
         $grid->column('permissions', trans('admin.permission'))->pluck('name')->take(7)->label();
 

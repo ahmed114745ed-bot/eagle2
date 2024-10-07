@@ -144,5 +144,6 @@ return [
     "event_period"=>"Event Period",
     'Labels' => 'Labels',
     'pay' => 'pay salary',
+    'preview' => 'preview'
 
 ];
