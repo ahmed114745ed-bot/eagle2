@@ -49,7 +49,7 @@ Route::group(
         });
 
         Route::prefix('pk-events-gift/{pk_type}/{pk_event_id}')->group(function () {
-            Route::get('/', [PkEventGiftController::class, 'index']);
+            Route::get('/', [PkEventGiftController::class, 'index'])->name('event-gift.index');;
             Route::get('/{level}/create', [PkEventGiftController::class, 'create']);
             Route::post('/{level}', [PkEventGiftController::class, 'store']);
             Route::get('/{id}', [PkEventGiftController::class, 'show'])->where('id', '[0-9]+');

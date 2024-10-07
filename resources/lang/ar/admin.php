@@ -146,5 +146,6 @@ return [
     "pk_event"=>"ايفينت ال PK",
     'Labels' => 'المسميات',
     'pay' => 'دفع الراتب',
-    'preview' => 'عرض'
+    'preview' => 'عرض',
+    'eventGift' => ' pk هدايا الاحداث',
 ];

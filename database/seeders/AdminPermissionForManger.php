@@ -86,7 +86,8 @@ class AdminPermissionForManger extends Seeder
             'agent-request',
             'agent-user',
             'roles',
-            'updates'
+            'updates',
+            'Permissions',
 
             
 
