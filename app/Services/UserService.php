@@ -440,4 +440,14 @@ class UserService
         $user->save();
         return $user;
     }
+
+    public function allUsers($search)
+    {
+        return $this->userRepository->UsersWithSearch($search);
+    }
+
+    public function userInfoWithRoles($ownerId)
+    {
+       $user = $this->userRepository->findUserById($ownerId);
+    }
 }

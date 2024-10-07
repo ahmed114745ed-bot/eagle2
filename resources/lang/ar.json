@@ -16,7 +16,7 @@
     "App": "التطبيق",
     "Email": "بريد الكتروني",
     "action": "عمليات",
-    "All Managers": "جميع المديرين",
+    "All Managers": "جميع المدرين ",
     "male": "ذكر",
     "registered successfully": "تم التسجيل بنجاح",
     "required": "مطلوب",
@@ -709,7 +709,7 @@
     "Target percentage":"النسبة المستهدفة",
     "Application wallet":"محفظة التطبيق",
     "Target hosts":"تارجيت المضيفيين",
-    "Shipping system":"سيستم الشحن",
+    "charge system":"سيستم الشحن",
     "Types of clouds":"انواع السحب",
     "Funds withdrawal requests":"طلبات سحب الاموال",
     "sales":"مبيعات",
@@ -798,7 +798,8 @@
     "ovip" : "الارستقراطية",
     "vip_privilege":"vip_privilege",
     "room-vips" :" مستويات الغرف",
-    "room-target": " اهداف الغرف"
+    "room-target": " اهداف الغرف",
+    "Manger" :" المدير"
 
 
 

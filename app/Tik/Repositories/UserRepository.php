@@ -298,4 +298,17 @@ class UserRepository extends AbstractRepository
         dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
 
     }
+
+    public function updateManger($userId)
+    {
+        $this->model->where('id',$userId)->update([
+            'is_manger' =>true,
+        ]);
+        return true;
+    }
+
+    public function countByAgencyId($agencyId)
+    {
+        return $this->model->where('agency_id',$agencyId)->count();
+    }
 }

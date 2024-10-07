@@ -171,4 +171,15 @@ class UserController extends Controller
     }
         return Common::apiResponse (1,'reset successful',new UserResource($user));
     }
+
+    public function userWithSearch(Request $request)
+    {
+        $data = $this->userService->allUsers($request->search);
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function userInfoWithRole(Request $request)
+    {
+        
+    }
 }

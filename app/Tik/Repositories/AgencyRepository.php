@@ -26,7 +26,7 @@ class AgencyRepository extends AbstractRepository
 
     public function findById($id)
     {
-        return $this->model->with('additionalInfo')->where('id', $id)->first();
+        return $this->model->with('additionalInfo',)->where('id', $id)->first();
     }
     public function findByStatus($id)
     {
@@ -79,5 +79,15 @@ class AgencyRepository extends AbstractRepository
                         $query->where('uuid', 'like', '%' . $keyword . '%');
                     });
             })->take(10)->get();
+    }
+
+    public function countAgencyUserAdmin($userId)
+    {
+        return $this->model->where('agency_manger_id', $userId)->count();
+    }
+
+    public function getByAgencyMangerId($agencyMangerId)
+    {
+        return $this->model->where('agency_manger_id',$agencyMangerId)->with('owner')->get();
     }
 }
