@@ -26,8 +26,8 @@ class AchievementsController extends MainController
         // $grid->column('type', __('Type'));
 
         $grid->column('type', __('Type'))->display(function ($value) {
-            $redirectRoute = 'admin.gift-achievements.index';
-            $button = '<a href="' . route($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary"> اضف هدايا مستخدمين </a>';
+            $redirectRoute = 'preview/admin/gift-achievements';
+            $button = '<a href="' . url($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary"> اضف هدايا مستخدمين </a>';
             $button2 =  $value === 'gift_target' ? $button : null;
             return $value . '<br>' . $button2;
         });
@@ -47,8 +47,8 @@ class AchievementsController extends MainController
 
         $grid->column(__('redirect_button'))->display(function ($value) {
 
-            $redirectRoute = 'admin.achievement-levels.index';
-            $button = '<a href="' . route($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
+            $redirectRoute = 'preview/admin/achievement-levels';
+            $button = '<a href="' . url($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
             return $button;
         });
 

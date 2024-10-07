@@ -10,6 +10,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Agent extends Authenticatable
 {
     use HasFactory;
+
+    protected $guarded = ['id'];
     protected $table = 'admin_users';
 
 }

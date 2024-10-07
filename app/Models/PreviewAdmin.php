@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Auth\Database\Administrator;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Admin extends \App\Models\Administrator
+class PreviewAdmin extends \App\Models\Administrator
 {
-    protected $table = 'admin_users';
     protected $appends = ['agency_id'];
     public function agency(){
         return $this->hasOne (Agency::class,'owner_id');
@@ -29,6 +27,10 @@ class Admin extends \App\Models\Administrator
     protected static function boot()
     {
         parent::boot();
+
+        static::addGlobalScope('preview', function (Builder $builder) {
+            $builder->where('status', 'active');
+        });
 
         // Listen for the 'deleting' event of the admin model
         static::deleting(function ($admin) {
@@ -56,6 +58,7 @@ class Admin extends \App\Models\Administrator
     public function per() {
         return $this->hasMany(Agency::class, 'agency_manger_id');
     }
+
 
 
 

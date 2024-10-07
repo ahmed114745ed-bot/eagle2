@@ -97,6 +97,7 @@ Route::group(
         }
         $router->resource('questions', QuestionController::class);
         $router->resource('user-online-history', UserOnlineHistoryController::class);
+        $router->post('create-preview-user', [App\Admin\Controllers\AuthController::class,"createPreviewUser"]);
 
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         $router->get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');

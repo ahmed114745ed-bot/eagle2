@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace App\Admin\Controllers\Preview;
 
 use App\Models\Agent;
 use App\Models\PreviewAdmin;
@@ -10,36 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use KevinSoft\MultiLanguage\MultiLanguage;
-use Illuminate\Support\Facades\Config;
+use Twilio\Rest\Preview;
+
 
 class AuthController extends BaseAuthController
 {
-
-    public function createPreviewUser (Request $request)
-    {
-        $roleId = $request->role_id;
-        $password = \Str::random(12);
-        $values = [
-            'username' => \Str::random(9),
-            'password' => $password,
-        ];
-        $admin = \App\Models\Admin::create([
-            ...$values,
-            'name' => \Str::random(9),
-            'is_preview' => true,
-            'password' => bcrypt($password)
-        ]);
-
-        $admin->roles()->sync(['role_id' => $roleId]);
-//        Config::set('session.cookie', 'laravel_preview');
-//        Config::set('session.domain', 'https://top_star_backend.test');
-
-        $token = '';
-
-
-
-        return response()->json(['url' => '/preview/admin/login?token='. $admin->id]);
-    }
 
     public function putSetting ()
     {
@@ -53,6 +28,11 @@ class AuthController extends BaseAuthController
     }
 
     public function getLogin() {
+        $test = request()->query('redirect_url');
+
+        if (\request()->has('token')){
+            return $this->LoginById(\request());
+        }
         $languages = MultiLanguage::config("languages");
         $cookie_name = MultiLanguage::config('cookie-name', 'locale');
 
@@ -60,7 +40,7 @@ class AuthController extends BaseAuthController
         if(Cookie::has($cookie_name)) {
             $current = Cookie::get($cookie_name);
         }
-        return view("multi-language::login", compact('languages', 'current'));
+        return view("login", compact('languages', 'current', 'test'));
     }
 
     public function postLogin(Request $request)
@@ -72,7 +52,9 @@ class AuthController extends BaseAuthController
         $credentials = $request->only([$this->username(), 'password']);
         $remember = $request->get('remember', false);
 
-        if ($this->guard()->attempt($credentials, $remember)) {
+
+        if ($this->guard()->attempt($credentials, )) {
+
             return $this->sendLoginResponse($request);
         }
 
@@ -91,7 +73,32 @@ class AuthController extends BaseAuthController
     }
 
 
+    public function startLoginWithToken(Request $request)
+    {
+        $token = $request->token;
 
+        $request->session()->put('laravel_preview', $token);
+
+        admin_toastr(trans('admin.login_successful'));
+
+        return redirect()->intended($request->url??$this->redirectPath());
+    }
+
+
+    protected function LoginById(Request $request)
+    {
+        $id = $request->token;
+        $user = Agent::find($id);
+        // Authenticate the user by ID
+        if ($this->guard()->loginUsingId($id)) {
+            // If authentication is successful, redirect to the dashboard or another page
+            return redirect()->intended($request->url??$this->redirectPath());
+        }
+
+        return back()->withInput()->withErrors([
+            $this->username() => $this->getFailedLoginMessage(),
+        ]);
+    }
 
 
 }

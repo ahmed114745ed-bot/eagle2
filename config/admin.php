@@ -66,7 +66,7 @@ return [
         'namespace' => 'App\\Admin\\Controllers',
 
         'middleware' => [
-            'web',
+//            'web',
             'admin',
             'multiLanguage',
             'admin.permission:deny,agency',
@@ -145,12 +145,21 @@ return [
                 'driver'   => 'session',
                 'provider' => 'admin',
             ],
+            'preview-admin' => [
+                'driver'   => 'session',
+                'provider' => 'preview-admin',
+            ],
         ],
 
         'providers' => [
             'admin' => [
                 'driver' => 'eloquent',
                 'model'  => \App\Models\Admin::class,
+//                'model'  => Encore\Admin\Auth\Database\Administrator::class,
+            ],
+            'preview-admin' => [
+                'driver' => 'eloquent',
+                'model'  => \App\Models\PreviewAdmin::class,
 //                'model'  => Encore\Admin\Auth\Database\Administrator::class,
             ],
         ],

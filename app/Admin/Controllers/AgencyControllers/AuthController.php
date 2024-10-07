@@ -1,6 +1,6 @@
 <?php
 
-namespace Encore\Admin\Controllers;
+namespace App\Admin\Controllers\AgencyControllers;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
