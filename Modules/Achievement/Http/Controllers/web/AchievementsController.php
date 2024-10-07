@@ -26,7 +26,7 @@ class AchievementsController extends MainController
         // $grid->column('type', __('Type'));
 
         $grid->column('type', __('Type'))->display(function ($value) {
-            $redirectRoute = 'admin.gift-achievements.index';
+            $redirectRoute =nameRoute('admin.gift-achievements.index');
             $button = '<a href="' . route($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary"> اضف هدايا مستخدمين </a>';
             $button2 =  $value === 'gift_target' ? $button : null;
             return $value . '<br>' . $button2;
@@ -47,7 +47,7 @@ class AchievementsController extends MainController
 
         $grid->column(__('redirect_button'))->display(function ($value) {
 
-            $redirectRoute = 'admin.achievement-levels.index';
+            $redirectRoute =nameRoute('admin.achievement-levels.index');
             $button = '<a href="' . route($redirectRoute, ['achievement_id' => $this->getKey()]) . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
             return $button;
         });
@@ -121,7 +121,7 @@ class AchievementsController extends MainController
         //     // $add = Achievement::saveAchievement($data);
 
 
-        //     //    redirect()->route('admin.achievements');
+        //     //    redirect()->route(nameRoute('admin.achievements'));
 
         // });
 

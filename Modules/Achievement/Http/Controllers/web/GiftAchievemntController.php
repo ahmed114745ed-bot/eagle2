@@ -38,7 +38,7 @@ class GiftAchievemntController extends MainController
            'user_id'=>$user_id
          ]);
 
-       return Redirect::route('admin.gift-achievements.index');
+       return Redirect::route(nameRoute('admin.gift-achievements.index'));
        }
 
 
@@ -61,7 +61,7 @@ class GiftAchievemntController extends MainController
            'ar_description'=>$ar_description,
            'en_description'=>$en_description
          ]);
-         return  redirect()->route('admin.achievements.index');
+         return  redirect()->route(nameRoute('admin.achievements.index'));
 
 
 
@@ -96,7 +96,7 @@ class GiftAchievemntController extends MainController
 
          // Save the updated achievement level
          $achievementLevel->save();
-        return  redirect()->route('admin.achievements.index');
+        return  redirect()->route(nameRoute('admin.achievements.index'));
 
 
 
