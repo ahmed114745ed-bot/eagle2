@@ -38,6 +38,9 @@ class PkEventGiftController extends MainController
     return $content
         ->header(trans('admin.index'))
         ->description(trans('admin.description'))
+        ->breadcrumb(
+            ['text' => trans('admin.eventGift')]
+        )
         ->row($buttonHTML) // Add the button row
         ->row($this->grid1()) // First grid
         ->row($this->grid2()) // Second grid
