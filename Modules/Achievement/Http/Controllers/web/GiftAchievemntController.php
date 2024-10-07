@@ -96,7 +96,7 @@ class GiftAchievemntController extends MainController
 
          // Save the updated achievement level
          $achievementLevel->save();
-        return  redirect()->to('preview/admin/achievements');
+        return  redirect()->route('admin.achievements.index');
 
 
 

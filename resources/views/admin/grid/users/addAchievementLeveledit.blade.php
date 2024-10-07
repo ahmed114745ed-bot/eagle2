@@ -26,7 +26,7 @@
                     $achievement_levels = DB::table('achievement_levels')->where('id',$id)->first();
 
         @endphp
-        <form method="POST" action="{{ url('preview/admin/posteditGiftAchievementLevel') }}" class="formcustomPage" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('admin.posteditGiftAchievementLevel') }}" class="formcustomPage" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="achievement_id" placeholder="" value="{{ @$achievement_levels->achievement_id }}" class="inputs_cus_form">
                 <input type="hidden" name="id" placeholder="" value="{{ @$id }}" class="inputs_cus_form">
