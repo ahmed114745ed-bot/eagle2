@@ -202,7 +202,7 @@ class AdminUsersController extends MainController
         });
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
-        $grid->column('owner.name', trans('Owner'));
+        $grid->column('owner.name', trans('owner'));
         $grid->column('phone', trans('phone'));
         $grid->column('img', trans('img'))->image('', 30);
         $grid->column('', trans('Users Count'))->display(function () {
