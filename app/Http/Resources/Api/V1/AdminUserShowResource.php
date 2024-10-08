@@ -27,7 +27,7 @@ class AdminUserShowResource extends JsonResource
             'owner_id' => @$this->app_owner_id??0,
             'owner_name' => @$this->owner->name  ?? '',
             'phone' => @$this->phone ?? 0,
-            'img' => $this->img ?? '',
+            'img' => $this->owner->profile->avatar ?? '',
             'user_count' => $this->userCount ?? 0,
 
         ];
