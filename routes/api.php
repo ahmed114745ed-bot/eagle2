@@ -11,11 +11,13 @@ use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PackController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
+use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V1\TargetController;
@@ -25,6 +27,7 @@ use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
+use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
@@ -44,8 +47,6 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
-use App\Http\Controllers\Api\V1\RoleController;
-use App\Http\Controllers\Api\V1\UtdUserController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -154,6 +155,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/update', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
             Route::post('/show', [CoreWalletsController::class, 'show']);
         });
+        Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
+
+
     });
 
     // all route with auth
