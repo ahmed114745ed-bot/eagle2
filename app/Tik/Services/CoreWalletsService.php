@@ -42,7 +42,7 @@ class CoreWalletsService
             'coins'         => $request->coins,
         ];
 
-        $this->coreWalletsRepository->update($data, $request->Core_wallet_id);
+        $this->coreWalletsRepository->update($data, $request->core_wallet_id);
         return true;
     }
 }

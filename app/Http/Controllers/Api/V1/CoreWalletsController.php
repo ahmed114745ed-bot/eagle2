@@ -43,7 +43,7 @@ class CoreWalletsController extends Controller
 
     public function show(Request $request)
     {
-        $data = $this->coreWalletsService->show($request->Core_wallet_id);
+        $data = $this->coreWalletsService->show($request->core_wallet_id);
         return Common::apiResponse(1, '', $data);
     }
 
@@ -53,6 +53,7 @@ class CoreWalletsController extends Controller
         $validator = Validator::make($request->all(), [
             'name'         => 'required|string|max:255',
             'coins'         => 'required|numeric',
+            "core_wallet_id" => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());

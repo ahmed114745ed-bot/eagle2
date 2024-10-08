@@ -81,39 +81,47 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // utd apis
     Route::prefix('utd')->group(function () {
         //configs
-        Route::get('configs', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
-        Route::post('update-config', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
+        Route::prefix('configs')->group(function () {
+            Route::get('/all', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
+            Route::post('/update', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
+        });
         //games
-        Route::get('all-games', [AllGameController::class, 'utdGameIndex']);
-        Route::post('create-game', [AllGameController::class, 'utdGameCreate'])->middleware('decrypt.data');
-        Route::post('update-game', [AllGameController::class, 'utdGameUpdate'])->middleware('decrypt.data');
-        Route::post('show-game', [AllGameController::class, 'showGame']);
-        Route::post('update-switch-games', [AllGameController::class, 'utdGameSwitchUpdate']);
+        Route::prefix('games')->group(function () {
+            Route::get('/all', [AllGameController::class, 'utdGameIndex']);
+            Route::post('/create', [AllGameController::class, 'utdGameCreate'])->middleware('decrypt.data');
+            Route::post('/update', [AllGameController::class, 'utdGameUpdate'])->middleware('decrypt.data');
+            Route::post('/show', [AllGameController::class, 'showGame']);
+            Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
+        });
         // target
-        Route::get('all-targets', [TargetController::class, 'index']);
-        Route::post('create-target', [TargetController::class, 'store'])->middleware('decrypt.data');
-        Route::post('update-target', [TargetController::class, 'update'])->middleware('decrypt.data');
-        Route::post('show-target', [TargetController::class, 'show']);
-
+        Route::prefix('targets')->group(function () {
+            Route::get('/all', [TargetController::class, 'index']);
+            Route::post('/create', [TargetController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/update', [TargetController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/show', [TargetController::class, 'show']);
+        });
         //ovip
-        Route::get('all-ovips', [OvipController::class, 'index']);
-        Route::post('create-ovip', [OvipController::class, 'store'])->middleware('decrypt.data');
-        Route::post('update-ovip', [OvipController::class, 'update'])->middleware('decrypt.data');
-        Route::post('show-ovip', [OvipController::class, 'show']);
+        Route::prefix('ovips')->group(function () {
+            Route::get('/all', [OvipController::class, 'index']);
+            Route::post('/create', [OvipController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/update', [OvipController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/show', [OvipController::class, 'show']);
+        });
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
-
 
         // agency statistic
         Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
 
 
         //admin users
-        Route::get('all_admin_users', [AdminUsersController::class, 'index']);
-        Route::post('create_admin_user', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
-        Route::post('show_admin_user', [AdminUsersController::class, 'show']);
+        Route::prefix('admin_users')->group(function () {
+            Route::get('/all', [AdminUsersController::class, 'index']);
+            Route::post('/create', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/show', [AdminUsersController::class, 'show']);
+        });
         // roles 
         Route::resource('roles', RoleController::class)->middleware('decrypt.data');
-        Route::get('permissions', [RoleController::class,"permissions"])->middleware('decrypt.data');
+        Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
 
         // users
         Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
@@ -123,25 +131,29 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('all-users', [UserController::class, 'userWithSearch']);
 
         //mangerType
-
-        Route::get('all-manger-types', [MangerTypeController::class, 'index']);
-        Route::post('create-manger-type', [MangerTypeController::class, 'store'])->middleware('decrypt.data');
-        Route::post('update-manger-type', [MangerTypeController::class, 'update'])->middleware('decrypt.data');
-        Route::post('show-manger-type', [MangerTypeController::class, 'show']);
-
+        Route::prefix('manger-types')->group(function () {
+            Route::get('/all', [MangerTypeController::class, 'index']);
+            Route::post('/create', [MangerTypeController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/update', [MangerTypeController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/show', [MangerTypeController::class, 'show']);
+        });
         //target Percentage
-        Route::post('create-target-Percentage', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
-        Route::post('show-target-Percentage', [AddTargetToJsonController::class, 'show']);
-
+        Route::prefix('target-Percentage')->group(function () {
+            Route::post('/create', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
+            Route::post('/show', [AddTargetToJsonController::class, 'show']);
+        });
         //setting config
-        Route::post('create-setting-config', [addTOjesonController::class, 'create'])->middleware('decrypt.data');
-        Route::post('show-setting-config', [addTOjesonController::class, 'show']);
+        Route::prefix('setting-config')->group(function () {
+            Route::post('/create', [addTOjesonController::class, 'create'])->middleware('decrypt.data');
+            Route::post('/show', [addTOjesonController::class, 'show']);
+        });
         //CoreWallets
-
-        Route::get('all-core-wallets', [CoreWalletsController::class, 'index']);
-        Route::post('create-core-wallet', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
-        Route::post('update-core-wallet', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
-        Route::post('show-core-wallet', [CoreWalletsController::class, 'show']);
+        Route::prefix('core-wallets')->group(function () {
+            Route::get('/all', [CoreWalletsController::class, 'index']);
+            Route::post('/create', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/update', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/show', [CoreWalletsController::class, 'show']);
+        });
     });
 
     // all route with auth
