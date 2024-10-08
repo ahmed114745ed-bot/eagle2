@@ -140,12 +140,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         //target Percentage
         Route::prefix('target-Percentage')->group(function () {
             Route::post('/create', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
-            Route::post('/show', [AddTargetToJsonController::class, 'show']);
+            Route::get('/show', [AddTargetToJsonController::class, 'show']);
         });
         //setting config
         Route::prefix('setting-config')->group(function () {
             Route::post('/create', [addTOjesonController::class, 'create'])->middleware('decrypt.data');
-            Route::post('/show', [addTOjesonController::class, 'show']);
+            Route::get('/show', [addTOjesonController::class, 'show']);
         });
         //CoreWallets
         Route::prefix('core-wallets')->group(function () {
