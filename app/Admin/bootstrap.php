@@ -22,7 +22,7 @@ use Encore\Admin\Facades\Admin;
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
 //Admin::js('/packages/customization/js/main.js');
-Admin::css ('css/dashboard.css');
+Admin::css ('css/admin.css');
 app('view')->prependNamespace('admin', resource_path('views/admin'));
 view()->composer('admin::partials.menu', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/menu.blade.php'));
