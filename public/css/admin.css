@@ -1,3 +1,7 @@
+:root {
+    --bs-breadcrumb-font-size: 14px;
+}
+
 .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
     z-index: 2;
     color: #fff;
@@ -18,4 +22,20 @@
 
 input:checked+.slider {
     background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%) !important;
+}
+
+.breadcrumb>li {
+    display: inline-block;
+    font-size: var(--bs-breadcrumb-font-size) - 2;
+
+}
+.content-header>.breadcrumb>li>a {
+    color: #468dff !important;
+    text-decoration: none;
+    font-size: var(--bs-breadcrumb-font-size);
+    display: inline-block;
+}
+
+.content-header>.breadcrumb>li+li:before {
+    content: '/\00a0' !important;
 }
