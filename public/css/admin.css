@@ -1,5 +1,6 @@
 :root {
     --bs-breadcrumb-font-size: 14px;
+    --ot-bg-secondary: #fff
 }
 
 .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
@@ -38,4 +39,16 @@ input:checked+.slider {
 
 .content-header>.breadcrumb>li+li:before {
     content: '/\00a0' !important;
+}
+
+
+.content-header{
+    padding: 15px 20px !important;
+    margin: 24px 16px !important;
+    background-color: var(--ot-bg-secondary) !important;
+    filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.05)) !important;
+    border-radius: 5px !important;
+    /*padding: 28px;*/
+    border: none !important;
+
 }
