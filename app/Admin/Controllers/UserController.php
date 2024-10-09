@@ -103,10 +103,17 @@ class UserController extends MainController
 
     protected function grid2()
     {
-        $form = new Box();
-        $form->view('admin.grid.users.userChargeViewNew');
+        $transfer_salary = settings()->get('transfer_salary');
+        $stop_invite_code = settings()->get('stop_invite_code');
+        $stop_charge = settings()->get('stop_charge');
+        $make_rooms_top = settings()->get('make_rooms_top');
 
-        return $form;
+        //        $form->collapsable();
+
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code' , 'transfer_salary', ])),
+        ))->collapsable()->class('box collapsed-box');
     }
     protected function grid()
     {
@@ -157,7 +164,7 @@ class UserController extends MainController
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
-        
+
         $grid->column('charge_status', __("charge status"))->switch($states);
         $grid->column('transfer_salary', __("transfer_salary"))->switch($states);
         $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
