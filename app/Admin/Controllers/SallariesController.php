@@ -9,6 +9,8 @@ use App\Models\SalaryTrx;
 use App\Models\User;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use function request;
@@ -19,10 +21,13 @@ class SallariesController extends MainController
 
     public function index(Content $content)
     {
-        return $content->title(trans('Sallaries'))->description(__(request('desc') ?: 'users'))->row(function ($row) {
-                $row->column(2, view('admin.grid.common.sallaries'));
-                $row->column(10, $this->grid());
-            });
+        return $content
+            ->title(trans('Sallaries'))
+            ->description(__(request('desc') ?: 'users'))
+            ->row(function ($row) {
+            $row->column(3, $this->salaryNavbar());
+            $row->column(9, $this->grid());
+        });
     }
 
     protected function grid()
@@ -56,68 +61,68 @@ class SallariesController extends MainController
                     $m = $amount ?: $agency->old_usd;
                     if ($m > 0) {
                         SalaryTrx::query()->create([
-                                                       'type'       => 1, 'oid' => $agency->id,
-                                                       'amount'     => $amount ?: $agency->old_usd,
-                                                       't_no'       => rand(11111111, 99999999),
-                                                       'note'       => 'paid via admin', 'before_pay' => $prev,
-                                                       'after_pay'  => $prev - $m, 'payer_id' => auth()->id(),
-                                                       'payer_type' => 0
-                                                   ]);
+                            'type' => 1, 'oid' => $agency->id,
+                            'amount' => $amount ?: $agency->old_usd,
+                            't_no' => rand(11111111, 99999999),
+                            'note' => 'paid via admin', 'before_pay' => $prev,
+                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
+                            'payer_type' => 0
+                        ]);
                     }
                 }
             } elseif (request('id') && request('type') == 'user') {
                 $user = User::query()->find(request('id'));
                 if ($user) {
                     $prev = $user->old_usd;
-                    $m    = $amount ?: $user->old_usd;
+                    $m = $amount ?: $user->old_usd;
                     if ($amount) {
                         $user->old_usd -= $amount;
                     } else {
                         $user->old_usd = 0;
-                        $user->coins   = 0;
+                        $user->coins = 0;
                     }
                     $user->save();
                     if ($m > 0) {
                         SalaryTrx::query()->create([
-                                                       'type'       => 0, 'oid' => $user->id,
-                                                       'amount'     => $amount ?: $user->old_usd,
-                                                       't_no'       => rand(11111111, 99999999),
-                                                       'note'       => 'paid via admin', 'before_pay' => $prev,
-                                                       'after_pay'  => $prev - $m, 'payer_id' => auth()->id(),
-                                                       'payer_type' => 0
-                                                   ]);
+                            'type' => 0, 'oid' => $user->id,
+                            'amount' => $amount ?: $user->old_usd,
+                            't_no' => rand(11111111, 99999999),
+                            'note' => 'paid via admin', 'before_pay' => $prev,
+                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
+                            'payer_type' => 0
+                        ]);
                     }
                 }
             } elseif (request('id') && request('type') == 'agency_users') {
                 $agency = Agency::query()->find(request('id'));
                 if ($agency) {
-                    $prev            = $agency->old_usd;
-                    $m               = $agency->old_usd;
+                    $prev = $agency->old_usd;
+                    $m = $agency->old_usd;
                     $agency->old_usd = 0;
                     if ($m > 0) {
                         SalaryTrx::query()->create([
-                                                       'type'       => 0, 'oid' => $agency->id,
-                                                       'amount'     => $agency->old_usd,
-                                                       't_no'       => rand(11111111, 99999999),
-                                                       'note'       => 'paid via admin', 'before_pay' => $prev,
-                                                       'after_pay'  => $prev - $m, 'payer_id' => auth()->id(),
-                                                       'payer_type' => 0
-                                                   ]);
+                            'type' => 0, 'oid' => $agency->id,
+                            'amount' => $agency->old_usd,
+                            't_no' => rand(11111111, 99999999),
+                            'note' => 'paid via admin', 'before_pay' => $prev,
+                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
+                            'payer_type' => 0
+                        ]);
                     }
                     $users = $agency->users;
                     foreach ($users as $user) {
-                        $m             = $user->old_usd;
+                        $m = $user->old_usd;
                         $user->old_usd = 0;
-                        $user->coins   = 0;
+                        $user->coins = 0;
                         if ($m > 0) {
                             SalaryTrx::query()->create([
-                                                           'type'       => 0, 'oid' => $user->id,
-                                                           'amount'     => $user->old_usd,
-                                                           't_no'       => rand(11111111, 99999999),
-                                                           'note'       => 'paid via admin for agency , contact your agent for your salary',
-                                                           'before_pay' => $prev, 'after_pay' => $prev - $m,
-                                                           'payer_id'   => auth()->id(), 'payer_type' => 0
-                                                       ]);
+                                'type' => 0, 'oid' => $user->id,
+                                'amount' => $user->old_usd,
+                                't_no' => rand(11111111, 99999999),
+                                'note' => 'paid via admin for agency , contact your agent for your salary',
+                                'before_pay' => $prev, 'after_pay' => $prev - $m,
+                                'payer_id' => auth()->id(), 'payer_type' => 0
+                            ]);
                         }
                         $user->save();
                     }
@@ -138,7 +143,9 @@ class SallariesController extends MainController
     {
         $grid = new Grid(new User());
         $grid->column('id', __('id'));
-        $grid->column('agency', __('agency'))->display(function () { return @$this->agency->name; });
+        $grid->column('agency', __('agency'))->display(function () {
+            return @$this->agency->name;
+        });
         // $grid->column ('uuid',__ ('uuid'));
         $grid->column('name', __('name'));
         $grid->column('old_usd', __('old usd'));
@@ -189,7 +196,7 @@ class SallariesController extends MainController
 
     protected function users()
     {
-        $grid  = new Grid(new User());
+        $grid = new Grid(new User());
         $model =
             $grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
         if (request('salary_only') == 1) {
@@ -211,7 +218,7 @@ class SallariesController extends MainController
             return (new SalariesAction($this->id, 'user'))->render();
         });
         $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'user',$this->salary))->render();
+            return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
@@ -225,11 +232,11 @@ class SallariesController extends MainController
         $grid = new Grid(new Agency());
 
         $model = $grid->model()
-                 ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
-                 ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
+            ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
+            ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
 //            ->where('agencies.id', request('id'))
-                 ->orderByRaw('total desc')
-                 ->groupBy('agencies.id', 'agencies.name');
+            ->orderByRaw('total desc')
+            ->groupBy('agencies.id', 'agencies.name');
 
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
@@ -238,10 +245,10 @@ class SallariesController extends MainController
             $filter->disableIdFilter();
             $filter->expand();
 
-            $filter->column(12, function(Grid\Filter $filter) {
-                $filter->where( function ($q) {
+            $filter->column(12, function (Grid\Filter $filter) {
+                $filter->where(function ($q) {
                     $q->where('agencies.id', '=', $this->input);
-                } , 'id');
+                }, 'id');
 
             });
         });
@@ -255,12 +262,31 @@ class SallariesController extends MainController
             return (new SalariesAction($this->id, 'agency'))->render();
         });
         $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'agency',$this->salary))->render();
+            return (new PaySalariesAction($this->id, 'agency', $this->salary))->render();
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
         return $grid;
+    }
+
+    private function salaryNavbar()
+    {
+        $content = new Row();
+
+        $box = (new Box(
+            title: __('Fields'),
+            content: view('admin.grid.common.salaries')
+        ));
+        $content->column(12, $box);
+        $box = (new Box(
+            title: __('Details'),
+            content: view('admin.grid.common.salaries-statistics')
+        ))->collapsable();
+        $content->column(12, $box);
+
+
+        return $content;
     }
 
 
