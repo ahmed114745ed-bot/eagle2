@@ -232,7 +232,7 @@ Route::group(
         $router->resource ('sallaries_history','SallariesHistoryController');
         // $router->resource ('export-excel','ImportExcelReportController');
         $router->resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
-        $router->resource('report_users', Report_from_usersController::class);
+        $router->resource('report_users', ReportFromUsersController::class);
         $router->post ('cashing','ReportController@cashing')->name ('cashing');
         $router->resource ('trxs','CoinLogController');
         $router->resource ('images','ImageController');

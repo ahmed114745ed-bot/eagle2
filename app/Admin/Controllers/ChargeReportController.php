@@ -1,5 +1,8 @@
 <?php
 namespace App\Admin\Controllers;
+use App\Admin\Forms\CustomForm;
+use Encore\Admin\Show;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -7,6 +10,8 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\CoinLog;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,9 +28,9 @@ class ChargeReportController extends MainController {
         return $content
             ->title("Reports")
             ->description("Charges")
-            ->row(function($row) {
-                $row->column(2, view('admin.grid.common.report.charge'));
-                $row->column(10, $this->grid());
+            ->row(function(Row $row) {
+                $row->column(3, $this->tabsComponent());
+                $row->column(9, $this->grid());
             });
     }
 
@@ -196,5 +201,48 @@ class ChargeReportController extends MainController {
             return (new \App\Admin\Actions\ReturnDiAction($this->id))->render () ;
         });
         return $grid;
+    }
+
+    private function tabsComponent()
+    {
+        $content = new Row();
+
+        $box = (new Box(
+            title: __('Fields'),
+            content: view('admin.grid.common.report.charge')
+        ));
+        $content->column(12, $box);
+        $box = (new Box(
+            title: __('Details'),
+            content: view('admin.grid.common.report.show-statistics-for-charge')
+        ))->collapsable();
+        $content->column(12, $box);
+
+
+        return $content;
+    }
+}
+
+class TemporaryModel extends Model
+{
+    // Prevent Laravel from trying to map the model to a database table
+    protected $table = null;
+
+    // Disable timestamps
+    public $timestamps = false;
+
+    // Disable incrementing IDs and primary key
+    protected $primaryKey = null;
+    public $incrementing = false;
+
+    // Disable auto connection to the database
+    protected $connection = null;
+
+    // Optionally, define fillable attributes if you want to use it like a regular model
+    protected $fillable = ['name', 'age', 'email'];
+
+    public function getTestAttribute() : string
+    {
+        return 'this is test attribute';
     }
 }

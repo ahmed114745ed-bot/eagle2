@@ -14,7 +14,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
 
 
-class ReportRealsControlle extends AdminController
+class ReportRealsController extends AdminController
 {
     use HasResourceActions;
 

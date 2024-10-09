@@ -11,7 +11,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 
 
-class Report_from_usersController extends AdminController
+class ReportFromUsersController extends AdminController
 {
     /**
      * Title for current resource.
@@ -40,12 +40,12 @@ class Report_from_usersController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Report_user());
-   
+
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('report_details', __('Report details'));
 
-       
+
 
 
         // $grid->column('user_id', __('User id'));
@@ -68,13 +68,13 @@ class Report_from_usersController extends AdminController
             return __('User not found');
         });
         $grid->column('image', __('image'))->image('', 200);
-      
+
 
         $grid->disableExport();
         $grid->disableCreateButton();
-        
 
-   
+
+
         // $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));
 
@@ -122,7 +122,7 @@ class Report_from_usersController extends AdminController
         $form->textarea('report_details', __('Report details'));
         // $form->number('user_id', __('User id'));
         // $form->number('Reporter_id', __('Reporter id'));
-       
+
         return $form;
     }
 }
