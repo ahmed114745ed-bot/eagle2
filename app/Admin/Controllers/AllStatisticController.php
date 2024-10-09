@@ -105,14 +105,14 @@ class AllStatisticController extends MainController
         $earned_charge = $first_earned_charge + $second_earned_charge;
         $app_earned_charge = $earned_charge - $lose;
         $data = [
-            'allUsersCount' => $allUsersCount ??0,
-            'onlineUsers' => $onlineUsers ?? 0,
-            'coins' => $coins ?? 0,
-            'diamonds' => $total_monthly_di_recieved ?? 0,
-            'user_salaries' =>$user_sallaries ?? 0,
-            'agency_salaries' => $agency_sallaries ?? 0,
-            'total_salaries' =>$total_sallary ?? 0 ,
-            'app_earned' => $app_earned_charge ?? 0,
+            'allUsersCount' =>number_format( $allUsersCount) ??0,
+            'onlineUsers' => number_format($onlineUsers) ?? 0,
+            'coins' => number_format($coins) ?? 0,
+            'diamonds' => number_format($total_monthly_di_recieved )?? 0,
+            'user_salaries' =>number_format($user_sallaries) ?? 0,
+            'agency_salaries' => number_format($agency_sallaries) ?? 0,
+            'total_salaries' =>number_format($total_sallary) ?? 0 ,
+            'app_earned' => number_format($app_earned_charge )?? 0,
         ];
         return Common::apiResponse(1, '', $data);
     }
