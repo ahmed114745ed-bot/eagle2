@@ -74,18 +74,18 @@ class RoomRepository extends AbstractRepository
     public function all($req)
     {
         $user = $req->user();
+        $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
             'lastPk'
         ])
             ->whereHas('owner')
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->where('count_room_socket', '!=', 0)
-                        ->where('top_room', 1);
-                })->orWhere(function ($q) {
-                    $q->where('count_room_socket', '!=', 0);
+            ->when(!$allRooms, function ($query){
+                $query->where(function ($query){
+                    $query->where(fn($q) => $q->where('count_room_socket','!=',0)->where('top_room', 1))
+                        ->orWhere(fn($q) => $q->where('pin', 1))
+                        ->orWhere(fn($q) => $q->where('count_room_socket','!=',0));
                 });
             })
             ->where('room_status', 1);
