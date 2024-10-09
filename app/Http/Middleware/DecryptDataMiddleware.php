@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,7 +36,7 @@ class DecryptDataMiddleware
                 // Merge decrypted data into the request
                 $request->merge($decryptedData);
             } else {
-                return response()->json(['error' => 'Decryption failed'], 400);
+                return Common::apiResponse(0, 'Decryption failed', null, 400);
             }
         }
 
