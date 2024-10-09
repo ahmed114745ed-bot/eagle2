@@ -147,6 +147,13 @@ class VipService
     {
         $vipPrivilege  = $this->vipPrivilegeRepository->findById($request->vipPrivilege_id);
         $Vip = $this->ovipRepository->findById($request->ovip_id);
+
+        if ($request->hasFile('image')) {
+            $image = Common::upload('images', $request->file('image'));
+        }
+        if ($request->hasFile('img2')) {
+            $img2 = Common::upload('images', $request->file('image'));
+        }
         $data = [
           'get_type' => 1,  
           'type' => $vipPrivilege->type,
@@ -156,8 +163,8 @@ class VipService
           'title' => $request->title,
           'title_en' => $request->title_en,
           'level' => $Vip->level,
-          'show_img' => $request->show_img,
-          'img2' => $request->img2,
+          'show_img' => $image,
+          'img2' => $img2,
           'img2_type' => $request->img2_type,
           'enable' =>1,
           'is_active_for_vip' =>1,
