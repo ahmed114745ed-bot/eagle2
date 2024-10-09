@@ -147,7 +147,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         });
         //setting config
         Route::prefix('setting-config')->group(function () {
-            Route::post('/create', [addTOjesonController::class, 'create'])->middleware('decrypt.data');
+            Route::post('/create', [addTOjesonController::class, 'create']);
             Route::get('/show', [addTOjesonController::class, 'show']);
         });
         //CoreWallets
