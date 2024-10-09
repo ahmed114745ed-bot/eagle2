@@ -54,7 +54,7 @@ input:checked+.slider {
 }
 
 .box {
-    border-radius: 42px!important;
+    border-radius: 20px!important;
     padding: 15px;
     border-color: #eaeaea;
 }
