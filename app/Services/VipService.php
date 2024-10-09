@@ -142,4 +142,28 @@ class VipService
         $this->userVipRepository->update($data, $user_vip->id);
         return $user_vip;
     }
+
+    public function createWareVip($request)
+    {
+        $vipPrivilege  = $this->vipPrivilegeRepository->findById($request->vipPrivilege_id);
+        $Vip = $this->ovipRepository->findById($request->ovip_id);
+        $data = [
+          'get_type' => 1,  
+          'type' => $vipPrivilege->type,
+          'price' => 0,
+          'name' => $request->name,
+          'name_en' => $request->name_en,
+          'title' => $request->title,
+          'title_en' => $request->title_en,
+          'level' => $Vip->level,
+          'show_img' => $request->show_img,
+          'img2' => $request->img2,
+          'img2_type' => $request->img2_type,
+          'enable' =>1,
+          'is_active_for_vip' =>1,
+
+        ];
+        $this->wareRepository->create($data);
+        return true;
+    }
 }
