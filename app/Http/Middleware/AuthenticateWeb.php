@@ -18,7 +18,6 @@ class AuthenticateWeb
     public function handle($request, Closure $next)
     {
         \config(['auth.defaults.guard' => 'admin']);
-        $test = request();
 
         $redirectTo = admin_base_path(config('admin.auth.redirect_to', 'auth/login'));
         $test = $request->getRequestUri();  // Or any other value you want to pass

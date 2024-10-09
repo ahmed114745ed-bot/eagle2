@@ -66,7 +66,7 @@ return [
         'namespace' => 'App\\Admin\\Controllers',
 
         'middleware' => [
-//            'web',
+            'web',
             'admin',
             'multiLanguage',
             'admin.permission:deny,agency',
