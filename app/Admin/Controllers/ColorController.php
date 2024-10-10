@@ -90,7 +90,7 @@ class ColorController extends MainController
             $data = new WebSetting();
         }
         if ($request->hasFile('logo')) {
-            $imagePath = Common::upload('images', $request->file('img'));
+            $imagePath = Common::upload('images', $request->file('logo'));
             $data->logo = $imagePath;
         }
     
