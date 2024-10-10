@@ -30,6 +30,7 @@ class WareResource extends JsonResource
             'img'       =>  $this->img1 == null ? '' : $this->img1,
             'svg'       =>  $this->img2 == null ? '' : $this->img2,
             'video'     =>  $this->img3  == null ? '' : $this->img3,
+            'image_type' => $this->image_type??"",
         ];
     }
 }

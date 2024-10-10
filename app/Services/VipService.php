@@ -165,7 +165,7 @@ class VipService
           'level' => $Vip->level,
           'show_img' => $image,
           'img2' => $img2,
-          'img2_type' => $request->img2_type,
+          'image_type' => $request->img2_type,
           'enable' =>1,
           'is_active_for_vip' =>1,
 

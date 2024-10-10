@@ -226,6 +226,13 @@ class WareVipController extends MainController
         $form->file('img2', trans('svg'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
+        $form->select('image_type', __('image_type'))->options (
+            [
+                'svga'=>__ ('svga'),
+                'alpha'=>__ ('alpha'),
+                'mp4'=>__ ('mp4'),
+            ]
+        )->required();
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));

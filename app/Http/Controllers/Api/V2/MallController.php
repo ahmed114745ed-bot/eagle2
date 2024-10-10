@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V2;
 
+use App\Models\Ware;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
@@ -48,5 +49,17 @@ class MallController extends Controller
         if (!$wareId || !$toUserId) return Common::apiResponse(0, 'missing params', null, 422);
 
         return $this->mallService->sendWare($user, $wareId, $toUserId, $quantity);
+    }
+
+
+    public function wareImage()
+    {
+        $wares = Ware::whereNotNull('img2')->get();
+        foreach ($wares as $wares) {
+            $ImageType =     pathinfo($wares->img2, PATHINFO_EXTENSION);
+            $wares->image_type = $ImageType =='alpha'? 'mp4':$ImageType;
+            $wares->save();
+        }
+        return $wares;
     }
 }

@@ -177,6 +177,13 @@ class DedicateWareController extends MainController
 
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'));
+        $form->select('image_type', __('image_type'))->options (
+            [
+                'svga'=>__ ('svga'),
+                'alpha'=>__ ('alpha'),
+                'mp4'=>__ ('mp4'),
+            ]
+        )->required();
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
