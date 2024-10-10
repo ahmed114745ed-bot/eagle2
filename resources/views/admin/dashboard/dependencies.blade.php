@@ -1,4 +1,5 @@
 <div class="box box-default">
+    <div class="box box-default">
     <div class="box-header with-border">
         <h3 class="box-title">Dependencies</h3>
 
