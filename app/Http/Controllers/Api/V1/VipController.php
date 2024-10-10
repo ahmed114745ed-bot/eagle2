@@ -109,4 +109,10 @@ class VipController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function badges()
+    {
+        $badges =   $this->vipService->badges();
+        return Common::apiResponse(true, 'success', VipResource::collection($badges));
+    }
 }

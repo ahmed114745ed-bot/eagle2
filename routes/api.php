@@ -362,7 +362,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
+               
             });
+            Route::get('levels/badges', [VipController::class, 'badges']);
             Route::get('levels', [VipController::class, 'index']);
             // end vips
 
