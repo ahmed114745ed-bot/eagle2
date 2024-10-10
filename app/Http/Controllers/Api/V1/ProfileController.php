@@ -103,11 +103,15 @@ class ProfileController extends Controller
                 ->orderBy('distance', 'asc')
                 ->paginate(10); 
         
-            return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
+        }else{
+            $users = User::query()                
+            ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
+            ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
+            ->where('id', '!=', $user->id) 
+            ->paginate(10); 
+
         }
-        
-        return Common::apiResponse(false, 'User location data is incomplete.', [], 400);
-        
+        return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
     
 
