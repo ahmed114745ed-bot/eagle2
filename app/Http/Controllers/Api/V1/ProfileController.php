@@ -58,23 +58,51 @@ class ProfileController extends Controller
         return Common::apiResponse(true, $message, 200);
     }
 
-    public function users(Request $request)
+    // public function users(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $latitude = $user->lat;
+    //     $longitude = $user->long;
+    //     $users = User::query()->select('users.*')
+    //         ->selectRaw(
+    //             "(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance",
+    //             [$latitude, $longitude, $latitude]
+    //         )
+    //         ->where('users.id', '!=', $user->id)
+    //         ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
+    //         ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
+    //         ->orderBy('distance')
+    //         ->paginate(10);
+
+    //     return $users;
+    //     return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
+    // }
+
+    public function getNearbyUsers($userId, $distance = 10)
     {
         $user = Auth::user();
+    
         $latitude = $user->lat;
         $longitude = $user->long;
-        $distance = $request->input('distance', INF);
-
-        $users = User::query()->select('users.*')
-        ->selectRaw("(6371 * acos(cos(radians(?)) * cos(radians(users.lat)) * cos(radians(users.long) - radians(?)) + sin(radians(?)) * sin(radians(users.lat)))) AS distance", [$latitude, $longitude, $latitude])
-        ->where('users.id', '!=', $user->id)
-        ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id",$user->id))
-        ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id",$user->id)])
-            ->orderBy('distance')
-        ->paginate(10);
-
+        $users = User::query()
+        ->select(
+            'users.*',
+            DB::raw("(6371 * acos(cos(radians($latitude)) 
+                * cos(radians(users.lat)) 
+                * cos(radians(users.long) - radians($longitude)) 
+                + sin(radians($latitude)) 
+                * sin(radians(users.lat)))) AS distance")
+        )
+        ->whereNotNull('lat')
+        ->whereNotNull('long')
+        ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
+        ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
+        ->where('id', '!=', $userId) 
+        ->orderBy('distance', 'asc')
+        ->paginate(10); 
         return Common::apiResponse(true,'', NewProfileResource::collection($users), 200);
     }
+    
 
     public function myProfileVisitorsList(Request $request)
     {
