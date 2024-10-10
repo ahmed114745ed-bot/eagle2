@@ -18,5 +18,6 @@
     "ConfigApp": true,
     "ServerControl": true,
     "SalaryTransaction": true,
-    "WhatsappAuth": true
+    "WhatsappAuth": true,
+    "DailyPrize": true
 }
