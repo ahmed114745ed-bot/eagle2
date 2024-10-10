@@ -52,7 +52,8 @@ class ProfileRepository
 
     public function getRandomUsers($limit = 10)
     {
-        return User::inRandomOrder()->where("online",1)->limit($limit)->get();
+        $user = User::find(auth()->user()->id);
+        return User::whereNotIn("id",$user?->followeds?->pluck("followed_user_id")->toArray())->inRandomOrder()->where("online",1)->limit($limit)->get();
     }
    
 }
