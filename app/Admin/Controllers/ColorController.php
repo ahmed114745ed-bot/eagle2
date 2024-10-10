@@ -97,6 +97,6 @@ class ColorController extends MainController
         $data->footer_description = $request->input('desc');
         $data->save();
     
-        return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');
+        return redirect()->to("admin/colors")->with('success', 'تم تحديث الصورة والوصف بنجاح');
     }
 }
