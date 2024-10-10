@@ -21,4 +21,9 @@ class VipRepository extends AbstractRepository
         return $this->model->query()->whereIn('level', $levelsList)
         ->where('type', $type)->select('img', 'level')->get();
     }
+
+    public function badgesVip()
+    {
+        return $this->model->whereRaw('MOD(level + 1, 10) = 1')->orWhere('level',1)->where('level',"!=",0)->orderBy('level')->get();
+    }
 }

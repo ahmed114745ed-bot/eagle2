@@ -173,4 +173,9 @@ class VipService
         $this->wareRepository->create($data);
         return true;
     }
+
+    public function badges()
+    {
+        return $this->vipRepository->badgesVip();
+    }
 }
