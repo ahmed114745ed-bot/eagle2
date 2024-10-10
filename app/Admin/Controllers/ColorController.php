@@ -90,10 +90,10 @@ class ColorController extends MainController
         }
         if ($request->hasFile('logo')) {
             $imagePath = $request->file('logo')->store('images', 'public');
-            $data->image = $imagePath;
+            $data->logo = $imagePath;
         }
     
-        $data->desc = $request->input('desc');
+        $data->footer_description = $request->input('desc');
         $data->save();
     
         return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');
