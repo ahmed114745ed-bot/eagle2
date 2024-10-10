@@ -32,7 +32,7 @@ class OvipService
         $dataOvip = [
             'name' => $request->name,
             'level' => $request->level,
-            'img' => $image?? '',
+            'img' => $image ?? '',
             'price' => $request->price,
             'expire' => $request->expire,
             'exp' => $request->exp
@@ -57,10 +57,20 @@ class OvipService
     {
         return $this->ovipRepository->findById($id);
     }
+    public function showWithAllPrivileges($id)
+    {
+        $vipPrivileges = $this->vipPrivilegeRepository->all();
+        $ovip = $this->ovipRepository->findById($id);
+        $data = [
+            'all_privileges' => $vipPrivileges,
+            'o_vips' => $ovip,
+        ];
+        return $data;
+    }
 
     public function update($request)
     {
-        
+
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
             $dataOvip = [
@@ -71,7 +81,7 @@ class OvipService
                 'expire' => $request->expire,
                 'exp' => $request->exp
             ];
-        }else{
+        } else {
             $dataOvip = [
                 'name' => $request->name,
                 'level' => $request->level,
@@ -81,13 +91,13 @@ class OvipService
             ];
         }
         $privileges = json_decode($request->privileges);
-         $this->ovipRepository->update($dataOvip, $request->o_vip_id);
-         $ovip = $this->ovipRepository->findById($request->o_vip_id);
-        $ovip->privilegs()->sync( $privileges);
+        $this->ovipRepository->update($dataOvip, $request->o_vip_id);
+        $ovip = $this->ovipRepository->findById($request->o_vip_id);
+        $ovip->privilegs()->sync($privileges);
 
         $notActive = $this->wareRepository->notActive($request->level);
         if ($notActive) {
-            foreach ( $privileges as $privilege) {
+            foreach ($privileges as $privilege) {
                 $vip = $this->vipPrivilegeRepository->findById($privilege);
                 if (isset($vip->type)) {
                     $this->wareRepository->updateActiveWithType($vip->type, $request->level);

@@ -9,6 +9,8 @@ use Illuminate\Validation\Rule;
 use App\Tik\Services\OvipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\V1\OVipPrivilegesResource;
+
 
 
 
@@ -52,6 +54,12 @@ class OvipController extends Controller
     {
         $data = $this->ovipService->show($request->ovip_id);
         return Common::apiResponse(1, '', $data);
+    }
+    public function showWithAllPrivileges(Request $request)
+    {
+        $data = $this->ovipService->showWithAllPrivileges($request->ovip_id);
+        \request()->vipPrivileges = $data['all_privileges'];
+        return Common::apiResponse(1, '', new OVipPrivilegesResource($data['o_vips']));
     }
 
     public function update(Request $request)

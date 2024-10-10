@@ -108,6 +108,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/update', [OvipController::class, 'update'])->middleware('decrypt.data');
             Route::post('/show', [OvipController::class, 'show']);
             Route::post('/ware-vip', [VipController::class, 'createWareVip'])->middleware('decrypt.data');
+            Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
+
 
         });
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
