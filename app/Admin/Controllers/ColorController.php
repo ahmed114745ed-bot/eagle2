@@ -7,7 +7,9 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
+use App\Models\WebSetting;
 use Encore\Admin\Controllers\AdminController;
+use Illuminate\Http\Request;
 
 class ColorController extends MainController
 {
@@ -23,7 +25,7 @@ class ColorController extends MainController
      * Make a grid builder.
      *
      * @return Grid
-     */
+     */ 
     protected function grid()
     {
         $grid = new Grid(new Color());
@@ -34,6 +36,9 @@ class ColorController extends MainController
             return $status== 0?__('main colors'):__('button colors');
         });
         
+        $grid->footer(function ($query) {
+            return view('admin.dashboard.app-setting', ['color' => $query]);
+        });
 
         return $grid;
     }
@@ -75,5 +80,22 @@ class ColorController extends MainController
         );
 
         return $form;
+    }
+
+    public function appSetting(Request $request)
+    {
+        $data = WebSetting::find(1);
+        if (!$data) {
+            $data = new WebSetting();
+        }
+        if ($request->hasFile('logo')) {
+            $imagePath = $request->file('logo')->store('images', 'public');
+            $data->image = $imagePath;
+        }
+    
+        $data->desc = $request->input('desc');
+        $data->save();
+    
+        return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');
     }
 }

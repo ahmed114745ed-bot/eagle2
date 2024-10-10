@@ -104,6 +104,7 @@ Route::group(
         $router->resource('auth/roles', 'RoleController');
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
+        $router->post('app-setting', [ColorController::class,'appSetting'])->name("app-setting");
         $router->resource('app-features', AppFeatureController::class);
         //resources
         $router->resource('users', 'UserController', [
