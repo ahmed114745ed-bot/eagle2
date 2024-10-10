@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\WebSetting;
 use Encore\Admin\Controllers\AdminController;
 use Illuminate\Http\Request;
@@ -89,7 +90,7 @@ class ColorController extends MainController
             $data = new WebSetting();
         }
         if ($request->hasFile('logo')) {
-            $imagePath = $request->file('logo')->store('images', 'public');
+            $imagePath = Common::upload('images', $request->file('img'));
             $data->logo = $imagePath;
         }
     
