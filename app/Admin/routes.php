@@ -1,50 +1,53 @@
 <?php
 
-use App\Admin\Controllers\AdminAgencyMangerController;
-use App\Admin\Controllers\AdminUsersController;
-use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\AgencyMangerTaregetController;
+use Illuminate\Routing\Router;
+use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\ReelController;
+use App\Admin\Controllers\ColorController;
+use App\Admin\Controllers\OfferController;
+use App\Admin\Controllers\RouteController;
+use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\MomentController;
+use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
-use App\Admin\Controllers\AppearChargerAgencyController;
-use App\Admin\Controllers\AppFeatureController;
-use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\BanTypeController;
-use App\Admin\Controllers\BlackListUsersController;
-use App\Admin\Controllers\ChangeAgencyMangerController;
-use App\Admin\Controllers\chargUsersSleemController;
-use App\Admin\Controllers\ColorController;
-use App\Admin\Controllers\CoreWalletsController;
-use App\Admin\Controllers\CustomZegoMessageController;
-use App\Admin\Controllers\ImageColorController;
-use App\Admin\Controllers\MomentController;
-use App\Admin\Controllers\MultiLanguageController;
-use App\Admin\Controllers\OfferController;
-use App\Admin\Controllers\ParentUsersController;
-use App\Admin\Controllers\PaymentGetWayController;
-use App\Admin\Controllers\PermissionController;
-use App\Admin\Controllers\PoliceController;
-use App\Admin\Controllers\QuestionController;
-use App\Admin\Controllers\ReelController;
-use App\Admin\Controllers\ReportMomentController;
-use App\Admin\Controllers\ReportUserController;
-use App\Admin\Controllers\RoomGiftTargetController;
-use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\RoomVipController;
-use App\Admin\Controllers\ServerCountryController;
-use App\Admin\Controllers\TargetPercentageController;
-use App\Admin\Controllers\TestPusherController;
-use App\Admin\Controllers\TrashedUserAccountController;
-use App\Admin\Controllers\UserLevelController;
-use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\QuestionController;
+use App\Admin\Controllers\ScaffoldController;
+use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
-use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\UserLevelController;
+use App\Admin\Controllers\AdminUsersController;
+use App\Admin\Controllers\AppFeatureController;
+use App\Admin\Controllers\ImageColorController;
+use App\Admin\Controllers\PermissionController;
+use App\Admin\Controllers\ReportUserController;
+use App\Admin\Controllers\RoomTargetController;
+use App\Admin\Controllers\TestPusherController;
+use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\ParentUsersController;
+use App\Admin\Controllers\ReportMomentController;
+use App\Admin\Controllers\MultiLanguageController;
+use App\Admin\Controllers\PaymentGetWayController;
+use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\RoomGiftTargetController;
+use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\AppSitiingCOnfigController;
+use App\Admin\Controllers\TargetPercentageController;
+use App\Admin\Controllers\AdminAgencyMangerController;
+use App\Admin\Controllers\CustomZegoMessageController;
+use App\Admin\Controllers\UserOnlineHistoryController;
+use App\Admin\Controllers\ChangeAgencyMangerController;
+use App\Admin\Controllers\TrashedUserAccountController;
+use App\Admin\Controllers\AgencyMangerTaregetController;
+use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Admin\Controllers\AgencyMangerAgencyesController;
 
-Admin::routes();
+
 
 
 Route::group(
@@ -55,17 +58,15 @@ Route::group(
             'web',
             'admin',
             'adminIp',
-//            'adminGeneralBan',
+            //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
         Route::post('login', App\Admin\Controllers\AuthController::class . '@postLogin');
-
-
-    });
-
+    }
+);
 
 Route::group(
     [
@@ -75,7 +76,32 @@ Route::group(
             'web',
             'admin',
             'adminIp',
-//            'adminGeneralBan',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function (Router $router) {
+        $router->get('helpers/terminal/database', [TerminalController::class, 'database']);
+        $router->post('helpers/terminal/database',   [TerminalController::class, 'runDatabase']);
+        $router->get('helpers/terminal/artisan',  [TerminalController::class, 'artisan']);
+        $router->post('helpers/terminal/artisan', [TerminalController::class, 'runArtisan']);
+        $router->get('helpers/scaffold',  [ScaffoldController::class, 'index']);
+        $router->post('helpers/scaffold', [ScaffoldController::class, 'store']);
+        $router->get('helpers/routes', [RouteController::class, 'index']);
+    }
+);
+
+Admin::routes();
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => config('admin.route.namespace'),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
             'multiLanguage',
         ],
         'as' => config('admin.route.prefix') . '.',
@@ -84,7 +110,6 @@ Route::group(
         Route::post('/locale', MultiLanguageController::class . '@locale');
         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', MultiLanguageController::class . '@getLogin');
-
         }
         $router->resource('questions', QuestionController::class);
         $router->resource('user-online-history', UserOnlineHistoryController::class);
@@ -104,7 +129,7 @@ Route::group(
         $router->resource('auth/roles', 'RoleController');
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
-        $router->post('app-setting', [ColorController::class,'appSetting'])->name("app-setting");
+        $router->post('app-setting', [ColorController::class, 'appSetting'])->name("app-setting");
         $router->resource('app-features', AppFeatureController::class);
         //resources
         $router->resource('users', 'UserController', [
@@ -181,9 +206,13 @@ Route::group(
         // $router->get('/', 'HomeController@infoBox')->name('home');
         $router->get('/', 'AllStatisticController@index')->name('home');
         $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
-        $router->get('/custom-export-users', [\App\Admin\Controllers\ExportController::class, 'usersSallaryTargets'
+        $router->get('/custom-export-users', [
+            \App\Admin\Controllers\ExportController::class,
+            'usersSallaryTargets'
         ])->name('custom-export-users');
-        $router->get('/agency-export-report', [\App\Admin\Controllers\ExportController::class, 'usersAgencyTargets'
+        $router->get('/agency-export-report', [
+            \App\Admin\Controllers\ExportController::class,
+            'usersAgencyTargets'
         ])->name('agency-export-report');
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
         $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
@@ -300,25 +329,5 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
-
-
     }
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
