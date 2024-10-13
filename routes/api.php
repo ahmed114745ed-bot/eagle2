@@ -167,6 +167,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
+
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
