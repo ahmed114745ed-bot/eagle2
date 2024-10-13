@@ -76,6 +76,8 @@ class VipService
             $sender = $request->user();
             $sender_id = $sender->id;
             $from = $sender;
+            if ($sender->di < $total) return Common::apiResponse (0,'balance low',null,407);
+
         } else {
             $type = 0;
             $user = $request->user();
@@ -155,7 +157,7 @@ class VipService
             $img2 = Common::upload('images', $request->file('image'));
         }
         $data = [
-          'get_type' => 1,  
+          'get_type' => 1,
           'type' => $vipPrivilege->type,
           'price' => 0,
           'name' => $request->name,

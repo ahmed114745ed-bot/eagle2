@@ -48,12 +48,12 @@ Trait ZegoTrait
 
         ];
         try {
-            Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
         }
 
-        return ;
+        return null;
     }
 
     public static function sendToZego_2($Action,$RoomId,$UserId,$UserName,$MessageContent,$IsTest = 'false'){

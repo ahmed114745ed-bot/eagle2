@@ -57,7 +57,8 @@ class PkController extends Controller
             ]
         ];
         $json = json_encode($mc);
-        Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
+        $response = Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
+        dd($response->body());
         return Common::apiResponse(1, __('api_responses.created'), ['pk_id' => $pk->id], 201);
     }
 
