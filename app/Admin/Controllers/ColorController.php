@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\WebSetting;
 use Encore\Admin\Controllers\AdminController;
 use Illuminate\Http\Request;
@@ -89,11 +90,11 @@ class ColorController extends MainController
             $data = new WebSetting();
         }
         if ($request->hasFile('logo')) {
-            $imagePath = $request->file('logo')->store('images', 'public');
-            $data->image = $imagePath;
+            $imagePath = Common::upload('images', $request->file('logo'));
+            $data->logo = $imagePath;
         }
     
-        $data->desc = $request->input('desc');
+        $data->footer_description = $request->input('desc');
         $data->save();
     
         return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');

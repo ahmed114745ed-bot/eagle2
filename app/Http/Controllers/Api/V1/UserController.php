@@ -182,4 +182,14 @@ class UserController extends Controller
     {
         
     }
+
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->is_logout = 1;
+        $user->save();
+        $user->currentAccessToken()->delete();
+        return Common::apiResponse(1, 'logged out');
+    }
 }
