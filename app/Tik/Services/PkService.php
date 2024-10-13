@@ -51,7 +51,7 @@ class PkService
 
     public function showPkOrHide($ownerId, $status)
     {
-        $room =  $this->roomRepository->findRoomUser($ownerId);
+        $room =  $this->roomRepository->findRoomUserEnable($ownerId);
         if (!$room) throw new \Exception('not found');
 
         $room->enableSaving = false;
