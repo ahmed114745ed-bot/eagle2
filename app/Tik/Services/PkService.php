@@ -18,7 +18,7 @@ class PkService
 
     public function create($request, $userId)
     {
-        $room =  $this->roomRepository->findRoomUser($userId)->where('room_status', 1)->first();
+        $room =  $this->roomRepository->findRoomUser($request->owner_id)->where('room_status', 1)->first();
         if (!$room) throw new \Exception('not found');
         if ($userId != $room->uid  && $room->room_visitor = '')  throw new \Exception('room closed');
         $ex =  $this->pkRepository->getPk($room->id);
