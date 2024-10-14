@@ -188,7 +188,7 @@ class UserService
             case '1':
             case '2':
             case '3':
-            case '6'
+            case '6':
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
                 return Common::apiResponse(true, '', $this->getData($user, $type), 200);
 
