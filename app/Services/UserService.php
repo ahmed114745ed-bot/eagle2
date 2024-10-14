@@ -263,6 +263,7 @@ class UserService
             $data = $this->followRepository->getByFollowed($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('followed');
+            dd( $users);
         } elseif ($type == 2) {
             $data = $this->followRepository->getByFollower($userId);
             $collect = collect($data->items());
@@ -273,9 +274,8 @@ class UserService
             $users    = $collect->pluck('follower');
         } 
         elseif ($type == 6) {
-            $data = $this->followRepository->getFollow($userId);
-            $collect = collect($data->items());
-            $users    = $collect->pluck('follower');
+            $users = $this->followRepository->getFollow($userId);
+
         } else {
             $users = collect([]);
         }
