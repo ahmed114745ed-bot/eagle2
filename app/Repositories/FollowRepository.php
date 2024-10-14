@@ -86,6 +86,23 @@ class FollowRepository
             ]);
         })->orderByDesc('follows.id')->paginate(15);
     }
+    public function getFollow($userId)
+    {
+        return Follow::query()->whereHas('followed')->WhereDoesntHave('follower')->join('follows as f1', function (JoinClause $join) {
+            $join->on('follows.user_id', '=', 'f1.followed_user_id')
+                ->on('f1.user_id', '=', 'follows.followed_user_id');
+        })->where('follows.user_id', $userId)->with('follower', function ($query) {
+            $query->with([
+                'room' => function ($query) {
+                    return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                },
+                'followPacks',
+                'profile',
+                'ware',
+                'UserVip'
+            ]);
+        })->orderByDesc('follows.id')->paginate(15);
+    }
 
     public function getFollowedIds($userId)
     {

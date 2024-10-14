@@ -188,6 +188,7 @@ class UserService
             case '1':
             case '2':
             case '3':
+            case '6'
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
                 return Common::apiResponse(true, '', $this->getData($user, $type), 200);
 
@@ -268,6 +269,11 @@ class UserService
             $users    = $collect->pluck('follower');
         } elseif ($type == 3) {
             $data = $this->followRepository->getByFriends($userId);
+            $collect = collect($data->items());
+            $users    = $collect->pluck('follower');
+        } 
+        elseif ($type == 6) {
+            $data = $this->followRepository->getFollow($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
         } else {
