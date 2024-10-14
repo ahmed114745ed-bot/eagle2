@@ -2,13 +2,14 @@
 
 namespace Modules\DailyPrize\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 use Modules\DailyPrize\Entities\DailyGiftType;
 
-class DailyPrizeTypeController extends AdminController
+class DailyPrizeTypeController extends MainController
 {
     /**
      * Title for current resource.
@@ -16,6 +17,7 @@ class DailyPrizeTypeController extends AdminController
      * @var string
      */
     protected $title = 'DailyGiftType';
+    public $permission_name = 'daily-prize';
 
     /**
      * Make a grid builder.
