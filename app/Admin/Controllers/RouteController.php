@@ -15,6 +15,8 @@ class RouteController extends Controller
 {
     public function index()
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
       
         return Admin::content(function (Content $content) {
             $model = $this->getModel()->setRoutes($this->getRoutes());

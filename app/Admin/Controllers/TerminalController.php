@@ -21,7 +21,9 @@ use Symfony\Component\Console\Output\Output;
 class TerminalController extends Controller
 {
     public function artisan()
-    { 
+    {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         return Admin::content(function (Content $content) {
             $content->header('Artisan terminal');
 
@@ -30,13 +32,15 @@ class TerminalController extends Controller
     }
 
     public function runArtisan()
-    
+
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         $command = Request::get('c', 'list');
 
         // If Exception raised.
         if (1 === Artisan::handle(
-            new ArgvInput(explode(' ', 'artisan '.trim($command))),
+            new ArgvInput(explode(' ', 'artisan ' . trim($command))),
             $output = new StringOutput()
         )) {
             return $this->renderException(new Exception($output->getContent()));
@@ -47,6 +51,8 @@ class TerminalController extends Controller
 
     public function database()
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         return Admin::content(function (Content $content) {
             $content->header('Database terminal');
 
@@ -56,6 +62,8 @@ class TerminalController extends Controller
 
     public function runDatabase()
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         $query = Request::get('q');
 
         $connection = Request::get('c', config('database.default'));
@@ -125,7 +133,7 @@ class TerminalController extends Controller
             return $this->execRedisCommand($connection, $query);
         }
 
-        $config = config('database.connections.'.$connection);
+        $config = config('database.connections.' . $connection);
 
         if ($config['driver'] == 'mongodb') {
             return $this->execMongodbQuery($config, $query);
@@ -256,7 +264,7 @@ class StringOutput extends Output
 
     protected function doWrite($message, $newline)
     {
-        $this->output .= $message.($newline ? "\n" : '');
+        $this->output .= $message . ($newline ? "\n" : '');
     }
 
     public function getContent()

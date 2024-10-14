@@ -17,6 +17,8 @@ class ScaffoldController extends Controller
 {
     public function index()
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         return Admin::content(function (Content $content) {
             $content->header('Scaffold');
 
@@ -36,6 +38,8 @@ class ScaffoldController extends Controller
 
     public function store(Request $request)
     {
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') return  abort(403, __('something went wrong'));
         $paths = [];
         $message = '';
 
