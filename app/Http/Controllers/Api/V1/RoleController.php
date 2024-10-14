@@ -112,7 +112,7 @@ class RoleController extends Controller
     {
         $permissionModel = config('admin.database.permissions_model');
 
-        $permissions =Permission::orderBy('category')->get();
+        $permissions = $permissionModel::all()->groupBy('category')->toArray();
         return Common::apiResponse(1, '', $permissions);
     }
 }
