@@ -107,5 +107,13 @@ class RoleController extends Controller
         $role->delete();
         return Common::apiResponse(1, 'Role deleted successfully');
     }
+
+    public function permissionsCategory()
+    {
+        $permissionModel = config('admin.database.permissions_model');
+
+        $permissions =Permission::orderBy('category')->get();
+        return Common::apiResponse(1, '', $permissions);
+    }
 }
  

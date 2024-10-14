@@ -176,8 +176,8 @@ class VipService
         return true;
     }
 
-    public function badges()
+    public function badges($type)
     {
-        return $this->vipRepository->badgesVip();
+        return $this->vipRepository->badgesVip($type);
     }
 }

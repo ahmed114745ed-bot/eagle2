@@ -1,0 +1,189 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+
+class AdminPermission extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $permissions = [
+
+            'moment',
+            'wares-dedicate',
+            'vips-dedicate',
+            'users',
+            'version',
+            'bans',
+            'auth-users',
+            'user-levels',
+            'agency-manager',
+            'manger-agency-manager',
+            'carousel',
+            'manger-type',
+            'official-messages',
+            'banners',
+            'wares-vips',
+            'achievement',
+            'user_achievement_level',
+            'level',
+            'achievement_level',
+            'offers',
+            'trashed-account-user',
+            'special-history',
+            'special-Ware',
+            'special-frame',
+            'event',
+            'ovip',
+            'room-vip',
+            'withdraw-type',
+            'weekly-star',
+            'general-roles',
+            'pk-event',
+            'pk-event-rewards',
+            'target-event',
+            'weekly_star_rewards',
+            'weekly-star',
+            'get-salary-requests',
+            'request-agencies',
+            'color',
+            "agencies-tareget-manger",
+            'managers',
+            'report',
+            'special-id-request',
+            'background-image-request',
+            'report-moment',
+            'admin-users',
+            'appear-charger-agency',
+            'charger-report',
+            'report-user',
+            'target-percentage',
+            'core-wallets',
+            'auth-user',
+            'all-statistic',
+            'level-interval',
+            'user-parent',
+            'Real',
+            'sailer',
+            'group-chat',
+            'image-color',
+            'users-devices',
+            'user-target',
+            'room-target',
+            'exchange',
+            'boxes',
+            'box-use',
+            'level-cp',
+            'event_report',
+            'payment-gat-way',
+            'agent-target',
+            'agent-request',
+            'agent-user',
+            'roles',
+            'updates',
+            'Permissions',
+            'daily-prize',
+
+
+
+        ];
+
+        $methods = [
+            'browse',
+            'show',
+            'create',
+            'update',
+            'delete',
+            'edit',
+        ];
+
+        $categories = [
+
+            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles',],
+            'special_id' => ['special-history', 'special-Ware', 'special-frame', 'special-id-request'],
+            'daily-prize' => ['daily-prize'],
+            'roles' => ['roles', 'Permissions',],
+            'cp' => ['level-cp'],
+            'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
+            'user' => ['users', 'bans', 'trashed-account-user', 'user-target',],
+            'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
+            'level' => ['level', 'ovip','wares-vips'],
+            'moment' => ['moment',],
+            'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices'],
+            'version' => ['version'],
+            'auth-users' => ['auth-users','admin-users'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers'],
+            'agent' => ['agent-user', 'agent-request', 'agent-target',],
+            'payment-gat-way' => ['payment-gat-way',],
+            'box' => ['boxes', 'box-use',],
+            'exchange' => ['exchange'],
+            'rooms' => ['room-vip', 'room-target',],
+            'image-color' => ['image-color'],
+            'sailer' => ['sailer'],
+            'real' => ['Real',],
+            'user-parent' => ['user-parent',],
+            'level-interval' => ['level-interval'],
+            'all-statistic' => ['all-statistic'],
+            'core-wallets' => ['core-wallets'],
+            'target-percentage' => ['target-percentage',],
+            'background-image' => ['background-image-request'],
+            'color' => ['color'],
+            'get-salary-requests' => ['get-salary-requests'],
+            'withdraw-type' => ['withdraw-type'],
+            'offers' => ['offers'],
+            'banners' =>['banners'],
+            'official-messages' => ['official-messages'],
+            'carousel' => ['carousel'],
+            'user-levels' => ['user-levels'],
+
+
+
+
+        ];
+
+        // Function to get category for each permission
+        function getCategory($permission, $categories)
+        {
+            foreach ($categories as $category => $permissionsInCategory) {
+                if (in_array($permission, $permissionsInCategory)) {
+                    return $category;
+                }
+            }
+            return 'general'; // Default category if no match is found
+        }
+
+        foreach ($permissions as $permission) {
+           
+            foreach ($methods as $method) {
+                $slug = $method . '-' . $permission;
+                $name = $method . ' ' . str_replace('-', ' ', $permission);
+                //                $lname = 'roles.' . $method . ' ' . str_replace('-', ' ', $permission);
+                $isExist = DB::table('admin_permissions')->where('slug', $slug)->exists();
+
+                if (!$isExist) {
+                    $category = getCategory($permission, $categories);
+                    //                    Lang::addLines([$lname => $name], 'en', );
+
+                    // Insert the permission and its translation
+                    DB::table('admin_permissions')->insert([
+                        "name"        => $name,
+                        "slug"        => $slug,
+                        "http_method" => NULL,
+                        "http_path"   => NULL,
+                        'category' => $category,
+                        "created_at"  => now(),
+                        "updated_at"  => now(),
+                    ]);
+
+                    // Append the translation to the 'roles' language file
+                }
+            }
+        }
+    }
+}

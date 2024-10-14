@@ -110,9 +110,17 @@ class VipController extends Controller
         }
     }
 
-    public function badges()
+    public function badges(Request $request)
     {
-        $badges =   $this->vipService->badges();
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|numeric|min:1|max:4',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        $badges =   $this->vipService->badges($request->type);
         return Common::apiResponse(true, 'success', VipResource::collection($badges));
     }
 }

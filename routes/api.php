@@ -127,6 +127,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         // roles 
         Route::resource('roles', RoleController::class)->middleware('decrypt.data');
         Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
+        Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
 
         // users
         Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
