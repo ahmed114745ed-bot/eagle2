@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\NewProfileResource;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Validator;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,13 @@ class ProfileController extends Controller
 
     public function update(ProfileRequest $request)
     {
-       $out = $this->profileService->updateProfile($request);
+        $validator = Validator::make($request->all(), [
+            'country_id'       => 'nullable|numeric|exists:countries,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $out = $this->profileService->updateProfile($request);
 
         return Common::apiResponse(true, 'profile updated successfully', $out, 200);
     }
@@ -84,7 +91,7 @@ class ProfileController extends Controller
 
         $latitude = $user->lat;
         $longitude = $user->long;
-        
+
         if ($latitude && $longitude) {
             $users = User::query()
                 ->select(
@@ -99,21 +106,19 @@ class ProfileController extends Controller
                 ->whereNotNull('long')
                 ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
                 ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
-                ->where('id', '!=', $user->id) 
+                ->where('id', '!=', $user->id)
                 ->orderBy('distance', 'asc')
-                ->paginate(10); 
-        
-        }else{
-            $users = User::query()                
-            ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
-            ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
-            ->where('id', '!=', $user->id) 
-            ->paginate(10); 
-
+                ->paginate(10);
+        } else {
+            $users = User::query()
+                ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
+                ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
+                ->where('id', '!=', $user->id)
+                ->paginate(10);
         }
         return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
-    
+
 
     public function myProfileVisitorsList(Request $request)
     {
@@ -125,7 +130,6 @@ class ProfileController extends Controller
     {
         $randomUsers = $this->profileService->getRelatedUsers(20);
 
-        return Common::apiResponse(true,'',  UserRelationsResource::collection($randomUsers), 200);
+        return Common::apiResponse(true, '',  UserRelationsResource::collection($randomUsers), 200);
     }
 }
-

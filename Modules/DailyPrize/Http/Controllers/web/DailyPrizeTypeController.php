@@ -18,7 +18,6 @@ class DailyPrizeTypeController extends MainController
      */
     protected $title = 'DailyGiftType';
     public $permission_name = 'daily-prize';
-
     /**
      * Make a grid builder.
      *

@@ -86,6 +86,16 @@ class FollowRepository
             ]);
         })->orderByDesc('follows.id')->paginate(15);
     }
+    public function getFollow($userId)
+    {
+        $followId = Follow::where('followed_user_id', $userId)
+            ->whereNotIn('user_id', function ($query) use ($userId) {
+                $query->select('followed_user_id')
+                    ->from('follows')
+                    ->where('user_id', $userId); 
+            })->pluck('user_id');
+        return User::whereIn('id', $followId)->paginate(15);
+    }
 
     public function getFollowedIds($userId)
     {

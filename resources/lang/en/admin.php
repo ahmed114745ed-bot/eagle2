@@ -145,6 +145,9 @@ return [
     'Labels' => 'Labels',
     'pay' => 'pay salary',
     'preview' => 'preview',
-    "eventGift" => 'events Gifts pk'
+    "eventGift" => 'events Gifts pk',
+    'balance'=> 'balance',
+    'availableBalance' => 'available balance ',
+    'used' =>'used',
 
 ];

@@ -30,10 +30,14 @@ class AllGameService
         \request()->type = 1;
         $miniGames = AllGameResource::collection($miniGames)->toArray(request());
 
-        // Prepare data
+        $key = [
+            "baishun_channel" => config('app.baishun_channel') ?? '',
+            "baishun_app_id" => config('app.baishun_app_id') ?? '',
+        ];
         return [
             'full' => $fullGames,
-            'mini' => $miniGames
+            'mini' => $miniGames,
+            'credentials'  => $key,
         ];
     }
 
@@ -80,7 +84,7 @@ class AllGameService
 
     public function updateUtd($request)
     {
-        
+
         if ($request->hasFile('image')) {
             $image = Common::upload('images', $request->file('image'));
             $data = [
@@ -93,7 +97,7 @@ class AllGameService
                 'is_enable' => $request->is_enable,
                 'custom_id' => $request->custom_id,
             ];
-        }else{
+        } else {
             $data = [
                 'name' => $request->name,
                 'name_en' => $request->name_en,
@@ -104,7 +108,7 @@ class AllGameService
                 'custom_id' => $request->custom_id,
             ];
         }
-        
+
         return $this->allGameRepository->update($request->game_id, $data);
     }
 
