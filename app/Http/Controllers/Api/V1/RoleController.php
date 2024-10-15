@@ -21,8 +21,8 @@ class RoleController extends Controller
         $roleModel = config('admin.database.roles_model');
 
         $roles = $roleModel::with('permissions:name')
-                    ->select('id', 'slug', 'name', 'created_at', 'updated_at')
-                    ->get();
+            ->select('id', 'slug', 'name', 'created_at', 'updated_at')
+            ->get();
 
         $roles = $roles->map(function ($role) {
             $role->can_delete = !in_array($role->slug, ['administrator', 'admin', 'developer', 'agency', 'charger']);
@@ -35,7 +35,7 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
-       
+
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string|max:255',
             'name' => 'required|string|max:255|unique:admin_roles,name',
@@ -111,9 +111,8 @@ class RoleController extends Controller
     public function permissionsCategory()
     {
         $permissionModel = config('admin.database.permissions_model');
-
-        $permissions = $permissionModel::all()->groupBy('category')->toArray();
+        $permissionsPaginated = $permissionModel::paginate(50);
+        $permissions = $permissionsPaginated->getCollection()->groupBy('category');
         return Common::apiResponse(1, '', $permissions);
     }
 }
- 
