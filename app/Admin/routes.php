@@ -40,6 +40,7 @@ use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
+use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\TrashedUserAccountController;
@@ -148,6 +149,7 @@ Route::group(
             ]
         ]);
         $router->resource('all-games', AllGameController::class);
+        $router->resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         $router->resource('blacks', 'BlackListController');
         Route::prefix('black-lists')->group(function () {
             Route::get('/', [BlackListUsersController::class, 'index']);

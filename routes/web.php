@@ -6,9 +6,10 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use GuzzleHttp\Psr7\Request;
 use App\Models\MultiLanguage;
+use App\Jobs\ExportGiftLogsJob;
+
+
 use Encore\Admin\Facades\Admin;
-
-
 use App\Models\AgencyJoinRequest;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\AcceptAgency;
@@ -26,8 +27,8 @@ use App\Http\Controllers\AddTargetToJsonController;
 use Modules\Reals\Http\Controllers\RealsController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\TargetPercentageController;
-use App\Jobs\ExportGiftLogsJob;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Admin\Controllers\GameChargeHistoryController;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use KevinSoft\MultiLanguage\Http\Controllers\MultiLanguageController;
@@ -148,6 +149,10 @@ Route::get('old_real', [RealsController::class, 'oldReal']);
 //Route::get('/test-websocket', [WebsocketController::class, 'index']);
 Route::post("send-request-make-rooms-top",[UserController::class,"make_rooms_top"]);
 Route::post("send-request-transfer-salary",[UserController::class,"transferSalary"]);
+Route::get('admin/auth', function () {
+    return view('checkLogin');
+})->name('admin/auth');
+Route::post('/authenticate', [GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
 $router->post('ovip-config', [UpgradeLevelController::class,'ovipConfig'])->name('ovip-config');
 /*$router->post('group-chat-config', [UpgradeLevelController::class,'group_chat_config'])->name('group-chat-config');
 
@@ -188,6 +193,7 @@ Route::get("update-join-date",function(){
     }
     return "تم التعديل بنجاح";
 });
+
 
 Route::get("test-room-level",function(){
     $room = Room::find(8);

@@ -5,6 +5,7 @@ namespace App\Http;
 //use App\Http\Middleware\AdminOneMiddleware;
 use App\Http\Middleware\IpMiddleware;
 use App\Http\Middleware\AuthenticateWeb;
+use App\Http\Middleware\CheckLoginAdmin;
 use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
 use App\Http\Middleware\UserBanMiddleware;
@@ -91,6 +92,8 @@ class Kernel extends HttpKernel
         'decrypt.data' => \App\Http\Middleware\DecryptDataMiddleware::class,
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
+        'auth.redirect' => CheckLoginAdmin::class,
+        'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
 
     ];
 }

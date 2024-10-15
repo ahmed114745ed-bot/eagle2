@@ -12,6 +12,11 @@ return [
     'baishun_app_id' => env('BAISHUN_APP_Id',"4280702746"),
     'baishun_app_key' => env('BAISHUN_APP_KEY',"LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
     'baishun_server_url' => env('BAISHUN_SERVER_URL','https://mesh-channels-test.jieyou.shop'),
+    'baishun_channel'      => env('BAISHUN_CHANNEL',''),
+
+    'balance_user_name'     => env('BALANCE_USER_NAME', 'superAdmin'),
+    'balance_password'      => env('BALANCE_PASSWORD', '12345678'),
+    'one_coins'             => env('ONE_COINS'),
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -41,6 +46,9 @@ return [
     'api_prefix' =>env('API_PREFIX',''),
 
     'app_origin_name'=>env('APP_ORIGIN_NAME', 'r-star'),
+
+    
+    
 
     /*
     |--------------------------------------------------------------------------
