@@ -148,4 +148,7 @@ return [
     'pay' => 'دفع الراتب',
     'preview' => 'عرض',
     'eventGift' => ' pk هدايا الاحداث',
+    'balance' => 'الرصيد',
+    'availableBalance' => 'الرصيد المتاح',
+    'used' => 'المستخدم',
 ];
