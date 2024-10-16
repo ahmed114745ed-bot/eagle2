@@ -14,9 +14,11 @@ class RoomRepository extends AbstractRepository
     }
 
 
-    public function findRoomUser($userId)
+    public function findRoomUser($userId, $withoutAppends = true)
     {
-        return $this->model->withoutAppends()->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
+        $model = $this->model;
+        if ($withoutAppends) $model = $model->withoutAppends();
+        return $model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->first();
     }
 
     public function findRoomUserEnable($userId)
