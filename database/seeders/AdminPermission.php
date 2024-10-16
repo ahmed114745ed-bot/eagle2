@@ -158,42 +158,39 @@ class AdminPermission extends Seeder
             return 'general'; 
         }
 
-        // foreach ($permissions as $permission) {
-        //     foreach ($methods as $method) {
-        //         $slug = $method . '-' . $permission;
-        //         $name = $method . ' ' . str_replace('-', ' ', $permission);
+        foreach ($permissions as $permission) {
+            foreach ($methods as $method) {
+                $slug = $method . '-' . $permission;
+                $name = $method . ' ' . str_replace('-', ' ', $permission);
         
-        //         // Check if the permission already exists
-        //         $permissionExists = DB::table('admin_permissions')->where('slug', $slug)->first();
+                // Check if the permission already exists
+                $permissionExists = DB::table('admin_permissions')->where('slug', $slug)->first();
         
-        //         // Get the category for the permission
-        //         $category = getCategory($permission, $categories);
+                // Get the category for the permission
+                $category = getCategory($permission, $categories);
         
-        //         if ($permissionExists) {
-        //             // If the permission exists, update the category
-        //             DB::table('admin_permissions')->where('slug', $slug)->update([
-        //                 'category'   => $category,
-        //                 'updated_at' => now(),
-        //             ]);
+                if ($permissionExists) {
+                    // If the permission exists, update the category
+                    DB::table('admin_permissions')->where('slug', $slug)->update([
+                        'category'   => $category,
+                        'updated_at' => now(),
+                    ]);
                     
-        //         } else {
-        //             // Insert the new permission with its category
-        //             DB::table('admin_permissions')->insert([
-        //                 'name'        => $name,
-        //                 'slug'        => $slug,
-        //                 'http_method' => null,
-        //                 'http_path'   => null,
-        //                 'category'    => $category,
-        //                 'created_at'  => now(),
-        //                 'updated_at'  => now(),
-        //             ]);
-        //         }
-        //     }
-        // }
-        DB::table('admin_permissions')->where("category",null)->update([
-                            'category'   => 'other',
-                            'updated_at' => now(),
-                        ]);
+                } else {
+                    // Insert the new permission with its category
+                    DB::table('admin_permissions')->insert([
+                        'name'        => $name,
+                        'slug'        => $slug,
+                        'http_method' => null,
+                        'http_path'   => null,
+                        'category'    => $category,
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ]);
+                }
+            }
+        }
+       
 
     }
 }

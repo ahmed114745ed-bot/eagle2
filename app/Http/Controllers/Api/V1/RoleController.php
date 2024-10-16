@@ -112,7 +112,9 @@ class RoleController extends Controller
     {
         $permissionModel = config('admin.database.permissions_model');
         $permissionsPaginated = $permissionModel::paginate(50);
-        $permissions = $permissionsPaginated->getCollection()->groupBy('category');
+        $permissions = $permissionsPaginated->getCollection()->groupBy(function ($item) {
+            return $item->category ?? 'other';
+        });
         return Common::apiResponse(1, '', $permissions);
     }
 }
