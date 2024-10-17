@@ -8,7 +8,7 @@ use App\Models\Ware;
 use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\CpRelation as EntitiesCpRelation;
 use Modules\CP\Entities\UserRelationAvilable as EntitiesUserRelationAvilable;
-
+/// todo remove rename import
 class CpRepository
 {
     public function getCpRelationById($id)
@@ -36,6 +36,7 @@ class CpRepository
                             ->where("user_one_id", $otherUserId);
                   });
         })
+            /// TODO convert these status to enum
         ->whereIn("status", [0, 1, 4])
         ->first();
     }
@@ -101,6 +102,7 @@ class CpRepository
                 $q->where('cp_relation_id', $relationType);
             })
             ->when($type, function ($query) use ($type) {
+                /// todo update this filter
                 switch ($type) {
                     case 1:
                         return $query->whereDay('created_at', now()->day);
@@ -116,15 +118,17 @@ class CpRepository
             ->get();
     }
 
-    public function getCpList($userId)
+    public function getCpList($userId, $activeOnly = false)
     {
+       $var = $activeOnly ? [ 1, 4] : [0,1,4];
+
         return Cp::where(function ($query) use ($userId) {
                 $query->where("user_one_id", $userId)
                       ->orWhere(function ($query) use ($userId) {
                           $query->where("user_two_id", $userId);
                       });
             })
-            ->whereIn("status", [0, 1, 4])
+            ->whereIn("status", $var)
             ->get();
     }
 
@@ -133,7 +137,7 @@ class CpRepository
         return Ware::find($wareId);
     }
 
-    public function getUserCpProfiles($userId, $statuses)
+    public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
         return Cp::with('relation:id,title')
             ->where(function ($query) use ($userId) {
@@ -141,6 +145,8 @@ class CpRepository
                       ->orWhere('user_two_id', $userId);
             })
             ->whereIn('status', $statuses)
-            ->orderByDesc('di');
+            ->orderByDesc('di')
+            ->take($count)
+            ->get();
     }
 }
