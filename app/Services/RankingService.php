@@ -3,15 +3,17 @@
 namespace App\Services;
 
 use App\Helpers\Common;
-use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Models\AppFeature;
 use App\Repositories\RankingRepository;
+use App\Tik\Repositories\GiftLogRepository;
+use App\Http\Resources\Api\V1\MangerTypeResource;
 
 class RankingService
 {
     protected $rankingRepo;
 
-    public function __construct(RankingRepository $rankingRepo)
+    public function __construct(RankingRepository $rankingRepo,
+    private readonly GiftLogRepository $GiftLogRepository)
     {
         $this->rankingRepo = $rankingRepo;
     }
@@ -162,5 +164,27 @@ class RankingService
             }
         }
         return $sort ? (string) $sort : '99+';
+    }
+
+    public function topUser()
+    {
+        $giftLogs = $this->GiftLogRepository->topUser('sender','sender_id');
+        $giftLogsReceiver = $this->GiftLogRepository->topUser('receiver','receiver_id');
+        $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner','roomowner_id');
+        $img      = [];
+        foreach ($giftLogs as $giftLog) {
+            $img[] = $giftLog->sender->profile->avatar ?? '';
+        }
+
+        $receiverImage = [];
+        foreach ($giftLogsReceiver as $giftLog) {
+            $receiverImage[] = $giftLog->receiver->profile->avatar ?? '';
+        }
+
+        $roomImage = [];
+        foreach ($giftLogsRooms as $giftLogsRoom) {
+            $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
+        }
+        return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Tik\Repositories;
 
 use Carbon\Carbon;
 use App\Models\GiftLog;
+use Illuminate\Support\Facades\DB;
 
 
 class GiftLogRepository extends AbstractRepository
@@ -56,5 +57,10 @@ class GiftLogRepository extends AbstractRepository
     public function getByDate($userId, $date)
     {
         return $this->model->query()->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total')->groupBy("receiver_id")->where('receiver_id', $userId)->whereDate("created_at", $date)->first();
+    }
+
+    public function topUser($withRelation,$actionId)
+    {
+        return $this->model->with($withRelation)->select(DB::raw('sum(giftPrice) as totalGiftPrice'), $actionId)->groupBy($actionId)->orderByDesc('totalGiftPrice')->whereDate('created_at', Carbon::today())->limit(3)->get();
     }
 }

@@ -34,4 +34,9 @@ class RankingController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function topUserRanking()
+    {
+        return $this->rankingService->topUser();
+    }
+
 }
