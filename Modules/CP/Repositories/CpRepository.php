@@ -2,18 +2,20 @@
 namespace Modules\CP\Repositories;
 
 use App\Models\Cp;
-use App\Models\CpRelation;
 use App\Models\GiftLog;
 use App\Models\Ware;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Modules\CP\Entities\CpRelation as EntitiesCpRelation;
-use Modules\CP\Entities\UserRelationAvilable as EntitiesUserRelationAvilable;
+use Modules\CP\Entities\CpRelation;
+use Modules\CP\Entities\UserRelationAvilable;
+use Modules\CP\Enums\CpStatus;
+
 /// todo remove rename import
 class CpRepository
 {
     public function getCpRelationById($id)
     {
-        return EntitiesCpRelation::find($id);
+        return CpRelation::find($id);
     }
 
     public function getCpCount($userId)
@@ -37,13 +39,23 @@ class CpRepository
                   });
         })
             /// TODO convert these status to enum
-        ->whereIn("status", [0, 1, 4])
-        ->first();
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->first();
+    }
+
+    public function checkExistingCpOne($userId,$cpId)
+    {
+        return Cp::where("cp_relation_id",$cpId)->where(function ($query) use ($userId) {
+                $query->where('user_one_id', $userId)
+                    ->orWhere('user_two_id', $userId);
+            })
+            ->whereIn("status", [ CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->first();
     }
 
     public function getUserRelationAvailable($userId, $cpRelationId)
     {
-        return EntitiesUserRelationAvilable::where(["user_id" => $userId, "cp_relation_id" => $cpRelationId])
+        return UserRelationAvilable::where(["user_id" => $userId, "cp_relation_id" => $cpRelationId])
                                    ->where("count", ">", 0)
                                    ->first();
     }
@@ -79,7 +91,7 @@ class CpRepository
 
     public function updateOrCreateUserRelation($userId, $cpRelationId)
     {
-        return EntitiesUserRelationAvilable::updateOrCreate(
+        return UserRelationAvilable::updateOrCreate(
             [
                 "user_id" => $userId,
                 "cp_relation_id" => $cpRelationId,
@@ -105,11 +117,11 @@ class CpRepository
                 /// todo update this filter
                 switch ($type) {
                     case 1:
-                        return $query->whereDay('created_at', now()->day);
+                        return $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
                     case 2:
-                        return $query->whereRaw('WEEK(created_at) = ?', [now()->week]);
+                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
                     case 3:
-                        return $query->whereMonth('created_at', now()->month);
+                        return $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
                 }
             })
             ->groupBy('cp_id')
