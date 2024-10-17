@@ -23,19 +23,10 @@ class CpProfileService
     public function getCpProfiles($userId)
     {
         $statuses = [1, 4];
-        $data = $this->cpRepository->getUserCpProfiles($userId, $statuses);
-
         $vipCount = $this->packRepository->countUserVipPacks($userId);
 
-        if ($vipCount == 1) {
-            $data->take(7);
-        } elseif ($vipCount >= 2) {
-            $data->take(10);
-        } else {
-            $data->take(4);
-        }
-
-        $data = $data->get();
+        if ($vipCount == 1) $count =  7; elseif ($vipCount >= 2) $count =  10; else $count =  4;
+        $data = $this->cpRepository->getUserCpProfiles($userId, $statuses, $count);
 
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }

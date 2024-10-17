@@ -89,6 +89,7 @@ class CpserviceCo
             $this->cpRepository->updateOrCreateUserRelation($cp->user_one_id, $cp->cp_relation_id);
         }
 
+
         return Common::apiResponse(1, 'تم الرد علي الطلب بنجاح');
     }
 
@@ -111,8 +112,8 @@ class CpserviceCo
 
     public function getCpList($userId)
     {
-        $data = $this->cpRepository->getCpList($userId);
+        $data = $this->cpRepository->getCpList($userId, true);
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }
-    
+
 }

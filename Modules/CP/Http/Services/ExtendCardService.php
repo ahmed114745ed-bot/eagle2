@@ -34,8 +34,12 @@ class ExtendCardService
         }
 
         $expire = 30;
+
+        /// TODO check expire packs
         $existingPack = $this->packRepository->findByUserIdAndTargetId($user->id, $ware->id);
 
+        // card ends today at midnight
+        /// create another pack // from today to 30 days
         if ($existingPack) {
             $existingPack->expire = $existingPack->expire ? now()->timestamp + ($expire * 86400) : now()->addDays($expire)->timestamp;
             $existingPack->save();
