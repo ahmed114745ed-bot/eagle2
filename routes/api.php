@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
@@ -245,6 +246,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
+            });
+      
+            Route::prefix ('home_carousels')->group (function (){
+                Route::get ('/',[HomeCarouselController::class,'index']);
             });
 
 

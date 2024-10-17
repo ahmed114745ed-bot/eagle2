@@ -20,8 +20,7 @@ class HomeCarouselResource extends JsonResource
         return [
             'id'         => $this->id,
             'img'        => $this->img ?:'',
-            'type'   => $this->type ?? '',
-            //'url'        =>$this->type == 2 ? $this->url ?? '':'',
+            'type'   => $this->type ?? '',  
             'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period')? ($urlEvent->url ?? ''):''),
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
