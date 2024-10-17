@@ -1,21 +1,9 @@
 <?php
 
-use App\Models\Room;
-use App\Models\User;
-use Modules\CP\Http\Controllers\web\CpVipController;
-use Modules\CP\Http\Controllers\web\CPGiftController;
-use Modules\CP\Http\Services\CpServices;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Models\Ware;
+use Modules\CP\Http\Controllers\web\CpRelationController;
+use Modules\CP\Http\Controllers\web\LevelController;
+use Modules\CP\Http\Controllers\web\LevelGiftController;
 
 Route::group(
     [
@@ -27,19 +15,25 @@ Route::group(
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
-            'appFeatureEnable:cp'
+            'appFeatureEnable:achievement',
         ],
         'as'         => config('admin.route.prefix') . '.',
     ],
     function (\Illuminate\Routing\Router $router) {
-        $router->resource('cp-gifts', CPGiftController::class);
-        $router->resource('cp-vips', CpVipController::class);
+        $router->resource('cp-relations', CpRelationController::class);
+        $router->resource('cp-levels', LevelController::class);
+
+        Route::prefix('cp-level-gifts/{cp_level_id}')->group(function () {
+            Route::get('/', [LevelGiftController::class, 'index']);
+            Route::get('/create', [LevelGiftController::class, 'create']);
+            Route::post('/', [LevelGiftController::class, 'store']);
+            Route::get('/{id}', [LevelGiftController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/{id}/edit', [LevelGiftController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [LevelGiftController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [LevelGiftController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+
     });
 
-    Route::get('/test-method-services', function () {
-        $user = User::first();
-        $room = Room::find(25);
-        (new CpServices)->cancelation($user);
-        dd("ddddddddddd");
-        dd((new CpServices)->ranking());
-     });
+
+

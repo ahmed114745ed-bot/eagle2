@@ -28,7 +28,7 @@ class GiftLog extends Model
     }
 
     public function cp(){
-        return $this->belongsTo(CpInfo::class,'cp_id')->with("userOne:id,uuid,name","userTwo:id,uuid,name");
+        return $this->belongsTo(Cp::class,'cp_id')->with("fromUser:id,uuid,name","toUser:id,uuid,name");
     }
 
 }

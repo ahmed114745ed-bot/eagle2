@@ -18,6 +18,7 @@ use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
+use Modules\CP\Http\Services\CpService;
 
 class GiftLogService
 {
@@ -47,8 +48,8 @@ class GiftLogService
         // receivers ids
         $receiversIds = explode(',', $data['toUid']);
         $numberOfGift = $number * count($receiversIds);
-
         $totalPrice = $gift->price * $numberOfGift;
+        $totalPriceForOnlyReceiver = $gift->price * $number;
 
         // if user didn't have inf coins throw exception
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
@@ -67,13 +68,14 @@ class GiftLogService
 
         $cpId = null;
         //check type of cp
-        if ($gift->type == 8) {
-            try {
-                $cpId = (new CpServices())->processCpWhenSendGift($user, $receivedUsers->first(), $giftId, $totalPrice);
+        // if ($gift->type == 8) {
+            try { 
+                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                // dd($cpIds);
             } catch (\Exception $e) {
                 return Common::apiResponse(0, $e->getMessage());
             }
-        }
+        // }
 
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();

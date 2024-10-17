@@ -43,6 +43,7 @@ use App\Traits\HelperTraits\FilterTrait;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Facades\Agency as FacadesAgency;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class UserCommon{
 
