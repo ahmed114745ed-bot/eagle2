@@ -68,7 +68,7 @@ class GiftLogService
 
         $cpId = null;
         //check type of cp
-        if ($cpId == null) {
+        if ($cpId != null) {
             try { 
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
