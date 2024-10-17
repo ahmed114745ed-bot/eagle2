@@ -526,7 +526,7 @@ Trait CalcsTrait
         $vip = OVip::query ()->find ($uvip->vip_id);
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level',$vip->level)->where('type' ,12)->where('get_type',1)->first();
-
+        
         return [
             'id'        => 1,
             'level'     => $vip->level?? 0,

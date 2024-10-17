@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Ware;
 use Illuminate\Http\Request;
-use Modules\CP\Http\Controllers\Api\CPControllerApi;
+use Modules\CP\Http\Controllers\Api\CpRelationController;
+use Modules\CP\Http\Controllers\Api\CpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,12 +16,14 @@ use Modules\CP\Http\Controllers\Api\CPControllerApi;
 |
 */
 
-Route::middleware('auth:api')->get('/cp', function (Request $request) {
-    return $request->user();
-});
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureEnable:cp'])->group(function () {
-    Route::post('cp-ranking',[CPControllerApi::class,'cp_ranking']);
-    Route::get('cp-level',[CPControllerApi::class,'cp_level']);
-    Route::post('cancel-cp',[CPControllerApi::class,'cancel_cp']);
+Route::middleware(['auth:sanctum','appFeatureEnable:achievement'])->group(function () {
+    Route::get('/cp-relations', [CpRelationController::class,'index']);
+    Route::post('/make-cp-request', [CpController::class,'makeRequestCp']);
+    Route::get('/get-cp-request', [CpController::class,'getRequestCp']);
+    Route::post('/respond-request', [CpController::class,'RespondRequest']);
+    Route::get('/cp-ranking', [CpController::class,'CpRanking']);
+    Route::get('/cp-list', [CpController::class,'cpList']);
+    Route::post('/buy-sets', [CpController::class,'extendCard']);
+    Route::get('/cp-profile', [CpController::class,'cpProfile']);
 
 });

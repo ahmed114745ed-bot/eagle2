@@ -479,35 +479,35 @@ class RoomController extends Controller
 
 
         if ($phase < 4) $arr[] = $data['owner_id'];
-        $cp_arr = [];
-        foreach ($arr as $k => &$v) {
-            if ($v == -1 || $v == 0) continue;
-            $cp_id = Common::check_first_cp($user_id, $v, 1);
-            if ($cp_id) {
-                $level            = Common::getLevel($v, 3);
-                $ar['cp_level']   = Common::getCpLevel($cp_id);
-                $ar['nick_color'] = Common::getNickColorByVip($level);
-                $ar['id']         = $v;
-                $ar['nickname']   = DB::table('users')->where(['id' => $v])->value('nickname');
-                $ar['exp']        = DB::table('cp')->where(['id' => $cp_id])->value('exp');
-                $img              = @User::query()->find($v)->profile->avatar;
-                $ar['img']        = $img;
-                $cp_arr[]         = $ar;
-            }
-        }
-        if ($cp_arr) {
-            array_multisort(array_column($cp_arr, 'exp'), SORT_DESC, $cp_arr);
-        }
-        $cp_xssm = Common::getConf('cp_xssm');
-        $i       = 0;
-        foreach ($cp_arr as $k => &$va) {
-            if (!$i) {
-                $va['cp_xssm'] = $va['cp_level'] >= 7 ? $cp_xssm : '';
-            } else {
-                $va['cp_xssm'] = '';
-            }
-            $i++;
-        }
+        // $cp_arr = [];
+        // foreach ($arr as $k => &$v) {
+        //     if ($v == -1 || $v == 0) continue;
+        //     $cp_id = Common::check_first_cp($user_id, $v, 1);
+        //     if ($cp_id) {
+        //         $level            = Common::getLevel($v, 3);
+        //         $ar['cp_level']   = Common::getCpLevel($cp_id);
+        //         $ar['nick_color'] = Common::getNickColorByVip($level);
+        //         $ar['id']         = $v;
+        //         $ar['nickname']   = DB::table('users')->where(['id' => $v])->value('nickname');
+        //         $ar['exp']        = DB::table('cp')->where(['id' => $cp_id])->value('exp');
+        //         $img              = @User::query()->find($v)->profile->avatar;
+        //         $ar['img']        = $img;
+        //         $cp_arr[]         = $ar;
+        //     }
+        // }
+        // if ($cp_arr) {
+        //     array_multisort(array_column($cp_arr, 'exp'), SORT_DESC, $cp_arr);
+        // }
+        // $cp_xssm = Common::getConf('cp_xssm');
+        // $i       = 0;
+        // foreach ($cp_arr as $k => &$va) {
+        //     if (!$i) {
+        //         $va['cp_xssm'] = $va['cp_level'] >= 7 ? $cp_xssm : '';
+        //     } else {
+        //         $va['cp_xssm'] = '';
+        //     }
+        //     $i++;
+        // }
         if (@$mic_arr[$position]) {
             $mic_arr[$position] = $user_id;
         }
@@ -525,7 +525,7 @@ class RoomController extends Controller
         $user['avatar']     = @$u->profile->avatar;
         $user_level         = Common::getLevel($user_id, 3);
         $user['nick_color'] = Common::getNickColorByVip($user_level);
-        $res_arr['cp']      = $cp_arr;
+        // $res_arr['cp']      = $cp_arr;
         $res_arr['user']    = $user;
 
         if ($res) {

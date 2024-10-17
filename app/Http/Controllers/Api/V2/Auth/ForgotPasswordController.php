@@ -41,5 +41,5 @@ class ForgotPasswordController extends Controller
         }
 
         return Common::apiResponse (1,'valid code',null);
-    }
+    } 
 }

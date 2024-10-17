@@ -5,7 +5,6 @@ namespace App\Models;
 use DB;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
-use Modules\CP\Traits\CpUserTrait;
 use Modules\Reals\Entities\Real;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\PaymentGetWayTrait;
@@ -32,7 +31,7 @@ use Modules\SalaryTransaction\Traits\UserTransferTrait;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, FollowTrait,PaymentGetWayTrait, SoftDeletes,AchievementUser, RealRelationshipTrait,MomentRelationshipTrait;
-    use SpecialId , ChatUserTrait, CpUserTrait, UserTransferTrait;
+    use SpecialId , ChatUserTrait, UserTransferTrait;
     /*
      * To enable and disable observer saving and updating methods
      */

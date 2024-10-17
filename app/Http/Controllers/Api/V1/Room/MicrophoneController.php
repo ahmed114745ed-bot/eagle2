@@ -48,7 +48,7 @@ class MicrophoneController extends Controller
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
 
-        (new CpServices())->sendZegoMap($user, $room);
+        // (new CpServices())->sendZegoMap($user, $room);
         return Common::apiResponse(1, __('api_responses.Success_on_the_mic'));
     }
     //leave mic

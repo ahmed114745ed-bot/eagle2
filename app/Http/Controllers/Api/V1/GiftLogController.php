@@ -66,8 +66,6 @@ class GiftLogController extends Controller
 
        
       return  $this->giftLogService->sendGift($request , $updateUserWhenSendGift);
-
-     
     }
 
 
