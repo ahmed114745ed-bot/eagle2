@@ -68,14 +68,14 @@ class GiftLogService
 
         $cpId = null;
         //check type of cp
-        // if ($gift->type == 8) {
+        if ($cpId == null) {
             try { 
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
                 return Common::apiResponse(0, $e->getMessage());
             }
-        // }
+        }
 
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
