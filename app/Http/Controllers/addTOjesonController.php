@@ -49,11 +49,9 @@ class addTOjesonController extends Controller
     public function create(Request $request)
     {
         $chat_status =  $request->chat_status;
-        $chat_enable_version =  $request->chat_enable_version;
         $invitation_code_date =  $request->invitation_code_date;
         $show_welcom_enmation =  $request->show_welcom_enmation;
         settings()->set("chat_status", $chat_status);
-        settings()->set("chat_enable_version", $chat_enable_version);
         settings()->set("invitation_code_date", $invitation_code_date);
         settings()->set("show_welcom_enmation", $show_welcom_enmation);
 
