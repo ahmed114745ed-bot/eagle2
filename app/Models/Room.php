@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -158,6 +159,12 @@ class Room extends Model
     {
         return $this->hasMany(RoomVisitor::class, 'room_id');
     }
+
+    public function roomVisitorUsers(): HasManyThrough
+    {
+        return $this->hasManyThrough(User::class, RoomVisitor::class, 'room_visitors.room_id', 'id', 'id', 'room_visitors.user_id');
+    }
+
     public function getRoomVisitorAttribute() : string
     {
         $usersIds = $this->roomVisitors->pluck('user_id')->toArray();
@@ -168,7 +175,7 @@ class Room extends Model
     {
         return $this->belongsTo(User::class, 'top_user_id');
     }
-   
+
     public function boxUse()
     {
         return $this->hasMany(BoxUse::class, 'room_id');
@@ -179,11 +186,18 @@ class Room extends Model
         return $this->hasOneThrough(
             RequestBackgroundImage::class,
             User::class,
-            'id', 
+            'id',
             'owner_room_id',
             'uid',
             'id'
         )->where('request_background_images.status', 1);
+    }
+
+    public function getVisitorsImages()
+    {
+        $visitors = $this->roomVisitorUsers;
+
+        return $visitors->pluck('profile.avatar');
     }
 
 }

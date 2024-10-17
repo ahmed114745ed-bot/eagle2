@@ -242,8 +242,7 @@ class EnteranceRoomServices
 
     public function enterRoom($user, $request, $room_pass, $owner_id)
     {
-        $messageBlack = null;
-        $remainingTime = null;
+
         if ($request->type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
@@ -256,7 +255,7 @@ class EnteranceRoomServices
 
 
         // get room by owner_id
-        $room = $this->roomRepository->findRoomUser($owner_id);
+        $room = $this->roomRepository->findRoomUser($owner_id, false);
         if (!$room)return Common::apiResponse (false,'No room yet, please create first',null,404);
         // if(($room->count_room_socket == 0 ) && $room->uid != $user_id && $room->pin != 1 )return Common::apiResponse(false, __('api_responses.closedRoom'), null, 402);
 
@@ -274,7 +273,7 @@ class EnteranceRoomServices
                 if ($sjc < $arr[2] && $arr[0] == $user->id) {
                     $messageBlack = __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room');
                     $remainingTime = ['remaining_time' => "$h:$m:$s"];
-                    
+
                     return [$messageBlack,$remainingTime];
                     Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'), ['remaining_time' => "$h:$m:$s"], 200);
                 }
@@ -335,10 +334,10 @@ class EnteranceRoomServices
                 'room_id'=>$room->id,
             ]);
         }
-     
+
         return Common::apiResponse(true, '', $room_info);
 
-       
+
     }
     private function updateRoom($user_id, $owner_id, Room &$room)
     {
