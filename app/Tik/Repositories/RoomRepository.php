@@ -85,7 +85,8 @@ class RoomRepository extends AbstractRepository
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
-            'lastPk'
+            'lastPk',
+            'roomVisitorUsers' => fn($q) => $q->limit(5)
         ])
             ->whereHas('owner')
             ->when(!$allRooms, function ($query){

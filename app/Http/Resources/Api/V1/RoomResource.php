@@ -4,12 +4,8 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Resources\CountryResource;
-use App\Models\BoxUse;
-use App\Models\Pk;
 use App\Models\User;
 use App\Models\Request;
-use App\Models\RequestBackgroundImage;
-use App\Repositories\User\UserRepo;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomResource extends JsonResource
@@ -51,6 +47,9 @@ class RoomResource extends JsonResource
             'distance' => $this->distance,
             $this->mergeWhen($this->relationLoaded('game'), [
                 'game' => $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
+            ]),
+            $this->mergeWhen($this->relationLoaded('roomVisitorUsers'), [
+                'visitors_images' => $this->getVisitorsImages(),
             ]),
         ];
 
