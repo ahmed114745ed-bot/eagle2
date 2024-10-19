@@ -6,6 +6,7 @@ use App\Models\EnteredRoom;
 use App\Models\Room;
 use App\Models\RoomPrivateMessages;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 class RoomRepository extends AbstractRepository
 {
@@ -140,11 +141,11 @@ class RoomRepository extends AbstractRepository
             case 'interested':
 
                 $roomTypes = EnteredRoom::query()
-                    ->where('uid',  $user->id) 
-                    ->where('entered_at', '>=', Carbon::now()->subDay()) 
-                    ->with('room') 
+                    ->where('uid',  $user->id)
+                    ->where('entered_at', '>=', Carbon::now()->subDay())
+                    ->with('room')
                     ->get()
-                    ->pluck('room.room_type') 
+                    ->pluck('room.room_type')
                     ->unique();
 
                 $result->whereIn("roomTypes",$roomTypes)->orderByDesc('top_room')
@@ -153,7 +154,8 @@ class RoomRepository extends AbstractRepository
                 break;
             case 'following':
                 $result->whereIn('uid', function ($query) use ($user) {
-                    $query->select('followed_id')
+                    /* @var Builder $query*/
+                    $query->select('user_id')
                           ->from('follows')
                           ->where('followed_user_id', $user->id);
                 })
