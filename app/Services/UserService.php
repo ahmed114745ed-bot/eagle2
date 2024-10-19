@@ -258,8 +258,9 @@ class UserService
     public function getData(User $user, $type = 1)
     {
         $userId = $user->id;
-
+        
         if ($type == 1) {
+            // following in app
             $data = $this->followRepository->getByFollowed($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('followed');
@@ -273,6 +274,7 @@ class UserService
             $users    = $collect->pluck('follower');
         } 
         elseif ($type == 6) {
+            // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
 
         } else {
