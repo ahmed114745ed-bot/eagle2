@@ -33,6 +33,18 @@ class CpserviceCo
         if ($cpCount >= 15) {
             return Common::apiResponse(0, 'لقد تعديت العدد المسموح به!');
         }
+        if ($cpRelation->cp_one == 1) {
+            $existingCpOne = $this->cpRepository->checkExistingCpOne($user->id,$cpRelation->id);
+            $existingCptwo = $this->cpRepository->checkExistingCpOne($request->user_id,$cpRelation->id);
+
+            if ($existingCpOne) {
+                return Common::apiResponse(0, 'انت تتمتع ب cp مع شخص اخر!');
+            }
+
+            if ( $existingCptwo) {
+                return Common::apiResponse(0, 'هذا المستخدم يتمتع ب cp مع شخص اخر!');
+            }
+        }
 
         $existingCp = $this->cpRepository->checkExistingCp($user->id, $request->user_id);
 

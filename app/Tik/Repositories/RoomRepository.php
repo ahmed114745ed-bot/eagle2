@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use App\Models\EnteredRoom;
 use App\Models\Room;
 use App\Models\RoomPrivateMessages;
+use Carbon\Carbon;
 
 class RoomRepository extends AbstractRepository
 {
@@ -128,6 +129,35 @@ class RoomRepository extends AbstractRepository
 
             case 'festival':
                 $result->orderByDesc('top_room')
+                    ->orderByDesc('session')
+                    ->orderByDesc('count_room_socket');
+                break;
+            case 'recently':
+                $result->orderByDesc('top_room')
+                    ->orderByDesc('session')
+                    ->orderByDesc('count_room_socket');
+                break;
+            case 'interested':
+
+                $roomTypes = EnteredRoom::query()
+                    ->where('uid',  $user->id) 
+                    ->where('entered_at', '>=', Carbon::now()->subDay()) 
+                    ->with('room') 
+                    ->get()
+                    ->pluck('room.room_type') 
+                    ->unique();
+
+                $result->whereIn("roomTypes",$roomTypes)->orderByDesc('top_room')
+                    ->orderByDesc('session')
+                    ->orderByDesc('count_room_socket');
+                break;
+            case 'following':
+                $result->whereIn('uid', function ($query) use ($user) {
+                    $query->select('followed_id')
+                          ->from('follows')
+                          ->where('followed_user_id', $user->id);
+                })
+                    ->orderByDesc('top_room')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;

@@ -15,6 +15,8 @@ class PackRepository
     {
         return Pack::where('user_id', $userId)
                     ->where('target_id', $targetId)
+                    ->where('expire', '<', Carbon::now()->timestamp)
+                    ->where('expire', '!=', 0)
                     ->first();
     }
 
