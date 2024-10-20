@@ -79,7 +79,7 @@ class MicService
         //Remove mic sequence
         Common::delMicHand($user->id);
 
-        $t = $this->liveTimeRepository->getByUserId($user->id);
+        $t = $this->liveTimeRepository->getActiveByUserId($user->id);
         if (!$t) {
 
             $data = [

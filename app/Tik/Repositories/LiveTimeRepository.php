@@ -18,7 +18,7 @@ class LiveTimeRepository extends AbstractRepository
         return $this->model->query()->where('uid', $userId)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->whereDay('created_at', '=', Carbon::now()->day)->sum('hours');
     }
 
-    public function getByUserId($userId)
+    public function getActiveByUserId($userId)
     {
         return $this->model->query()->where('uid', $userId)
             ->where('end_time', null)
