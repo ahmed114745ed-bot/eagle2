@@ -13,6 +13,8 @@ class CreateCpsTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('cps');
+
         Schema::create('cps', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("cp_relation_id")->default(0);
