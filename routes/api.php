@@ -110,6 +110,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/show', [OvipController::class, 'show']);
             Route::post('/ware-vip', [VipController::class, 'createWareVip'])->middleware('decrypt.data');
             Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
+            Route::get('/ware-vips', [VipController::class, 'getWareVip']);
+
 
 
         });
@@ -231,6 +233,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
+                Route::post('reset_password', [\App\Http\Controllers\Api\V1\Auth\ResetPasswordController::class, 'reset']);
             });
 
             Route::prefix('search')->group(function () {
@@ -347,6 +350,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('ignored', [ProfileController::class, 'ignored']);
                 Route::get('users', [ProfileController::class, 'getNearbyUsers']);
                 Route::get('related', [ProfileController::class, 'related']);
+                Route::get('following', [ProfileController::class, 'getFollowingUsers']);
             });
 
             // TODO refact @eriny

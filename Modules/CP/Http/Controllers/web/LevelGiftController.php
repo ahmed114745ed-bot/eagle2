@@ -51,13 +51,33 @@ class LevelGiftController extends MainController
         return $this->form()->update($id);
     }
 
+    // public function edit($id, Content $content)
+    // {
+    //     $id = request()->route('id');
+    //     return $content
+    //         ->header(trans('admin.edit'))
+    //         ->description(trans('admin.description'))
+    //         ->body($this->form()->edit($id));
+    // }
+
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+        // العثور على النموذج بناءً على المعرف
+        $model = CpLevelGift::findOrFail($id);
+        
+        // تحميل النموذج
+        $form = $this->form()->edit($id);
+
+        // تعبئة حقل coins بالقيمة الموجودة في item_id إذا كان النوع "coins"
+        if ($model->type == 'coins') {
+            $form->coins =(int) $model->item_id; // تعيين قيمة coins
+        }
+
         return $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($form);
     }
 
     public function show($id, Content $content)
@@ -84,9 +104,9 @@ class LevelGiftController extends MainController
             }elseif ($this->type == "vip"){
                 return @$this->vip->name;
             }elseif ($this->type == "coins"){
-                return @$this->target;
+                return @$this->item_id;
             }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
+                $value = getDriverUrl() . '/'. @$this->item_id;
                 return "<img src='$value' width='80' height='80'>";
             }
 
@@ -116,9 +136,9 @@ class LevelGiftController extends MainController
     protected function form()
     {
         $form = new Form(new CpLevelGift());
-    
+
         $form->hidden('vip_id')->value(request('cp_level_id'));
-    
+
         $form->select('type', trans('type'))->options([
             "ware" => __('ware'),
             "vip" => __('vip'),
@@ -140,8 +160,8 @@ class LevelGiftController extends MainController
                 }
                 return $ops;
             });
-    
-            $form->hidden('sub_type'); // تأكد من وجود هذا الحقل ليتم تحديثه لاحقاً
+
+            $form->hidden('sub_type'); 
         })
         ->when("vip", function () use ($form) {
             $form->select('item_id', trans('vips'))->options(function () {
@@ -154,19 +174,21 @@ class LevelGiftController extends MainController
             });
         })
         ->when("coins", function () use ($form) {
-            $form->number("target", __("coins"));
+            $form->number("coins", __("coins"));
         })
         ->when("achievement", function () use ($form) {
-            $form->image("item_id", __('image'))->name(function ($file) {
+            $form->image("achievement", __('image'))->name(function ($file) {
                 return now()->timestamp . '.' . $file->guessExtension();
             })->disk('gcs');
         });
-    
+
         $form->number('expire', __('expire'));
         $form->select('gender', __('gender'))->options([
+            'all' => __('all'),
             'male' => __('Male'),
             'female' => __('Female')
         ])->required();
+
         $form->saving(function (Form $form) {
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
@@ -179,10 +201,18 @@ class LevelGiftController extends MainController
                         $form->sub_type = 'frame';
                     }
                 }
+            } elseif ($form->type == 'vip') {
+                
+            } elseif ($form->type == 'coins') {
+                $form->item_id = $form->coins;
+            } elseif ($form->type == 'achievement') {
+                $form->item_id = $form->achievement;
             }
         });
-    
+        
+
         return $form;
     }
+
     
 }

@@ -76,8 +76,7 @@ class VipService
             $sender = $request->user();
             $sender_id = $sender->id;
             $from = $sender;
-            if ($sender->di < $total) return Common::apiResponse (0,'balance low',null,407);
-
+            if ($sender->di < $total) return Common::apiResponse(0, 'balance low', null, 407);
         } else {
             $type = 0;
             $user = $request->user();
@@ -157,23 +156,30 @@ class VipService
             $img2 = Common::upload('images', $request->file('image'));
         }
         $data = [
-          'get_type' => 1,
-          'type' => $vipPrivilege->type,
-          'price' => 0,
-          'name' => $request->name,
-          'name_en' => $request->name_en,
-          'title' => $request->title,
-          'title_en' => $request->title_en,
-          'level' => $Vip->level,
-          'show_img' => $image,
-          'img2' => $img2,
-          'image_type' => $request->img2_type,
-          'enable' =>1,
-          'is_active_for_vip' =>1,
+            'get_type' => 1,
+            'type' => $vipPrivilege->type,
+            'price' => 0,
+            'name' => $request->name,
+            'name_en' => $request->name_en,
+            'title' => $request->title,
+            'title_en' => $request->title_en,
+            'level' => $Vip->level,
+            'show_img' => $image,
+            'img2' => $img2,
+            'image_type' => $request->img2_type,
+            'enable' => 1,
+            'is_active_for_vip' => 1,
 
         ];
         $this->wareRepository->create($data);
         return true;
+    }
+
+    public function wareVip($request)
+    {
+        $vipPrivilege  = $this->vipPrivilegeRepository->findById($request->vipPrivilege_id);
+        $Vip = $this->ovipRepository->findById($request->ovip_id);
+        return $this->wareRepository->getByTypeAndLevel($vipPrivilege->type, $Vip->level);
     }
 
     public function badges($type)

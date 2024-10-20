@@ -20,13 +20,13 @@ class WareRepository extends AbstractRepository
         return $this->model->where(['id' => $id])->first();
     }
 
-    public function getWithType($type,$level)
+    public function getWithType($type, $level)
     {
         return $this->model->query()->where('get_type', 1)
-        ->where('type', $type)
-        ->select('id', 'img2')
-        ->where('level', $level)
-        ->first();
+            ->where('type', $type)
+            ->select('id', 'img2')
+            ->where('level', $level)
+            ->first();
     }
 
     public function findById($id)
@@ -75,26 +75,30 @@ class WareRepository extends AbstractRepository
 
     public function getOVip($levels = [], $types = [])
     {
-        return $this->model->query()->where ('get_type',1)->whereIn('type',$types)->whereIn('level',$levels)/*->where('enable', true)*/->get();
+        return $this->model->query()->where('get_type', 1)->whereIn('type', $types)->whereIn('level', $levels)/*->where('enable', true)*/->get();
     }
 
     public function getOVipNew($levels = [], $types = [])
     {
-        return$this->model->query()->where ('get_type',1)->whereIn('type',$types)->whereIn('level',$levels)->where('enable', true)->get();
+        return $this->model->query()->where('get_type', 1)->whereIn('type', $types)->whereIn('level', $levels)->where('enable', true)->get();
     }
 
     public function notActive($level)
     {
-       return  $this->model->where('level', $level)->update([
-            'is_active_for_vip'=>false
+        return  $this->model->where('level', $level)->update([
+            'is_active_for_vip' => false
         ]);
     }
 
-    public function updateActiveWithType($type,$level)
+    public function updateActiveWithType($type, $level)
     {
-        return $this->model->where('type', $type)->where('level',$level)->update([
-            'is_active_for_vip'=>true
+        return $this->model->where('type', $type)->where('level', $level)->update([
+            'is_active_for_vip' => true
         ]);
     }
 
+    public function getByTypeAndLevel($type, $level)
+    {
+        return $this->model->where('type', $type)->where('level', $level)->get();
+    }
 }

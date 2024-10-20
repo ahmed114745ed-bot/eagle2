@@ -20,6 +20,7 @@ class NewProfileResource extends JsonResource
             'bio'=>@$this->bio,
             'distance'=>$this->distance ?? 3.3,
             'liked'=>$this->likes_exists ?? false,
+            "multi_images"          => $this->images?->select("img"),
         ];
     }
 }
