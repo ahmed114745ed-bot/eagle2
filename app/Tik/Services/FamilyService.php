@@ -153,7 +153,7 @@ class FamilyService
         $userSentRequest = $this->familyUserRepository->checkSendJoinRequest($user->id, $familyId);
         if ($userSentRequest)  throw new \Exception(__('you_alredy_have_sent'));
 
-        DB::beginTransaction();
+        
         $data = [
             'user_id' => $user->id,
             'family_id' => $family->id,
