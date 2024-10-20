@@ -51,13 +51,33 @@ class LevelGiftController extends MainController
         return $this->form()->update($id);
     }
 
+    // public function edit($id, Content $content)
+    // {
+    //     $id = request()->route('id');
+    //     return $content
+    //         ->header(trans('admin.edit'))
+    //         ->description(trans('admin.description'))
+    //         ->body($this->form()->edit($id));
+    // }
+
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+        // العثور على النموذج بناءً على المعرف
+        $model = CpLevelGift::findOrFail($id);
+        
+        // تحميل النموذج
+        $form = $this->form()->edit($id);
+
+        // تعبئة حقل coins بالقيمة الموجودة في item_id إذا كان النوع "coins"
+        if ($model->type == 'coins') {
+            $form->coins =(int) $model->item_id; // تعيين قيمة coins
+        }
+
         return $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($form);
     }
 
     public function show($id, Content $content)
@@ -169,12 +189,6 @@ class LevelGiftController extends MainController
             'female' => __('Female')
         ])->required();
 
-        $form->editing(function (Form $form) {
-            if ($form->model()->type == 'coins') {
-                $form->coins = $form->model()->item_id;
-            }
-        });
-        
         $form->saving(function (Form $form) {
             if ($form->type == 'ware') {
                 $ware = Ware::find($form->item_id);
