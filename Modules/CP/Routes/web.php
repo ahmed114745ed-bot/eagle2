@@ -27,10 +27,10 @@ Route::group(
         $router->resource('cp-levels', LevelController::class);
        
 
-        Route::prefix('cp-level-gifts/{weekly_cp_id}/')->group(function () {
+        Route::prefix('cp-level-gifts/{cp_level_id}/')->group(function () {
             Route::get('/', [LevelGiftController::class, 'index']);
-            Route::get('{level}/create', [LevelGiftController::class, 'create']);
-            Route::post('/{level}', [LevelGiftController::class, 'store']);
+            Route::get('/create', [LevelGiftController::class, 'create']);
+            Route::post('/', [LevelGiftController::class, 'store']);
             Route::get('/{id}', [LevelGiftController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [LevelGiftController::class, 'edit'])->where('id', '[0-9]+');
             Route::put('/{id}', [LevelGiftController::class, 'update'])->where('id', '[0-9]+');
