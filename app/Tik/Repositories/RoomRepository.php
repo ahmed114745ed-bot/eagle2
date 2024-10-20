@@ -148,7 +148,7 @@ class RoomRepository extends AbstractRepository
                     ->pluck('room.room_type')
                     ->unique();
 
-                $result->whereIn("roomTypes",$roomTypes)->orderByDesc('top_room')
+                $result->whereIn("room_type",$roomTypes)->orderByDesc('top_room')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;
