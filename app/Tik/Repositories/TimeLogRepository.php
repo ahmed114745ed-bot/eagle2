@@ -15,11 +15,11 @@ class TimeLogRepository extends AbstractRepository
 
     public function getByOwnerAndUserId($ownerRoomId, $userId)
     {
-        return $this->model->where(['uid' => $ownerRoomId, 'muid' => $userId])->orderByRaw('id desc')->limit(1)->first();
+        return $this->model->where(['uid' => $ownerRoomId, 'user_id' => $userId])->orderByRaw('id desc')->limit(1)->first();
     }
 
     public function delete($ownerRoomId, $userId)
     {
-        return $this->model->where(array('uid' => $ownerRoomId, 'muid' => $userId))->delete();
+        return $this->model->where(array('uid' => $ownerRoomId, 'user_id' => $userId))->delete();
     }
 }
