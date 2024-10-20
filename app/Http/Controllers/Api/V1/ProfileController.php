@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
 use App\Http\Resources\Api\V1\NewProfileResource;
 use App\Http\Resources\Api\V1\UserRelationsResource;
+use App\Models\Follow;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Validator;
@@ -131,5 +132,12 @@ class ProfileController extends Controller
         $randomUsers = $this->profileService->getRelatedUsers(20);
 
         return Common::apiResponse(true, '',  UserRelationsResource::collection($randomUsers), 200);
+    }
+
+    public function getFollowingUsers()
+    {
+        $followedIds = Follow::query ()->whereHas('followed')->where ('user_id',Auth::id())->pluck ('followed_user_id');
+        $users = User::query()->whereIn("id",$followedIds)->get();
+        return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
 }
