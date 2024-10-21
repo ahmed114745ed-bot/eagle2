@@ -108,9 +108,9 @@ class FamilyController extends Controller
         try {
             $family =   $this->familyServices->create($user, $request, $family_price);
 
-            DB::commit();
+          
         } catch (\Exception $e) {
-            DB::rollBack();
+           
             return Common::apiResponse(0, $e != null ? $e->getMessage() : 'missing params', 422);
         }
         CustomNotification::family($family, $user);
@@ -165,10 +165,10 @@ class FamilyController extends Controller
         try {
 
             $this->familyServices->delete($user, $id);
-            DB::commit();
+         
             return Common::apiResponse(1, 'success', null, 200);
         } catch (\Exception $exception) {
-            DB::rollBack();
+           
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -247,13 +247,13 @@ class FamilyController extends Controller
         $userId = $request->user_id;
 
         try {
-            DB::beginTransaction();
+           
             [$family, $user] = $this->familyServices->removeUserFromFamily($userId, $request->family_id, $authId);
-            DB::commit();
+          
             CustomNotification::removeFamilyUser($family, $user);
             return Common::apiResponse(1, 'success', new FamilyResource(Family::find($family->id)), 200);
         } catch (\Exception $exception) {
-            DB::rollBack();
+            
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }

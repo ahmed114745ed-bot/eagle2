@@ -60,6 +60,7 @@ class GeneralRoleController extends MainController
             'pk_event' => 'pk_event',
             'charge_event' => 'charge_event',
             'event_period' => 'period_event',
+            'weekly_cp' => 'weekly_cp',
         ])->creationRules(['required', "unique:general_roles"], ['unique' => 'هذا النوع مستخدم من قبل روح عدل عليه '])
             ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
         $form->url('url', trans('url'))->required();

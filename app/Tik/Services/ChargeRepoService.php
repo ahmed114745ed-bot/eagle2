@@ -167,7 +167,7 @@ class ChargeRepoService
 
             if ($salary < $count)  throw new \Exception('Low Balance');
 
-            DB::beginTransaction();
+           // DB::beginTransaction();
             // Increment 'di' column for the user
             $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
             $numDi     = $coinPrise * $count;
@@ -175,7 +175,7 @@ class ChargeRepoService
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
-            \DB::rollBack();
+           // \DB::rollBack();
             throw new \Exception($e->getMessage());
         }
     }
