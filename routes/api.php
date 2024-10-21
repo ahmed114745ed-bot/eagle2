@@ -429,7 +429,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
-                Route::post('{id}', [AgencyController::class, 'update']);
+                Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
+
             });
             Route::prefix('payment-gateway')->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
