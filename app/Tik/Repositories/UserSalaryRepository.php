@@ -17,7 +17,7 @@ class UserSalaryRepository extends AbstractRepository
      */
     public function __construct()
     {
-        dd('this');
+
         parent::__construct(new UserSallary());
     }
 

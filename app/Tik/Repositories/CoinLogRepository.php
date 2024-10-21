@@ -14,6 +14,7 @@ class CoinLogRepository extends AbstractRepository
      */
     public function __construct()
     {
+        dd('this');
         parent::__construct(new CoinLog());
     }
 
