@@ -292,6 +292,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
 
+            Route::get ('my_gifts',[\App\Http\Controllers\Api\V1\GiftLogController::class,'giftLogsList']);
+
+
             Route::prefix('group-chat')->group(function () {
                 Route::get('/', [GroupChatController::class, 'index']);
                 Route::post('/send', [GroupChatController::class, 'store']);
