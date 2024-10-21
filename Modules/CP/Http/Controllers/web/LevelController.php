@@ -22,66 +22,71 @@ class LevelController extends MainController
     // {
     //     (new AppFeatureService)->validateStatusEnable("target_events");
     // }
-    protected function grid()
+    protected function grid($relation_id)
     {
         $grid = new Grid(new Vip());
-        $grid->model()->where("type",3);
-
+        
+        // استخدام relation_id و type
+        $grid->model()->where("type", 3)->where('relation_id', $relation_id);
+    
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'))->select(
             [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3=>__ ('cp'),
-                4=>__ ('room'),
+                5 => __('broadcaster'),
+                6 => __('honor'),
+                7 => __('cp'),
+                8 => __('room'),
             ]
         );
-        $grid->column('level', __('Level'))->editable();   
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($value) {
             return number_format($value);
         })->editable();
         $grid->column('img', __('Image'))->image('', '30');
-
-        $grid->column('الاجرائات')->display(function () {
-            $url1 = url('admin/cp-level-gifts/' . $this->id);
-
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>   هداية </a>";
-
-            return $button1 ;
+    
+        $grid->column('الاجرائات')->display(function () use ($relation_id) {
+            $url1 = url('admin/cp-level-gifts/' . $this->id . '?relation_id=' . $relation_id);
+    
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
+    
+            return $button1;
         });
-
+    
         return $grid;
     }
-
+    
     /**
      * Make a show builder.
      *
      * @param mixed $id
+     * @param int $relation_id
      * @return Show
      */
-    protected function detail($id)
+    protected function detail($id, $relation_id)
     {
-        $show = new Show(Vip::findOrFail($id));
-
+        $show = new Show(Vip::where('id', $id)->where('relation_id', $relation_id)->firstOrFail());
+    
         $show->field('id', __('Id'));
         $show->field('tile', __('Tile'));
-        $show->field('value', __('value'));
+        $show->field('value', __('Value'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
-
+    
         return $show;
     }
-
+    
     /**
      * Make a form builder.
      *
+     * @param int $relation_id
      * @return Form
      */
-    protected function form()
+    protected function form($relation_id)
     {
         $form = new Form(new Vip());
         $form->hidden("type")->value(3);
+        $form->hidden('relation_id')->value($relation_id);
+    
         $form->textarea('name_ar', __('name_ar'));
         $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
@@ -89,6 +94,8 @@ class LevelController extends MainController
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
+    
         return $form;
     }
+    
 }

@@ -195,6 +195,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('quit_room', [RoomController::class, 'quit_room']);
                 Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
+                Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
+                Route::post('remove_admin', [RoomController::class, 'remove_admin']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
@@ -231,6 +233,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
+                Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
                 Route::post('reset_password', [\App\Http\Controllers\Api\V1\Auth\ResetPasswordController::class, 'reset']);

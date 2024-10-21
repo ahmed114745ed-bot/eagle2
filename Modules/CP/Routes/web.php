@@ -28,6 +28,18 @@ Route::group(
        
 
         Route::prefix('cp-level-gifts/{cp_level_id}/')->group(function () {
+        // $router->resource('cp-levels/{id}', LevelController::class);
+
+        Route::prefix('cp-levels/{relation_id}')->group(function () {
+            Route::get('/', [LevelController::class, 'index'])->name('cp-levels.index');
+            Route::get('/create', [LevelController::class, 'create'])->name('cp-levels.create');
+            Route::post('/', [LevelController::class, 'store'])->name('cp-levels.store');
+            Route::get('/{id}', [LevelController::class, 'show'])->name('cp-levels.show');
+            Route::get('/{id}/edit', [LevelController::class, 'edit'])->name('cp-levels.edit');
+            Route::put('/{id}', [LevelController::class, 'update'])->name('cp-levels.update');
+            Route::delete('/{id}', [LevelController::class, 'destroy'])->name('cp-levels.destroy');
+        });
+        Route::prefix('cp-level-gifts/{cp_level_id}')->group(function () {
             Route::get('/', [LevelGiftController::class, 'index']);
             Route::get('/create', [LevelGiftController::class, 'create']);
             Route::post('/', [LevelGiftController::class, 'store']);
