@@ -15,6 +15,7 @@ class AgencySalaryRepository extends AbstractRepository
     public function __construct()
     {
         parent::__construct(new AgencySallary());
+
     }
 
     public function findByAgencyId($agencyId)

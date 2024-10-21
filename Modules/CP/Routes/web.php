@@ -1,16 +1,15 @@
 <?php
 
-use App\Models\Ware;
-use Modules\CP\Http\Controllers\web\LevelController;
-use Modules\CP\Http\Controllers\web\WeeklyCpController;
-use Modules\CP\Http\Controllers\web\LevelGiftController;
 use Modules\CP\Http\Controllers\web\CpRelationController;
+use Modules\CP\Http\Controllers\web\LevelController;
+use Modules\CP\Http\Controllers\web\LevelGiftController;
+use Modules\CP\Http\Controllers\web\WeeklyCpController;
 use Modules\CP\Http\Controllers\web\WeeklyCpGiftController;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'web',
         'middleware' => [
             'web',
             'admin',
@@ -19,7 +18,7 @@ Route::group(
             'multiLanguage',
             'appFeatureEnable:achievement',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
     function (\Illuminate\Routing\Router $router) {
         $router->resource('cp-relations', CpRelationController::class);
@@ -29,6 +28,9 @@ Route::group(
 
         // Route::prefix('cp-level-gifts/{cp_level_id}/')->group(function () {
         // $router->resource('cp-levels/{id}', LevelController::class);
+        $router->resource('weekly-cp', WeeklyCpController::class);
+        // $router->resource('cp-levels', LevelController::class);
+
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {
             Route::get('/', [LevelController::class, 'index'])->name('cp-levels.index');
@@ -57,6 +59,8 @@ Route::group(
             Route::put('/{id}', [WeeklyCpGiftController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WeeklyCpGiftController::class, 'destroy'])->where('id', '[0-9]+');
         });
+
+
     });
 
 

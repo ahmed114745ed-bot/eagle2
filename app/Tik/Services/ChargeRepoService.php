@@ -25,8 +25,10 @@ class ChargeRepoService
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly AgencyRepository $agencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
-        private readonly CoinLogRepository $coinLogRepository
-    ) {}
+       
+    ) {
+
+    }
 
     public function create(array $data)
     {
