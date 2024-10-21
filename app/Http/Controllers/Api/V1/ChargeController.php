@@ -24,7 +24,7 @@ class ChargeController extends Controller
 
     public function __construct(ChargeRepoService $chargeService)
     {
-        dd('this');
+
         $this->chargeService = $chargeService;
     }
 

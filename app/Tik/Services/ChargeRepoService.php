@@ -26,7 +26,9 @@ class ChargeRepoService
         private readonly AgencyRepository $agencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly CoinLogRepository $coinLogRepository
-    ) {}
+    ) {
+        dd('this');
+    }
 
     public function create(array $data)
     {
