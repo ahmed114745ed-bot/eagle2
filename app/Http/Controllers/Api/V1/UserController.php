@@ -227,33 +227,30 @@ class UserController extends Controller
 
     public function changePhone(Request $request)
     {
-        if (!$request->phone  || !$request->current_phone || !$request->old_code || !$request->new_code) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$request->phone || !$request->current_phone) return Common::apiResponse(0, 'missing params', null, 422);
         $user = $request->user();
+
         $rules = [
             'phone' => [
                 'required',
                 Rule::unique('users', 'phone')->withoutTrashed()->ignore($user->id),
             ],
         ];
-        if ($user->phone != $request->current_phone) return Common::apiResponse(0, 'Old phone is wronge', null, 404);
+        // $rules = [
+        //     'phone' => 'required|unique:users,phone,{id}',
+        // ];
+
         $validator = Validator::make($request->all(), $rules);
+
+
         if ($validator->fails()) {
             return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
         }
-        $whatsappOtpService = new WhatsappOtp();
-        $phone              = $request->phone;
-        $isValidOld            = $whatsappOtpService->isValidate($request->current_phone, $request->old_code);
-        $isValidNew            = $whatsappOtpService->isValidate($phone, $request->new_code);
-        if (!$isValidOld) {
-            return Common::apiResponse(false, __('api_responses.invalid_old_code'));
-        }
-        if (!$isValidNew) {
-            return Common::apiResponse(false, __('api_responses.invalid_new_code'));
-        }
-        $whatsappOtpService->resetCodes($phone);
 
+        // $code = Code::query ()->where ('phone',$request->current_phone)->where('code',$request->vr_code)->first ();
+        // if (!$code) return Common::apiResponse (0,'current phone not verified',null,310);
         $user->phone = $request->phone;
-
+        // $code->delete ();
 
         $user->save();
         return Common::apiResponse(1, 'reset successful', new UserResource($user));
