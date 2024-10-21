@@ -66,6 +66,7 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to   = User::withoutAppends()->searchByUuid($toId)->first();
 
+        dd($to);
 
         if ($from->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
@@ -178,7 +179,7 @@ class ChargeController extends Controller
 
         try {
             [$receiver, $amount, $salary]  = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
-           
+
             if ($user instanceof User) {
                 (new UserAchievementService())->insertCharging($receiver, $amount);
             }
@@ -189,7 +190,7 @@ class ChargeController extends Controller
             ];
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
-           
+
             return Common::apiResponse(0, $e->getMessage(), 400);
         }
     }
