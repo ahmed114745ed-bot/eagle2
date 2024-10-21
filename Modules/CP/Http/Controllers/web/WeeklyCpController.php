@@ -23,10 +23,10 @@ class WeeklyCpController extends MainController
     use HasResourceActions;
 
     public $permission_name = 'weekly-cp';
-    // public function __construct()
-    // {
-    //     (new AppFeatureService)->validateStatusEnable("weekly_cp");
-    // }
+    public function __construct()
+    {
+        (new AppFeatureService)->validateStatusEnable("weekly_cp");
+    }
     public function index ( Content $content )
     {
         return $content

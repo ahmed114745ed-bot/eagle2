@@ -92,7 +92,7 @@ class VipController extends Controller
             'title_en' => 'nullable|string|max:255',
             'image' => 'required||mimes:jpeg,png,jpg,gif,svg|max:2048',
             'img2' => 'required||mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'img2_type' => 'nullable',
+            'img2_type' => 'nullable|string',
             'vipPrivilege_id' => 'required||integer|exists:vip_privileges,id',
             'ovip_id' => 'required|integer|exists:o_vips,id',
 
