@@ -89,6 +89,7 @@ class AdminPermission extends Seeder
             'updates',
             'Permissions',
             'daily-prize',
+            'weekly_cp'
 
 
 
@@ -105,7 +106,7 @@ class AdminPermission extends Seeder
 
         $categories = [
 
-            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles',],
+            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles','weekly_cp'],
             'special_id' => ['special-history', 'special-Ware', 'special-frame', 'special-id-request'],
             'daily-prize' => ['daily-prize'],
             'roles' => ['roles', 'Permissions',],
