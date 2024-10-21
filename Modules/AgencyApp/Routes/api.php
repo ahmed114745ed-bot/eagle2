@@ -24,7 +24,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureE
     Route::get('agency-total-reports', [AgencyAppController::class, 'agency_total_reports']);
     Route::post('cancel-request-createAgency', [AgencyAppController::class, 'cancel_request_createAgency']);
     Route::get('agency-request-info', [AgencyAppController::class, 'agency_request_info']);
-    Route::get('user-agency-information', [AgencyAppController::class, 'user_agency_information']);
+    // Route::get('user-agency-information', [AgencyAppController::class, 'user_agency_information']);
     Route::prefix('agencies')->group(function () {
         Route::post('request-leave-agency', [AgencyAppController::class, 'leave_agency']);
         Route::post('history-data-agency', [AgencyAppController::class, 'historyDataAgency']);
