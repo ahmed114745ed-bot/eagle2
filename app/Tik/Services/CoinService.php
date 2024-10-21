@@ -29,7 +29,7 @@ class CoinService
         $coin = $this->coinRepository->findById($request->coin_id);
         if (!$coin) return Common::apiResponse(0, 'not found', null, 404);
         $trx = rand(111111111111111111, 999999999999999999);
-        DB::beginTransaction();
+       // DB::beginTransaction();
         try {
             $dataCoinLog = [
                 'paid_usd' => $coin->usd,
@@ -40,7 +40,7 @@ class CoinService
                 'status' => 0
             ];
             $log = $this->coinLogRepository->create($dataCoinLog);
-            DB::commit();
+          //  DB::commit();
             $data = [
                 'name' => $coin->coin . '_coins',
                 'amount' => $coin->usd,
@@ -61,7 +61,7 @@ class CoinService
                 return Common::apiResponse(0, 'un supported payment gateway', null, 400);
             }
         } catch (\Exception $exception) {
-            DB::rollBack();
+          //  DB::rollBack();
             return Common::apiResponse(0, 'fail', null, 400);
         }
     }

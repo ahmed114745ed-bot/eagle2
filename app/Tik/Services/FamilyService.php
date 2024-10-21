@@ -46,7 +46,7 @@ class FamilyService
         if ($request->hasFile('image'))  $img = Common::upload('families', $request->file('image'));
 
 
-        DB::beginTransaction();
+       // DB::beginTransaction();
         $familyData = [
             'name' => $request->name,
             'introduce' => $request->introduce,
