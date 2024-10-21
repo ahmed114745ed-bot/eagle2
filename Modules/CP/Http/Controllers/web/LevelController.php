@@ -12,6 +12,7 @@ use Modules\Events\Entities\TargetEvent;
 use App\Admin\Controllers\MainController;
 use App\Models\Vip;
 use Encore\Admin\Controllers\AdminController;
+use Modules\CP\Entities\CpLevel;
 use Modules\Events\Entities\ChargeTargetEvent;
 
 class LevelController extends MainController
@@ -22,22 +23,17 @@ class LevelController extends MainController
     // {
     //     (new AppFeatureService)->validateStatusEnable("target_events");
     // }
-    protected function grid($relation_id)
+    protected function grid()
     {
-        $grid = new Grid(new Vip());
-        
-        // استخدام relation_id و type
-        $grid->model()->where("type", 3)->where('relation_id', $relation_id);
+        $relation_id = request("relation_id");
+        if (!$relation_id) {
+            abort(400, 'Relation ID is required');
+        }
+    
+        $grid = new Grid(new CpLevel());
+        $grid->model()->where('cp_relation_id', $relation_id);
     
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                5 => __('broadcaster'),
-                6 => __('honor'),
-                7 => __('cp'),
-                8 => __('room'),
-            ]
-        );
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($value) {
             return number_format($value);
@@ -46,14 +42,13 @@ class LevelController extends MainController
     
         $grid->column('الاجرائات')->display(function () use ($relation_id) {
             $url1 = url('admin/cp-level-gifts/' . $this->id . '?relation_id=' . $relation_id);
-    
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
-    
             return $button1;
         });
     
         return $grid;
     }
+    
     
     /**
      * Make a show builder.
@@ -64,7 +59,7 @@ class LevelController extends MainController
      */
     protected function detail($id, $relation_id)
     {
-        $show = new Show(Vip::where('id', $id)->where('relation_id', $relation_id)->firstOrFail());
+        $show = new Show(CpLevel::where('id', $id)->where('cp_relation_id', $relation_id)->firstOrFail());
     
         $show->field('id', __('Id'));
         $show->field('tile', __('Tile'));
@@ -81,12 +76,14 @@ class LevelController extends MainController
      * @param int $relation_id
      * @return Form
      */
-    protected function form($relation_id)
+    protected function form()
     {
-        $form = new Form(new Vip());
-        $form->hidden("type")->value(3);
-        $form->hidden('relation_id')->value($relation_id);
-    
+        $relation_id = request("relation_id");
+        if (!$relation_id) {
+            abort(400, 'Relation ID is required');
+        }
+        $form = new Form(new CpLevel());
+        $form->hidden('cp_relation_id')->value($relation_id);
         $form->textarea('name_ar', __('name_ar'));
         $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
