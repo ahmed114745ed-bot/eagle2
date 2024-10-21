@@ -14,8 +14,9 @@ class CoinLogRepository extends AbstractRepository
      */
     public function __construct()
     {
-        parent::__construct(new CoinLog());
         dd('this');
+        parent::__construct(new CoinLog());
+
     }
 
     public function getCoinsByUserId($userId, string $searchKey = null)
