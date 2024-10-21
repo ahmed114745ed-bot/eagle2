@@ -24,6 +24,7 @@ class ChargeController extends Controller
 
     public function __construct(ChargeRepoService $chargeService)
     {
+        dd('this');
         $this->chargeService = $chargeService;
     }
 
@@ -56,7 +57,7 @@ class ChargeController extends Controller
 
     public function chargeTo(Request $request)
     {
-        dd('$to');
+
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
             return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
