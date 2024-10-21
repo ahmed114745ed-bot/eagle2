@@ -10,6 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
+use App\Models\Agency;
+use App\Models\UserSallary;
+use Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Illuminate\Validation\Rule;
@@ -191,5 +194,33 @@ class UserController extends Controller
         $user->save();
         $user->currentAccessToken()->delete();
         return Common::apiResponse(1, 'logged out');
+    }
+
+    public function user_agency_information()
+    {
+        $user   =   Auth::user();
+        $month  =   \request('month');
+        $year  =   \request('year');
+
+        $agency = Agency::query()->where('app_owner_id', $user->id)->first();
+        if (!$agency) return Common::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
+        $total_host_target = UserSallary::where('user_agency_id', $agency->id);
+
+        if ($month != null && $year != null) {
+            $total_host_target = $total_host_target->where('month', $month)
+                ->where('year', $year);
+        }
+        $total_host_target = $total_host_target->sum('sallary');
+
+        $data = [
+            'id'                => $agency->id,
+            'name'              => $agency->name,
+            'image'             => $agency->img,
+            'pio'               => $agency->contents,
+            'num_of_hosts'      => $agency->mempers->count(),
+            'total_salary'      => $total_host_target,
+            'agency_target'     => $agency->getSalary($month, $year),
+        ];
+        return Common::apiResponse(1, '', $data);
     }
 }
