@@ -21,7 +21,7 @@ class WeeklyCpGiftController extends MainController
     {
         $weekly_cp_id = request('weekly_cp_id');
         $data = WeeklyStar::find($weekly_cp_id);
-        if ($data->type == "weekly_cp") {
+        if (@$data->type == "weekly_cp") {
 
             (new AppFeatureService)->validateStatusEnable("weekly_cp");
         }
