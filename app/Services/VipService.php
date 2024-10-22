@@ -171,7 +171,14 @@ class VipService
             'is_active_for_vip' => 1,
 
         ];
-        $this->wareRepository->create($data);
+
+        $ware = $this->wareRepository->findByTypeAndLevel($vipPrivilege->type, $Vip->level);
+        if (!$ware) {
+            $this->wareRepository->create($data);
+        } else {
+            $this->wareRepository->update($data, $ware->id);
+        }
+
         return true;
     }
 
