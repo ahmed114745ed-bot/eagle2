@@ -200,4 +200,18 @@ class Room extends Model
         return $visitors->pluck('profile.avatar');
     }
 
+    public function background()
+    {
+        return $this->belongsTo(Background::class, 'room_background', 'id');
+    }
+
+    public function getFinalRoomImageAttribute()
+    {
+
+        $var = $this->mode == '3' ?
+            'custom_image/back-black.png' :
+            ($this->backgroundImage?->img ?: ($this->background ?: request()->default_background));
+        return $var;
+    }
+
 }

@@ -139,6 +139,13 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
+            'room' => [
+                "room_name"           => @$this->ownerRoom->room_name,
+                "room_cover"          => @$this->ownerRoom->room_cover,
+                "room_background"     => @$this->ownerRoom->final_room_image,
+                "mode"                => @$this->ownerRoom->mode,
+
+            ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
             'family_id' => @$this->family_id,

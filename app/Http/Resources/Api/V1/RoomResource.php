@@ -21,6 +21,7 @@ class RoomResource extends JsonResource
             'owner_id' => $this->uid ?: 0,
             'room_id' => $this->numid ?: 0,
             'name' => $this->room_name ?: '',
+            "mode" => $this->mode,
             'visitors_count' => $this->count_room_socket,
             'cover' => $this->room_cover ?: '',
             'class' => $this->myClass ?: new \stdClass(),
@@ -34,6 +35,7 @@ class RoomResource extends JsonResource
             'is_recommended' => $this->is_recommended ?: 0,
             'lang' => $this->lang ?: '',
             'is_pk' => (bool) $pk,
+            'room_background' => $this->final_room_image,
             'country' => $this->country
                 ? new CountryResource($this->country)
                 : [
@@ -54,7 +56,6 @@ class RoomResource extends JsonResource
         ];
 
         if ($request['show']) {
-            $requestBackground = $this->backgroundImage;
 
 
             $data = array_merge($data, [
