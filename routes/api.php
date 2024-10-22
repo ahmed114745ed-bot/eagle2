@@ -112,8 +112,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
             Route::get('/ware-vips', [VipController::class, 'getWareVip']);
 
-
-
         });
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 

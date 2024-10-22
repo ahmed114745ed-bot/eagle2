@@ -223,7 +223,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     //     }));
 
     $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    $router->resource('report-reals', ReportRealsControlle::class);
+    $router->resource('report-reals', ReportRealsController::class);
     $router->resource('report-moments', ReportMomentController::class);
     $router->resource('admin-users', AdminUsersController::class);
     $router->resource('parent-users', ParentUsersController::class);
@@ -255,7 +255,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->resource('banners', BannerController::class);
 
     // module achievement
-    
+
     $router->resource('achievements', AchievementsController::class);
     $router->post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
     $router->get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
