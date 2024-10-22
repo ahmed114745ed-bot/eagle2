@@ -223,7 +223,7 @@ class FamilyService
         if (!$family) throw new \Exception(__('not found'));
         if ($request->status == 1 && $family->members_num >= $family->num) throw new \Exception(__('family is full members'));
         $admin = $this->familyUserRepository->checkIsAdmin($family->id, $auth->id);
-        if ($family->uid != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
+        if ($family->user_id != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
         $requestUser->status = $request->status;
         $requestUser->save();
 
