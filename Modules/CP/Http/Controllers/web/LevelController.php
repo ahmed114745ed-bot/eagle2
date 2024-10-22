@@ -41,7 +41,7 @@ class LevelController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
     
         $grid->column('الاجرائات')->display(function () use ($relation_id) {
-            $url1 = url('admin/cp-level-gifts/' . $this->id . '?relation_id=' . $relation_id);
+            $url1 = url('admin/cp-level-gifts/' . $this->id);
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
             return $button1;
         });

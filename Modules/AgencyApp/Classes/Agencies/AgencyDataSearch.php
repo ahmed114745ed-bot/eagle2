@@ -41,7 +41,7 @@ class AgencyDataSearch
 //            'users' => $transformedData ?: 0,
 //        ];
 
-        return Common::apiResponse(1, '', $transformedData);
+        return $transformedData;
     }
 
     private function isCurrentPeriod($month, $year)
