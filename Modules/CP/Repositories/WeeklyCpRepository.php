@@ -4,14 +4,12 @@ namespace Modules\CP\Repositories;
 
 use App\Models\Cp;
 
-use Carbon\Carbon;
 use App\Models\GiftLog;
 use Illuminate\Support\Facades\DB;
 use Modules\CP\Entities\WeeklyCpWinner;
 use Modules\Events\Entities\WeeklyStar;
 use Modules\Events\Entities\GeneralRole;
 
-/// todo remove rename import
 class WeeklyCpRepository
 {
 
@@ -22,18 +20,19 @@ class WeeklyCpRepository
 
     public function perviousWeeklyCp()
     {
-        return WeeklyStar::previousEvent()->WeeklyCP()->latest()->first();
+        return WeeklyStar::previousEvent()->WeeklyCP()->with(['WeeklyCpWinners' => function ($query) {
+            $query->where('type_relation', 'lover')->where('level', 1);
+        }])->latest()->first();
     }
 
-    public function perviousWeeklyCpWinners()
+    public function perviousWeeklyCpWinners($startDate)
     {
-        $weeklyCp =  $this->currentWeeklyCp();
-        return WeeklyStar::where("start_date", '<', $weeklyCp->start_date)->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
+        return WeeklyStar::where("start_date", '<', $startDate)->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
             $query->where('type_relation', 'lover');
         }])->limit(3)->get();
     }
 
-    
+
 
     public function role()
     {
@@ -51,12 +50,6 @@ class WeeklyCpRepository
             })->with('cp')->orderByDesc('totalGiftNum')->get();
         return $gifts;
     }
-
-    public function firstPerviousWeeklyCp($perviousWeeklyCpId)
-    {
-        return WeeklyCpWinner::where('weekly_cp_id', $perviousWeeklyCpId)->where('level', 1)->first();
-    }
-
 
     public function userDetails($giftIds, $weeklyCp, $userId)
     {

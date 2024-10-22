@@ -2,16 +2,10 @@
 
 namespace Modules\CP\Http\Services;
 
-use App\Models\Pack;
-use App\Helpers\Common;
-use App\Repositories\WareRepository;
-use Illuminate\Support\Facades\Auth;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\CP\Repositories\CpRepository;
-use Modules\CP\Repositories\PackRepository;
+
 use Modules\CP\Repositories\WeeklyCpRepository;
 use Modules\CP\Http\Resources\TopWeeklyCpResource;
-use Modules\CP\Http\Resources\UserWeeklyCpResource;
+
 
 class WeeklyCpService
 {
@@ -21,7 +15,7 @@ class WeeklyCpService
     {
         $weeklyCp = $this->weeklyCpRepository->currentWeeklyCp();
         if (!$weeklyCp) throw new \Exception('there is not weekly cp now');
-        return $this->weeklyCpRepository->perviousWeeklyCpWinners();
+        return $this->weeklyCpRepository->perviousWeeklyCpWinners($weeklyCp->start_date);
     }
 
     public function weeklyCpDetails()
@@ -51,7 +45,7 @@ class WeeklyCpService
     {
         $perviousWeeklyCp = $this->weeklyCpRepository->perviousWeeklyCp();
         if (!$perviousWeeklyCp) throw new \Exception('there is not weekly cp ');
-        return $this->weeklyCpRepository->firstPerviousWeeklyCp($perviousWeeklyCp->id);
+        return$perviousWeeklyCp ;
     }
 
     public function userDetails($user)
