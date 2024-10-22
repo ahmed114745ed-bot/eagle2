@@ -193,4 +193,11 @@ class VipService
     {
         return $this->vipRepository->badgesVip($type);
     }
+
+    public function deleteWare($wareId)
+    {
+      $ware = $this->wareRepository->findById($wareId);
+      $ware->delete();
+      return true;
+    }
 }

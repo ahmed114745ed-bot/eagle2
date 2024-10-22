@@ -111,6 +111,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/ware-vip', [VipController::class, 'createWareVip'])->middleware('decrypt.data');
             Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
             Route::get('/ware-vips', [VipController::class, 'getWareVip']);
+            Route::post('/delete-ware', [VipController::class, 'deleteWare']);
+
 
         });
         Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
