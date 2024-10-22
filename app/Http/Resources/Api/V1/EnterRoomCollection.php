@@ -47,7 +47,7 @@ class EnterRoomCollection extends JsonResource
             "room_pass"           => $this->room_pass,
             "room_type"           => @$this->roomCategory->name ?? '',
             "hot"                 => '',
-            "room_background"     => $this->getRoomBackground(),
+            "room_background"     => $this->final_room_image,
             "microphone"          => $this->microphone,
             "room_welcome"        => $this->room_welcome,
             "session"             => $this->session,

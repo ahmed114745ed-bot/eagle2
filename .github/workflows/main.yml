@@ -26,4 +26,5 @@ jobs:
           cat /home/${{ secrets.USERNAME }}/scripts/hub.sh
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           php artisan migrate
+          php artisan optimize:clear
           

@@ -2,22 +2,17 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Facades\UserHandling;
+use App\Helpers\Common;
+use App\Models\FamilyLevel;
+use App\Models\FamilyUser;
+use App\Models\GiftLog;
 use App\Models\Pack;
 use App\Models\Room;
-use App\Models\Ware;
-use App\Models\Agency;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\TimeLog;
-use App\Models\FamilyUser;
-use App\Models\FamilyLevel;
-use App\Facades\UserHandling;
-use App\Models\AgencyUserJob;
-use App\Models\AgencyJoinRequest;
-use App\Models\Config;
 use App\Models\UserSetting;
-use Illuminate\Support\Facades\DB;
+use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class MyDataResource extends JsonResource
 {
@@ -108,10 +103,10 @@ class MyDataResource extends JsonResource
         $show_user_setting = $this->userSetting;
         if ($show_user_setting == null) {
             $show_user_setting = UserSetting::firstOrCreate(['user_id' => $this->id], [
-                    'show_git' => 1,
-                    'show_intro' => 1,
-                    'show_banner' => 1,
-                ]);
+                'show_git' => 1,
+                'show_intro' => 1,
+                'show_banner' => 1,
+            ]);
         }
 
         $achievement_images = [];
@@ -139,6 +134,14 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
+            'room' => [
+                "id" => @$this->ownerRoom->id,
+                "room_name" => @$this->ownerRoom->room_name,
+                "room_cover" => @$this->ownerRoom->room_cover,
+                "room_background" => @$this->ownerRoom->final_room_image,
+                "mode" => @$this->ownerRoom->mode,
+
+            ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
             'family_id' => @$this->family_id,
@@ -172,7 +175,7 @@ class MyDataResource extends JsonResource
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
-            "multi_images"          => $this->images?->select("img"),
+            "multi_images" => $this->images?->select("img"),
         ];
 
         $data['auth_token'] = $this->auth_token;

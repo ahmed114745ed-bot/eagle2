@@ -12,7 +12,7 @@ class RoomRepository extends AbstractRepository
 {
     public function __construct()
     {
-        parent::__construct(new Room());
+        parent::__construct(new Room);
     }
 
 
@@ -88,6 +88,7 @@ class RoomRepository extends AbstractRepository
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
             'lastPk',
+            'background',
             'roomVisitorUsers' => fn($q) => $q->limit(5)
         ])
             ->whereHas('owner')
