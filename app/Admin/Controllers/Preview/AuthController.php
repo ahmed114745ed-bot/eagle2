@@ -90,7 +90,7 @@ class AuthController extends BaseAuthController
         $id = $request->token;
         $user = Agent::find($id);
         // Authenticate the user by ID
-        if ($this->guard()->loginUsingId($id)) {
+        if ($user->is_preview && $this->guard()->loginUsingId($id)) {
             // If authentication is successful, redirect to the dashboard or another page
             return redirect()->intended($request->url??$this->redirectPath());
         }

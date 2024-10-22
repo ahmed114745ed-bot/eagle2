@@ -167,12 +167,6 @@ class AgencyController extends Controller
         if ($type == "application") {
             $list_req1 = $list_req->where('status', 0)->with('user')->get();
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
-
-            // $list_req2 =LeaveAgencyRequest::where("agency_id", $agency->id)->with("user",'admin')->get();
-            // $list_req2 = MyDataForAgancyNewResource::collection($list_req2,'leave')->toArray();
-
-            // $list_req = array_merge($list_req1,$list_req2);
-
         } elseif ($type == "record") {
             $list_req = $list_req->where('status', '!=', 0)->with('user', 'admin')->get();
             $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
@@ -183,4 +177,14 @@ class AgencyController extends Controller
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
+
+    // public function showAgencyRequest(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $type = $request->type;
+
+    //     // استدعاء الخدمة لمعالجة الطلب
+    //     $data = $this->agencyService->showAgencyRequest($user, $type);
+    //     return Common::apiResponse(1, '',$data);
+    // }
 }
