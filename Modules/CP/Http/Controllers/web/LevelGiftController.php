@@ -21,6 +21,7 @@ use App\Services\AppFeatureService;
 use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Entities\RewardTarget;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 
 class LevelGiftController extends MainController
@@ -91,7 +92,7 @@ class LevelGiftController extends MainController
     {
 
         $charge_event_id = request('cp_level_id');
-        $vip = Vip::query()->find($charge_event_id);
+        $vip = CpLevel::query()->find($charge_event_id);
         $grid = new Grid(new CpLevelGift());
         $grid->column('created_at')->hide();
         $grid->model()->where("vip_id",$charge_event_id);
@@ -113,12 +114,12 @@ class LevelGiftController extends MainController
         });
         $grid->column('created_at', __('Created at'));
 
-        $grid->tools(function (Grid\Tools $tools) use ($vip){
-            $url = url('admin/target-events');
+        $grid->tools(function (Grid\Tools $tools) use ($vip,$charge_event_id){
+            $url = url('admin/cp-levels/'.$charge_event_id);
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                            <i class="fa fa-arrow-left"></i> الرجوع إلى targets
+                            <i class="fa fa-arrow-left"></i> الرجوع إلى levels
                         </a>
                         <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
                     </div>

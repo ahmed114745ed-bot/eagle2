@@ -23,13 +23,7 @@ Route::group(
     function (\Illuminate\Routing\Router $router) {
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
-        // $router->resource('cp-levels', LevelController::class);
-       
-
-        // Route::prefix('cp-level-gifts/{cp_level_id}/')->group(function () {
-        // $router->resource('cp-levels/{id}', LevelController::class);
         $router->resource('weekly-cp', WeeklyCpController::class);
-        // $router->resource('cp-levels', LevelController::class);
 
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {

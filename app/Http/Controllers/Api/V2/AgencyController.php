@@ -11,9 +11,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
-
-
-
+use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencyUserJob;
 
 class AgencyController extends Controller
 {
@@ -142,4 +143,48 @@ class AgencyController extends Controller
 
         return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
     }
+
+    public function showAgencyRequest(Request $request)
+    {
+        $user   = $request->user();
+        $type = $request->type;
+
+        $admin = AgencyUserJob::where('user_id', $user->id)->where('type', 'requestManger')->first();
+        if ($admin) {
+            $agency = Agency::where('id', $admin->agency_id)->first();
+        } else {
+            $agency = Agency::where('app_owner_id', $user->id)->first();
+        }
+
+
+        if (!$agency) {
+
+            return Common::apiResponse(0, __('api_responses.notAdmin'));
+        }
+        $agency_id = $agency->id;
+        $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
+
+        if ($type == "application") {
+            $list_req1 = $list_req->where('status', 0)->with('user')->get();
+            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
+        } elseif ($type == "record") {
+            $list_req = $list_req->where('status', '!=', 0)->with('user', 'admin')->get();
+            $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
+        }
+
+        if ($list_req) {
+            return Common::apiResponse(1, '', $list_req);
+        }
+        return Common::apiResponse(0, 'لا يوجد بيانات', []);
+    }
+
+    // public function showAgencyRequest(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $type = $request->type;
+
+    //     // استدعاء الخدمة لمعالجة الطلب
+    //     $data = $this->agencyService->showAgencyRequest($user, $type);
+    //     return Common::apiResponse(1, '',$data);
+    // }
 }
