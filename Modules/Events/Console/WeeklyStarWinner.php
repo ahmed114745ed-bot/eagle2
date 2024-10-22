@@ -56,24 +56,24 @@ class WeeklyStarWinner extends Command
                                          ]);
                 $rewardIds = $weeklyEvent->rewards->where('level',$index + 1);
                 if (count($rewardIds) > 0){
-                    foreach ($rewardIds as $rewad){
+                    foreach ($rewardIds as $reward){
 
-                        $expiredAt = now()->addDays($rewad);
-                        if ($rewad->type == "coins"){
-                            $entry->sender->di+=$rewad->target;
+                        $expiredAt = now()->addDays($reward->expire);
+                        if ($reward->type == "coins"){
+                            $entry->sender->di+=$reward->target;
                             $entry->sender->save();
-                        }elseif ($rewad->type == "vip"){
-                            $vip=OVip::query()->find($rewad->target);
-                            UserCommon::addVipToUser($entry->sender,$vip,$rewad->expire);
+                        }elseif ($reward->type == "vip"){
+                            $vip=OVip::query()->find($reward->target);
+                            UserCommon::addVipToUser($entry->sender,$vip,$reward->expire);
 
-                        }elseif ($rewad->type == "ware"){
-                            $ware=Ware::query()->find($rewad->target);
-                            UserCommon::addWareToUser($entry->sender,$ware,$rewad->expire);
-                        }elseif ($rewad->type == "achievement"){
-                            $dateTimestamp = Carbon::parse($rewad->expire)->format("Y-m-d H:i:s");
+                        }elseif ($reward->type == "ware"){
+                            $ware=Ware::query()->find($reward->target);
+                            UserCommon::addWareToUser($entry->sender,$ware,$reward->expire);
+                        }elseif ($reward->type == "achievement"){
+                            $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
-                                'custom_image' => $rewad->target,
+                                'custom_image' => $reward->target,
                                 'end_at' => $dateTimestamp,
                             ];
 
@@ -82,14 +82,14 @@ class WeeklyStarWinner extends Command
                             continue;
                         }
 
-                        $daata= [
+                        $data= [
                             'winner_id' => $entry->sender_id,
-                            'reward_id' => $rewad->id,
+                            'reward_id' => $reward->id,
                             'expaired_at' => $expiredAt,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
-                        DB::table('winner_rewards')->insert($daata);
+                        DB::table('winner_rewards')->insert($data);
                     }
                 }
 

@@ -56,26 +56,26 @@ class WeeklyCpWinnerConsole extends Command
                                          ]);
                 $rewardIds = $weeklyCp->weeklyCpGifts->where('level',$index + 1);
                 if (count($rewardIds) > 0){
-                    foreach ($rewardIds as $rewad){
-                        if ($rewad->type == "coins"){
-                            $entry->cp->fromUser->di+=$rewad->target;
+                    foreach ($rewardIds as $reward){
+                        if ($reward->type == "coins"){
+                            $entry->cp->fromUser->di+=$reward->target;
                             $entry->cp->fromUser->save();
-                            $entry->cp->toUser->di+=$rewad->target;
+                            $entry->cp->toUser->di+=$reward->target;
                             $entry->cp->toUser->save();
 
-                        }elseif ($rewad->type == "vip"){
-                            $vip=OVip::query()->find($rewad->target);
-                            UserCommon::addVipToUser($entry->cp->fromUser,$vip,$rewad->expire);
-                            UserCommon::addVipToUser($entry->cp->toUser,$vip,$rewad->expire);
+                        }elseif ($reward->type == "vip"){
+                            $vip=OVip::query()->find($reward->target);
+                            UserCommon::addVipToUser($entry->cp->fromUser,$vip,$reward->expire);
+                            UserCommon::addVipToUser($entry->cp->toUser,$vip,$reward->expire);
 
-                        }elseif ($rewad->type == "ware"){
-                            $ware=Ware::query()->find($rewad->target);
-                            UserCommon::addWareToUser($entry->sender,$ware,$rewad->expire);
-                        }elseif ($rewad->type == "achievement"){
-                            $dateTimestamp = Carbon::parse($rewad->expire)->format("Y-m-d H:i:s");
+                        }elseif ($reward->type == "ware"){
+                            $ware=Ware::query()->find($reward->target);
+                            UserCommon::addWareToUser($entry->sender,$ware,$reward->expire);
+                        }elseif ($reward->type == "achievement"){
+                            $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
-                                'custom_image' => $rewad->target,
+                                'custom_image' => $reward->target,
                                 'end_at' => $dateTimestamp,
                             ];
 
