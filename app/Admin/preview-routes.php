@@ -176,7 +176,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->resource('sallaries_history', 'SallariesHistoryController');
     // $router->resource ('export-excel','ImportExcelReportController');
     $router->resource('agencies-tareget-manger', AgencyMangerTaregetController::class);
-    $router->resource('report_users', Report_from_usersController::class);
+    $router->resource('report_users', ReportFromUsersController::class);
     $router->post('cashing', 'ReportController@cashing')->name('cashing');
     $router->resource('trxs', 'CoinLogController');
     $router->resource('images', 'ImageController');
@@ -209,7 +209,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->resource('/bans', 'BanController');
     $router->resource('/request-background-image', 'RequestBackgroundImageController');
     $router->resource('/group-chat', 'GroupChatController');
-    $router->resource('interests', InterestsController::class);
+    $router->resource('interests', \App\Admin\Controllers\InterestsController::class);
     $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
     $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
     $router->resource('agency-manger-users', AgencyMangerUsers::class);
@@ -223,7 +223,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     //     }));
 
     $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    $router->resource('report-reals', ReportRealsController::class);
+    $router->resource('report-reals', \App\Admin\Controllers\ReportRealsController::class);
     $router->resource('report-moments', ReportMomentController::class);
     $router->resource('admin-users', AdminUsersController::class);
     $router->resource('parent-users', ParentUsersController::class);
