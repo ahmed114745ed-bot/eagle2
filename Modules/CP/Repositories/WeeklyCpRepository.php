@@ -25,20 +25,15 @@ class WeeklyCpRepository
         return WeeklyStar::previousEvent()->WeeklyCP()->latest()->first();
     }
 
-    public function perviousWeeklyCpIds()
+    public function perviousWeeklyCpWinners()
     {
         $weeklyCp =  $this->currentWeeklyCp();
-        return WeeklyStar::where("start_date", '<', $weeklyCp->start_date)->pluck('id')->toArray();
+        return WeeklyStar::where("start_date", '<', $weeklyCp->start_date)->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
+            $query->where('type_relation', 'lover');
+        }])->limit(3)->get();
     }
 
-    public function perviousWeeklyCpWinners($typeRelation)
-    {
-        $perviousWeeklyCpId =    $this->perviousWeeklyCpIds();
-        return WeeklyCpWinner::whereIn('weekly_cp_id', $perviousWeeklyCpId)
-            ->with('userOne', 'userTwo', 'weeklyCp')
-            ->where('type_relation', $typeRelation)
-            ->get();
-    }
+    
 
     public function role()
     {

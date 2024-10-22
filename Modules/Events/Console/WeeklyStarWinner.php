@@ -21,8 +21,7 @@ class WeeklyStarWinner extends Command
 
     public function handle()
     {
-        $nowDate = Carbon::now()->copy()->timezone('Atlantic/Stanley')->toDate();
-        $weeklyEvent = WeeklyStar::endToday()
+        $weeklyEvent = WeeklyStar::endToday()->where('type','weekly_star')
                                  ->with('gifts', 'rewards')
                                  ->latest()
                                  ->first();

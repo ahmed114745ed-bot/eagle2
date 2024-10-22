@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\CP\Entities\WeeklyCpWinner;
 
 class WeeklyStar extends Model
 {
@@ -49,6 +50,10 @@ class WeeklyStar extends Model
     public function WeeklyStarGifts()
     {
         return $this->hasMany(WeeklyStarGift::class,'weekly_star_id');
+    }
+    public function WeeklyCpWinners()
+    {
+        return $this->hasMany(WeeklyCpWinner::class,'weekly_cp_id');
     }
 
     protected static function boot() {

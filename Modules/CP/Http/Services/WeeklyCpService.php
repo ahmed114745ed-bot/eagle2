@@ -21,7 +21,7 @@ class WeeklyCpService
     {
         $weeklyCp = $this->weeklyCpRepository->currentWeeklyCp();
         if (!$weeklyCp) throw new \Exception('there is not weekly cp now');
-        return $this->weeklyCpRepository->perviousWeeklyCpWinners('lover');
+        return $this->weeklyCpRepository->perviousWeeklyCpWinners();
     }
 
     public function weeklyCpDetails()
