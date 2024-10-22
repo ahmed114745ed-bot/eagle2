@@ -311,4 +311,11 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->where('agency_id',$agencyId)->count();
     }
+
+
+    public function updateAgencyId($user, $agencyId)
+    {
+        $user->update(['agency_id', $agencyId]);
+        return true;
+    }
 }
