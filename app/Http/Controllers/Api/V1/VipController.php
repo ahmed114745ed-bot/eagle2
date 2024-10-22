@@ -134,7 +134,7 @@ class VipController extends Controller
     public function deleteWare(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ware_id' => 'nullable|integer|exists:wares,id',
+            'ware_id' => 'required|integer|exists:wares,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
