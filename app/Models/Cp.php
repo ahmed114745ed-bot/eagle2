@@ -23,4 +23,11 @@ class Cp extends Model
     {
         return $this->belongsTo(CpRelation::class,"cp_relation_id");
     }
+
+    public function scopeRelation($query)
+    {
+        return $query->whereHas('relation', function ($query) {
+            $query->where('title', 'lover');
+        });
+    }
 }

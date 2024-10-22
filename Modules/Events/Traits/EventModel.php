@@ -37,7 +37,7 @@ trait EventModel
 
     public function scopeCurrentEvent(Builder $query)
     {
-        $timezone = config('app.owner_timezone');
+        $timezone = config('app.owner_timezone') ?? '-03:00';
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
         return $query->whereRaw("start_date <= ?", [date($nowDate)] ) // 27
                      ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate] ); // 27
@@ -46,7 +46,7 @@ trait EventModel
 
     public function scopePreviousEvent(Builder $query)
     {
-        $timezone = config('app.owner_timezone');
+        $timezone = config('app.owner_timezone') ?? '-03:00';
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
 
         return $query->whereRaw("start_date < ?", [ date($nowDate)] ) // 27

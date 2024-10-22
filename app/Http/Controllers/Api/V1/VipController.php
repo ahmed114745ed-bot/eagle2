@@ -116,7 +116,7 @@ class VipController extends Controller
         $validator = Validator::make($request->all(), [
             'vipPrivilege_id' => 'required||integer|exists:vip_privileges,id',
             'ovip_id' => 'required|integer|exists:o_vips,id',
-           
+
 
         ]);
         if ($validator->fails()) {
@@ -129,6 +129,24 @@ class VipController extends Controller
         }
 
         return Common::apiResponse(1, 'success', $data, 200);
+    }
+
+    public function deleteWare(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'ware_id' => 'required|integer|exists:wares,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $this->vipService->deleteWare($request->ware_id);
+            return Common::apiResponse(1, 'deleted successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
     public function badges(Request $request)

@@ -7,7 +7,7 @@ return [
 
     'payment_url' => env('PAYMENT_URL'),
 
-    'owner_timezone' => env('OWNER_TIMEZONE'),
+    'owner_timezone' => env('OWNER_TIMEZONE','-03:00'),
 
     'baishun_app_id' => env('BAISHUN_APP_Id',"4280702746"),
     'baishun_app_key' => env('BAISHUN_APP_KEY',"LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),

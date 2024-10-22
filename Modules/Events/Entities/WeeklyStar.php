@@ -6,12 +6,13 @@ use Carbon\Carbon;
 use App\Models\Gift;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\CP\Entities\WeeklyCpGift;
+use Modules\Events\Traits\EventModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Events\Traits\EventModel;
 
 class WeeklyStar extends Model
 {
@@ -38,6 +39,11 @@ class WeeklyStar extends Model
     public function rewards()
     {
         return $this->hasMany(Reward::class,'weekly_star_id');
+    }
+
+    public function weeklyCpGifts()
+    {
+        return $this->hasMany(WeeklyCpGift::class,'weekly_cp_id');
     }
 
     public function WeeklyStarGifts()
@@ -125,6 +131,11 @@ class WeeklyStar extends Model
     public function scopePeriod(Builder $query)
     {
         return $query->where('type', 'event_period');
+    }
+
+    public function scopeWeeklyCP(Builder $query)
+    {
+        return $query->where('type', 'weekly_cp');
     }
 
 }
