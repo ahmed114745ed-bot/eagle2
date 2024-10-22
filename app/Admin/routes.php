@@ -301,7 +301,7 @@ Route::group(
         //     }));
 
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        $router->resource('report-reals', ReportRealsControlle::class);
+        $router->resource('report-reals', ReportRealsController::class);
         $router->resource('report-moments', ReportMomentController::class);
         $router->resource('admin-users', AdminUsersController::class);
         $router->resource('parent-users', ParentUsersController::class);
