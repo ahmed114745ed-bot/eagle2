@@ -22,6 +22,11 @@ class CpRelationController extends MainController
         $grid->column('image', __('Img'))->image('', 30, 30);
         $grid->column("price",__("price"));
 
+        $grid->column('الاجرائات')->display(function (){
+            $url1 = url('admin/cp-levels/' . $this->id);
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>المستويات (levels)</a>";
+            return $button1;
+        });
         return $grid;
     }
 

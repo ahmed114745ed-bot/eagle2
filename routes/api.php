@@ -127,7 +127,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/create', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
             Route::post('/show', [AdminUsersController::class, 'show']);
         });
-        // roles 
+        // roles
         Route::resource('roles', RoleController::class)->middleware('decrypt.data');
         Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
         Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
@@ -233,6 +233,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
+                Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
                 Route::post('reset_password', [\App\Http\Controllers\Api\V1\Auth\ResetPasswordController::class, 'reset']);
@@ -252,7 +253,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('community')->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
             });
-      
+
             Route::prefix ('home_carousels')->group (function (){
                 Route::get ('/',[HomeCarouselController::class,'index']);
             });
@@ -290,6 +291,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
+
+            Route::get ('my_gifts',[\App\Http\Controllers\Api\V1\GiftLogController::class,'giftLogsList']);
+
 
             Route::prefix('group-chat')->group(function () {
                 Route::get('/', [GroupChatController::class, 'index']);
@@ -379,7 +383,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
-               
+
             });
             Route::get('levels/badges', [VipController::class, 'badges']);
             Route::get('levels', [VipController::class, 'index']);
@@ -416,7 +420,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
-
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
@@ -424,9 +427,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('actions_request', [AgencyController::class, 'Accept_request']);
                 Route::get('list_options_his', [AgencyController::class, 'list_options_his']);
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
-                Route::post('{id}', [AgencyController::class, 'update']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+                Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
+
             });
             Route::prefix('payment-gateway')->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);

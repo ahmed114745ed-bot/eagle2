@@ -2,31 +2,32 @@
 
 namespace App\Tik\Services;
 
-use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use Illuminate\Support\Facades\DB;
-use App\Tik\Repositories\UserRepository;
+use App\Models\User;
 use App\Tik\Repositories\AgencyRepository;
+use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
-use App\Tik\Repositories\AgencySalaryRepository;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
 class ChargeRepoService
 {
     public function __construct(
-        private readonly ChargeRepository $chargeRepository,
-        private readonly RoomSalaryRepository $roomSalaryRepo,
-        private readonly UserRepository $userRepository,
-        private readonly UserSalaryRepository $userSalaryRepository,
-        private readonly AgencyRepository $agencyRepository,
-        private readonly AgencySalaryRepository $agencySalaryRepository,
-        private readonly CoinLogRepository $coinLogRepository
-    ) {}
+        private readonly ChargeRepository       $chargeRepository,
+        private readonly RoomSalaryRepository   $roomSalaryRepo,
+        private readonly UserRepository         $userRepository,
+        private readonly UserSalaryRepository   $userSalaryRepository,
+        private readonly AgencyRepository       $agencyRepository,
+   
+    )
+    {
+
+    }
 
     public function create(array $data)
     {
@@ -36,7 +37,7 @@ class ChargeRepoService
 
     public function chargeCoinsFromOwner($amount, $userId, $toUserUuId)
     {
-        $userResve =  $this->userRepository->searchUser($toUserUuId);
+        $userResve = $this->userRepository->searchUser($toUserUuId);
         if (!$userResve) {
             throw new \Exception('this user not found');
         }
@@ -55,7 +56,7 @@ class ChargeRepoService
             \DB::beginTransaction();
             // Increment 'di' column for the user
             $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
-            $coins     = $coinPrise * $amount;
+            $coins = $coinPrise * $amount;
             $userType = $userResve->user_type;
 
             $data = [
@@ -114,33 +115,32 @@ class ChargeRepoService
     public function sendMoney(User $sender, $receiverUuid, $count)
     {
 
-            $agency =  $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
-            if (!$agency || $agency->status == 0)  throw new \Exception(__('api_responses.canNotCharge'));
-            $userReceiver = $this->userRepository->searchUser($receiverUuid);
-            if (!$userReceiver)   throw new \Exception('this user not found');
+        $agency = $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
+        if (!$agency || $agency->status == 0) throw new \Exception(__('api_responses.canNotCharge'));
+        $userReceiver = $this->userRepository->searchUser($receiverUuid);
+        if (!$userReceiver) throw new \Exception('this user not found');
 
-            // Decrement sender's coins
-            $this->userRepository->decrementUserCoins($sender, $count);
-            $percentage = Common::getConf("one_usd_value_in_coins") ?? 1;
-            $usd = $count / $percentage;
+        // Decrement sender's coins
+        $this->userRepository->decrementUserCoins($sender, $count);
+        $percentage = Common::getConf("one_usd_value_in_coins") ?? 1;
+        $usd = $count / $percentage;
 
-            $this->charge($sender, $userReceiver, 'freight forwarder', $count, $usd);
-            return $userReceiver;
+        $this->charge($sender, $userReceiver, 'freight forwarder', $count, $usd);
+        return $userReceiver;
 
     }
 
-    public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null,$searchKey = null)
+    public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null, $searchKey = null)
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
         if ($type == 'received') {
-            $charge = $charge/*->where('user_type', $charger_type)*/->where('user_id', $userId);
+            $charge = $charge/*->where('user_type', $charger_type)*/ ->where('user_id', $userId);
         }
         if ($type == 'sent') {
-            $charge = $charge/*->where('charger_type', $charger_type)*/->where('charger_id', $userId);
+            $charge = $charge/*->where('charger_type', $charger_type)*/ ->where('charger_id', $userId);
         }
-        if($searchKey != null )
-        {
-            $charge = $charge->when( $searchKey, fn($query) => $query->whereHas('sender' , fn($q) => $q->where('uuid', 'like', $searchKey)));
+        if ($searchKey != null) {
+            $charge = $charge->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         }
         if ($by_date) {
             $charge = $charge->where('created_at', 'like', "%$by_date%");
@@ -153,7 +153,7 @@ class ChargeRepoService
     {
         try {
             $receiver = $this->userRepository->searchUser($receiverUuid);
-            if (!$receiver)   throw new \Exception('this user not found');
+            if (!$receiver) throw new \Exception('this user not found');
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
@@ -165,21 +165,20 @@ class ChargeRepoService
 
             $salary = $agency->salary;
 
-            if ($salary < $count)  throw new \Exception('Low Balance');
+            if ($salary < $count) throw new \Exception('Low Balance');
 
-           // DB::beginTransaction();
+            // DB::beginTransaction();
             // Increment 'di' column for the user
             $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
-            $numDi     = $coinPrise * $count;
+            $numDi = $coinPrise * $count;
             $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
-           // \DB::rollBack();
+            // \DB::rollBack();
             throw new \Exception($e->getMessage());
         }
     }
-
 
 
     public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
@@ -187,9 +186,9 @@ class ChargeRepoService
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
-            'charger_id'  => $sender->id,
+            'charger_id' => $sender->id,
             'charger_type' => $chargeType,
-            'user_id'     => $receiver->id,
+            'user_id' => $receiver->id,
             'user_type' => $type,
             'amount' => $amount,
             'amount_type' => 2,
