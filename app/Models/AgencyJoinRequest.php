@@ -10,6 +10,11 @@ class AgencyJoinRequest extends Model
 
     protected $guarded = ['id'];
 
+    public function admin()
+    {
+        return $this->hasOne(Agent::class,'id',"change_status_admin_id");
+    }
+
     public function user(){
         return $this->belongsTo (User::class);
     }
@@ -32,8 +37,5 @@ class AgencyJoinRequest extends Model
         return parent::update($attributes, $options);
     }
 
-    public function admin()
-    {
-        return $this->hasOn(Agent::class,"change_status_admin_id");
-    }
+    
 }
