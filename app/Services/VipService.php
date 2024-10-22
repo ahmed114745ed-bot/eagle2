@@ -172,7 +172,7 @@ class VipService
 
         ];
 
-        $ware = $this->wareRepository->findByTypeAndLevel($vipPrivilege->type, $Vip->level);
+        $ware = $this->wareRepository->findById($request->ware_id);
         if (!$ware) {
             $this->wareRepository->create($data);
         } else {

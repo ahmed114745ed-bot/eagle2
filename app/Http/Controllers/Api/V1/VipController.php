@@ -95,6 +95,7 @@ class VipController extends Controller
             'img2_type' => 'nullable|string',
             'vipPrivilege_id' => 'required||integer|exists:vip_privileges,id',
             'ovip_id' => 'required|integer|exists:o_vips,id',
+            'ware_id' => 'nullable|integer|exists:wares,id',
 
         ]);
         if ($validator->fails()) {
@@ -115,6 +116,7 @@ class VipController extends Controller
         $validator = Validator::make($request->all(), [
             'vipPrivilege_id' => 'required||integer|exists:vip_privileges,id',
             'ovip_id' => 'required|integer|exists:o_vips,id',
+           
 
         ]);
         if ($validator->fails()) {
