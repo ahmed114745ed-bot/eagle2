@@ -113,7 +113,6 @@ class WeeklyCpGiftController extends MainController
                     <i class="fa fa-plus"></i> ضيف
                 </a>
                 <h3 style="margin-right: 10px;">جوائز للفائز الأول</h3>
-        
             HTML;
             $tools->append($customButtonHTML);
         });
