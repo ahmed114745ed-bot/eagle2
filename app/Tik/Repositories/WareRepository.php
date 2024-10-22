@@ -101,4 +101,9 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->where('type', $type)->where('level', $level)->get();
     }
+
+    public function findByTypeAndLevel($typePrivilege,$levelOvip)
+    {
+        return $this->model->where(['type' => $typePrivilege, 'get_type' => 1,'level' =>$levelOvip])->first();
+    }
 }
