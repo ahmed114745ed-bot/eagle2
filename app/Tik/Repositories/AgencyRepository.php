@@ -3,7 +3,8 @@
 namespace App\Tik\Repositories;
 
 use App\Models\Agency;
-
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencyUserJob;
 
 class AgencyRepository extends AbstractRepository
 {
@@ -89,5 +90,25 @@ class AgencyRepository extends AbstractRepository
     public function getByAgencyMangerId($agencyMangerId)
     {
         return $this->model->where('agency_manger_id',$agencyMangerId)->with('owner')->get();
+    }
+
+    public function getAdminByUserId($userId)
+    {
+        return AgencyUserJob::where('user_id', $userId)->where('type', 'requestManger')->first();
+    }
+
+    public function getAgencyById($agencyId)
+    {
+        return Agency::where('id', $agencyId)->first();
+    }
+
+    public function getAgencyByOwnerId($ownerId)
+    {
+        return Agency::where('app_owner_id', $ownerId)->first();
+    }
+
+    public function getJoinRequests($agencyId)
+    {
+        return AgencyJoinRequest::where('agency_id', $agencyId);
     }
 }

@@ -31,6 +31,7 @@ use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
+use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
 
 
@@ -691,5 +692,37 @@ class AgencyService
             $user = $this->userRepository->findById($request->user()->id);
         }
         return $user;
+    }
+
+    public function showAgencyRequest($user, $type)
+    {
+        // التحقق مما إذا كان المستخدم هو المدير
+        $admin = $this->agencyRepository->getAdminByUserId($user->id);
+        if ($admin) {
+            $agency = $this->agencyRepository->getAgencyById($admin->agency_id);
+        } else {
+            $agency = $this->agencyRepository->getAgencyByOwnerId($user->id);
+        }
+
+        if (!$agency) {
+            return Common::apiResponse(0, __('api_responses.notAdmin'));
+        }
+
+        $agency_id = $agency->id;
+        $list_req = $this->agencyRepository->getJoinRequests($agency_id);
+
+        if ($type == "application") {
+            $list_req1 = $list_req->where('status', 0)->with('user')->get();
+            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
+        } elseif ($type == "record") {
+            $list_req = $list_req->where('status', '!=', 0)->with('user', 'admin')->get();
+            $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
+        }
+
+        if ($list_req) {
+            return $list_req;
+        }
+
+        return [];
     }
 }
