@@ -177,4 +177,14 @@ class AgencyController extends Controller
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
+
+    // public function showAgencyRequest(Request $request)
+    // {
+    //     $user = $request->user();
+    //     $type = $request->type;
+
+    //     // استدعاء الخدمة لمعالجة الطلب
+    //     $data = $this->agencyService->showAgencyRequest($user, $type);
+    //     return Common::apiResponse(1, '',$data);
+    // }
 }
