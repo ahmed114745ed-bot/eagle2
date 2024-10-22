@@ -11,9 +11,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
-
-
-
+use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencyUserJob;
 
 class AgencyController extends Controller
 {

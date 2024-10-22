@@ -423,7 +423,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
-                Route::get('show-agency-request', [\App\Http\Controllers\Api\V1\AgencyController::class, 'showAgencyRequest']);
+                Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
                 Route::get('show_request', [AgencyController::class, 'show_request']);
                 Route::post('actions_request', [AgencyController::class, 'Accept_request']);
                 Route::get('list_options_his', [AgencyController::class, 'list_options_his']);
