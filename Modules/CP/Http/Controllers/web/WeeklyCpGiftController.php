@@ -22,7 +22,7 @@ class WeeklyCpGiftController extends MainController
         $weekly_cp_id = request('weekly_cp_id');
         $data = WeeklyStar::find($weekly_cp_id);
         if ($data->type == "weekly_cp") {
-           
+
             (new AppFeatureService)->validateStatusEnable("weekly_cp");
         }
     }
@@ -88,13 +88,13 @@ class WeeklyCpGiftController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if (@$this->type == "ware") {
                 return @$this->ware->name;
-            } elseif ($this->type == "vip") {
+            } elseif (@$this->type == "vip") {
                 return @$this->vip->name;
-            } elseif ($this->type == "coins") {
+            } elseif (@$this->type == "coins") {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
+            } elseif (@$this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
@@ -108,7 +108,7 @@ class WeeklyCpGiftController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('weekly_cp_id') . "/1/create";
             $customButtonHTML = <<<HTML
-            
+
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> ضيف
                 </a>
@@ -226,7 +226,7 @@ class WeeklyCpGiftController extends MainController
                     }
                     return $ops;
                 });
-                $form->hidden('sub_type'); 
+                $form->hidden('sub_type');
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
@@ -251,13 +251,13 @@ class WeeklyCpGiftController extends MainController
             'female' => __('Female')
         ])->required();
         $form->saved(function (Form $form) {
-            
-           
+
+
             $route = url('admin/weekly-cp-gift/'.request('weekly_cp_id'));
             return redirect($route);
         });
 
-        
+
         return $form;
     }
 }
