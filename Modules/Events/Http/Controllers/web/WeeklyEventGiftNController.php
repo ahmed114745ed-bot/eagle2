@@ -29,7 +29,7 @@ class WeeklyEventGiftNController extends MainController
     {
         $weekly_event_id = request('weekly_event_id');
         $data = WeeklyStar::find($weekly_event_id);
-        if ($data->type == "event_period") {
+        if (@$data->type == "event_period") {
             (new AppFeatureService)->validateStatusEnable("period_event");
         } else {
             (new AppFeatureService)->validateStatusEnable("weekly_star");
@@ -117,12 +117,12 @@ class WeeklyEventGiftNController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('weekly_event_id') . "/1/create";
             $customButtonHTML = <<<HTML
-            
+
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> ضيف
                 </a>
                 <h3 style="margin-right: 10px;">جوائز للفائز الأول</h3>
-        
+
             HTML;
             $tools->append($customButtonHTML);
         });
