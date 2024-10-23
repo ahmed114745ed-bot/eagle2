@@ -42,10 +42,42 @@ class ChargeAction extends Action
             // }
 
         }elseif ($request->user_type == 'dash'){
-            $user = Admin::query ()->find ($request->user_id);
-            if (!$user){
-                return $this->response()->error(__('user not found'))->refresh();
+            // $user = Admin::query ()->find ($request->user_id);
+            // if (!$user){
+            //     return $this->response()->error(__('user not found'))->refresh();
+            // }
+            if ($request->id_type == '1'){
+                $user = User::query ()->where ('uuid',$request->user_id)->first ();
+            }else{
+                $user = User::query ()->find ($request->user_id);
             }
+            $agency = Agency::where("app_owner_id",$user->id)->first();
+            if (!$agency){
+                return $this->response()->error(__('api_responses.agency'))->refresh();
+            }
+
+            if ($request->charge_type == "increment") {
+                $agency->coins += $request->amount;
+                $amount = $request->amount;
+            } else {
+                if ($request->amount > $agency->coins) return $this->response()->error(__('عفوا لا يمتلك المستخدم هذا المبلغ'))->refresh();
+                $agency->coins -= $request->amount;
+                $amount = -$request->amount;
+            }
+
+            $agency->save();
+
+            $charge = new Charge();
+            $charge->charger_id = Auth::id ();
+            $charge->user_id = $user->id;
+            $charge->charger_type = 'dash';
+            $charge->agency_id = $agency->id;
+            $charge->user_type = $request->user_type;
+            $charge->amount = $amount;
+            $charge->amount_type = 1;
+            $charge->balance_before = $agency->coins;
+            $charge->save ();
+            return $this->response()->success('success')->refresh();
         }else{
             return $this->response()->error(__('system need to know what type of user you want add balance to'))->refresh();
         }
@@ -140,7 +172,7 @@ class ChargeAction extends Action
 
     }
 
-    public function form() 
+    public function form()
     {
         $this->name = __ ('Charge');
         $this->hidden('charger_id', 'charger id')->value (Auth::id ());
@@ -148,9 +180,8 @@ class ChargeAction extends Action
         $this->text('user_id', __('user id'));
         $this->select('id_type', __('id type'))->options ([0=>__('normal'),1=>__('big')]);
         $this->select('charge_type', __('charge_type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->select('user_type', __('user type'))->options (['app'=>__ ('app'),
-            //  'dash'=>__ ('dash')
-        ])->default ('app');
+        $this->select('user_type', __('user type'))->options (['app'=>__ ('app'),'dash'=>__ ('dash')])->default ('app');
+
         $this->text('amount', __('amount'));
         $this->hidden('amount_type', 'amount_type')->value (1);
     }
