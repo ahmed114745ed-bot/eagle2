@@ -147,7 +147,7 @@ class ChargeRepoService
             $charge = $charge->where('created_at', 'like', "%$by_date%");
         }
 
-        return $charge->orderByDesc('created_at');
+        return $charge->orderByDesc('created_at')->get();
     }
 
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
