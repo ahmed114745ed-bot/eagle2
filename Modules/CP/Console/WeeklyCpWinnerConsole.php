@@ -71,17 +71,17 @@ class WeeklyCpWinnerConsole extends Command
                     foreach ($rewards as $reward) {
                         switch ($reward->type) {
                             case 'coins':
-                                UserRewardsWeeklyCp::assignCoins($reward->item_id, $userOne, $userTwo);
+                                UserRewardsWeeklyCp::assignCoins($reward->target, $userOne, $userTwo);
                                 break;
                             case 'vip':
-                                UserRewardsWeeklyCp::assignVip($reward->item_id, $reward->expire, $userOne, $userTwo);
+                                UserRewardsWeeklyCp::assignVip($reward->target, $reward->expire, $userOne, $userTwo);
                                 break;
                             case 'ware':
-                                $ware = Ware::find($reward->item_id);
+                                $ware = Ware::find($reward->target);
                                 UserRewardsWeeklyCp::assignWare($ware, $reward, $userOne, $userTwo);
                                 break;
                             case 'achievement':
-                                UserRewardsWeeklyCp::assignAchievement($reward->item_id, $reward->expire, $userOne, $userTwo);
+                                UserRewardsWeeklyCp::assignAchievement($reward->target, $reward->expire, $userOne, $userTwo);
                                 break;
                         }
                     }
