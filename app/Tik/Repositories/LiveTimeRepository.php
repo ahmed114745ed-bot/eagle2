@@ -29,7 +29,7 @@ class LiveTimeRepository extends AbstractRepository
 
     public function totalHoursByMonth($userId)
     {
-        return $this->model->LiveTime::query()->where('uid', $userId)
+        return $this->model->query()->where('uid', $userId)
             ->whereYear('created_at', '=', Carbon::now()->year)
             ->whereMonth('created_at', '=', Carbon::now()->month)->sum('hours');
     }

@@ -725,5 +725,13 @@ class Common{
 
     }
 
+    public  static function totalTime($TotalHours)
+    {
+        $hoursInt = (int) $TotalHours;
+        $hours   = $TotalHours;
+        $minutes = ceil(((double)$TotalHours - $hoursInt) * 60);
+       return sprintf('%02d:%02d:00', $hours, $minutes);
+    }
+
 
 }
