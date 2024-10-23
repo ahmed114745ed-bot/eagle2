@@ -139,6 +139,7 @@ class ChargeRepoService
         if ($type == 'sent') {
             $charge = $charge/*->where('charger_type', $charger_type)*/ ->where('charger_id', $userId);
         }
+
         if ($searchKey != null) {
             $charge = $charge->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         }
@@ -146,7 +147,7 @@ class ChargeRepoService
             $charge = $charge->where('created_at', 'like', "%$by_date%");
         }
 
-        return $charge->orderByDesc('created_at');
+        return $charge->orderByDesc('created_at')->get();
     }
 
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)

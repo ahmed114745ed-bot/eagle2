@@ -65,9 +65,12 @@ class RoleController extends Controller
     public function permissions()
     {
         $permissionModel = config('admin.database.permissions_model');
-
-        $permissions = $permissionModel::all()->pluck('name', 'id');
+        $permissionsPaginated = $permissionModel::paginate(50);
+        $permissions = $permissionsPaginated->getCollection()->groupBy(function ($item) {
+            return $item->category ?? 'other';
+        });
         return Common::apiResponse(1, '', $permissions);
+        
     }
 
     public function update(Request $request, $id)
