@@ -237,7 +237,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
-                Route::post('reset_password', [\App\Http\Controllers\Api\V1\Auth\ResetPasswordController::class, 'reset']);
+                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
             });
 
             Route::prefix('search')->group(function () {

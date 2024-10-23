@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Auth;
+namespace App\Http\Controllers\Api\V2\Auth;
 
 use App\Helpers\Common;
 use App\Helpers\FirebaseValidate;
@@ -17,7 +17,8 @@ use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
 
 class ResetPasswordController extends Controller
 {
-    public function reset(Request $request){
+    public function reset(Request $request)
+    {
         if (!$request->phone || !$request->password|| !$request->code) return Common::apiResponse (0,'missing params',null,422);
         $user = $request->user ();
 
