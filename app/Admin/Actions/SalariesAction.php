@@ -17,6 +17,7 @@ use Encore\Admin\Form;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -41,9 +42,12 @@ class SalariesAction extends Action
     public function handle(Request $request)
     {
         $amount = \request('amount');
+
+
         try {
             DB::beginTransaction();
-            if (\request('id') && \request('type') == 'agency') {
+            $type = \request('type') ?? 'user';
+            if (\request('id') && $type == 'agency') {
                 $agency = Agency::query()->find(\request('id'));
                 if ($agency) {
                     if ($request->select_type == 'decrement') {
@@ -54,6 +58,7 @@ class SalariesAction extends Action
 
                     $m = $amount ?: $agency->salary;
                     $userSallary = AgencySallary::where('agency_id', \request('id'))->latest('created_at')->first();
+
                     if (!$userSallary) {
                         $userSallary = new AgencySallary();
                         $userSallary->agency_id=\request('id');
@@ -97,7 +102,7 @@ class SalariesAction extends Action
                     }
                 }
             }
-            elseif (\request('id') && \request('type') == 'user') {
+            elseif (\request('id') && $type == 'user') {
                 $user = User::query()->find(\request('id'));
                 if ($user) {
                     if ($request->select_type == 'decrement') {
@@ -143,7 +148,7 @@ class SalariesAction extends Action
                             [
                                 'type' => 0,
                                 'oid' => $user->id,
-                                'amount' => ($amount ?: $user->dalary),
+                                'amount' => ($amount ?: $user->salary),
                                 't_no' => rand(11111111, 99999999),
                                 'note' => 'paid via admin',
                                 'payer_id' => auth()->id(),
@@ -157,6 +162,8 @@ class SalariesAction extends Action
 
             DB::commit();
         } catch (\Exception $exception) {
+
+            \Log::info('this '. $exception->getMessage());
             DB::rollBack();
             return $this->response()->error($exception->getMessage())->refresh();
         }
@@ -166,7 +173,7 @@ class SalariesAction extends Action
 
     public function form()
     {
-        $this->hidden('id', __('id'))->attribute('id', 'vid');
+        $this->hidden('id', __('id'))->attribute('id', 'salary-user-id');
         if ($this->type == 'user') {
             $this->hidden('type', 'type')->value('user');
         } else {
@@ -178,11 +185,10 @@ class SalariesAction extends Action
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-success salary_action ">'.__('admin.edit').'</a>
+        return '<a href="javascript:void(0);" onclick="putSalary(' . $this->id . ')" class="btn btn-sm btn-success salary_action ">'.__('admin.edit').'</a>
 <script>
-function pu(val) {
-
-  $("#vid").val(val)
+function putSalary(val) {
+  $("#salary-user-id").val(val)
 }
 </script>
 ';
