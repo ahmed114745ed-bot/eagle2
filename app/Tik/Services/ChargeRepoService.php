@@ -146,7 +146,6 @@ class ChargeRepoService
         if ($by_date) {
             $charge = $charge->where('created_at', 'like', "%$by_date%");
         }
-        dd($charge->orderByDesc('created_at'));
 
         return $charge->orderByDesc('created_at');
     }

@@ -202,6 +202,7 @@ class ChargeController extends Controller
         $userId = $request->user()->id;
         if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
         $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'Host agent');
+        dd("charge",$charge);
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
