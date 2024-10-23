@@ -88,8 +88,9 @@ class AdminPermissionForManger extends Seeder
             'roles',
             'updates',
             'Permissions',
+            'charges'
 
-            
+
 
         ];
 

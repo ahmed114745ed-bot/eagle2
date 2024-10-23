@@ -23,6 +23,8 @@ class ChargeController extends MainController
 
     protected $title = "Charges";
 
+    public $permission_name = "charges";
+
     /**
      * Index interface.
      *
