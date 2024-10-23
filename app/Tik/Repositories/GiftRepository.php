@@ -25,8 +25,23 @@ class GiftRepository extends AbstractRepository
     public function findById($giftId)
     {
         return $this->model->query()->select([
-            'id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img',
-            'show_img2', 'image_type'
+            'id',
+            'name',
+            'type',
+            'price',
+            'vip_level',
+            'is_play',
+            'img',
+            'show_img',
+            'show_img2',
+            'image_type'
         ])->where('id', $giftId)->where('enable', 1)->first();
     }
+
+    public function findByGiftId($giftId)
+    {
+        return $this->model->query()->with('lucky_gift')->find($giftId);
+    }
+
+    
 }

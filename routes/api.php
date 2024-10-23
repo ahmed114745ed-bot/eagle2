@@ -127,6 +127,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/create', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
             Route::post('/show', [AdminUsersController::class, 'show']);
         });
+        Route::prefix('gifts')->group(function () {
+            Route::get('/all', [GiftController::class, 'allGifts']);
+            Route::post('/create', [GiftController::class, 'store'])->middleware('decrypt.data');
+            Route::post('/update', [GiftController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/show', [GiftController::class, 'show']);
+        });
         // roles
         Route::resource('roles', RoleController::class)->middleware('decrypt.data');
         Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
