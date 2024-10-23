@@ -17,9 +17,13 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 
-class ChargeController extends AdminController
+class ChargeController extends MainController
 {
     use HasResourceActions;
+
+    protected $title = "Charges";
+
+    public $permission_name = "charges";
 
     /**
      * Index interface.

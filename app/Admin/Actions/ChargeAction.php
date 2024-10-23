@@ -3,164 +3,142 @@
 namespace App\Admin\Actions;
 
 use App\Models\User;
-use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use App\Helpers\Common;
-use App\Models\CoinLog;
 use App\Helpers\UserCommon;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Facades\CustomNotification;
 
 class ChargeAction extends Action
 {
     public $name;
-
     protected $selector = '.charge_action';
 
     public function handle(Request $request)
     {
-        if ($request->user_type == 'app'){
-            if ($request->id_type == '1'){
-                $user = User::query ()->searchByUuid($request->user_id)->first();
-            }else{
-                $user = User::query ()->find ($request->user_id);
-            }
-            if (!$user){
-                return $this->response()->error(__('user not found'))->refresh();
-            }
-            // $agency = Agency::where('app_owner_id',$user->id )->first();
-
-            // if($agency && $agency->status == 0){
-            //     return $this->response()->error( __('api_responses.canNotCharge'))->refresh();
-            // }
-
-        }elseif ($request->user_type == 'dash'){
-            $user = Admin::query ()->find ($request->user_id);
-            if (!$user){
-                return $this->response()->error(__('user not found'))->refresh();
-            }
-        }else{
-            return $this->response()->error(__('system need to know what type of user you want add balance to'))->refresh();
+        $user = $this->getUser($request);
+        if (!$user) {
+            return $this->response()->error(__('user not found'))->refresh();
         }
 
-        if ($request->amount < 10){
+        if ($this->isInvalidAmount($request->amount)) {
             return $this->response()->error(__('amount must be more than 10'))->refresh();
         }
 
-        $charger = Auth::user ();
-        DB::beginTransaction ();
-        try {
-            $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
-            $usd =  $request->amount / $percentage ;
-
-            $charge = new Charge();
-            $charge->charger_id = Auth::id ();
-            $charge->charger_type = 'dash';
-            $charge->user_id = $user->id;
-            $charge->user_type = $request->user_type;
-            $charge->amount_type = 1;
-            $charge->balance_before = $user->di;
-            if ($request->charge_type == "increment") {
-                $user->di += $request->amount;
-                $charge->amount = $request->amount;
-                $charge->usd += $usd;
-
-            } else {
-                if ($request->amount > $user->di) return $this->response()->error(__('messages.coins'))->refresh();
-                $user->di -= $request->amount;
-                $charge->amount = -$request->amount;
-                $charge->usd = 0;
-
+        if ($request->user_type == 'dash') {
+            $agency = $this->getAgency($user);
+            if (!$agency) {
+                return $this->response()->error(__('api_responses.agency'))->refresh();
             }
-            $charge->save ();
-            $user->save ();
-            //insert amount to user achievement
-            if ($user instanceof User) {
-                (new UserAchievementService())->insertCharging($user, $request->amount);
-            }
-            if (!$charger->isRole('admin') && !$charger->isRole('developer')){
-                if($charger->isRole('agency')){
-                    $agency = Agency::query ()->where ('owner_id',$charger->id)->first ();
-                    if ($agency){
-                        $agency_balance = $agency->salary;
-                        $usd_coins = Common::getConf ('one_usd_value_in_coins')?:10;
-                        $agency_balance_coins = $agency_balance * $usd_coins;
-                        if ($agency_balance_coins < $request->amount){
-                            return $this->response()->error(__ ('balance not enough'))->refresh();
-                        }
-                        $amount_usd = $request->amount / $usd_coins;
-                        $ta = $agency->target();
-                        $ta->cut_amount += $amount_usd;
-                        $ta->save();
-                        $agency->save ();
-                    }else{
-                        if ($charger->di < $request->amount){
-                            return $this->response()->error(__ ('balance not enough'))->refresh();
-                        }
-                        $charger->di -= $request->amount;
-                        $charger->save();
-                    }
-                }else{
-                    if ($charger->di < $request->amount){
-                        return $this->response()->error(__ ('balance not enough'))->refresh();
-                    }
-                    $charger->di -= $request->amount;
-                    $charger->save();
-                }
-            }
-            /*CoinLog::query ()->create (
-                [
-                    'paid_usd'=>0,
-                    'obtained_coins'=>$request->amount,
-                    'user_id'=>$user->id,
-                    'method'=>@\auth ()->user ()->name?:'agent',
-                    'donor_id'=> Auth::id (),
-                    'donor_type'=>\auth ()->user ()->roles->first()->name,
-                    'status'=>1,
-                    'trx'=>$randomString = rand(111111111111111111,999999999999999999)
-                ]
-            );*/
-            DB::commit ();
-            UserCommon::UserEarnedInvitation($user->id,$request->amount);
+
+            return $this->handleAgencyCharge($request, $agency, $user);
+        }
+
+        return $this->handleUserCharge($request, $user);
+    }
+
+    private function getUser(Request $request)
+    {
+        if ($request->user_type == 'app') {
+            return $request->id_type == '1'
+                ? User::query()->searchByUuid($request->user_id)->first()
+                : User::query()->find($request->user_id);
+        }
+
+        return $request->id_type == '1'
+            ? User::query()->where('uuid', $request->user_id)->first()
+            : User::query()->find($request->user_id);
+    }
+
+    private function getAgency(User $user)
+    {
+        return Agency::where("app_owner_id", $user->id)->first();
+    }
+
+    private function isInvalidAmount($amount)
+    {
+        return $amount < 10;
+    }
+
+    private function handleAgencyCharge(Request $request, Agency $agency, User $user)
+    {
+        $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+        if ($amount < 0 && $agency->coins < abs($amount)) {
+            return $this->response()->error(__('Insufficient agency balance'))->refresh();
+        }
+
+        DB::transaction(function () use ($request, $agency, $user, $amount) {
+            $agency->coins += $amount;
+            $agency->save();
+
+            $this->createChargeRecord($request, $user, $agency, $amount);
+
             if ($request->charge_type == "increment") {
                 CustomNotification::chargeAction($user, $request);
             }
-            return $this->response()->success('success')->refresh();
-        }catch (\Exception $exception){
-            DB::rollBack ();
-            return $this->response()->error($exception->getMessage ())->refresh();
-        }
+        });
 
+        return $this->response()->success('Success')->refresh();
     }
 
-    public function form() 
+    private function handleUserCharge(Request $request, User $user)
     {
-        $this->name = __ ('Charge');
-        $this->hidden('charger_id', 'charger id')->value (Auth::id ());
-        $this->hidden('charger_type', 'charger_type')->value ('dash');
-        $this->text('user_id', __('user id'));
-        $this->select('id_type', __('id type'))->options ([0=>__('normal'),1=>__('big')]);
-        $this->select('charge_type', __('charge_type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->select('user_type', __('user type'))->options (['app'=>__ ('app'),
-            //  'dash'=>__ ('dash')
-        ])->default ('app');
-        $this->text('amount', __('amount'));
-        $this->hidden('amount_type', 'amount_type')->value (1);
+        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
+        $usdAmount = $request->amount / $percentage;
+
+        DB::transaction(function () use ($request, $user, $usdAmount) {
+            $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+            if ($amount < 0 && $user->di < abs($amount)) {
+                return $this->response()->error(__('Insufficient user balance'))->refresh();
+            }
+
+            $user->di += $amount;
+            $user->save();
+
+            $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
+            (new UserAchievementService())->insertCharging($user, $request->amount);
+        });
+
+        return $this->response()->success('Success')->refresh();
+    }
+
+    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
+    {
+        $charge = new Charge();
+        $charge->charger_id = Auth::id();
+        $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'app';
+        $charge->user_id = $user->id;
+        $charge->agency_id = $agency->id ?? null;
+        $charge->user_type = $request->user_type;
+        $charge->amount = $amount;
+        $charge->usd = $usdAmount;
+        $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
+        $charge->save();
+    }
+
+    public function form()
+    {
+        $this->name = __('Charge');
+        $this->hidden('charger_id')->value(Auth::id());
+        $this->hidden('charger_type')->value('dash');
+        $this->text('user_id', __('User ID'));
+        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
+        $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
+        $this->select('user_type', __('User Type'))->options(['app' => __('App'), 'dash' => __('Agencies')])->default('app');
+        $this->text('amount', __('Amount'));
+        $this->hidden('amount_type')->value(1);
     }
 
     public function html()
     {
         return <<<HTML
-
-    <li><a href="javascript:void(0);" class="charge_action "><i class="fa fa-dollar text-red"></i>اضافة رصيد</a></li>
-
+            <li><a href="javascript:void(0);" class="charge_action"><i class="fa fa-dollar text-red"></i> إضافة رصيد</a></li>
 HTML;
     }
 }
