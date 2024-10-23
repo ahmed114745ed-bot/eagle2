@@ -29,14 +29,12 @@ use App\Classes\Room\RoomComments;
 use App\Services\RoomService;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
-use App\Models\RoomPrivateMessages;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
 use App\Tik\Services\RoomRepoService;
 use App\Http\Requests\EditRoomRequest;
 use App\Models\RequestBackgroundImage;
-use App\Tik\Services\ChargeRepoService;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserResource;
@@ -45,7 +43,6 @@ use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Resources\RoomCountriesResource;
 use App\Http\Services\ProfileRelationsService;
 use Illuminate\Validation\ValidationException;
-use function App\Http\Controllers\Api\V1\input;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
@@ -106,6 +103,8 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+
         $rooms = $this->roomService->getAllRooms($request);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200, Common::getPaginates($rooms));
     }
