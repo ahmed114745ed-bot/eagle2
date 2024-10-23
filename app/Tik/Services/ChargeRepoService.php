@@ -133,6 +133,7 @@ class ChargeRepoService
     public function getChargeUserHistory($userId, $type, $by_date = null, $chargeType = null, $searchKey = null)
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
+        dd($charge);
         if ($type == 'received') {
             $charge = $charge/*->where('user_type', $charger_type)*/ ->where('user_id', $userId);
         }
