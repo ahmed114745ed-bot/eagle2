@@ -226,6 +226,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show']);
+                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgincy']);
+
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
