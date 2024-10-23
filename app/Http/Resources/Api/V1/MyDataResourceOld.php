@@ -19,7 +19,7 @@ use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Models\Agency;
 use Modules\AgencyApp\Entities\AgencyUserJob;
 
-class MyDataResource extends JsonResource
+class MyDataResourceOld extends JsonResource
 {
 
     /**

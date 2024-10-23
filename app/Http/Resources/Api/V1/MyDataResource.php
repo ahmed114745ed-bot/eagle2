@@ -9,6 +9,7 @@ use App\Models\FamilyUser;
 use App\Models\GiftLog;
 use App\Models\Pack;
 use App\Models\Room;
+use App\Models\User;
 use App\Models\UserSetting;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -117,6 +118,9 @@ class MyDataResource extends JsonResource
                 }
             }
         }
+        $ownerRoom = $this->ownerRoom;
+        /**@var User $this
+         * @var Room $ownerRoom*/
 
         $data = [
             'id' => @$this->id,
@@ -135,11 +139,14 @@ class MyDataResource extends JsonResource
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
             'room' => [
-                "id" => @$this->ownerRoom->id,
-                "room_name" => @$this->ownerRoom->room_name,
-                "room_cover" => @$this->ownerRoom->room_cover,
-                "room_background" => @$this->ownerRoom->final_room_image,
-                "mode" => @$this->ownerRoom->mode,
+                "id" => @$ownerRoom->id,
+                "owner_uuid" => @$this->uuid,
+                "room_name" => @$ownerRoom->room_name,
+                "room_cover" => @$ownerRoom->room_cover,
+                "room_background" => @$ownerRoom->final_room_image,
+                "mode" => @$ownerRoom->mode,
+                'giftPrice' => $ownerRoom->session_string,
+
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
