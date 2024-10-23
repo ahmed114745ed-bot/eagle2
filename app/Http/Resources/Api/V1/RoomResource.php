@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Resources\CountryResource;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -16,9 +17,11 @@ class RoomResource extends JsonResource
         $pk = $this->lastPk;
 
         $have_luck_box = $this->boxUse;
+        /**@var Room $this*/
         $data = [
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
+            'owner_uuid' => $this->owner?->uuid ?: 0,
             'room_id' => $this->numid ?: 0,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
@@ -27,6 +30,8 @@ class RoomResource extends JsonResource
             'class' => $this->myClass ?: new \stdClass(),
             'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,
+            'session' => $this->session_string,
+            'giftPrice' => $this->session_string,
             'is_popular' => $this->is_popular ?: 0,
             'room_status' => $this->room_status,
             'password_status' => (bool) $this->room_pass,
