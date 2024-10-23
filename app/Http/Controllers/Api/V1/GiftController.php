@@ -55,7 +55,6 @@ class GiftController extends Controller
         $this->giftService->create($request);
 
         return Common::apiResponse(1, 'created successfully');
-
     }
 
     public function show(Request $request)
@@ -98,6 +97,48 @@ class GiftController extends Controller
 
         $this->giftService->update($request);
 
+        return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function musicSwitchUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'music_gift' => 'required',
+            'gift_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $value =   $this->giftService->updateSwitch($request->music_gift, $request->gift_id, 'music_gift');
+        if (!$value)  return Common::apiResponse(1, 'failed');
+        return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function enableSwitchUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'enable' => 'required',
+            'gift_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $value =   $this->giftService->updateSwitch($request->enable, $request->gift_id, 'enable');
+        if (!$value)  return Common::apiResponse(1, 'failed');
+        return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function isPlaySwitchUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'is_play' => 'required',
+            'gift_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $value =   $this->giftService->updateSwitch($request->is_play, $request->gift_id, 'is_play');
+        if (!$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
     }
 }

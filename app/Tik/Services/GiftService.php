@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 
+use App\Helpers\Common;
 use App\Tik\Repositories\GiftRepository;
 
 class GiftService
@@ -24,16 +25,25 @@ class GiftService
 
     public function create($request)
     {
+        if ($request->hasFile('img')) {
+            $image = Common::upload('images', $request->file('img'));
+        }
+        if ($request->hasFile('show_img')) {
+            $showImg = Common::upload('images', $request->file('show_img'));
+        }
+        if ($request->hasFile('show_img2')) {
+            $showImg2 = Common::upload('images', $request->file('show_img2'));
+        }
         $data = [
             'name'         => $request->name,
             'e_name'         => $request->e_name,
             'type'         => $request->type,
             'vip_level'         => $request->vip_level,
             'price'         => $request->price,
-            'img'          => $request->img,
-            'show_img'          => $request->show_img,
+            'img'          =>  $image ?? "",
+            'show_img'          => $showImg ?? "",
             'image_type'         => $request->image_type,
-            'show_img2'          => $request->show_img2,
+            'show_img2'          => $showImg2 ?? '',
             'sort'         => $request->sort,
             'enable'         => $request->enable,
             'music_gift'         => $request->music_gift,
@@ -53,16 +63,25 @@ class GiftService
 
     public function update($request)
     {
+        if ($request->hasFile('img')) {
+            $image = Common::upload('images', $request->file('img'));
+        }
+        if ($request->hasFile('show_img')) {
+            $showImg = Common::upload('images', $request->file('show_img'));
+        }
+        if ($request->hasFile('show_img2')) {
+            $showImg2 = Common::upload('images', $request->file('show_img2'));
+        }
         $data = [
             'name'         => $request->name,
             'e_name'         => $request->e_name,
             'type'         => $request->type,
             'vip_level'         => $request->vip_level,
             'price'         => $request->price,
-            'img'          => $request->img,
-            'show_img'          => $request->show_img,
+            'img'          =>  $image,
+            'show_img'          => $showImg,
             'image_type'         => $request->image_type,
-            'show_img2'          => $request->show_img2,
+            'show_img2'          =>  $showImg2,
             'sort'         => $request->sort,
             'enable'         => $request->enable,
             'music_gift'         => $request->music_gift,
@@ -77,6 +96,14 @@ class GiftService
             ];
             $gift->lucky_gift()->sync($luckyGiftData);
         }
+        return true;
+    }
+
+    public function updateSwitch($requestSwitch, $giftId, $type)
+    {
+        $gift = $this->giftRepository->findByGiftId($giftId);
+        $gift[$type] = $requestSwitch;
+        $gift->update();
         return true;
     }
 }
