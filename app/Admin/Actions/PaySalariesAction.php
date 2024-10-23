@@ -20,7 +20,7 @@ class PaySalariesAction extends Action
     public $type;
     public $salary;
 
-    protected $selector = '.salary_action';
+    protected $selector = '.salary_pay_action';
 
     public function __construct($id = 0, $type = 'user',$salary = 0)
     {
@@ -72,7 +72,7 @@ class PaySalariesAction extends Action
                     ]
                 );
             }
-            
+
 
             UsdTransfer::create([
                 "admin_id"  => auth()->user()->id,
@@ -105,7 +105,7 @@ class PaySalariesAction extends Action
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-primary salary_action ">'.__('admin.pay').'</a>
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-primary salary_pay_action ">'.__('admin.pay').'</a>
             <script>
             function pu(val) {
                 $("#newvid").val(val)
