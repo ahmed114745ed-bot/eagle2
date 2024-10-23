@@ -171,6 +171,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
 

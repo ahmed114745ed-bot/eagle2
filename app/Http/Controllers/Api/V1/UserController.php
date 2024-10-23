@@ -15,6 +15,7 @@ use App\Models\Agency;
 use App\Models\UserSallary;
 use Auth;
 use Illuminate\Support\Facades\Validator;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Illuminate\Validation\Rule;
 
@@ -27,6 +28,35 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    public function app_setting()
+    {
+        $user = auth()->user();
+        $chat_status = settings()->get('chat_status');
+        $showChat = $user->userSetting?->hide_chat ?? $chat_status;
+        $stop_invite_code = settings()->get('stop_invite_code');
+        if ($stop_invite_code == 1) {
+            $invite_code = true;
+        } else {
+            $invite_code = false;
+            if ($user->userSetting->show_invite_code == 1) {
+                $invite_code = true;
+            }
+        }
+        //        $shared = Common::getConfig('shared') ?? '1234';
+        $data = [
+            'version' => [
+                'android_version'   => settings()->get('android_current_version'),
+                'ios_version'       => settings()->get('ios_current_version'),
+                'huawei_version'    => settings()->get('huawei_current_version'),
+            ],
+            'hide_invite'       => $invite_code,
+            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
+            'shared_key' => Common::getConfig('shared') ?? '1234',
+            'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
+            'have_pending_request' => SalaryRequest::where("status",2)->where("host_id",$user->id)->first() != null ? true : false,
+        ];
+        return Common::apiResponse(true, '', $data, 200);
+    }
     public function search(Request $request)
     {
         $key = $request->search;
@@ -112,7 +142,7 @@ class UserController extends Controller
         $isVisit = @$request->is_visit == 'true' ? true : false;
         $auth   = $request->user();
         try {
-            
+
             $user = $this->userService->showUser($id, $auth, $request, $isVisit);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
@@ -184,7 +214,7 @@ class UserController extends Controller
 
     public function userInfoWithRole(Request $request)
     {
-        
+
     }
 
 
