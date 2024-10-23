@@ -132,6 +132,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/create', [GiftController::class, 'store'])->middleware('decrypt.data');
             Route::post('/update', [GiftController::class, 'update'])->middleware('decrypt.data');
             Route::post('/show', [GiftController::class, 'show']);
+            Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
+            Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
+            Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
+
         });
         // roles
         Route::resource('roles', RoleController::class)->middleware('decrypt.data');
