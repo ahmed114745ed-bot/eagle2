@@ -102,6 +102,7 @@ class UserController extends Controller
         $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
 
         $this->userService->unlockDressHand($user->id);
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
         $data = new MyDataResource($userWithMedals);
         return Common::apiResponse(true, '', $data, 200);
