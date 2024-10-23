@@ -203,13 +203,14 @@ class EnteranceController extends Controller
         $data = RoomUserResource::collection($users);
         return Common::apiResponse(1, '', $data);
     }
-    
+
     public function enter_room(Request $request)
     {
         $room_pass = $request['room_pass'];
         $owner_id  = $request['owner_id'];
         $user   = $request->user();
-        
+        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+
        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $owner_id);
     }
 

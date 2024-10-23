@@ -34,7 +34,7 @@ class RoomRepoService
 
     public function getAllRooms($request)
     {
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+//        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         return $this->repository->all($request);
     }
 
