@@ -65,7 +65,7 @@ class RoomResource extends JsonResource
 
             $data = array_merge($data, [
                 'room_users' => Common::get_room_users($this->owner()?->id, $request->user()->id),
-                'background' => $requestBackground?->img ?: $this->room_background,
+                'background' => $this->final_room_image ?: $this->room_background,
                 'mics' => $this->microphone ? explode(',', $this->microphone) : [],
                 'is_mics_free' => $this->free_mic ?: 0,
                 'owner' => $this->owner(),
