@@ -132,18 +132,10 @@ class GiftLogService
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
 
         try {
-
-
-            $responses = Utils::unwrap($promises);
-
-// Iterate and print each response
-            foreach ($responses as $response) {
-                echo $response->getBody(); // Assuming the promises are HTTP responses
-            }
+            Utils::unwrap($promises);
         } catch (BadResponseException $e) {
         }
 
-        die();
 
 
         if ($room->mode != '1' && $room->mode != '2') {
