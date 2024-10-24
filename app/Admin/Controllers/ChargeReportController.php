@@ -29,8 +29,10 @@ class ChargeReportController extends MainController {
             ->title("Reports")
             ->description("Charges")
             ->row(function(Row $row) {
-                $row->column(3, $this->tabsComponent());
-                $row->column(9, $this->grid());
+                $row->column(12, $this->tabsComponent());
+            })
+            ->row(function(Row $row) {
+                $row->column(12, $this->grid());
             });
     }
 

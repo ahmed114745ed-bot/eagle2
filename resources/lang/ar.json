@@ -809,14 +809,8 @@
     "daily prize" :"الجائزة اليومية",
     "hight" : " ارتفاع بالنسبه المئويه",
     "in_room":" فى الغرفه",
-    "hight_image":" ارتفاع الصوره pexel"
-    
-
-
-
-   
-  
-    
-  
-    
+    "hight_image":" ارتفاع الصوره pexel",
+    "Filter by date" : "البحث ب التاريخ",
+    "ID Type" : "نوع ال id",
+    "Charge Type" : "نوع الشحن"
 }
