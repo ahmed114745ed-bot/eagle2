@@ -78,6 +78,10 @@ class AllGameService
             'type' => $request->type,
             'is_enable' => $request->is_enable,
             'custom_id' => $request->custom_id,
+            'hight_image' => $request->hight_image,
+            'in_room'    => $request->in_room,
+            'hight' => $request->hight,
+
         ];
         return $this->allGameRepository->create($data);
     }
@@ -96,6 +100,9 @@ class AllGameService
                 'type' => $request->type,
                 'is_enable' => $request->is_enable,
                 'custom_id' => $request->custom_id,
+                'hight_image' => $request->hight_image,
+                'in_room'    => $request->in_room,
+                'hight' => $request->hight,
             ];
         } else {
             $data = [
@@ -106,6 +113,9 @@ class AllGameService
                 'type' => $request->type,
                 'is_enable' => $request->is_enable,
                 'custom_id' => $request->custom_id,
+                'hight_image' => $request->hight_image,
+                'in_room'    => $request->in_room,
+                'hight' => $request->hight,
             ];
         }
 
