@@ -295,7 +295,7 @@ class UserObserver
                 $user->tokens()->delete();
             }
 
-            if (!$user->uuid) {
+            if ($user->isDirty('uuid') && !$user->uuid) {
                 do {
                     // توليد قيمة uuid عشوائية
                     $uuid = (string)rand(1000000, 9999999);
