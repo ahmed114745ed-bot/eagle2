@@ -686,17 +686,7 @@ class Common{
                 'IsTest'           => $IsTest
             ];
 
-            dd([
-                'Action'           => $Action,
-                'RoomId'           => $RoomId,
-                'FromUserId'       => $FromUserId,
-                'AppId'            => $AppId,
-                'SignatureNonce'   => $SignatureNonce,
-                'Timestamp'        => $Timestamp,
-                'Signature'        => $signature,
-                'SignatureVersion' => $SignatureVersion,
-                'IsTest'           => $IsTest
-            ]);
+
             $promises         = [];
             $headers          = [
 
