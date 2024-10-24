@@ -664,17 +664,7 @@ class Common{
     public static function sendToZego3($Action,$RoomId,$FromUserId,$MessageContents = [],$IsTest = 'false'){
 
 
-        dd([
-            'Action'           => $Action,
-            'RoomId'           => $RoomId,
-            'FromUserId'       => $FromUserId,
-            'AppId'            => $AppId,
-            'SignatureNonce'   => $SignatureNonce,
-            'Timestamp'        => $Timestamp,
-            'Signature'        => $signature,
-            'SignatureVersion' => $SignatureVersion,
-            'IsTest'           => $IsTest
-        ]);
+
         try {
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
@@ -695,6 +685,18 @@ class Common{
                 'SignatureVersion' => $SignatureVersion,
                 'IsTest'           => $IsTest
             ];
+
+            dd([
+                'Action'           => $Action,
+                'RoomId'           => $RoomId,
+                'FromUserId'       => $FromUserId,
+                'AppId'            => $AppId,
+                'SignatureNonce'   => $SignatureNonce,
+                'Timestamp'        => $Timestamp,
+                'Signature'        => $signature,
+                'SignatureVersion' => $SignatureVersion,
+                'IsTest'           => $IsTest
+            ]);
             $promises         = [];
             $headers          = [
 
