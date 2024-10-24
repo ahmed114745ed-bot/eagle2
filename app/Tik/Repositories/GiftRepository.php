@@ -22,6 +22,14 @@ class GiftRepository extends AbstractRepository
         return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
     }
 
+    public function allGifts()
+    {
+        $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
+        
+        return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
+
+    }
+
     public function findById($giftId)
     {
         return $this->model->query()->select([
