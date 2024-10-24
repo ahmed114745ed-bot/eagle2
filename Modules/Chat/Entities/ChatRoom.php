@@ -15,15 +15,15 @@ class ChatRoom extends Model
     {
         return $this->hasMany(ChatMessage::class)->orderBy('id','desc');
     }
-
-    public function unReadMessages()
-    {
-        return $this->hasMany(ChatMessage::class)->where('status','not Like','seen');
-    }
     public function getLastMessageCreatedAtAttribute()
     {
         $lastMessage = $this->messages()->latest()->first();
         return $lastMessage ? $lastMessage->created_at : null;
+    }
+
+    public function unReadMessages()
+    {
+        return $this->hasMany(ChatMessage::class)->where('status','not Like','seen');
     }
 
     public function userOne(){

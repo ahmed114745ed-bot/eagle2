@@ -3,6 +3,7 @@
 namespace Modules\Chat\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Room;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Chat\Events\OpenChat;
 use App\Http\Controllers\Controller;
@@ -21,7 +22,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Modules\Chat\Entities\React;
-use Modules\Chat\Events\UpdateConversationUser;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 
 class ChatRoomController extends Controller
@@ -60,8 +60,6 @@ class ChatRoomController extends Controller
 
         $this->sendMessageToUsers($userId, $userIds, $data);
 
-        // event(new UpdateConversationUser($userId));
-
         return Common::apiResponse(true, __('success'));
     }
     public function find_user(Request $request)
@@ -82,24 +80,19 @@ class ChatRoomController extends Controller
 
         //get user chats
         $friends = ChatRoom::WhereHas('messages')->select('chat_rooms.*', DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at'))
-            ->with(['userOne' => function($query) {
-                $query->withTrashed(); 
-            }, 'userTwo' => function($query) {
-                $query->withTrashed(); 
-            }])
-            ->where(function ($query) use ($chats, $user) {
-                $query->where('chat_rooms.id', 'not Like', $chats)
-                    ->where('chat_rooms.user_id', $user->id)
-                    ->where('chat_rooms.type', 'friends');
-            })
-            ->orWhere(function ($query) use ($chats, $user) {
-                $query->where('chat_rooms.id', 'not Like', $chats)
-                    ->where('chat_rooms.user_id2', $user->id)
-                    ->where('chat_rooms.type', 'friends');
-            })
-            ->groupBy(['chat_rooms.id','chat_rooms.user_id','chat_rooms.user_id2','chat_rooms.type','user_1_deleted','user_2_deleted','created_at','updated_at'])
-            ->orderByDesc('last_message_created_at')
-            ->get();
+        ->where(function ($query) use ($chats, $user) {
+            $query->where('chat_rooms.id', 'not Like', $chats)
+                ->where('chat_rooms.user_id', $user->id)
+                ->where('chat_rooms.type', 'friends');
+        })
+        ->orWhere(function ($query) use ($chats, $user) {
+            $query->where('chat_rooms.id', 'not Like', $chats)
+                ->where('chat_rooms.user_id2', $user->id)
+                ->where('chat_rooms.type', 'friends');
+        })
+        ->groupBy(['chat_rooms.id','chat_rooms.user_id','chat_rooms.user_id2','chat_rooms.type','user_1_deleted','user_2_deleted','created_at','updated_at'])
+        ->orderByDesc('last_message_created_at')
+        ->get();
 
         //get chat requests
         $guest = ChatRoom::WhereHas('messages')->select('chat_rooms.*')->where('chat_rooms.user_id2', $user->id)->where('chat_rooms.type', 'guest')->with('messages')
@@ -130,7 +123,7 @@ class ChatRoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required',
+            'user_id' => 'required|exists:users,id',
         ]);
         $user = $request->user();
         // $follow_check = Follow::where('user_id', $user->id)->where('followed_user_id', $request->user_id)
@@ -151,9 +144,15 @@ class ChatRoomController extends Controller
         $user->update();
         $data = ChatMessage::where('chat_room_id', $check_room->id)->with('reacts', 'albums')->orderBy('id','desc')->paginate(15);
 
-        $total_unread =  ChatMessage::where('chat_room_id', $check_room->id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->get();
+//        $total_unread =  ChatMessage::where('chat_room_id', $check_room->id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->get();
         $room_resource =  new ChatRoomResourcePusher($check_room) ;
-        dispatch(new ReciveChatMessagejob($total_unread , 'seen'));
+//        dispatch(new ReciveChatMessagejob($total_unread , 'seen'));
+
+        // update to seen
+
+        ChatMessage::where('chat_room_id', $check_room->id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')
+            ->update(['status' => 'seen']);
+
         if($check_room->user_id == $user->id)
         {
             $user2 =User::find($check_room->user_id2);
@@ -162,25 +161,96 @@ class ChatRoomController extends Controller
             $user2 =User::find($check_room->user_id);
         }
         try {
-            if($user2)event(new OpenChat($room_resource->toResponse(request())->getData()->data , $user2, $check_room));
-            
+            event(new OpenChat($room_resource->toResponse(request())->getData()->data , $user2, $check_room));
         } catch (\Throwable $th) {
-            // Log::info($th->getMessage());
-            // return $th->getMessage();
+            Log::info($th->getMessage());
+            return $th->getMessage();
         }
 
+        // this code to get user now room id and password of room
+        $pass_status = false;
+        $now_room = Room::query ()->where ('uid',$user2->now_room_uid)->first ();
+        if ($now_room){
+            if($now_room->room_pass){
+                $pass_status = true;
+            }
+        }
         return[
             'messages' =>  ChatMessageResource::collection($data),
-            'chat_room_id' => $check_room->id
+            'chat_room_id' => $check_room->id,
+            'user_now_room' => [
+                'room_owner_id' => $user2->now_room_uid,
+                'has_password'  =>  $pass_status
+            ]
         ];
     }
 
-    
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //     ]);
+    //     $user = $request->user();
+
+    //     $check_room = ChatRoom::where(function ($query) use ($user, $request) {
+    //         $query->where('user_id', $user->id)->where('user_id2', $request->user_id);
+    //     })->orWhere(function ($query) use ($user, $request) {
+    //         $query->where('user_id', $request->user_id)->where('user_id2', $user->id);
+    //     })->first();
+
+    //     if (!$check_room) {
+    //         $check_room = new ChatRoom();
+    //         $check_room->user_id = $user->id;
+    //         $check_room->user_id2 = $request->user_id;
+    //         $check_room->save();
+    //     }
+    //     $user->current_room_chat = $check_room->id;
+    //     $user->update();
+
+    //     $data = ChatMessage::where('chat_room_id', $check_room->id)
+    //         ->with('reacts', 'albums')
+    //         ->orderBy('id', 'desc')
+    //         ->paginate(15);
+
+    //     $total_unread = ChatMessage::where('chat_room_id', $check_room->id)
+    //         ->where('user_id', '!=', $user->id)
+    //         ->where('status', '!=', 'seen')
+    //         ->get();
+
+    //     dispatch(new ReciveChatMessagejob($total_unread->pluck('id'), 'seen'));
+
+    //     if ($check_room->user_id == $user->id) {
+    //         $user2 = User::find($check_room->user_id2);
+    //     } else {
+    //         $user2 = User::find($check_room->user_id);
+    //     }
+
+    //     try {
+    //         event(new OpenChat(['chat_room_id' => $check_room->id,'chat_room_type' => $check_room->type,'user2_profile' => $user2->profile ?? null
+    //         ], $user2->id));
+    //     } catch (\Throwable $th) {
+    //         Log::info($th->getMessage());
+    //         return $th->getMessage();
+    //     }
+
+    //     return [
+    //         'messages' => ChatMessageResource::collection($data),
+    //         'chat_room_id' => $check_room->id
+    //     ];
+
+    // }
+
     public function destroy(Request $request, $id)
     {
 
         $user = $request->user();
         $check_room = ChatRoom::where('user_id', $user->id)->where('user_id2', $id)->orWhere('user_id', $id)->where('user_id2', $user->id)->first();
+        if (!$check_room) {
+            return response()->json([
+                'status' => 404,
+                'status' => 'Chat not Found',
+            ], 404);
+        }
         $midea = MessageAlbum::where('chat_room_id',$check_room->id)->get();
         $mideaStrings =[];
         foreach ($midea as $key => $item) {
@@ -249,45 +319,20 @@ class ChatRoomController extends Controller
 
                     $data = [];
                     foreach ($chatRooms as $chatRoom) {
-//                        $userChatId = $chatRoom->user_id != $userId ? $chatRoom->user_id : $chatRoom->user_id2;
-                        $userChatId = $userId;
+                        $userChatId = $chatRoom->user_id != $userId ? $chatRoom->user_id : $chatRoom->user_id2;
                         $data[]     = [
                             'chat_room_id' => $chatRoom->id,
                             'user_id'      => $userChatId,
                             'message'      => $message,
                             'status'       => 'received',
-                            'type'         => $url ? 'img' : 'text',
+                            'type'         => 'img',
                             'file'         => $url,
                             'created_at'   => now(),
                             'updated_at'   => now(),
                         ];
                     }
 
-
-                    DB::table('chat_messages')->insert($data);
-
-                    if ($url != null){
-                        $lastId = DB::getPdo()->lastInsertId('chat_messages');
-
-                        $data = [];
-                        foreach ($chatRooms as $chatRoom) {
-                            $userChatId = $chatRoom->user_id != $userId ? $chatRoom->user_id : $chatRoom->user_id2;
-                            $data[]     = [
-                                'chat_room_id' => $chatRoom->id,
-                                'user_id'      => $userChatId,
-                                'chat_message_id'      => $lastId,
-                                'type'         => 'img',
-                                'file'         => $url,
-                                'created_at'   => now(),
-                                'updated_at'   => now(),
-                            ];
-                            $lastId++;
-                        }
-                        MessageAlbum::insert($data);
-                    }
-
-
-
+                    ChatMessage::insert($data);
                 });
         return $userIds;
     }
@@ -324,11 +369,11 @@ class ChatRoomController extends Controller
     {
         $timeZone = request()->hasHeader('tz') ? request()->header()['tz'][0] : 'UTC';
         dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
-//        $userIds = $this->sendMessages($userId, $userIds, $message);
-//
-//        $this->createNewChatRooms($userIds, $userId);
-//
-//        $this->sendMessages($userId, $userIds, $message);
+        // $userIds = $this->sendMessages($userId, $userIds, $message);
+
+        // $this->createNewChatRooms($userIds, $userId);
+
+        // $this->sendMessages($userId, $userIds, $message);
     }
 
 }

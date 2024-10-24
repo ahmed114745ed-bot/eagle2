@@ -2,7 +2,6 @@
 
 namespace Modules\Chat\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
 use App\Http\Controllers\Controller;
@@ -69,10 +68,10 @@ class ChatMessagesController extends Controller
         //get user 2
         if($check_room->user_id == $user->id)
         {
-            $user2 =User::find($check_room->user_id2);
+            $user2 =User::withoutAppends()->find($check_room->user_id2);
         }
         else{
-            $user2 =User::find($check_room->user_id);
+            $user2 =User::withoutAppends()->find($check_room->user_id);
         }
 
         //Files Validations
@@ -96,23 +95,23 @@ class ChatMessagesController extends Controller
         $message->message = $request->message;
         $message->save();
 
-        //add status for message
-        if($user2->online == 1 && $user2->current_room_chat == $check_room->id )
-        {
-            $message->status = 'seen';
-            $message->update();
-        }
-        else if($user2->online == 1)
-        {
-            $message->status = 'received';
-            $message->update();
-        }
-        else if($user2->is_logout == 0){
-            $tokens_notfacion[] = DB::table('users')->where('id', $user2->id)->value('notification_id');
-            $title=$user->name;
-            $body= $message->message ;
-            Common::send_firebase_notification($tokens_notfacion,$title,$body);
-        }
+        // //add status for message
+        // if($user2->online == 1 && $user2->current_room_chat == $check_room->id )
+        // {
+        //     $message->status = 'seen';
+        //     $message->update();
+        // }
+        // else if($user2->online == 1)
+        // {
+        //     $message->status = 'received';
+        //     $message->update();
+        // }
+        // else{
+        //     $tokens_notfacion[] = DB::table('users')->where('id', $user2->id)->value('notification_id');
+        //     $title=$user->name;
+        //     $body= $message->message ;
+        //     Common::send_firebase_notification($tokens_notfacion,$title,$body,messageType: 'message');
+        // }
 
         //insert files to database
         if ($request->hasFile('file')) {
@@ -169,7 +168,7 @@ class ChatMessagesController extends Controller
                         $this->extract_frame($videoPath, $thumbnailPath);
 
                     } catch (\Throwable $e) {
-                    //    return $e->getMessage();
+                       return $e->getMessage();
 
                     }
                     $album->frame =  $thumbnailPath;
@@ -251,7 +250,7 @@ class ChatMessagesController extends Controller
                             $this->extract_frame($videoPath, $thumbnailPath);
 
                         } catch (\Throwable $e) {
-                        //    return $e->getMessage();
+                           return $e->getMessage();
 
                         }
                         $album->frame =  $thumbnailPath;
@@ -278,6 +277,26 @@ class ChatMessagesController extends Controller
             }
         }
 
+        //add status for message
+        if($user2->online == 1 && $user2->current_room_chat == $check_room->id )
+        {
+            $message->status = 'seen';
+            $message->update();
+        }
+        else if($user2->online == 1)
+        {
+            $message->status = 'received';
+            $message->update();
+        }
+        if($user2->is_logout != 1) {
+            $tokens_notfacion[] = DB::table('users')->where('id', $user2->id)->value('notification_id');
+            $title=$user->name;
+            $body= $message->message ;
+            $type = $message->type ?? 'text';
+             Common::send_firebase_notification($tokens_notfacion,$title,$body,messageType:$type );
+
+        }
+
         //Replay Message
         if($request->message_id)
         {
@@ -290,12 +309,8 @@ class ChatMessagesController extends Controller
         $message_resource = new ChatMessageResource($data);
         $room_resource =  new ChatRoomResourcePusher($check_room) ;
         // return $user2;
-        try{
         event(new Conversation( $message_resource->toResponse(request())->getData()->data  , $user2 , $room_resource ));
         event(new Chat($room_resource->toResponse(request())->getData()->data , $user2));
-    } catch (\Throwable $th) {
-        // return $th->getMessage();
-     }
         return [
          'message'=>    $message_resource,
          'card' =>  new ChatRoomResource($check_room)
@@ -341,6 +356,12 @@ class ChatMessagesController extends Controller
         $chat_room_id =0 ;
         $user =$request->user();
         $ids = [];
+        if(!$request->id   ){
+            return response()->json([
+                'status' => 404,
+                'message' =>'missing parameter',
+            ],404);
+        }
         foreach ($request->id as $id) {
             $ids [] = (int)$id ;
             $message = ChatMessage::find($id);
@@ -380,12 +401,8 @@ class ChatMessagesController extends Controller
         }
 
         $room_resource =  new ChatRoomResourcePusher($check_room) ;
-        try{
         event(new DeleteMessage( $ids , $user2 , $room_resource ));
         event(new CardDeleteMessage($room_resource->toResponse(request())->getData()->data , $user2));
-    } catch (\Throwable $th) {
-        // return $th->getMessage();
-     }
         return response()->json([
             'status' => 200,
             'message' => 'message deleted',

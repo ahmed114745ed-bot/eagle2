@@ -12,10 +12,15 @@ use Illuminate\Support\Facades\Log;
 
 class PusherController extends Controller
 {
-    function edit_user(Request $request) {
-        if (!$request->header('X-Pusher-Key') === env('PUSHER_APP_KEY')) {
+    public function edit_user(Request $request) {
+
+        if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
+            Log::info('Pusehr error');
+
             abort(403, 'Invalid Pusher webhook request');
         }
+
+//        Log::info('this is response pusher '. json_encode($request->all()));
         $channel = $request->events[0]['channel'];
         $name = $request->events[0]['name'];
         $parts = explode('-', $channel);
@@ -30,10 +35,14 @@ class PusherController extends Controller
             {
                 if($name  =='channel_vacated')
                 {
+               // Log::info("تم تسجيل اليوز اونلاين");
+
                     $user->online = 0;
                     $user->current_room_chat  = null ;
                 }
                 else{
+              //  Log::info("تم تسجيل اليوز اوفلاين");
+
                     $user->online = 1;
                     $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->get()->pluck('id')->toArray();;
                     $total_unread =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$user->id)->where('status','sended')->get();
@@ -46,15 +55,14 @@ class PusherController extends Controller
         return response()->json(['status' => 'Webhook received']);
     }
 
-    function user_status($id) {
+    public function user_status($id) {
         $user = User::find($id);
-        if($user)
+        if($user != null)
         {
             return [
                 'online' =>$user->online
             ] ;
-        }
-        else{
+        }else{
             return 'user not found';
         }
     }

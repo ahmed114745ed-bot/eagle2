@@ -130,7 +130,7 @@ class ChatMessageResource extends JsonResource
         return[
             'replay' => $replay ? $replay_array : null,
             'id' => $this->id,
-            'user_id' => $this->user_id??0,
+            'user_id' => $this->user_id,
             'message' => $this->message,
             'status' => $this->status,
             'type' => $this->type,

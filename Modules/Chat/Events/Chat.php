@@ -27,7 +27,7 @@ class Chat implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return ['user-'.$this->user2?->id];
+        return ['user-'.$this->user2->id];
     }
 
     public function broadcastAs()

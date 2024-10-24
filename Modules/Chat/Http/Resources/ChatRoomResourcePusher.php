@@ -22,8 +22,8 @@ class ChatRoomResourcePusher extends JsonResource
 
         $total_undread_message = ChatMessage::where('chat_room_id',$this->id)->where('user_id',$user2->id)->where('status','not Like','seen')->count();
         return [
-            'user_id'             => $user2->id??0,
-            'name'                => $user2->name?? __('api_responses.fakeName'),
+            'user_id'             => $user2->id,
+            'name'                => $user2->name,
             'img'                 => @$user2->profile->avatar,
             'chat_id'             => $this->id,
             'unread_message'      => $total_undread_message,
