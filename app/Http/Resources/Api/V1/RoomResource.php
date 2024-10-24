@@ -22,7 +22,7 @@ class RoomResource extends JsonResource
             'id' => $this->id,
             'owner_id' => $this->uid ?: 0,
             'owner_uuid' => $this->owner?->uuid ?: 0,
-            'room_id' => $this->numid ?: 0,
+            'room_id' => $this->id ?: 0,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
             'visitors_count' => $this->count_room_socket,
