@@ -265,7 +265,7 @@ Route::group(
         $router->resource('withdraw-types', WithdrawController::class);
         $router->resource('room-vips', RoomVipController::class);
         $router->resource('room-target', RoomTargetController::class);
-
+   
         // $router->resource('agencyMangLink', AgencyMangerLinkController::class);
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
@@ -332,4 +332,6 @@ Route::group(
 
         $router->resource('banners', BannerController::class);
     }
+
+    
 );

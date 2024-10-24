@@ -1028,7 +1028,7 @@ class User extends Authenticatable
         if (Common::checkPackPrev($this->id, 20)) return null;
         return $value;
     }
-    
+
     public function getRealOnlineTimeAttribute()
     {
         return @$this->attributes['online_time'] ?? $this->online_time;
