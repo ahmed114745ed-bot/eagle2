@@ -121,7 +121,16 @@ class AllGameController extends AdminController
         );
         $form->url('mini_url', __('Mini Url'));
         $form->image('image', __('Image'));
+        $form->text('hight_image', __('hight_image'));
         $form->switch('is_enable', __('enable'));
+        $form->select('in_room', __('in_room'))->options (
+            [
+                0=>__('mini'),
+                1=>__ ('full'),
+                
+            ]
+        )->default (0);
+        $form->text('hight', __('hight'));
 
         return $form;
     }
