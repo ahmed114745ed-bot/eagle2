@@ -33,6 +33,17 @@ class RoleController extends Controller
         return Common::apiResponse(1, '', $roles);
     }
 
+    public function show($id)
+    {
+        $roleModel = config('admin.database.roles_model');
+
+        $roles = $roleModel::with('permissions:name')
+            ->select('id', 'slug', 'name', 'created_at', 'updated_at')
+            ->where('id',$id)->first();
+
+        return Common::apiResponse(1, '', $roles);
+    }
+
     public function store(Request $request)
     {
 

@@ -10,6 +10,9 @@ class Admin extends \App\Models\Administrator
 {
     protected $table = 'admin_users';
     protected $appends = ['agency_id'];
+    protected $fillable = ['username', 'password', 'name', 'avatar', 'is_preview'];
+
+    protected $guarded = [];
     public function agency(){
         return $this->hasOne (Agency::class,'owner_id');
     }

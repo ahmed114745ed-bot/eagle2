@@ -52,62 +52,41 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Charge);
-        $grid->model ()->orderByDesc ('id');
-        $grid->id(__ ('ID'));
-        $grid->column('charger_id',__('charger id'))->modal ('Charger info',function ($model){
-            if ($model->charger_id){
-                if ($model->charger_type == 'app'){
-                    if (!User::query ()->where ('id',$model->user_id)->exists ()){
-                        return null;
-                    }
-                    return Common::getUserShow($model->charger_id);
-                }else{
-                    if (!Admin::query ()->where ('id',$model->user_id)->exists ()){
-                        return null;
-                    }
-                    return Common::getAdminShow($model->charger_id);
-                }
-            }
-            return null;
-        });
-        $grid->column('charger_type',__ ('charger type'))->using (
-            [
-                'app'=>__ ('app'),
-                'dash'=>__ ('office')
-            ]
-        );
-        $grid->column('user_id',__('user id'))->modal ('User info',function ($model){
-            if ($model->user_id){
-                if ($model->user_type == 'app'){
-                    if (!User::query ()->where ('id',$model->user_id)->exists ()){
-                        return null;
-                    }
-                    return Common::getUserShow($model->user_id);
-                }else{
-                    if (!Admin::query ()->where ('id',$model->user_id)->exists ()){
-                        return null;
-                    }
-                    return Common::getAdminShow($model->user_id);
-                }
+        $grid->model()->orderByDesc('id');
+        $grid->id(__('ID'));
+        $grid->filter(function ($filter) {
+            // إلغاء الفلاتر الافتراضية
+            $filter->disableIdFilter();
+        
+            // فلتر "من تاريخ إلى تاريخ" على عمود created_at
+            $filter->between('created_at', __('Filter by date'))->date();
+            $filter->expand();
 
-            }
-            return null;
         });
-        $grid->column('user_type',__ ('user type'))->using (
-            [
-                'app'=>__ ('app'),
-                'dash'=>__ ('office')
-            ]
-        );
+        $grid->column('user_id', __('User'))->display(function($userId) {
+            $user = \App\Models\User::find($userId);
+            $img = getDriverUrl().'/'. $user->profile?->avatar;
+            return "<img src='$img' style='width: 50px; height: 50px; border-radius: 50%;' /> <br> uid: #{$user->uuid}";
+        });
+        
+        // $grid->column('user_type', __('User Type'))->using([
+        //     'app' => __('app'),
+        //     'dash' => __('office')
+        // ]);
+        
         $grid->amount(__('coins'));
-//        $grid->amount_type('amount_type');
-        $grid->column('created_at',trans('admin.created_at'))->diffForHumans ();
-//        $grid->updated_at(trans('admin.updated_at'));
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
+        $grid->column('created_at', trans('admin.created_at'));
+        
+        
+        
+        $grid->disableActions();
+        $grid->disableCreateButton();
         $grid->disableExport();
-        $this->extendGrid ($grid);
+        
+        $this->extendGrid($grid);
+        
         return $grid;
+        
     }
 
     /**
