@@ -1023,4 +1023,14 @@ class User extends Authenticatable
 
         return floor($userSallary ?? 0);
     }
+    public function getOnlineTimeAttribute($value)
+    {
+        if (Common::checkPackPrev($this->id, 20)) return null;
+        return $value;
+    }
+    
+    public function getRealOnlineTimeAttribute()
+    {
+        return @$this->attributes['online_time'] ?? $this->online_time;
+    }
 }
