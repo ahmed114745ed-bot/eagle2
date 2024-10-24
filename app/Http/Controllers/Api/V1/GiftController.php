@@ -103,8 +103,8 @@ class GiftController extends Controller
     public function musicSwitchUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'music_gift' => 'required',
-            'gift_id' => 'required',
+            'music_gift' => 'required|boolean',
+            'gift_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -117,8 +117,8 @@ class GiftController extends Controller
     public function enableSwitchUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'enable' => 'required',
-            'gift_id' => 'required',
+            'enable' => 'required|boolean',
+            'gift_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -131,8 +131,8 @@ class GiftController extends Controller
     public function isPlaySwitchUpdate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'is_play' => 'required',
-            'gift_id' => 'required',
+            'is_play' => 'required|boolean',
+            'gift_id' => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
