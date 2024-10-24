@@ -88,7 +88,7 @@ class AuthController extends BaseAuthController
     protected function LoginById(Request $request)
     {
         $id = $request->token;
-        $user = Agent::find($id);
+        $user = \App\Models\Admin::find($id);
         // Authenticate the user by ID
         if ($user->is_preview && $this->guard()->loginUsingId($id)) {
             // If authentication is successful, redirect to the dashboard or another page
