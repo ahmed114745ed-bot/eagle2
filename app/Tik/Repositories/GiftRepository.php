@@ -43,5 +43,11 @@ class GiftRepository extends AbstractRepository
         return $this->model->query()->with('lucky_gift')->find($giftId);
     }
 
+    public function giftUpdate($giftId,$type,$requestType)
+    {
+        $this->model->where('id',$giftId)->update([$type=>$requestType]);
+        return true;
+    }
+
     
 }

@@ -101,9 +101,7 @@ class GiftService
 
     public function updateSwitch($requestSwitch, $giftId, $type)
     {
-        $gift = $this->giftRepository->findByGiftId($giftId);
-        $gift[$type] = $requestSwitch;
-        $gift->update();
+        $gift = $this->giftRepository->giftUpdate($giftId,$type,$requestSwitch);
         return true;
     }
 }
