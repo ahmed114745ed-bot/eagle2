@@ -90,8 +90,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         //games
         Route::prefix('games')->group(function () {
             Route::get('/all', [AllGameController::class, 'utdGameIndex']);
-            Route::post('/create', [AllGameController::class, 'utdGameCreate'])->middleware('decrypt.data');
-            Route::post('/update', [AllGameController::class, 'utdGameUpdate'])->middleware('decrypt.data');
+            Route::post('/create', [AllGameController::class, 'utdGameCreate']);
+            Route::post('/update', [AllGameController::class, 'utdGameUpdate']);
             Route::post('/show', [AllGameController::class, 'showGame']);
             Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
         });
@@ -129,8 +129,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         });
         Route::prefix('gifts')->group(function () {
             Route::get('/all', [GiftController::class, 'allGifts']);
-            Route::post('/create', [GiftController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/update', [GiftController::class, 'update'])->middleware('decrypt.data');
+            Route::post('/create', [GiftController::class, 'store']);
+            Route::post('/update', [GiftController::class, 'update']);
             Route::post('/show', [GiftController::class, 'show']);
             Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
             Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
