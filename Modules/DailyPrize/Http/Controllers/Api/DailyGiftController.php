@@ -41,9 +41,6 @@ class DailyGiftController extends Controller
         $currentDay= $this->getCurrentDay();
         
         $result=DailyGiftCount::query()->where('user_id',$user->id)->first();
-       /* if ($this->check_date_hours($result?->last_active) && $result != null) {
-            $currentDay -=1;
-        }*/
        
         $check_received=DailyGiftCount::query()->where('user_id',$user->id)->where("day_count",$currentDay)->first();
         $data=[
