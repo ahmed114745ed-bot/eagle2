@@ -111,13 +111,40 @@ class RoleController extends Controller
         return Common::apiResponse(1, 'Role deleted successfully');
     }
 
+    // public function permissionsCategory()
+    // {
+    //     $permissionModel = config('admin.database.permissions_model');
+    //     $permissionsPaginated = $permissionModel::groupBy(function ($item) {
+    //         return $item->category ?? 'other';
+    //     })->paginate(50);
+    //     // $permissions = $permissionsPaginated->getCollection()->groupBy(function ($item) {
+    //     //     return $item->category ?? 'other';
+    //     // });
+    //     return Common::apiResponse(1, '', $permissionsPaginated);
+    // }
+
     public function permissionsCategory()
-    {
-        $permissionModel = config('admin.database.permissions_model');
-        $permissionsPaginated = $permissionModel::paginate(50);
-        $permissions = $permissionsPaginated->getCollection()->groupBy(function ($item) {
-            return $item->category ?? 'other';
-        });
-        return Common::apiResponse(1, '', $permissions);
-    }
+{
+    $permissionModel = config('admin.database.permissions_model');
+    
+    // Fetch all permissions first and then group by category
+    $permissionsPaginated = $permissionModel::paginate(50);
+
+    // Group the permissions by category
+    $permissions = $permissionsPaginated->getCollection()->groupBy(function ($item) {
+        return $item->category ?? 'other';
+    });
+
+    // Prepare pagination metadata
+    $paginationData = [
+        'current_page' => $permissionsPaginated->currentPage(),
+        'last_page' => $permissionsPaginated->lastPage(),
+        'per_page' => $permissionsPaginated->perPage(),
+        'total' => $permissionsPaginated->total(),
+    ];
+
+    
+    return Common::apiResponse2(1, '',$permissions,200,$paginationData);
+}
+
 }

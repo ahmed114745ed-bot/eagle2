@@ -41,6 +41,7 @@ use Illuminate\Support\Str;
 use Kreait\Firebase\Factory;
 use Twilio\Rest\Client as TwilioClint;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Common{
 
@@ -79,7 +80,7 @@ class Common{
     {
         return Vip::query()->whereIn('type', [1,2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
     }
-    public static function apiResponse(bool $success,$message,$data = null,$statusCode = null,$paginates = null, $isPagination = false){
+    public static function apiResponse2(bool $success,$message,$data = null,$statusCode = null,$paginates = null, $isPagination = false){
 
         if ($success == false && $statusCode == null){
             $statusCode = 422;
@@ -89,11 +90,7 @@ class Common{
             $statusCode = 200;
         }
 
-//        $arr = ['yai'];
-//        $countries = [];
-//        if (in_array (\config ('app.app_origin_name'),$arr)){
-//            $countries = CountryResource::collection (Country::query ()->where ('status',1)->get ());
-//        }
+
 
         $arr = [
             'success' => $success,
@@ -139,6 +136,59 @@ class Common{
             'from' => $collection->firstItem(),
             'to' => $collection->lastItem(),
         ];
+    }
+
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
+    {
+
+        if ($success == false && $statusCode == null) {
+            $statusCode = 422;
+        }
+
+        if ($success == true && $statusCode == null) {
+            $statusCode = 200;
+        }
+
+
+        $dataForPaginationCheck = $data;
+
+        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource) {
+
+            $dataForPaginationCheck = $data->resource;
+        }
+
+        return response()->json(
+            [
+                'success'   => $success,
+
+                'message'   => __($message),
+
+                'data'      => $data,
+                'paginates' => ($dataForPaginationCheck instanceof LengthAwarePaginator) ? self::paginationData($data) : null,
+            ],
+            $statusCode
+        );
+    }
+    public static  function paginationData($data)
+    {
+        $result['meta'] =  [
+            'current_page'  => $data->currentPage(),
+            'from'          => $data->firstItem(),
+            'last_page'     => $data->lastPage(),
+            'path'          => $data->path(),
+            'per_page'      => $data->perPage(),
+            'to'            => $data->lastItem(),
+            'total'         => $data->total(),
+        ];
+
+        $result['links'] = [
+            'first' => $data->url(1),
+            'last'  => $data->url($data->lastPage()),
+            'prev'  => $data->previousPageUrl(),
+            'next'  => $data->nextPageUrl(),
+        ];
+
+        return $result;
     }
 
 
