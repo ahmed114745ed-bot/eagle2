@@ -46,12 +46,12 @@ class Room extends Model
         return $query;
     }
 
-    public function getRoomBackgroundAttribute($val){
-        if (self::$withoutAppends){
-            return;
-        }
-        return @Background::query ()->where ('id',$val)->first ()->img;
-    }
+//    public function getRoomBackgroundAttribute($val){
+//        if (self::$withoutAppends){
+//            return;
+//        }
+//        return @Background::query ()->where ('id',$val)->first ()->img;
+//    }
 
     public function owner(){
         return $this->belongsTo(User::class,'uid','id');
@@ -202,15 +202,14 @@ class Room extends Model
 
     public function background()
     {
-        return $this->belongsTo(Background::class, 'room_background', 'id');
+        return $this->belongsTo(Background::class, 'room_background');
     }
 
     public function getFinalRoomImageAttribute()
     {
-
         $var = $this->mode == '3' ?
             'custom_image/back-black.png' :
-            ($this->backgroundImage?->img ?: ($this->background ?: request()->default_background));
+            ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));
         return $var;
     }
 

@@ -459,7 +459,7 @@ class EnteranceController extends Controller
             $data = [
                 "messageContent"=>[
                     "message"=>"changeBackground",
-                    "imgbackground"=>$room->room_background?:@$background_me,
+                    "imgbackground"=>$room->final_room_image?:@$background_me,
                     "roomIntro"=>$room->room_intro?:"",
                     "roomImg"=>$room->room_cover?:"",
                     "room_type"=>@$room->myType->name?:"",
