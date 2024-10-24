@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\Api\V1\UserTypeResource;
+use App\Http\Services\ProfileRelationsService;
+use App\Models\User;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
@@ -26,6 +29,16 @@ class UserController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
+    }
+
+    public function chargerAgincy(Request $request, ProfileRelationsService $profileRelationsService)
+    {
+        $users = User::where('type_user', 3)->orWhere('type_user', 4)->orderByDesc('id')->paginate(10);
+        $usersType = UserTypeResource::collection($users);
+        [$senderLevels, $receivedImage] = $profileRelationsService->getLevelsSenderAndReceiver($usersType);
+        UserTypeResource::initializeData($senderLevels, $receivedImage, null);
+        $data = UserTypeResource::collection($usersType);
+        return Common::apiResponse(1, '', $usersType);
     }
 
     public function app_setting()
