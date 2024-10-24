@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 
 use App\Helpers\Common;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Utils;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Classes\Gifts\SendGiftService;
@@ -55,7 +56,7 @@ class GiftLogService
         if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
 
         // Get Room Data
-        $room =  $this->repository->findUserRoom($ownerId);
+        $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
         // Validation if no room
         if (!$room) return Common::apiResponse(0, 'room does not exist', null, 404);
 
@@ -69,7 +70,7 @@ class GiftLogService
         $cpId = null;
         //check type of cp
         if ($cpId != null) {
-            try { 
+            try {
                 $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                 // dd($cpIds);
             } catch (\Exception $e) {
@@ -109,7 +110,7 @@ class GiftLogService
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
         //send to zego if pk not null
 
-        
+
         if ($room->lastPk != null) {
 
             dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
@@ -131,9 +132,18 @@ class GiftLogService
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
 
         try {
-            Utils::unwrap($promises);
-        } catch (\Throwable $e) {
+
+
+            $responses = Utils::unwrap($promises);
+
+// Iterate and print each response
+            foreach ($responses as $response) {
+                echo $response->getBody(); // Assuming the promises are HTTP responses
+            }
+        } catch (BadResponseException $e) {
         }
+
+        die();
 
 
         if ($room->mode != '1' && $room->mode != '2') {
