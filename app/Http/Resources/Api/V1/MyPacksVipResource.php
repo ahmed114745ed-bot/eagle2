@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Pack;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,6 +11,8 @@ class MyPacksVipResource extends JsonResource
 {
     public function toArray($request)
     {
+
+        /** @var Pack $this */
         return [
             'id' => $this->id,
             'target_id' => $this->id,
@@ -24,6 +27,7 @@ class MyPacksVipResource extends JsonResource
             'num_used' => $this->num_used > 0,
             'name' => $this->OVip?->name,
             'show_img' => $this->OVip?->img,
+            'svg'       =>  $this->OVip->img2 ?? '',
             'price' => @$this->OVip?->price ?? '',
         ];
     }
