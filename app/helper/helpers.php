@@ -246,7 +246,7 @@ if (!function_exists('handleShowImageWithTypes')){
     function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = 50, int $height= 50): string
     {
         $imageType = getFileExtension($url);
-        if ($imageType == 'svga') {
+        if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
 
             return "<div id='$model' style='width: {$width}px; height: {$height}px'> </div>";
