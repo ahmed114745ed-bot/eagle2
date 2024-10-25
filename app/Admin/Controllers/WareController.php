@@ -67,12 +67,9 @@ class WareController extends MainController
         $grid->column('price',__ ('price'))->editable ();
 
         $grid->column('show_img',__ ('show_img'))->image ('',30);
-        $grid->column('img2',__ ('show_img'))->display(function (){
+        $grid->column('img2',__ ('show_img'))->display(function ($path){
             /** @var Ware $this */
-
-            $path = $this->img2;
             $url = getImagePath($path);
-            $imageType = 'svga';
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('get_type',__ ('get_type'))->select (

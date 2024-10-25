@@ -53,12 +53,9 @@ class GiftController extends MainController
         $grid->column('e_name', __('e_name'))->editable();
         $grid->column('price', __('price'))->editable();
         $grid->column('img', trans('image'))->image('', '50', 50);
-        $grid->column('show_img2', trans('show_img'))->display(function () {
+        $grid->column('show_img2', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
-
-            $path = $this->show_img;
             $url = getImagePath($path);
-            $imageType = $this->image_type;
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
