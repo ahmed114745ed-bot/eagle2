@@ -63,6 +63,18 @@ class WareController extends MainController
         });
 
         $grid->id(__ ('ID'));
+        $grid->column('name',__ ('name'))->editable ();
+        $grid->column('price',__ ('price'))->editable ();
+
+        $grid->column('show_img',__ ('show_img'))->image ('',30);
+        $grid->column('img2',__ ('show_img'))->display(function (){
+            /** @var Ware $this */
+
+            $path = $this->img2;
+            $url = getImagePath($path);
+            $imageType = $this->image_type;
+            return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
+        });
         $grid->column('get_type',__ ('get_type'))->select (
             [
               //  1=>trans ('vip level automatic acquisition'),
@@ -99,19 +111,18 @@ class WareController extends MainController
 
             ]
         );
-        $grid->column('name',__ ('name'))->editable ();
+
         $grid->title(__('title'));
-        $grid->column('price',__ ('price'))->editable ();
         $states = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
-        $grid->column('is_active_for_vip', __("active vip"))->switch($states);
 //        $grid->score('score');
         $grid->level(__('level'));
-        $grid->column('show_img',__ ('show_img'))->image ('',30);
+
         $grid->column('color',__ ('color'));
         $grid->expire(__('expire'));
+        $grid->column('is_active_for_vip', __("active vip"))->switch($states);
         $grid->column('enable',__ ('enable'))->switch (Common::getSwitchStates ());
         $grid->sort(__ ('sort'),__ ('sort'));
         $this->extendGrid ($grid);

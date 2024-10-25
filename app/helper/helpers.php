@@ -1,5 +1,6 @@
 <?php
 use App\Classes\AppSetting;
+use Encore\Admin\Admin;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
@@ -218,21 +219,91 @@ if (!function_exists( 'getPusherConfig')) {
     }
 
 
-    if (!function_exists('nameRoute')){
-        function nameRoute (string $name): string
-        {
-            $separators = ['.', '/'];
-            $separator = null;
-            $requestPath = \Request::path();
+}
+if (!function_exists('nameRoute')){
+    function nameRoute (string $name): string
+    {
+        $separators = ['.', '/'];
+        $separator = null;
+        $requestPath = \Request::path();
 
-            if (\Str::startsWith($requestPath, 'preview')) {//admin.route.prefix,admin.auth.controller
-                foreach ($separators as $s) {
-                    $valuesCount = count(explode($s, $name));
-                    if ($valuesCount > 1) $separator = $s;
-                }
+        if (\Str::startsWith($requestPath, 'preview')) {//admin.route.prefix,admin.auth.controller
+            foreach ($separators as $s) {
+                $valuesCount = count(explode($s, $name));
+                if ($valuesCount > 1) $separator = $s;
             }
-
-            return $separator ? ('preview' . $separator . $name) : $name;
         }
+
+        return $separator ? ('preview' . $separator . $name) : $name;
     }
 }
+if (!function_exists('handleShowImageWithTypes')){
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, ?string $imageType = 'png', int $width = 50, int $height= 50): string
+    {
+        if ($imageType == 'svga') {
+            $model = showSvgaImage($url, $uniqueId);
+
+            return "<div id='$model' style='width: {$width}px; height: {$height}px'> </div>";
+        } elseif ($imageType == 'mp4') {
+            return "
+                <video width='$width' height='$height' controls autoplay muted loop>
+                    <source src='$url' type='video/mp4'>
+                    <source src='$url' type='video/webm'>
+
+                    Your browser does not support the video tag.
+                 </video>
+                ";
+
+        }
+
+        return "<img href='$url' style='height: {$height}px; width: {$width}px' alt='' />";
+    }
+}
+
+if (!function_exists('showSvgaImage')){
+    /**
+     * @param string|null $url
+     * @return string
+     */
+    function showSvgaImage(?string $url, ?string $uniqueKey): string
+    {
+        $model = 'this' . $uniqueKey;
+        $model2 = 'this2' . $uniqueKey;
+
+        Admin::script("
+                    var $model = new SVGA.Player('#$model');
+                    $model.loops = 100;
+                    $model.clearsAfterStop = false;
+
+                    var $model2 = new SVGA.Parser('#$model');
+
+                    function pauseAnimation() {
+                        $model.pauseAnimation();
+                    }
+
+                    function stopAnimation() {
+                        $model.stopAnimation();
+                    }
+                ");
+
+        // Load SVGA animation and handle potential errors
+        Admin::script("
+                    try {
+                        $model2.load('$url', function(videoItem) {
+                            $model.setVideoItem(videoItem);
+                            $model.startAnimation();
+
+                            $model.onFinished(function() {
+                                // Code for when the animation finishes
+                            });
+                        });
+                    } catch (error) {
+                        console.error('An error occurred:', error.message);
+                    } finally {
+                        console.log('Try...catch has finished executing.');
+                    }
+                ");
+        return $model;
+    }
+}
+

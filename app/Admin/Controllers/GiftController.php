@@ -4,12 +4,10 @@ namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
 use App\Models\Gift;
-use App\Http\Controllers\Controller;
+use Encore\Admin\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
-use Encore\Admin\Admin;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
 class GiftController extends MainController
@@ -18,6 +16,9 @@ class GiftController extends MainController
 
     public $permission_name = 'gift';
     public $hiddenColumns = [];
+
+
+
 
     /**
      * Make a grid builder.
@@ -39,66 +40,13 @@ class GiftController extends MainController
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
         $grid->price(__('price'));
         $grid->column('img', trans('image'))->image('', '50', 50);
-        $grid->column('show_img2', trans('show_img'))->display(function($data){
-            /** @var Gift $this*/
+        $grid->column('show_img2', trans('show_img'))->display(function ($data) {
+            /** @var Gift $this */
 
-                $path = $this->show_img;
+            $path = $this->show_img;
             $url = getImagePath($path);
-            if ($this->image_type == 'svga') {
-                $model = 'this' . $this->id;
-                $model2 = 'this2' . $this->id;
-
-                Admin::script(
-                    script: "
-                var $model = new SVGA.Player('#$model');
-               $model.loops = 100;
-               $model.clearsAfterStop = false;
-           var $model2 = new SVGA.Parser('#$model');
-           function pauseAnimation(){
-                $model.pauseAnimation();
-           }
-
-            function stopAnimation(){
-                $model2.stopAnimation();
-            }
-           ");
-                Admin::script(
-                    script: "
-           try{
-           $model2.load('$url', function(videoItem) {
-
-               $model.setVideoItem(videoItem);
-               $model.startAnimation();
-           $model.onFinished(function(){
-
-
-           });
-           })
-           }catch (error) {
-            // Handle the error
-                console.error('An error occurred:', error.message);
-            } finally {
-                // This block will execute no matter what
-                console.log('Try...catch has finished executing.');
-            }
-");
-                return "<div id='$model' style='width: 50px; height: 50px'> </div>";
-            } elseif ($this->image_type == 'mp4') {
-                return "
-                <video width='50' height='50' controls autoplay muted loop>
-                    <source src='$url' type='video/mp4'>
-                    <source src='$url' type='video/webm'>
-
-                    Your browser does not support the video tag.
-
-                 </video>
-
-
-                ";
-
-            }
-
-            return "<img href='$url' style='height: 50px; width: 50px' alt='' />";
+            $imageType = $this->image_type;
+            return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
         });
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
@@ -129,8 +77,6 @@ class GiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
-
-
 
 
         return $grid;
@@ -268,7 +214,7 @@ class GiftController extends MainController
                 $max_percentage = $form->input('luckyGift.max_percentag');
                 if (($min_percentag + $mid_percentage + $max_percentage) != 100) {
                     $error = new \Illuminate\Support\MessageBag([
-                        'title'   => 'Error',
+                        'title' => 'Error',
                         'message' => 'The sum of percentages must be equal to 100.',
                     ]);
                 }
@@ -281,7 +227,7 @@ class GiftController extends MainController
                     $max_percentage = $form->input('luckyGift.max_percentag');
                     if (($min_percentag + $mid_percentage + $max_percentage) != 100) {
                         $error = new \Illuminate\Support\MessageBag([
-                            'title'   => 'Error',
+                            'title' => 'Error',
                             'message' => 'The sum of percentages must be equal to 100.',
                         ]);
 
