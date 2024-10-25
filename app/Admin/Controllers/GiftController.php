@@ -27,10 +27,27 @@ class GiftController extends MainController
      */
     protected function grid()
     {
-
+        $types = [
+            1 => __('normal'),
+            2 => __('hot'),
+            3 => __('country'),
+            4 => __('Moment'),
+            5 => __('Famous gifts'),
+            6 => __('Lucky gifts'),
+            7 => __('events'),
+        ];
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
 
+        $grid->filter(function (Grid\Filter $filter) use($types){
+            $filter->disableIdFilter();
+            // $filter->like('type', __('type'));
+            $filter->in('type', __('type'))->multipleSelect(
+                $types
+            );
+
+            $filter->expand();
+        });
         $grid->id(__('ID'));
         $grid->column('name', __('name'))->editable();
         $grid->column('e_name', __('e_name'))->editable();
@@ -45,7 +62,7 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->type(__('type'));
+        $grid->column('type', __('type'))->select($types);
         $grid->vip_level(__('vip_level'));
         $grid->column('hot', trans('hot'));
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
@@ -56,30 +73,12 @@ class GiftController extends MainController
         $grid->sort(__('sort'))->editable();
         $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
         //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            // $filter->like('type', __('type'));
-            $filter->in('type', __('type'))->multipleSelect(
-                [
-                    1 => __('normal'),
-                    2 => __('hot'),
-                    3 => __('country'),
-                    4 => __('Moment'),
-                    5 => __('Famous gifts'),
-                    6 => __('Lucky gifts'),
-                    7 => __('events'),
 
-
-                ]
-            );
-
-            $filter->expand();
-        });
 
 
         $this->extendGrid($grid);
         $grid->disableExport();
-        
+
         return $grid;
     }
 
