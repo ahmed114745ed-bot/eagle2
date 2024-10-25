@@ -66,7 +66,7 @@ class GiftController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'gift_id'  => 'required|numeric',
+            'gift_id'  => 'required|integer|exists:gifts,id',
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
             'type'         => 'required',
@@ -104,7 +104,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'music_gift' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -118,7 +118,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'enable' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -132,7 +132,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'is_play' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
