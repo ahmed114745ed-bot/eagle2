@@ -4,8 +4,12 @@ namespace App\Tik\Repositories;
 
 use App\Models\UserVip;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 
+/**
+ *@property UserVip $model
+ */
 class UserVipRepository extends AbstractRepository
 {
 
@@ -16,7 +20,7 @@ class UserVipRepository extends AbstractRepository
     {
         parent::__construct(new UserVip());
     }
-   
+
     public function findByUserId($userId)
     {
         return $this->model->where('user_id', $userId)->orderBy('expire', 'DESC')->first();
@@ -33,7 +37,7 @@ class UserVipRepository extends AbstractRepository
         return $this->model->find($id);
     }
 
-    public function getByUserId($userId)
+    public function getByUserId($userId) : Collection
     {
         return $this->model->where("user_id", $userId)->get();
     }

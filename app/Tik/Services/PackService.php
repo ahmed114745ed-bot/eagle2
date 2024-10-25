@@ -11,6 +11,8 @@ use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
+use Illuminate\Database\Eloquent\Collection;
+use phpDocumentor\Reflection\Types\Mixed_;
 
 
 class PackService
@@ -51,7 +53,7 @@ class PackService
     }
 
 
-    public function userPack($request)
+    public function userPack($request) : mixed
     {
         $this->packRepository->deleteExpirePack();
         $userId = $request->user_id ?:  $request->user()->id;
@@ -62,11 +64,11 @@ class PackService
             $data = $this->packRepository->packsJoinWithGift($userId, $type);
         } elseif ($type == 22) {
             $this->userVipRepository->deleteExpireUserVip();
-            $userVips = $this->userVipRepository->getByUserId($userId);
+            $data = $this->userVipRepository->getByUserId($userId);
         } else {
             $data = $this->packRepository->packsJoinWithWare($userId, $type);
         }
-        return ($type == 22) ?  $userVips : $data;
+        return  $data;
     }
 
     public function unlock_dress($userId)
