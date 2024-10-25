@@ -88,35 +88,20 @@ class AllGameService
 
     public function updateUtd($request)
     {
-
+        $data = [
+            'name' => $request->name,
+            'name_en' => $request->name_en,
+            'url' => $request->url,
+            'mini_url' => $request->mini_url,
+            'type' => $request->type,
+            'is_enable' => $request->is_enable,
+            'custom_id' => $request->custom_id,
+            'hight_image' => $request->hight_image,
+            'in_room'    => $request->in_room,
+            'hight' => $request->hight,
+        ];
         if ($request->hasFile('image')) {
-            $image = Common::upload('images', $request->file('image'));
-            $data = [
-                'name' => $request->name,
-                'name_en' => $request->name_en,
-                'url' => $request->url,
-                'image' => $image,
-                'mini_url' => $request->mini_url,
-                'type' => $request->type,
-                'is_enable' => $request->is_enable,
-                'custom_id' => $request->custom_id,
-                'hight_image' => $request->hight_image,
-                'in_room'    => $request->in_room,
-                'hight' => $request->hight,
-            ];
-        } else {
-            $data = [
-                'name' => $request->name,
-                'name_en' => $request->name_en,
-                'url' => $request->url,
-                'mini_url' => $request->mini_url,
-                'type' => $request->type,
-                'is_enable' => $request->is_enable,
-                'custom_id' => $request->custom_id,
-                'hight_image' => $request->hight_image,
-                'in_room'    => $request->in_room,
-                'hight' => $request->hight,
-            ];
+            $data['image'] = Common::upload('images', $request->file('image'));
         }
 
         return $this->allGameRepository->update($request->game_id, $data);
