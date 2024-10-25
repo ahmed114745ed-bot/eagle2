@@ -64,6 +64,7 @@ class GiftController extends MainController
            ");
                 Admin::script(
                     script: "
+           try{
            $model2.load('$url', function(videoItem) {
 
                $model.setVideoItem(videoItem);
@@ -73,8 +74,14 @@ class GiftController extends MainController
 
            });
            })
-
-           ");
+           }catch (error) {
+    // Handle the error
+    console.error('An error occurred:', error.message);
+} finally {
+    // This block will execute no matter what
+    console.log('Try...catch has finished executing.');
+}
+");
                 return "<div id='$model' style='width: 50px; height: 50px'> </div>";
             } elseif ($this->image_type == 'mp4') {
                 return "<video href='$path' style='height: 50px; width: 50px'  />";
