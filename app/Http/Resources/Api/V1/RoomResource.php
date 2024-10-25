@@ -51,7 +51,9 @@ class RoomResource extends JsonResource
                     'phone_code' => ''
                 ],
             'have_luck_box' => (bool) $have_luck_box,
-            'distance' => $this->distance,
+            $this->mergeWhen($this->distance, [
+                'distance' => $this->distance,
+            ]),
             $this->mergeWhen($this->relationLoaded('game'), [
                 'game' => $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
             ]),
