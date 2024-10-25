@@ -4,12 +4,20 @@ namespace App\Tik\Repositories;
 
 use App\Models\Pack;
 use Carbon\Carbon;
+
+
+
+/**
+ * @property  Pack $model
+ */
 class PackRepository extends AbstractRepository
 {
+
 
     public function __construct()
     {
         parent::__construct(new Pack());
+
     }
 
 
@@ -89,7 +97,7 @@ class PackRepository extends AbstractRepository
         return true;
     }
 
-    public function packsJoinWithGift($userId, $type)
+    public function packsJoinWithGift($userId, $type) : \Illuminate\Support\Collection
     {
         return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
             ->where(['packs.user_id' => $userId, 'packs.type' => $type])
@@ -97,11 +105,11 @@ class PackRepository extends AbstractRepository
             ->get();
     }
 
-    public function packsJoinWithWare($userId, $type)
+    public function packsJoinWithWare($userId, $type) : \Illuminate\Support\Collection
     {
         return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
             ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color")
+            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
             ->get();
     }
 

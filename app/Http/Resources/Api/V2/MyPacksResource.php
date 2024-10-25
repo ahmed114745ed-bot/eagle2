@@ -53,7 +53,6 @@ class MyPacksResource extends JsonResource
             '5' => 'background addition',
             '6' => 'limited time purchase'
         ];
-        dd($this->resource);
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
