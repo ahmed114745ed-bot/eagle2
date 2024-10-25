@@ -72,7 +72,7 @@ class WareController extends MainController
 
             $path = $this->img2;
             $url = getImagePath($path);
-            $imageType = $this->image_type;
+            $imageType = 'svga';
             return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
         });
         $grid->column('get_type',__ ('get_type'))->select (
