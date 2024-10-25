@@ -22,6 +22,8 @@ class OVipController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ovip';
+
+    protected $title = 'VIPs';
     public $hiddenColumns = [
 
     ];
@@ -68,7 +70,7 @@ class OVipController extends MainController
         $grid->id('ID');
         $grid->column('level',__ ('level'));
         $grid->column('name',__ ('name'));
-        $grid->column('img',__ ('img'))->display(function ($path){
+        $grid->column('img',__ ('img'))->display(function ($path, Grid\Column $data){
             /** @var OVip $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
@@ -79,6 +81,11 @@ class OVipController extends MainController
 //        $grid->updated_at(trans('admin.updated_at'));
         $this->extendGrid ($grid);
         $grid->disableExport();
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 

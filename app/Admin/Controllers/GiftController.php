@@ -53,7 +53,7 @@ class GiftController extends MainController
         $grid->column('e_name', __('e_name'))->editable();
         $grid->column('price', __('price'))->editable();
         $grid->column('img', trans('image'))->image('', '50', 50);
-        $grid->column('show_img2', trans('show_img'))->display(function ($path) {
+        $grid->column('show_img2', trans('show_img'))->display(function ($path,) {
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
@@ -75,7 +75,11 @@ class GiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
-
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
