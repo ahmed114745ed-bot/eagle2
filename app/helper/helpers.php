@@ -262,7 +262,7 @@ if (!function_exists('handleShowImageWithTypes')){
 
         }
 
-        return "<img href='$url' style='height: {$height}px; width: {$width}px' alt='' />";
+        return "<img src='$url' style='height: {$height}px; width: {$width}px' alt='' />";
     }
 }
 
