@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ware;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
