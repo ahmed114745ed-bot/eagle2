@@ -27,7 +27,6 @@ class MyPacksVipResource extends JsonResource
             'num_used' => $this->num_used > 0,
             'name' => $this->OVip?->name,
             'show_img' => $this->OVip?->img,
-            'svg'       =>  $this->OVip->img2 ?? '',
             'price' => @$this->OVip?->price ?? '',
         ];
     }
