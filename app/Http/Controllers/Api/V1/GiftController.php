@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Models\Gift;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
@@ -94,9 +95,12 @@ class GiftController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
+        try {
+            $this->giftService->update($request);
+        } catch (Exception $exception) {
 
-        $this->giftService->update($request);
-
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
         return Common::apiResponse(1, 'updated successfully');
     }
 
