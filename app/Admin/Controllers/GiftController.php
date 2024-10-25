@@ -26,6 +26,7 @@ class GiftController extends MainController
      */
     protected function grid()
     {
+
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
         $grid->id(__('ID'));
@@ -38,7 +39,50 @@ class GiftController extends MainController
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
         $grid->price(__('price'));
         $grid->column('img', trans('image'))->image('', '30');
-        $grid->column('show_img', trans('show_img'))->image('', '30');
+        $grid->column('show_img2', trans('show_img'))->image('', '30')->display(function($data){
+            /** @var Gift $this*/
+
+                $path = $this->show_img;
+
+            if ($this->image_type == 'svga') {
+                $model = 'this' . $this->id;
+                $model2 = 'this2' . $this->id;
+                $url = getImagePath($path);
+                Admin::script(
+                    script: "
+                var $model = new SVGA.Player('#$model');
+               $model.loops = 1;
+               $model.clearsAfterStop = false;
+           var $model2 = new SVGA.Parser('#$model');
+           function pauseAnimation(){
+                $model.pauseAnimation();
+           }
+
+            function stopAnimation(){
+                $model2.stopAnimation();
+            }
+           ");
+                Admin::script(
+                    script: "
+           $model2.load('$url', function(videoItem) {
+
+               $model.setVideoItem(videoItem);
+               $model.startAnimation();
+           $model.onFinished(function(){
+
+
+           });
+           })
+
+           ");
+                return "<div id='$model' style='width: 50px; height: 50px'> </div>";
+            } elseif ($this->image_type == 'mp4') {
+                return "<video href='$path' style='height: 50px; width: 50px'  />";
+
+            }
+
+            return "<img href='$path' style='height: 50px; width: 50px' alt='' />";
+        });
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         $grid->column('music_gift', trans('music_gift'))->switch(Common::getSwitchStatesGiftMucic());
@@ -68,6 +112,10 @@ class GiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
+
+
+
+
         return $grid;
     }
 
