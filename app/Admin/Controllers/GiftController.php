@@ -59,7 +59,7 @@ class GiftController extends MainController
             $path = $this->show_img;
             $url = getImagePath($path);
             $imageType = $this->image_type;
-            return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
         $grid->column('type', __('type'))->select($types);

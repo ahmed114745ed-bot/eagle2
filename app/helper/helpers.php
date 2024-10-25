@@ -237,9 +237,15 @@ if (!function_exists('nameRoute')){
         return $separator ? ('preview' . $separator . $name) : $name;
     }
 }
+if (!function_exists('getFileExtension')){
+    function getFileExtension($url) {
+        return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+    }
+}
 if (!function_exists('handleShowImageWithTypes')){
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, ?string $imageType = 'png', int $width = 50, int $height= 50): string
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = 50, int $height= 50): string
     {
+        $imageType = getFileExtension($url);
         if ($imageType == 'svga') {
             $model = showSvgaImage($url, $uniqueId);
 
