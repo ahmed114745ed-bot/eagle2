@@ -38,8 +38,8 @@ class GiftController extends MainController
         $grid->column('hot', trans('hot'));
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
         $grid->price(__('price'));
-        $grid->column('img', trans('image'))->image('', '30');
-        $grid->column('show_img2', trans('show_img'))->image('', '30')->display(function($data){
+        $grid->column('img', trans('image'))->image('', '50', 50);
+        $grid->column('show_img2', trans('show_img'))->display(function($data){
             /** @var Gift $this*/
 
                 $path = $this->show_img;
