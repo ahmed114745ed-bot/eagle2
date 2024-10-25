@@ -51,7 +51,7 @@ class GiftController extends MainController
                 Admin::script(
                     script: "
                 var $model = new SVGA.Player('#$model');
-               $model.loops = 1;
+               $model.loops = 100;
                $model.clearsAfterStop = false;
            var $model2 = new SVGA.Parser('#$model');
            function pauseAnimation(){
@@ -75,16 +75,25 @@ class GiftController extends MainController
            });
            })
            }catch (error) {
-    // Handle the error
-    console.error('An error occurred:', error.message);
-} finally {
-    // This block will execute no matter what
-    console.log('Try...catch has finished executing.');
-}
+            // Handle the error
+                console.error('An error occurred:', error.message);
+            } finally {
+                // This block will execute no matter what
+                console.log('Try...catch has finished executing.');
+            }
 ");
-                return "<div id='$model' > </div>";
+                return "<div id='$model' style='width: 50px; height: 50px'> </div>";
             } elseif ($this->image_type == 'mp4') {
-                return "<video href='$path' style='height: 50px; width: 50px'  />";
+                return "
+                <video width='50' height='50' controls autoplay muted loop>
+                    <source src='$path' type='video/mp4'>
+
+                    Your browser does not support the video tag.
+
+                 </video>
+
+
+                ";
 
             }
 
