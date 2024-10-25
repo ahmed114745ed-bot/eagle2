@@ -30,17 +30,13 @@ class GiftController extends MainController
 
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
+
         $grid->id(__('ID'));
-        $grid->name(__('name'));
-        $grid->e_name(__('e_name'));
-        $grid->type(__('type'));
-        $grid->column("use_count", __('use count'));
-        $grid->vip_level(__('vip_level'));
-        $grid->column('hot', trans('hot'));
-        $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
-        $grid->price(__('price'));
+        $grid->column('name', __('name'))->editable();
+        $grid->column('e_name', __('e_name'))->editable();
+        $grid->column('price', __('price'))->editable();
         $grid->column('img', trans('image'))->image('', '50', 50);
-        $grid->column('show_img2', trans('show_img'))->display(function ($data) {
+        $grid->column('show_img2', trans('show_img'))->display(function () {
             /** @var Gift $this */
 
             $path = $this->show_img;
@@ -48,6 +44,12 @@ class GiftController extends MainController
             $imageType = $this->image_type;
             return handleShowImageWithTypes($this->id, $url, $imageType, 50, 50);
         });
+        $grid->column("use_count", __('use count'));
+        $grid->type(__('type'));
+        $grid->vip_level(__('vip_level'));
+        $grid->column('hot', trans('hot'));
+        $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
+
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         $grid->column('music_gift', trans('music_gift'))->switch(Common::getSwitchStatesGiftMucic());
@@ -77,8 +79,7 @@ class GiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
-
-
+        
         return $grid;
     }
 
