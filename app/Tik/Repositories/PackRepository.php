@@ -109,7 +109,7 @@ class PackRepository extends AbstractRepository
     {
         return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
             ->where(['packs.user_id' => $userId, 'packs.type' => $type])
-            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2ss")
+            ->selectRaw("packs.*,b.name,b.show_img,b.title,b.color, b.img2 as img2")
             ->get();
     }
 
