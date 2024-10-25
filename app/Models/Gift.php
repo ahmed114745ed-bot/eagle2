@@ -9,7 +9,8 @@ use Modules\Achievement\Http\Traits\AchievementGift;
 class Gift extends Model
 {
     use AchievementGift;
-    protected $fillable=['use_count'];
+   // protected $fillable=['use_count'];
+   protected $guarded = ['id'];
     public function luckyGift()
     {
         return $this->hasOne(LuckyGift::class);

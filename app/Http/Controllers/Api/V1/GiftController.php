@@ -34,9 +34,9 @@ class GiftController extends Controller
             'vip_level'         => 'nullable|lt:256',
             'price'         => 'required|numeric',
             'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'show_img'          => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'show_img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'image_type'         => 'required|string|max:255',
-            'show_img2'          => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'show_img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort'         => 'nullable|numeric',
             'enable'         => 'nullable|boolean',
             'music_gift'         => 'nullable|boolean',
@@ -66,16 +66,16 @@ class GiftController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'gift_id'  => 'required|numeric',
+            'gift_id'  => 'required|integer|exists:gifts,id',
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
             'type'         => 'required',
             'vip_level'         => 'nullable|lt:256',
             'price'         => 'required|numeric',
             'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'show_img'          => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'show_img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'image_type'         => 'required|string|max:255',
-            'show_img2'          => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'show_img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort'         => 'nullable|numeric',
             'enable'         => 'nullable|boolean',
             'music_gift'         => 'nullable|boolean',
@@ -104,7 +104,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'music_gift' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -118,7 +118,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'enable' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -132,7 +132,7 @@ class GiftController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'is_play' => 'required|boolean',
-            'gift_id' => 'required|numeric',
+            'gift_id' => 'required|integer|exists:gifts,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
