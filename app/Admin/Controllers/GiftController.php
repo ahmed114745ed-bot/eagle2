@@ -43,11 +43,11 @@ class GiftController extends MainController
             /** @var Gift $this*/
 
                 $path = $this->show_img;
-
+            $url = getImagePath($path);
             if ($this->image_type == 'svga') {
                 $model = 'this' . $this->id;
                 $model2 = 'this2' . $this->id;
-                $url = getImagePath($path);
+
                 Admin::script(
                     script: "
                 var $model = new SVGA.Player('#$model');
@@ -86,7 +86,8 @@ class GiftController extends MainController
             } elseif ($this->image_type == 'mp4') {
                 return "
                 <video width='50' height='50' controls autoplay muted loop>
-                    <source src='$path' type='video/mp4'>
+                    <source src='$url' type='video/mp4'>
+                    <source src='$url' type='video/webm'>
 
                     Your browser does not support the video tag.
 
@@ -97,7 +98,7 @@ class GiftController extends MainController
 
             }
 
-            return "<img href='$path' style='height: 50px; width: 50px' alt='' />";
+            return "<img href='$url' style='height: 50px; width: 50px' alt='' />";
         });
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
