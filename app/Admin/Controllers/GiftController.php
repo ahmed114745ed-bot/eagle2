@@ -82,7 +82,7 @@ class GiftController extends MainController
     console.log('Try...catch has finished executing.');
 }
 ");
-                return "<div id='$model' style='width: 50px; height: 50px'> </div>";
+                return "<div id='$model' > </div>";
             } elseif ($this->image_type == 'mp4') {
                 return "<video href='$path' style='height: 50px; width: 50px'  />";
 
