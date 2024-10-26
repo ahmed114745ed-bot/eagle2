@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VipPrivilege;
 use App\Selectables\Privileges;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
