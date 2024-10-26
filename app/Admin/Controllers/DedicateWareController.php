@@ -39,7 +39,7 @@ class DedicateWareController extends MainController
             $grid->model()->whereNotNull('get_type')->where('type', '!=', 25);
         }
          $grid->id('ID');
-        $grid->column('name', __('name'))->editable();
+        $grid->column('name', __('name'));
         $grid->column('price', __('price'))->currency();
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2',__ ('show_img'))->display(function ($path){
