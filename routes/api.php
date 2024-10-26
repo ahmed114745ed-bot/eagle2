@@ -184,7 +184,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
-
+            Route::post('/change-room-effect',[UserController::class, 'showSetting']);
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
