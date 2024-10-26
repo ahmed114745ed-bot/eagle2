@@ -4,6 +4,10 @@ namespace App\Tik\Services;
 
 
 use Exception;
+use App\Models\Pack;
+use App\Models\Room;
+use App\Models\User;
+use App\Models\Ware;
 use App\Helpers\Common;
 use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
@@ -120,5 +124,34 @@ class HomeService
         }
 
         return  $tkt;
+    }
+
+    public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
+    {
+        if (key_exists($type, $privilegeArr)) {
+            $privilegeId = $privilegeArr[$type];
+
+            if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
+                return Common::apiResponse(0, 'not found', null, 404);
+            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
+
+                return Common::apiResponse(0, 'not allowed', null, 403);
+            }
+
+            Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
+
+            switch ($type) {
+                case 'country':
+                    /*if ($isAvailable) {
+                        $user->country_id = null;
+                        $user->save();
+                    }*/
+                    break;
+                case 'room':
+                    Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
+                    break;
+            }
+        }
+        return true;
     }
 }

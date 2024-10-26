@@ -2,40 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\PK;
-use Carbon\Carbon;
 use App\Models\Vip;
-use App\Models\OVip;
-use App\Models\Pack;
 use App\Models\Room;
-use App\Models\User;
-use App\Models\Ware;
-
-use App\Models\Image;
-use App\Helpers\Agora;
-use App\Models\Ticket;
 use App\Helpers\Common;
-use App\Models\CoinLog;
-use App\Models\Country;
-use App\Models\GiftLog;
-use App\Models\UserVip;
-use App\Models\Exchange;
-use App\Models\LiveTime;
-use App\Models\Background;
 use App\Helpers\UserCommon;
-use App\Models\ExchangeLog;
-use App\Models\RoomCategory;
-use App\Models\VipPrivilege;
 use Illuminate\Http\Request;
 use App\Classes\Packs\AllowPacks;
 use App\Tik\Services\HomeService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\RequestBackgroundImage;
-use App\Http\Resources\CountryResource;
-use App\Http\Resources\Api\V1\TrxResource;
-use App\Http\Resources\Api\V1\RoomCategoryResource;
 
 class HomeController extends Controller
 {
@@ -245,5 +221,23 @@ class HomeController extends Controller
             return Common::apiResponse(1, 'exists', true);
         }
         return Common::apiResponse(1, 'does not exists', false);
+    }
+
+    public function hide(Request $request)
+    {
+        $user         = $request->user();
+        $privilegeArr = [
+            'has_color_name' => 18,
+            'anonymous'      => 17,
+            'country'        => 13,
+            'last_active'    => 20,
+            'visit'          => 19,
+            'room'           => 16,
+            'sound_effect'   => 21
+        ];
+        $type         = $request->type;
+        $this->homeService->changePackMode($type, $privilegeArr, $user, true);
+
+        return Common::apiResponse(1, 'ok', null, 200);
     }
 }
