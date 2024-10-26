@@ -249,7 +249,7 @@ if (!function_exists('handleShowImageWithTypes')){
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
 
-            return "<div id='$model' style='width: {$width}px; height: {$height}px'> </div>";
+            return "<div id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
                 <video width='$width' height='$height' controls autoplay muted loop>
@@ -262,7 +262,7 @@ if (!function_exists('handleShowImageWithTypes')){
 
         }
 
-        return "<img src='$url' style='height: {$height}px; width: {$width}px' alt='' />";
+        return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important;' alt='' />";
     }
 }
 

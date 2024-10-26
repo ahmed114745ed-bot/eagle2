@@ -30,9 +30,8 @@ class HomeCarouselController extends MainController
         $grid = new Grid(new HomeCarousel);
 
         $grid->id( __ ('ID'));
-        $grid->column('img',trans ('img'))->image ('',30);
-        $grid->column('contents',trans ('contents'));
-        $grid->column('url',trans ('url'))->url ();
+        $grid->column('img',trans ('img'))->image ('',235, 77);
+        $grid->column('url',trans ('url'))->url();
         $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ())->display(function($enable, $column) {
             if($this->duration > carbon::now()->timestamp ||$this->duration == null )
             {
@@ -41,7 +40,7 @@ class HomeCarouselController extends MainController
             return null;
         });
 
-
+        $grid->column('contents',trans ('contents'));
         $grid->column('sort',trans ('sort'))->editable();
         $this->extendGrid ($grid);
         $grid->disableExport();
@@ -117,7 +116,7 @@ class HomeCarouselController extends MainController
                     $form->select ('event_type',trans ('events'))->options(['event'=>__ ('events'),'pk_event'=>__ ('pk_event'),'weekly_star'=>__ ('weekly_star'),'charge_event' =>__('charge_event'),'event_period' =>__('event_period')])->when('event', function(Form $form){
                         $form->url('url', trans('url'));
                     });
-                    
+
                 });
 
             return $form;
