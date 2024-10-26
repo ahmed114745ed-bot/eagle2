@@ -39,6 +39,14 @@ class DedicateWareController extends MainController
             $grid->model()->whereNotNull('get_type')->where('type', '!=', 25);
         }
          $grid->id('ID');
+        $grid->column('name', __('name'))->editable();
+        $grid->column('price', __('price'))->currency();
+        $grid->column('show_img', __('show_img'))->image('', 30);
+        $grid->column('img2',__ ('show_img'))->display(function ($path){
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('get_type', __('get_type'))->select(
             [
                 1 => trans('vip level automatic acquisition'),
@@ -78,15 +86,14 @@ class DedicateWareController extends MainController
                 ]
             );
         }
-        $grid->column('name', __('name'))->editable();
+
         if (!$typeSpecial) {
             $grid->title(__('title'));
         } else {
             $grid->value(__('value'));
         }
-        $grid->column('price', __('price'))->currency();
+
         $grid->level(__('level'));
-        $grid->column('show_img', __('show_img'))->image('', 30);
 
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
@@ -112,6 +119,11 @@ class DedicateWareController extends MainController
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;Create New</a>';
             $tools->append($button);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 

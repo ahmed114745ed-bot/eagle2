@@ -70,7 +70,7 @@ class OVipController extends MainController
         $grid->id('ID');
         $grid->column('level',__ ('level'));
         $grid->column('name',__ ('name'));
-        $grid->column('img',__ ('img'))->display(function ($path, Grid\Column $data){
+        $grid->column('img',__ ('img'))->display(function ($path){
             /** @var OVip $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);

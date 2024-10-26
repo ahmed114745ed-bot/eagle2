@@ -23,10 +23,15 @@ class DedicateVipController extends MainController
         $grid = new Grid(new OVip);
         $grid->model ()->orderByDesc('created_at');
         $grid->id('ID');
-        $grid->column('level',__ ('level'));
         $grid->column('name',__ ('name'));
-        $grid->column('img',__ ('img'))->image ('',150);
         $grid->column('price',__ ('price'));
+        $grid->column('img',__ ('img'))->image ('',150);
+        $grid->column('img',__ ('img'))->display(function ($path){
+            /** @var OVip $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('level',__ ('level'));
         $grid->column('expire',__ ('expire'));
         $grid->disableCreateButton ();
         $grid->actions (function ($actions){
@@ -35,6 +40,11 @@ class DedicateVipController extends MainController
             $actions->disableView();
             $actions->add(new DedicateAction());
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
