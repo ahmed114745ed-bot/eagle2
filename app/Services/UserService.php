@@ -19,6 +19,7 @@ use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
@@ -36,6 +37,7 @@ class UserService
     public function __construct(
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
+        private readonly UserSettingRepository $userSettingRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository
@@ -456,5 +458,28 @@ class UserService
     public function userInfoWithRoles($ownerId)
     {
        $user = $this->userRepository->findUserById($ownerId);
+    }
+
+    public function setting($userId, $request)
+    {
+        $setting = $this->userSettingRepository->userSitting($userId);
+
+        if ($setting != null) {
+            $key = $request->key;
+            $this->userSettingRepository->updateKey($setting, !$setting->$key);
+            $setting->$key = !$setting->$key;
+            $setting->save();
+        } else {
+
+            $data = [
+                'user_id'      => $userId,
+                'show_git'     => $request->chat_with_friends ?? 1,
+                'show_intro'   => $request->chat_with_followers ?? 1,
+                'show_banner'  => $request->chat_with_all ?? 1,
+            ];
+            $this->userSettingRepository->create($data);
+        }
+
+        return $setting;
     }
 }

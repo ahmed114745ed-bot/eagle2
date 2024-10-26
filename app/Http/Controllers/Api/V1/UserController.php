@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Resources\Api\V1\UserTypeResource;
-use App\Http\Services\ProfileRelationsService;
-use App\Models\User;
+use Auth;
 use Exception;
+use App\Models\User;
+use App\Models\Agency;
 use App\Helpers\Common;
+use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Illuminate\Validation\Rule;
+use App\Http\Services\WhatsappOtp;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
-use App\Http\Services\WhatsappOtp;
-use App\Models\Agency;
-use App\Models\UserSallary;
-use Auth;
-use Illuminate\Support\Facades\Validator;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
+use App\Http\Services\ProfileRelationsService;
+use App\Http\Resources\Api\V1\UserTypeResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
-use Illuminate\Validation\Rule;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
+use App\Http\Resources\Api\V1\ShowUserSettingResource;
 
 class UserController extends Controller
 {
@@ -39,6 +40,14 @@ class UserController extends Controller
         UserTypeResource::initializeData($senderLevels, $receivedImage, null);
         $data = UserTypeResource::collection($usersType);
         return Common::apiResponse(1, '', $usersType);
+    }
+
+    public function showSetting(Request $request)
+    {
+        $user = $request->user();
+        $sitting = $this->userService->setting($user->id, $request);
+
+        return Common::apiResponse(1, 'تم التعديل بنجاح', new ShowUserSettingResource($sitting));
     }
 
     public function app_setting()
