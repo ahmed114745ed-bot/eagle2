@@ -17,7 +17,7 @@ class InterestsController extends AdminController
      * @var string
      */
     protected $title ='الاهتمامات';
-   
+
 
 
     /**
@@ -31,7 +31,7 @@ class InterestsController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
-        $grid->column('img', __('Img'));
+        $grid->column('img', __('Img'))->image(width: 100, height: 100);
         // $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));
 
