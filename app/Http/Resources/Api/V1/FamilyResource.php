@@ -30,6 +30,7 @@ class FamilyResource extends JsonResource
                 'profile'=> [
                     'image' => $user->profile->avatar,
                 ],
+                'country'=> $user->country,
                 'type_user'            => intval(@$user->type_user) ?: 0, // both
                 "manger_type"          =>new MangerTypeResource(@$user->mangerType),
                 'uuid'                 => @$user->uuid, // both
@@ -51,9 +52,7 @@ class FamilyResource extends JsonResource
 //            'notice'=>@$this->notice?:'',
             'max_num_of_members'=>@$this->num?:0,
             'max_num_of_admins'=>@$this->num_admins?:0,
-//            'rank'=>@(integer)$this->rank?:0,
             'owner'=>$owner,
-//            'me'=>$me,
             'am_i_member'=>FamilyUser::query ()->where ('user_id',$request->user ()->id)->where ('family_id',$this->id)->where ('status',1)->exists (),
             'am_i_owner'=>(@$this->user_id == $request->user ()->id) ?true:false,
             'am_i_admin'=>$request->user ()->is_family_admin ?true:false,
@@ -61,9 +60,6 @@ class FamilyResource extends JsonResource
             'num_of_requests'=>FamilyUser::query ()->where ('family_id',$this->id)->where ('status',0)->count (),
             'num_of_members'=>$this->members_count,
             'level'=>@$this->level?:'',
-//            'today_rank'=>$this->today_rank,
-//            'week_rank'=>$this->week_rank,
-//            'month_rank'=>$this->month_rank,
         ];
     }
 }
