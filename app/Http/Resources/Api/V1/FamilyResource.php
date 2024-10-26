@@ -30,7 +30,11 @@ class FamilyResource extends JsonResource
                 'profile'=> [
                     'image' => $user->profile->avatar,
                 ],
-                'country'=> $user->country,
+                'country'=> [
+                    'id' => $user->country->id,
+                    'name' => $user->country->name,
+                    'flag' => $user->country->flag,
+                ],
                 'type_user'            => intval(@$user->type_user) ?: 0, // both
                 "manger_type"          =>new MangerTypeResource(@$user->mangerType),
                 'uuid'                 => @$user->uuid, // both
