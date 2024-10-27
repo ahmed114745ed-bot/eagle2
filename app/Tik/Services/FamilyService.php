@@ -186,7 +186,7 @@ class FamilyService
         if (!$family || !$user) throw new \Exception('not found');
 
         if (!$isAdmin && ($family->user_id !=  $authId)) throw new \Exception('not allowed');
-        $this->userRepository->update(['family_id' => $familyId], $user->id);
+        $this->userRepository->update(['family_id' => null], $user->id);
         $this->familyUserRepository->deleteUserFromFamily($userId, $family->id);
 
         return [$family, $user];
