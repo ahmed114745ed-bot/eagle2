@@ -200,11 +200,11 @@ class FamilyController extends Controller
         $auth = Auth::user();
         try {
 
-            $this->familyServices->actionRequest($request, $auth);
+             $user = $this->familyServices->actionRequest($request, $auth);
 
             if ($request->status == 1){
-                request()->family_status = 2;
-                $resource = new MembersUserResource($auth);
+                request()->family_status = 0;
+                $resource = new MembersUserResource($user);
             }
 
             return Common::apiResponse(1, 'success', @$resource ?? null, 200);
