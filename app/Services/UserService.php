@@ -19,6 +19,7 @@ use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
@@ -38,9 +39,11 @@ class UserService
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
+      private readonly  GiftLogRepository $giftLogRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
-        FollowRepository $followRepository
+        FollowRepository $followRepository,
+       
     ) {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
@@ -481,5 +484,10 @@ class UserService
         }
 
         return $setting;
+    }
+
+    public function supporter($userId)
+    {
+        return $this->giftLogRepository->getByUserId($userId);
     }
 }

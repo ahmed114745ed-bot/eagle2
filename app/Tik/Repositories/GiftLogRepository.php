@@ -63,4 +63,20 @@ class GiftLogRepository extends AbstractRepository
     {
         return $this->model->with($withRelation)->select(DB::raw('sum(giftPrice) as totalGiftPrice'), $actionId)->groupBy($actionId)->orderByDesc('totalGiftPrice')->whereDate('created_at', Carbon::today())->limit(3)->get();
     }
+
+    public function getByUserId($userId)
+    {
+        return $this->model->query()
+        ->has('sender')
+        ->with('sender')
+        ->select('sender_id')
+        ->selectRaw('SUM(giftNum * giftPrice) AS total')
+        ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
+        ->where('receiver_id', $userId)
+        ->groupBy('sender_id')
+        ->orderByDesc('total')
+        ->take(20)
+        ->get();
+    }
+
 }

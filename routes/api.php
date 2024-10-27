@@ -185,6 +185,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
             Route::post('/change-room-effect',[UserController::class, 'showSetting']);
+            Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             // rooms api
             Route::prefix('rooms')->group(function () {
