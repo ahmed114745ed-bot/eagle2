@@ -258,11 +258,11 @@ class FamilyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         $request->family_status = 2;
-        $membersUserResource = (new MembersUserResource($owner))->toArray($owner);
+        $membersUserResource = (new MembersUserResource($owner))->toResponse($request);
         $request->family_status = 1;
-        $anonymousResourceCollection = MembersUserResource::collection($admins)->toArray($request);
+        $anonymousResourceCollection = MembersUserResource::collection($admins)->toResponse($request);
         $request->family_status = 0;
-        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toArray($request);
+        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toResponse($request);
         $data = [
             'owner' => $membersUserResource,
             'admins' => $anonymousResourceCollection,
