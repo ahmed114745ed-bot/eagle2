@@ -26,9 +26,7 @@ class MembersUserResource extends JsonResource
      */
     public function toArray($request)
     {
-       if(!@$this->id){
-           return ;
-       }
+
 
         $data = [
             'id'=>@$this->id,
@@ -43,6 +41,9 @@ class MembersUserResource extends JsonResource
             'uuid'                 => @$this->uuid, // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            $this->mergeWhen(isset(request()->family_status) , [
+                'family_status' => request()->family_status
+            ]),
            /* 'level'=> [
                 'receiver_img' => @$this->getImageReceiverOrSender('receiver_id',1)->img,
                 'sender_img' => @$this->getImageReceiverOrSender('sender_id',2)->img,

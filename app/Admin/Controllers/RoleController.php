@@ -57,7 +57,7 @@ class RoleController extends MainController
         $grid = new Grid(new $roleModel());
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
-       $grid->column('name', trans('admin.name'));
+        $grid->column('name', trans('admin.name'));
         $grid->column('preview', trans('admin.preview'))->display(function () {
             $id = $this->id; // Assuming 'id' is the record ID field
             return '<a href="javascript:void(0);" onclick="openPreview(' . $id . ')">

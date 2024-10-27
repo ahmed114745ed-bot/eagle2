@@ -145,7 +145,7 @@ class MyDataResource extends JsonResource
                 "room_cover" => @$ownerRoom->room_cover,
                 "room_background" => @$ownerRoom->final_room_image,
                 "mode" => @$ownerRoom->mode,
-                'giftPrice' => $ownerRoom->session_string,
+                'giftPrice' => @$ownerRoom->session_string,
 
             ],
             'phone_bind' => (bool)@$this->phone,

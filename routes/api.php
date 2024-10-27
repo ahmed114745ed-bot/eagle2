@@ -48,6 +48,7 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
+use App\Http\Controllers\Api\V1\CoinReportController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -134,6 +135,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
+            Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
 
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
@@ -356,6 +358,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
+
+            // coins reports
+            Route::get('/coin-reports', [CoinReportController::class, 'index']);
+
+            // end coin report
         }
     );
 

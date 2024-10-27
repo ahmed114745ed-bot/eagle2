@@ -275,6 +275,32 @@ class RoomRepoService
         }
         return Common::apiResponse(1, 'done', null, 201);
     }
+    
+    public function changeModeMic($request, $currentMode)
+    {
+        $room =  $this->findRoomUser($request->owner_id);
+        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        //get last mode of rooms to if is cinema mode and change it update room background
+        $lastMode = $room->mode;
+        $room->mode = $currentMode;
+        $room->save();
+        $jsons = [];
+        $map = [];
+        $mode = $currentMode;
+        $ms   = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+      
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
+        return Common::apiResponse(1, 'done', null, 201);
+    }
 
     public function changeBackground(Room $room, int $owner_id, string $image = ''): string|false
     {

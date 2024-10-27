@@ -16,9 +16,6 @@ class FamilyResource extends JsonResource
      */
     public function toArray($request)
     {
-//        if (!$this->resource){
-//            return null;
-//        }
         $user = User::find($this->user_id);
         if ($user){
             $owner = [
@@ -26,14 +23,13 @@ class FamilyResource extends JsonResource
                 'is_family_admin'=>@$this->is_family_admin,
                 'family_id'=>$user->family_id,
                 'name'  => $user->name,
-//            'profile'=>new ProfileResource(@$this->profile),
                 'profile'=> [
                     'image' => $user->profile->avatar,
                 ],
                 'country'=> [
-                    'id' => $user->country->id,
-                    'name' => $user->country->name,
-                    'flag' => $user->country->flag,
+                    'id' => @$user->country->id,
+                    'name' => @$user->country->name,
+                    'flag' => @$user->country->flag,
                 ],
                 'type_user'            => intval(@$user->type_user) ?: 0, // both
                 "manger_type"          =>new MangerTypeResource(@$user->mangerType),
@@ -44,8 +40,6 @@ class FamilyResource extends JsonResource
         }else{
             $owner = new \stdClass();
         }
-//
-//        $me = new UserResource($request->user ());
 
         $mems = FamilyUser::query ()->where ('family_id',@$this->id)->where ('status',1)->pluck ('user_id');
         return [
@@ -53,7 +47,6 @@ class FamilyResource extends JsonResource
             'name'=>@$this->name?:'',
             'introduce'=>@$this->introduce?:'',
             'image'=>@$this->image?:'',
-//            'notice'=>@$this->notice?:'',
             'max_num_of_members'=>@$this->num?:0,
             'max_num_of_admins'=>@$this->num_admins?:0,
             'owner'=>$owner,

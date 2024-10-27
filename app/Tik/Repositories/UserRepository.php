@@ -112,7 +112,7 @@ class UserRepository extends AbstractRepository
 
     public function updateFamilyId($user, $familyId)
     {
-        $user->update(['family_id', $familyId]);
+        $user->update(['family_id' => $familyId]);
         return true;
     }
 
