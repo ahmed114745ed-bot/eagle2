@@ -124,7 +124,7 @@ class PkEventGiftController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
@@ -184,7 +184,7 @@ class PkEventGiftController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
@@ -245,7 +245,7 @@ class PkEventGiftController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */

@@ -41,7 +41,7 @@ class DailyPrizeController extends AdminController
             } elseif ($this->gift_type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
