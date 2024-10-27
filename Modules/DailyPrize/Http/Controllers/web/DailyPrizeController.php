@@ -31,6 +31,25 @@ class DailyPrizeController extends AdminController
         $grid->model()->where('type',$type);
         $grid->column('order', __('Order'))->editable();
         $grid->column('gift_type', __('gifts'));
+        $grid->column('image', __('image'))->display(function ($path) {
+            if($this->gift_type == 'ware')
+            {
+            $ware = Ware::find($this->target);
+            $path = $ware->show_img ?? $ware->img2 ; 
+            }elseif($this->gift_type == 'vip')
+            {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+
+            }elseif($this->gift_type == 'achievement')
+            {
+                $path = $this->target;
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
        
         $grid->column('expir', __('expire'));
 
