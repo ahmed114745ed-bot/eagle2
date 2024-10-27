@@ -89,6 +89,24 @@ class RewardTargetController extends MainController
             }
 
         });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware->show_img ;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = '';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($target){

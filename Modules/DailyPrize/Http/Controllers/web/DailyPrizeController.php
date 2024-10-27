@@ -34,7 +34,7 @@ class DailyPrizeController extends AdminController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->gift_type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;

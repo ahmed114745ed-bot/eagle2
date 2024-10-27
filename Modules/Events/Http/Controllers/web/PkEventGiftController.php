@@ -100,7 +100,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",1);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -118,7 +117,7 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -132,6 +131,7 @@ class PkEventGiftController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
@@ -161,7 +161,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -178,7 +177,7 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -192,6 +191,7 @@ class PkEventGiftController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
@@ -221,7 +221,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",3);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -239,7 +238,7 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -253,6 +252,7 @@ class PkEventGiftController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
