@@ -118,7 +118,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
             }
 
             /** @var Gift $this */
@@ -178,7 +178,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
             }
 
             /** @var Gift $this */
@@ -237,7 +237,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'https://storage.googleapis.com/eagle-t/cion.png';
             }
 
             /** @var Gift $this */
