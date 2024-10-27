@@ -144,6 +144,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -202,7 +207,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
-
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -261,6 +270,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
