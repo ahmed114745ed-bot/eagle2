@@ -257,12 +257,12 @@ class FamilyController extends Controller
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        request()->family_status = 2;
-        $membersUserResource = (new MembersUserResource($owner))->toArray();
-        request()->family_status = 1;
-        $anonymousResourceCollection = MembersUserResource::collection($admins)->toArray();
-        request()->family_status = 0;
-        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toArray();
+        $request->family_status = 2;
+        $membersUserResource = (new MembersUserResource($owner))->toArray($request);
+        $request->family_status = 1;
+        $anonymousResourceCollection = MembersUserResource::collection($admins)->toArray($request);
+        $request->family_status = 0;
+        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toArray($request);
         $data = [
             'owner' => $membersUserResource,
             'admins' => $anonymousResourceCollection,
