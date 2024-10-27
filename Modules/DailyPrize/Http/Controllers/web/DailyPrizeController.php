@@ -28,29 +28,27 @@ class DailyPrizeController extends AdminController
     {
         $type = request('type');
         $grid = new Grid(new DailyGift());
-        $grid->model()->where('type',$type);
+        $grid->model()->where('type', $type);
         $grid->column('order', __('Order'))->editable();
         $grid->column('gift_type', __('gifts'));
         $grid->column('image', __('image'))->display(function ($path) {
-            if($this->gift_type == 'ware')
-            {
-            $ware = Ware::find($this->target);
-            $path = $ware->show_img ?? $ware->img2 ; 
-            }elseif($this->gift_type == 'vip')
-            {
+            if ($this->gift_type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->show_img ?? $ware->img2;
+            } elseif ($this->gift_type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
-
-            }elseif($this->gift_type == 'achievement')
-            {
+            } elseif ($this->gift_type == 'achievement') {
                 $path = $this->target;
+            } else {
+                $path = '';
             }
 
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-       
+
         $grid->column('expir', __('expire'));
 
         return $grid;
@@ -84,7 +82,7 @@ class DailyPrizeController extends AdminController
     protected function form()
     {
         $form = new Form(new DailyGift());
-        
+
         $form->hidden('type')->value(request('type'));
         $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
