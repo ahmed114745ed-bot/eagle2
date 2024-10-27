@@ -198,10 +198,13 @@ class FamilyController extends Controller
     public function RequestFamilyAction(Request $request)
     {
         $auth = Auth::user();
+
+        DB::beginTransaction();
         try {
 
              $user = $this->familyServices->actionRequest($request, $auth);
-
+             DB::commit();
+             
             if ($request->status == 1){
                 request()->family_status = 0;
                 $resource = new MembersUserResource($user);
