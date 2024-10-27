@@ -109,10 +109,28 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+               
+                return "achievement";
             }
 
+        });
+
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->show_img ?? $ware->img2;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = '';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('created_at', __('Created at'));
 
@@ -152,10 +170,27 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+               
+                return "achievement";
             }
 
+        });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->show_img ?? $ware->img2;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = '';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('created_at', __('Created at'));
 
@@ -195,10 +230,28 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                
+                return "achievement";
             }
 
+        });
+
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->show_img ?? $ware->img2;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = '';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('created_at', __('Created at'));
 
