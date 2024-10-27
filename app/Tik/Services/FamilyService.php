@@ -153,7 +153,7 @@ class FamilyService
         $userSentRequest = $this->familyUserRepository->checkSendJoinRequest($user->id, $familyId);
         if ($userSentRequest)  throw new \Exception(__('you_alredy_have_sent'));
 
-        
+
         $data = [
             'user_id' => $user->id,
             'family_id' => $family->id,
@@ -186,7 +186,7 @@ class FamilyService
         if (!$family || !$user) throw new \Exception('not found');
 
         if (!$isAdmin && ($family->user_id !=  $authId)) throw new \Exception('not allowed');
-        $this->userRepository->updateFamilyId($user, 0);
+        $this->userRepository->update(['family_id' => $familyId], $user->id);
         $this->familyUserRepository->deleteUserFromFamily($userId, $family->id);
 
         return [$family, $user];
