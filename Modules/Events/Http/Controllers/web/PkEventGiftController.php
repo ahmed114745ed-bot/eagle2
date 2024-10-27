@@ -9,6 +9,7 @@ use App\Services\AppFeatureService;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Facades\Admin;
 
 use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\PkReward;
@@ -150,6 +151,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
     protected function grid2()
@@ -208,6 +214,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -269,6 +280,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
