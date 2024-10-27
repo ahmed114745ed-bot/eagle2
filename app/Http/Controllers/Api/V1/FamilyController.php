@@ -200,11 +200,14 @@ class FamilyController extends Controller
         $auth = Auth::user();
         try {
 
-            [$family, $user] = $this->familyServices->actionRequest($request, $auth);
+            $this->familyServices->actionRequest($request, $auth);
 
-            CustomNotification::acceptUserFamily($family, $user);
+            if ($request->status == 1){
+                request()->family_status = 2;
+                $resource = new MembersUserResource($auth);
+            }
 
-            return Common::apiResponse(1, 'success', null, 200);
+            return Common::apiResponse(1, 'success', @$resource ?? null, 200);
         } catch (\Exception $exception) {
 
             DB::rollBack();

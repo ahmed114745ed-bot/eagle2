@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Facades\CustomNotification;
 use App\Models\User;
 use App\Helpers\Common;
 use Carbon\CarbonInterface;
@@ -228,13 +229,16 @@ class FamilyService
         $requestUser->save();
 
         if ($user && $request->status == 1) {
-            $this->userRepository->updateFamilyId($user, $family->id);
+            $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
+
+            CustomNotification::acceptUserFamily($family, $user);
         } elseif ($user && $request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
 
-        return  [$family, $user];
+
+        return $user;
     }
 
 
