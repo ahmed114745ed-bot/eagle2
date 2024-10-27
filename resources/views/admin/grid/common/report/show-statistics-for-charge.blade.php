@@ -25,18 +25,18 @@
                     ->where('method', 'strip')
                     ->sum('obtained_coins');
             } elseif ($isInApp) {
-                return $request('name_for_url_shortcut')
-                    ? \App\Models\CoinLog::where('user_id', $user?->id)
-                        ->where('method', $request('name_for_url_shortcut'))
-                        ->sum('obtained_coins')
-                    : \App\Models\CoinLog::where('user_id', $user?->id)
-                        ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
-                        ->sum('obtained_coins');
-            }
+                    return $request->name_for_url_shortcut
+                        ? \App\Models\CoinLog::where('user_id', $user?->id)
+                            ->where('method', $request->name_for_url_shortcut)
+                            ->sum('obtained_coins')
+                        : \App\Models\CoinLog::where('user_id', $user?->id)
+                            ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
+                            ->sum('obtained_coins');
+                }
+
             return 0; // Default return value
         };
     @endphp
-
     <div class="row my-1 form-Roles" style="overflow-x: auto;">
         <div class="d-flex">
             @foreach (['receiver' => __('admin.receiver'), 'sender' => __('admin.sender'), 'gameCoins' => __('admin.gameCoins'), 'luckyGiftCoin' => __('admin.luckyGiftCoin')] as $name => $label)
@@ -64,8 +64,10 @@
                             )->where('user_id', $user?->id)->first();
                             $value = ($giftResult->sum_type_1 ?? 0) - ($giftResult->sum_type_0 ?? 0);
                         }
+
                     @endphp
                     <input type="text" class="form-control" name="{{ $name }}" id="{{ $name }}" value="{{ $value }}">
+
                 </div>
             @endforeach
         </div>

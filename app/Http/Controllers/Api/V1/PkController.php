@@ -120,13 +120,32 @@ class PkController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
+       $jsons[] =  $this->changeBackground($room, $request->owner_id, PK_IMAGE);
         $mc   = [
             'messageContent' => [
                 'message' => 'showPK'
             ]
         ];
-        $json = json_encode($mc);
-        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+        $jsons[] = json_encode($mc);
+        // Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function changeBackground(Room $room, int $owner_id, string $image = '')
+    {
+        $data = [
+            "messageContent" => [
+                "message"       => "changeBackground",
+                "imgbackground" => $image ?: "",
+                "roomIntro"     => $room->room_intro ?: "",
+                "roomImg"       => $room->room_cover ?: "",
+                "room_type"     => @$room->myType->name ?: "",
+                "room_name"     => @$room->room_name ?: ""
+            ]
+        ];
+        $json = json_encode($data);
+        // Common::sendToZego3('SendCustomCommand', $room->id, $owner_id, $json);
+        return $json;
     }
 }
