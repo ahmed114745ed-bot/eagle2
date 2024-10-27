@@ -52,7 +52,6 @@ class EventReportController extends MainController
         $grid = new Grid(new WinnerReward());
         $grid->model()->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
-        $grid->column('winner.uuid', __('uuid'));
         $grid->column('winner.name', __('name'))
             ->display(function ($name) {
                 $uid = @$this->winner->uuid;
@@ -107,7 +106,6 @@ class EventReportController extends MainController
         $grid = new Grid(new RewardWinnerPk());
 
         $grid->column('id', __('ID'));
-        $grid->column('winner.uuid', __('uuid'));
         $grid->column('winner.name', __('name'))->display(function ($name) {
             $uid = @$this->winner->uuid;
             $path = @$this->winner->profile->avatar;
@@ -161,7 +159,6 @@ class EventReportController extends MainController
         $grid = new Grid(new WinnerReward());
         $grid->model()->where('type', 'event_period');
         $grid->column('id', __('ID'));
-        $grid->column('winner.uuid', __('uuid'));
         $grid->column('winner.name', __('name'))
             ->display(function ($name) {
                 $uid = @$this->winner->uuid;
