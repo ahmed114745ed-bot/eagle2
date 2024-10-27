@@ -157,7 +157,8 @@ $router->post('ovip-config', [UpgradeLevelController::class,'ovipConfig'])->name
 /*$router->post('group-chat-config', [UpgradeLevelController::class,'group_chat_config'])->name('group-chat-config');
 
 $router->post('reel-config', [UpgradeLevelController::class,'reelConfig'])->name('reel-config');
-$router->post('moment-config', [UpgradeLevelController::class,'momentConfig'])->name('moment-config');*/
+*/
+$router->post('moment-config', [UpgradeLevelController::class,'momentConfig'])->name('moment-config');
 
 Route::post("send-request-stop-charge",[UserController::class,"stop_charge"]);
 

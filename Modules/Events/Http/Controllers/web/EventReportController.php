@@ -53,7 +53,15 @@ class EventReportController extends MainController
         $grid->model()->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
         $grid->column('winner.uuid', __('uuid'));
-        $grid->column('winner.name', __('name'));
+        $grid->column('winner.name', __('name'))
+            ->display(function ($name) {
+                $uid = @$this->winner->uuid;
+                $path = @$this->winner->profile->avatar;
+                $url = getImagePath($path);
+                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+                return "$image<br>$name <br>
+            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+            });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('الهديه'))->display(function () {
@@ -100,7 +108,14 @@ class EventReportController extends MainController
 
         $grid->column('id', __('ID'));
         $grid->column('winner.uuid', __('uuid'));
-        $grid->column('winner.name', __('name'));
+        $grid->column('winner.name', __('name'))->display(function ($name) {
+            $uid = @$this->winner->uuid;
+            $path = @$this->winner->profile->avatar;
+            $url = getImagePath($path);
+            $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+            return "$image<br>$name <br>
+        <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+        });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('الهديه'))->display(function () {
@@ -147,7 +162,15 @@ class EventReportController extends MainController
         $grid->model()->where('type', 'event_period');
         $grid->column('id', __('ID'));
         $grid->column('winner.uuid', __('uuid'));
-        $grid->column('winner.name', __('name'));
+        $grid->column('winner.name', __('name'))
+            ->display(function ($name) {
+                $uid = @$this->winner->uuid;
+                $path = @$this->winner->profile->avatar;
+                $url = getImagePath($path);
+                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+                return "$image<br>$name <br>
+        <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+            });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
         $grid->column(__('الهديه'))->display(function () {
