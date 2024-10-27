@@ -257,16 +257,16 @@ class FamilyController extends Controller
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        $request->family_status = 2;
-        $membersUserResource = (new MembersUserResource($owner))->toResponse($request)->getOriginalContent();
-        $request->family_status = 1;
-        $anonymousResourceCollection = MembersUserResource::collection($admins)->toResponse($request)->getOriginalContent();
-        $request->family_status = 0;
-        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toResponse($request)->getOriginalContent();
+        request()->family_status = 2;
+        $membersUserResource = (new MembersUserResource($owner))->toJson();
+        request()->family_status = 1;
+        $anonymousResourceCollection = MembersUserResource::collection($admins)->toJson();
+        request()->family_status = 0;
+        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toJson();
         $data = [
-            'owner' => $membersUserResource,
-            'admins' => $anonymousResourceCollection,
-            'members' => $anonymousResourceCollection1
+            'owner' => json_decode($membersUserResource),
+            'admins' => json_decode($anonymousResourceCollection),
+            'members' => json_decode($anonymousResourceCollection1)
         ];
         return Common::apiResponse(1, '', $data, 200);
     }
