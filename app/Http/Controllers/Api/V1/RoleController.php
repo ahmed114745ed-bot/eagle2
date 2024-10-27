@@ -3,16 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Agency;
-use App\Models\AgencySallary;
-use App\Models\User;
-use App\Tik\Services\BackgroundService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Tik\Services\RequestBackgroundImagService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class RoleController extends Controller
 {
@@ -39,7 +32,7 @@ class RoleController extends Controller
 
         $roles = $roleModel::with('permissions:name')
             ->select('id', 'slug', 'name', 'created_at', 'updated_at')
-            ->where('id',$id)->first();
+            ->where('id', $id)->first();
 
         return Common::apiResponse(1, '', $roles);
     }
@@ -81,7 +74,7 @@ class RoleController extends Controller
             return $item->category ?? 'other';
         });
         return Common::apiResponse(1, '', $permissions);
-        
+
     }
 
     public function update(Request $request, $id)
@@ -135,22 +128,49 @@ class RoleController extends Controller
     // }
 
     public function permissionsCategory()
-{
-    $permissionModel = config('admin.database.permissions_model');
-    
-    // Fetch all permissions first and then group by category
-    $permissionsPaginated = $permissionModel::all();
+    {
+        $permissionModel = config('admin.database.permissions_model');
 
-    // Group the permissions by category
-    $permissions = $permissionsPaginated->groupBy(function ($item) {
-        return $item->category ?? 'other';
-    });
+        // Fetch all permissions first and then group by category
+        $permissionsPaginated = $permissionModel::all();
 
-    // Prepare pagination metadata
-    
+        // Group the permissions by category
+        $permissions = $permissionsPaginated->groupBy(function ($item) {
+            return $item->category ?? 'other';
+        });
 
-    
-    return Common::apiResponse(1, '',$permissions,200,);
-}
+        // Prepare pagination metadata
+
+
+        return Common::apiResponse(1, '', $permissions, 200);
+    }
+
+    public function preview(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+           'role_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->messages()->toJson()], 422);
+        }
+
+        $roleId = $request->role_id;
+        $password = \Str::random(12);
+        $values = [
+            'username' => \Str::random(9),
+            'password' => $password,
+        ];
+        $admin = \App\Models\Admin::create([
+            ...$values,
+            'name' => \Str::random(9),
+            'is_preview' => true,
+            'password' => bcrypt($password)
+        ]);
+
+        $admin->roles()->sync(['role_id' => $roleId]);
+
+        return response()->json(['url' =>  url('/preview/admin/login', ['token' => $admin->id])]);
+    }
 
 }

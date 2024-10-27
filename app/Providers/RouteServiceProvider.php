@@ -44,6 +44,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
+            Route::prefix('utd')
+                ->namespace($this->namespace)
+                ->group(base_path('routes/utd.php'));
+
             if (AppFeatureService::isEnable('login')){
                 Route::prefix('api')
                     ->middleware('api')
