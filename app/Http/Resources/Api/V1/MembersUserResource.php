@@ -43,6 +43,9 @@ class MembersUserResource extends JsonResource
             'uuid'                 => @$this->uuid, // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            $this->when(request()->family_status, [
+                'family_status' => request()->family_status
+            ]),
            /* 'level'=> [
                 'receiver_img' => @$this->getImageReceiverOrSender('receiver_id',1)->img,
                 'sender_img' => @$this->getImageReceiverOrSender('sender_id',2)->img,

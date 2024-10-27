@@ -98,9 +98,9 @@ class FamilyController extends Controller
         try {
             $family =   $this->familyServices->create($user, $request, $family_price);
 
-          
+
         } catch (\Exception $e) {
-           
+
             return Common::apiResponse(0, $e != null ? $e->getMessage() : 'missing params', 422);
         }
         CustomNotification::family($family, $user);
@@ -155,10 +155,10 @@ class FamilyController extends Controller
         try {
 
             $this->familyServices->delete($user, $id);
-         
+
             return Common::apiResponse(1, 'success', null, 200);
         } catch (\Exception $exception) {
-           
+
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -206,7 +206,7 @@ class FamilyController extends Controller
 
             return Common::apiResponse(1, 'success', null, 200);
         } catch (\Exception $exception) {
-            
+
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage()??'failed', null, 400);
         }
@@ -237,13 +237,13 @@ class FamilyController extends Controller
         $userId = $request->user_id;
 
         try {
-           
+
             [$family, $user] = $this->familyServices->removeUserFromFamily($userId, $request->family_id, $authId);
-          
+
             CustomNotification::removeFamilyUser($family, $user);
             return Common::apiResponse(1, 'success', new FamilyResource(Family::find($family->id)), 200);
         } catch (\Exception $exception) {
-            
+
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -257,10 +257,16 @@ class FamilyController extends Controller
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+        request()->family_status = 2;
+        $membersUserResource = new MembersUserResource($owner);
+        request()->family_status = 1;
+        $anonymousResourceCollection = MembersUserResource::collection($admins);
+        request()->family_status = 0;
+        $anonymousResourceCollection1 = MembersUserResource::collection($members);
         $data = [
-            'owner' => new MembersUserResource($owner),
-            'admins' => MembersUserResource::collection($admins),
-            'members' => MembersUserResource::collection($members)
+            'owner' => $membersUserResource,
+            'admins' => $anonymousResourceCollection,
+            'members' => $anonymousResourceCollection1
         ];
         return Common::apiResponse(1, '', $data, 200);
     }
