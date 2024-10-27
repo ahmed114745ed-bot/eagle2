@@ -1,23 +1,24 @@
 <?php
 
 
-use App\Admin\Controllers\AllStatisticController;
-use App\Http\Controllers\AddTargetToJsonController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
-use App\Http\Controllers\Api\V1\AdminUsersController;
-use App\Http\Controllers\Api\V1\AgencyStatisticController;
-use App\Http\Controllers\Api\V1\AllGameController;
-use App\Http\Controllers\Api\V1\ConfigController;
-use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\GiftController;
-use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
-use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\WareController;
+use App\Admin\Controllers\AllStatisticController;
+use App\Http\Controllers\Api\V1\ConfigController;
+use App\Http\Controllers\Api\V1\TargetController;
+use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
-use App\Http\Controllers\Api\V1\VipController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AddTargetToJsonController;
+use App\Http\Controllers\Api\V1\AdminUsersController;
+use App\Http\Controllers\Api\V1\MangerTypeController;
+use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\AgencyStatisticController;
 
 
 // utd apis
@@ -75,6 +76,17 @@ Route::middleware([])->group(function () {
         Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
         Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
         Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
+
+    });
+
+    //ware
+    Route::prefix('wares')->group(function () {
+        Route::get('/all', [WareController::class, 'index']);
+        Route::post('/create', [WareController::class, 'store']);
+        Route::post('/update', [WareController::class, 'update']);
+        Route::post('/show', [WareController::class, 'show']);
+        Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
+       
 
     });
     // roles

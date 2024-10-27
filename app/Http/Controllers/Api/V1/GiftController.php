@@ -92,9 +92,6 @@ class GiftController extends Controller
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) != 100) && ($request->type == 6)) {
             return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
         try {
             $this->giftService->update($request);
         } catch (Exception $exception) {
