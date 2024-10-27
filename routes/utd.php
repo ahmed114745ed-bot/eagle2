@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 
 // utd apis
-Route::middleware([])->prefix('utd')->group(function () {
+Route::middleware([])->group(function () {
     //configs
     Route::prefix('configs')->group(function () {
         Route::get('/all', [ConfigController::class, 'index']);
