@@ -69,16 +69,6 @@ class FamilyController extends Controller
             'rank' => '0',
         ];
 
-        // if ($request->page == 1 || !isset($request->page)) {
-        //     $top   = $data->slice(0, 3);
-        //     $t[0]  = @$top[0] ? new FamilyRankResource($top[0]) : $em;
-        //     $t[1]  = @$top[1] ? new FamilyRankResource($top[1]) : $em;
-        //     $t[2]  = @$top[2] ? new FamilyRankResource($top[2]) : $em;
-        //     $other = $data->slice(3);
-        // } else {
-        //     $t     = [];
-        //     $other = $data;
-        // }
         $data = FamilyRankResource::collection($data);
         return Common::apiResponse(1, '',$data);
     }

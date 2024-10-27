@@ -25,6 +25,13 @@ class FamilyRankResource extends JsonResource
             'introduce' => @$this->family?->introduce ?? '',
             'image'     => @$this->family?->image ?? '',
             'rank'      => @(string)$this->coins ?? '0',
+            'country'=> [
+                'id' =>@$this->family?->owner->country->id ?? 0,
+                'name' => @$this->family?->owner->country->name ?? '',
+                'flag' => @$this->family?->owner->country->flag ?? '',
+            ],
+            'level'=>@$this->family->level?:'',
+            
 
         ];
     }
