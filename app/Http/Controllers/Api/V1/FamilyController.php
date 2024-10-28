@@ -173,8 +173,6 @@ class FamilyController extends Controller
             CustomNotification::requestJoinFamily($family, $user);
 
             return Common::apiResponse(1, __('joinSacses') . ' ' . $family->name);
-
-            // return Common::apiResponse (1,'',new FamilyResource($family));
         } catch (\Exception $e) {
             DB::rollBack();
             return Common::apiResponse(0, $e->getMessage() ?? __('failed'), null, 400);
