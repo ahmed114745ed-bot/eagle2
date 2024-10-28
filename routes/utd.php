@@ -70,6 +70,7 @@ Route::middleware([])->group(function () {
     });
     Route::prefix('gifts')->group(function () {
         Route::get('/all', [GiftController::class, 'allGifts']);
+        Route::get('/type', [GiftController::class, 'typeGift']);
         Route::post('/create', [GiftController::class, 'store']);
         Route::post('/update', [GiftController::class, 'update']);
         Route::post('/show', [GiftController::class, 'show']);
@@ -86,6 +87,8 @@ Route::middleware([])->group(function () {
         Route::post('/update', [WareController::class, 'update']);
         Route::post('/show', [WareController::class, 'show']);
         Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
+        Route::get('/type', [WareController::class, 'typeWare']); 
+        Route::get('/get-type', [WareController::class, 'getTypeWare']);
        
 
     });
