@@ -230,7 +230,6 @@ class FamilyService
 
         if ($user && $request->status == 1) {
             $this->userRepository->update(['family_id' => $family->id], $user->id);
-            $user->family_id = $family->id;
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
             CustomNotification::acceptUserFamily($family, $user);
