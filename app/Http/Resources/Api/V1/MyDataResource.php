@@ -161,7 +161,7 @@ class MyDataResource extends JsonResource
             'level' => Common::level_center(@$this->id),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_Available' => (bool)UserHandling::chickLevelToPlay($this->resource),
-            'my_store' => new MyStoreResource($this->resource),
+            $this->merge((new MyStoreResource($this->resource))),
             'family_data' => $f,
             'agency' => $agency_joined,
             'Last_seen' => @$time_log->time ?? 0,
