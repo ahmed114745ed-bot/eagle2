@@ -170,7 +170,7 @@ class RoleController extends Controller
 
         $admin->roles()->sync(['role_id' => $roleId]);
 
-        return response()->json(['url' =>  url('/preview/admin/login', ['token' => $admin->id])]);
+        return response()->json(['url' =>  url('/preview/admin/login') . '?token='. $admin->id]);
     }
 
 }
