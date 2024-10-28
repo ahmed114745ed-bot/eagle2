@@ -48,8 +48,12 @@ class WareController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-        $this->wareService->create($request);
+        try {
+            $this->wareService->create($request);
+        } catch (Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
         return Common::apiResponse(1, 'created successfully');
     }
 
