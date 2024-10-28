@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
+use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
@@ -127,6 +128,14 @@ Route::middleware([])->group(function () {
         Route::post('/create', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
         Route::post('/update', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
         Route::post('/show', [CoreWalletsController::class, 'show']);
+    });
+
+    //coin
+    Route::prefix('coin')->group(function () {
+        Route::get('/all', [CoinController::class, 'index']);
+        Route::post('/create', [CoinController::class, 'store'])->middleware('decrypt.data');
+        Route::post('/update', [CoinController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/show', [CoinController::class, 'show']);
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
