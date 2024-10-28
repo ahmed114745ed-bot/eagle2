@@ -37,12 +37,7 @@ const TYPE_WARE =
 
 const  GET_TYPE_WARE =
 [
-    //  1=>trans ('vip level automatic acquisition'),
-//               2=>trans ('activity'),
-//               3=>trans ('treasure box'),
-4=>'purchase',
-//               5=>'background modification',
+ 4=>'purchase',
  6=>'limited time purchase',
-//               7=>trans ('treasure box point exchange'),
-//               8=>trans ('cp level unlock'),
+
 ];

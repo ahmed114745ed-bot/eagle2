@@ -121,7 +121,7 @@ class WareController extends Controller
 
     public function getTypeWare(Request $request)
     {
-        return translate(TYPE_WARE);
+        return translate(GET_TYPE_WARE);
     }
 
 }
