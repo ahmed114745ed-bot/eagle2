@@ -198,13 +198,19 @@ class FamilyController extends Controller
     public function RequestFamilyAction(Request $request)
     {
         $auth = Auth::user();
+
+        DB::beginTransaction();
         try {
 
-            [$family, $user] = $this->familyServices->actionRequest($request, $auth);
+             $user = $this->familyServices->actionRequest($request, $auth);
+             DB::commit();
+             
+            if ($request->status == 1){
+                request()->family_status = 0;
+                $resource = new MembersUserResource($user);
+            }
 
-            CustomNotification::acceptUserFamily($family, $user);
-
-            return Common::apiResponse(1, 'success', null, 200);
+            return Common::apiResponse(1, 'success', @$resource ?? null, 200);
         } catch (\Exception $exception) {
 
             DB::rollBack();

@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Facades\CustomNotification;
 use App\Models\User;
 use App\Helpers\Common;
 use Carbon\CarbonInterface;
@@ -153,7 +154,7 @@ class FamilyService
         $userSentRequest = $this->familyUserRepository->checkSendJoinRequest($user->id, $familyId);
         if ($userSentRequest)  throw new \Exception(__('you_alredy_have_sent'));
 
-        
+
         $data = [
             'user_id' => $user->id,
             'family_id' => $family->id,
@@ -186,7 +187,7 @@ class FamilyService
         if (!$family || !$user) throw new \Exception('not found');
 
         if (!$isAdmin && ($family->user_id !=  $authId)) throw new \Exception('not allowed');
-        $this->userRepository->updateFamilyId($user, 0);
+        $this->userRepository->update(['family_id' => null], $user->id);
         $this->familyUserRepository->deleteUserFromFamily($userId, $family->id);
 
         return [$family, $user];
@@ -224,17 +225,20 @@ class FamilyService
         if ($request->status == 1 && $family->members_num >= $family->num) throw new \Exception(__('family is full members'));
         $admin = $this->familyUserRepository->checkIsAdmin($family->id, $auth->id);
         if ($family->user_id != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
-        $requestUser->status = $request->status;
-        $requestUser->save();
+
+        $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
 
         if ($user && $request->status == 1) {
-            $this->userRepository->updateFamilyId($user, $family->id);
+            $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
+
+            CustomNotification::acceptUserFamily($family, $user);
         } elseif ($user && $request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
 
-        return  [$family, $user];
+
+        return $user;
     }
 
 

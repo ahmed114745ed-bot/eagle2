@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
 use App\Helpers\UserRewardsWeeklyCp;
+use Modules\CP\Entities\CpWinnerReward;
 use Modules\CP\Entities\WeeklyCpWinner;
 use Modules\CP\Http\Services\CpService;
 use Modules\Events\Entities\WeeklyStar;
@@ -63,9 +64,9 @@ class WeeklyCpWinnerConsole extends Command
                     'total_price' => $entry->totalGiftNum,
                 ]);
                 $userOne =  UserRewardsWeeklyCp::getUserById($entry->cp->user_one_id);
-
                 $userTwo = UserRewardsWeeklyCp::getUserById($entry->cp->user_two_id);
                 $rewards = $weeklyCp->weeklyCpGifts->where('level', $index + 1);
+                
                 if (count($rewards) > 0) {
 
                     foreach ($rewards as $reward) {
@@ -84,6 +85,9 @@ class WeeklyCpWinnerConsole extends Command
                                 UserRewardsWeeklyCp::assignAchievement($reward->target, $reward->expire, $userOne, $userTwo);
                                 break;
                         }
+
+                        CpWinnerReward::create(['winner_id'=>$userOne->id,'reward_id'=>$reward->id]);
+                        CpWinnerReward::create(['winner_id'=>$userTwo->id,'reward_id'=>$reward->id]);
                     }
                 }
             }

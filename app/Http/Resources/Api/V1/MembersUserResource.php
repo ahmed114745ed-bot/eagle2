@@ -26,9 +26,7 @@ class MembersUserResource extends JsonResource
      */
     public function toArray($request)
     {
-       if(!@$this->id){
-           return ;
-       }
+
 
         $data = [
             'id'=>@$this->id,

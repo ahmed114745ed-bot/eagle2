@@ -38,7 +38,7 @@ class UserRepository extends AbstractRepository
 
     public function decrementCoins($userUuIdOrId, $coins)
     {
-        $user =$this->searchUser($userUuIdOrId) ?? $this->findById($userUuIdOrId);
+        $user = $this->searchUser($userUuIdOrId) ?? $this->findById($userUuIdOrId);
         $this->decrementUserCoins($user, $coins);
         return true;
     }
@@ -91,16 +91,20 @@ class UserRepository extends AbstractRepository
     public function usersRoom($roomAdminActive)
     {
         return $this->model->withoutAppends()->select([
-            '*', DB::raw('(SELECT  level from users_vips
+            '*',
+            DB::raw('(SELECT  level from users_vips
                      where (users_vips.expire >= UNIX_TIMESTAMP()) and users_vips.user_id = users.id order by level  desc limit 1) as max_level
                      ')
         ])->with([
             'packs' => function ($query) {
                 return $query->whereIn('type', [4, 18, 5, 17]);
-            }, 'profile', 'UserVip', 'dress1',
+            },
+            'profile',
+            'UserVip',
+            'dress1',
         ])->where(function ($query) {
             $query->whereDoesntHave('packs')->orWhereHas('packs', function ($q) {
-                $q->where("type", '!=', 17)->orWhere(fn ($q) => $q->where('type', 17)->where("is_used", 0));
+                $q->where("type", '!=', 17)->orWhere(fn($q) => $q->where('type', 17)->where("is_used", 0));
             });
         })->whereIn('users.id', $roomAdminActive)->orderByDesc(DB::raw('max_level'));
     }
@@ -112,7 +116,7 @@ class UserRepository extends AbstractRepository
 
     public function updateFamilyId($user, $familyId)
     {
-        $user->update(['family_id', $familyId]);
+        $user->update(['family_id' => $familyId]);
         return true;
     }
 
@@ -142,7 +146,7 @@ class UserRepository extends AbstractRepository
     }
     public function checkTrashedEmail($email, $googleId)
     {
-        return $this->model->withTrashed()->where(fn ($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->exists();
+        return $this->model->withTrashed()->where(fn($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->exists();
     }
 
     public function findByEmail($email)
@@ -162,7 +166,7 @@ class UserRepository extends AbstractRepository
 
     public function findByTrashedEmail($email, $googleId)
     {
-        return $this->model->onlyTrashed()->where(fn ($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->first();
+        return $this->model->onlyTrashed()->where(fn($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->first();
     }
 
     public function checkByGoogleId($userId, $googleId)
@@ -174,7 +178,7 @@ class UserRepository extends AbstractRepository
         return $this->model->query()->where('facebook_id', $facebookId)->where('id', '!=', $userId)->exists();
     }
 
-    public function checkByPhone($userId,$phone)
+    public function checkByPhone($userId, $phone)
     {
         return $this->model->query()->where('phone', $phone)->where('id', '!=', $userId)->exists();
     }
@@ -279,43 +283,42 @@ class UserRepository extends AbstractRepository
         return $this->model->where('name', 'LIKE', '%' . $name . '%')->select('id', 'name', 'img')->get();
     }
 
-    public function userChatRoom($userId,$data,$exceptId)
+    public function userChatRoom($userId, $data, $exceptId)
     {
         $this->model->query()
-        ->select('id')
-        ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
-        ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId))
-        ->whereNotIn('id', $exceptId)
-        ->chunk(400, function($userIds) use($userId, $data){
-            $userIds = $userIds->pluck('id')->toArray();
-            $this->sendMessageToUsers($userId, $userIds, $data);
-        });
+            ->select('id')
+            ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
+            ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId))
+            ->whereNotIn('id', $exceptId)
+            ->chunk(400, function ($userIds) use ($userId, $data) {
+                $userIds = $userIds->pluck('id')->toArray();
+                $this->sendMessageToUsers($userId, $userIds, $data);
+            });
     }
 
     public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
     {
         $timeZone = request()->hasHeader('tz') ? request()->header()['tz'][0] : 'UTC';
         dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
-
     }
 
     public function updateManger($userId)
     {
-        $this->model->where('id',$userId)->update([
-            'is_manger' =>true,
+        $this->model->where('id', $userId)->update([
+            'is_manger' => true,
         ]);
         return true;
     }
 
     public function countByAgencyId($agencyId)
     {
-        return $this->model->where('agency_id',$agencyId)->count();
+        return $this->model->where('agency_id', $agencyId)->count();
     }
 
 
     public function updateAgencyId($user, $agencyId)
     {
-        $user->update(['agency_id', $agencyId]);
+        $user->update(['agency_id' => $agencyId]);
         return true;
     }
 }
