@@ -364,10 +364,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
 
             // end coin report
+
+            
+            Route::prefix('tickets')->group(function () {
+                Route::post('open', [HomeController::class, 'openTicket']);
+            });
         }
     );
 
-    Route::prefix('tickets')->group(function () {
-        Route::post('open', [HomeController::class, 'openTicket']);
-    });
 });
