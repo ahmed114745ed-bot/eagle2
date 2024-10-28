@@ -82,6 +82,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
 
+    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan','throttle:4,1'])
+    ->group(function () {
+        Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
+    });
+
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
@@ -366,9 +371,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
 
             
-            Route::prefix('tickets')->group(function () {
-                Route::post('open', [HomeController::class, 'openTicket']);
-            });
+    
         }
     );
 
