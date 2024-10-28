@@ -18,6 +18,13 @@ class GiftService
         return $this->giftRepository->all($type);
     }
 
+    public function allGift()
+    {
+        return $this->giftRepository->allGifts();
+    }
+
+
+
     public function show($giftId)
     {
         return $this->giftRepository->findByGiftId($giftId);

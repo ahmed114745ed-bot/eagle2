@@ -23,7 +23,7 @@ class GiftController extends Controller
 
     public function allGifts()
     {
-        $gifts = $this->giftService->index();
+        $gifts = $this->giftService->allGift();
         return Common::apiResponse(1, '',  $gifts);
     }
 
