@@ -128,7 +128,7 @@ Route::middleware([])->group(function () {
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
-    Route::post('roles/preview',  [RoleController::class, 'preview']);
+    Route::post('roles/preview',  [RoleController::class, 'preview'])->middleware('decrypt.data');
 
 });
 
