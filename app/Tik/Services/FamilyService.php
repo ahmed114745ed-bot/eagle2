@@ -204,6 +204,7 @@ class FamilyService
             }
         }
         if (!$family) throw new \Exception('not found');
+        
         return $this->familyUserRepository->requestUsersList($userId, $family->id);
     }
 
@@ -217,7 +218,6 @@ class FamilyService
         if ($other && $user->family_id != 0)  throw new \Exception('user already joined to other family');
 
         $familyUser = $this->familyRepository->findByUserId($requestUser->user_id);
-
         if ($familyUser)  throw new \Exception(__('already have one'));
 
         $family = $this->familyRepository->findById($requestUser->family_id);
@@ -236,7 +236,6 @@ class FamilyService
         } elseif ($user && $request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
-
 
         return $user;
     }
