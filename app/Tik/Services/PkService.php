@@ -53,7 +53,9 @@ class PkService
     {
         $room =  $this->roomRepository->findRoomUserEnable($ownerId);
         if (!$room) throw new \Exception('not found');
-
+        if ($room->mode != 3 && $room->mode != 9) {
+            throw new \Exception('Mode Not Compatible');
+        }
         $room->enableSaving = false;
         $status == 1 ? $room->update(['is_show_pk' => 1]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
         return $room;
