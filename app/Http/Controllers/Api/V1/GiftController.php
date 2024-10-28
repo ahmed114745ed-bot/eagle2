@@ -16,7 +16,8 @@ class GiftController extends Controller
     public function __construct(private GiftService $giftService) {}
     public function index(Request $request)
     {
-        $gifts = $this->giftService->index($request);
+        $type = $request->type;
+        $gifts = $this->giftService->index($type);
         return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
 

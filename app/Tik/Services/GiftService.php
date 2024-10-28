@@ -13,9 +13,9 @@ class GiftService
         private readonly GiftRepository $giftRepository,
     ) {}
 
-    public function index()
+    public function index($type)
     {
-        return $this->giftRepository->allGifts();
+        return $this->giftRepository->all($type);
     }
 
     public function show($giftId)
