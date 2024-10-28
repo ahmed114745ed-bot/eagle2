@@ -59,7 +59,8 @@
         },
         "files": [
             "app/helpers.php",
-            "app/helper/helpers.php"
+            "app/helper/helpers.php",
+            "app/helper/helperType.php"
         ]
     },
     "autoload-dev": {

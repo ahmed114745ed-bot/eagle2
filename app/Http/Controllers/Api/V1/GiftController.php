@@ -143,4 +143,9 @@ class GiftController extends Controller
         if (!$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
     }
+
+    public function typeGift(Request $request)
+    {
+        return translate(TYPE_GIFT);
+    }
 }

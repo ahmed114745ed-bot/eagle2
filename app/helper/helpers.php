@@ -1,4 +1,5 @@
 <?php
+
 use App\Classes\AppSetting;
 use Encore\Admin\Admin;
 
@@ -6,6 +7,18 @@ const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
 const CINEMA_IMAGE = 'custom_image/back-black.png';
 const GAME_COINS_PLAY = 'game_coins_play_#';
+
+
+
+function translate($typeArray)
+{
+    $arr = [];
+    foreach ($typeArray as $key => $type) {
+        $arr[$key]  = __($type);
+    }
+    return $arr;
+}
+
 
 function generateSignature($nonce, $appKey, $timestamp)
 {
@@ -189,11 +202,10 @@ if (!function_exists('isSubdomain')) {
 
         return count($hostParts) > 2;
     }
-
 }
 
 
-if (!function_exists( 'getPusherConfig')) {
+if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
         return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
@@ -217,17 +229,15 @@ if (!function_exists( 'getPusherConfig')) {
             ];
         });
     }
-
-
 }
-if (!function_exists('nameRoute')){
-    function nameRoute (string $name): string
+if (!function_exists('nameRoute')) {
+    function nameRoute(string $name): string
     {
         $separators = ['.', '/'];
         $separator = null;
         $requestPath = \Request::path();
 
-        if (\Str::startsWith($requestPath, 'preview')) {//admin.route.prefix,admin.auth.controller
+        if (\Str::startsWith($requestPath, 'preview')) { //admin.route.prefix,admin.auth.controller
             foreach ($separators as $s) {
                 $valuesCount = count(explode($s, $name));
                 if ($valuesCount > 1) $separator = $s;
@@ -237,13 +247,14 @@ if (!function_exists('nameRoute')){
         return $separator ? ('preview' . $separator . $name) : $name;
     }
 }
-if (!function_exists('getFileExtension')){
-    function getFileExtension($url) {
+if (!function_exists('getFileExtension')) {
+    function getFileExtension($url)
+    {
         return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
     }
 }
-if (!function_exists('handleShowImageWithTypes')){
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = 50, int $height= 50): string
+if (!function_exists('handleShowImageWithTypes')) {
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = 50, int $height = 50): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
@@ -259,14 +270,13 @@ if (!function_exists('handleShowImageWithTypes')){
                     Your browser does not support the video tag.
                  </video>
                 ";
-
         }
 
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important;' alt='' />";
     }
 }
 
-if (!function_exists('showSvgaImage')){
+if (!function_exists('showSvgaImage')) {
     /**
      * @param string|null $url
      * @return string
@@ -312,4 +322,3 @@ if (!function_exists('showSvgaImage')){
         return $model;
     }
 }
-

@@ -113,4 +113,15 @@ class WareController extends Controller
         if (!$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
     }
+
+    public function typeWare(Request $request)
+    {
+        return translate(TYPE_WARE);
+    }
+
+    public function getTypeWare(Request $request)
+    {
+        return translate(TYPE_WARE);
+    }
+
 }
