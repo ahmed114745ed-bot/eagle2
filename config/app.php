@@ -47,8 +47,8 @@ return [
 
     'app_origin_name'=>env('APP_ORIGIN_NAME', 'r-star'),
 
-    
-    
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -198,6 +198,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ConfigServiceProvider::class,
+        App\Providers\Route2ServiceProvider::class,
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
