@@ -156,15 +156,24 @@ class Common{
         $isPagination = false;
 
 
+
         if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
 
             $dataForPaginationCheck = $data->resource;
+
+
             $isPagination = true;
-            
+
             if ($data instanceof LengthAwarePaginator ) {
                 $isPagination = true;
 
                 $data = $data->getCollection();
+            }
+
+            if ($dataForPaginationCheck instanceof \Illuminate\Support\Collection ) {
+                $isPagination = false;
+
+//                $data = $data;
             }
         }
 
