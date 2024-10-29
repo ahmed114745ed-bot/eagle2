@@ -57,6 +57,11 @@ class RouteServiceProvider extends ServiceProvider
                     ->namespace($this->namespace)
                     ->group(base_path('routes/game.php'));
 
+                 Route::middleware([ 'throttle'])
+                    ->prefix('preview')
+                    ->namespace($this->namespace)
+                    ->group(base_path('app/Admin/preview-routes.php'));
+
                 Route::middleware(['web', 'throttle:40,1'])
                     ->namespace($this->namespace)
                     ->group(base_path('routes/web.php'));
@@ -66,6 +71,8 @@ class RouteServiceProvider extends ServiceProvider
                     ->namespace($this->namespace)
                     ->group(base_path('app/Agency/routes.php'));
 
+
+               
             }
 
         });
