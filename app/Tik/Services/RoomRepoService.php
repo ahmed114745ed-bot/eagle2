@@ -181,10 +181,10 @@ class RoomRepoService
         $currentPage = $request->page ?? 1;
         $visitors = null;
 
-        if ($request->has('users') && $currentPage == 1) {
+         if ($request->has('users') && $currentPage == 1) {
             $room->enableSaving      = false;
             $visitors      = $request->users ?? '';
-        }
+       }
 
         $roomAdmin   = $room->room_admin ?? '';
         $roomVisitor = $visitors ?? $room->room_visitor;
@@ -192,15 +192,17 @@ class RoomRepoService
 
         $roomAdmin        = explode(',', $roomAdmin);
         $roomAdminActive  = array_intersect($roomVisitor, $roomAdmin);
+       
         $roomVisitorArray = array_diff($roomVisitor, array_merge($roomAdminActive, [$room->uid . '']));
         $users = $this->userRepository->usersRoom($roomAdminActive);
-
+        
         $usersCount        = count($roomVisitor);
         $countInterested   = $users->count(['users.id']);
         $perPage           = 10;
         //        $diffCountWithPage = $countInterested - ($perPage * $currentPage);
 
         $users = $users->paginate($perPage);
+      
         if ($currentPage == 1 && in_array($room->uid, $roomVisitor)) {
             $allData[] = $room->owner;
             $allData   = array_merge($allData, $users->items());

@@ -17,9 +17,9 @@ class WareController extends Controller
     public function __construct(private WareService $wareService) {}
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $wares = $this->wareService->index();
+        $wares = $this->wareService->index($request->page);
         return Common::apiResponse(1, '',  $wares);
     }
 
