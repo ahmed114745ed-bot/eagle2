@@ -19,7 +19,8 @@ class CountryResource extends JsonResource
             'name'=> app ()->getLocale () == 'ar' ? ($this->name?:'') : ($this->e_name?:''),
             'flag'=>$this->flag?:'',
             'lang'=>$this->language?:'',
-            'phone_code'=>$this->phone_code?:''
+            'phone_code'=>$this->phone_code?:'',
+            'iso'=>$this->iso?:''
         ];
     }
 }

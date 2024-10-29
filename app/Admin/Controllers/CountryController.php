@@ -87,7 +87,7 @@ class CountryController extends MainController
         $form->text('phone_code', trans('phone code'))->rules ('required');
         // $form->text('language', trans('language'))->rules ('required');
         $form->image ('flag',trans ('flag'))->rules ('required');
-        // $form->text('iso', trans('iso'))->rules ('required');
+        $form->text('iso', trans('iso'))->rules ('required');
         // $form->text('iso3', trans('iso3'))->rules ('required');
         // $form->text('continent_name', trans('continent name'))->rules ('required');
         // $form->text('e_continent_name', trans('english continent name'))->rules ('required');

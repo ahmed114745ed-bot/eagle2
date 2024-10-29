@@ -108,6 +108,7 @@ class DailyGiftController extends Controller
             $vip = OVip::query()->find($target);
             UserCommon::addVipToUser($user, $vip, $expire);
         } elseif ($type == "ware") {
+            
             $ware = Ware::query()->find($target);
             UserCommon::addWareToUser($user, $ware, $expire);
         } elseif ($type == "achievement") {
