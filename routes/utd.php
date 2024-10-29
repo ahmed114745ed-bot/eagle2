@@ -94,7 +94,7 @@ Route::middleware([])->group(function () {
 
     });
     // roles
-    Route::resource('roles', RoleController::class)->middleware('decrypt.data');
+    Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
 
