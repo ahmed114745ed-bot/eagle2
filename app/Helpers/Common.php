@@ -138,7 +138,7 @@ class Common{
         ];
     }
 
-    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
     {
         if ($success == false && $statusCode == null){
             $statusCode = 422;
