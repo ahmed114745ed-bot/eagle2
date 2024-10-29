@@ -50,7 +50,17 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use Modules\Achievement\Http\Controllers\web\GiftAchievemntController;
 use Modules\Achievement\Http\Controllers\web\UserAchievementLevelController;
 use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
+
+
 Admin::routes();
+Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => ['web', 'admin','prevent-delete', 'adminIp', //            'adminGeneralBan',
+        'multiLanguage',], 'as' => config('admin.route.prefix') . '.',], function (Router $router) {
+        $router->post('_handle_form_', 'HandleController@handleForm')->name('admin.handle-form');
+        $router->post('_handle_action_', 'HandleController@handleAction')->name('admin.handle-action');
+        $router->get('_handle_selectable_', 'HandleController@handleSelectable')->name('admin.handle-selectable');
+        $router->get('_handle_renderable_', 'HandleController@handleRenderable')->name('admin.handle-renderable');
+
+});
 
 
 Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => '', 'middleware' => [
@@ -73,6 +83,10 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
 //        Route::get('login', [App\Admin\Controllers\Preview\AuthController::class, 'getLogin']);
 //
 //    }
+
+
+
+
     $router->resource('questions', QuestionController::class);
     $router->resource('user-online-history', UserOnlineHistoryController::class);
 
