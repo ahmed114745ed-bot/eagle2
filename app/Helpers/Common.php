@@ -151,20 +151,27 @@ class Common{
 
 
         $dataForPaginationCheck = $data;
-
-        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource) {
+       
+        
+        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource ) {
 
             $dataForPaginationCheck = $data->resource;
         }
 
+        if ($data instanceof LengthAwarePaginator ) {
+
+            $dataForPaginationCheck = $data->getCollection()->toArray();
+        }
+
+        
         return response()->json(
             [
                 'success'   => $success,
 
                 'message'   => __($message),
 
-                'data'      => $data,
-                'paginates' => ($dataForPaginationCheck instanceof LengthAwarePaginator) ? self::paginationData($data) : null,
+                'data'      => $dataForPaginationCheck,
+                'paginates' => ($data instanceof LengthAwarePaginator) ? self::paginationData($data) : null,
             ],
             $statusCode
         );
