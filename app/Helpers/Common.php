@@ -156,32 +156,30 @@ class Common{
         $isPagination = false;
 
 
-        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource) {
+        if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
 
             $dataForPaginationCheck = $data->resource;
-
-            if ($dataForPaginationCheck instanceof LengthAwarePaginator ) {
+            $isPagination = true;
+            
+            if ($data instanceof LengthAwarePaginator ) {
                 $isPagination = true;
 
-                $dataForPaginationCheck = $dataForPaginationCheck->getCollection()->toArray();
+                $data = $data->getCollection();
             }
         }
 
         if ($data instanceof LengthAwarePaginator ) {
             $isPagination = true;
 
-            $dataForPaginationCheck = $data->getCollection()->toArray();
+            $data = $data->getCollection();
         }
-
 
         return response()->json(
             [
                 'success'   => $success,
-
                 'message'   => __($message),
-
-                'data'      => $dataForPaginationCheck,
-                'paginates' => $isPagination ? self::paginationData($data) : null,
+                'data'      => $data,
+                'paginates' => $isPagination ? self::paginationData($dataForPaginationCheck) : null,
             ],
             $statusCode
         );
