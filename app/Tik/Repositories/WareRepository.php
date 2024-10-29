@@ -99,16 +99,16 @@ class WareRepository extends AbstractRepository
 
     public function getByTypeAndLevel($type, $level)
     {
-        return $this->model->where(['type' => $type, 'get_type' => 1,'level' =>$level])->get();
+        return $this->model->where(['type' => $type, 'get_type' => 1, 'level' => $level])->get();
     }
 
-    public function findByTypeAndLevel($typePrivilege,$levelOvip)
+    public function findByTypeAndLevel($typePrivilege, $levelOvip)
     {
-        return $this->model->where(['type' => $typePrivilege, 'get_type' => 1,'level' =>$levelOvip])->first();
+        return $this->model->where(['type' => $typePrivilege, 'get_type' => 1, 'level' => $levelOvip])->first();
     }
 
-    public function allWares()
+    public function allWares($page )
     {
-        return $this->model->whereNot('get_type',1)->get();
+        return $this->model->whereNot('get_type', 1)->paginate(10, ['*'], 'page', $page);
     }
 }
