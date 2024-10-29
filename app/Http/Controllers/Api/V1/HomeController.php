@@ -85,7 +85,6 @@ class HomeController extends Controller
             ];
             return Common::apiResponse(1, 'done', $out, 200);
         } catch (\Throwable $th) {
-            dd($th->getMessage());
 
             return Common::apiResponse(0, $th->getMessage());
         }
