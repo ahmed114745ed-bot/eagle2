@@ -138,43 +138,51 @@ class Common{
         ];
     }
 
-    public static function apiResponse(bool $success,$message,$data = null,$statusCode = null,$paginates = null, $isPagination = false){
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
+    {
 
-        if ($success == false && $statusCode == null){
+        if ($success == false && $statusCode == null) {
             $statusCode = 422;
         }
 
-        if ($success == true && $statusCode == null){
+        if ($success == true && $statusCode == null) {
             $statusCode = 200;
         }
 
 
 
-        $arr = [
-            'success' => $success,
+        $dataForPaginationCheck = $data;
 
-            'message' => __($message),
-
-            //                'extra_data'=> [
-            //                    'storage_base_url'=>self::getConf ('storage_base_url') ?:asset ('storage'),
-            //                    'countries'=>$countries
-            //                ],
+        $isPagination = false;
 
 
-            'paginates' => $paginates
-        ];
+        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource) {
 
+            $dataForPaginationCheck = $data->resource;
 
-        if ($isPagination){
+            if ($dataForPaginationCheck instanceof LengthAwarePaginator ) {
+                $isPagination = true;
 
-            $arr = array_merge($arr, $data->toArray());
-        }else{
-            $arr['data']  = $data;
+                $dataForPaginationCheck = $dataForPaginationCheck->getCollection()->toArray();
+            }
+        }
+
+        if ($data instanceof LengthAwarePaginator ) {
+            $isPagination = true;
+
+            $dataForPaginationCheck = $data->getCollection()->toArray();
         }
 
 
-        return response ()->json (
-            $arr,
+        return response()->json(
+            [
+                'success'   => $success,
+
+                'message'   => __($message),
+
+                'data'      => $dataForPaginationCheck,
+                'paginates' => $isPagination ? self::paginationData($data) : null,
+            ],
             $statusCode
         );
     }
