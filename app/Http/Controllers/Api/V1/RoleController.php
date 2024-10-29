@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class RoleController extends Controller
 {
@@ -83,25 +84,31 @@ class RoleController extends Controller
         try {
             $roleModel = config('admin.database.roles_model');
             $role = $roleModel::findOrFail($id);
-
+        
             $validated = $request->validate([
                 'slug' => 'required|string|max:255',
                 'name' => 'required|string|max:255|unique:admin_roles,name,' . $id,
                 'permissions' => 'required',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
-
+        
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
             $role->save();
-
+        
             if (is_string($request->permissions)) {
                 $permissions = json_decode($request->permissions, true);
             }
             $role->permissions()->sync($permissions);
+        
             return Common::apiResponse(1, 'Role updated successfully', $role);
+        
+        } catch (ValidationException $e) {
+            Log::info('Validation Error:', $e->errors());
+            return Common::apiResponse(0, 'Validation failed', $e->errors());
         } catch (\Throwable $th) {
-            Log::info('errrrrrrrrrror    '.$th->getMessage());
+            Log::info('Unexpected Error: ' . $th->getMessage());
+            return Common::apiResponse(0, 'An unexpected error occurred');
         }
         
     }
