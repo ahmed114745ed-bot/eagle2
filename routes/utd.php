@@ -131,7 +131,7 @@ Route::middleware([])->group(function () {
     });
 
     //coin
-    Route::prefix('coin')->group(function () {
+    Route::prefix('coins')->group(function () {
         Route::get('/all', [CoinController::class, 'index']);
         Route::post('/create', [CoinController::class, 'store'])->middleware('decrypt.data');
         Route::post('/update', [CoinController::class, 'update'])->middleware('decrypt.data');
