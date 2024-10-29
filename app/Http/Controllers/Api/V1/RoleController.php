@@ -91,7 +91,8 @@ class RoleController extends Controller
                 'permissions' => 'required',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
-        
+            Log::info('passsess');
+
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
             $role->save();
