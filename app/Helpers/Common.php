@@ -160,7 +160,7 @@ class Common{
 
         if ($data instanceof LengthAwarePaginator ) {
 
-            $dataForPaginationCheck = $data->all();
+            $dataForPaginationCheck = @$data->all()['data'] ?? $data->all();
         }
 
 
