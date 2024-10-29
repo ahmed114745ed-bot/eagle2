@@ -138,43 +138,41 @@ class Common{
         ];
     }
 
-    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
     {
-        if ($success == false && $statusCode == null){
+
+        if ($success == false && $statusCode == null) {
             $statusCode = 422;
         }
 
-        if ($success == true && $statusCode == null){
+        if ($success == true && $statusCode == null) {
             $statusCode = 200;
         }
 
 
-
-        $arr = [
-            'success' => $success,
-
-            'message' => __($message),
-
-            //                'extra_data'=> [
-            //                    'storage_base_url'=>self::getConf ('storage_base_url') ?:asset ('storage'),
-            //                    'countries'=>$countries
-            //                ],
+        $dataForPaginationCheck = $data;
 
 
-            'paginates' => $paginates
-        ];
+        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource ) {
 
+            $dataForPaginationCheck = $data->resource;
+        }
 
-        if ($isPagination){
+        if ($data instanceof LengthAwarePaginator ) {
 
-            $arr = array_merge($arr, $data->toArray());
-        }else{
-            $arr['data']  = $data;
+            $dataForPaginationCheck = $data->all();
         }
 
 
-        return response ()->json (
-            $arr,
+        return response()->json(
+            [
+                'success'   => $success,
+
+                'message'   => __($message),
+
+                'data'      => $dataForPaginationCheck,
+                'paginates' => ($data instanceof LengthAwarePaginator) ? self::paginationData($data) : null,
+            ],
             $statusCode
         );
     }
