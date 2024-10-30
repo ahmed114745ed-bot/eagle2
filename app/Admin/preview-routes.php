@@ -90,6 +90,9 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->resource('questions', QuestionController::class);
     $router->resource('user-online-history', UserOnlineHistoryController::class);
 
+    $router->get('btats', function(){
+        dd(Admin::menu()) ;
+    });
     $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
     $router->get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
     $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
