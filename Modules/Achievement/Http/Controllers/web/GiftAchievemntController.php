@@ -20,7 +20,6 @@ class GiftAchievemntController extends MainController
 
     public $permission_name = 'gift_achievement';
     public function postAddGiftAchievemnt(Request $request){
-
         $user_id=$request->user_id;
         $gift_id=$request->gift_id;
         $achievement_id=$request->achievement_id ?? Achievement::query()->where('type', AchievementType::GIFT_TARGET)->value('id');
@@ -37,8 +36,11 @@ class GiftAchievemntController extends MainController
            'gift_id'=>$gift_id,
            'user_id'=>$user_id
          ]);
-
-       return Redirect::route(nameRoute('admin.gift-achievements.index'));
+         $prefix = request()->route()->getPrefix();
+         $baseUrl = ($prefix === 'preview') ? url('preview/admin/gift-achievements') : url('admin/gift-achievements');
+         
+         return Redirect::to($baseUrl);
+         
        }
 
 
