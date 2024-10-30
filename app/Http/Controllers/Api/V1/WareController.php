@@ -19,7 +19,7 @@ class WareController extends Controller
 
     public function index(Request $request)
     {
-        $wares = $this->wareService->index($request->page);
+        $wares = $this->wareService->index($request->page,$request->per_page);
         return Common::apiResponse(1, '',  $wares);
     }
 

@@ -22,11 +22,11 @@ class GiftRepository extends AbstractRepository
         return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
     }
 
-    public function allGifts()
+    public function allGifts($page,$perPage)
     {
         $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
 
-        return $gifts->orderBy('price')->get();
+        return $gifts->orderBy('price')->paginate($perPage, ['*'], 'page', $page);
 
     }
 

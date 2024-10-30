@@ -18,9 +18,9 @@ class GiftService
         return $this->giftRepository->all($type);
     }
 
-    public function allGift()
+    public function allGift($page,$perPage)
     {
-        return $this->giftRepository->allGifts();
+        return $this->giftRepository->allGifts($page,$perPage);
     }
 
 
