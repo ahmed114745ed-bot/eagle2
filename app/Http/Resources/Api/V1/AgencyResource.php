@@ -29,6 +29,8 @@ class AgencyResource extends JsonResource
             'url'=>$this->url,
             'img'=>$this->img,
             'contents'=>$this->contents,
+            'payments'=>@$this->AgencypaymentGateways,
+            'countries'=>@$this?->countries,
             'owner'=>$owner,
             'dollar'=>$this->salary,
             'coins'=>$this->coins,
