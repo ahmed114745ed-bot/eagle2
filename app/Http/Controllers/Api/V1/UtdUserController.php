@@ -104,6 +104,13 @@ class UtdUserController extends Controller
         return response()->json(['message' => 'User deleted successfully.'], 200);
     }
 
+    public function show($id)
+    {
+        $user = Admin::with("roles")->findOrFail($id);
+        return Common::apiResponse(1, '', $user);
+
+    }
+
    
 }
  
