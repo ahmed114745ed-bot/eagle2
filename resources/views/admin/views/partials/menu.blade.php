@@ -1,7 +1,35 @@
 @php
     $anyChild = false;
+    $permissionExists = false;
             $roles = \Illuminate\Support\Arr::get($item, 'roles', []);
             $roles = count($roles) > 0 ? $roles : null;
+
+
+            if (!function_exists('getPermissions')){
+                function getPermissions($child) {
+                    if (!$child) {
+                        return ['permission' => [], 'roles' => []];
+                    }
+
+                    $permissions = [
+                        'permission' => Arr::get($child, 'permission') ? [Arr::get($child, 'permission')] : [],
+                        'roles' => Arr::get($child, 'roles', [])
+                    ];
+
+                    // Check if there are children and merge their permissions and roles recursively
+                    if (isset($child['children']) && is_array($child['children'])) {
+                        foreach ($child['children'] as $subChild) {
+                            $childPermissions = getPermissions($subChild);
+                            $permissions['permission'] = array_merge($permissions['permission'], $childPermissions['permission']);
+                            $permissions['roles'] = array_merge($permissions['roles'], $childPermissions['roles']);
+                        }
+                    }
+
+                    return $permissions;
+                }
+                }
+
+
 
 @endphp
 
@@ -9,91 +37,30 @@
     @php
 
 
-// if ($item['id'] == 111) {
-//     foreach ( $item['children'] as $child) {
-//             // if ($child['id'] == 111) {
-//             //     dd($child);
-//             // }
-//             if (isset($child['children'])){
-//                 foreach ($child['children'] as $child2){
-//                     // dd($child2['id']);
-//                     if ($child2['id'] == 86) {
-//                         $permission=\Illuminate\Support\Arr::get($child2, 'permission');
-//                         $name=\Illuminate\Support\Arr::get($child2, 'title');
+        $data = getPermissions(@$item);
 
-//                         $rolesL = \Illuminate\Support\Arr::get($child2, 'roles', []);
-//                         $rolesL = count($rolesL) > 0 ? $rolesL : null;
-
-//                         if (!$rolesL && !$permission)  continue;
-//                         dd($permission,"kkkkkkkkkk");
-//                     }
-//                     $permission=\Illuminate\Support\Arr::get($child2, 'permission');
-//                     $name=\Illuminate\Support\Arr::get($child2, 'title');
-
-//                     $rolesL = \Illuminate\Support\Arr::get($child2, 'roles', []);
-//                     $rolesL = count($rolesL) > 0 ? $rolesL : null;
-
-//                     if (!$rolesL && !$permission)  continue;
-//                     $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
-
-//                     // dd($rolesL);
-//                     $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
-//                     if ($anyChild) break;
-//                 }
-//             }
-
-//                 $permission=\Illuminate\Support\Arr::get($child, 'permission');
-//                 $name=\Illuminate\Support\Arr::get($child, 'title');
-
-//                 $rolesL = \Illuminate\Support\Arr::get($child, 'roles', []);
-//                 $rolesL = count($rolesL) > 0 ? $rolesL : null;
-
-//                 if (!$rolesL && !$permission)  continue;
-//                 $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
-
-//                 $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
-//                 if ($anyChild) break;
-
-
-//         }
-// }
-        foreach ( $item['children'] as $child) {
-            // if ($child['id'] == 111) {
-            //     dd($child);
-            // }
-            if (isset($child['children'])){
-
-                foreach ($child['children'] as $child2){
-
-                        $permission=\Illuminate\Support\Arr::get($child2, 'permission');
-                    $name=\Illuminate\Support\Arr::get($child2, 'title');
-
-                    $rolesL = \Illuminate\Support\Arr::get($child2, 'roles', []);
+                    $rolesL = $data['roles'];
                     $rolesL = count($rolesL) > 0 ? $rolesL : null;
 
-                    if (!$rolesL && !$permission)  continue;
                     $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
 
-                    $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
-                    if ($anyChild) break;
-                }
-            }else {                
+                    foreach ($data['permission'] as $permission){
 
-                $permission=\Illuminate\Support\Arr::get($child, 'permission');
-                $name=\Illuminate\Support\Arr::get($child, 'title');
-
-                $rolesL = \Illuminate\Support\Arr::get($child, 'roles', []);
-                $rolesL = count($rolesL) > 0 ? $rolesL : null;
-
-                if (!$rolesL && !$permission)  continue;
-                $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
-
-                $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
-                if ($anyChild) break;
-            }
+                        if (!$permission)  continue;
 
 
-        }
+                        $permissionExists =   ( Admin::user()->can($permission));
+
+                        if ($permissionExists) break;
+                    }
+
+
+
+
+                    if (@$permissionExists || $isRoleVisible ){
+                        $anyChild = true;
+                    }
+                    
     @endphp
 @endif
 
