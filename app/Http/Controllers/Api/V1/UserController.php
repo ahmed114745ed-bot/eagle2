@@ -9,6 +9,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
+use App\Facades\UserHandling;
 use App\Services\UserService;
 use Illuminate\Validation\Rule;
 use App\Http\Services\WhatsappOtp;
@@ -350,5 +351,17 @@ class UserController extends Controller
         $arr['count'] = $countData;
 
         return Common::apiResponse(1, '', $arr);
+    }
+
+    public function delete(Request $request)
+    {
+        $user = $request->user();
+
+        if (UserHandling::checkIfUserOwnerOfAgency($user)) {
+            return Common::apiResponse(0, 'This User is the host Of agency can\'t delete it');
+        }
+        $user->tokens()->delete();
+        $user->delete();
+        return Common::apiResponse(1, 'account deleted successfully');
     }
 }

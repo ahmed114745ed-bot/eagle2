@@ -159,6 +159,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
+                Route::get('delete', [UserController::class, 'delete']);
                 Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
