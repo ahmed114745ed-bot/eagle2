@@ -37,8 +37,7 @@ class GiftAchievemntController extends MainController
            'user_id'=>$user_id
          ]);
          $prefix = request()->route()->getPrefix();
-         $baseUrl = ($prefix === 'preview') ? url('preview/admin/gift-achievements') : url('admin/gift-achievements');
-         
+         $baseUrl = ($prefix === 'preview/admin') ? url('preview/admin/gift-achievements') : url('admin/gift-achievements');
          return Redirect::to($baseUrl);
          
        }

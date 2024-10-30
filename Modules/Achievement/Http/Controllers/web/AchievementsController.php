@@ -52,7 +52,7 @@ class AchievementsController extends MainController
         $grid->column(__('redirect_button'))->display(function ($value) {
 
             $prefix = request()->route()->getPrefix();
-            $baseUrl = ($prefix === 'preview') ? url('preview/admin/achievement-levels') : url('admin/achievement-levels');
+            $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/achievement-levels') : url('admin/achievement-levels');
             
             $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
             
