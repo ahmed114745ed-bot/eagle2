@@ -21,9 +21,9 @@ class GiftController extends Controller
         return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
 
-    public function allGifts()
+    public function allGifts(Request $request)
     {
-        $gifts = $this->giftService->allGift();
+        $gifts = $this->giftService->allGift($request->page,$request->per_page);
         return Common::apiResponse(1, '',  $gifts);
     }
 

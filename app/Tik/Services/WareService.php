@@ -12,9 +12,9 @@ class WareService
         private readonly WareRepository $wareRepository,
     ) {}
 
-    public function index($page)
+    public function index($page,$perPage)
     {
-        return $this->wareRepository->allWares($page);
+        return $this->wareRepository->allWares($page,$perPage);
     }
 
     public function create($request)
