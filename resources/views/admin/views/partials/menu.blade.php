@@ -10,17 +10,37 @@
 
 
         foreach ( $item['children'] as $child) {
-            $permission=\Illuminate\Support\Arr::get($child, 'permission');
-            $name=\Illuminate\Support\Arr::get($child, 'title');
 
-            $rolesL = \Illuminate\Support\Arr::get($child, 'roles', []);
-            $rolesL = count($rolesL) > 0 ? $rolesL : null;
+            if (isset($child['children'])){
 
-            if (!$rolesL && !$permission)  continue;
-            $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
+                foreach ($child['children'] as $child2){
+                        $permission=\Illuminate\Support\Arr::get($child2, 'permission');
+                    $name=\Illuminate\Support\Arr::get($child2, 'title');
 
-            $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
-            if ($anyChild) break;
+                    $rolesL = \Illuminate\Support\Arr::get($child2, 'roles', []);
+                    $rolesL = count($rolesL) > 0 ? $rolesL : null;
+
+                    if (!$rolesL && !$permission)  continue;
+                    $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
+
+                    $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
+                    if ($anyChild) break;
+                }
+            }
+
+                $permission=\Illuminate\Support\Arr::get($child, 'permission');
+                $name=\Illuminate\Support\Arr::get($child, 'title');
+
+                $rolesL = \Illuminate\Support\Arr::get($child, 'roles', []);
+                $rolesL = count($rolesL) > 0 ? $rolesL : null;
+
+                if (!$rolesL && !$permission)  continue;
+                $isRoleVisible = $rolesL && Admin::user()->visible($rolesL);
+
+                $anyChild =  ( $isRoleVisible) || ($permission && Admin::user()->can($permission));
+                if ($anyChild) break;
+
+
         }
     @endphp
 @endif
@@ -29,13 +49,23 @@
 @php
 
 
+
+
+
     $hasRoles = $roles && Admin::user()->visible($roles);
     $hasPermission = !empty(Arr::get($item, 'permission')) && Admin::user()->can(Arr::get($item, 'permission'));
     $anyChildExists = $anyChild ?? false;
     $allPermission = Admin::user()->can('*');
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
 
+
+    if (Arr::get($item, 'id') == '13'){
+        dump(Admin::user()->can(Arr::get($item, 'permission')));
+
+            dump($isVisible, $hasRoles , $hasPermission, $allPermission , $anyChildExists);
+        }
 @endphp
+
 
 @if($isVisible)
     @if(!isset($item['children']))
