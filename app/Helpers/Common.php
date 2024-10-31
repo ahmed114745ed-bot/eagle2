@@ -159,7 +159,17 @@ class Common{
                 $paginationData = self::paginationData($dataForPagination);
                 $data[$paginationKey] = $dataForPagination->getCollection();
             }
+        }if($paginates)
+        {
+            
+            foreach ($paginates as $paginationKey => $paginationCollection) {
+                if ($paginationCollection instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($paginationCollection);
+                    $data[$paginationKey] = $paginationCollection->getCollection();
+                }
+            }
         }
+    
 
         return response()->json(
             [
