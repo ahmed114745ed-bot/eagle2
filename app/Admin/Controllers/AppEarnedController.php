@@ -7,15 +7,16 @@ use Carbon\Carbon;
 use App\Models\Charge;
 
 use App\Models\CoinLog;
-use App\Models\Commission;
+use App\Models\AppFeature;
 
+use App\Models\Commission;
 use App\Models\UsdTransfer;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Form;
 use Encore\Admin\Layout\Content;
+
+
 use App\Models\RequestTakeSalary;
-
-
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Widgets\DatePicker;
 use Illuminate\Support\Facades\Request;
@@ -43,6 +44,7 @@ class AppEarnedController extends MainController
             $bonus = $earned * 0.1;
             $commission = Commission::sum("amount");
             $deduction = number_format($bonus- $commission, 2) ;
+            $appFeature = AppFeature::where(['slug' => 'commission','status' => 1])->exists();
             return $content
                 ->title(trans('app-earned'))
                 ->description(__( 'الرئيسيه'))
@@ -64,13 +66,14 @@ class AppEarnedController extends MainController
 
                 })
 
-                ->row(function (\Encore\Admin\Layout\Row $row) use (  $earned_charge,$bonus,$deduction) {
+                ->row(function (\Encore\Admin\Layout\Row $row) use (  $earned_charge,$bonus,$deduction ,$appFeature) {
                    // $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('app earned') . ' <i class="fa fa-star"></i></h3>');
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', '', @$earned_charge ?? 0));
-                    $row->column(6, new InfoBox(__('bonus'), 'dollar', 'yellow', '',@$deduction ?? 0));
-                })->row(function (\Encore\Admin\Layout\Row $row) use ($commission) {
-                     $row->column(6, new InfoBox(__('commission'), 'dollar', 'red',route('admin.commissions'), @$commission ?? 0));
+                    if($appFeature) $row->column(6, new InfoBox(__('bonus'), 'dollar', 'yellow', '',@$deduction ?? 0));
+                   
+                })->row(function (\Encore\Admin\Layout\Row $row) use ($commission,$appFeature) {
+                   if($appFeature)  $row->column(6, new InfoBox(__('commission'), 'dollar', 'red',route('admin.commissions'), @$commission ?? 0));
                  });
 
 
