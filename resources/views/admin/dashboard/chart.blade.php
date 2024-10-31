@@ -74,7 +74,7 @@ ul.list-unstyled {
 
     <div class="row">
         <div class="col-md-12 text-center">
-            @if ($usePercentage >= 90)
+            @if ($usePercentage <= 90)
             <div class="row">
                 <div class="col-md-12 text-center">
                     <h4 class="text-danger">{{ __('admin.you_must_pay') }}</h4>
