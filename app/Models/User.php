@@ -5,6 +5,7 @@ namespace App\Models;
 use DB;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Modules\Reals\Entities\Real;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\PaymentGetWayTrait;
@@ -49,6 +50,7 @@ class User extends Authenticatable
     protected $dates =['deleted_at'];
 
 
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -90,6 +92,35 @@ class User extends Authenticatable
 
      ];*/
 
+
+    public function following(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id')
+            ->withPivot('status', 'created_at')
+            ->withTimestamps()
+            ->orderBy('follows.created_at', 'desc');
+    }
+
+    // Define the users that are following this user
+    public function followerss(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followed_user_id', 'user_id')
+            ->withPivot('status', 'created_at')
+            ->withTimestamps()
+            ->orderBy('follows.created_at', 'desc');
+    }
+
+    // Define mutual followers as friends
+    public function friends(): BelongsToMany
+    {
+        return $this->following()
+            ->wherePivot('status', 1) // Active status for mutual relationships
+            ->whereHas('followerss', function($query) {
+                $query->where('user_id', $this->id);
+            })
+            ->orderBy('follows.created_at', 'desc');
+    }
+
      public function images()
      {
         return $this->hasMany(ProfileGallary::class);
@@ -100,7 +131,7 @@ class User extends Authenticatable
          return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')
                      ->withTimestamps();
      }
- 
+
      public function ignoredBy()
      {
          return $this->belongsToMany(User::class, 'profile_user_ignores', 'ignore_user_id', 'user_id')
@@ -112,7 +143,7 @@ class User extends Authenticatable
          return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
                      ->withTimestamps();
      }
- 
+
      public function likedBy()
      {
          return $this->belongsToMany(User::class, 'profile_user_likes', 'liked_user_id', 'user_id')
@@ -149,7 +180,7 @@ class User extends Authenticatable
             default => 'user',
         };
     }
- 
+
 
     public function getTotalDays()
     {
@@ -245,7 +276,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserSetting::class,'user_id');
     }
-    
+
     public function codeInvitations(){
         return $this->belongsToMany(User::class, 'user_code_invitations', 'user_id', 'id')->withPivot('updated_at');
     }

@@ -64,43 +64,6 @@ class ProfileRelationsService
 
         return UserRelationsResource::collection($users);
     }
-    public function getData0(User $user, $type = 1)
-    {
-        $query = User::withoutAppends()
-                     ->with([
-                                'room' => function ($query) {
-                                    return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
-                                }, 'followPacks', 'profile', 'ware', 'UserVip'
-                            ]);
-
-        if ($type != 2) {
-            $query->whereHas('followeds', function ($q) use ($user, $type) {
-                switch ($type) {
-                    case 1:
-                    case 3:
-                        $q->where('followed_user_id', $user->id)->where('user_id', '!=', $user->id)->orderByDesc('id');
-                        break;
-
-                }
-            });
-        }
-
-        if ($type == 2 || $type == 3) {
-            $query->whereHas('followers', function ($q) use ($user) {
-                $q->where('user_id', $user->id)->where('followed_user_id', '!=', $user->id)->orderByDesc('id');
-            });
-        }
-        $data = $query
-            ->selectRaw('id,uuid,name,sender_level,sub_sender_level,received_level,sub_receiver_level,dress_1,online_time')
-            ->paginate(15);
-
-        [$userFollowers, $vipsSenderImages, $vipsReceivedImages] = $this->getHelperArrays($user, $data);
-
-
-        UserRelationsResource::initializeData($vipsReceivedImages, $vipsSenderImages, $userFollowers);
-
-        return UserRelationsResource::collection($data);
-    }
 
     /**
      * @param User $user
