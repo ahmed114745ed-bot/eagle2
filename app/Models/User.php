@@ -93,33 +93,7 @@ class User extends Authenticatable
      ];*/
 
 
-    public function following(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id')
-            ->withPivot('status', 'created_at')
-            ->withTimestamps()
-            ->orderBy('follows.created_at', 'desc');
-    }
 
-    // Define the users that are following this user
-    public function followerss(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'follows', 'followed_user_id', 'user_id')
-            ->withPivot('status', 'created_at')
-            ->withTimestamps()
-            ->orderBy('follows.created_at', 'desc');
-    }
-
-    // Define mutual followers as friends
-    public function friends(): BelongsToMany
-    {
-        return $this->following()
-            ->wherePivot('status', 1) // Active status for mutual relationships
-            ->whereHas('followerss', function($query) {
-                $query->where('user_id', $this->id);
-            })
-            ->orderBy('follows.created_at', 'desc');
-    }
 
      public function images()
      {

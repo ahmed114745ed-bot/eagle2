@@ -2,10 +2,14 @@
 
 namespace App\Tik\Repositories;
 
+use App\Models\Family;
+use App\Models\Mode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
+
+/** @property Family $model*/
 abstract class AbstractRepository
 {
     /**
@@ -30,8 +34,11 @@ abstract class AbstractRepository
      * @param $id
      * @return mixed
      */
-    public function update(array $data,$id): mixed
+    public function update(array $data, $id): mixed
     {
+        if ($id instanceof Model){
+            return $id->update($data);
+        }
         return $this->model->find($id)->update($data);
     }
 

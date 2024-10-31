@@ -122,6 +122,78 @@ class Common{
     }
 
 
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null,$paginates = null, $paginationKey = null)
+    {
+        if ($statusCode === null) {
+            $statusCode = $success ? 200 : 422;
+        }
+
+        $paginationData = null;
+
+        // Check if data is a collection directly or a paginated resource
+        if ($paginationKey === null) {
+            if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+                $resourceData = $data->resource;
+
+                if ($resourceData instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($resourceData);
+                    $data = $resourceData->getCollection();
+                }
+            } elseif ($data instanceof LengthAwarePaginator) {
+                $paginationData = self::paginationData($data);
+                $data = $data->getCollection();
+            }
+        }
+        // Check if data contains the pagination key and it's paginated
+        elseif (isset($data[$paginationKey])) {
+            $dataForPagination = $data[$paginationKey];
+
+            if ($dataForPagination instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+                $resourceData = $dataForPagination->resource;
+
+                if ($resourceData instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($resourceData);
+                    $data[$paginationKey] = $dataForPagination->getCollection();
+                }
+            } elseif ($dataForPagination instanceof LengthAwarePaginator) {
+                $paginationData = self::paginationData($dataForPagination);
+                $data[$paginationKey] = $dataForPagination->getCollection();
+            }
+        }
+
+        return response()->json(
+            [
+                'success'   => $success,
+                'message'   => __($message),
+                'data'      => $data,
+                'paginates' => $paginationData,
+            ],
+            $statusCode
+        );
+    }
+
+// Pagination data formatting function remains unchanged
+    public static function paginationData($data)
+    {
+        return [
+            'meta' => [
+                'current_page'  => $data->currentPage(),
+                'from'          => $data->firstItem(),
+                'last_page'     => $data->lastPage(),
+                'path'          => $data->path(),
+                'per_page'      => $data->perPage(),
+                'to'            => $data->lastItem(),
+                'total'         => $data->total(),
+            ],
+            'links' => [
+                'first' => $data->url(1),
+                'last'  => $data->url($data->lastPage()),
+                'prev'  => $data->previousPageUrl(),
+                'next'  => $data->nextPageUrl(),
+            ],
+        ];
+    }
+
     public static function  getPaginates($collection)
     {
         return [
@@ -137,83 +209,84 @@ class Common{
             'to' => $collection->lastItem(),
         ];
     }
+    /*
 
-    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
-    {
+     public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
+     {
 
-        if ($success == false && $statusCode == null) {
-            $statusCode = 422;
-        }
+         if ($success == false && $statusCode == null) {
+             $statusCode = 422;
+         }
 
-        if ($success == true && $statusCode == null) {
-            $statusCode = 200;
-        }
-
-
-
-        $dataForPaginationCheck = $data;
-
-        $isPagination = false;
+         if ($success == true && $statusCode == null) {
+             $statusCode = 200;
+         }
 
 
 
-        if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+         $dataForPaginationCheck = $data;
 
-            $dataForPaginationCheck = $data->resource;
+         $isPagination = false;
 
 
-            $isPagination = true;
 
-            if ($data instanceof LengthAwarePaginator ) {
-                $isPagination = true;
+         if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
 
-                $data = $data->getCollection();
-            }
+             $dataForPaginationCheck = $data->resource;
 
-            if ($dataForPaginationCheck instanceof \Illuminate\Support\Collection ) {
-                $isPagination = false;
 
-//                $data = $data;
-            }
-        }
+             $isPagination = true;
 
-        if ($data instanceof LengthAwarePaginator ) {
-            $isPagination = true;
+             if ($data instanceof LengthAwarePaginator ) {
+                 $isPagination = true;
 
-            $data = $data->getCollection();
-        }
+                 $data = $data->getCollection();
+             }
 
-        return response()->json(
-            [
-                'success'   => $success,
-                'message'   => __($message),
-                'data'      => $data,
-                'paginates' => $isPagination ? self::paginationData($dataForPaginationCheck) : null,
-            ],
-            $statusCode
-        );
-    }
-    public static  function paginationData($data)
-    {
-        $result['meta'] =  [
-            'current_page'  => $data->currentPage(),
-            'from'          => $data->firstItem(),
-            'last_page'     => $data->lastPage(),
-            'path'          => $data->path(),
-            'per_page'      => $data->perPage(),
-            'to'            => $data->lastItem(),
-            'total'         => $data->total(),
-        ];
+             if ($dataForPaginationCheck instanceof \Illuminate\Support\Collection ) {
+                 $isPagination = false;
 
-        $result['links'] = [
-            'first' => $data->url(1),
-            'last'  => $data->url($data->lastPage()),
-            'prev'  => $data->previousPageUrl(),
-            'next'  => $data->nextPageUrl(),
-        ];
+ //                $data = $data;
+             }
+         }
 
-        return $result;
-    }
+         if ($data instanceof LengthAwarePaginator ) {
+             $isPagination = true;
+
+             $data = $data->getCollection();
+         }
+
+         return response()->json(
+             [
+                 'success'   => $success,
+                 'message'   => __($message),
+                 'data'      => $data,
+                 'paginates' => $isPagination ? self::paginationData($dataForPaginationCheck) : null,
+             ],
+             $statusCode
+         );
+     }*/
+//    public static  function paginationData($data)
+//    {
+//        $result['meta'] =  [
+//            'current_page'  => $data->currentPage(),
+//            'from'          => $data->firstItem(),
+//            'last_page'     => $data->lastPage(),
+//            'path'          => $data->path(),
+//            'per_page'      => $data->perPage(),
+//            'to'            => $data->lastItem(),
+//            'total'         => $data->total(),
+//        ];
+//
+//        $result['links'] = [
+//            'first' => $data->url(1),
+//            'last'  => $data->url($data->lastPage()),
+//            'prev'  => $data->previousPageUrl(),
+//            'next'  => $data->nextPageUrl(),
+//        ];
+//
+//        return $result;
+//    }
 
 
 
