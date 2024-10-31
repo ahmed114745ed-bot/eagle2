@@ -63,7 +63,7 @@ class AllStatisticController extends MainController
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
             $data = [$balance->used ?? 0, $availableBalance ?? 0];
             $user = Auth::user();
-            $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
+            $usePercentage = ($balance->balance  ?? 0 >= 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return $content
                 ->title(trans('statistics'))
                 ->description(__(request('desc') ?: 'الرئيسيه'))
