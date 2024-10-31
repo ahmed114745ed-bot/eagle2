@@ -57,7 +57,7 @@ class AllStatisticController extends MainController
                 $balance = $balance->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
                 $balanceDollar = $balanceDollar->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
             }
-            $balance = @$balance->first();
+            @$balance = @$balance->first();
             $balanceDollar = $balanceDollar->sum("value");
             $allBalance = $balance->balance ?? 0;
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
