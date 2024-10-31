@@ -57,13 +57,13 @@ class AllStatisticController extends MainController
                 $balance = $balance->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
                 $balanceDollar = $balanceDollar->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
             }
-            @$balance = @$balance->first();
+            $balance = $balance->first();
             $balanceDollar = $balanceDollar->sum("value");
             $allBalance = $balance->balance ?? 0;
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
             $data = [$balance->used ?? 0, $availableBalance ?? 0];
             $user = Auth::user();
-            $usePercentage = (@$balance?->balance  ?? 0 >= 0) ? ((@$balance?->used ?? 0 / @$balance?->balance) * 100) : 0;
+            $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return $content
                 ->title(trans('statistics'))
                 ->description(__(request('desc') ?: 'الرئيسيه'))
