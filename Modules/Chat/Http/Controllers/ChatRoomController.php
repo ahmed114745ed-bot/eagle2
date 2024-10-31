@@ -111,9 +111,7 @@ class ChatRoomController extends Controller
             'total_unread_messages' => $total_unread->count(),
             'unread_messages' => ChatMessageResource::collection($total_unread),
         ];
-        return Common::apiResponse(1, 'successfully', $data,200,        [
-            'friends' => $friends,
-        ]
+        return Common::apiResponse(1, 'successfully', $data,200,'','chat'
 );
     }
     public function close_Chat(Request $request)
