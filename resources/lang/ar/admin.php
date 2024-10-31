@@ -151,4 +151,6 @@ return [
     'balance' => 'الرصيد',
     'availableBalance' => 'الرصيد المتاح',
     'used' => 'المستخدم',
+    'pay' => 'دفع',
+
 ];

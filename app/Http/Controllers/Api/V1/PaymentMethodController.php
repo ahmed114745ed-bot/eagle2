@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\GameChargeHistory;
+use App\Models\GameWallet;
+use App\Models\PaymentMethodHistory;
+use Illuminate\Http\Request;
+
+
+class PaymentMethodController extends Controller
+{
+    public function callback(Request $request)
+    {
+        $callbackData = $request->all();
+        $fawryRefNumber = $callbackData['fawryRefNumber'];
+        $merchantRefNumber = $callbackData['merchantRefNumber'];
+        $orderStatus = $callbackData['orderStatus'];
+
+        $order = PaymentMethodHistory::where("utd_code",$merchantRefNumber)->first();
+        if ($orderStatus === 'PAID') {
+            $order->status = "paid";
+            if ($order->type == "game_type") {
+                $this->updateDiForUser($order->amount);
+                GameChargeHistory::create([
+                    "value" => $order->amount,
+                    "admin_id" => 0,
+                ]);
+            }
+        } elseif ($orderStatus === 'CANCELLED') {
+            $order->status = "cancelled";
+        } else {
+            $order->status = "Error";
+        }
+        $order->ref_code = $fawryRefNumber;
+
+        $order->save();
+
+        return true;
+    }
+
+    public function updateDiForUser($amount)
+    {
+        $balance  = $amount * config("app.one_coins") * 2;
+        $gameWallet = GameWallet::whereMonth("created_at",date("m"))->whereYear("created_at",date("Y"))->first();
+        if ($gameWallet) {
+            $gameWallet->balance += $balance;
+            $gameWallet->save();
+        }else{
+            GameWallet::create([
+                'balance' => $balance,
+            ]);
+        }
+    }
+}

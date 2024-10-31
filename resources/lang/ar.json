@@ -813,5 +813,6 @@
     "Filter by date" : "البحث ب التاريخ",
     "ID Type" : "نوع ال id",
     "Charge Type" : "نوع الشحن",
-    "limited time purchase" : "شراء لفترة محدودة"
+    "limited time purchase" : "شراء لفترة محدودة",
+     "payment method" : "طريقة الدفع"
 }

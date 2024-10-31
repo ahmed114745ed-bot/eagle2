@@ -32,6 +32,7 @@ use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
+use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
@@ -124,6 +125,9 @@ Route::group(
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
         $router->resource('test-test', 'TestTestController');
+
+        $router->resource('payment-with-method', PaymentMethodController::class);
+        $router->post('save-payment-with-method', [PaymentMethodController::class,"customStore"]);
 
         $router->resource('auth/users', 'AdminUserController');
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);

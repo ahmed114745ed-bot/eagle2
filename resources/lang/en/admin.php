@@ -149,5 +149,6 @@ return [
     'balance'=> 'balance',
     'availableBalance' => 'available balance ',
     'used' =>'used',
+    'pay' => 'pay'
 
 ];

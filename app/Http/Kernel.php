@@ -94,6 +94,7 @@ class Kernel extends HttpKernel
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
         'auth.redirect' => CheckLoginAdmin::class,
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
+        'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
 
     ];
 }
