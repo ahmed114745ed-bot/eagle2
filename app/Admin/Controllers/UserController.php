@@ -446,7 +446,8 @@ class UserController extends MainController
             $actions->add(new DeletePackAction());
             $actions->add(new EditPackExpireAction());
         });
-
+       
+        $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();
         $grid->disableRowSelector();
@@ -480,7 +481,8 @@ class UserController extends MainController
             $actions->add(new DeleteUserVipAction());
             //            $actions->add(new EditPackExpireAction());
         });
-
+        
+        $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();
         $grid->disableRowSelector();

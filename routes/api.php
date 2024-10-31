@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
@@ -43,18 +44,19 @@ use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
-use App\Http\Controllers\Api\V1\CoinReportController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
+    Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);

@@ -71,6 +71,22 @@ ul.list-unstyled {
             <canvas id="myChart"></canvas>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            @if ($usePercentage >= 90)
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h4 class="text-danger">{{ __('admin.you_must_pay') }}</h4>
+                </div>
+            </div>
+            @endif
+            <!-- Add a button here -->
+            <button type="button" class="btn btn-primary mt-3" onclick="window.location.href='admin/payment-with-method';">
+                {{ __('admin.pay') }} 
+            </button>
+        </div>
+    </div>
 </div>
 
 
