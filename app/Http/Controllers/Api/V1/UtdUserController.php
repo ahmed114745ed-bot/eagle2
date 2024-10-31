@@ -18,9 +18,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UtdUserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = Admin::with("roles")->get();
+        $page = $request->page;
+        $perPage = $request->per_page;
+        $users = Admin::with("roles")->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(1, '', $users);
     }
 
@@ -28,7 +30,7 @@ class UtdUserController extends Controller
     public function store(Request $request)
     {
         try {
-            
+
             $validatedData = $request->validate([
                 'username' => 'required|string|max:255|unique:admin_users',
                 'name' => 'required|string|max:255',
@@ -39,28 +41,27 @@ class UtdUserController extends Controller
                 // 'permissions' => 'required|array',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
-    
+
             $validatedData['password'] = Hash::make($validatedData['password']);
-    
+
             if ($request->hasFile('avatar')) {
-                $avatarPath = $request->file('avatar')->store('avatars', 'public'); 
-                $validatedData['avatar'] = $avatarPath; 
-            }   
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $validatedData['avatar'] = $avatarPath;
+            }
             $user = Admin::create($validatedData);
             $user->roles()->attach(json_decode($validatedData['roles']));
             // $user->permissions()->attach($validatedData['permissions']);
-    
+
             return response()->json(['message' => 'User created successfully.', 'user' => $user], 201);
         } catch (\Throwable $th) {
             return Common::apiResponse(0, $th->getMessage());
         }
-       
     }
 
     public function update(Request $request, $id)
     {
         try {
-            
+
             $user = Admin::findOrFail($id);
 
             $validatedData = $request->validate([
@@ -73,23 +74,22 @@ class UtdUserController extends Controller
                 // 'permissions' => 'required|array',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
-    
+
             if (isset($validatedData['password'])) {
                 $validatedData['password'] = Hash::make($validatedData['password']);
             } else {
                 unset($validatedData['password']);
             }
-    
+
             $user->update($validatedData);
-    
+
             $user->roles()->sync(json_decode($validatedData['roles']));
             // $user->permissions()->sync($validatedData['permissions']);
-    
+
             return response()->json(['message' => 'User updated successfully.', 'user' => $user], 200);
         } catch (\Throwable $th) {
             return Common::apiResponse(0, $th->getMessage());
         }
-       
     }
 
     public function destroy($id)
@@ -108,9 +108,5 @@ class UtdUserController extends Controller
     {
         $user = Admin::with("roles")->findOrFail($id);
         return Common::apiResponse(1, '', $user);
-
     }
-
-   
 }
- 
