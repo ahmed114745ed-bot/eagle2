@@ -92,18 +92,18 @@ class ChatRoomController extends Controller
         })
         ->groupBy(['chat_rooms.id','chat_rooms.user_id','chat_rooms.user_id2','chat_rooms.type','user_1_deleted','user_2_deleted','created_at','updated_at'])
         ->orderByDesc('last_message_created_at')
-        ->get();
+        ->paginate(20);
 
         //get chat requests
         $guest = ChatRoom::WhereHas('messages')->select('chat_rooms.*')->where('chat_rooms.user_id2', $user->id)->where('chat_rooms.type', 'guest')->with('messages')
         ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
         ->orderBy('chat_messages.id', 'desc')
-        ->get();
+        ->paginate(20);
 
 
 
         $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->get()->pluck('id')->toArray();
-        $total_unread =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->get();
+        $total_unread =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->paginate(20);
         return [
             'top_chats' => ChatRoomResource::collection($user->chats),
             'chat' => ChatRoomResource::collection($friends),

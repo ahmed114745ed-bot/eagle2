@@ -3,18 +3,21 @@
 namespace Modules\Achievement\Http\Controllers;
 
 use App\Helpers\Common;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\WeeklyStar;
+use Illuminate\Contracts\Support\Renderable;
 use Modules\Achievement\Entities\Achievement;
+use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Achievement\Entities\UserAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
 use Modules\Achievement\Http\Services\AchievementService;
-use Modules\Achievement\Transformers\AchievementOneLevelsResource;
-use Modules\Achievement\Transformers\AchievementDetailResource;
 use Modules\Achievement\Transformers\AchievementResource;
+use Modules\Achievement\Transformers\AchievementDetailResource;
+use Modules\Achievement\Transformers\AchievementOneLevelsResource;
 
 class AchievementController extends Controller
 {
@@ -104,7 +107,8 @@ class AchievementController extends Controller
 
     public function get_all($id = null)
     {
-        if(isset($id)){
+        
+        if(isset($id) && ($id != 4)){
             $achievements = Achievement::where('id',$id)-> with([
                 'levels' => function ($query) {
                     $query->withCount([
@@ -116,9 +120,33 @@ class AchievementController extends Controller
                 },
             ])->get();
 
-
             return Common::apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
         }
+
+        if(isset($id) && ($id == 4))
+            {
+                $weeklyStar =WeeklyStar::currentEvent()
+                ->select('*')
+                ->with(['rewards' => function ($query) {
+                    $query->where('type', 'achievement');
+                }])
+                ->distinct()
+                ->get();
+                $pkEvent = PkEvent::currentEvent()->with(['rewards' => function ($query) {
+                    $query->where('type','achievement');
+                }])->first();
+
+                $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
+                    $query->where('type','achievement');
+                }])->get();
+                $data = 
+                ['weekly_star' => $weeklyStar,
+                  'pk_event' => $pkEvent,
+                  'charge_event' => $chargeEvent,
+
+                ];
+                return Common::apiResponse(1, 'successfully', $data);
+            }
         $user=Auth::user();
         $achievements = Achievement::whereHas("userAchievementLevel",function($q) use ($user){
             $q->where("is_enable",1)->where("user_id",$user->id);
