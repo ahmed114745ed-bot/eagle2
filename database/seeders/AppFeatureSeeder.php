@@ -37,6 +37,7 @@ class AppFeatureSeeder extends Seeder
             ['name' => 'Reels Feature', 'name_ar' => 'ميزه الفديوهات', 'slug' => 'reel', 'status' => 1, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             ['name' => 'Salary Transaction Feature', 'name_ar' => 'ميزه طلبات التحويل', 'slug' => 'salary_transaction', 'status' => 1, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],       
             ['name' => 'config', 'name_ar' => ' تكوينات ', 'slug' => 'config', 'status' => 1, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['name' => 'commission', 'name_ar' => 'عموله', 'slug' => 'commission', 'status' => 0, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ];
         foreach ($appFeatures as $appFeature) {
 
