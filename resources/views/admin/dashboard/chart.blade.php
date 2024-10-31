@@ -40,7 +40,7 @@ ul.list-unstyled {
 }
 </style>
 
-<div class="card">
+<div class="card cardHome">
     <div class="row">
         <!-- Left content with table -->
         <div class="col-md-6 d-flex align-items-center justify-content-center">
