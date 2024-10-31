@@ -3,67 +3,52 @@ namespace App\Traits;
 
 use App\Models\Follow;
 use App\Models\Room;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 Trait FollowTrait{
-    public function followers_ids(){
-        return Follow::query ()->whereHas('follower')->where ('followed_user_id',$this->id)->orderByDesc('created_at')->pluck ('user_id');
+
+    public function following(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id')
+            ->withPivot('status', 'created_at')
+            ->withTimestamps()
+            ->orderBy('follows.created_at', 'desc');
     }
 
-    // public function followeds_ids(){
-    //     return Follow::query ()->where ('user_id',$this->id)->orderByDesc('created_at')->pluck ('followed_user_id');
-    // }
-
-    // public function rooms_uids(){
-    //     return Room::query ()->where ('room_status',1)->where ('is_afk',1)->pluck ('uid');
-    // }
-
-    public function followeds_ids(){
-        return Follow::query ()->whereHas('followed')->where ('user_id',$this->id)->orderByDesc('created_at')->pluck ('followed_user_id');
+    // Define the users that are following this user
+    public function followerss(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followed_user_id', 'user_id')
+            ->withPivot('status', 'created_at')
+            ->withTimestamps()
+            ->orderBy('follows.created_at', 'desc');
     }
 
-    public function rooms_uids(){
-        return Room::query ()->where ('room_status',1)->where ('is_afk',1)->pluck ('uid');
-        // return Room::query ()->where ('room_status',1)->pluck ('uid');
+    // Define mutual followers as friends
+    public function friends(): BelongsToMany
+    {
+        return $this->following()
+            ->wherePivot('status', 1) // Active status for mutual relationships
+            ->whereHas('followerss', function($query) {
+                $query->where('user_id', $this->id);
+            })
+            ->orderBy('follows.created_at', 'desc');
     }
 
 
-    public function followers(){
-        return self::query ()->whereIn('id',$this->followers_ids ())->get ()->sortByDesc('follow_date');
-    }
-    public function followeds(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->get ()->sortByDesc('followed_date');
-    }
-
-    public function friends(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->followers_ids ())->get ()->sortByDesc('follow_date');
+    // Assume we have a relationship to check if the user is being followed
+    public function followedByAuthUser()
+    {
+        return $this->hasOne(Follow::class, 'followed_user_id', 'id')
+            ->where('user_id', auth()->id());
     }
 
-    public function friends_ids(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->followers_ids ())->pluck ('id');
-    }
-
-    public function numberOfFans(){
-        return self::query ()->whereIn('id',$this->followers_ids ())->count();
-    }
-
-    public function numberOfFollowings(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->count ();
-    }
-
-    public function numberOfFriends(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->followers_ids ())->count ();
-    }
-
-    public function onRoomFolloweds(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->rooms_uids ())->get ();
-    }
-
-    public function onRoomFollowedsRooms(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->rooms_uids ())->whereHas('rooms')->get ();
-    }
-
-    public function my_followers(){
-        return self::query ()->whereIn('id',$this->followers_ids ());
+    // Accessor for is_follow property
+    public function getIsFollowAttribute()
+    {
+        // Check if the authenticated user follows this user
+        return $this->followedByAuthUser()->exists();
     }
 
 }
