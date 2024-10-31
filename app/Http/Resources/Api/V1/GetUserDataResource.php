@@ -41,11 +41,7 @@ class GetUserDataResource extends JsonResource
             $fn = $family->name;
         }
 
-        if ($request->user ()){
-            $fArr = $request->user ()->friends_ids()->toArray();
-        }else{
-            $fArr = [];
-        }
+
         $data = [
             'id'   => @$this->id,
             'uuid' => @$this->uuid,
