@@ -104,13 +104,14 @@ class ChatRoomController extends Controller
 
         $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->get()->pluck('id')->toArray();
         $total_unread =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->paginate(20);
-        return [
+        $data = [
             'top_chats' => ChatRoomResource::collection($user->chats),
             'chat' => ChatRoomResource::collection($friends),
             'request_chat' => ChatRoomResource::collection($guest),
             'total_unread_messages' => $total_unread->count(),
             'unread_messages' => ChatMessageResource::collection($total_unread),
         ];
+        return Common::apiResponse(1, 'successfully', $data);
     }
     public function close_Chat(Request $request)
     {
