@@ -25,7 +25,6 @@ use Encore\Admin\Facades\Admin;
 
 Admin::favicon(asset('images/app-logo.png')); //config('app.appLogo')
 Admin::css ('css/admin.css');
-Admin::css(route('dynamic-style'));
 app('view')->prependNamespace('admin', resource_path('views/admin'));
 view()->composer('admin::partials.menu', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/menu.blade.php'));
@@ -37,3 +36,8 @@ view()->composer('admin::partials.footer', function (Illuminate\View\View $view)
 view()->composer('admin::partials.js', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/js.blade.php'));
 });
+
+view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
+    $view->setPath(resource_path('views/admin/views/partials/css.blade.php'));
+});
+

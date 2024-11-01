@@ -1,4 +1,4 @@
-{{--<style>--}}
+<style >
     /* Dynamic Theme Variables */
     :root {
         --primary-color: {{ config('themes.primaryColor') }};
@@ -78,7 +78,6 @@
     }
 
 
-
     .sidebar-menu > li > .treeview-menu {
         background: var(--secondary-color) !important;
     }
@@ -151,7 +150,7 @@
 
     .skin-black-light .main-header > .navbar {
         color: var(--primary-color) !important;
-        background-color: var(--secondary-color)a !important;
+        background-color: var(--secondary-color) a !important;
 
     }
 
@@ -185,22 +184,23 @@
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-    color: #fff;
-    background: var(--primary-color) !important;
-    }
-    .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success {
-    color: #fff;
-    background: var(--primary-color) !important;
+        color: #fff;
+        background: var(--primary-color) !important;
     }
 
-.bootstrap-switch .bootstrap-switch-label {
-    text-align: center;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    z-index: 100;
-    color: #333;
-    background: var(--second-alpha) !important;
-}
+    .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success {
+        color: #fff;
+        background: var(--primary-color) !important;
+    }
+
+    .bootstrap-switch .bootstrap-switch-label {
+        text-align: center;
+        margin-top: -1px;
+        margin-bottom: -1px;
+        z-index: 100;
+        color: #333;
+        background: var(--second-alpha) !important;
+    }
 
     * {
         scrollbar-color: var(--scroll-first-color) var(--scroll-second-color);
@@ -209,79 +209,79 @@
 
 
     .box-header.with-border {
-         border-bottom: 1px solid var(--second-alpha) !important;
+        border-bottom: 1px solid var(--second-alpha) !important;
     }
 
-.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
-    border-top: 1px solid var(--primary-hover-alpha) !important;
-}
+    .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+        border-top: 1px solid var(--primary-hover-alpha) !important;
+    }
 
 
-.table-responsive {
-border: 1px solid var(--second-alpha) !important;
-}
+    .table-responsive {
+        border: 1px solid var(--second-alpha) !important;
+    }
 
 
-.pagination>li>a, .pagination>li>span {
-    position: relative;
-    float: left;
-    padding: 6px 12px;
-    margin-left: -1px;
-    line-height: 1.42857143;
-    color: #337ab7;
-    text-decoration: none;
-    background-color: var(--second-alpha) !important;
-    border: 1px solid var(--primary-hover-alpha) !important;
-}
+    .pagination > li > a, .pagination > li > span {
+        position: relative;
+        float: left;
+        padding: 6px 12px;
+        margin-left: -1px;
+        line-height: 1.42857143;
+        color: #337ab7;
+        text-decoration: none;
+        background-color: var(--second-alpha) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+    }
 
-.skin-black-light .main-header>.navbar .sidebar-toggle:hover {
+    .skin-black-light .main-header > .navbar .sidebar-toggle:hover {
 
         background: var(--second-alpha) !important;
-}
+    }
 
-.form-control {
-    display: block;
-    width: 100%;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: var(--text-secondary-color) !important;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid var(--primary-hover-alpha) !important;
-    border-radius: 4px;
+    .form-control {
+        display: block;
+        width: 100%;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: var(--text-secondary-color) !important;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid var(--primary-hover-alpha) !important;
+        border-radius: 4px;
 
-}
-{{--</style>--}}
-
-
-.select2-dropdown {
-    background-color: var(--secondary-color) !important;
-    border: 1px solid var(--primary-hover-alpha) !important;
-    border-radius: 4px;
-
-}
-
-.select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: var(--second-alpha) !important;
-    color: white;
-}
-
-.select2-container--default .select2-results__option[aria-selected=true] {
-    background-color: var(--primary-hover-alpha) !important;
-    color: var(--text-primary-color) !important;
-
-}
-
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-color: var(--text-primary-color) !important;
-
-}
+    }
 
 
-.input-group .input-group-addon {
-border-radius: 0;
-border-color: var(--primary-hover-alpha) !important;
-background-color: #fff;
-}
+    .select2-dropdown {
+        background-color: var(--secondary-color) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+        border-radius: 4px;
+
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--second-alpha) !important;
+        color: white;
+    }
+
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: var(--primary-hover-alpha) !important;
+        color: var(--text-primary-color) !important;
+
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--text-primary-color) !important;
+
+    }
+
+
+    .input-group .input-group-addon {
+        border-radius: 0;
+        border-color: var(--primary-hover-alpha) !important;
+        background-color: #fff;
+    }
+</style>
