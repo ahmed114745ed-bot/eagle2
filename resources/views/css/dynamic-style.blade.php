@@ -19,6 +19,8 @@
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
 
+
+
     .btn-success {
         background: var(--success-button) !important;
         /*background: #FF9428 !important;*/
@@ -283,7 +285,7 @@
     .form-control {
         display: block;
         width: 100%;
-        height: 34px;
+
         padding: 6px 12px;
         font-size: 14px;
         line-height: 1.42857143;
@@ -324,6 +326,38 @@
         border-radius: 0;
         border-color: var(--primary-hover-alpha) !important;
         background-color: #fff;
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: var(--box-background-color) !important;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid var(--primary-hover-alpha) !important;
+
+        border-radius: 6px;
+        outline: 0;
+        -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+        box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    }
+
+    .modal-header {
+        min-height: 16.43px;
+        padding: 15px;
+        border-bottom: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .modal-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .main-footer {
+        background: #fff;
+        padding: 15px;
+        color: #444;
+        border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
 
