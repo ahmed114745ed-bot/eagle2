@@ -360,6 +360,47 @@
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
+    .dropdown-toggle {
+        background-color: var(--primary-hover-alpha) !important;
+        color: var(--inverse-box-color) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .btn-default {
+        background-color: var(--primary-hover-alpha) !important;
+        color: var(--inverse-box-color) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .btn-default:hover {
+        background-color: var(--second-color) !important;
+        color: var(--inverse-color) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
+
+
+
+        background: var(--primary-hover-alpha) !important;
+        color: var(--inverse-box-color) !important;
+
+    }
+
+    .img-thumbnail {
+        display: inline-block;
+        max-width: 100%;
+        height: auto;
+        padding: 4px;
+        line-height: 1.42857143;
+        background-color: transparent !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
+        border-radius: 4px;
+        -webkit-transition: all .2s ease-in-out;
+        -o-transition: all .2s ease-in-out;
+        transition: all .2s ease-in-out;
+    }
+
 
 
 </style>
