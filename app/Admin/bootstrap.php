@@ -22,6 +22,8 @@ use Encore\Admin\Facades\Admin;
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
 //Admin::js('/packages/customization/js/main.js');
+
+Admin::favicon(asset('images/app-logo.png')); //config('app.appLogo')
 Admin::css ('css/admin.css');
 Admin::css(route('dynamic-style'));
 app('view')->prependNamespace('admin', resource_path('views/admin'));

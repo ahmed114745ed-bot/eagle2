@@ -26,3 +26,4 @@ Dockerfile
 php.ini
 public/settings.json
 config/filesystems.php
+public/images/app-logo.png
