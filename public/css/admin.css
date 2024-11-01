@@ -12,14 +12,14 @@
 }
 
 
-.bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
+/*.bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
     color: #fff;
     background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%) !important;
 }
 .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success {
     color: #fff;
     background: linear-gradient(90deg, #28eb92 0%, #06864b 100%) !important;
-}
+}*/
 
 input:checked+.slider {
     background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%) !important;
@@ -73,6 +73,6 @@ input:checked+.slider {
 
 .btn-success {
     /* background: linear-gradient(90deg, #28eb92 0%, #06864b 100%); */
-    background: #FF9428!important;
+    background: #FF9428 !important;
     /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
 }

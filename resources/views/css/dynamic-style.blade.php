@@ -1,171 +1,199 @@
-/* Dynamic CSS */
-.skin-black-light .wrapper, 
-.skin-black-light .main-sidebar, 
-.skin-black-light .left-side {
-    background-color: {{ config('thems.sideMenuBackground') }} !important;
-}
+{{--<style>--}}
+    /* Dynamic Theme Variables */
+    :root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --background-image: {{ config('themes.backgroundImage') }};
+        --second-alpha: #ffffff1a;
+        --primary-hover-alpha: {{ config('themes.primaryColor') }}1a;
+    }
 
-.skin-black-light .sidebar-menu>li.header {
-    color: {{ config('thems.sideMenuWordMenuColor') }} !important;
-    background: {{ config('thems.sideMenuWordMenuBackground') }} !important;
-}
+    /* Dynamic CSS */
+    .skin-black-light .wrapper,
+    .skin-black-light .main-sidebar,
+    .skin-black-light .left-side {
+        background-color: var(--secondary-color) !important;
+    }
 
-body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.42857143;
-    color: {{ config('thems.bodyColor') }}!important;
-    background-color: {{ config('thems.bodyBackGroundColor') }}!important;
-}
+    .skin-black-light .sidebar-menu > li.header {
+        color: var(--text-primary-color) !important;
+        background: var(--primary-color) !important;
+    }
 
-.skin-black-light .content-wrapper, .skin-black-light .main-footer {
-    border-left: 1px solid #263552;
-    background-image: none !important;
-    background-color: {{ config('thems.bodyBackGroundColor') }};
-}
+    body {
+        color: var(--primary-color) !important;
+        background-color: var(--secondary-color) !important;
+    }
 
-.content-header {
-    background-color: {{ config('thems.bodyBackGroundColor') }} !important;
-}
+    .skin-black-light .content-wrapper,
+    .skin-black-light .main-footer {
+        border-left: 1px solid #d2d6de;
+        background-color: var(--secondary-color) !important;
+        background-image: var(--background-image) !important;
+    }
 
-.content-header>.breadcrumb {
-    background:{{ config('thems.bodyBackGroundColor') }} !important;
-}
+    .content-header {
+        background-color: var(--box-background-color) !important;
+    }
 
-.skin-black-light .sidebar a {
-    color: {{ config('thems.sideMenuListWordColor') }} !important;
-}
+    .content-header > .breadcrumb {
+        background: var(--secondary-color) !important;
+    }
 
-.skin-black-light .sidebar a i{
-    color: {{ config('thems.sideMenuListIconColor') }} !important;
-}
+    .skin-black-light .sidebar a {
+        color: var(--text-secondary-color) !important;
+    }
 
-.box {
-    background: {{ config('thems.boxBackGround') }} !important;
-    color: {{ config('thems.boxColor') }} !important;
-}
+    .skin-black-light .sidebar a i {
+        color: var(--primary-color) !important;
+    }
 
-.skin-black-light .sidebar-menu>li:hover>a, .skin-black-light .sidebar-menu>li.active>a {
-    color: {{ config('thems.sideMenuListHoverColor') }} !important;
-    background: {{ config('thems.sideMenuListHoverBackground') }} !important;
-}
-.skin-black-light .sidebar-menu>li:hover>a, .skin-black-light .sidebar-menu>li.active>a i{
-    color: {{ config('thems.sideMenuListHoverColor') }} !important;
-    background: {{ config('thems.sideMenuListHoverBackground') }} !important;
-}
+    .box {
+        background: var(--box-background-color) !important;
+        color: var(--text-secondary-color) !important;
+        border-top: 3px solid var(--second-alpha) !important;
+    }
 
-.skin-black-light .treeview-menu>li.active>a, .skin-black-light .treeview-menu>li>a:hover {
-    color: {{ config('thems.sideMenuListActiveHoverColor') }} !important;
-}
+    .skin-black-light .sidebar-menu > li:hover > a,
+    .skin-black-light .sidebar-menu > li.active > a {
+        color: var(--text-primary-color) !important;
+        background: var(--primary-hover-alpha) !important;
+    }
 
-.sidebar-menu>li>.treeview-menu {
-    background: {{ config('thems.sideMenuListTreeView') }} !important;
-}
+    .skin-black-light .sidebar-menu > li:hover > a i,
+    .skin-black-light .sidebar-menu > li.active > a i {
+        color: var(--text-primary-color) !important;
+        background: var(--primary-hover-alpha) !important;
 
-.table.table-hover tbody tr:hover {
-    color: #fdf8f8 !important;
-    background-color: #FF9428 !important; 
-}
+    }
 
-.filter-box {
-    color: #ffffff !important; /* اللون الأبيض للنص */
-    {{-- background-color: rgba(255, 255, 255, 0.8) !important; /* اللون الأبيض بخلفية شفافة */ --}}
-}
-
-/* تعديل شكل ولون الحقول */
-.filter-box input, 
-.filter-box select {
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-}
-.input-group .input-group-addon {
-    border-radius: 0;
-    border-color: #d2d6de;
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-}
+    .skin-black-light .treeview-menu > li.active > a,
+    .skin-black-light .treeview-menu > li > a:hover {
+        color: var(--text-primary-color) !important;
+    }
 
 
-.box-footer {
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-}
 
-.btn-primary {
-    background-color: #2b353b;
-    background-color: #FF9428 !important;
-}
+    .sidebar-menu > li > .treeview-menu {
+        background: var(--secondary-color) !important;
+    }
 
+    .table.table-hover tbody tr:hover {
+        color: var(--text-primary-color) !important;
+        background-color: var(--primary-hover-alpha) !important;
+    }
 
-.form-control, /* يشمل input و textarea */
-select,
-.select2-container .select2-selection--single,
-.select2-container .select2-selection--multiple {
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-    color: #ffffff; 
-}
-/* تخصيص زر التحويل في switch */
-.bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
-    background-color: #FF9428 !important;
-    color: #ffffff; 
-}
+    .filter-box {
+        color: var(--text-primary-color) !important;
+    }
 
-.box-header>.fa, .box-header>.glyphicon, .box-header>.ion, .box-header .box-title {
-    color: #c1b9b9 !important;
-}
+    .filter-box input,
+    .filter-box select {
+        background-color: var(--second-alpha) !important;
+    }
 
-.grid-create-btn>.btn-success {
-    background-color: #FF9428 !important;
-    color: #ffffff; 
-}
+    .input-group .input-group-addon {
+        color: var(--text-primary-color) !important;
+        background-color: var(--second-alpha) !important;
+    }
 
-.btn-dropbox {
-    color: #fdf8f8;
-    background-color: #FF9428 !important;
-    border-color: rgba(0, 0, 0, 0.2);
-}
+    .box-footer {
+        background-color: var(--second-color) !important;
+    }
 
-.btn-instagram {
-    color: #fdf8f8;
-    background-color: #FF9428 !important;
-    border-color: rgba(0, 0, 0, 0.2);
-}
+    .btn-primary {
+        background-color: var(--primary-color) !important;
+    }
 
-.btn-success {
-    background-color: #FF9428 !important; /* لون الخلفية الجديد */
-    color: #ffffff !important; /* لون النص */
- 
-    transition: background-color 0.3s ease; /* تأثير انتقال للون */
-}
+    .form-control,
+    select,
+    .select2-container .select2-selection--single,
+    .select2-container .select2-selection--multiple {
+        background-color: var(--second-alpha) !important;
+        color: var(--text-primary-color);
+    }
 
-.content-header>.breadcrumb>li>a {
-    color: #ffffff !important;
-}
+    .bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
+        background-color: var(--primary-color) !important;
+        color: var(--text-primary-color);
+    }
 
-.skin-black-light .main-header>.navbar {
-    color: #FF9428 !important;
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-}
+    .box-header > .fa,
+    .box-header > .glyphicon,
+    .box-header > .ion,
+    .box-header .box-title {
+        color: var(--text-secondary-color) !important;
+    }
 
-.skin-black-light .main-header>.navbar>.sidebar-toggle {
-    color: #FF9428 !important;
-}
+    .grid-create-btn > .btn-success {
+        background-color: var(--primary-color) !important;
+        color: var(--text-primary-color) !important;
+    }
 
-.skin-black-light .main-header>.navbar .nav>li>a, .skin-black-light .main-header>.navbar .nav>li>a:active, .skin-black-light .main-header>.navbar .nav>li>a:focus, .skin-black-light .main-header>.navbar .nav .open>a, .skin-black-light .main-header>.navbar .nav .open>a:hover, .skin-black-light .main-header>.navbar .nav .open>a:focus, .skin-black-light .main-header>.navbar .nav>.active>a {
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-    color: #FF9428 !important;
-}
+    .btn-dropbox,
+    .btn-instagram,
+    .btn-success {
+        background-color: var(--primary-color) !important;
+        color: var(--text-primary-color) !important;
+    }
 
-.skin-black-light .main-header>.logo {
-    background-color: rgba(255, 255, 255, 0.1) !important; 
-    color: #FF9428 !important;
-}
+    .content-header > .breadcrumb > li > a {
+        color: var(--text-primary-color) !important;
+    }
 
-.cardHome {
-    color: #fdf8f8 !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    width: 44%;
-    margin: inherit;
-    padding: 20px;
-    background-color: #FF9428 !important;
-    margin-top: 10px;
+    .skin-black-light .main-header > .navbar {
+        color: var(--primary-color) !important;
+        background-color: var(--secondary-color)a !important;
+
+    }
+
+    .skin-black-light .main-header > .navbar > .sidebar-toggle {
+        color: var(--primary-color) !important;
+        border-right: 1px solid var(--second-alpha) !important;
+
+    }
+
+    .skin-black-light .main-header > .navbar .nav > li > a,
+    .skin-black-light .main-header > .navbar .nav > li > a:active,
+    .skin-black-light .main-header > .navbar .nav > li > a:focus,
+    .skin-black-light .main-header > .navbar .nav .open > a,
+    .skin-black-light .main-header > .navbar .nav .open > a:hover,
+    .skin-black-light .main-header > .navbar .nav .open > a:focus,
+    .skin-black-light .main-header > .navbar .nav > .active > a {
+        background-color: var(--second-color) !important;
+        color: var(--primary-color) !important;
+        border-left: 1px solid var(--second-alpha) !important;
+    }
+
+    .skin-black-light .main-header > .logo {
+        background-color: var(--second-color) !important;
+        color: var(--primary-color) !important;
+        border-right: 1px solid var(--second-alpha) !important;
+    }
+
+    .cardHome {
+        color: var(--text-primary-color) !important;
+        background-color: var(--primary-color) !important;
+    }
+
+    .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
+    color: #fff;
+    background: var(--primary-color) !important;
+    }
+    .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success {
+    color: #fff;
+    background: var(--primary-color) !important;
+    }
+
+.bootstrap-switch .bootstrap-switch-label {
+    text-align: center;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    z-index: 100;
+    color: #333;
+    background: var(--second-alpha) !important;
 }
+{{--</style>--}}
