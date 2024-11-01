@@ -22,7 +22,7 @@
 
     .skin-black-light .sidebar-menu > li.header {
         color: var(--text-primary-color) !important;
-        background: var(--primary-color) !important;
+        background: var(--primary-hover-alpha) !important;
     }
 
     body {
@@ -284,4 +284,6 @@
         border-color: var(--primary-hover-alpha) !important;
         background-color: #fff;
     }
+
+
 </style>
