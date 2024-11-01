@@ -65,11 +65,7 @@ input:checked+.slider {
     background: #edfbff!important;
 }
 
-* {
-    scrollbar-color: #dceaed #e6f4f7;
-    scrollbar-width: thin;
-    scrollbar-width: thin;
-}
+
 
 .btn-success {
     /* background: linear-gradient(90deg, #28eb92 0%, #06864b 100%); */

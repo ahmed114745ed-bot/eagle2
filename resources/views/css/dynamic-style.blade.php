@@ -9,6 +9,8 @@
         --background-image: {{ config('themes.backgroundImage') }};
         --second-alpha: #ffffff1a;
         --primary-hover-alpha: {{ config('themes.primaryColor') }}1a;
+        --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
+        --scroll-first-color: {{ config('themes.primaryColor') }}1a;
     }
 
     /* Dynamic CSS */
@@ -30,7 +32,7 @@
 
     .skin-black-light .content-wrapper,
     .skin-black-light .main-footer {
-        border-left: 1px solid #d2d6de;
+        border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--secondary-color) !important;
         background-image: var(--background-image) !important;
     }
@@ -102,6 +104,8 @@
 
     .box-footer {
         background-color: var(--second-color) !important;
+        border-top: 1px solid var(--second-alpha) !important;
+
     }
 
     .btn-primary {
@@ -195,5 +199,37 @@
     z-index: 100;
     color: #333;
     background: var(--second-alpha) !important;
+}
+
+    * {
+        scrollbar-color: var(--scroll-first-color) var(--scroll-second-color);
+        scrollbar-width: thin;
+    }
+
+
+    .box-header.with-border {
+         border-bottom: 1px solid var(--second-alpha) !important;
+    }
+
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+    border-top: 1px solid var(--primary-hover-alpha) !important;
+}
+
+
+.table-responsive {
+border: 1px solid var(--second-alpha) !important;
+}
+
+
+.pagination>li>a, .pagination>li>span {
+    position: relative;
+    float: left;
+    padding: 6px 12px;
+    margin-left: -1px;
+    line-height: 1.42857143;
+    color: #337ab7;
+    text-decoration: none;
+    background-color: var(--second-alpha) !important;
+    border: 1px var(--primary-hover-alpha) !important;
 }
 {{--</style>--}}
