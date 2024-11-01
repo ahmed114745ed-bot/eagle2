@@ -8,9 +8,40 @@
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
         --background-image: {{ config('themes.backgroundImage') }};
         --second-alpha: #ffffff1a;
-        --primary-hover-alpha: {{ config('themes.primaryColor') }}1a;
+        --primary-hover-alpha: {{ adjustColor(config('themes.primaryColor'), -30, -30, -30) }}1a;
         --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
-        --scroll-first-color: {{ config('themes.primaryColor') }}1a;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
+
+    .btn-success {
+        background: var(--success-button) !important;
+        /*background: #FF9428 !important;*/
+        /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
+    }
+
+    .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+        z-index: 2;
+        color: #fff;
+        cursor: default;
+        background: var(--primary-button) !important;
+        border-color: #337ab7
+    }
+
+    input:checked+.slider {
+        background: var(--primary-button) !important ;
+    }
+
+    .content-header>.breadcrumb>li>a {
+        color: var(--primary-color) !important;
+        text-decoration: none;
+        font-size: var(--bs-breadcrumb-font-size);
+        display: inline-block;
     }
 
     /* Dynamic CSS */
@@ -38,7 +69,13 @@
     }
 
     .content-header {
+        padding: 15px 20px !important;
+        margin: 24px 16px !important;
         background-color: var(--box-background-color) !important;
+        filter: drop-shadow(0px 2px 8px rgba(0, 0, 0, 0.05)) !important;
+        border-radius: 5px !important;
+        /*padding: 28px;*/
+        border: none !important;
     }
 
     .content-header > .breadcrumb {
@@ -57,6 +94,9 @@
         background: var(--box-background-color) !important;
         color: var(--text-secondary-color) !important;
         border-top: 3px solid var(--second-alpha) !important;
+        border-radius: 20px!important;
+        padding: 15px;
+
     }
 
     .skin-black-light .sidebar-menu > li:hover > a,
@@ -88,7 +128,7 @@
     }
 
     .filter-box {
-        color: var(--text-primary-color) !important;
+        color: var(--inverse-box-color) !important;
     }
 
     .filter-box input,
@@ -134,14 +174,14 @@
 
     .grid-create-btn > .btn-success {
         background-color: var(--primary-color) !important;
-        color: var(--text-primary-color) !important;
+        color: var(--inverse-color) !important;
     }
 
     .btn-dropbox,
     .btn-instagram,
     .btn-success {
         background-color: var(--primary-color) !important;
-        color: var(--text-primary-color) !important;
+        color: var(--inverse-color) !important;
     }
 
     .content-header > .breadcrumb > li > a {
@@ -179,9 +219,10 @@
     }
 
     .cardHome {
-        color: var(--text-primary-color) !important;
-        background-color: var(--primary-color) !important;
+        color: var(--inverse-box-color) !important;
+        background-color: var(--box-background-color) !important;
     }
+
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
         color: #fff;
@@ -263,8 +304,8 @@
     }
 
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: var(--second-alpha) !important;
-        color: white;
+        background-color: var(--primary-hover-alpha) !important;
+        color: var(--inverse-box-color) !important;
     }
 
     .select2-container--default .select2-results__option[aria-selected=true] {
@@ -284,6 +325,7 @@
         border-color: var(--primary-hover-alpha) !important;
         background-color: #fff;
     }
+
 
 
 </style>
