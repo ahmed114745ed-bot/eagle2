@@ -232,4 +232,9 @@ border: 1px solid var(--second-alpha) !important;
     background-color: var(--second-alpha) !important;
     border: 1px var(--primary-hover-alpha) !important;
 }
+
+.skin-black-light .main-header>.navbar .sidebar-toggle:hover {
+
+        background: var(--second-alpha) !important;
+}
 {{--</style>--}}
