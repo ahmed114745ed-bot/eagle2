@@ -157,7 +157,7 @@
     select,
     .select2-container .select2-selection--single,
     .select2-container .select2-selection--multiple {
-        background-color: var(--second-alpha) !important;
+        background-color: var(--box-background-color) !important;
         color: var(--text-primary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
@@ -299,7 +299,7 @@
 
 
     .select2-dropdown {
-        background-color: var(--secondary-color) !important;
+        background-color: var(--box-background-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
         border-radius: 4px;
 
@@ -497,6 +497,11 @@
         background-color: var(--primary-hover-alpha) !important;
         transition: .4s;
         border-radius: 34px;
+    }
+
+    .navbar-nav>.user-menu>.dropdown-menu>.user-footer {
+        background-color: var(--box-background-color) !important;
+        padding: 10px;
     }
 
 
