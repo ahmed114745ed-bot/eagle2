@@ -7,7 +7,7 @@
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
         --background-image: {{ config('themes.backgroundImage') }};
-        --second-alpha: #ffffff1a;
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
         --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
         --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
@@ -414,6 +414,90 @@
         }
     }
 
+
+    .popover {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1060;
+        display: none;
+        max-width: 276px;
+        padding: 1px;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.42857143;
+        text-align: left;
+        text-align: start;
+        text-decoration: none;
+        text-shadow: none;
+        text-transform: none;
+        letter-spacing: normal;
+        word-break: normal;
+        word-spacing: normal;
+        word-wrap: normal;
+        white-space: normal;
+        background-color: var(--box-background-color) !important ;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid var(--primary-hover-alpha) !important;
+        border: 1px solid rgba(0,0,0,.2);
+        border-radius: 6px;
+        -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        line-break: auto;
+    }
+
+    .popover.top>.arrow:after {
+        bottom: 1px;
+        margin-left: -10px;
+        content: " ";
+        border-top-color: var(--box-background-color) !important ;
+        border-bottom-width: 0;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        float: left;
+        min-width: 160px;
+        padding: 5px 0;
+        margin: 2px 0 0;
+        font-size: 14px;
+        text-align: left;
+        list-style: none;
+        background-color: var(--box-background-color) !important;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+        border: 1px solid var(--primary-hover-alpha) !important;
+        border: 1px solid rgba(0,0,0,.15);
+        border-radius: 4px;
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        color: var(--inverse-box-color) !important;
+    }
+
+    select>option{
+        background-color: var(--box-background-color) !important;
+        color: var(--inverse-box-color) !important;
+
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--primary-hover-alpha) !important;
+        transition: .4s;
+        border-radius: 34px;
+    }
 
 
 </style>
