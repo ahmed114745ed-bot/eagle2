@@ -363,7 +363,7 @@
     .dropdown-toggle {
         background-color: var(--primary-hover-alpha) !important;
         color: var(--inverse-box-color) !important;
-        border: 1px solid var(--primary-hover-alpha) !important;
+        border: 1px solid transparent !important;
     }
 
     .btn-default {
