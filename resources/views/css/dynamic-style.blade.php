@@ -504,5 +504,24 @@
         padding: 10px;
     }
 
+    .skin-black-light .main-header li.user-header {
+        background-color: var(--box-background-color) !important;
+    }
+
+    .navbar-nav>.user-menu>.dropdown-menu>li.user-header>img {
+        z-index: 5;
+        height: 90px;
+        width: 90px;
+        border: 3px solid  var(--primary-hover-alpha) !important;
+
+    }
+
+    .navbar-nav>.user-menu>.dropdown-menu>li.user-header>p {
+        z-index: 5;
+        color: var(--inverse-box-color) !important;
+        font-size: 17px;
+        margin-top: 10px;
+    }
+
 
 </style>
