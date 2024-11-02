@@ -8,7 +8,7 @@
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
         --background-image: {{ config('themes.backgroundImage') }};
         --second-alpha: #ffffff1a;
-        --primary-hover-alpha: {{ adjustColor(config('themes.primaryColor'), -30, -30, -30) }}1a;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
         --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
         --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
@@ -110,7 +110,7 @@
     .skin-black-light .sidebar-menu > li:hover > a i,
     .skin-black-light .sidebar-menu > li.active > a i {
         color: var(--text-primary-color) !important;
-        background: var(--primary-hover-alpha) !important;
+        background: transparent !important;
 
     }
 
