@@ -401,6 +401,19 @@
         transition: all .2s ease-in-out;
     }
 
+    /* Default for web */
+    .nprogress-custom-parent {
+        overflow: hidden;
+        position: relative !important;
+    }
+
+    /* Mobile styles (adjust max-width as needed) */
+    @media (max-width: 768px) {
+        .nprogress-custom-parent {
+            position: absolute !important;
+        }
+    }
+
 
 
 </style>
