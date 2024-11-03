@@ -48,9 +48,7 @@ use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-
-
-
+use App\Admin\Controllers\CoinController;
 
 Route::group(
     [
@@ -242,9 +240,22 @@ Route::group(
         $router->resource('family_levels', 'FamilyLevelController');
         $router->resource('silver', 'SilverController');
 
-        $router->resource('coins/{paymentId}', 'CoinController')->only(['index', 'create', 'store', 'destroy']);
-        $router->get('coins/{paymentId}/{id}/edit', 'CoinController@edit');
-        $router->put('coins/{paymentId}/{id}', 'CoinController@update');
+        // $router->resource('coins/{paymentGatwayId}', 'CoinController')->only(['create', 'store', 'destroy']);
+        // $router->get('coins/{paymentGatwayId}/{id}/edit', 'CoinController@edit');
+        // $router->put('coins/{paymentGatwayId}/{id}', 'CoinController@update');
+
+        Route::prefix('coins/{paymentGatwayId}')->group(function () {
+            Route::get('/', [CoinController::class, 'index'])->name('coins.index');
+            Route::get('/create', [CoinController::class, 'create'])->name('coins.create');
+            Route::post('/', [CoinController::class, 'store'])->name('coins.store');
+            Route::get('/{id}', [CoinController::class, 'show'])->name('coins.show');
+            Route::get('/{id}/edit', [CoinController::class, 'edit'])->name('coins.edit');
+            Route::put('/{id}', [CoinController::class, 'update'])->name('coins.update');
+            Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
+        });
+
+
+
         $router->resource('ovip', 'OVipController');
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
