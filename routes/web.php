@@ -45,12 +45,7 @@ use KevinSoft\MultiLanguage\Http\Controllers\MultiLanguageController;
 */
 
 Route::get('/t1', function () {
-//    $i = 0;
-//    while ($i < 100000000){
-//        $i++;
-//        echo $i;
-//        echo '<br>';
-//    }
+dd(User::first()->friends_ids());
 });
 
 Route::get('/deleted/users', function (){
@@ -59,10 +54,6 @@ Route::get('/deleted/users', function (){
         'data'=> $users
     ]);
 });
-// routes/web.php
-Route::get('/dynamic-style', function () {
-    return response()->view('css.dynamic-style')->header('Content-Type', 'text/css');
-})->name('dynamic-style');
 
 Route::get('/t2', function () {
     return gethostname();

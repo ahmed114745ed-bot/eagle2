@@ -13,4 +13,4 @@ class WhatsappAuthDatabaseSeeder extends Seeder
     {
         // $this->call([]);
     }
-}
+};

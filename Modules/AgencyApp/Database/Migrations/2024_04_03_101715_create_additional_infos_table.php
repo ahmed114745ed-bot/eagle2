@@ -1,10 +1,11 @@
 <?php
 
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAdditionalInfosTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -36,4 +37,4 @@ class CreateAdditionalInfosTable extends Migration
     {
         Schema::dropIfExists('additional_infos');
     }
-}
+};

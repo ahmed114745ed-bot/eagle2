@@ -203,6 +203,75 @@ if (!function_exists('isSubdomain')) {
         return count($hostParts) > 2;
     }
 }
+if (!function_exists('adjustColor')) {
+
+    function adjustColor($hex, $rOffset= -30, $gOffset = -90, $bOffset = -60) : string
+    {
+        // Convert the hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Apply the offsets and ensure values are within 0-255
+        $newR = max(0, min(255, $r - $rOffset));
+        $newG = max(0, min(255, $g - $gOffset));
+        $newB = max(0, min(255, $b - $bOffset));
+
+        // Convert the new RGB values back to hex format
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+
+    function getInverseColor($hex) :string
+    {
+        // Convert the hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate the inverse by subtracting each component from 255
+        $inverseR = 255 - $r;
+        $inverseG = 255 - $g;
+        $inverseB = 255 - $b;
+
+        // Convert the inverted RGB values back to hex format
+        return sprintf("#%02x%02x%02x", $inverseR, $inverseG, $inverseB);
+    }
+
+
+    function adjustTextColor($hex, $lightnessFactor = 0.8, $darknessFactor = 0.2) {
+        // Convert hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate brightness (perceived luminance)
+        $brightness = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
+
+        if ($brightness > 0.5) {
+            // If color is light, make it darker
+            $newR = intval($r * $darknessFactor);
+            $newG = intval($g * $darknessFactor);
+            $newB = intval($b * $darknessFactor);
+        } else {
+            // If color is dark, make it lighter
+            $newR = intval($r + (255 - $r) * $lightnessFactor);
+            $newG = intval($g + (255 - $g) * $lightnessFactor);
+            $newB = intval($b + (255 - $b) * $lightnessFactor);
+        }
+
+        // Convert back to hex
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+    function getLighterColor($hex, $lightness  = 0.9)
+    {
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate a lighter color closer to white by increasing each component
+        $newR = intval($r + (255 - $r) * $lightness);
+        $newG = intval($g + (255 - $g) * $lightness);
+        $newB = intval($b + (255 - $b) * $lightness);
+
+        // Convert back to hex
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+
+
+
+}
 
 
 if (!function_exists('getPusherConfig')) {

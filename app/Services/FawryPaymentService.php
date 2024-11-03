@@ -2,13 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\AppFeature;
 use App\Models\PaymentMethodHistory;
-use Nette\Schema\ValidationException;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 
 class FawryPaymentService
 {

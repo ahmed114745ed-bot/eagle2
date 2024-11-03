@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 Trait FollowTrait{
 
+    public function friends_ids()
+    {
+        return $this->friends()->pluck('users.id');
+    }
+
     public function following(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id')

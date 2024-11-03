@@ -17,6 +17,8 @@ return [
     'balance_user_name'     => env('BALANCE_USER_NAME', 'superAdmin'),
     'balance_password'      => env('BALANCE_PASSWORD', '12345678'),
     'one_coins'             => env('ONE_COINS'),
+
+    'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
     /*
     |--------------------------------------------------------------------------
     | Application Name

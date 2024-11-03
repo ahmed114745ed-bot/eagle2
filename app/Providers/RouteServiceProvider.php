@@ -59,6 +59,7 @@ class RouteServiceProvider extends ServiceProvider
 
                  Route::middleware([ 'throttle'])
                     ->prefix('preview')
+                    ->name('.preview.')
                     ->namespace($this->namespace)
                     ->group(base_path('app/Admin/preview-routes.php'));
 

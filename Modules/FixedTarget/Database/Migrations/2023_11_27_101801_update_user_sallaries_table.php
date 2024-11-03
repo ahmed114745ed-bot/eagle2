@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use Modules\FixedTarget\Enums\TargetType;
 
-class UpdateUserSallariesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -46,4 +46,4 @@ class UpdateUserSallariesTable extends Migration
 //
 //        });
     }
-}
+};

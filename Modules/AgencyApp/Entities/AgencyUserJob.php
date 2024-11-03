@@ -2,7 +2,7 @@
 
 namespace Modules\AgencyApp\Entities;
 
-use App\Classes\Facades\Agency;
+use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

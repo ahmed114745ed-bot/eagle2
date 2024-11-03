@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Tests\Models;
+namespace Modules\Events\Tests;
 
 use App\Models\Background;
 use App\Models\Room;

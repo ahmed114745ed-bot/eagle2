@@ -28,7 +28,7 @@
 
 <div class="login-box">
     <div class="login-logo">
-        <div><img src="{{asset('images/tik-login-logo.png')}}" style="width: 150px;"></div>
+        <div><img src="{{asset('images/app-logo.png')}}" style="width: 150px;"></div>
         <div class="box-title">
             <a href="{{ admin_url('/') }}" style="color: #25D366;">{{__('dashboard.login.title')}}</a>
         </div>
