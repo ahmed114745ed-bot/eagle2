@@ -32,7 +32,7 @@ class UpgradeLevelController extends MainController
             $conf->save();
         }
 
-        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+        return redirect()->back()->with('message', __('dashboard.update'));
 
     }
     public function group_chat_config(Request $request)
@@ -49,7 +49,7 @@ class UpgradeLevelController extends MainController
             $conf->save();
         }
 
-        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+        return redirect()->back()->with('message', __('dashboard.update'));
 
     }
 
@@ -67,7 +67,7 @@ class UpgradeLevelController extends MainController
             $conf->save();
         }
 
-        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+        return redirect()->back()->with('message', __('dashboard.update'));
 
     }
 
@@ -85,7 +85,7 @@ class UpgradeLevelController extends MainController
             $conf->save();
         }
 
-        return redirect()->back()->with('message', 'تم التعديل بنجاح!');
+        return redirect()->back()->with('message', __('dashboard.update'));
 
     }
 
