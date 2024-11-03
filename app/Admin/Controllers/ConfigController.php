@@ -183,8 +183,8 @@ class ConfigController extends MainController
         $form->select('category', trans('category'))
         ->options(
             array_combine(
-                ConfigCategory::getOptions(),
-                array_map(fn($value) => ucfirst(str_replace('_', ' ', $value)), ConfigCategory::getOptions())
+                translate( ConfigCategory::getOptions()),
+                array_map(fn($value) => ucfirst(str_replace('_', ' ', $value)), translate(ConfigCategory::getOptions()))
             )
         )
         ->required();
