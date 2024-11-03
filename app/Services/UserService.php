@@ -385,7 +385,6 @@ class UserService
         $user = $this->userRepository->findById($userId);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
-        if (in_array($auth->id, Common::getUserBlackList($user->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
 
         if ($auth->id != $user->id && $isVisit == true) {
