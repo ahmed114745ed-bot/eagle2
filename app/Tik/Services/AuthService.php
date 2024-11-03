@@ -96,7 +96,7 @@ class AuthService
                     $user->tags()->attach(\request('tags'));
                 }
 
-                $user->country_id = @$country->id ?: 0;
+                $user->country_id = @$country->id ?: null;
                 $user->is_points_first = 1;
                 $user->save();
             }
