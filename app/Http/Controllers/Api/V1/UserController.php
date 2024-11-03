@@ -23,8 +23,11 @@ use App\Http\Resources\Api\V1\UserTypeResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use App\Models\Target;
+use DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Modules\FixedTarget\Services\FixedTargetService;
 
 class UserController extends Controller
 {
@@ -51,6 +54,76 @@ class UserController extends Controller
         $sitting = $this->userService->setting($user->id, $request);
 
         return Common::apiResponse(1, 'تم التعديل بنجاح', new ShowUserSettingResource($sitting));
+    }
+
+    public function user_statistic(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'date' => ['required', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
+            // Other validation rules...
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(false, 'date format error');
+        }
+        $user = $request->user();
+
+        try {
+            $date = \Carbon\Carbon::parse($request->date);
+        } catch (Exception $e) {
+        }
+
+        $month = $date?->month ?? now()->month;
+        $year = $date?->year ?? now()->year;
+
+        if (now()->month == $month && now()->year == $year) {
+            (new FixedTargetService($user))->calculateTarget();
+        }
+        $totalSalary = UserSallary::query()->where('user_id', $user->id)
+            ->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            })
+            ->sum(DB::raw('sallary - cut_amount'));
+
+        $user_sallary = UserSallary::query()->where('user_id', $user->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->orderByDesc('id')
+            ->first();
+
+
+        $total_usd = 0;
+        $current_total_hour = "0 / 0";
+        $current_total_day = "0 / 0";
+        $current_diamond = "0 / 0";
+        if ($user_sallary != null) {
+            $total_usd          = $totalSalary;
+            $current_total_hour = $user_sallary->hours;
+            $current_total_day  = $user_sallary->days;
+            $diamonds            = $user_sallary->diamond;
+            $current_diamond    = $diamonds ?? $current_diamond;
+            if ($diamonds) {
+                $stringWithoutSpaces = str_replace(' ', '', $diamonds);
+                $parts = explode('/', $stringWithoutSpaces);
+
+                // Convert the parts to integers
+                $firstNumber = intval($parts[0]);
+                //                $secondNumber = intval($parts[1]);
+                $nextTarget = Target::query()->where('diamonds', '>', $firstNumber)->orderBy('diamonds')->first();
+                if ($nextTarget) {
+                    $current_diamond = $firstNumber . ' / ' . $nextTarget->diamonds;
+                }
+            }
+        }
+        $data = [
+            "total_diamond" => $user->total_diamond_received,
+            "total_usd" => floor($total_usd),
+            "current_total_hour" => $current_total_hour,
+            "current_total_day" => $current_total_day,
+            "diamond" => $current_diamond,
+        ];
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function app_setting()

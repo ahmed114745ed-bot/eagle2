@@ -56,4 +56,17 @@ Trait FollowTrait{
         return $this->followedByAuthUser()->exists();
     }
 
+
+    public function numberOfFans(){
+        return $this->followers()->count();
+    }
+
+    public function numberOfFollowings(){
+        return $this->following()->count();
+    }
+
+    public function numberOfFriends(){
+        return $this->friends()->count();
+    }
+
 }
