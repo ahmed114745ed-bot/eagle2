@@ -87,7 +87,7 @@ class AuthService
                     'name' => $request['name'],
                     'email' => $request['email'],
                     'google_id' => $request['google_id'],
-                    'country_id' => @$country->id ?: 0,
+                    'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => 1
                 ];
@@ -96,9 +96,9 @@ class AuthService
                     $user->tags()->attach(\request('tags'));
                 }
 
-                $user->country_id = @$country->id ?: null;
+                /*$user->country_id = @$country->id ?: null;
                 $user->is_points_first = 1;
-                $user->save();
+                $user->save();*/
             }
         }
         $this->rule($user, '', @$request['device_token'], $request);
