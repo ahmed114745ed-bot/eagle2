@@ -34,7 +34,11 @@ class EmojiController extends MainController
         $grid->column('pid',__ ('pid'));
         $grid->name(__('name'));
         $grid->column('name_en',__ ('name_en'));
-        $grid->column('emoji',trans ('emoji'))->image ('',30);
+        $grid->column('emoji',trans ('emoji'))->display(function ($path) {
+            /** @var Emoji $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->t_length(__('t_length'));
         $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
         $grid->sort(__('sort'));
