@@ -55,7 +55,9 @@ class AgencyController extends Controller
             $agency->Countries()->sync($countries);
         }
         $agency->save();
-        return Common::apiResponse(1, __('admin.update_succeeded'), $agency);
+        $result = new AgencyResource($agency);
+
+        return Common::apiResponse(1, __('admin.update_succeeded'), $result);
     }
 
 }
