@@ -25,28 +25,20 @@ class CoinController extends MainController
 
     ];
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+    
     protected function grid()
     {
+        $paymentId = request('paymentId');
         $grid = new Grid(new Coin);
-
+        $grid->model()->where("payment_gateway_id",$paymentId);
         $grid->id( __ ('ID'));
         $grid->usd( __ ('usd'));
         $grid->coin( __ ('coin'));
-//        $grid->first_charge_coin('first_charge_coin');
-//        $grid->status('status');
-//        $grid->discount_code('discount_code');
-//        $grid->discount_code_expire_in('discount_code_expire_in');
-//        $grid->extra_value('extra_value');
-//        $grid->extra_value_end_in('extra_value_end_in');
-//        $grid->created_at(trans('admin.created_at'));
-//        $grid->updated_at(trans('admin.updated_at'));
         $this->extendGrid ($grid);
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
         return $grid;
     }
 
@@ -63,39 +55,35 @@ class CoinController extends MainController
         $show->id('ID');
         $show->usd('usd');
         $show->coin('coin');
-//        $show->first_charge_coin('first_charge_coin');
-//        $show->status('status');
-//        $show->discount_code('discount_code');
-//        $show->discount_code_expire_in('discount_code_expire_in');
-//        $show->extra_value('extra_value');
-//        $show->extra_value_end_in('extra_value_end_in');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
         $this->extendShow ($show);
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
+  
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $form = $this->form()->edit($id);
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($form);
+    }
+
+    public function update($id)
+    {
+        $id = request()->route('id');
+        return $this->form()->update($id);
+    }
+
     protected function form()
     {
         $form = new Form(new Coin);
 
         $form->display( __ ('ID'));
+        $form->hidden('payment_gateway_id')->value(request('paymentId'));
         $form->text('usd', __ ('usd'));
         $form->text('coin', __ ('coin'));
-//        $form->text('first_charge_coin', 'first_charge_coin');
-//        $form->text('status', 'status');
-//        $form->text('discount_code', 'discount_code');
-//        $form->text('discount_code_expire_in', 'discount_code_expire_in');
-//        $form->text('extra_value', 'extra_value');
-//        $form->text('extra_value_end_in', 'extra_value_end_in');
-//        $form->display(trans('admin.created_at'));
-//        $form->display(trans('admin.updated_at'));
-
         return $form;
     }
 

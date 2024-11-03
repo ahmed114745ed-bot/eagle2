@@ -823,5 +823,6 @@
     "payment_settings": "إعدادات الدفع",
     "room_settings": "إعدادات الغرف",
     "agency_settings": "إعدادات الوكالة",
-    "level_settings": "إعدادات المستوى"
+    "level_settings": "إعدادات المستوى",
+    "category" : "فئة"
 }

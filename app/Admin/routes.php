@@ -241,7 +241,10 @@ Route::group(
         $router->resource('special-id-requests', 'SpecialIdRequestController');
         $router->resource('family_levels', 'FamilyLevelController');
         $router->resource('silver', 'SilverController');
-        $router->resource('coins', 'CoinController');
+
+        $router->resource('coins/{paymentId}', 'CoinController')->only(['index', 'create', 'store', 'destroy']);
+        $router->get('coins/{paymentId}/{id}/edit', 'CoinController@edit');
+        $router->put('coins/{paymentId}/{id}', 'CoinController@update');
         $router->resource('ovip', 'OVipController');
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
