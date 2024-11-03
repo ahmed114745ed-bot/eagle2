@@ -59,6 +59,12 @@ class WareController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'ware_id' => 'required|integer|exists:wares,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->wareService->show($request->ware_id);
         return Common::apiResponse(1, '', $data);
     }

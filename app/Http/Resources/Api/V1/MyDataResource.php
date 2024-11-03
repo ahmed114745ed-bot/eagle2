@@ -2,18 +2,18 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Facades\UserHandling;
-use App\Helpers\Common;
-use App\Models\FamilyLevel;
-use App\Models\FamilyUser;
-use App\Models\GiftLog;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\UserSetting;
 use App\Models\Ware;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\Common;
+use App\Models\GiftLog;
+use App\Models\FamilyUser;
+use App\Models\FamilyLevel;
+use App\Models\UserSetting;
+use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataResource extends JsonResource
 {
@@ -118,6 +118,7 @@ class MyDataResource extends JsonResource
                 }
             }
         }
+
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/

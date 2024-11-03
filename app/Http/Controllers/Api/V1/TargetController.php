@@ -52,6 +52,12 @@ class TargetController extends Controller
     }
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'target_id' => 'required|integer|exists:targets,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->targetService->show($request->target_id);
         return Common::apiResponse(1, '', $data);
     }
@@ -60,18 +66,18 @@ class TargetController extends Controller
     {
         $id = $request->target_id;
 
-       $validator = Validator::make($request->all(), [
-        'level' => [
-            'required',
-            'numeric',
-            Rule::unique('targets')->ignore($id, 'id'), 
-        ],
-        'diamonds' => [
-            'required',
-            'numeric',
-            Rule::unique('targets')->ignore($id, 'id'), 
-        ],
-            'target_id'=> 'required|integer|exists:targets,id',
+        $validator = Validator::make($request->all(), [
+            'level' => [
+                'required',
+                'numeric',
+                Rule::unique('targets')->ignore($id, 'id'),
+            ],
+            'diamonds' => [
+                'required',
+                'numeric',
+                Rule::unique('targets')->ignore($id, 'id'),
+            ],
+            'target_id' => 'required|integer|exists:targets,id',
             'usd' => ['required', 'numeric', new ValidUsd(floatval($request->diamonds))],
             'hours'        => 'nullable|numeric',
             'days'        => 'nullable|numeric',

@@ -49,6 +49,7 @@ class AllGameController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'is_enable' => 'required',
+            'game_id' => 'required|integer|exists:games,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
@@ -61,7 +62,7 @@ class AllGameController extends Controller
     public function showGame(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'game_id' => 'required',
+            'game_id' => 'required|integer|exists:games,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
