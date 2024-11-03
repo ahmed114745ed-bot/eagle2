@@ -66,6 +66,12 @@ class CoinController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            "coin_id" => 'required|integer|exists:coins,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->coinService->show($request->coin_id);
         return Common::apiResponse(1, '', $data);
     }

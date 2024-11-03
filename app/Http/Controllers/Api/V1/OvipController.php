@@ -52,6 +52,12 @@ class OvipController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+           'ovip_id' => 'required|integer|exists:o_vips,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->ovipService->show($request->ovip_id);
         return Common::apiResponse(1, '', $data);
     }

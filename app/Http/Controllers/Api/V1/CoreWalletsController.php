@@ -27,7 +27,7 @@ class CoreWalletsController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name'         => 'required|string|max:255',
-            'coins'         => 'required|numeric', 
+            'coins'         => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -43,17 +43,23 @@ class CoreWalletsController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            "core_wallet_id" => 'required|integer|exists:core_wallets,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->coreWalletsService->show($request->core_wallet_id);
         return Common::apiResponse(1, '', $data);
     }
 
     public function update(Request $request)
     {
-       
+
         $validator = Validator::make($request->all(), [
             'name'         => 'required|string|max:255',
             'coins'         => 'required|numeric',
-            "core_wallet_id" => 'required|numeric',
+            "core_wallet_id" => 'required|integer|exists:core_wallets,id',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -67,7 +73,4 @@ class CoreWalletsController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
-
-        
-
 }

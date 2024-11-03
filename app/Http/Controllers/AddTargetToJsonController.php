@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class AddTargetToJsonController extends Controller
 {
@@ -31,6 +32,16 @@ class AddTargetToJsonController extends Controller
 
     public function create(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'hours'        => 'required|numeric',
+            'days'        => 'required|numeric',
+            'reels'        => 'nullable|numeric',
+            'moments'         => 'nullable|numeric',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         $hours =  $request->hours;
         $days =  $request->days;
         $reels =  $request->reels;

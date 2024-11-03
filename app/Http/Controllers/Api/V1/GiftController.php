@@ -23,7 +23,7 @@ class GiftController extends Controller
 
     public function allGifts(Request $request)
     {
-        $gifts = $this->giftService->allGift($request->page,$request->per_page);
+        $gifts = $this->giftService->allGift($request->page, $request->per_page);
         return Common::apiResponse(1, '',  $gifts);
     }
 
@@ -61,6 +61,12 @@ class GiftController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'gift_id'  => 'required|integer|exists:gifts,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->giftService->show($request->gift_id);
         return Common::apiResponse(1, '', $data);
     }
