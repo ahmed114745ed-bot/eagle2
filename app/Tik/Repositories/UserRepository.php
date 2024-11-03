@@ -120,6 +120,12 @@ class UserRepository extends AbstractRepository
         return true;
     }
 
+    public function updateUsersFamily($familyId, $newFamilyId)
+    {
+        $this->model->where('family_id', $familyId)->update(['family_id' => $familyId]);
+        return true;
+    }
+
     public function findByPhoneUser($phone)
     {
         return $this->model->query()->where('phone', $phone)->first();

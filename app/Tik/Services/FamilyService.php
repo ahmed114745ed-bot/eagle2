@@ -171,7 +171,8 @@ class FamilyService
         if (!$family) throw new \Exception('not found');
         if ($user->id != $family->user_id) return Common::apiResponse(0, 'not allowed', null, 403);
         $this->familyUserRepository->delete($familyId);
-        $this->userRepository->updateFamilyId($user, 0);
+        $this->userRepository->updateFamilyId($user, null);
+        $this->userRepository->updateUsersFamily($familyId, null);
         $family->delete();
         return true;
     }
