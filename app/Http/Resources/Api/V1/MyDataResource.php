@@ -14,7 +14,6 @@ use App\Models\UserSetting;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
 
 class MyDataResource extends JsonResource
 {
@@ -120,17 +119,6 @@ class MyDataResource extends JsonResource
             }
         }
 
-        $chat_status = settings()->get('chat_status');
-        $showChat = $this->userSetting?->hide_chat ?? $chat_status;
-        $stop_invite_code = settings()->get('stop_invite_code');
-        if ($stop_invite_code == 1) {
-            $invite_code = true;
-        } else {
-            $invite_code = false;
-            if ($this->userSetting->show_invite_code == 1) {
-                $invite_code = true;
-            }
-        }
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/
@@ -189,18 +177,6 @@ class MyDataResource extends JsonResource
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
-            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", @$this->id)->first() != null ? true : false,
-            'user-app-setting' =>[
-                'version' => [
-                'android_version'   => settings()->get('android_current_version'),
-                'ios_version'       => settings()->get('ios_current_version'),
-                'huawei_version'    => settings()->get('huawei_current_version'),
-            ],
-            'hide_invite'       => $invite_code,
-            'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
-            'shared_key' => Common::getConfig('shared') ?? '1234',
-            'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $this->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
-            ],
         ];
 
         $data['auth_token'] = $this->auth_token;
