@@ -9,7 +9,7 @@ use App\Classes\PaymentGateways\Fawry;
 use App\Tik\Repositories\CoinRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Http\Controllers\Web\OPayController;
-
+use App\Services\FawryPaymentService;
 
 class CoinService
 {
@@ -51,9 +51,18 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                $fawry = new Fawry();
-                $res = $fawry->make($data);
-                return Common::apiResponse(1, 'ok', $res, 200);
+                $fawryService = new FawryPaymentService();
+                $exterData = ["type"=>'charge_coin','paymentType' => "revenue"];
+
+                //  get url
+                $paymentUrl = $fawryService->makePayment($log->id, $coin->usd,$exterData);
+
+                if(isset($response['status']) && $paymentUrl['status']  == 0){
+                    return $paymentUrl;
+                }
+
+                return response()->json($paymentUrl, 200);
+
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
