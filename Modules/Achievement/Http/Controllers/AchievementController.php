@@ -8,6 +8,9 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\PkReward;
+use Modules\Events\Entities\Reward;
+use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\WeeklyStar;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\Achievement\Entities\Achievement;
@@ -107,7 +110,7 @@ class AchievementController extends Controller
 
     public function get_all($id = null)
     {
-        
+
         if(isset($id) && ($id != 4)){
             $achievements = Achievement::where('id',$id)-> with([
                 'levels' => function ($query) {
@@ -139,12 +142,28 @@ class AchievementController extends Controller
                 $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
                     $query->where('type','achievement');
                 }])->get();
-                $data = 
-                ['weekly_star' => $weeklyStar,
+
+
+                $append = [
+                    'id' => 0,
+                    'type' => '',
+                    'invalid_image' => '',
+                    'target_type' => '',
+                ];
+                $pkArray = ($pkEvent?->rewards->map(fn($e) =>/** @var PkReward $e*/ collect(['valid_image' => $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,
+                ])->merge($append))->toArray()) ?? [];
+                $chargeArray = $chargeEvent?->pluck('rewards')->map(fn($e) =>/** @var RewardTarget $e*/ collect(['valid_image' => $e->target, 'target' => __('target-events') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
+                $weeklyArray = $weeklyStar?->pluck('rewards')->map(fn($e) =>/** @var Reward $e*/ collect(['valid_image' => $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
+
+
+                $list = array_merge($weeklyArray, $pkArray, $chargeArray);
+
+                $data = $list
+                /*['weekly_star' => $weeklyStar,
                   'pk_event' => $pkEvent,
                   'charge_event' => $chargeEvent,
 
-                ];
+                ]*/;
                 return Common::apiResponse(1, 'successfully', $data);
             }
         $user=Auth::user();
