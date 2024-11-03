@@ -19,4 +19,10 @@ enum ConfigCategory : string
     {
         return array_column(self::cases(), 'value');
     }
+
+    // Method to get translated options
+    public static function getTranslatedOptions(): array
+    {
+        return translateCategory(self::getOptions());
+    }
 }

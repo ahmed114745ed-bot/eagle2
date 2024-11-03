@@ -229,6 +229,9 @@ return [
 'changeAgency' => 'Change agency',
 'ban' => 'Ban',
 'acceptAgency' => 'Accept agency',
+'reelValue' => 'Video value settings:',
+'update' => 'Updated successfully!'
+
 
 
 
