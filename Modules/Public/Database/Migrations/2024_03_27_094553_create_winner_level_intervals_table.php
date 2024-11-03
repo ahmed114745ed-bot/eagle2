@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateWinnerLevelIntervalsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -34,4 +34,4 @@ class CreateWinnerLevelIntervalsTable extends Migration
     {
         Schema::dropIfExists('winner_level_intervals');
     }
-}
+};

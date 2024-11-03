@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AgencyUserJob extends Model
 {
-    use HasFactory;
     protected $guarded=['id'];
 
     public function user()
@@ -16,6 +15,6 @@ class AgencyUserJob extends Model
     }
     public function agency()
     {
-        return $this->belongsTo(Agency::class);
+        return $this->belongsTo(\App\Models\Agency::class);
     }
 }

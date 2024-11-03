@@ -4,7 +4,7 @@ namespace Modules\Reals\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class profileResource extends JsonResource
+class ProfileResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

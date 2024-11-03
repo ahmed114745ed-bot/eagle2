@@ -9,8 +9,8 @@ class Vip extends Model
 {
     use HasFactory;
 
-    public function gifts()
+    /*public function gifts()
     {
         return $this->hasMany(GiftRoomLevel::class,'level_id');
-    }
+    }*/
 }

@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MomentfollwedResource extends JsonResource
+class MomentFollwedResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

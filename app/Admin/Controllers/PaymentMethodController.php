@@ -2,12 +2,12 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Models\PaymentMethodHistory;
 use App\Services\FawryPaymentService;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Illuminate\Http\Request;
 
 class PaymentMethodController extends AdminController
@@ -25,16 +25,16 @@ class PaymentMethodController extends AdminController
             $filter->expand();
             $filter->equal('status')->select(['pending' => 'pending', 'paid' => 'paid','error' => 'error'])->default("paid");
         });
-        
+
         $grid->column('id', __('Id'));
         $grid->column('amount', __('amount'));
         $grid->column('payment_method', __('payment method'));
         $grid->column('status', __('status'));
         $grid->disableActions();
-        
+
         return $grid;
-        
-        
+
+
     }
 
 
@@ -77,7 +77,7 @@ class PaymentMethodController extends AdminController
 
         //  get url
         $paymentUrl = $fawryService->makePayment($trxId, $request->amount,$exterData);
-        
+
         if(isset($response['status']) && $paymentUrl['status']  == 0){
             return $paymentUrl;
         }
