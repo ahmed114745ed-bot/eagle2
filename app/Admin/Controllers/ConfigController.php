@@ -181,13 +181,8 @@ class ConfigController extends MainController
         $form->text('value', trans('value'));
         $form->textarea ('desc',trans ('description'));
         $form->select('category', trans('category'))
-        ->options(
-            array_combine(
-                translate( ConfigCategory::getOptions()),
-                array_map(fn($value) => ucfirst(str_replace('_', ' ', $value)), translate(ConfigCategory::getOptions()))
-            )
-        )
-        ->required();
+         ->options(ConfigCategory::getTranslatedOptions())
+         ->required();
 
         return $form;
     }

@@ -19,6 +19,15 @@ function translate($typeArray)
     return $arr;
 }
 
+function translateCategory($typeArray)
+{
+    $arr = [];
+    foreach ($typeArray as $key => $type) {
+        $arr[$type]  = __($type);
+    }
+    return $arr;
+}
+
 
 function generateSignature($nonce, $appKey, $timestamp)
 {
