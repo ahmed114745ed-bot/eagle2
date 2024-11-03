@@ -155,10 +155,11 @@ class FamilyController extends Controller
         try {
 
             $this->familyServices->delete($user, $id);
+            DB::commit();
 
             return Common::apiResponse(1, 'success', null, 200);
         } catch (\Exception $exception) {
-
+            DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -202,7 +203,7 @@ class FamilyController extends Controller
 
              $user = $this->familyServices->actionRequest($request, $auth);
              DB::commit();
-             
+
             if ($request->status == 1){
                 request()->family_status = 0;
                 $resource = new MembersUserResource($user);
