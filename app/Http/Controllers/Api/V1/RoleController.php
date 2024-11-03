@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -76,7 +77,6 @@ class RoleController extends Controller
             return $item->category ?? 'other';
         });
         return Common::apiResponse(1, '', $permissions);
-
     }
 
     public function update(Request $request, $id)
@@ -84,7 +84,7 @@ class RoleController extends Controller
         try {
             $roleModel = config('admin.database.roles_model');
             $role = $roleModel::findOrFail($id);
-        
+
             $validated = $request->validate([
                 'slug' => 'required|string|max:255',
                 'name' => 'required|string|max:255|unique:admin_roles,name,' . $id,
@@ -95,14 +95,13 @@ class RoleController extends Controller
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
             $role->save();
-        
+
             if (is_string($request->permissions)) {
                 $permissions = json_decode($request->permissions, true);
             }
             $role->permissions()->sync($permissions);
-        
+
             return Common::apiResponse(1, 'Role updated successfully', $role);
-        
         } catch (ValidationException $e) {
             Log::info('Validation Error:', $e->errors());
             return Common::apiResponse(0, 'Validation failed', $e->errors());
@@ -110,7 +109,6 @@ class RoleController extends Controller
             Log::info('Unexpected Error: ' . $th->getMessage());
             return Common::apiResponse(0, 'An unexpected error occurred');
         }
-        
     }
 
     public function destroy($id)
@@ -161,7 +159,7 @@ class RoleController extends Controller
     public function preview(Request $request)
     {
         $validator = Validator::make($request->all(), [
-           'role_id' => 'required|integer',
+            'role_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -183,7 +181,12 @@ class RoleController extends Controller
 
         $admin->roles()->sync(['role_id' => $roleId]);
 
-        return response()->json(['url' =>  url('/preview/admin/login') . '?token='. $admin->id]);
+        return response()->json(['url' =>  url('/preview/admin/login') . '?token=' . $admin->id]);
     }
 
+    public function config()
+    {
+        $configs = Config::all()->groupBy('category');
+        return Common::apiResponse(1, '', $configs);
+    }
 }
