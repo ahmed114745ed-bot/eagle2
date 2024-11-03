@@ -523,5 +523,20 @@
         margin-top: 10px;
     }
 
+    .inputs_cus_form {
+        color: var( --text-primary-color)!important;
+        background-color: var(--box-background-color) !important;
+    }
+
+    .dd-handle {
+        display: block;
+        margin: 1px 0;
+        padding: 8px 10px;
+        color: var( --text-primary-color)!important;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        background:  var(--box-background-color) !important;
+    }
+
 
 </style>
