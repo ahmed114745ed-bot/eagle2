@@ -2,18 +2,19 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Facades\UserHandling;
-use App\Helpers\Common;
-use App\Models\FamilyLevel;
-use App\Models\FamilyUser;
-use App\Models\GiftLog;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\UserSetting;
 use App\Models\Ware;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\Common;
+use App\Models\GiftLog;
+use App\Models\FamilyUser;
+use App\Models\FamilyLevel;
+use App\Models\UserSetting;
+use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\SalaryTransaction\Entities\SalaryRequest;
 
 class MyDataResource extends JsonResource
 {
@@ -176,6 +177,7 @@ class MyDataResource extends JsonResource
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
+            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", @$this->id)->first() != null ? true : false,
         ];
 
         $data['auth_token'] = $this->auth_token;
