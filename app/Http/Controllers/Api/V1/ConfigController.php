@@ -39,8 +39,6 @@ class ConfigController extends Controller
 
     public function config( Request $request )
     {
-        $locale = $request->input('locale') ?? app()->getLocale();
-        app()->setLocale($locale);
         $configs = Config::all()->groupBy('category');
         $formattedConfigs = [];
 
