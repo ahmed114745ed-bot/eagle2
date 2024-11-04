@@ -30,9 +30,9 @@ class CheckLatestToken
             }
             $token = hash('sha256', $bearerToken);
 
-            if (!hash_equals($lastToken, $token)) {
+            /*if (!hash_equals($lastToken, $token)) {
                 return Common::apiResponse(0, 'Another device login with your account', null, 505);
-            }
+            }*/
         }
 
         return $next($request);
