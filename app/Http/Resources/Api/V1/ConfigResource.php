@@ -17,6 +17,8 @@ class ConfigResource extends JsonResource
      */
     public function toArray($request)
     {
+        $locale = $request->input('locale') ?? app()->getLocale();
+        app()->setLocale($locale);
 
         return [
             'id' => $this->id,
