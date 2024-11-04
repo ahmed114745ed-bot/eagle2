@@ -37,7 +37,7 @@ class AuthService
 
         if (!$request->country_id) {
             $country = $this->countryRepository->findByPhoneCode('101');
-            $user->country_id = @$country->id ?: 0;
+            $user->country_id = @$country->id ;
         }
         $user->is_points_first = 1;
         $user->save();

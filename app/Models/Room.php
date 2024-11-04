@@ -29,6 +29,11 @@ class Room extends Model
 
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'uid'); 
+    }
+
     public function level()
     {
         return $this->belongsTo(Vip::class,'level_id');

@@ -812,5 +812,10 @@
     "hight_image":" ارتفاع الصوره pexel",
     "Filter by date" : "البحث ب التاريخ",
     "ID Type" : "نوع ال id",
-    "Charge Type" : "نوع الشحن"
+    "Charge Type" : "نوع الشحن",
+
+    "Session":"سيشن",
+    "Uid":"المعرف المميز للمستخدم",
+    "Room name":"اسم الغرفة"
+    
 }

@@ -116,6 +116,15 @@ Route::group(
         $router->resource('user-online-history', UserOnlineHistoryController::class);
         $router->post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
+        $router->resource('rooms-preview', TestController::class);//
+        $router->resource('days', DayController::class);
+        $router->resource('daily-tasks', DailyTaskController::class);
+        $router->resource('user-day-progresses', UserDayProgressController::class);
+        $router->resource('user-day-task-progresses', UserDayTaskProgressController::class);
+        $router->resource('task-rewards', TaskRewardController::class);
+        $router->resource('user-task-rewards', UserTaskRewardController::class);
+        
+
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         $router->get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');

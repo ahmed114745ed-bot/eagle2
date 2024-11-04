@@ -120,10 +120,13 @@ class UserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->with("ownerRoom");
+
+        $grid->model()->withPhone();
+        //$grid->model()->where('phone', '!=', '');//scope
+
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp);
         } else if ($haveCoins) {
-
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
             $grid->model()->orderByDesc('id')->ofAgency();
@@ -154,11 +157,22 @@ class UserController extends MainController
                 return number_format($value);
             });
         }
-        $grid->column('original_uuid', __('uuid'));
-        $grid->column('uuid', __('uuid used'));
+        //$grid->column('original_uuid', __('uuid'));
+        //$grid->column('uuid', __('uuid used'));
+        //$grid->column('uuid1', __('uuid used'))->display(function () {
+        //    return $this->id;
+        //});
+        $grid->column('uuid', __('uuid used'))->display(function () {
+            return $this->uuid . ' ' . $this->original_uuid;
+        });
+        
 
         //        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
-        $grid->column('name', __('Name'));
+        $grid->column('name3', __('Name'));//->display(function ($value){//attribute
+         //   return $value??'undefined name';
+        //});
+
+
         $grid->column('nickname', __('NickName'));
         $states = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
@@ -192,7 +206,7 @@ class UserController extends MainController
         ]);
 
 
-        $grid->column('phone', __('Phone'));
+        $grid->column('phone3', __('Phone'));
         //        $grid->column('di', __('coins'));
         //        $grid->column('gold', __('silver coins'));
         //        $grid->column('coins', __('diamonds'));

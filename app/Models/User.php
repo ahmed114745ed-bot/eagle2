@@ -73,7 +73,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid'
+        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid','name3'
     ];
 
     /* protected $appends = [
@@ -89,7 +89,14 @@ class User extends Authenticatable
          'frame',
 
      ];*/
-
+     public function scopeWithPhone($query)
+     {
+         return $query->where('phone', '!=', '');//NotEqual where not null
+     }
+     public function getName3Attribute()
+    {
+        return $this->name ?? 'undefined name';
+    }
      public function images()
      {
         return $this->hasMany(ProfileGallary::class);
