@@ -152,7 +152,12 @@ class AchievementController extends Controller
                 ];
                 $pkArray = ($pkEvent?->rewards->map(fn($e) =>/** @var PkReward $e*/ collect(['valid_image' => $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,
                 ])->merge($append))->toArray()) ?? [];
-                $chargeArray = $chargeEvent?->pluck('rewards')->map(fn($e) =>/** @var RewardTarget $e*/ collect(['valid_image' => @$e->getAttribute('target'), 'target' => __('target-events') ])->merge($append))->toArray() ?? [];
+                $chargeArray = $chargeEvent?->pluck('rewards')->map(function ($e) use ($append) {
+                        /** @var RewardTarget $e */ ;
+
+                        \Log::info(json_encode($e));
+                    return collect(['valid_image' => @$e->getAttribute('target'), 'target' => __('target-events') ])->merge($append);
+                } ) ?? [];
                 $weeklyArray = $weeklyStar?->pluck('rewards')->map(fn($e) =>/** @var Reward $e*/ collect(['valid_image' => $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
 
 
