@@ -175,7 +175,6 @@ class AchievementController extends Controller
             "target"=> null,
             "target_type"=> null,]];
 
-                \Log::info(json_encode($data));
                 /*['weekly_star' => $weeklyStar,
                   'pk_event' => $pkEvent,
                   'charge_event' => $chargeEvent,

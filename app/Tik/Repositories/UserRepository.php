@@ -8,9 +8,10 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 
-
+/** @property User $model*/
 class UserRepository extends AbstractRepository
 {
+
 
     public function __construct()
     {

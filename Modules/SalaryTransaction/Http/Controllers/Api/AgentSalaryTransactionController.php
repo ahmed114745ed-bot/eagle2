@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
 use App\Models\PaymentGateway;
+use App\Tik\Repositories\UserRepository;
 use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
@@ -35,6 +36,13 @@ use Modules\SalaryTransaction\Transformers\HostRequestsResource;
 
 class AgentSalaryTransactionController extends Controller
 {
+
+    public function __construct(private readonly UserRepository         $userRepository,)
+    {
+
+
+    }
+
     public function charge_co_for_usersHistory(Request $request)
     {
         $me = $request->user();
@@ -79,11 +87,11 @@ class AgentSalaryTransactionController extends Controller
         if ($count < 0) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
-        $user_Resve = User::where('uuid', $user_uuid)->first();
+        $user_Resve = $this->userRepository->searchUser($user_uuid);
         if (!$user_Resve) {
             return Common::apiResponse(0, __('api_responses.this_user_not_found'));
         }
-       
+
         if ($user_Resve ->id ==  $user->id) {
             return Common::apiResponse(0, __('salaryTransaction::api_responses.not_this_user'));
         }
