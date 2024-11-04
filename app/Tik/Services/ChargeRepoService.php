@@ -115,6 +115,7 @@ class ChargeRepoService
 
     public function sendMoney(User $sender, $receiverUuid, $count)
     {
+        \Log::info(' This is user id '. $receiverUuid);
 
         $agency = $this->agencyRepository->findAgencyByOwnerId($sender->id, 1);
         if (!$agency || $agency->status == 0) throw new \Exception(__('api_responses.canNotCharge'));

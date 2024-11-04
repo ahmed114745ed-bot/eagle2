@@ -158,7 +158,7 @@ class ChargeController extends Controller
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
         $count = $request->amount;
-        $userUuid = $request->user_id;
+        $userUuid = $request->id;
         if ($user->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
