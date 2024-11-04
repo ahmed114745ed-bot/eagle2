@@ -256,12 +256,16 @@ class AgencyService
         $operator = $this->userRepository->findById($userId);
 
         if ($agencyId != $operator->agency_id) throw new Exception('يجب ان يكون المستخدم في الوكاله!');
+
+        if ($this->agencyUserJobRepository->exists($operator->id, $agencyId)) {
+            throw new Exception(__('This user already has an agency job requested!'));
+        }
+
         $data = [
             'agency_id' => $agencyId,
             'user_id' => $operator->id,
             'type' => "requestManger",
         ];
-
         $this->agencyUserJobRepository->create($data);
         return true;
     }
@@ -490,6 +494,7 @@ class AgencyService
             $data->day = Carbon::parse($data->date)->day;
             return $data;
         });
+        /** @var User $user */
         $totalDays = $user->getTotalDays();
 
         $userInfoArray = $user->getSallaryInfo();
