@@ -145,6 +145,13 @@ class AchievementController extends Controller
 
 
                 $append = [
+                    "achievement_id"=> 1,
+                    "gift_id"=> null,
+                    "created_at"=> "2023-12-21T13:11:38.000000Z",
+                    "updated_at"=> "2023-12-21T13:11:38.000000Z",
+                    "deleted_at"=> null,
+                    "enable"=> 1,
+                    "description"=> null,
                     'id' => 0,
                     'type' => '',
                     'invalid_image' => '',
@@ -161,7 +168,12 @@ class AchievementController extends Controller
 
                 $list = array_merge($weeklyArray, $pkArray, $chargeArray);
 
-                $data = [['levels' => $list]];
+                $data = [['levels' => $list,  "id"=> 1,
+            "type"=> "recharge_target",
+            "valid_image"=> "/test",
+            "invalid_image"=> "/test2",
+            "target"=> null,
+            "target_type"=> null,]];
 
                 \Log::info(json_encode($data));
                 /*['weekly_star' => $weeklyStar,
