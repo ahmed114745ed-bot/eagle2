@@ -71,8 +71,8 @@ class ChargeController extends Controller
         }
         $usd = $request->usd;
 
-        if ($usd < 0 || !is_numeric($usd)) {
-            return Common::apiResponse(0, 'this value not allow', 422);
+        if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) !== 0) {
+            return Common::apiResponse(0, 'This value is not allowed', 422);
         }
 
         if (!$usd || !$to) {
