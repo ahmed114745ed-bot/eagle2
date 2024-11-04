@@ -157,7 +157,7 @@ class AchievementController extends Controller
 
                         \Log::info(json_encode($e));
                     return collect(['valid_image' => @$e->getAttribute('target'), 'target' => __('target-events') ])->merge($append);
-                } ) ?? [];
+                } )->toArray() ?? [];
                 $weeklyArray = $weeklyStar?->pluck('rewards')->map(fn($e) =>/** @var Reward $e*/ collect(['valid_image' => $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
 
 
