@@ -145,20 +145,37 @@ class AchievementController extends Controller
 
 
                 $append = [
+                    "achievement_id"=> 1,
+                    "gift_id"=> null,
+                    "created_at"=> "2023-12-21T13:11:38.000000Z",
+                    "updated_at"=> "2023-12-21T13:11:38.000000Z",
+                    "deleted_at"=> null,
+                    "enable"=> 1,
+                    "description"=> null,
                     'id' => 0,
                     'type' => '',
                     'invalid_image' => '',
                     'target_type' => '',
                 ];
-                $pkArray = ($pkEvent?->rewards->map(fn($e) =>/** @var PkReward $e*/ collect(['valid_image' => $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,
-                ])->merge($append))->toArray()) ?? [];
-                $chargeArray = $chargeEvent?->pluck('rewards')->map(fn($e) =>/** @var RewardTarget $e*/ collect(['valid_image' => @$e->getAttribute('target'), 'target' => __('target-events') ])->merge($append))->toArray() ?? [];
-                $weeklyArray = $weeklyStar?->pluck('rewards')->map(fn($e) =>/** @var Reward $e*/ collect(['valid_image' => $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
+                $pkArray = ($pkEvent?->rewards->map(fn($e) =>/** @var PkReward $e*/ collect(
+                    ['image' => $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,])->merge($append))->toArray()) ?? [];
+                $chargeArray = $chargeEvent?->pluck('rewards')->flatten()->map(function ($e) use ($append) {
+                        /** @var RewardTarget $e */
+                    return collect(['image' => @$e->getAttribute('target'), 'target' => __('target-events') ])->merge($append);
+                } )->toArray() ?? [];
+                $weeklyArray = $weeklyStar?->pluck('rewards')->flatten()->map(fn($e) =>/** @var Reward $e*/ collect(['image' => $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
 
 
                 $list = array_merge($weeklyArray, $pkArray, $chargeArray);
 
-                $data = $list
+                $data = [['levels' => $list,  "id"=> 1,
+            "type"=> "recharge_target",
+            "valid_image"=> "/test",
+            "invalid_image"=> "/test2",
+            "target"=> null,
+            "target_type"=> null,]];
+
+                \Log::info(json_encode($data));
                 /*['weekly_star' => $weeklyStar,
                   'pk_event' => $pkEvent,
                   'charge_event' => $chargeEvent,

@@ -28,7 +28,7 @@ class WareController extends Controller
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'name_en'         => 'nullable|string|max:255',
-            'type'         => 'required',
+            'type'         => 'required|numeric',
             'level'         => 'nullable|numeric',
             'price'         => 'required|numeric',
             'img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg,mp4,svga',

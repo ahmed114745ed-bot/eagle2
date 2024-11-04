@@ -37,7 +37,7 @@ class ConfigController extends Controller
         return Common::apiResponse(1, 'updated successfully');
     }
 
-    public function config()
+    public function config( Request $request )
     {
         $configs = Config::all()->groupBy('category');
         $formattedConfigs = [];
