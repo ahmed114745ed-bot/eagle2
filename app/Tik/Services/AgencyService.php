@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Exceptions\CValidationException;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Facades\UserHandling;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
+use http\Exception\RuntimeException;
 use Illuminate\Support\Facades\Storage;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AdminRepository;
@@ -256,10 +258,10 @@ class AgencyService
     {
         $operator = $this->userRepository->findById($userId);
 
-        if ($agencyId != $operator->agency_id) throw new ValidationException('يجب ان يكون المستخدم في الوكاله!');
+        if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
 
         if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
-            throw new ValidationException(__('This user already has an agency job requested!'));
+            throw new CValidationException(__('This user already has an agency job requested!'));
         }
 
         $data = [
