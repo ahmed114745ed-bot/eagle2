@@ -12,6 +12,7 @@ use App\Http\Resources\Api\V1\AdminUsersResource;
 use App\Http\Resources\Api\V1\GameReportResource;
 use App\Models\CoinGameUser;
 use App\Models\User;
+use Carbon\Carbon;
 
 class GameReportController extends Controller
 {
@@ -74,8 +75,8 @@ class GameReportController extends Controller
     {
         $gameId = $id;
         $type = $request->input('type');
-
-        $data = CoinGameUser::with(['game:id,name', 'user:id,name']) 
+        $filterType = $request->input('filter') ;
+        $data = CoinGameUser::with(['game:id,name', 'user:id,name'])
             ->selectRaw('
                 coin_game_users.user_id,
                 SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
@@ -85,11 +86,54 @@ class GameReportController extends Controller
             ->when($gameId, function ($q) use ($gameId) {
                 $q->where('coin_game_users.game_id', $gameId);
             })
+            ->when($filterType, function ($q) use ($filterType) {
+                switch ($filterType) {
+                    case 'hour':
+                        $q->where('coin_game_users.created_at', '>=', Carbon::now()->subHour());
+                        break;
+                    case 'day':
+                        $q->where('coin_game_users.created_at', '>=', Carbon::now()->subDay());
+                        break;
+                    case 'week':
+                        $q->where('coin_game_users.created_at', '>=', Carbon::now()->subWeek());
+                        break;
+                    case 'month':
+                        $q->where('coin_game_users.created_at', '>=', Carbon::now()->subMonth());
+                        break;
+                }
+            })
             ->groupBy('coin_game_users.user_id')
             ->orderByRaw($type == 1 ? 'total_coins_win DESC' : 'total_coins_lose DESC')
-            ->limit(10) 
+            ->limit(10)
             ->get();
+        
 
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function gameInfo()
+    {
+        $data = CoinGameUser::with(["game:id,name"])
+        ->selectRaw('
+            coin_game_users.game_id,
+            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
+            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+        ')
+        ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+        ->groupBy('coin_game_users.game_id')
+        ->get()
+        ->map(function ($player) {
+            // Calculate total_app_gain for each player
+            $player->total_app_gain = $player->total_coins_lose - $player->total_coins_win;
+            return $player;
+        });
+
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function gamePlay($id)
+    {
+        $data = User::where(['game_id' => $id,'online' => 1])->paginate();
         return Common::apiResponse(1, '', $data);
     }
 
