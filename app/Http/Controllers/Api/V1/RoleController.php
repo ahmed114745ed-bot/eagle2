@@ -183,10 +183,4 @@ class RoleController extends Controller
 
         return response()->json(['url' =>  url('/preview/admin/login') . '?token=' . $admin->id]);
     }
-
-    public function config()
-    {
-        $configs = Config::all()->groupBy('category');
-        return Common::apiResponse(1, '', $configs);
-    }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\Config;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Services\ConfigService;
+use Doctrine\DBAL\Schema\Index;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
-use Doctrine\DBAL\Schema\Index;
-use App\Services\ConfigService;
-use App\Models\Config;
+use App\Http\Resources\Api\V1\ConfigResource;
+
 class ConfigController extends Controller
 {
 
@@ -33,6 +35,18 @@ class ConfigController extends Controller
             "desc" => $request->desc,
         ]);
         return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function config()
+    {
+        $configs = Config::all()->groupBy('category');
+        $formattedConfigs = [];
+
+        foreach ($configs as $category => $items) {
+            $formattedConfigs[$category] = ConfigResource::collection($items);
+        }
+
+        return Common::apiResponse(1, '', $formattedConfigs);
     }
 
 }

@@ -28,6 +28,7 @@ Route::middleware([])->group(function () {
     Route::prefix('configs')->group(function () {
         Route::get('/all', [ConfigController::class, 'index']);
         Route::post('/update', [ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
+        Route::get('/category', [ConfigController::class, "config"]);
     });
     //games
     Route::prefix('games')->group(function () {
@@ -97,10 +98,11 @@ Route::middleware([])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    Route::get('configs', [RoleController::class, "config"]);
+    
 
     // users
     Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
+    Route::get('utd-users/show/{id}', [UtdUserController::class,'show'])->middleware('decrypt.data');
 
 
 
