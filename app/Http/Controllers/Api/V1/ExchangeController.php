@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\ExchangeService;
@@ -22,7 +23,8 @@ class ExchangeController extends Controller
             return Common::apiResponse(0, 'missing param', null, 422);
         }
         $list = $this->exchangeService->index($request->type);
-        return Common::apiResponse(1, $user->di, $list, 200);
+        /** @var User $user */
+        return Common::apiResponse(1, $user->monthly_diamond_received, $list, 200);
     }
 
     public function exchangeSave(Request $request)
