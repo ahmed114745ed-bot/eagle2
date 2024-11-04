@@ -185,7 +185,7 @@ class User extends Authenticatable
         $userSallary = UserSallary::query()
                                   ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
                                   ->where(function ($query) use ($year, $month) {
-                                      $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                                      $query->where(DB::raw('year'), '<=', $year )->where('month', '<=', $month);
                                   })
                                   ->where('user_id', $this->id)
                                   ->groupBy('user_id')
