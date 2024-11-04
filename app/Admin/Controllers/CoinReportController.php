@@ -94,7 +94,7 @@ class CoinReportController extends MainController {
         return $grid;
     }
 
-    protected function games()
+    protected function games() 
     {
         $grid = new Grid(new CoinGameUser());
         $grid->model()->selectRaw('MIN(coin_game_users.created_at) as earliest_created_at, coin_game_users.user_id, MAX(users.name) as user_name, SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose')

@@ -50,6 +50,7 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
+use App\Http\Controllers\Api\V1\GameReportController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -375,6 +376,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // end coin report
 
+            // game report 
+            Route::get('/all-players', [GameReportController::class, 'allPlayers']);
+            Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
+            Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
+            // end game report
             
     
         }
