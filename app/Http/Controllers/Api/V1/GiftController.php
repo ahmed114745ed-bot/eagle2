@@ -32,7 +32,7 @@ class GiftController extends Controller
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
-            'type'         => 'required',
+            'type'         => 'required|numeric',
             'vip_level'         => 'nullable|lt:256',
             'price'         => 'required|numeric',
             'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
