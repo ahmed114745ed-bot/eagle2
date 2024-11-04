@@ -39,11 +39,13 @@ class ConfigController extends Controller
 
     public function config( Request $request )
     {
+        $locale = $request->input('locale') ?? app()->getLocale();
+        app()->setLocale($locale);
         $configs = Config::all()->groupBy('category');
         $formattedConfigs = [];
 
         foreach ($configs as $category => $items) {
-            $formattedConfigs[$category] = ConfigResource::collection($items);
+            $formattedConfigs[__($category)] = ConfigResource::collection($items);
         }
 
         return Common::apiResponse(1, '', $formattedConfigs);
