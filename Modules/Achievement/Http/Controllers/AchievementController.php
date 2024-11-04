@@ -152,7 +152,7 @@ class AchievementController extends Controller
                 ];
                 $pkArray = ($pkEvent?->rewards->map(fn($e) =>/** @var PkReward $e*/ collect(['valid_image' => $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,
                 ])->merge($append))->toArray()) ?? [];
-                $chargeArray = $chargeEvent?->pluck('rewards')->map(function ($e) use ($append) {
+                $chargeArray = $chargeEvent?->pluck('rewards')->flatten()->map(function ($e) use ($append) {
                         /** @var RewardTarget $e */ ;
 
                         \Log::info(json_encode($e));
