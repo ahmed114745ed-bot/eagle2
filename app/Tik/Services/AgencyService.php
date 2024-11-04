@@ -21,6 +21,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
@@ -255,10 +256,10 @@ class AgencyService
     {
         $operator = $this->userRepository->findById($userId);
 
-        if ($agencyId != $operator->agency_id) throw new Exception('يجب ان يكون المستخدم في الوكاله!');
+        if ($agencyId != $operator->agency_id) throw new ValidationException('يجب ان يكون المستخدم في الوكاله!');
 
-        if ($this->agencyUserJobRepository->exists($operator->id, $agencyId)) {
-            throw new Exception(__('This user already has an agency job requested!'));
+        if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
+            throw new ValidationException(__('This user already has an agency job requested!'));
         }
 
         $data = [

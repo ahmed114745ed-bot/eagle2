@@ -15,6 +15,8 @@ use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\AgencyUserJob;
+use Illuminate\Validation\ValidationException;
+use PHPUnit\Framework\Exception;
 
 class AgencyController extends Controller
 {
@@ -124,7 +126,7 @@ class AgencyController extends Controller
 
             return Common::apiResponse(0, $e->getMessage(), null, 500);
         }
-        
+
         return Common::apiResponse(1, __('api_responses.agency_updated'), new AllDataAgencyResource($agency));
     }
 
@@ -134,12 +136,13 @@ class AgencyController extends Controller
         $agency = $user->ownAgency;
         if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
 
-        try {
+//        try {
             $this->agencyService->userHandlingRequest($request->user_id, $agency->id);
+      /*  } catch (ValidationException $exception){
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         } catch (\Exception $e) {
-
             return Common::apiResponse(0, $e->getMessage(), null, 500);
-        }
+        }*/
 
         return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
     }
