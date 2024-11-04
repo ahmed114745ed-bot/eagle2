@@ -35,7 +35,7 @@ class Handler extends ExceptionHandler
     {
 
         if ($request->is('api/*')) {
-            if ($e instanceof ValidationException) {
+            if ($e instanceof CValidationException) {
                 return Common::apiResponse(0, $e->getMessage(), null, 422);
             }elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
 
