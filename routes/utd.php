@@ -101,6 +101,7 @@ Route::middleware([])->group(function () {
 
     // users
     Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
+    Route::get('utd-users/show/{id}', [UtdUserController::class,'show'])->middleware('decrypt.data');
 
 
 
