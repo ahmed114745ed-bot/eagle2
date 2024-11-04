@@ -23,6 +23,7 @@ class OVipResource extends JsonResource
             "price"=> $this->price,
             "expire"=> $this->expire,
             "exp"=> $this->exp,
+            "target_id"=> $userVip?->id ,
             "is_buyed"=> $userVip != null ? true : false,
             "is_used"=> ($userVip != null && $userVip->is_used == 1 ? true : false),
             'privilegs' => VipPrivilegeResource::collection(
