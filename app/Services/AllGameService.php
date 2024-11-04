@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Helpers\Common;
+use App\Models\GameWallet;
+use App\Models\GameChargeHistory;
 use App\Http\Resources\AllGameResource;
 use App\Repositories\AllGameRepository;
 use App\Repositories\User\UserRepository;
@@ -118,5 +120,35 @@ class AllGameService
     public function show($game_id)
     {
         return $this->allGameRepository->findById($game_id);
+    }
+
+    public function gameChargeDetails($date)
+    {
+        $balance = GameWallet::query();
+        $balanceDollar = GameChargeHistory::query();
+        if ($date != null) {
+            $year = substr($date, 0, 4);
+            $month = substr($date, 5, 2);
+            $balance = $balance->whereMonth("created_at", $month)->whereYear("created_at", $year);
+            $balanceDollar = $balanceDollar->whereMonth("created_at", $month)->whereYear("created_at", $year);
+        } else {
+            $balance = $balance->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+            $balanceDollar = $balanceDollar->whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"));
+        }
+        $balance = $balance->first();
+        $balanceDollar = $balanceDollar->sum("value");
+        $allBalance = $balance->balance ?? 0;
+        $availableBalance = $balance ? $balance->balance - $balance->used : 0;
+        $dollarValue =  config("app.one_coins") * 2;
+        $usedDollar = (@$balance->used ?? 0) / $dollarValue;
+        $availableBalanceDollar = (@$availableBalance ?? 0) / $dollarValue;
+        return $data = [
+            "balance" => @$allBalance ?? 0,
+            'balance_dollar' => @$balanceDollar ?? 0,
+            'available_balance' => @$availableBalance ?? 0,
+            'available_balance_dollar' => $availableBalanceDollar ?? 0,
+            'used_dollar' => $usedDollar ?? 0,
+            'used' => @$balance->used ?? 0,
+        ];
     }
 }

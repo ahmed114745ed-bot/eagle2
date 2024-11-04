@@ -214,9 +214,10 @@ class FamilyService
         $requestUser = $this->familyUserRepository->findById($request->req_id);
 
         if (!$requestUser) throw new \Exception('not found');
-        $other = $this->familyUserRepository->findByUserId($request->user_id);
-        $user = $this->userRepository->findById($request->user_id);
-        if ($other && $user->family_id != 0)  throw new \Exception('user already joined to other family');
+        $other = $this->familyUserRepository->findByUserId($requestUser->user_id);
+        $user = $this->userRepository->findById($requestUser->user_id);
+        if(!$user) throw new \Exception('user not found');
+        if ($other && $user->family_id != null)  throw new \Exception('user already joined to other family');
 
         $familyUser = $this->familyRepository->findByUserId($requestUser->user_id);
         if ($familyUser)  throw new \Exception(__('already have one'));
@@ -229,12 +230,13 @@ class FamilyService
 
         $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
 
-        if ($user && $request->status == 1) {
+        if ( $request->status == 1) {
+            
             $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
             CustomNotification::acceptUserFamily($family, $user);
-        } elseif ($user && $request->status == 2) {
+        } elseif ($request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
 

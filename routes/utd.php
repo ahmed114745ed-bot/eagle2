@@ -37,6 +37,8 @@ Route::middleware([])->group(function () {
         Route::post('/update', [AllGameController::class, 'utdGameUpdate']);
         Route::post('/show', [AllGameController::class, 'showGame']);
         Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
+        Route::get('/game-charge-details', [AllGameController::class, 'gameChargeDetails']);
+        
     });
     // target
     Route::prefix('targets')->group(function () {
