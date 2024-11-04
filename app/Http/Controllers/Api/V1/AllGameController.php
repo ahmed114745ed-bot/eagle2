@@ -70,4 +70,10 @@ class AllGameController extends Controller
         $data = $this->allGameService->show($request->game_id);
         return Common::apiResponse(1, '', $data);
     }
+
+    public function gameChargeDetails(Request $request)
+    {
+        $data = $this->allGameService->gameChargeDetails($request->date);
+        return Common::apiResponse(1, '', $data);
+    }
 }
