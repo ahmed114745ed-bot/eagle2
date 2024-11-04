@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
-
+use App\Http\Controllers\Api\V1\GameReportController;
 
 // utd apis
 Route::middleware([])->group(function () {
@@ -146,6 +146,15 @@ Route::middleware([])->group(function () {
 
 
     Route::post('roles/preview',  [RoleController::class, 'preview'])->middleware('decrypt.data');
+
+    
+    // game report 
+    Route::get('/all-players', [GameReportController::class, 'allPlayers'])->middleware('decrypt.data');
+    Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails'])->middleware('decrypt.data');
+    Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking'])->middleware('decrypt.data');
+    Route::get('/games-info', [GameReportController::class, 'gameInfo'])->middleware('decrypt.data');
+    Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay'])->middleware('decrypt.data');
+    // end game report
 
 });
 

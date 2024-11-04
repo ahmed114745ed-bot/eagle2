@@ -375,14 +375,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
 
             // end coin report
-
-            // game report 
-            Route::get('/all-players', [GameReportController::class, 'allPlayers']);
-            Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
-            Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
-            Route::get('/games-info', [GameReportController::class, 'gameInfo']);
-            Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay']);
-            // end game report
             
     
         }
