@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Resources\Api\V1;
+
+use App\Models\UserVip;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OVipResource extends JsonResource
@@ -8,6 +10,7 @@ class OVipResource extends JsonResource
 
     public function toArray($request)
     {
+        $userVip = UserVip::where("user_id",auth()->user()->id)->where("vip_id",$this->id)->first(); 
 
         $activePrivilegeIds = $this->privilegs->pluck('id')->toArray();
 
@@ -20,6 +23,8 @@ class OVipResource extends JsonResource
             "price"=> $this->price,
             "expire"=> $this->expire,
             "exp"=> $this->exp,
+            "is_buyed"=> $userVip != null ? true : false,
+            "is_used"=> ($userVip != null && $userVip->is_used == 1 ? true : false),
             'privilegs' => VipPrivilegeResource::collection(
                 $request->vipPrivileges->map(function ($p) use ($activePrivilegeIds) {
                     $priv = clone  $p;
