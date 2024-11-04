@@ -90,7 +90,7 @@ class FamilyUserRepository extends AbstractRepository
 
     public function deleteRefusedRequest($refusedRequestId)
     {
-        $this->model->where('id', $$refusedRequestId)->delete();
+        $this->model->where('id', $refusedRequestId)->delete();
         return true;
     }
 
