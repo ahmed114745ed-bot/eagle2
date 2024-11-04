@@ -16,13 +16,13 @@ class AllDataAgencyResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
 
-    
+
     public function toArray($request)
     {
         $target = UserSallary::where('user_agency_id', $this->agency_id)->sum('agency_sallary');
 
         // Calculate the agency share threshold based on the target
-        
+
         $minValue = Target::where('usd', '<', $target)
             ->orderBy('usd', 'desc')
             ->first();
@@ -33,6 +33,7 @@ class AllDataAgencyResource extends JsonResource
         // // $target_usd =Agency::where('id',$this->id)->sum('target_usd');
         // $Theratio=$target->agency_share /100;
         // $All=$target->usd* $Theratio ;
+        /** @var Agency $this*/
         return [
             'id'=>$this->id?:0,
             'target'=>$result?:0,
@@ -42,6 +43,8 @@ class AllDataAgencyResource extends JsonResource
             'phone'=>$this->phone?:0,
             // 'url'=>$this->url,
             'img'=>$this->img?:'',
+            'num_of_hosts'      => $this->mempers->count(),
+
             // 'contents'=>$this->contents,
             'owner'=>new MyDataForAgancyResource($this->owner)?:[
                 "id" => 0,
