@@ -42,6 +42,7 @@ class AllGameController extends AdminController
         ->whereDate('created_at', '<=', $to_date)
         ->first();
         
+        
         $total_lose = $results->total_lose;
         $total_earn = $results->total_earn;
         $result = $total_lose - $total_earn;

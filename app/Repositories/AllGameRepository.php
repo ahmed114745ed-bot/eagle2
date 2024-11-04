@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\AllGame;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class AllGameRepository
@@ -31,6 +32,18 @@ class AllGameRepository
     public function all()
     {
         return AllGame::orderBy('id')->get();
+    }
+
+    public function gameByTotalGain()
+    {
+        $games = AllGame::with(['coinGameUser' => function ($query) {
+            $query->whereMonth('created_at', date('m'))->select('game_id', DB::raw("
+                SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS total_gain
+            "))->groupBy('game_id');
+        }])->get()->sortByDesc(function ($game) {
+            return $game->coinGameUser->first()->total_gain ?? 0;
+        });
+        return  array_values($games->toArray());
     }
 
     public function create($data)

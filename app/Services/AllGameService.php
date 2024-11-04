@@ -62,7 +62,7 @@ class AllGameService
 
     public function utdIndex()
     {
-        return $this->allGameRepository->all();
+        return $this->allGameRepository->gameByTotalGain();
     }
 
     public function createUtd($request)
