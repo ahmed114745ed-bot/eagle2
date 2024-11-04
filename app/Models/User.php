@@ -183,12 +183,12 @@ class User extends Authenticatable
         if (!$year) $year = now()->year;
 
         $userSallary = UserSallary::query()
-                                  ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
-                                  ->where(function ($query) use ($year, $month) {
-                                      $query->whereRaw("(year < year(now()) OR (year = $year AND month <= $month)");
-                                  })
-                                  ->where('user_id', $this->id)
-                                  ->first();
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where(function ($query) use ($year, $month) {
+                $query->whereRaw("(year < ? OR (year = ? AND month <= ?))", [$year, $year, $month]);
+            })
+            ->where('user_id', $this->id)
+            ->first();
 
         return $userSallary?->toArray() ?? [];
     }
