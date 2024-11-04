@@ -188,7 +188,6 @@ class User extends Authenticatable
                                       $query->where('year', '<=', $year )->where('month', '<=', $month);
                                   })
                                   ->where('user_id', $this->id)
-                                  ->groupBy('user_id')
                                   ->first();
 
         return $userSallary?->toArray() ?? [];
@@ -939,7 +938,7 @@ class User extends Authenticatable
         }
         if ($this->agency_id) {
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where('year', '<=', $year )->where('month', '<=', $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
