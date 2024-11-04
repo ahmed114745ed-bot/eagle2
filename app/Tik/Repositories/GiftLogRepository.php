@@ -48,7 +48,7 @@ class GiftLogRepository extends AbstractRepository
     {
         return  $this->model->query()
             ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->where(fn($q) => $q->whereRaw("(year < ? OR (year = ? AND month <= ?))", [$year, $year, $month]))
+            ->where(fn($q) => $q->whereYear('created_at', '<' , $year)->orWhere(fn($q) => $q->whereMonth('created_at', '<=' , $month)->whereYear('created_at', '<=' , $year)))
             ->where('receiver_id', $userId)
             ->where('agency_id', $agencyId)->groupBy(\DB::raw('date(created_at)'))
             ->limit(31)->get();
