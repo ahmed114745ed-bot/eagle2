@@ -22,21 +22,23 @@ class ChargeAction extends Action
 
     public function handle(Request $request)
     {
-        $user = $this->getUser($request);
-        if (!$user) {
-            return $this->response()->error(__('user not found'))->refresh();
-        }
-
-        if ($this->isInvalidAmount($request->amount)) {
-            return $this->response()->error(__('amount must be more than 10'))->refresh();
+        if ($request->user_type != 'dash') {
+            $user = $this->getUser($request);
+            if (!$user) {
+                return $this->response()->error(__('user not found'))->refresh();
+            }
+    
+            if ($this->isInvalidAmount($request->amount)) {
+                return $this->response()->error(__('amount must be more than 10'))->refresh();
+            }
         }
 
         if ($request->user_type == 'dash') {
-            $agency = $this->getAgency($user);
+            $agency = $this->getAgency($request->user_id);
             if (!$agency) {
                 return $this->response()->error(__('api_responses.agency'))->refresh();
             }
-
+            $user = $agency->owner;
             return $this->handleAgencyCharge($request, $agency, $user);
         }
 
@@ -56,9 +58,9 @@ class ChargeAction extends Action
             : User::query()->find($request->user_id);
     }
 
-    private function getAgency(User $user)
+    private function getAgency($agencyId)
     {
-        return Agency::where("app_owner_id", $user->id)->first();
+        return Agency::where("id", $agencyId)->first();
     }
 
     private function isInvalidAmount($amount)
