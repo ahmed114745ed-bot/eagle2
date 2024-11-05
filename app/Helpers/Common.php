@@ -42,6 +42,7 @@ use Kreait\Firebase\Factory;
 use Twilio\Rest\Client as TwilioClint;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 
 class Common{
 
@@ -444,11 +445,86 @@ class Common{
     //     self::sendOfficialMessage($user_id, $title, $body, $type, null, $titleAr);
     // }
 
+    // public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    // {
+
+    //     $api_access_key =
+    //         'AAAAYyrfZ8U:APA91bHcAaUhToEPWGpd_DfsUVv6aZLKttTDem_WF0rXJbHZMVERG9MP11G_TzcJKW_xnvzZx2R0t4Y-kCvCZn7UqfX8f6mJmVzTNAJ10lsMLMpje9AXdrCeSQ8l98H_sozao1vw9UeW';
+
+    //     if (gettype($tokens) == 'string'){
+    //         $tokens = [$tokens];
+    //     }
+
+    //     $notification = [
+    //         'title'        => $title,
+    //         'body'         => $body,
+    //         'sound'        => 'tiknotifi',
+    //         'visibility' => 'public',
+    //         "alert" => true,
+
+    //     ];
+
+    //     $payload = [
+    //         'registration_ids' => $tokens,
+    //         'notification'     => $notification,
+    //        // 'priority'         => 'high',
+    //         'visibility' => 'private',
+    //         //'sound'        => 'tiknotifi',
+    //         'data' => [
+    //             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+    //             'message-type' => json_encode($messageType ?? ''),
+    //             'data' => !empty($data) ? json_encode($data) : "",
+    //         ],
+    //     ];
+
+    //     if (!empty($icon)) {
+    //         $payload['notification']['icon'] = $icon;
+    //     }
+
+    //     if (isset($data['image']) && !empty($data['image'])) {
+    //         $payload['notification']['image'] = $data['image'];
+    //     } else {
+    //         // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+    //     }
+
+    //     $headers = [
+    //         'Authorization: key=' . $api_access_key,
+    //         'Content-Type: application/json',
+    //     ];
+
+    //     $ch = curl_init();
+    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($ch, CURLOPT_CUSTOMREQUEST , 'POST');
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    //     $result = curl_exec($ch);
+    //     curl_close($ch);
+
+    //     return $result;
+
+
+    // }
+
+    private static function getGoogleAccessToken(){
+
+        $credentialsFilePath = base_path(config("app.fileName"));
+        $client = new \Google_Client();
+        $client->setAuthConfig($credentialsFilePath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->refreshTokenWithAssertion();
+        $token = $client->getAccessToken();
+        return $token['access_token'];
+    }
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
+        if ($tokens == null) return;
+        $api_access_key = self::getGoogleAccessToken();
 
-        $api_access_key =
-            'AAAAYyrfZ8U:APA91bHcAaUhToEPWGpd_DfsUVv6aZLKttTDem_WF0rXJbHZMVERG9MP11G_TzcJKW_xnvzZx2R0t4Y-kCvCZn7UqfX8f6mJmVzTNAJ10lsMLMpje9AXdrCeSQ8l98H_sozao1vw9UeW';
+        $isGroup = false;
+        $key = time();
 
         if (gettype($tokens) == 'string'){
             $tokens = [$tokens];
@@ -457,18 +533,25 @@ class Common{
         $notification = [
             'title'        => $title,
             'body'         => $body,
-            'sound'        => 'tiknotifi',
-            'visibility' => 'public',
-            "alert" => true,
-
+        //            'sound'        => 'default',
         ];
+        if (count($tokens) == 1){
+            $token = $tokens[0];
+
+
+        }else{
+
+            if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+            //make group and get token
+            $token = self::makeGroup($tokens, $key,  $api_access_key);
+
+            $isGroup = true;
+        }
 
         $payload = [
-            'registration_ids' => $tokens,
+            'token' => $token,
             'notification'     => $notification,
-           // 'priority'         => 'high',
-            'visibility' => 'private',
-            //'sound'        => 'tiknotifi',
+        //            'priority'         => 'high',
             'data' => [
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 'message-type' => json_encode($messageType ?? ''),
@@ -476,9 +559,9 @@ class Common{
             ],
         ];
 
-        if (!empty($icon)) {
-            $payload['notification']['icon'] = $icon;
-        }
+        //        if (!empty($icon)) {
+        //            $payload['notification']['icon'] = $icon;
+        //        }
 
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
@@ -487,24 +570,107 @@ class Common{
         }
 
         $headers = [
-            'Authorization: key=' . $api_access_key,
+            'Authorization' => 'Bearer ' . $api_access_key,
+            'Content-Type' => 'application/json',
+        ];
+
+
+        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/top-star-75039/messages:send', [
+            'message' => $payload
+        ]);
+
+        $result = json_decode($result);
+
+
+        //remove group with $key if is group
+        if ($result  && $isGroup) {
+            self::removeGroupName($key,$token,$tokens, $api_access_key);
+        }
+        return $result;
+    }
+
+    public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
+    {
+        $url = 'https://fcm.googleapis.com/fcm/notification';
+        $projectId = config("app.projectId");
+
+        if($registrationIds == null) return;
+        $headers = [
             'Content-Type: application/json',
+            'access_token_auth: true',
+            'Authorization: Bearer ' . $accessToken,
+            'project_id: ' . $projectId,
+        ];
+
+        $payload = [
+            'operation' => $operation,
+            'notification_key_name' => $notificationKeyName,
+            'registration_ids' => $registrationIds,
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST , 'POST');
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+        if (!curl_errno($ch)) {
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $response = json_decode($response);
+                return $response->notification_key;
+            }
+        }
+
+
+        return null;
+    }
+    
+    private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
+    {
+        $url = 'https://fcm.googleapis.com/fcm/notification';
+        if($token == null) return;
+        $projectId = config("app.projectId");
+        $payload = [
+            'operation' => 'remove',
+            'notification_key_name' => json_encode($notificationKeyName),
+            'notification_key' => $token,
+            'registration_ids' => $tokens
+        ];
+
+        $headers = [
+            'Content-Type: application/json',
+            'access_token_auth: true',
+            'Authorization: Bearer ' . $accessToken,
+            'project_id: ' . $projectId,
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
         $result = curl_exec($ch);
         curl_close($ch);
+        if (!curl_errno($ch)) {
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $result = json_decode($result);
+                return $result->notification_key;
+            }
+        }
 
         return $result;
-
-
     }
 
 

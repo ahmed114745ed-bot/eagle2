@@ -19,6 +19,11 @@ return [
     'one_coins'             => env('ONE_COINS'),
 
     'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
+
+    // fairbase
+    'fileName' => env('FILL_NAME','firebase_credentials.json'),
+    'projectId' => env('PROJECT_ID','hola-chat-5554d'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

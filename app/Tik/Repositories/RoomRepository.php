@@ -94,7 +94,7 @@ class RoomRepository extends AbstractRepository
             ->whereHas('owner')
             ->when(!$allRooms, function ($query){
                 $query->where(function ($query){
-                    $query->where(fn($q) => $q->where('count_room_socket','!=',0)->where('top_room', 1))
+                    $query->where(fn($q) => $q->where('count_room_socket','!=',0)->orWhere('top_room', 1))
                         ->orWhere(fn($q) => $q->where('pin', 1))
                         ->orWhere(fn($q) => $q->where('count_room_socket','!=',0));
                 });
