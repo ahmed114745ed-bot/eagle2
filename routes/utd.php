@@ -27,7 +27,7 @@ Route::middleware([])->group(function () {
     //configs
     Route::prefix('configs')->group(function () {
         Route::get('/all', [ConfigController::class, 'index']);
-        Route::post('/update', [ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
+        Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
     //games
@@ -43,33 +43,33 @@ Route::middleware([])->group(function () {
     // target
     Route::prefix('targets')->group(function () {
         Route::get('/all', [TargetController::class, 'index']);
-        Route::post('/create', [TargetController::class, 'store'])->middleware('decrypt.data');
-        Route::post('/update', [TargetController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/create', [TargetController::class, 'store']);
+        Route::post('/update', [TargetController::class, 'update']);
         Route::post('/show', [TargetController::class, 'show']);
     });
     //ovip
     Route::prefix('ovips')->group(function () {
         Route::get('/all', [OvipController::class, 'index']);
-        Route::post('/create', [OvipController::class, 'store'])->middleware('decrypt.data');
-        Route::post('/update', [OvipController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/create', [OvipController::class, 'store']);
+        Route::post('/update', [OvipController::class, 'update']);
         Route::post('/show', [OvipController::class, 'show']);
-        Route::post('/ware-vip', [VipController::class, 'createWareVip'])->middleware('decrypt.data');
+        Route::post('/ware-vip', [VipController::class, 'createWareVip']);
         Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
         Route::get('/ware-vips', [VipController::class, 'getWareVip']);
-        Route::post('/delete-ware', [VipController::class, 'deleteWare'])->middleware('decrypt.data');
+        Route::post('/delete-ware', [VipController::class, 'deleteWare']);
 
 
     });
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic
-    Route::get('agency-statistic', [AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
+    Route::get('agency-statistic', [AgencyStatisticController::class, 'statistic']);
 
 
     //admin users
     Route::prefix('admin_users')->group(function () {
         Route::get('/all', [AdminUsersController::class, 'index']);
-        Route::post('/create', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
+        Route::post('/create', [AdminUsersController::class, 'store']);
         Route::post('/show', [AdminUsersController::class, 'show']);
     });
     Route::prefix('gifts')->group(function () {
@@ -98,13 +98,13 @@ Route::middleware([])->group(function () {
     });
     // roles
     Route::resource('roles', RoleController::class);
-    Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
+    Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
     
 
     // users
-    Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
-    Route::get('utd-users/show/{id}', [UtdUserController::class,'show'])->middleware('decrypt.data');
+    Route::resource('utd-users', UtdUserController::class);
+    Route::get('utd-users/show/{id}', [UtdUserController::class,'show']);
 
 
 
@@ -113,13 +113,13 @@ Route::middleware([])->group(function () {
     //mangerType
     Route::prefix('manger-types')->group(function () {
         Route::get('/all', [MangerTypeController::class, 'index']);
-        Route::post('/create', [MangerTypeController::class, 'store'])->middleware('decrypt.data');
-        Route::post('/update', [MangerTypeController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/create', [MangerTypeController::class, 'store']);
+        Route::post('/update', [MangerTypeController::class, 'update']);
         Route::post('/show', [MangerTypeController::class, 'show']);
     });
     //target Percentage
     Route::prefix('target-Percentage')->group(function () {
-        Route::post('/create', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
+        Route::post('/create', [AddTargetToJsonController::class, 'create']);
         Route::get('/show', [AddTargetToJsonController::class, 'show']);
     });
     //setting config
@@ -130,30 +130,30 @@ Route::middleware([])->group(function () {
     //CoreWallets
     Route::prefix('core-wallets')->group(function () {
         Route::get('/all', [CoreWalletsController::class, 'index']);
-        Route::post('/create', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
-        Route::post('/update', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/create', [CoreWalletsController::class, 'store']);
+        Route::post('/update', [CoreWalletsController::class, 'update']);
         Route::post('/show', [CoreWalletsController::class, 'show']);
     });
 
     //coin
     Route::prefix('coins')->group(function () {
         Route::get('/all', [CoinController::class, 'index']);
-        Route::post('/create', [CoinController::class, 'store'])->middleware('decrypt.data');
-        Route::post('/update', [CoinController::class, 'update'])->middleware('decrypt.data');
+        Route::post('/create', [CoinController::class, 'store']);
+        Route::post('/update', [CoinController::class, 'update']);
         Route::post('/show', [CoinController::class, 'show']);
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
-    Route::post('roles/preview',  [RoleController::class, 'preview'])->middleware('decrypt.data');
+    Route::post('roles/preview',  [RoleController::class, 'preview']);
 
     
     // game report 
-    Route::get('/all-players', [GameReportController::class, 'allPlayers'])->middleware('decrypt.data');
-    Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails'])->middleware('decrypt.data');
-    Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking'])->middleware('decrypt.data');
-    Route::get('/games-info', [GameReportController::class, 'gameInfo'])->middleware('decrypt.data');
-    Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay'])->middleware('decrypt.data');
+    Route::get('/all-players', [GameReportController::class, 'allPlayers']);
+    Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
+    Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
+    Route::get('/games-info', [GameReportController::class, 'gameInfo']);
+    Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay']);
     // end game report
 
 });
