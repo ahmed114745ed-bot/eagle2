@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Helpers\Common;
-use App\Http\Controllers\Controller;
 use App\Models\Config;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Http\Resources\Api\V1\PermissionResource;
 
 class RoleController extends Controller
 {
@@ -143,17 +144,20 @@ class RoleController extends Controller
         $permissionModel = config('admin.database.permissions_model');
 
         // Fetch all permissions first and then group by category
-        $permissionsPaginated = $permissionModel::all();
+        $permissions = $permissionModel::all();
 
-        // Group the permissions by category
-        $permissions = $permissionsPaginated->groupBy(function ($item) {
-            return $item->category ?? 'other';
-        });
+    // Group the permissions by category
+    $permissionsGrouped = $permissions->groupBy(function ($item) {
+        return $item->category ?? 'other';
+    });
 
-        // Prepare pagination metadata
+    // Prepare the response to match your desired format
+    $formattedPermissions = [];
+    foreach ($permissionsGrouped as $category => $items) {
+        $formattedPermissions[__($category)] = PermissionResource::collection($items);
+    }
 
-
-        return Common::apiResponse(1, '', $permissions, 200);
+    return Common::apiResponse(1, '', $formattedPermissions, 200);
     }
 
     public function preview(Request $request)
