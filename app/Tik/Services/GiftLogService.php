@@ -68,6 +68,7 @@ class GiftLogService
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
         $cpId = null;
+        $cpIds = [];
         //check type of cp
         if ($cpId != null) {
             try {
