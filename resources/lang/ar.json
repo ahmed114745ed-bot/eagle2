@@ -866,5 +866,12 @@
  "pk_background"         :"خلفية PK",
  "kick_out_less_than_day"    :"طرد خلال أقل من يوم" ,
  "kick_out_greater_than_day": "طرد بعد أكثر من يوم",
-    "This user already has an agency job requested!": "هذا المستخدم مضاف بالفعل"
+ "This user already has an agency job requested!": "هذا المستخدم مضاف بالفعل",
+ "salary transaction" : "معاملة الراتب",
+ "transaction-request-problem" :"مشكلة طلب المعاملة",
+ "agent-salary-requests":"طلبات راتب الوكيل",
+ "charge-country":"بلد الشحن البلاد",
+ "agency-country":" الوكالة البلاد",
+ "salary-requests":"طلبات الراتب",
+ "agent-requests-history":"سجل طلبات الوكيل"
 }
