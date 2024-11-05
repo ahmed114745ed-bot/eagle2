@@ -30,7 +30,7 @@ class CpService
             foreach ($receivers as $receiver) {
                 $cpId = $this->processGiftForReceiver($sender, $receiver, $giftId, $giftPrice);
                 if ($cpId) {
-                    $cpIds[] = $cpId;
+                    $cpIds[$receiver->id] = $cpId;
                 }
             }
         }
@@ -86,8 +86,8 @@ class CpService
         return Vip::query()->where(['type' => 3])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
- 
-    
+
+
     //////////////////////////////////////////// assign gift ///////////////////////////////////////////////////////////////////
     protected function assignGifts($level, $cp)
     {
@@ -110,9 +110,9 @@ class CpService
         $this->markGiftAsTaken($cp->id, $level);
     }
 
-    protected function getUserById($id) 
+    protected function getUserById($id)
     {
-       return User::find($id);   
+       return User::find($id);
     }
 
     protected function hasTakenGift($cpId, $level)

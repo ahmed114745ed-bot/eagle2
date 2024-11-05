@@ -123,7 +123,7 @@ class GiftLogService
 
         $realPrice = (int)($number * $gift->price);
         $price = ceil($realPrice);
-        $sendGiftServices->sendGift2($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpId: $cpId);
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);
