@@ -49,6 +49,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\PaymentCoinController;
 
 Route::group(
     [
@@ -180,6 +181,7 @@ Route::group(
         $router->resource('polices', PoliceController::class);
         $router->resource('offers', OfferController::class);
         $router->resource('payment-gateways', PaymentGetWayController::class);
+        $router->resource('payment-coins', PaymentCoinController::class);
         $router->resource('charges', 'ChargeController', [
 
             'names' => [
