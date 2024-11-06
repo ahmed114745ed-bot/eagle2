@@ -283,7 +283,8 @@ class FamilyService
         if (!$family) throw new \Exception('not found');
         $memberIds = $this->familyUserRepository->familyMemberIds($family->id);
 
-        $rooms = $this->roomRepository->getRooms($memberIds);
+        // $rooms = $this->roomRepository->getRooms($memberIds);
+        $rooms = $this->roomRepository->all(request(),$memberIds);
         return $rooms;
     }
 

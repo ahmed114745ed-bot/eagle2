@@ -117,7 +117,7 @@ class FamilyUserRepository extends AbstractRepository
 
     public function familyMemberIds($familyId)
     {
-        return $this->model->query()->where('family_id', $familyId)->where('status', 1)->pluck('user_id');
+        return $this->model->query()->where('family_id', $familyId)->where('status', 1)->pluck('user_id')->toArray();
     }
 
 

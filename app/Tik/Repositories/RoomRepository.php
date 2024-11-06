@@ -80,10 +80,12 @@ class RoomRepository extends AbstractRepository
         return true;
     }
 
-    public function all($req)
+    public function all($req,$ids = [])
     {
-        $user = $req->user();
+        
+        $user = $req?->user();
         $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
@@ -184,7 +186,11 @@ class RoomRepository extends AbstractRepository
                 $result->orderByDesc('hour_hot');
                 break;
         }
+
         // Paginate the results with 10 items per page
+        if (count($ids) > 0) {
+            $result = $result->whereIn('uid', $ids);
+        }
         return $result->paginate(10);
     }
 
