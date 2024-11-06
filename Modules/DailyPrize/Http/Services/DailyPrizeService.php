@@ -48,7 +48,7 @@ class DailyPrizeService
     public function getDayGift(int $day)
     {
       //  \Log::info('this test daily '.$this->dailyGiftsCount());
-        $day = $day % $this->dailyGiftsCount() ?: 1;
+        $day = $day % ($this->dailyGiftsCount() ?: 1);
         return DailyGift::with('ware')->selectRaw('daily_gifts.*, (SELECT SUM((type - 1) * 7 + `order`) FROM daily_gifts as dg WHERE dg.id = daily_gifts.id) as day')
                         ->having('day', '=', $day)
                         ->first();
