@@ -214,6 +214,7 @@ class FamilyService
         $requestUser = $this->familyUserRepository->findById($request->req_id);
 
         if (!$requestUser) throw new \Exception('not found');
+        if ( $request->status == 1) {
         $other = $this->familyUserRepository->findByUserId($requestUser->user_id);
         $user = $this->userRepository->findById($requestUser->user_id);
         if(!$user) throw new \Exception('user not found');
@@ -230,8 +231,6 @@ class FamilyService
 
         $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
 
-        if ( $request->status == 1) {
-            
             $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
