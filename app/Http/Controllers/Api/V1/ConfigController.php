@@ -32,7 +32,6 @@ class ConfigController extends Controller
     {
         Config::find($request->config_id)->update([
             "value" => $request->value,
-            "desc" => $request->desc,
         ]);
         return Common::apiResponse(1, 'updated successfully');
     }
