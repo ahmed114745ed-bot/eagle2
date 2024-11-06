@@ -89,19 +89,19 @@ class DailyGift extends Model
 
     public function getTarget1Attribute()
     {
-        return $this->gift_type;
+        return $this->gift_type == 'ware' ? $this->target : null;
     }
     public function getTarget2Attribute()
     {
-        return $this->gift_type;
+        return $this->gift_type == 'vip' ? $this->target : null;
     }
     public function getTarget3Attribute()
     {
-        return $this->gift_type;
+        return $this->gift_type == 'coins' ? $this->target : null;
     }
     public function getTarget4Attribute()
     {
-        return $this->gift_type;
+        return $this->gift_type == 'achievement' ? $this->target : null;
     }
 
 
