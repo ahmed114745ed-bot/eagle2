@@ -95,13 +95,12 @@ class RoomRepository extends AbstractRepository
             ->whereHas('owner')
             ->when(!$allRooms, function ($query){
                 $query->where(function ($query){
-                    $query->where(fn($q) => $q->having("room_visitors_count",">",0))
+                    $query->where(fn($q) => $q->has("roomVisitors"))
                         ->orWhere(fn($q) => $q->where('pin', 1));
                         // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
                 });
             })
             ->where('room_status', 1);
-
         // Filter by country if provided
         if (!is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
