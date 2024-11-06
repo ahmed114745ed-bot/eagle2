@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\DailyPrize\Http\Controllers\web;
-
+use Encore\Admin\Facades\Admin;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -52,6 +52,11 @@ class DailyPrizeController extends AdminController
         });
 
         $grid->column('expir', __('expire'));
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
