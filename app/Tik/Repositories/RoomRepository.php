@@ -127,7 +127,6 @@ class RoomRepository extends AbstractRepository
                 break;
 
             case 'popular':
-                dd("dsdsds");
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ;
                 break;
