@@ -14,7 +14,6 @@ class OVips extends Selectable
 
     public function make()
     {
-        $this->grid->model()->whereIn('type', [4, 5, 6]);
         $this->column('id');
         $this->column('level', __('level'));
         $this->column('name', __('name'));
