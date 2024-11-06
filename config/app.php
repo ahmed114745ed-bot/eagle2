@@ -22,7 +22,7 @@ return [
 
     // fairbase
     'fileName' => env('FILL_NAME','firebase_credentials.json'),
-    'projectId' => env('PROJECT_ID','hola-chat-5554d'),
+    'senderId' => env('SENDER_ID','hola-chat-5554d'),
 
     /*
     |--------------------------------------------------------------------------
