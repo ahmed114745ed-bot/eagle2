@@ -32,7 +32,7 @@ class GiftLogService
     ) {}
 
 
-    public function sendGift($request , $updateUserWhenSendGift)
+    public function sendGift($request ,UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $data    = $request;
         $user    = $request->user();
