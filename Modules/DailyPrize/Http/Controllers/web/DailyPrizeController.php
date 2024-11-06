@@ -9,7 +9,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
-
+use Encore\Admin\Layout\Content;
 class DailyPrizeController extends AdminController
 {
     /**
@@ -79,6 +79,27 @@ class DailyPrizeController extends AdminController
      *
      * @return Form
      */
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $model = DailyGift::findOrFail($id);
+        
+        $form = $this->form()->edit($id);
+
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($form);
+    }
+
+    public function show($id, Content $content)
+    {
+        return $content
+            ->header(trans('admin.detail'))
+            ->description(trans('admin.description'))
+            ->body($this->detail($id));
+    }
+    
     protected function form()
     {
         $form = new Form(new DailyGift());
