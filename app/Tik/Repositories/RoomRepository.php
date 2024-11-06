@@ -91,12 +91,13 @@ class RoomRepository extends AbstractRepository
             'background',
             'roomVisitorUsers' => fn($q) => $q->limit(5)
         ])
+            ->withCount('roomVisitors')
             ->whereHas('owner')
             ->when(!$allRooms, function ($query){
                 $query->where(function ($query){
-                    $query->where(fn($q) => $q->where('count_room_socket','!=',0)->orWhere('top_room', 1))
+                    $query->where(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0)->orWhere('top_room', 1))
                         ->orWhere(fn($q) => $q->where('pin', 1))
-                        ->orWhere(fn($q) => $q->where('count_room_socket','!=',0));
+                        ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
                 });
             })
             ->where('room_status', 1);
@@ -121,21 +122,22 @@ class RoomRepository extends AbstractRepository
 
             case 'trend':
                 $result->orderBy('top_room', 'DESC')
+                ->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session');
                 break;
 
             case 'popular':
-                $result->orderByDesc('top_room')
+                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('count_room_socket');
                 break;
 
             case 'festival':
-                $result->orderByDesc('top_room')
+                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;
             case 'recently':
-                $result->orderByDesc('top_room')
+                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;
@@ -160,7 +162,7 @@ class RoomRepository extends AbstractRepository
                           ->from('follows')
                           ->where('followed_user_id', $user->id);
                 })
-                    ->orderByDesc('top_room')
+                    ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
                     ->orderByDesc('count_room_socket');
                 break;
