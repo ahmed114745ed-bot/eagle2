@@ -19,12 +19,12 @@ class TargetService
     public function create($request)
     {
         if (isset($request->moment)) {
-            $arrayMoment = array_values($request->moment);
+            $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
         }
         if (isset($request->reel)) {
-            $arrayReel = array_values($request->reel);
+            $arrayReel = array_values(json_decode($request->reel));
             // Convert the values to a comma-separated string
             $reel = implode(', ', $arrayReel);
         }
@@ -51,12 +51,12 @@ class TargetService
     public function update($id, $request)
     {
         if (isset($request->moment)) {
-            $arrayMoment = array_values($request->moment);
+            $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
         }
         if (isset($request->reel)) {
-            $arrayReel = array_values($request->reel);
+            $arrayReel = array_values(json_decode($request->reel));
             // Convert the values to a comma-separated string
             $reel = implode(', ', $arrayReel);
         }
