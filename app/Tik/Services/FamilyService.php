@@ -23,8 +23,7 @@ class FamilyService
         private readonly UserRepository $userRepository,
         private readonly FamilyRankRepository $familyRankRepository,
         private readonly RoomRepository $roomRepository
-    ) {
-    }
+    ) {}
 
 
     public function getWithSearch($search = null): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -47,7 +46,7 @@ class FamilyService
         if ($request->hasFile('image'))  $img = Common::upload('families', $request->file('image'));
 
 
-       // DB::beginTransaction();
+        // DB::beginTransaction();
         $familyData = [
             'name' => $request->name,
             'introduce' => $request->introduce,
@@ -88,9 +87,9 @@ class FamilyService
                 throw new \Exception('time not define');
         }
         if ($time == 'today' || $time == 'month') {
-            $rank = $this->familyRankRepository->ranking(condition: $query,paginate:10);
+            $rank = $this->familyRankRepository->ranking(condition: $query, paginate: 10);
         } else {
-            $rank = $this->familyRankRepository->ranking(whereBetween: $query,paginate:10);
+            $rank = $this->familyRankRepository->ranking(whereBetween: $query, paginate: 10);
         }
 
         return $rank;
@@ -214,27 +213,27 @@ class FamilyService
         $requestUser = $this->familyUserRepository->findById($request->req_id);
 
         if (!$requestUser) throw new \Exception('not found');
-        if ( $request->status == 1) {
-        $other = $this->familyUserRepository->findByUserId($requestUser->user_id);
         $user = $this->userRepository->findById($requestUser->user_id);
-        if(!$user) throw new \Exception('user not found');
-        if ($other && $user->family_id != null)  throw new \Exception('user already joined to other family');
+        if ($request->status == 1) {
+            $other = $this->familyUserRepository->findByUserId($requestUser->user_id);
+            if (!$user) throw new \Exception('user not found');
+            if ($other && $user->family_id != null)  throw new \Exception('user already joined to other family');
 
-        $familyUser = $this->familyRepository->findByUserId($requestUser->user_id);
-        if ($familyUser)  throw new \Exception(__('already have one'));
+            $familyUser = $this->familyRepository->findByUserId($requestUser->user_id);
+            if ($familyUser)  throw new \Exception(__('already have one'));
 
-        $family = $this->familyRepository->findById($requestUser->family_id);
-        if (!$family) throw new \Exception(__('not found'));
-        if ($request->status == 1 && $family->members_num >= $family->num) throw new \Exception(__('family is full members'));
-        $admin = $this->familyUserRepository->checkIsAdmin($family->id, $auth->id);
-        if ($family->user_id != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
+            $family = $this->familyRepository->findById($requestUser->family_id);
+            if (!$family) throw new \Exception(__('not found'));
+            if ($request->status == 1 && $family->members_num >= $family->num) throw new \Exception(__('family is full members'));
+            $admin = $this->familyUserRepository->checkIsAdmin($family->id, $auth->id);
+            if ($family->user_id != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
 
-        $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
+            $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
 
             $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
-            CustomNotification::acceptUserFamily($family, $user);
+            if ($user && ($request->status == 1))  CustomNotification::acceptUserFamily($family, $user);
         } elseif ($request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
@@ -283,7 +282,7 @@ class FamilyService
         $memberIds = $this->familyUserRepository->familyMemberIds($family->id);
 
         // $rooms = $this->roomRepository->getRooms($memberIds);
-        $rooms = $this->roomRepository->all(request(),$memberIds);
+        $rooms = $this->roomRepository->all(request(), $memberIds);
         return $rooms;
     }
 
