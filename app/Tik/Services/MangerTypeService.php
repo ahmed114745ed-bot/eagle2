@@ -23,7 +23,7 @@ class MangerTypeService
     {
         $image = null;
         if ($request->hasFile('image')) {
-            $image = Common::uploadWithTimesTamp('images', $request->file('image'));
+            $image = Common::upload('images', $request->file('image'));
         }
         $data = [
 

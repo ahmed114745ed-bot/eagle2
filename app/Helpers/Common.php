@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Helpers;
 
 use App\Classes\Facades\Agency as FacadesAgency;
@@ -45,12 +44,11 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Http;
 
-class Common
-{
+class Common{
 
-    use CalcsTrait, AdminTrait, MoneyTrait, RoomTrait, AttributesTrait, ZegoTrait, InfoTrait, FilterTrait;
+    use CalcsTrait , AdminTrait , MoneyTrait ,RoomTrait , AttributesTrait,ZegoTrait ,InfoTrait, FilterTrait;
 
-    public static function level_center_min($user_id)
+    public static function level_center_min ( $user_id )
     {
         $user = User::query()->find($user_id);
 
@@ -64,33 +62,32 @@ class Common
 
         return $data;
     }
-    public static function backgroundCount($oldBackgroundId = 0, $newBackGroundId = 0)
+    public static function backgroundCount($oldBackgroundId=0,$newBackGroundId=0)
     {
-        $oldBackground = Background::where("id", $oldBackgroundId)->orWhere("img", $oldBackgroundId)->first();
+        $oldBackground=Background::where("id",$oldBackgroundId)->orWhere("img",$oldBackgroundId)->first();
         if ($oldBackground != null) {
-            $oldBackground->use_count -= 1;
+            $oldBackground->use_count -=1;
             $oldBackground->save();
         }
 
-        $newBackground = Background::find($newBackGroundId);
+        $newBackground=Background::find($newBackGroundId);
         if ($newBackground != null) {
-            $newBackground->use_count += 1;
+            $newBackground->use_count +=1;
             $newBackground->save();
         }
     }
 
-    public static function getLevels($levels): Collection
+    public static function getLevels($levels) : Collection
     {
-        return Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
+        return Vip::query()->whereIn('type', [1,2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
     }
-    public static function apiResponse2(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
-    {
+    public static function apiResponse2(bool $success,$message,$data = null,$statusCode = null,$paginates = null, $isPagination = false){
 
-        if ($success == false && $statusCode == null) {
+        if ($success == false && $statusCode == null){
             $statusCode = 422;
         }
 
-        if ($success == true && $statusCode == null) {
+        if ($success == true && $statusCode == null){
             $statusCode = 200;
         }
 
@@ -111,22 +108,22 @@ class Common
         ];
 
 
-        if ($isPagination) {
+        if ($isPagination){
 
             $arr = array_merge($arr, $data->toArray());
-        } else {
+         }else{
             $arr['data']  = $data;
         }
 
 
-        return response()->json(
+        return response ()->json (
             $arr,
             $statusCode
         );
     }
 
 
-    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $paginationKey = null)
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null,$paginates = null, $paginationKey = null)
     {
         if ($statusCode === null) {
             $statusCode = $success ? 200 : 422;
@@ -163,9 +160,9 @@ class Common
                 $paginationData = self::paginationData($dataForPagination);
                 $data[$paginationKey] = $dataForPagination->getCollection();
             }
-        }
-        if ($paginates) {
-
+        }if($paginates)
+        {
+            
             foreach ($paginates as $paginationKey => $paginationCollection) {
                 if ($paginationCollection instanceof LengthAwarePaginator) {
                     $paginationData = self::paginationData($paginationCollection);
@@ -173,7 +170,7 @@ class Common
                 }
             }
         }
-
+    
 
         return response()->json(
             [
@@ -186,7 +183,7 @@ class Common
         );
     }
 
-    // Pagination data formatting function remains unchanged
+// Pagination data formatting function remains unchanged
     public static function paginationData($data)
     {
         return [
@@ -280,62 +277,50 @@ class Common
              $statusCode
          );
      }*/
-    //    public static  function paginationData($data)
-    //    {
-    //        $result['meta'] =  [
-    //            'current_page'  => $data->currentPage(),
-    //            'from'          => $data->firstItem(),
-    //            'last_page'     => $data->lastPage(),
-    //            'path'          => $data->path(),
-    //            'per_page'      => $data->perPage(),
-    //            'to'            => $data->lastItem(),
-    //            'total'         => $data->total(),
-    //        ];
-    //
-    //        $result['links'] = [
-    //            'first' => $data->url(1),
-    //            'last'  => $data->url($data->lastPage()),
-    //            'prev'  => $data->previousPageUrl(),
-    //            'next'  => $data->nextPageUrl(),
-    //        ];
-    //
-    //        return $result;
-    //    }
+//    public static  function paginationData($data)
+//    {
+//        $result['meta'] =  [
+//            'current_page'  => $data->currentPage(),
+//            'from'          => $data->firstItem(),
+//            'last_page'     => $data->lastPage(),
+//            'path'          => $data->path(),
+//            'per_page'      => $data->perPage(),
+//            'to'            => $data->lastItem(),
+//            'total'         => $data->total(),
+//        ];
+//
+//        $result['links'] = [
+//            'first' => $data->url(1),
+//            'last'  => $data->url($data->lastPage()),
+//            'prev'  => $data->previousPageUrl(),
+//            'next'  => $data->nextPageUrl(),
+//        ];
+//
+//        return $result;
+//    }
 
 
 
-    public static function getConf($key)
-    {
-        if ($conf = Config::query()->where('name', $key)->first()) {
+    public static function getConf($key){
+        if ($conf = Config::query ()->where('name',$key)->first ()){
             return $conf->value;
         }
         return null;
     }
 
-    public static function getConfFromKey(array $keys)
+    public static function getConfFromKey(array $keys )
     {
         $confs = Config::query()->whereIn('name', $keys)->select(['name', 'value'])->get();
 
         return $confs ?: null;
     }
 
-    public static function upload($folder, $file)
+    public static function upload($folder,$file)
     {
         $extension = $file->getClientOriginalExtension();
-        $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, \config('filesystems.default'));
-        return $folder . DIRECTORY_SEPARATOR . $fileName;
-    }
-    public static function uploadWithTimesTamp($folder, $file)
-    {
-        // Generate a unique filename using timestamp, random number, and file extension
-        $fileName = now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-
-        // Store the file in the specified folder with the unique filename
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
-
-        // Return the path to the stored file
-        return $folder . DIRECTORY_SEPARATOR . $fileName;
+        $fileName = Str::random(10).'.'.$extension;
+        $file->storeAs($folder.DIRECTORY_SEPARATOR,$fileName, \config('filesystems.default'));
+        return $folder.DIRECTORY_SEPARATOR.$fileName;
     }
 
     public static function deleteImage($filePath)
@@ -348,28 +333,25 @@ class Common
     }
 
 
-    public static function paginate($req, $data)
-    {
-        if ($req->pp) {
-            return static::getPaginates($data);
+    public static function paginate($req,$data){
+        if ($req->pp){
+            return static::getPaginates ($data);
         }
         return null;
     }
 
     // هل اتابعه
 
-    public static function IsFollow($user_id = null, $followed_user_id = null)
-    {
-        if (!$user_id || !$followed_user_id) return 0;
-        if ($user_id == $followed_user_id)   return 1;
-        $id = Follow::query()->where('user_id', $user_id)->where('status', 1)->where('followed_user_id', $followed_user_id)->value('id');
+    public static function IsFollow($user_id = null,$followed_user_id = null){
+        if(!$user_id || !$followed_user_id) return 0;
+        if($user_id == $followed_user_id)   return 1;
+        $id=Follow::query ()->where('user_id',$user_id)->where('status',1)->where('followed_user_id',$followed_user_id)->value('id');
         return $id ? 1 : 0;
     }
 
 
 
-    public static function getConfig($name = null)
-    {
+    public static function getConfig($name = null){
         if (!$name) {
             return '';
         }
@@ -386,9 +368,9 @@ class Common
         }
         $f_yj_ratio = self::getConfig('f_yj_ratio');
         foreach ($data as $k => &$v) {
-            //            $skill = $redisMod->getRedisData('skill', 'getSkillDetails', 18000, $v['skill_id']);
-            //            $v['skill_img'] = isset($skill['image']) ? $skill['image'] :$this->auth->setFilePath($this->getConfig('logo'));
-            //            $v['skill_name'] = isset($skill['name']) ? $skill['name'] :'暂无';
+//            $skill = $redisMod->getRedisData('skill', 'getSkillDetails', 18000, $v['skill_id']);
+//            $v['skill_img'] = isset($skill['image']) ? $skill['image'] :$this->auth->setFilePath($this->getConfig('logo'));
+//            $v['skill_name'] = isset($skill['name']) ? $skill['name'] :'暂无';
             if (in_array($type, [1, 3])) {
                 $v->user_name = self::getUserField($v->master_id, 'nickname');
                 $v->avatar = self::getUserField($v->master_id, 'avatar');
@@ -416,10 +398,9 @@ class Common
 
 
     //تصنيف حالة ترتيب اللعبة
-    //type 1 users 2 master
-    public static function getGmOrdersText($val = null, $type = 1)
-    {
-        $user = [
+//type 1 users 2 master
+    public static function getGmOrdersText($val = null,$type = 1){
+        $user=[
             1 => 'to be paid',
             2 => 'Pending orders',
             3 => 'to be served',
@@ -435,7 +416,7 @@ class Common
             84 => 'Appealing',
         ];
 
-        $master = [
+        $master=[
             1 => 'to be paid',
             2 => 'Pending orders',
             3 => 'to be served',
@@ -450,11 +431,11 @@ class Common
             83 => 'Refused to refund',
             84 => 'The other party is appealing',
         ];
-        if ($type == 1) {
+        if($type == 1){
             return $val ? $user[$val] : $user;
-        } elseif (in_array($type, [2, 3])) {
+        }elseif(in_array($type, [2,3])){
             return $val ? $master[$val] : $master;
-        } else {
+        }else{
             return '';
         }
     }
@@ -533,7 +514,7 @@ class Common
 
         // التحقق من وجود الملف
         if (!file_exists($credentialsFilePath)) {
-            return;
+            return ;
         }
 
         $client = new \Google_Client();
@@ -553,18 +534,20 @@ class Common
         $isGroup = false;
         $key = time();
 
-        if (gettype($tokens) == 'string') {
+        if (gettype($tokens) == 'string'){
             $tokens = [$tokens];
         }
 
         $notification = [
             'title'        => $title,
             'body'         => $body,
-            //            'sound'        => 'default',
+        //            'sound'        => 'default',
         ];
-        if (count($tokens) == 1) {
+        if (count($tokens) == 1){
             $token = $tokens[0];
-        } else {
+
+
+        }else{
 
             if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
             //make group and get token
@@ -576,7 +559,7 @@ class Common
         $payload = [
             'token' => $token,
             'notification'     => $notification,
-            //            'priority'         => 'high',
+        //            'priority'         => 'high',
             'data' => [
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 'message-type' => json_encode($messageType ?? ''),
@@ -609,7 +592,7 @@ class Common
 
         //remove group with $key if is group
         if ($result  && $isGroup) {
-            self::removeGroupName($key, $token, $tokens, $api_access_key);
+            self::removeGroupName($key,$token,$tokens, $api_access_key);
         }
         return $result;
     }
@@ -619,7 +602,7 @@ class Common
         $url = 'https://fcm.googleapis.com/fcm/notification';
         $senderId = config("app.senderId");
 
-        if ($registrationIds == null) return;
+        if($registrationIds == null) return;
         $headers = [
             'Content-Type: application/json',
             'access_token_auth: true',
@@ -656,11 +639,11 @@ class Common
 
         return null;
     }
-
+    
     private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
     {
         $url = 'https://fcm.googleapis.com/fcm/notification';
-        if ($token == null) return;
+        if($token == null) return;
         $senderId = config("app.senderId");
         $payload = [
             'operation' => 'remove',
@@ -699,141 +682,137 @@ class Common
     }
 
 
-    public static function handelVip($vip, $user, $expire = null)
-    {
-        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->where('is_active_for_vip', 1)->get();
+    public static function handelVip($vip,$user, $expire = null){
+        $wares = Ware::query ()->where ('get_type',1)->where('enable', 1)->where ('level',$vip->level)->where('is_active_for_vip', 1)->get ();
 
-        foreach ($wares as $ware) {
-            Pack::query()->where('user_id', $user->id)
-                ->where('expire', '<', now()->timestamp)
-                ->where('expire', '!=', 0)
-                ->delete();
-            $pack =  Pack::query()
-                ->where('user_id', $user->id)
-                ->where('get_type', 1)
-                ->where('target_id', $ware->id)
-                ->where(function ($q) {
-                    $q->where('expire', '>=', now()->timestamp)
-                        ->orWhere('expire', 0);
-                })->first();
+        foreach ($wares as $ware){
+            Pack::query ()->where ('user_id',$user->id)
+                ->where ('expire','<',now ()->timestamp)
+                ->where ('expire','!=',0)
+                ->delete ();
+            $pack =  Pack::query ()
+                ->where ('user_id',$user->id)
+                ->where ('get_type',1)
+                ->where ('target_id',$ware->id)
+                ->where (function ($q){
+                    $q->where('expire','>=',now ()->timestamp)
+                        ->orWhere('expire',0);
+                })->first ();
 
             if ($expire == null) {
                 $expire = $vip->expire;
             }
-            if ($pack) {
-                if ($pack->expire == 0) {
-                    //                    throw new \Exception('already exists');
-                } else {
+            if($pack){
+                if ($pack->expire == 0){
+//                    throw new \Exception('already exists');
+                }else{
 
                     $pack->expire = $vip->expire ? $pack->expire + ($expire * 86400) : 0;
-                    $pack->save();
+                    $pack->save ();
                 }
-            } else {
-                Pack::query()->create(
+            }else{
+                Pack::query ()->create (
                     [
-                        'user_id' => $user->id,
-                        'get_type' => $ware->get_type,
-                        'type' => $ware->type,
-                        'target_id' => $ware->id,
-                        'num' => 1,
-                        'expire' => $vip->expire ? now()->addDays($expire)->timestamp : 0,
-                        'use_num' => $ware->num
+                        'user_id'=>$user->id,
+                        'get_type'=>$ware->get_type,
+                        'type'=>$ware->type,
+                        'target_id'=>$ware->id,
+                        'num'=>1,
+                        'expire'=>$vip->expire ? now ()->addDays ($expire)->timestamp : 0,
+                        'use_num'=>$ware->num
                     ]
                 );
             }
         }
-        $uvip = UserVip::query()->where('user_id', $user->id)->where(function ($q) {
-            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
-        })->orderBy('level', 'desc')->first();
-        if ($uvip) {
-            $user->update(['vip' => $uvip->id]);
+        $uvip = UserVip::query ()->where ('user_id',$user->id)->where (function ($q){
+            $q->where("is_used",1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->orderBy ('level','desc')->first ();
+        if ($uvip){
+            $user->update (['vip'=>$uvip->id]);
         }
     }
 
 
-    public static function setHourHot($uid)
-    {
+    public static function setHourHot($uid){
         $hot = GiftLog::query()->where('roomowner_id', $uid)
             ->where('created_at', '>', now()->subHour())
             ->selectRaw('SUM(giftPrice * giftNum) as total_gift_value')
             ->first();
-        DB::table('rooms')->where('uid', $uid)->update(['hour_hot' => (int)$hot->total_gift_value]);
+        DB::table ('rooms')->where ('uid',$uid)->update (['hour_hot'=>(integer)$hot->total_gift_value]);
     }
 
 
-    public static function sendSMS($phone, $message)
-    {
-        $account_sid = Common::getConf('twilio_sid');
-        $auth_token = Common::getConf('twilio_api_key');
-        $twilio_number = Common::getConf('twilio_from');
-        $twilio_service = Common::getConf('twilio_service');
+    public static function sendSMS($phone,$message){
+        $account_sid = Common::getConf ('twilio_sid');
+        $auth_token = Common::getConf ('twilio_api_key');
+        $twilio_number = Common::getConf ('twilio_from');
+        $twilio_service = Common::getConf ('twilio_service');
         try {
             $client = new TwilioClint($account_sid, $auth_token);
-            if ($twilio_service) {
+            if ($twilio_service){
                 $arr = [
-                    //                    'from' => $twilio_number,
+//                    'from' => $twilio_number,
                     "messagingServiceSid" => $twilio_service,
                     'body' => $message
                 ];
-            } else {
+            }else{
                 $arr = [
                     'from' => $twilio_number,
                     'body' => $message
                 ];
             }
             return $client->messages->create(
-                // Where to send a text message (your cell phone?)
+            // Where to send a text message (your cell phone?)
                 $phone,
                 $arr
             );
-        } catch (\Exception $exception) {
+        }catch (\Exception $exception){
+
         }
+
     }
 
-    public static function sendOfficialMessage($user_id, $content = '', $title = '', $type = 1, $sub_type = null, $titleAr = null, string $image = null, $fromUserId = null)
-    {
+    public static function sendOfficialMessage($user_id, $content = '', $title = '',$type = 1, $sub_type = null, $titleAr = null, string $image = null,$fromUserId = null){
 
-        OfficialMessage::query()->create(
+        OfficialMessage::query ()->create (
             [
-                'title' => $title,
-                'title_ar' => $titleAr,
-                'user_id' => $user_id,
-                'content' => $content,
+                'title'=>$title,
+                'title_ar'=>$titleAr,
+                'user_id'=>$user_id,
+                'content'=>$content,
                 'sub_type' => @$sub_type,
-                'type' => $type,
+                'type'=>$type,
                 'img' => $image,
                 'from_user_id' => $fromUserId,
             ]
         );
     }
 
-    public static function fireBaseFactory()
-    {
+    public static function fireBaseFactory(){
         return (new Factory)
-            ->withServiceAccount(public_path('firebase_credentials.json'))
+            ->withServiceAccount(public_path ('firebase_credentials.json'))
             ->withDatabaseUri('https://yay-chat-c2333-default-rtdb.firebaseio.com');
     }
 
-    public static function fireBaseDatabase($path, $obj, $type = 'set')
-    {
-        $factory = self::fireBaseFactory();
+    public static function fireBaseDatabase($path,$obj,$type = 'set'){
+        $factory = self::fireBaseFactory ();
         $database = $factory->createDatabase();
-        if ($type == 'set') {
-            $database->getReference($path)->set($obj);
-        } else {
+        if ($type == 'set'){
+            $database->getReference($path) ->set($obj);
+        }else{
             return $database->getReference($path)->getSnapshot()->getValue();
         }
+
     }
 
-    public static function sendToZegoWithArrayOfRooms($Action, array $RoomIds, $FromUserId, $MessageContent, ?int $exceptRoomId = null, $IsTest = 'false')
-    {
+    public static function sendToZegoWithArrayOfRooms($Action,array $RoomIds,$FromUserId,$MessageContent,?int $exceptRoomId = null,$IsTest = 'false'){
         $client = new Client();
 
         $url = 'https://rtc-api.zego.im';
-        $AppId = self::getConf('zego_app_id');
-        $SignatureNonce = self::getSignatureNonce();
-        $Timestamp = time();
-        $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $AppId = self::getConf ('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce ();
+        $Timestamp = time ();
+        $str = $AppId.$SignatureNonce.self::getConf('zego_server_secret').$Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -848,7 +827,9 @@ class Common
             'IsTest'           => $IsTest
         ];
         $promises = [];
-        $headers = [];
+        $headers = [
+
+        ];
         foreach ($RoomIds as $roomId) {
             if ($exceptRoomId && $roomId == $exceptRoomId) continue;
             $params['RoomId'] = $roomId;
@@ -858,36 +839,35 @@ class Common
 
         return $promises;
     }
-    public static function handelFirebase($request, $type = 'follow')
-    {
+    public static function handelFirebase($request,$type = 'follow'){
         $f_add = 0;
         $fr_add = 0;
         $vi_add = 0;
-        $id = (int)$request->user_id;
-        $snap = self::fireBaseDatabase($id, '', 'get');
-        $followers_count = @(int)$snap['followers'] ?: 0;
-        $followings_count = @(int)$snap['followings'] ?: 0;
-        $friends_count = @(int)$snap['friends'] ?: 0;
-        $visitors_count = @(int)$snap['visitors'] ?: 0;
+        $id = (integer)$request->user_id ;
+        $snap = self::fireBaseDatabase ($id,'','get');
+        $followers_count = @(integer)$snap['followers']?:0;
+        $followings_count = @(integer)$snap['followings']?:0;
+        $friends_count = @(integer)$snap['friends']?:0;
+        $visitors_count = @(integer)$snap['visitors']?:0;
         $path = $id;
 
-        if ($type == 'follow') {
-            if (in_array($request->user_id, $request->user()->followers_ids()->toArray())) {
+        if ($type == 'follow'){
+            if (in_array ($request->user_id,$request->user ()->followers_ids()->toArray())){
                 $fr_add = 1;
             }
             $f_add = 1;
-        } elseif ($type == 'visit') {
+        }elseif($type == 'visit'){
             $vi_add = 1;
         }
 
         $obj = [
-            'followers' => $followers_count + $f_add,
-            'followings' => $followings_count,
-            'friends' => $friends_count + $fr_add,
-            'visitors' => $visitors_count + $vi_add
+            'followers'=>$followers_count + $f_add,
+            'followings'=>$followings_count,
+            'friends'=>$friends_count + $fr_add,
+            'visitors'=>$visitors_count + $vi_add
         ];
 
-        self::fireBaseDatabase($path, $obj);
+        self::fireBaseDatabase ($path,$obj);
 
 
 
@@ -896,59 +876,56 @@ class Common
         $f_add = 0;
         $fr_add = 0;
         $vi_add = 0;
-        $id = (int)$request->user()->id;
-        $snap = self::fireBaseDatabase($id, '', 'get');
-        $followers_count = @(int)$snap['followers'] ?: 0;
-        $followings_count = @(int)$snap['followings'] ?: 0;
-        $friends_count = @(int)$snap['friends'] ?: 0;
-        $visitors_count = @(int)$snap['visitors'] ?: 0;
+        $id = (integer)$request->user()->id ;
+        $snap = self::fireBaseDatabase ($id,'','get');
+        $followers_count = @(integer)$snap['followers']?:0;
+        $followings_count = @(integer)$snap['followings']?:0;
+        $friends_count = @(integer)$snap['friends']?:0;
+        $visitors_count = @(integer)$snap['visitors']?:0;
         $path = $id;
 
-        if ($type == 'follow') {
-            if (in_array($request->user_id, $request->user()->followers_ids()->toArray())) {
+        if ($type == 'follow'){
+            if (in_array ($request->user_id,$request->user ()->followers_ids()->toArray())){
                 $fr_add = 1;
             }
             $f_add = 1;
         }
         $obj = [
-            'followers' => $followers_count,
-            'followings' => $followings_count + $f_add,
-            'friends' => $friends_count + $fr_add,
-            'visitors' => $visitors_count + $vi_add
+            'followers'=>$followers_count,
+            'followings'=>$followings_count + $f_add,
+            'friends'=>$friends_count + $fr_add,
+            'visitors'=>$visitors_count + $vi_add
         ];
 
-        self::fireBaseDatabase($path, $obj);
+        self::fireBaseDatabase ($path,$obj);
     }
 
-    public static function hasInPack($user_id, $type, $use_status = false)
-    {
-        $ch = Pack::query()
-            ->where('user_id', $user_id)
-            ->where('type', $type)
-            ->where(function ($q) {
-                $q->where('expire', 0)->orWhere('expire', '>=', time());
-            });
-        if ($use_status) {
-            $ch = $ch->where('is_used', 1);
+    public static function hasInPack($user_id,$type,$use_status=false){
+        $ch = Pack::query ()
+             ->where ('user_id',$user_id)
+             ->where ('type',$type)
+             ->where (function ($q){
+                 $q->where('expire',0)->orWhere('expire','>=',time ());
+             });
+        if ($use_status){
+            $ch = $ch->where ('is_used',1);
         }
 
-        return $ch->exists();
-    }
+        return $ch->exists ();
+     }
 
-    /*
+     /*
       * 19 vip package
       * */
-    public static function checkPackPrev($user_id, $type)
-    {
-        return Pack::query()->where('user_id', $user_id)->where('type', $type)->where(function ($q) {
-            $q->where('expire', 0)->orWhere('expire', '>=', time());
-        })->where('is_used', 1)->exists();
+    public static function checkPackPrev($user_id,$type){
+        return Pack::query ()->where ('user_id',$user_id)->where ('type',$type)->where (function ($q){
+            $q->where('expire',0)->orWhere('expire','>=',time ());
+        })->where ('is_used',1)->exists ();
     }
 
 
 
-    public static function AddUsdToHistoryForsUsers($user_id, $usd)
-    {
+    public static function AddUsdToHistoryForsUsers($user_id,$usd){
         $month = date('m');
         $year = date('Y');
         $Agancy = User::where('id', $user_id)->first();
@@ -959,8 +936,7 @@ class Common
         return $ownerPidTarget;
     }
 
-    public static function AddUsdToHistoryForsOwners($user_id, $usd)
-    {
+    public static function AddUsdToHistoryForsOwners($user_id,$usd){
         $month = date('m');
         $year = date('Y');
         $Agancy = User::where('id', $user_id)->first();
@@ -972,7 +948,7 @@ class Common
     }
 
 
-    public static function CurantUsdHistoryOwner($user_id, $month = null, $year = null)
+    public static function CurantUsdHistoryOwner($user_id ,$month= null ,$year = null)
     {
         if ($month == null) {
             $month = date('m');
@@ -989,33 +965,34 @@ class Common
         $Qa = UserSallary::where('user_agency_id', @$Agancy->id)
             ->where('year', $year)
             ->where('month', $month);
-        $target =  $Qa->sum('agency_sallary');
-        $minValue = Target::where('usd', '<', $target)
-            ->orderBy('usd', 'desc')
-            ->first();
+        $target =  $Qa ->sum('agency_sallary');
+            $minValue = Target::where('usd', '<', $target)
+                ->orderBy('usd', 'desc')
+                ->first();
 
         if (@$Agancy->app_owner_id == $user_id) {
-            if ($month = date('m') && $year = date('Y')) {
+            if($month = date('m')&&$year = date('Y')){
 
-                $total = (@$minValue->agency_share / 100) * $target;   // v 1
-                return $total;
-            }
-            $target->sum('sallary');
+            $total = (@$minValue->agency_share / 100) * $target;   // v 1
+            return $total;
+           }
+           $target->sum('sallary');
 
-            return  $target;
-        } else {
-            //            $result =$Qa->first();
-            $result = UserSallary::where('user_agency_id', @$Agancy->id)
-                ->where('year', $year)
-                ->where('month', $month)
-                ->where("user_id", $user_id)
-                ->first();
-            return @$result->sallary ?? 0;
+           return  $target;
+
+        }else{
+//            $result =$Qa->first();
+            $result =UserSallary::where('user_agency_id', @$Agancy->id)
+                                ->where('year', $year)
+                                ->where('month', $month)
+                                ->where("user_id",$user_id)
+                                ->first();
+            return @$result->sallary??0;
+
         }
     }
 
-    public static function sendToZego3($Action, $RoomId, $FromUserId, $MessageContents = [], $IsTest = 'false')
-    {
+    public static function sendToZego3($Action,$RoomId,$FromUserId,$MessageContents = [],$IsTest = 'false'){
 
 
 
@@ -1042,7 +1019,9 @@ class Common
 
 
             $promises         = [];
-            $headers          = [];
+            $headers          = [
+
+            ];
             foreach ($MessageContents as $messageContent) {
                 $params['MessageContent'] = $messageContent;
                 $promises[rand(1, 999) . ''] = $client->getAsync($url, ['query' => $params]);
@@ -1054,37 +1033,39 @@ class Common
 
 
 
-    public static function AgencyMangerCash($loggedInUserId = null)
-    {
-        if (!isset($loggedInUserId)) {
+    public static function AgencyMangerCash($loggedInUserId= null){
+          if(!isset($loggedInUserId)){
             $loggedInUserId = Admin::user()->app_id;
-        }
+          }
 
-        $fromconfig = Config::where('name', 'agency_manager_percentage')->first();
-        $AgencyMangerPullingOut = AgencyMangerPullingOut::where('agency_manger_id', $loggedInUserId)->get()->pluck('amount')->sum();
-        $pulling_out            = $AgencyMangerPullingOut ?? 0;
+            $fromconfig=Config::where('name','agency_manager_percentage')->first();
+            $AgencyMangerPullingOut = AgencyMangerPullingOut::where('agency_manger_id',$loggedInUserId)->get() ->pluck('amount')->sum();
+            $pulling_out            = $AgencyMangerPullingOut??0;
 
-        $sum = Agency::where('agency_manger_id', $loggedInUserId)
-            ->with('agencySalary') // Eager load the UserTarget relationship
+            $sum = Agency::where('agency_manger_id', $loggedInUserId)
+             ->with('agencySalary') // Eager load the UserTarget relationship
             ->get()
             // ->pluck('UserTarget.*.agency_obtain')
             // ->flatten()
             ->sum('agencySalary.sallary');
 
-        $result  = $sum * (intval($fromconfig->value) / 100);
-        $curnt = $result - $pulling_out;
-        if (is_float($curnt)) {
-            $curnt = floor($curnt);
-        }
+            $result  = $sum * ( intval($fromconfig->value) / 100);
+            $curnt= $result - $pulling_out;
+            if (is_float($curnt)) {
+                $curnt = floor($curnt);
+            }
 
-        return $curnt;
+            return $curnt;
+
     }
 
     public  static function totalTime($TotalHours)
     {
         $hoursInt = (int) $TotalHours;
         $hours   = $TotalHours;
-        $minutes = ceil(((float)$TotalHours - $hoursInt) * 60);
-        return sprintf('%02d:%02d:00', $hours, $minutes);
+        $minutes = ceil(((double)$TotalHours - $hoursInt) * 60);
+       return sprintf('%02d:%02d:00', $hours, $minutes);
     }
+
+
 }
