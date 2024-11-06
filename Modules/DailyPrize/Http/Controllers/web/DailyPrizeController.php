@@ -7,6 +7,8 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Selectables\OVips;
+use App\Selectables\Wares;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Layout\Content;
@@ -34,7 +36,7 @@ class DailyPrizeController extends AdminController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img ;
+                $path = $ware->img2 ?? $ware->show_img;
             } elseif ($this->gift_type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -108,31 +110,10 @@ class DailyPrizeController extends AdminController
         $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                $form->select('target1', trans('wares'))->options(function () {
-                    $ops = [0 => ''];
-                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                    foreach ($wares as  $ware) {
-                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
-
-                        if ($ware->type == 4) {
-                            $ops[$ware->id] .= '_' . 'bubble';
-                        } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' . 'intro';
-                        } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' . 'frame';
-                        }
-                    }
-                    return $ops;
-                });
+                $form->belongsTo('target1', Wares::class, trans('wares'));
             })
             ->when("vip", function () use ($form) {
-                $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
-                });
+                $form->belongsTo('target2', OVips::class, trans('vips'));
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
