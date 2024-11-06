@@ -508,16 +508,24 @@ class Common{
 
     // }
 
-    private static function getGoogleAccessToken(){
-
+    private static function getGoogleAccessToken()
+    {
         $credentialsFilePath = base_path(config("app.fileName"));
+
+        // التحقق من وجود الملف
+        if (!file_exists($credentialsFilePath)) {
+            return response()->json(['error' => 'Credentials file not found'], 500);
+        }
+
         $client = new \Google_Client();
         $client->setAuthConfig($credentialsFilePath);
         $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
         $client->refreshTokenWithAssertion();
         $token = $client->getAccessToken();
+
         return $token['access_token'];
     }
+
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
@@ -592,14 +600,14 @@ class Common{
     public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
     {
         $url = 'https://fcm.googleapis.com/fcm/notification';
-        $projectId = config("app.projectId");
+        $senderId = config("app.senderId");
 
         if($registrationIds == null) return;
         $headers = [
             'Content-Type: application/json',
             'access_token_auth: true',
             'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $projectId,
+            'project_id: ' . $senderId,
         ];
 
         $payload = [
@@ -636,7 +644,7 @@ class Common{
     {
         $url = 'https://fcm.googleapis.com/fcm/notification';
         if($token == null) return;
-        $projectId = config("app.projectId");
+        $senderId = config("app.senderId");
         $payload = [
             'operation' => 'remove',
             'notification_key_name' => json_encode($notificationKeyName),
@@ -648,7 +656,7 @@ class Common{
             'Content-Type: application/json',
             'access_token_auth: true',
             'Authorization: Bearer ' . $accessToken,
-            'project_id: ' . $projectId,
+            'project_id: ' . $senderId,
         ];
 
         $ch = curl_init();
