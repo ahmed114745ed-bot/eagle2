@@ -514,7 +514,7 @@ class Common{
 
         // التحقق من وجود الملف
         if (!file_exists($credentialsFilePath)) {
-            return response()->json(['error' => 'Credentials file not found'], 500);
+            return ;
         }
 
         $client = new \Google_Client();
