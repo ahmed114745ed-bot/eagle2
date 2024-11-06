@@ -31,7 +31,7 @@ class MangerTypeController extends Controller
             'name_ar'         => 'required|string|max:255',
             'description_en'         => 'required',
             'description_ar'         => 'required',
-            'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image'          => 'nullable|mimes:jpeg,png,jpg,gif,svg',
 
         ]);
         if ($validator->fails()) {
