@@ -9,7 +9,9 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\AdminUsersService;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\AdminUsersResource;
+use App\Http\Resources\Api\V1\GamePlayerReportResource;
 use App\Http\Resources\Api\V1\GameReportResource;
+use App\Models\AllGame;
 use App\Models\CoinGameUser;
 use App\Models\User;
 use Carbon\Carbon;
@@ -48,27 +50,48 @@ class GameReportController extends Controller
     {
         $userId = $id;
         $gameId = request("game_id");
-        $startDate = request('start_date'); 
-        $endDate = request('end_date'); 
+        // $startDate = request('start_date'); 
+        // $endDate = request('end_date'); 
 
-        $data = CoinGameUser::with(["game:id,name"])
-        ->selectRaw('
-            coin_game_users.game_id,
-            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
-            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
-        ')
-        ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-        ->where('users.id', $userId)
-        ->when($gameId, function ($q) use ($gameId) {
-            $q->where('coin_game_users.game_id', $gameId);
-        })
-        ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-            $q->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
-        })
-        ->groupBy('coin_game_users.game_id')
+        // $data = CoinGameUser::with(["game:id,name"])
+        // ->selectRaw('
+        //     coin_game_users.game_id,
+        //     SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
+        //     SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+        // ')
+        // ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+        // ->where('users.id', $userId)
+        // ->when($gameId, function ($q) use ($gameId) {
+        //     $q->where('coin_game_users.game_id', $gameId);
+        // })
+        // // ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+        // //     $q->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
+        // // })
+        // ->groupBy('coin_game_users.user_id')
+        // ->groupBy('coin_game_users.game_id')
+        // ->get();
+
+        $data = AllGame::with(["coinGameUser" => function ($query) use ($userId, $gameId) {
+            $query->selectRaw('
+                coin_game_users.game_id,
+                SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
+                SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+            ')
+            ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+            ->where('users.id', $userId)
+            ->when($gameId, function ($q) use ($gameId) {
+                $q->where('coin_game_users.game_id', $gameId);
+            })
+            ->groupBy('coin_game_users.game_id');
+        }])
+        ->select('id', 'name')
         ->get();
-    
-        return Common::apiResponse(1, '', $data);
+        $sortedData = $data->sortByDesc(function($game) {
+            return $game->coinGameUser[0]?->total_coins_win ?? 0;
+        });
+        
+        $sortedResource = GamePlayerReportResource::collection($sortedData);
+        return Common::apiResponse(1, '',$sortedResource);
     }
 
     public function gameRanking($id, Request $request)
