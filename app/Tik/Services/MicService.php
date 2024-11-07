@@ -55,7 +55,7 @@ class MicService
         $user = $this->userRepository->findById($data['user_id']);
 
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
-        $room = $this->roomRepository->findRoomUser($data['owner_id']);
+        $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
         if (!$room)  throw new Exception(__('room does not exist'));
 
         $position = $data['position']; //mic sequence 0-8
