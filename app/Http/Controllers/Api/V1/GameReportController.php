@@ -23,7 +23,9 @@ class GameReportController extends Controller
         $startDate = request('start_date') ?? date("Y-m-d"); 
         $endDate = request('end_date') ?? date("Y-m-d"); 
         
-        $players = CoinGameUser::selectRaw('
+        $players = CoinGameUser::with(["user" => function($q){
+            $q->with("profile:id,user_id,avatar")->select("id","name");
+        }])->selectRaw('
                 MAX(coin_game_users.created_at) as earliest_created_at, 
                 coin_game_users.user_id, 
                 MAX(users.name) as user_name, 
@@ -35,10 +37,9 @@ class GameReportController extends Controller
                 $query->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
             })
             ->groupBy('coin_game_users.user_id')
-            ->orderByDesc('earliest_created_at')
+            ->orderByDesc('total_coins_win')
             ->get()
             ->map(function ($player) {
-                // Calculate total_app_gain for each player
                 $player->total_app_gain = $player->total_coins_lose - $player->total_coins_win;
                 return $player;
             });
@@ -50,27 +51,6 @@ class GameReportController extends Controller
     {
         $userId = $id;
         $gameId = request("game_id");
-        // $startDate = request('start_date'); 
-        // $endDate = request('end_date'); 
-
-        // $data = CoinGameUser::with(["game:id,name"])
-        // ->selectRaw('
-        //     coin_game_users.game_id,
-        //     SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
-        //     SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
-        // ')
-        // ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-        // ->where('users.id', $userId)
-        // ->when($gameId, function ($q) use ($gameId) {
-        //     $q->where('coin_game_users.game_id', $gameId);
-        // })
-        // // ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-        // //     $q->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
-        // // })
-        // ->groupBy('coin_game_users.user_id')
-        // ->groupBy('coin_game_users.game_id')
-        // ->get();
-
         $data = AllGame::with(["coinGameUser" => function ($query) use ($userId, $gameId) {
             $query->selectRaw('
                 coin_game_users.game_id,
