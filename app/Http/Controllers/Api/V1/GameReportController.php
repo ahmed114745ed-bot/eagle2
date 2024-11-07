@@ -20,8 +20,8 @@ class GameReportController extends Controller
 {
     public function allPlayers()
     {
-        $startDate = request('start_date') ?? date("Y-m-d"); 
-        $endDate = request('end_date') ?? date("Y-m-d"); 
+        // $startDate = request('start_date') ?? date("Y-m-d"); 
+        // $endDate = request('end_date') ?? date("Y-m-d"); 
         
         $players = CoinGameUser::with(["user" => function($q){
             $q->with("profile:id,user_id,avatar")->select("id","name");
@@ -33,9 +33,9 @@ class GameReportController extends Controller
                 SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
             ')
             ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
-            })
+            // ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+            //     $query->whereBetween('coin_game_users.created_at', [$startDate, $endDate]);
+            // })
             ->groupBy('coin_game_users.user_id')
             ->orderByDesc('total_coins_win')
             ->get()
