@@ -21,7 +21,7 @@ class Wares extends Selectable
         $this->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 40, 40);
+            return handleShowImageWithTypes($this->id, $url, 30, 30);
         });
         $this->column('type', __('type'))->select(
             [ 
