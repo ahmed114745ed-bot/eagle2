@@ -50,6 +50,7 @@ class AuthService
             \DB::rollBack();
             throw $e;
         }
+
         return [$user, $token];
     }
 

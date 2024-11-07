@@ -75,7 +75,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid'
+        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid','name3'
     ];
 
     /* protected $appends = [
@@ -91,9 +91,6 @@ class User extends Authenticatable
          'frame',
 
      ];*/
-
-
-
 
      public function images()
      {

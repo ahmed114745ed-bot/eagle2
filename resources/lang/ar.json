@@ -1531,8 +1531,8 @@
     "official-messages": "رسائل رسمية",
     "carousel": "دوار",
     "user-levels": "مستويات المستخدم",
-    "salary-transaction": "معاملة الراتب"
- 
-
-
+    "salary-transaction": "معاملة الراتب",
+    "Session":"سيشن",
+    "Uid":"المعرف المميز للمستخدم",
+    "Room name":"اسم الغرفة"
 }
