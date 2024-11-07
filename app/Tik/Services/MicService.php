@@ -100,7 +100,7 @@ class MicService
         if (!$user) throw new Exception(__('api_responses.this_user_not_found'));
 
 
-        $room = $this->roomRepository->findRoomUser($data['owner_id']);
+        $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
        if(!$room) throw new Exception(__('api_responses.room_not_found'));
 
          $this->goMicrophoneHand($user, $room);
