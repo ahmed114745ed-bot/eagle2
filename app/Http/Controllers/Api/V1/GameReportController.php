@@ -141,3 +141,4 @@ class GameReportController extends Controller
     }
 
 }
+ 
