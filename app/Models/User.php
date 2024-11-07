@@ -75,7 +75,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid','name3'
+        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid'
     ];
 
     /* protected $appends = [
