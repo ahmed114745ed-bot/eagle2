@@ -508,7 +508,7 @@ class UserService
 
         if ($setting != null) {
             $key = $request->key;
-            $this->userSettingRepository->updateKey($setting, !$setting->$key);
+//            $this->userSettingRepository->updateKey($setting, !$setting->$key);
             $setting->$key = !$setting->$key;
             $setting->save();
         } else {
