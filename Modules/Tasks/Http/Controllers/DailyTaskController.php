@@ -14,55 +14,72 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
 
 class DailyTaskController extends AdminController
 {
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
     protected $title = 'DailyTask';
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
+    public function index(Content $content)
+    {
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->body($this->grid());
+    }
+
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        $model = DailyTask::findOrFail($id);
+        
+        $form = $this->form()->edit($id);
+
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($form);
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->header(trans('admin.create'))
+            ->description(trans('admin.description'))
+            ->body($this->form());
+    }
+
+    public function update($id)
+    {
+        $id = request()->route('id');
+        return $this->form()->update($id);
+    }
+
     protected function grid()
     {
         $grid = new Grid(new DailyTask());
-        $dayId = Request::get('day_id');
-//disable create button
-        if ($dayId) {
-            $grid->model()->where('day_id', $dayId);
-        }
-
+        $dayId = request('day_id');
+        $grid->model()->where('day_id', $dayId);
         $grid->column('id', __('Id'));
-        $grid->column('day_id', __('Day id'));
         $grid->column('title', __('Title'));
         $grid->column('type', __('Type'));
-        $grid->column('sub_type', __('Sub type'));
+        $grid->column('sub_type', __('Sub Type'));
         $grid->column('count', __('Count'));
-        $grid->column('total_points', __('Total points'));
+        $grid->column('total_points', __('Total Points'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
-        $grid->tools(function ($tools) {
-            $dayId = request()->get('day_id');
-            $createUrl = route('daily-tasks.create', ['day_id' => $dayId]);
-            $tools->append('<a href="' . $createUrl . '" class="btn btn-success">Create</a>');
+        $grid->tools(function ($tools) use ($dayId){
+            $day = Day::find($dayId);
+            $createUrl = url('admin/days');
+            $tools->append('<a href="' . $createUrl . '" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
+            $tools->append('<div><h5 style="color:yellow">مهام  '.$day?->title.' </h5></div>');
         });
-    
+
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
+   
     protected function detail($id)
     {
         $show = new Show(DailyTask::findOrFail($id));
@@ -80,72 +97,60 @@ class DailyTaskController extends AdminController
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-
     protected function form()
-{
-    $form = new Form(new DailyTask());
+    {
+        $form = new Form(new DailyTask());
 
-    $dayId = request()->get('day_id');
+        $dayId = request('day_id');
 
-    if ($dayId) {
-        $form->hidden('day_id')->default($dayId);
-    } else {
-        $form->select('day_id', 'Day')
-            ->options(Day::pluck('title', 'id'))
+        if ($dayId) {
+            $form->hidden('day_id')->default($dayId);
+        } else {
+            $form->select('day_id', 'Day')
+                ->options(Day::pluck('title', 'id'))
+                ->required();
+        }
+
+        $form->select('type', __('Type'))
+            ->options([
+                'images' => __('images'),
+                'enter_room' => __('Enter Room'),
+                'up_mic' => __('Up mic')
+            ])
+            ->required()
+            ->when('images', function (Form $form) {
+                $form->select('sub_type', __('Sub Type'))
+                    ->options([
+                        'profile' => __('Profile'),
+                        'row' => __('Room')
+                    ])
+                    ->placeholder('Select Sub Type')
+                    ->default(null);
+            });
+
+        $form->text('title', __('Title'))->required();
+
+        $form->number('count', __('Count'))
+            ->attribute(['step' => 1])  
+            ->min(0)
+            ->default(0)
             ->required();
+
+        $form->number('total_points', __('Total Points'))
+            ->attribute(['step' => 1])
+            ->min(0)
+            ->default(0)
+            ->required();
+
+
+            $form->saving(function (Form $form) use ($dayId) {
+                if ($dayId) {
+                    $form->day_id = $dayId;
+                }
+            });
+        
+        return $form;
     }
-
-    $form->select('type', __('Type'))
-        ->options([
-            'images' => 'Images',
-            'video' => 'Video',
-            'enter_room' => 'Enter Room',
-            'background_room' => 'Background Room'
-        ])
-        ->required()
-        ->when('images', function (Form $form) {
-
-            $form->select('sub_type', __('Sub Type'))
-                ->options([
-                    'profile' => 'Profile',
-                    'row' => 'Row'
-                ])
-                ->placeholder('Select Sub Type')
-                ->default(null);
-
-        });
-
-
-
-
-    $form->text('title', __('Title'))->required();
-
-    $form->number('count', __('Count'))
-        ->attribute(['step' => 1])  
-        ->min(0)
-        ->default(0)
-        ->required();
-
-    $form->number('total_points', __('Total Points'))
-        ->attribute(['step' => 1])
-        ->min(0)
-        ->default(0)
-        ->required();
-
-
-        $form->saving(function (Form $form) use ($dayId) {
-            if ($dayId) {
-                $form->day_id = $dayId;
-            }
-        });
-    
-    return $form;
-}
 
 
 }
