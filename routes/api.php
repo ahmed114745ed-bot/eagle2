@@ -306,6 +306,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/', [RankingController::class, 'ranking']);
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
+                Route::post('/one-room', [RankingController::class, 'oneRoomRanking']);
             });
             // end ranking
 

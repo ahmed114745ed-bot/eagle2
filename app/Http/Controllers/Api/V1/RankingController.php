@@ -22,7 +22,7 @@ class RankingController extends Controller
     {
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
-        
+
         if (!in_array($class, [1, 2, 3, 4]) || !in_array($type, [0, 1, 2, 3, 4])) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
@@ -39,4 +39,21 @@ class RankingController extends Controller
         return $this->rankingService->topUser();
     }
 
+    public function oneRoomRanking(Request $request)
+    {
+        $class = $request->class ?: 1;
+        $type = $request->type !== null ? $request->type : 1;
+
+        if (!in_array($class, [1, 2,]) || !in_array($type, [0, 1, 2, 3, 4])) {
+            return Common::apiResponse(0, 'Parameter error', null, 422);
+        }
+
+        if (!$request->room_id) {
+            return Common::apiResponse(0, 'Parameter error', null, 422);
+        }
+
+        $limit = $request->is_home ? 3 : 20;
+        $data = $this->rankingService->getRankingOneRoom($class, $type, $request->user(), $limit, $request->room_id, $request->sent_to_owner);
+        return Common::apiResponse(1, '', $data);
+    }
 }
