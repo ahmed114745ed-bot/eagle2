@@ -1,21 +1,24 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Tasks\Http\Controllers;//App\Admin\Controllers;
 
-use App\Models\TaskReward;
+use Modules\Tasks\Entities\UserDayProgress;
+//namespace App\Admin\Controllers;
+
+//use App\Models\UserDayProgress;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 
-class TaskRewardController extends AdminController
+class UserDayProgressController extends AdminController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title = 'TaskReward';
+    protected $title = 'UserDayProgress';
 
     /**
      * Make a grid builder.
@@ -24,7 +27,7 @@ class TaskRewardController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new TaskReward());
+        $grid = new Grid(new UserDayProgress());
 
 
 
@@ -39,7 +42,7 @@ class TaskRewardController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(TaskReward::findOrFail($id));
+        $show = new Show(UserDayProgress::findOrFail($id));
 
 
 
@@ -53,7 +56,7 @@ class TaskRewardController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new TaskReward());
+        $form = new Form(new UserDayProgress());
 
 
 

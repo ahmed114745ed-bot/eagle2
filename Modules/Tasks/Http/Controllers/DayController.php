@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Tasks\Http\Controllers;//App\Admin\Controllers;
 
-use App\Models\Day;
+use Modules\Tasks\Entities\Day;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -32,6 +32,12 @@ class DayController extends AdminController
         $grid->column('is_unlocked', __('Is unlocked'));
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->column('tasks', 'Tasks')->display(function () {
+            $dayId = $this->getKey(); 
+            $url = url("admin/daily-tasks?day_id={$dayId}");
+            return "<a href='{$url}' class='btn btn-sm btn-primary'>Tasks</a>";
+        });
 
         return $grid;
     }

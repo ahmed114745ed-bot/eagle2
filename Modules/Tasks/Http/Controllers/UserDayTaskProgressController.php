@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Tasks\Http\Controllers;//App\Admin\Controllers;
 
-use App\Models\UserDayTaskProgress;
+use Modules\Tasks\Entities\UserDayTaskProgress;
+//namespace App\Admin\Controllers;
+
+//use App\Models\UserDayTaskProgress;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

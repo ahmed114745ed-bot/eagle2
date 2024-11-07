@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Modules\Tasks\Http\Controllers;
 
-use App\Models\UserTaskReward;
+use Modules\Tasks\Entities\UserTaskReward;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
