@@ -70,7 +70,8 @@ return [
             'admin',
             'multiLanguage',
             'admin.permission:deny,agency',
-        ], 
+            'production.error'
+        ],
 
     ],
 
