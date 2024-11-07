@@ -39,6 +39,21 @@ class RankingRepository
                     });
     }
 
+    public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit,$room_id,$keywords)
+    {
+        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
+           
+            ->when($class != 3, fn($q) => $q->with($rel));
+
+        $this->applyDateFilters($query, $type);
+
+        return $query->selectRaw("sum(giftPrice) as exp, $keywords")
+                    ->groupBy($keywords)->orderByRaw("exp desc")
+                    ->limit($limit)->get()->reject(function ($q) {
+                        return $q->exp == 0;
+                    });
+    }
+
     protected function applyDateFilters(&$query, $type)
     {
         if ($type == 0) {
