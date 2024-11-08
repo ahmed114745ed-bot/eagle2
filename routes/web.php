@@ -84,15 +84,13 @@ Route::get('/clear', function () {
     Artisan::call('view:clear');
     Artisan::call('view:cache');
 
+    if (config('app.env') == 'production') {
+        Artisan::call('route:cache');
+    }
+
     return "Cleared!";
 
 });
-
-Route::get('for-test', [\App\Http\Controllers\TestController::class, 'index']);
-Route::get('/payment-callback/{payment?}', [\App\Http\Controllers\TestController::class, 'payment_verify'])->name('payment-verify');
-
-
-Route::get('test-table', [\App\Http\Controllers\TestController::class, 'index']);
 
 
 Route::get('/admin/custom-export-users', [\App\Admin\Controllers\ExportController::class, 'usersSallaryTargets'
@@ -137,24 +135,6 @@ $router->post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->nam
 $router->post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
 
 Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
-
-// use App\Classes\UserHandling;
-// use App\Models\Agency;
-
-// Route::get('/test-kick-user', function () {
-//     // يمكنك استدعاء الكلاس وإنشاء كائن منه
-//     $userHandling = new UserHandling();
-
-//     // قم بالحصول على مستخدم معين لاختبار الدالة
-//     $user = Agency::find(13);
-
-//     // استدعاء الدالة المطلوبة
-//     $userHandling->kickOfAllUsersFromAgency($user);
-
-//     // يمكنك إضافة المزيد من التحكم أو عرض النتائج كما تشاء
-//     dd("goood");
-// });
-//Route::post('update-room-count', [\App\Http\Controllers\Api\V1\Room\EnteranceController::class, 'updateRoomCount']);
 
 Route::get("update-room-socket", function () {
 

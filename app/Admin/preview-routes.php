@@ -102,7 +102,15 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->get('agency-settings', 'AgencySettingController@index');
     $router->resource('test-test', 'TestTestController');
 
-    $router->resource('auth/users', 'AdminUserController');
+    $router->resource('auth/users', 'AdminUserController')->names([
+        'index' => 'auth.users.index',
+        'create' => 'auth.users.create',
+        'store' => 'auth.users.store',
+        'show' => 'auth.users.show',
+        'edit' => 'auth.users.edit',
+        'update' => 'auth.users.update',
+        'destroy' => 'auth.users.destroy',
+    ]);
     $router->resource('/agencies/managers', AdminAgencyMangerController::class);
     $router->resource('auth/roles', 'RoleController');
     $router->resource('colors', ColorController::class);
@@ -144,7 +152,11 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
         'names' => ['index' => 'charges', 'show' => 'charges.show']]);
     $router->resource('charges-details', 'ChargesDetailsController', [
 
-        'names' => ['index' => 'charges-details', 'show' => 'charges.show']]);
+        'names' => [
+            'index' => 'charges-details',
+            'show' => 'charges-details.show'
+        ]
+    ]);
     $router->resource('commissions', 'CommissionController', [
 
         'names' => ['index' => 'commissions', 'show' => 'commission.show']]);
@@ -156,7 +168,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->get('/custom-export-users', [ExportController::class, 'usersSallaryTargets'])->name('custom-export-users');
     $router->get('/agency-export-report', [ExportController::class, 'usersAgencyTargets'])->name('agency-export-report');
     $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-    $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
+    $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
     $router->resource('wares-vips', WareVipController::class);
     // servers
     $router->resource('server-country', ServerCountryController::class);
@@ -165,7 +177,6 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     //--------------------
     // $router->get('/', 'HomeController@infoBox')->name('home');
     $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-    $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
     $router->resource('manger-types', 'MangerTypeController');
     $router->resource('chat-letters', ChatLetterController::class);
     $router->resource('userscharg', chargUsersSleemController::class);
@@ -199,7 +210,15 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->resource('images', 'ImageController');
     $router->resource('moments', MomentController::class);
     $router->resource('reels', ReelController::class);
-    $router->resource('levels/users', UserLevelController::class);
+    $router->resource('levels/users', UserLevelController::class)->names([
+        'index' => 'levels.users.index',
+        'create' => 'levels.users.create',
+        'store' => 'levels.users.store',
+        'show' => 'levels.users.show',
+        'edit' => 'levels.users.edit',
+        'update' => 'levels.users.update',
+        'destroy' => 'levels.users.destroy',
+    ]);
     $router->resource('trashed-users', TrashedUserAccountController::class);
     $router->resource('withdraw-types', WithdrawController::class);
     $router->resource('room-vips', RoomVipController::class);
@@ -273,7 +292,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
 
     // module achievement
 
-    $router->resource('achievements', AchievementsController::class);
+  /*  $router->resource('achievements', AchievementsController::class);
     $router->post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
     $router->get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
     $router->get('/get-view-page', [AchievementLevelsModuleController::class,'viewPage'])->name('get-view-page');
@@ -285,7 +304,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     $router->post('postAddGiftAchievement', [GiftAchievemntController::class,'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
     $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
     $router->post('posteditGiftAchievementLevel', [GiftAchievemntController::class,'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
-    $router->resource('achievement-levels', AchievementsLevelsController::class,['name'=>['create'=>'create2']]);
+    $router->resource('achievement-levels', AchievementsLevelsController::class,['name'=>['create'=>'create2']]);*/
 
 });
 
