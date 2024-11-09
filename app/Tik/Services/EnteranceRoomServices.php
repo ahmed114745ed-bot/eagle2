@@ -135,7 +135,7 @@ class EnteranceRoomServices
     //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
-        //        Log::info('goooooooooooooood');
+                Log::info('goooooooooooooood');
         //        $app_secert='a23b121a64ee9fab4567a2d75d00269d';
         //        if (!$this->checkSignature($app_secert,$request->signature, $request->timestamp, $request->nonce)) {
         //            Log::info('Invalid signature');
