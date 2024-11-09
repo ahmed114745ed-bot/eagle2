@@ -10,6 +10,7 @@ use App\Models\EnteredRoom;
 use App\Models\RoomVisitor;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Tik\Repositories\RoomRepository;
@@ -134,6 +135,55 @@ class EnteranceRoomServices
     //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
+        //        Log::info('goooooooooooooood');
+        //        $app_secert='a23b121a64ee9fab4567a2d75d00269d';
+        //        if (!$this->checkSignature($app_secert,$request->signature, $request->timestamp, $request->nonce)) {
+        //            Log::info('Invalid signature');
+        //            return response()->json(['status' => 'success'], 200);
+        //        }
+        $event = $request->event;
+        $roomId = $request->room_id;
+        $userId = $request->user_account;
+
+
+
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
+        $user = User::find($userId);
+
+        if (!$room || !$user) {
+            Log::info("Either room $roomId or user $userId not found.");
+            return response()->json(['status' => 'Webhook received but room or user not found']);
+        }
+
+        $visitors = $this->updateRoomVisitorsBasedOnEvent($event, $room, $user->id);
+
+
+        if ($event == 'room_login'){
+            $this->addUserToVisitors($room->id, $user->id);
+            $user->now_room_uid = $room->uid;
+        }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
+            $user->now_room_uid = 0;
+        }
+        if ($event == 'room_logout' ){
+            $this->removeUserToVisitors($room->id, $user->id);
+        }
+
+        if ($event == 'room_logout' && $room->charizma_status) {
+            $this->handleCharismaStatusOnLogout($room, $user, $request->owner_id);
+        }
+        $user->save();
+
+//        $count = RoomVisitor::query()->where('room_id', $room->id)->count();
+//        DB::table('rooms')->where('id', $roomId)->update(['count_room_socket' => $count, 'room_visitor' => implode(",", $visitors)]);
+//        $room->count_room_socket = $room->roomVisitors->count();
+//        $room->room_visitor = implode(",", $visitors);
+//        $room->save();
+
+        Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
+        return response()->json(['status' => 'Webhook processed successfully']);
+    }
+    /*public function updateRoomCountFromZego(Request $request)
+    {
         $event = $request->event;
         $roomId = $request->room_id;
         $userId = $request->user_account;
@@ -173,9 +223,19 @@ class EnteranceRoomServices
 
         Log::info(json_encode(['userId' => $userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
-    }
+    }*/
 
     private function addUserToVisitors(int $roomId, int $userId)
+    {
+        RoomVisitor::query()->where(['user_id' => $userId])->delete();
+        RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $roomId]);
+    }
+
+    private function removeUserToVisitors( int $roomId, int $userId)
+    {
+        RoomVisitor::query()->where(['user_id' => $userId, 'room_id'=> $roomId])->delete();
+    }
+  /*  private function addUserToVisitors(int $roomId, int $userId)
     {
         $enteranceRepo = $this->enteranceRoom(RoomVisitor::class);
 
@@ -186,7 +246,7 @@ class EnteranceRoomServices
     {
         $enteranceRepo = $this->enteranceRoom(RoomVisitor::class);
         $enteranceRepo->removeVisitor($roomId, $userId);
-    }
+    }*/
 
     private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
     {
