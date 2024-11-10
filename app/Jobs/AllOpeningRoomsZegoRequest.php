@@ -59,7 +59,7 @@ class AllOpeningRoomsZegoRequest implements ShouldQueue
 
         $rooms = Cache::remember('allRooms', 60, function (){
             return Room::withoutAppends()->where('room_status', 1)->where(function ($q) {
-                $q->orWhere('count_room_socket', '!=', 0);
+                $q->has('roomVisitors');
             })->select(['id'])->get();
         });
 

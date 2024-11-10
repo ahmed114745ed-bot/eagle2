@@ -187,4 +187,14 @@ class RankingService
         }
         return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
     }
+    public function getRankingOneRoom($class, $type, $user, $limit, $room_id, $sent_to_owner)
+    {
+        
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+
+        $data = $this->rankingRepo->getGiftLogsForRoomOwnerId($class, $rel, $type, $limit,$room_id,$keywords);
+        $this->transformData($data, $class, $keywords, $rel);
+
+        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
 }

@@ -32,7 +32,7 @@ Route::prefix('weekly-cp')->middleware(['auth:sanctum', 'appFeatureEnable:weekly
     Route::get('pervious-Winners', [WeeklyCpController::class, 'perviousWeeklyCpWinners']);
     Route::get('details', [WeeklyCpController::class, 'weeklyCpDetails']);
     Route::get('top-users', [WeeklyCpController::class, 'topUsers']);
-    Route::get('top-pervious-Winner', [WeeklyCpController::class, 'topOnePerviousWeeklyCp']);
+    Route::get('top-pervious-winner', [WeeklyCpController::class, 'topOnePerviousWeeklyCp']);
     Route::get('user_details', [WeeklyCpController::class, 'userDetails']);
 
 });

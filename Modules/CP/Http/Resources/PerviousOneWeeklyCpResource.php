@@ -10,18 +10,18 @@ class PerviousOneWeeklyCpResource extends JsonResource
     
     public function toArray($request)
     {
-        $winner = $this->WeeklyCpWinners->first();
+       
         return [
             
-            'id' => $winner->id,
-            'user_one_id' => $winner->userOne->id ?? 0,
-            'user_one_name' => $winner->userOne->name ?? '',
-            'user_one_image' => $winner->userOne->profile->avatar ?? '',
-            'user_two_id' => $winner->userTwo->id ?? 0,
-            'user_two_name' => $winner->userTwo->name ?? '',
-            'user_two_image' => $winner->userTwo->profile->avatar ?? '',
-            'total_gift_price' =>numToString(intval( $winner->total_price)) ?? '0',
-            'level' => $winner->level,
+            'id' => $this?->id ?? 0,
+            'user_one_id' => $this?->userOne->id ?? 0,
+            'user_one_name' => $this?->userOne->name ?? '',
+            'user_one_image' => $this?->userOne->profile->avatar ?? '',
+            'user_two_id' => $this?->userTwo->id ?? 0,
+            'user_two_name' => $this?->userTwo->name ?? '',
+            'user_two_image' => $this?->userTwo->profile->avatar ?? '',
+            'total_gift_price' =>numToString(intval( $this?->total_price ?? 0)) ,
+            'level' => @$this?->level ?? 0,
 
 
         ];
