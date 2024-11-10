@@ -14,6 +14,7 @@ use Illuminate\Routing\Router;
 use Modules\Tasks\Http\Controllers\DayController;
 //use Modules\Tasks\Http\Controllers\DayController;
 use Modules\Tasks\Http\Controllers\DailyTaskController;
+use Modules\Tasks\Http\Controllers\TaskProgressController;
 use Modules\Tasks\Http\Controllers\UserDayProgressController;
 use Modules\Tasks\Http\Controllers\UserDayTaskProgressController;
 use Modules\Tasks\Http\Controllers\TaskRewardController;
@@ -41,4 +42,7 @@ Route::group(
         $router->resource('user-day-task-progresses', UserDayTaskProgressController::class);
         $router->resource('task-rewards', TaskRewardController::class);
         $router->resource('user-task-rewards', UserTaskRewardController::class);
+        //Route::get('user/{userId}/progress', [TaskProgressController::class, 'getUserProgress']);
+        //$router->get('user/{userId}/progress', [TaskProgressController::class, 'getUserProgress']);//->withoutMiddleware(['auth']);
+
     });
