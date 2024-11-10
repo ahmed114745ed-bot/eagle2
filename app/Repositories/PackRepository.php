@@ -39,4 +39,8 @@ class PackRepository
             ->where('expire', '!=', 0)
             ->delete();
     }
+    public function deleteAllExpiredPacks()
+    {
+        return Pack::where('expire', '<=', time())->where('expire', '!=', 0)->delete();
+    }
 }

@@ -408,6 +408,7 @@ class UserService
                 }
             }
         }
+        $this->packRepository->deleteAllExpiredPacks();
         return $user;
     }
 
