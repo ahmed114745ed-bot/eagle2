@@ -23,8 +23,6 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-
-
         $agency_joined = $this->agency;
         if ($agency_joined != null) {
             $owner =
@@ -63,10 +61,8 @@ class UserResource extends JsonResource
         }
         if ($request->user()) {
             $fArr = $request->user()->friends_ids()->toArray();
-            // $ferArr = $request->user()->followers()->toArray();
         } else {
             $fArr = [];
-            // $ferArr = [];
         }
 
         $onlineTime      = Carbon::createFromTimestamp($this->online_time);
@@ -181,8 +177,6 @@ class UserResource extends JsonResource
 
         ];
 
-
-        // $data['auth_token'] = $this->auth_token;
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
             $data['is_mic'] = $this->is_mic;
         }
