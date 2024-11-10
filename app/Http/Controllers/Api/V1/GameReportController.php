@@ -114,22 +114,22 @@ class GameReportController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function gameInfo()
+    public function gameInfo($id)
     {
-        $data = CoinGameUser::with(["game:id,name"])
+        $data = CoinGameUser::with("game")
             ->selectRaw('
-            coin_game_users.game_id,
-            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
-            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+            CAST(coin_game_users.game_id AS UNSIGNED) as game_id,
+        CAST(SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) AS SIGNED) as total_coins_win, 
+        CAST(SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) AS SIGNED) as total_coins_lose,
+        CAST(
+            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) - 
+            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END)
+            AS SIGNED
+        ) as total_app_gain
         ')
             ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
             ->groupBy('coin_game_users.game_id')
-            ->get()
-            ->map(function ($player) {
-                // Calculate total_app_gain for each player
-                $player->total_app_gain = $player->total_coins_lose - $player->total_coins_win;
-                return $player;
-            });
+            ->where('coin_game_users.game_id', $id)->first();
 
         return Common::apiResponse(1, '', $data);
     }
