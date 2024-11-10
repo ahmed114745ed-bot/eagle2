@@ -251,7 +251,7 @@ class GiftLogService
                     'num_gift'    => $zigoData['number'],
                     "plural"      => $zigoData['plural'],
                     'gift_price'  => $zigoData['room_session'],
-                    'giftP' =>  $zigoData['gift_price'],
+                    'giftTP' =>  $totalPrice,
                     'coins'  => @$zigoData['coins'] ?? '0',
                     'type'  => @$zigoData['gift_image_type'] ?? 'mp4',
 
