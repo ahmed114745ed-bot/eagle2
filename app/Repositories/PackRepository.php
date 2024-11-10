@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Pack;
@@ -36,6 +37,12 @@ class PackRepository
     {
         return Pack::where('user_id', $userId)
             ->where('expire', '<=', time())
+            ->where('expire', '!=', 0)
+            ->delete();
+    }
+    public function deleteAllExpiredPacks()
+    {
+        return Pack::where('expire', '<=', time())
             ->where('expire', '!=', 0)
             ->delete();
     }

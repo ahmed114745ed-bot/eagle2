@@ -246,8 +246,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        $data = new UserResource($user);
-        return Common::apiResponse(true, '', $data, 200);
+        return Common::apiResponse(true, '', new UserResource($user), 200);
     }
 
 
