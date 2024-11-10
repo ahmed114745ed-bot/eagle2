@@ -386,7 +386,7 @@ class UserService
         $user = $this->userRepository->findOrFail($userId, ['packs' => function($q) {
             /** @var Builder $q*/
          $q->whereIn('type', [20 ,18, 17 , 20, 19, 16, 13])->where('is_used', 1);
-        }, 'profile','room','agency','family','mangerType','country','color_image','profileVisits','specialId','dress1','dress2','dress3']);
+        },]);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
