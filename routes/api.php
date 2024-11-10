@@ -94,6 +94,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::prefix('config')->group(function() {
+                Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
+                //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
+            });
             Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
@@ -376,8 +381,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
 
             // end coin report
-            
-    
+
+
         }
     );
 
