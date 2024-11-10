@@ -137,7 +137,7 @@ class GameReportController extends Controller
     public function gamePlay($id, Request $request)
     {
         try {
-            $data = User::where(['game_id' => $id, 'online' => 1])->paginate($request->perPage, ['*'], 'page', $request->page);
+            $data = User::where(['game_id' => $id, 'online' => 1])->with('profile')->paginate($request->perPage, ['*'], 'page', $request->page);
             return Common::apiResponse(1, '', $data);
         } catch (\Exception $exception) {
 
