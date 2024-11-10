@@ -276,6 +276,8 @@ class GiftLogService
                         'rrl' => $zigoData['r_receiver_level'],
                         'oId'    => (int)$zigoData['owner_id'],
                         'isPass' => $zigoData['is_password'],
+                        'GTP' =>  $totalPrice,
+
                     ]
                 ];
                 $json  = json_encode($d);
