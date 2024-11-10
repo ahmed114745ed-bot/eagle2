@@ -30,10 +30,10 @@ class UserResource extends JsonResource
         //            ->where ('use_num','>',0)
         //            ->first ();
 
-        Pack::query()
+       /* Pack::query()
             ->where('expire', '!=', 0)
-            ->where('expire', '<', time())->delete();
-        //        $reqs_count = AgencyJoinRequest::query ()->where ('user_id',@$this->id)->where ('status','!=',2)->count ();
+            ->where('expire', '<', time())->delete();*/
+
 
         $agency_joined = $this->agency;
         if ($agency_joined != null) {
@@ -95,7 +95,7 @@ class UserResource extends JsonResource
         $intro  =
             Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
-        $isHideCountry = Common::hasInPack($this->id, 13, true);
+        $isHideCountry = $this->getPackWithType(13);
 
         $color_image=ImageColor::select("id","image","color")->find($this->image_color_id);
 
@@ -187,15 +187,15 @@ class UserResource extends JsonResource
             'image_color'          => $color_image,
             'my_agency'            => $this->ownAgency()->select('id', 'name', 'notice', 'status', 'phone', 'url', 'img', 'contents')->first(),
             // both ------------
-            //            'prev'=>$previliges, // my
-            'online_time'          => !Common::hasInPack($this->id, 20, true) ? ($this->online_time ? $timeDifferenceFormatted : '') : '',
+            //            'prev'=>$previliges, // my // 20 ,18, 17 , 20, 19, 16, 13
+            'online_time'          => !$this->getPackWithType(20) ? ($this->online_time ? $timeDifferenceFormatted : '') : '',
             // both - calculated when get my data only     ----------
-            'has_color_name'       => Common::hasInPack($this->id, 18, true), // both
-            'anonymous'            => Common::hasInPack($this->id, 17, true), // both   --------
+            'has_color_name'       => $this->getPackWithType(18),
+            'anonymous'            => $this->getPackWithType(17),
             'country_hidden'       => $isHideCountry, // both
-            'last_active_hidden'   => Common::hasInPack($this->id, 20, true), // both --------
-            'visit_hidden'         => Common::hasInPack($this->id, 19, true), // both ------------
-            'room_hidden'          => Common::hasInPack($this->id, 16, true), // both ------------
+            'last_active_hidden'   => $this->getPackWithType(19),
+            'visit_hidden'         => $this->getPackWithType(19), // both ------------
+            'room_hidden'          => $this->getPackWithType(16), // both ------------
             //            'wapel_num'=>@(integer)$wapel->use_num?:0,
             //            'salary'=>$this->salary,
             'type_user'            => intval($this->type_user) ?: 0, // both
@@ -266,4 +266,13 @@ class UserResource extends JsonResource
     //            'bubble' => $bubble
     //        ];
     //    }
+
+
+    public function getPackWithType($type)
+    {
+
+        $packs = $this->packs;
+        /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        return $packs->where('type' , $type)->where('is_enable', true)->isNotEmpty() ;
+    }
 }

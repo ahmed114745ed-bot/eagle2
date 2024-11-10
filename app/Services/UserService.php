@@ -17,6 +17,7 @@ use App\Repositories\FollowRepository;
 use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\GiftLogRepository;
@@ -382,7 +383,10 @@ class UserService
 
     public function showUser($userId, $auth, $request, $isVisit)
     {
-        $user = $this->userRepository->findById($userId);
+        $user = $this->userRepository->findOrFail($userId, ['packs' => function($q) {
+            /** @var Builder $q*/
+         $q->whereIn('type', [20 ,18, 17 , 20, 19, 16, 13]);
+        }, 'profile']);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
