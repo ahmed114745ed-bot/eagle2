@@ -79,7 +79,7 @@ class GameReportController extends Controller
         $gameId = $id;
         $type = $request->input('type');
         $filterType = $request->input('filter');
-        $data = CoinGameUser::with(['game:id,name', 'user:id,name'])
+        $data = CoinGameUser::with(['game:id,name', 'user:id,name','user.profile'])
             ->selectRaw('
                 coin_game_users.user_id,
                 SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
