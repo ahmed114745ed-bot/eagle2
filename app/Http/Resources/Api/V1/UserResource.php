@@ -88,8 +88,6 @@ class UserResource extends JsonResource
         $isHideCountry = $this->getPackWithType(13);
 
         $color_image = @$this->color_image;
-        ImageColor::select("id", "image", "color")->find($this->image_color_id);
-
         $chat_setting = \App\Models\ChatSetting::where("user_id", $this->id)->first();
         $userHandling = new \App\Classes\UserHandling();
         if ($chat_setting == null) {
@@ -153,9 +151,7 @@ class UserResource extends JsonResource
             'bubble_id'            => $bubble != '' ? $this->dress_2 : 0, // both
             'frame_id'             => $frame != '' ? @$this->dress_1 : 0, // both
             'intro_id'             => $intro != '' ? @$this->dress_3 : 0, // both
-
             'bio'                  => @$this->bio ?: '', // both  -------------
-
             'is_agent'             => $this->is_agent, // both
             'is_gold_id'           => $color_image ? true : false,
             'image_color'          => $color_image,
@@ -170,8 +166,6 @@ class UserResource extends JsonResource
             'last_active_hidden'   => $this->getPackWithType(19),
             'visit_hidden'         => $this->getPackWithType(19), // both ------------
             'room_hidden'          => $this->getPackWithType(16), // both ------------
-            //            'wapel_num'=>@(integer)$wapel->use_num?:0,
-            //            'salary'=>$this->salary,
             'type_user'            => intval($this->type_user) ?: 0, // both
             'my_store'             => [
                 'id'           => $this->id,
@@ -180,7 +174,6 @@ class UserResource extends JsonResource
                 'silver_coins' => $this->gold,
                 'usd'          => (float)$this->sallary,
             ], // my
-            //            'old'=>$this->old
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
