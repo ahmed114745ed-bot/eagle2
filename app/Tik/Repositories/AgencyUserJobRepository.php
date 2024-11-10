@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use Modules\AgencyApp\Entities\AgencyUserJob;
 
 
+/** @property AgencyUserJob $model*/
 class AgencyUserJobRepository extends AbstractRepository
 {
 
@@ -20,4 +21,15 @@ class AgencyUserJobRepository extends AbstractRepository
     {
         return $this->model->where('user_id', $userId)->where('type', 'requestManger')->first();
     }
+
+    public function exists(int $userId, int $agencyId)
+    {
+        return $this->model->where('user_id', $userId)->where('agency_id', $agencyId)->where('type', 'requestManger')->exists();
+    }
+
+    public function delete(int $userId)
+    {
+        return $this->model->where('user_id', $userId)->where('type', 'requestManger')->delete();
+    }
+
 }

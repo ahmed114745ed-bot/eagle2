@@ -32,7 +32,7 @@ class GiftLogService
     ) {}
 
 
-    public function sendGift($request , $updateUserWhenSendGift)
+    public function sendGift($request ,UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $data    = $request;
         $user    = $request->user();
@@ -68,6 +68,7 @@ class GiftLogService
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
         $cpId = null;
+        $cpIds = [];
         //check type of cp
         if ($cpId != null) {
             try {
@@ -123,7 +124,7 @@ class GiftLogService
 
         $realPrice = (int)($number * $gift->price);
         $price = ceil($realPrice);
-        $sendGiftServices->sendGift2($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpId: $cpId);
+        $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
         foreach ($receivedUsers as $receivedUser) {
             $updateUserWhenSendGift->update($price, $receivedUser);

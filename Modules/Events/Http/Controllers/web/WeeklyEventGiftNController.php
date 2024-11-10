@@ -108,6 +108,24 @@ class WeeklyEventGiftNController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware->show_img ;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'cion.png';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions(function ($actions) {
@@ -126,6 +144,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -150,6 +173,24 @@ class WeeklyEventGiftNController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware->show_img ;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'cion.png';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions(function ($actions) {
@@ -166,7 +207,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
-
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -191,6 +236,24 @@ class WeeklyEventGiftNController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+        $grid->column('image', __('image'))->display(function ($path) {
+            if ($this->type == 'ware') {
+                $ware = Ware::find($this->target);
+                $path = $ware->img2 ?? $ware->show_img ;
+            } elseif ($this->type == 'vip') {
+                $vips = OVip::find($this->target);
+                $path = $vips->img;
+            } elseif ($this->type == 'achievement') {
+                $path = $this->target;
+            } else {
+                $path = 'cion.png';
+            }
+
+            /** @var Gift $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions(function ($actions) {
@@ -207,6 +270,11 @@ class WeeklyEventGiftNController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }

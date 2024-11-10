@@ -212,8 +212,8 @@ class Room extends Model
 
     public function getFinalRoomImageAttribute()
     {
-        $var = $this->mode == '3' ?
-            'custom_image/back-black.png' :
+        $var = /*$this->mode == '3' ?
+            'custom_image/back-black.png' :*/
             ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));
         return $var;
     }

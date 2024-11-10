@@ -45,12 +45,7 @@ use KevinSoft\MultiLanguage\Http\Controllers\MultiLanguageController;
 */
 
 Route::get('/t1', function () {
-//    $i = 0;
-//    while ($i < 100000000){
-//        $i++;
-//        echo $i;
-//        echo '<br>';
-//    }
+dd(User::first()->friends_ids());
 });
 
 Route::get('/deleted/users', function (){
@@ -154,10 +149,11 @@ Route::get('admin/auth', function () {
 })->name('admin/auth');
 Route::post('/authenticate', [GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
 $router->post('ovip-config', [UpgradeLevelController::class,'ovipConfig'])->name('ovip-config');
-/*$router->post('group-chat-config', [UpgradeLevelController::class,'group_chat_config'])->name('group-chat-config');
+$router->post('group-chat-config', [UpgradeLevelController::class,'group_chat_config'])->name('group-chat-config');
 
 $router->post('reel-config', [UpgradeLevelController::class,'reelConfig'])->name('reel-config');
-$router->post('moment-config', [UpgradeLevelController::class,'momentConfig'])->name('moment-config');*/
+
+$router->post('moment-config', [UpgradeLevelController::class,'momentConfig'])->name('moment-config');
 
 Route::post("send-request-stop-charge",[UserController::class,"stop_charge"]);
 

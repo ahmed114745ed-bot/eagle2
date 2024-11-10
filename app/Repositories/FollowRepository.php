@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Follow;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
 
 class FollowRepository
@@ -54,6 +53,36 @@ class FollowRepository
         })->orderByDesc('id')->paginate(15);
     }
 
+    public function getFollowing(User $user, array $with = [])
+    {
+
+        if (empty($with)) {
+            $with = [
+                'room' => function ($query) {
+                    return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+                },
+                'followPacks',
+                'profile',
+                'ware',
+                'UserVip'
+            ];
+        }
+        return $user->following()->with($with)->paginate(10); // Set pagination limit
+
+    }
+
+    // Get paginated list of users that are following the current user
+    public function getFollowers(User $user, array $with = [])
+    {
+        return $user->followerss()->with($with)->paginate(10);
+    }
+
+    // Get paginated list of mutual followers (friends)
+    public function getFriends(User $user, array $with = [])
+    {
+        return $user->friends()->with($with)->paginate(10);
+    }
+
     public function getByFollower($userId)
     {
         return Follow::query()->where('followed_user_id', $userId)->whereHas('follower')->with('follower', function ($query) {
@@ -86,13 +115,14 @@ class FollowRepository
             ]);
         })->orderByDesc('follows.id')->paginate(15);
     }
+
     public function getFollow($userId)
     {
         $followId = Follow::where('followed_user_id', $userId)
             ->whereNotIn('user_id', function ($query) use ($userId) {
                 $query->select('followed_user_id')
                     ->from('follows')
-                    ->where('user_id', $userId); 
+                    ->where('user_id', $userId);
             })->pluck('user_id');
         return User::whereIn('id', $followId)->paginate(15);
     }

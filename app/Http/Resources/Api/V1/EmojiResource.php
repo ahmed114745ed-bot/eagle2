@@ -17,7 +17,7 @@ class EmojiResource extends JsonResource
      */
     public function toArray($request)
     {
-        $name = app()->getLocale() === 'ar' ? ($this->name ?? $this->name_en) : ($this->name_en ?? $this->name);
+        $name = app()->getLocale() == 'ar' ? ($this->name ?? $this->name_en) : ($this->name_en ?? $this->name);
         return [
             "id" => $this->id,
             "pid" => $this->pid,

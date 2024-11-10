@@ -149,5 +149,7 @@ return [
     'balance'=> 'balance',
     'availableBalance' => 'available balance ',
     'used' =>'used',
+    'pay' => 'pay',
+    'you_must_pay' => "Please charge to avoid stopping the games",
 
 ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Reals\Http\Services;
+namespace Tests\Unit\Reals\Http\Services;
 
 use App\Models\User;
 use Modules\Reals\Entities\Real;

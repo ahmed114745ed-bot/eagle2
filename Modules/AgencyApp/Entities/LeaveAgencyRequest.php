@@ -2,8 +2,8 @@
 
 namespace Modules\AgencyApp\Entities;
 
-use App\Classes\Facades\Agency;
 use App\Facades\UserHandling;
+use App\Models\Agency;
 use App\Models\Agent;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LeaveAgencyRequest extends Model
 {
-    use HasFactory;
     protected $guarded = ['id'];
 
     public function agency()
@@ -38,7 +37,7 @@ class LeaveAgencyRequest extends Model
                 $user = User::find($model->user_id);
                 UserHandling::kickUserFromAgency($user);
             }
-            
+
         });
     }
 }

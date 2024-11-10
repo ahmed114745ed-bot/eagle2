@@ -61,18 +61,33 @@ class HomeController extends Controller
 
     public function openTicket(Request $request)
     {
-        if (!$request->contact || !$request->txt) {
-            return Common::apiResponse(0, 'missing params');
-        }
 
-        $tkt = $this->homeService->openTicket($request);
-        $out = [
-            'contact' => $tkt->contact_num,
-            'txt' => $tkt->problem,
-            'description' => $tkt->description,
-            'image' => $tkt->img,
-        ];
-        return Common::apiResponse(1, 'done', $out, 200);
+            $request->validate([
+                'contact' => 'required|string',
+                'txt' => 'required|string|min:10|max:500',
+            ], [
+                'contact.required' => 'حقل الاتصال مطلوب.',
+                'txt.required' => 'حقل النص مطلوب.',
+                'txt.min' => 'يجب أن يكون النص على الأقل 10 حروف.',
+                'txt.max' => 'لا يمكن أن يزيد النص عن 500 حرف.',
+            ]);
+
+            if (!$request->contact || !$request->txt) {
+                return Common::apiResponse(0, 'missing params');
+            }
+        try {
+            $tkt = $this->homeService->openTicket($request);
+            $out = [
+                'contact' => $tkt->contact_num,
+                'txt' => $tkt->problem,
+                'description' => $tkt->description,
+                'image' => $tkt->img,
+            ];
+            return Common::apiResponse(1, 'done', $out, 200);
+        } catch (\Throwable $th) {
+
+            return Common::apiResponse(0, $th->getMessage());
+        }
     }
 
     public function sendToZego(Request $request)

@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
-use Exception;
-use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\ChargeRepoService;
-use App\Http\Resources\Api\V1\TrxResource;
+use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use App\Http\Resources\Api\V1\ChargeResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
+use App\Http\Resources\Api\V1\TrxResource;
+use App\Models\User;
+use App\Tik\Services\ChargeRepoService;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -24,15 +24,14 @@ class ChargeController extends Controller
 
     public function __construct(ChargeRepoService $chargeService)
     {
-
         $this->chargeService = $chargeService;
     }
 
 
     public function charge_co_for_owner(Request $request)
     {
-        $user      = $request->user();
-        $count     = $request->amount;
+        $user = $request->user();
+        $count = $request->amount;
         $userUuid = $request->id;
         if ($user->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
@@ -54,7 +53,6 @@ class ChargeController extends Controller
     }
 
 
-
     public function chargeTo(Request $request)
     {
 
@@ -65,17 +63,16 @@ class ChargeController extends Controller
         $toId = $request->to_id;
         $from = $request->user();
         $isRoomTarget = false;
-        $to   = User::withoutAppends()->searchByUuid($toId)->first();
-
+        $to = User::withoutAppends()->searchByUuid($toId)->first();
 
 
         if ($from->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
-        $usd  = $request->usd;
+        $usd = $request->usd;
 
-        if ($usd < 0 || !is_numeric($usd)) {
-            return Common::apiResponse(0, 'this value not allow', 422);
+        if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) != 0) {
+            return Common::apiResponse(0, 'This value is not allowed', 422);
         }
 
         if (!$usd || !$to) {
@@ -97,13 +94,10 @@ class ChargeController extends Controller
         try {
 
             $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
-            $data = [
-                'coins' =>(string) $from->di,
-                'usd' => (string)$from->salary,
-            ];
+            $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
-            return Common::apiResponse(1, 'success',  $data, 201);
+            return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
             // Log::info('this from charge to - ' . $exception->getMessage());
             DB::rollBack();
@@ -120,12 +114,12 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
 
-        $user      = $request->user();
+        $user = $request->user();
 
         if ($user->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
-        $count     = $request->amount;
+        $count = $request->amount;
         $userUuid = $request->user_id;
 
         if ($count < 0 || !is_numeric($count)) {
@@ -143,13 +137,10 @@ class ChargeController extends Controller
             }
             // Increment recipient's coins
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
-            $data = [
-                'coins' =>(string) $user->di,
-                'usd' => (string)$user->salary,
-            ];
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
             return Common::apiResponse(1, 'your recharge was successful', $data, 200);
         } catch (Exception $e) {
-            return Common::apiResponse(0,  $e->getMessage());
+            return Common::apiResponse(0, $e->getMessage());
         }
     }
 
@@ -165,8 +156,8 @@ class ChargeController extends Controller
     public function ChargeDollarForOwner(Request $request)
     {
         //        return Common::apiResponse(0, 'try again');
-        $user      = $request->user();
-        $count     = $request->amount;
+        $user = $request->user();
+        $count = $request->amount;
         $userUuid = $request->id;
         if ($user->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
@@ -179,16 +170,13 @@ class ChargeController extends Controller
         }
 
         try {
-            [$receiver, $amount, $salary]  = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
+            [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
 
             if ($user instanceof User) {
                 (new UserAchievementService())->insertCharging($receiver, $amount);
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
-            $data = [
-                'coins' => (string)$user->di,
-                'usd' => (string) $salary,
-            ];
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
             return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
         } catch (Exception $e) {
 
@@ -218,7 +206,7 @@ class ChargeController extends Controller
     {
         $userId = $request->user()->id;
         $searchKey = $request->search_key ?? null;
-        $charge = $this->chargeService->getChargeUserHistory($userId, 'received',null,'Host agent');
+        $charge = $this->chargeService->getChargeUserHistory($userId, 'received', null, 'Host agent');
 
         $charge = $charge->with(['sender'])->when($searchKey, fn($query) => $query->whereHas('sender', fn($q) => $q->where('uuid', 'like', $searchKey)));
         if ($request->by_date) {
@@ -226,6 +214,7 @@ class ChargeController extends Controller
         }
         return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge->orderByDesc('created_at')->get()), 200);
     }
+
     public function userChargeCoinsII(Request $request)
     {
         $userId = $request->user()->id;
@@ -234,7 +223,6 @@ class ChargeController extends Controller
 
         return Common::apiResponse(1, '', ChargeRecievedInfoResource::collection($charge), 200);
     }
-
 
 
     public function trxLog(Request $request)

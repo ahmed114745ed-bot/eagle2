@@ -98,9 +98,9 @@ class FamilyController extends Controller
         try {
             $family =   $this->familyServices->create($user, $request, $family_price);
 
-          
+
         } catch (\Exception $e) {
-           
+
             return Common::apiResponse(0, $e != null ? $e->getMessage() : 'missing params', 422);
         }
         CustomNotification::family($family, $user);
@@ -155,10 +155,11 @@ class FamilyController extends Controller
         try {
 
             $this->familyServices->delete($user, $id);
-         
+            DB::commit();
+
             return Common::apiResponse(1, 'success', null, 200);
         } catch (\Exception $exception) {
-           
+            DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -173,8 +174,6 @@ class FamilyController extends Controller
             CustomNotification::requestJoinFamily($family, $user);
 
             return Common::apiResponse(1, __('joinSacses') . ' ' . $family->name);
-
-            // return Common::apiResponse (1,'',new FamilyResource($family));
         } catch (\Exception $e) {
             DB::rollBack();
             return Common::apiResponse(0, $e->getMessage() ?? __('failed'), null, 400);
@@ -198,15 +197,21 @@ class FamilyController extends Controller
     public function RequestFamilyAction(Request $request)
     {
         $auth = Auth::user();
+
+        DB::beginTransaction();
         try {
 
-            [$family, $user] = $this->familyServices->actionRequest($request, $auth);
+             $user = $this->familyServices->actionRequest($request, $auth);
+             DB::commit();
 
-            CustomNotification::acceptUserFamily($family, $user);
+            if ($request->status == 1){
+                request()->family_status = 0;
+                $resource = new MembersUserResource($user);
+            }
 
-            return Common::apiResponse(1, 'success', null, 200);
+            return Common::apiResponse(1, 'success', @$resource ?? null, 200);
         } catch (\Exception $exception) {
-            
+
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage()??'failed', null, 400);
         }
@@ -237,13 +242,13 @@ class FamilyController extends Controller
         $userId = $request->user_id;
 
         try {
-           
+
             [$family, $user] = $this->familyServices->removeUserFromFamily($userId, $request->family_id, $authId);
-          
+
             CustomNotification::removeFamilyUser($family, $user);
             return Common::apiResponse(1, 'success', new FamilyResource(Family::find($family->id)), 200);
         } catch (\Exception $exception) {
-            
+
             return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
         }
     }
@@ -257,10 +262,16 @@ class FamilyController extends Controller
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+        request()->family_status = 2;
+        $membersUserResource = (new MembersUserResource($owner))->toJson();
+        request()->family_status = 1;
+        $anonymousResourceCollection = MembersUserResource::collection($admins)->toJson();
+        request()->family_status = 0;
+        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toJson();
         $data = [
-            'owner' => new MembersUserResource($owner),
-            'admins' => MembersUserResource::collection($admins),
-            'members' => MembersUserResource::collection($members)
+            'owner' => json_decode($membersUserResource),
+            'admins' => json_decode($anonymousResourceCollection),
+            'members' => json_decode($anonymousResourceCollection1)
         ];
         return Common::apiResponse(1, '', $data, 200);
     }

@@ -32,6 +32,7 @@ use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
+use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
@@ -47,9 +48,8 @@ use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-
-
-
+use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\PaymentCoinController;
 
 Route::group(
     [
@@ -129,6 +129,9 @@ Route::group(
         $router->get('agency-settings', 'AgencySettingController@index');
         $router->resource('test-test', 'TestTestController');
 
+        $router->resource('payment-with-method', PaymentMethodController::class);
+        $router->post('save-payment-with-method', [PaymentMethodController::class,"customStore"]);
+
         $router->resource('auth/users', 'AdminUserController');
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);
         $router->resource('auth/roles', 'RoleController');
@@ -182,6 +185,7 @@ Route::group(
         $router->resource('polices', PoliceController::class);
         $router->resource('offers', OfferController::class);
         $router->resource('payment-gateways', PaymentGetWayController::class);
+        $router->resource('payment-coins', PaymentCoinController::class);
         $router->resource('charges', 'ChargeController', [
 
             'names' => [
@@ -241,7 +245,23 @@ Route::group(
         $router->resource('special-id-requests', 'SpecialIdRequestController');
         $router->resource('family_levels', 'FamilyLevelController');
         $router->resource('silver', 'SilverController');
-        $router->resource('coins', 'CoinController');
+
+        // $router->resource('coins/{paymentGatwayId}', 'CoinController')->only(['create', 'store', 'destroy']);
+        // $router->get('coins/{paymentGatwayId}/{id}/edit', 'CoinController@edit');
+        // $router->put('coins/{paymentGatwayId}/{id}', 'CoinController@update');
+
+        Route::prefix('coins/{paymentGatwayId}')->group(function () {
+            Route::get('/', [CoinController::class, 'index'])->name('coins.index');
+            Route::get('/create', [CoinController::class, 'create'])->name('coins.create');
+            Route::post('/', [CoinController::class, 'store'])->name('coins.store');
+            Route::get('/{id}', [CoinController::class, 'show'])->name('coins.show');
+            Route::get('/{id}/edit', [CoinController::class, 'edit'])->name('coins.edit');
+            Route::put('/{id}', [CoinController::class, 'update'])->name('coins.update');
+            Route::delete('/{id}', [CoinController::class, 'destroy'])->name('coins.destroy');
+        });
+
+
+
         $router->resource('ovip', 'OVipController');
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
@@ -337,5 +357,6 @@ Route::group(
         $router->resource('banners', BannerController::class);
     }
 
+    
     
 );

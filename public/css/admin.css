@@ -73,5 +73,6 @@ input:checked+.slider {
 
 .btn-success {
     /* background: linear-gradient(90deg, #28eb92 0%, #06864b 100%); */
-    background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important;
+    background: #FF9428!important;
+    /* background: linear-gradient(90deg, #2d7dffb8 0%, #21c6fba8 100%)!important; */
 }

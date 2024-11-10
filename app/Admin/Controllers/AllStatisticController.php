@@ -63,39 +63,40 @@ class AllStatisticController extends MainController
             $availableBalance = $balance ? $balance->balance - $balance->used : 0;
             $data = [$balance->used ?? 0, $availableBalance ?? 0];
             $user = Auth::user();
+            $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return $content
                 ->title(trans('statistics'))
                 ->description(__(request('desc') ?: 'الرئيسيه'))
 
-                ->row(function (\Encore\Admin\Layout\Row $row) use ($user,$data, $balanceDollar,$allBalance ) {
+                ->row(function (\Encore\Admin\Layout\Row $row) use ($user,$data, $balanceDollar,$allBalance,$usePercentage ) {
                     if ($user->isRole('admin') || $user->isRole('developer')) {
-                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance')));
+                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance','usePercentage')));
                     }
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
 
-                    $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Users') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Users') . ' <i class="fa fa-star"></i></h3>');
                     $row->column(6, new InfoBox(__('Number of users'), 'dollar', 'green', route('admin.users'), number_format(@$allUsersCount ?? 0)));
                     $row->column(6, new InfoBox(__('Online Users'), 'dollar', 'green', route('admin.users', ['online' => 1]), number_format(@$onlineUsers ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($coins, $total_monthly_di_recieved) {
 
-                    $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Total Coins') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Total Coins') . ' <i class="fa fa-star"></i></h3>');
 
                     $row->column(6, new InfoBox(__('total coins'), 'dollar', 'green', route('admin.users', ['have_coins' => 1]), number_format(@$coins ?? 0)));
                     $row->column(6, new InfoBox(__('totalDiamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), number_format(@$total_monthly_di_recieved ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user_sallaries, $agency_sallaries) {
-                    $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('salaries') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('salaries') . ' <i class="fa fa-star"></i></h3>');
 
                     $row->column(6, new InfoBox(__('users sallaries'), 'dollar', 'blue', route('admin.sallaries', ['name' => 'users', 'salary_only' => 1]), @$user_sallaries ?? 0));
                     $row->column(6, new InfoBox(__('agency sallaries'), 'dollar', 'yellow', route('admin.sallaries', ['name' => 'agencies', 'salary_only' => 1]), @$agency_sallaries ?? 0));
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($total_sallary) {
-                    $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('total salaries') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('total salaries') . ' <i class="fa fa-star"></i></h3>');
 
                     $row->column(6, new InfoBox(__('total salaries'), 'dollar', 'black', '', @$total_sallary ?? 0));
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($app_earned_charge) {
-                    $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('app earned') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('app earned') . ' <i class="fa fa-star"></i></h3>');
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), @$app_earned_charge ?? 0));
                 });

@@ -36,6 +36,9 @@ class ConfigServiceProvider extends ServiceProvider
          if (\Str::startsWith($requestPath, 'preview')){//admin.route.prefix,admin.auth.controller
              Config::set('session.cookie', 'laravel_preview');
              Config::set('admin.route.prefix', 'preview/admin');
+            $get = Config::get('admin.route.middleware');
+            $get[]="prevent-delete";
+            Config::set('admin.route.middleware',$get);
              Config::set('admin.auth.controller', \App\Admin\Controllers\Preview\AuthController::class);
          }
 

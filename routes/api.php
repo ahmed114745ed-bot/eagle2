@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\BackgroundController;
+use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
@@ -43,17 +44,20 @@ use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
+use App\Http\Controllers\Api\V1\GameReportController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
+    Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
 
     Route::prefix('config')->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
@@ -80,103 +84,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
     });
 
-    // utd apis
-    Route::prefix('utd')->group(function () {
-        //configs
-        Route::prefix('configs')->group(function () {
-            Route::get('/all', [\App\Http\Controllers\Api\V1\ConfigController::class, 'index']);
-            Route::post('/update', [\App\Http\Controllers\Api\V1\ConfigController::class, 'updateConfig'])->middleware('decrypt.data');
-        });
-        //games
-        Route::prefix('games')->group(function () {
-            Route::get('/all', [AllGameController::class, 'utdGameIndex']);
-            Route::post('/create', [AllGameController::class, 'utdGameCreate']);
-            Route::post('/update', [AllGameController::class, 'utdGameUpdate']);
-            Route::post('/show', [AllGameController::class, 'showGame']);
-            Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
-        });
-        // target
-        Route::prefix('targets')->group(function () {
-            Route::get('/all', [TargetController::class, 'index']);
-            Route::post('/create', [TargetController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/update', [TargetController::class, 'update'])->middleware('decrypt.data');
-            Route::post('/show', [TargetController::class, 'show']);
-        });
-        //ovip
-        Route::prefix('ovips')->group(function () {
-            Route::get('/all', [OvipController::class, 'index']);
-            Route::post('/create', [OvipController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/update', [OvipController::class, 'update'])->middleware('decrypt.data');
-            Route::post('/show', [OvipController::class, 'show']);
-            Route::post('/ware-vip', [VipController::class, 'createWareVip'])->middleware('decrypt.data');
-            Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
-            Route::get('/ware-vips', [VipController::class, 'getWareVip']);
-            Route::post('/delete-ware', [VipController::class, 'deleteWare'])->middleware('decrypt.data');
 
-
-        });
-        Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
-
-        // agency statistic
-        Route::get('agency-statistic', [V1AgencyStatisticController::class, 'statistic'])->middleware('decrypt.data');
-
-
-        //admin users
-        Route::prefix('admin_users')->group(function () {
-            Route::get('/all', [AdminUsersController::class, 'index']);
-            Route::post('/create', [AdminUsersController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/show', [AdminUsersController::class, 'show']);
-        });
-        Route::prefix('gifts')->group(function () {
-            Route::get('/all', [GiftController::class, 'allGifts']);
-            Route::post('/create', [GiftController::class, 'store']);
-            Route::post('/update', [GiftController::class, 'update']);
-            Route::post('/show', [GiftController::class, 'show']);
-            Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
-            Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
-            Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
-
-        });
-        // roles
-        Route::resource('roles', RoleController::class)->middleware('decrypt.data');
-        Route::get('permissions', [RoleController::class, "permissions"])->middleware('decrypt.data');
-        Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-
-        // users
-        Route::resource('utd-users', UtdUserController::class)->middleware('decrypt.data');
-
-
-
-        Route::get('all-users', [UserController::class, 'userWithSearch']);
-
-        //mangerType
-        Route::prefix('manger-types')->group(function () {
-            Route::get('/all', [MangerTypeController::class, 'index']);
-            Route::post('/create', [MangerTypeController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/update', [MangerTypeController::class, 'update'])->middleware('decrypt.data');
-            Route::post('/show', [MangerTypeController::class, 'show']);
-        });
-        //target Percentage
-        Route::prefix('target-Percentage')->group(function () {
-            Route::post('/create', [AddTargetToJsonController::class, 'create'])->middleware('decrypt.data');
-            Route::get('/show', [AddTargetToJsonController::class, 'show']);
-        });
-        //setting config
-        Route::prefix('setting-config')->group(function () {
-            Route::post('/create', [addTOjesonController::class, 'create']);
-            Route::get('/show', [addTOjesonController::class, 'show']);
-        });
-        //CoreWallets
-        Route::prefix('core-wallets')->group(function () {
-            Route::get('/all', [CoreWalletsController::class, 'index']);
-            Route::post('/create', [CoreWalletsController::class, 'store'])->middleware('decrypt.data');
-            Route::post('/update', [CoreWalletsController::class, 'update'])->middleware('decrypt.data');
-            Route::post('/show', [CoreWalletsController::class, 'show']);
-        });
-        Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
-
-
+    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan','throttle:4,1'])
+    ->group(function () {
+        Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
     });
+
 
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
@@ -185,7 +98,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
             Route::post('/change-room-effect',[UserController::class, 'showSetting']);
+            Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
+            Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
+
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
@@ -229,6 +145,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
+            Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
 
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
@@ -247,6 +164,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('account')->group(function () {
                 Route::post('bind', [UserController::class, 'joinAccount']);
+                Route::get('delete', [UserController::class, 'delete']);
                 Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
                 Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
                 Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
@@ -451,10 +369,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
+
+            // coins reports
+            Route::get('/coin-reports', [CoinReportController::class, 'index']);
+            Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
+
+            // end coin report
+            
+    
         }
     );
 
-    Route::prefix('tickets')->group(function () {
-        Route::post('open', [HomeController::class, 'openTicket']);
-    });
 });

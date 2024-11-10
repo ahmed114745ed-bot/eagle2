@@ -9,6 +9,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
+use App\Facades\UserHandling;
 use App\Services\UserService;
 use Illuminate\Validation\Rule;
 use App\Http\Services\WhatsappOtp;
@@ -22,6 +23,11 @@ use App\Http\Resources\Api\V1\UserTypeResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use App\Models\Target;
+use DB;
+use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Modules\FixedTarget\Services\FixedTargetService;
 
 class UserController extends Controller
 {
@@ -50,6 +56,76 @@ class UserController extends Controller
         return Common::apiResponse(1, 'تم التعديل بنجاح', new ShowUserSettingResource($sitting));
     }
 
+    public function user_statistic(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'date' => ['required', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
+            // Other validation rules...
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(false, 'date format error');
+        }
+        $user = $request->user();
+
+        try {
+            $date = \Carbon\Carbon::parse($request->date);
+        } catch (Exception $e) {
+        }
+
+        $month = $date?->month ?? now()->month;
+        $year = $date?->year ?? now()->year;
+
+        if (now()->month == $month && now()->year == $year) {
+            (new FixedTargetService($user))->calculateTarget();
+        }
+        $totalSalary = UserSallary::query()->where('user_id', $user->id)
+            ->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            })
+            ->sum(DB::raw('sallary - cut_amount'));
+
+        $user_sallary = UserSallary::query()->where('user_id', $user->id)
+            ->where('month', $month)
+            ->where('year', $year)
+            ->orderByDesc('id')
+            ->first();
+
+
+        $total_usd = 0;
+        $current_total_hour = "0 / 0";
+        $current_total_day = "0 / 0";
+        $current_diamond = "0 / 0";
+        if ($user_sallary != null) {
+            $total_usd          = $totalSalary;
+            $current_total_hour = $user_sallary->hours;
+            $current_total_day  = $user_sallary->days;
+            $diamonds            = $user_sallary->diamond;
+            $current_diamond    = $diamonds ?? $current_diamond;
+            if ($diamonds) {
+                $stringWithoutSpaces = str_replace(' ', '', $diamonds);
+                $parts = explode('/', $stringWithoutSpaces);
+
+                // Convert the parts to integers
+                $firstNumber = intval($parts[0]);
+                //                $secondNumber = intval($parts[1]);
+                $nextTarget = Target::query()->where('diamonds', '>', $firstNumber)->orderBy('diamonds')->first();
+                if ($nextTarget) {
+                    $current_diamond = $firstNumber . ' / ' . $nextTarget->diamonds;
+                }
+            }
+        }
+        $data = [
+            "total_diamond" => $user->total_diamond_received,
+            "total_usd" => floor($total_usd),
+            "current_total_hour" => $current_total_hour,
+            "current_total_day" => $current_total_day,
+            "diamond" => $current_diamond,
+        ];
+        return Common::apiResponse(true, '', $data, 200);
+    }
+
     public function app_setting()
     {
         $user = auth()->user();
@@ -75,7 +151,7 @@ class UserController extends Controller
             'show_chat'         => ($chat_status == null ? false : ($showChat == 0 ? false : true)),
             'shared_key' => Common::getConfig('shared') ?? '1234',
             'stop_transfer_salary' => settings()->get('transfer_salary') == 0 ? $user->transfer_salary : (settings()->get('transfer_salary') == 1 ? true : false),
-            'have_pending_request' => SalaryRequest::where("status",2)->where("host_id",$user->id)->first() != null ? true : false,
+            'have_pending_request' => SalaryRequest::where("status", 2)->where("host_id", $user->id)->first() != null ? true : false,
         ];
         return Common::apiResponse(true, '', $data, 200);
     }
@@ -203,13 +279,14 @@ class UserController extends Controller
         return Common::apiResponse(1, 'reset successful', new UserResource($user));
     }
 
-    public function resetWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook){
+    public function resetWhatsapp(Request $request, WhatsappWebhook $whatsappWebhook)
+    {
         $phone = $request->phone;
-        if (!$phone || !$request->password) return Common::apiResponse (0, 'missing params', null, 422);
-        $user = $request->user ();
+        if (!$phone || !$request->password) return Common::apiResponse(0, 'missing params', null, 422);
+        $user = $request->user();
 
 
-        if ($user->phone != $phone) return Common::apiResponse (0, 'phone number not register with your account', null, 404);
+        if ($user->phone != $phone) return Common::apiResponse(0, 'phone number not register with your account', null, 404);
 
         $rules = [
             'phone' => [
@@ -221,12 +298,12 @@ class UserController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, 'Validation failed', $validator->errors(), 422);
         }
-        try{
-        $this->userService->resetWhatsapp($request, $whatsappWebhook);
-    } catch (Exception $e) {
-        return Common::apiResponse(false, $e->getMessage(), null, 407);
-    }
-        return Common::apiResponse (1,'reset successful',new UserResource($user));
+        try {
+            $this->userService->resetWhatsapp($request, $whatsappWebhook);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
+        return Common::apiResponse(1, 'reset successful', new UserResource($user));
     }
 
     public function userWithSearch(Request $request)
@@ -235,10 +312,7 @@ class UserController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function userInfoWithRole(Request $request)
-    {
-
-    }
+    public function userInfoWithRole(Request $request) {}
 
 
     public function logout(Request $request)
@@ -310,5 +384,57 @@ class UserController extends Controller
 
         $user->save();
         return Common::apiResponse(1, 'reset successful', new UserResource($user));
+    }
+
+    public function get_users_support()
+    {
+        $userId = \request('user_id');
+
+        $results = $this->userService->supporter($userId);
+
+
+        $achievement = new UserAchievementService();
+
+        $previousTotal = null;
+        $data          = $results->map(function ($result) use ($achievement, &$previousTotal) {
+            $image         = optional(optional($result->sender)->profile)->avatar ?? '';
+            $currentTotal  = $result->total;
+            $totalDiff     = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
+            $previousTotal = $currentTotal;
+            $frame         =
+                Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img2', true) ?: Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img1', true);
+            return [
+                'id'           => $result->sender_id,
+                'name'         => $result->sender->name,
+                'image'        => $image,
+                'gender'       => $result->sender->gender,
+                'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
+                'sender_level' => $result->sender->total_sender_level ?? 0,
+                'total'        => $currentTotal,
+                'total_diff'   => $totalDiff,
+                'frame'        => $frame,
+                'frame_id'     => $frame != '' ? @$result->sender->dress_1 : 0,
+            ];
+        })->all();
+
+        $toArray      = $data;
+        $countData    = count($data);
+        $arr['top']   = $countData < 4 ? $data : array_slice($toArray, 0, 3);
+        $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
+        $arr['count'] = $countData;
+
+        return Common::apiResponse(1, '', $arr);
+    }
+
+    public function delete(Request $request)
+    {
+        $user = $request->user();
+
+        if (UserHandling::checkIfUserOwnerOfAgency($user)) {
+            return Common::apiResponse(0, 'This User is the host Of agency can\'t delete it');
+        }
+        $user->tokens()->delete();
+        $user->delete();
+        return Common::apiResponse(1, 'account deleted successfully');
     }
 }

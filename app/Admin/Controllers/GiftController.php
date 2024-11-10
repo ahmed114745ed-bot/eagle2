@@ -121,16 +121,7 @@ class GiftController extends MainController
         $form->text('name', __('name'));
         $form->text('e_name', __('e_name'));
         $form->select('type', __('type'))->options(
-            [
-                1 => __('normal'),
-                2 => __('hot'),
-                3 => __('country'),
-                4 => __('Moment'),
-                5 => __('Famous gifts'),
-                6 => __('Lucky gifts'),
-                7 => __('events'),
-
-            ]
+            translate(TYPE_GIFT) 
         )->attribute(['id' => 'type'])->required();
 
         $form->number('luckyGift.win_probability', __('win probability'))

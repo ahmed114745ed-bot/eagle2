@@ -1560,6 +1560,13 @@ class RoomController extends Controller
         return $this->roomService->changeMode($request, $currentMode);
     }
 
+    public function changeMicMode(Request $request)
+    {
+        $currentMode = $request->mode;
+        if ($currentMode == null || !$request->owner_id) return Common::apiResponse(0, 'missing param', null, 422);
+        return $this->roomService->changeModeMic($request, $currentMode);
+    }
+
 
     /**
      * @return JsonResponse

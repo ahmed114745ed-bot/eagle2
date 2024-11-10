@@ -24,7 +24,7 @@ use Modules\SalaryTransaction\Entities\AgentSalaryRequest;
 class AgentRequestHistoryController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'agent-request';
+    public $permission_name = 'agent-request-history';
 
     protected function grid()
     {

@@ -44,6 +44,18 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
+    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null)
+    {
+        if ($totalPrice == null) $totalPrice = $gift->price * $number;
+        $data = [];
+        foreach ($receivedUsers as $receivedUser) {
+            $cpId = @$cpIds[$receivedUser->id] ?? null;
+            $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId);
+            $data[] = $info;
+        }
+        DB::table('gift_logs')->insert($data);
+    }
+
     public function calculate($uid, $toUid, $total)
     {
         $room_user = DB::table('users')->select(['id', 'is_sign', 'scale', 'is_leader'])->where('id', $uid)->first();

@@ -13,6 +13,7 @@ class Target extends Model
         'diamonds',
         'minuts',
         'days',
+        'hours',
         'usd',
         'agency_share',
         'moment',

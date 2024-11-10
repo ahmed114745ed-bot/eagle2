@@ -23,7 +23,8 @@ class ChargeRepoService
         private readonly UserRepository         $userRepository,
         private readonly UserSalaryRepository   $userSalaryRepository,
         private readonly AgencyRepository       $agencyRepository,
-   
+        private readonly AgencySalaryRepository $agencySalaryRepository,
+        private readonly CoinLogRepository $coinLogRepository
     )
     {
 

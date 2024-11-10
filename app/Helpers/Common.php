@@ -42,6 +42,7 @@ use Kreait\Firebase\Factory;
 use Twilio\Rest\Client as TwilioClint;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Http;
 
 class Common{
 
@@ -122,6 +123,88 @@ class Common{
     }
 
 
+    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null,$paginates = null, $paginationKey = null)
+    {
+        if ($statusCode === null) {
+            $statusCode = $success ? 200 : 422;
+        }
+
+        $paginationData = null;
+
+        // Check if data is a collection directly or a paginated resource
+        if ($paginationKey === null) {
+            if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+                $resourceData = $data->resource;
+
+                if ($resourceData instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($resourceData);
+                    $data = $resourceData->getCollection();
+                }
+            } elseif ($data instanceof LengthAwarePaginator) {
+                $paginationData = self::paginationData($data);
+                $data = $data->getCollection();
+            }
+        }
+        // Check if data contains the pagination key and it's paginated
+        elseif (isset($data[$paginationKey])) {
+            $dataForPagination = $data[$paginationKey];
+
+            if ($dataForPagination instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+                $resourceData = $dataForPagination->resource;
+
+                if ($resourceData instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($resourceData);
+                    $data[$paginationKey] = $dataForPagination->getCollection();
+                }
+            } elseif ($dataForPagination instanceof LengthAwarePaginator) {
+                $paginationData = self::paginationData($dataForPagination);
+                $data[$paginationKey] = $dataForPagination->getCollection();
+            }
+        }if($paginates)
+        {
+            
+            foreach ($paginates as $paginationKey => $paginationCollection) {
+                if ($paginationCollection instanceof LengthAwarePaginator) {
+                    $paginationData = self::paginationData($paginationCollection);
+                    $data[$paginationKey] = $paginationCollection->getCollection();
+                }
+            }
+        }
+    
+
+        return response()->json(
+            [
+                'success'   => $success,
+                'message'   => __($message),
+                'data'      => $data,
+                'paginates' => $paginationData,
+            ],
+            $statusCode
+        );
+    }
+
+// Pagination data formatting function remains unchanged
+    public static function paginationData($data)
+    {
+        return [
+            'meta' => [
+                'current_page'  => $data->currentPage(),
+                'from'          => $data->firstItem(),
+                'last_page'     => $data->lastPage(),
+                'path'          => $data->path(),
+                'per_page'      => $data->perPage(),
+                'to'            => $data->lastItem(),
+                'total'         => $data->total(),
+            ],
+            'links' => [
+                'first' => $data->url(1),
+                'last'  => $data->url($data->lastPage()),
+                'prev'  => $data->previousPageUrl(),
+                'next'  => $data->nextPageUrl(),
+            ],
+        ];
+    }
+
     public static function  getPaginates($collection)
     {
         return [
@@ -137,59 +220,84 @@ class Common{
             'to' => $collection->lastItem(),
         ];
     }
+    /*
 
-    public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
-    {
+     public static function apiResponse(bool $success, $message, $data = null, $statusCode = null, $paginates = null)
+     {
 
-        if ($success == false && $statusCode == null) {
-            $statusCode = 422;
-        }
+         if ($success == false && $statusCode == null) {
+             $statusCode = 422;
+         }
 
-        if ($success == true && $statusCode == null) {
-            $statusCode = 200;
-        }
+         if ($success == true && $statusCode == null) {
+             $statusCode = 200;
+         }
 
 
-        $dataForPaginationCheck = $data;
 
-        if ($data instanceof \Illuminate\Http\Resources\Json\JsonResource) {
+         $dataForPaginationCheck = $data;
 
-            $dataForPaginationCheck = $data->resource;
-        }
+         $isPagination = false;
 
-        return response()->json(
-            [
-                'success'   => $success,
 
-                'message'   => __($message),
 
-                'data'      => $data,
-                'paginates' => ($dataForPaginationCheck instanceof LengthAwarePaginator) ? self::paginationData($data) : null,
-            ],
-            $statusCode
-        );
-    }
-    public static  function paginationData($data)
-    {
-        $result['meta'] =  [
-            'current_page'  => $data->currentPage(),
-            'from'          => $data->firstItem(),
-            'last_page'     => $data->lastPage(),
-            'path'          => $data->path(),
-            'per_page'      => $data->perPage(),
-            'to'            => $data->lastItem(),
-            'total'         => $data->total(),
-        ];
+         if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
 
-        $result['links'] = [
-            'first' => $data->url(1),
-            'last'  => $data->url($data->lastPage()),
-            'prev'  => $data->previousPageUrl(),
-            'next'  => $data->nextPageUrl(),
-        ];
+             $dataForPaginationCheck = $data->resource;
 
-        return $result;
-    }
+
+             $isPagination = true;
+
+             if ($data instanceof LengthAwarePaginator ) {
+                 $isPagination = true;
+
+                 $data = $data->getCollection();
+             }
+
+             if ($dataForPaginationCheck instanceof \Illuminate\Support\Collection ) {
+                 $isPagination = false;
+
+ //                $data = $data;
+             }
+         }
+
+         if ($data instanceof LengthAwarePaginator ) {
+             $isPagination = true;
+
+             $data = $data->getCollection();
+         }
+
+         return response()->json(
+             [
+                 'success'   => $success,
+                 'message'   => __($message),
+                 'data'      => $data,
+                 'paginates' => $isPagination ? self::paginationData($dataForPaginationCheck) : null,
+             ],
+             $statusCode
+         );
+     }*/
+//    public static  function paginationData($data)
+//    {
+//        $result['meta'] =  [
+//            'current_page'  => $data->currentPage(),
+//            'from'          => $data->firstItem(),
+//            'last_page'     => $data->lastPage(),
+//            'path'          => $data->path(),
+//            'per_page'      => $data->perPage(),
+//            'to'            => $data->lastItem(),
+//            'total'         => $data->total(),
+//        ];
+//
+//        $result['links'] = [
+//            'first' => $data->url(1),
+//            'last'  => $data->url($data->lastPage()),
+//            'prev'  => $data->previousPageUrl(),
+//            'next'  => $data->nextPageUrl(),
+//        ];
+//
+//        return $result;
+//    }
 
 
 
@@ -337,11 +445,94 @@ class Common{
     //     self::sendOfficialMessage($user_id, $title, $body, $type, null, $titleAr);
     // }
 
+    // public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    // {
+
+    //     $api_access_key =
+    //         'AAAAYyrfZ8U:APA91bHcAaUhToEPWGpd_DfsUVv6aZLKttTDem_WF0rXJbHZMVERG9MP11G_TzcJKW_xnvzZx2R0t4Y-kCvCZn7UqfX8f6mJmVzTNAJ10lsMLMpje9AXdrCeSQ8l98H_sozao1vw9UeW';
+
+    //     if (gettype($tokens) == 'string'){
+    //         $tokens = [$tokens];
+    //     }
+
+    //     $notification = [
+    //         'title'        => $title,
+    //         'body'         => $body,
+    //         'sound'        => 'tiknotifi',
+    //         'visibility' => 'public',
+    //         "alert" => true,
+
+    //     ];
+
+    //     $payload = [
+    //         'registration_ids' => $tokens,
+    //         'notification'     => $notification,
+    //        // 'priority'         => 'high',
+    //         'visibility' => 'private',
+    //         //'sound'        => 'tiknotifi',
+    //         'data' => [
+    //             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+    //             'message-type' => json_encode($messageType ?? ''),
+    //             'data' => !empty($data) ? json_encode($data) : "",
+    //         ],
+    //     ];
+
+    //     if (!empty($icon)) {
+    //         $payload['notification']['icon'] = $icon;
+    //     }
+
+    //     if (isset($data['image']) && !empty($data['image'])) {
+    //         $payload['notification']['image'] = $data['image'];
+    //     } else {
+    //         // $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+    //     }
+
+    //     $headers = [
+    //         'Authorization: key=' . $api_access_key,
+    //         'Content-Type: application/json',
+    //     ];
+
+    //     $ch = curl_init();
+    //     curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    //     curl_setopt($ch, CURLOPT_POST, true);
+    //     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    //     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    //     curl_setopt($ch, CURLOPT_CUSTOMREQUEST , 'POST');
+    //     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    //     $result = curl_exec($ch);
+    //     curl_close($ch);
+
+    //     return $result;
+
+
+    // }
+
+    private static function getGoogleAccessToken()
+    {
+        $credentialsFilePath = base_path(config("app.fileName"));
+
+        // التحقق من وجود الملف
+        if (!file_exists($credentialsFilePath)) {
+            return ;
+        }
+
+        $client = new \Google_Client();
+        $client->setAuthConfig($credentialsFilePath);
+        $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+        $client->refreshTokenWithAssertion();
+        $token = $client->getAccessToken();
+
+        return $token['access_token'];
+    }
+
     public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
+        if ($tokens == null) return;
+        $api_access_key = self::getGoogleAccessToken();
 
-        $api_access_key =
-            'AAAAYyrfZ8U:APA91bHcAaUhToEPWGpd_DfsUVv6aZLKttTDem_WF0rXJbHZMVERG9MP11G_TzcJKW_xnvzZx2R0t4Y-kCvCZn7UqfX8f6mJmVzTNAJ10lsMLMpje9AXdrCeSQ8l98H_sozao1vw9UeW';
+        $isGroup = false;
+        $key = time();
 
         if (gettype($tokens) == 'string'){
             $tokens = [$tokens];
@@ -350,18 +541,25 @@ class Common{
         $notification = [
             'title'        => $title,
             'body'         => $body,
-            'sound'        => 'tiknotifi',
-            'visibility' => 'public',
-            "alert" => true,
-
+        //            'sound'        => 'default',
         ];
+        if (count($tokens) == 1){
+            $token = $tokens[0];
+
+
+        }else{
+
+            if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+            //make group and get token
+            $token = self::makeGroup($tokens, $key,  $api_access_key);
+
+            $isGroup = true;
+        }
 
         $payload = [
-            'registration_ids' => $tokens,
+            'token' => $token,
             'notification'     => $notification,
-           // 'priority'         => 'high',
-            'visibility' => 'private',
-            //'sound'        => 'tiknotifi',
+        //            'priority'         => 'high',
             'data' => [
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                 'message-type' => json_encode($messageType ?? ''),
@@ -369,9 +567,9 @@ class Common{
             ],
         ];
 
-        if (!empty($icon)) {
-            $payload['notification']['icon'] = $icon;
-        }
+        //        if (!empty($icon)) {
+        //            $payload['notification']['icon'] = $icon;
+        //        }
 
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
@@ -380,24 +578,107 @@ class Common{
         }
 
         $headers = [
-            'Authorization: key=' . $api_access_key,
+            'Authorization' => 'Bearer ' . $api_access_key,
+            'Content-Type' => 'application/json',
+        ];
+
+
+        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/top-star-75039/messages:send', [
+            'message' => $payload
+        ]);
+
+        $result = json_decode($result);
+
+
+        //remove group with $key if is group
+        if ($result  && $isGroup) {
+            self::removeGroupName($key,$token,$tokens, $api_access_key);
+        }
+        return $result;
+    }
+
+    public static function makeGroup(array $registrationIds, string $notificationKeyName, $accessToken, string $operation = 'create')
+    {
+        $url = 'https://fcm.googleapis.com/fcm/notification';
+        $senderId = config("app.senderId");
+
+        if($registrationIds == null) return;
+        $headers = [
             'Content-Type: application/json',
+            'access_token_auth: true',
+            'Authorization: Bearer ' . $accessToken,
+            'project_id: ' . $senderId,
+        ];
+
+        $payload = [
+            'operation' => $operation,
+            'notification_key_name' => $notificationKeyName,
+            'registration_ids' => $registrationIds,
         ];
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST , 'POST');
+
+        $response = curl_exec($ch);
+
+        curl_close($ch);
+        if (!curl_errno($ch)) {
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $response = json_decode($response);
+                return $response->notification_key;
+            }
+        }
+
+
+        return null;
+    }
+    
+    private static function removeGroupName($notificationKeyName, $token, $tokens, $accessToken)
+    {
+        $url = 'https://fcm.googleapis.com/fcm/notification';
+        if($token == null) return;
+        $senderId = config("app.senderId");
+        $payload = [
+            'operation' => 'remove',
+            'notification_key_name' => json_encode($notificationKeyName),
+            'notification_key' => $token,
+            'registration_ids' => $tokens
+        ];
+
+        $headers = [
+            'Content-Type: application/json',
+            'access_token_auth: true',
+            'Authorization: Bearer ' . $accessToken,
+            'project_id: ' . $senderId,
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
         $result = curl_exec($ch);
         curl_close($ch);
+        if (!curl_errno($ch)) {
+
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $result = json_decode($result);
+                return $result->notification_key;
+            }
+        }
 
         return $result;
-
-
     }
 
 

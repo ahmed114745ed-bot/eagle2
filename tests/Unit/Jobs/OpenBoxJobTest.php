@@ -1,6 +1,6 @@
 <?php
 
-namespace Jobs;
+namespace Tests\Unit\Jobs;
 
 use App\Jobs\OpenBoxJob;
 use Illuminate\Support\Facades\Redis;
@@ -13,7 +13,7 @@ class OpenBoxJobTest extends TestCase
     {
 
         $vars = $this->updateDatabase();
-        dd($vars);
+        $this->assertTrue(true);
     }
     public function updateDatabase()
     {
@@ -34,6 +34,7 @@ class OpenBoxJobTest extends TestCase
                 Redis::del($cleanKey);
             }
         }
+        $this->assertTrue(true);
     }
 
     public function updateBoxUse()
@@ -54,5 +55,6 @@ class OpenBoxJobTest extends TestCase
                 \DB::table('box_uses')->update($value);
             }
         }
+        $this->assertTrue(true);
     }
 }

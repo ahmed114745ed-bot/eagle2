@@ -7,13 +7,14 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\AdminUser;
+use Illuminate\Support\Str;
+use App\Enums\ConfigCategory;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;
+Use Encore\Admin\Admin;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
-Use Encore\Admin\Admin;
-use Illuminate\Support\Str;
 
 class ConfigController extends MainController
 {
@@ -179,6 +180,9 @@ class ConfigController extends MainController
         $form->text('name', trans('name'));
         $form->text('value', trans('value'));
         $form->textarea ('desc',trans ('description'));
+        $form->select('category', trans('category'))
+         ->options(ConfigCategory::getTranslatedOptions())
+         ->required();
 
         return $form;
     }

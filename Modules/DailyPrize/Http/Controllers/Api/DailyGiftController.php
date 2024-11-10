@@ -33,19 +33,19 @@ class DailyGiftController extends Controller
     public function current_day()
     {
         $user = Auth::user();
-       
+
         //reset daily
-       
+
         (new DailyPrizeService())->reset(Carbon::createFromTimestamp($user->real_online_time), $user->id);
-       
+
         $currentDay= $this->getCurrentDay();
-        
+
         $result=DailyGiftCount::query()->where('user_id',$user->id)->first();
-       
+
         $check_received=DailyGiftCount::query()->where('user_id',$user->id)->where("day_count",$currentDay)->first();
         $data=[
             'current_day'   => ($currentDay % 7 == 0 ? 7 : $currentDay % 7),
-            'gift'          => $this->getGift($currentDay) ??[],
+            'gift'          => $this->getGift($currentDay) ??null,
             'is_received'   => $check_received != null ? true : false,
         ];
         return Common::apiResponse(1, '', $data);
@@ -108,6 +108,7 @@ class DailyGiftController extends Controller
             $vip = OVip::query()->find($target);
             UserCommon::addVipToUser($user, $vip, $expire);
         } elseif ($type == "ware") {
+
             $ware = Ware::query()->find($target);
             UserCommon::addWareToUser($user, $ware, $expire);
         } elseif ($type == "achievement") {
@@ -136,6 +137,6 @@ class DailyGiftController extends Controller
     {
 
         $data=$this->dailyPrizeService->getDayGift($currentDay);
-        return  $data!=null? new WeeklyStarGift($data) :[];
+        return  $data!=null? new WeeklyStarGift($data) :null;
     }
 }

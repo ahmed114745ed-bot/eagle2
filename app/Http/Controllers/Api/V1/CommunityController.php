@@ -32,9 +32,9 @@ class CommunityController extends Controller
 
         $this->searchRepository->saveSearchHistory($user_id, $keywords);
 
-        $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => array_slice($this->searchRepository->searchRooms($user_id, (int)$keywords), 0, 2),];
+        $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => $this->searchRepository->searchRooms($user_id, (int)$keywords),];
 
-        return Common::apiResponse(1, '', $result);
+        return Common::apiResponse(1, '', $result, paginationKey: 'user');
     }
 
     // friends

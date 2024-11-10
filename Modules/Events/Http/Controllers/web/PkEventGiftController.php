@@ -9,6 +9,7 @@ use App\Services\AppFeatureService;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Facades\Admin;
 
 use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\PkReward;
@@ -100,7 +101,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",1);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -118,20 +118,21 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
@@ -150,6 +151,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
     protected function grid2()
@@ -161,7 +167,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -178,20 +183,21 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
@@ -208,6 +214,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -221,7 +232,6 @@ class PkEventGiftController extends MainController
         $grid->model()->where("pk_event_id",$pkEventId)->where("pk_type",$pkType)->where("level",3);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('level', __('level'));
         $grid->column('gift_id', __('Gifts'))->display(function (){
             if ($this->type == "ware"){
                 return @$this->ware->name;
@@ -239,20 +249,21 @@ class PkEventGiftController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->show_img ?? $ware->img2;
+                $path = $ware->img2 ?? $ware->show_img ;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = '';
+                $path = 'cion.png';
             }
 
             /** @var Gift $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        $grid->column('expire', __('expire'));
         $grid->column('created_at', __('Created at'));
 
         $grid->actions (function ($actions){
@@ -269,6 +280,11 @@ class PkEventGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }

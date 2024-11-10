@@ -460,7 +460,8 @@ class UserController extends MainController
             $actions->add(new DeletePackAction());
             $actions->add(new EditPackExpireAction());
         });
-
+       
+        $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();
         $grid->disableRowSelector();
@@ -486,7 +487,6 @@ class UserController extends MainController
             return __('no time');
         });
         $grid->column('qty', __('qty'));
-
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
@@ -494,7 +494,8 @@ class UserController extends MainController
             $actions->add(new DeleteUserVipAction());
             //            $actions->add(new EditPackExpireAction());
         });
-
+        
+        $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();
         $grid->disableRowSelector();

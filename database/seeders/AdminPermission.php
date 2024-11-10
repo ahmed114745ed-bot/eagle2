@@ -89,7 +89,14 @@ class AdminPermission extends Seeder
             'updates',
             'Permissions',
             'daily-prize',
-            'weekly_cp'
+            'weekly_cp',
+            "request-problem",
+            'agent-request-transaction',
+            "charge-country",
+            'charge-agency',
+            'salary-request',
+            "agent-request-history",
+
 
 
 
@@ -142,9 +149,7 @@ class AdminPermission extends Seeder
             'official-messages' => ['official-messages'],
             'carousel' => ['carousel'],
             'user-levels' => ['user-levels'],
-
-
-
+            'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
 
         ];
 

@@ -32,7 +32,11 @@ class PaymentGetWayController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
         $grid->column('photo', __('Photo'))->image('', 50);
-
+        // $grid->column('الاجرائات')->display(function () {
+        //     $url1 = url('admin/coins/' . $this->id);
+        //     $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>الكوينات</a>";
+        //     return $button1;
+        // });
         return $grid;
     }
 

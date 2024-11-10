@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class addTOjesonController extends Controller
 {
@@ -48,6 +49,25 @@ class addTOjesonController extends Controller
 
     public function create(Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'chat_status'        => 'nullable',
+            'invitation_code_date'        => 'nullable|numeric',
+            'show_welcom_enmation'        => 'nullable',
+            'android_min_version'         => 'nullable|numeric',
+            'android_current_version'         => 'nullable|numeric',
+            'android_update_required'         => 'nullable|numeric',
+            'ios_min_version'         => 'nullable|numeric',
+            'ios_current_version'         => 'nullable|numeric',
+            'ios_update_required'         => 'nullable|numeric',
+            'huawei_min_version'         => 'nullable|numeric',
+            'huawei_current_version'         => 'nullable|numeric',
+            'huawei_update_required'         => 'nullable|numeric',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         $chat_status =  $request->chat_status;
         $invitation_code_date =  $request->invitation_code_date;
         $show_welcom_enmation =  $request->show_welcom_enmation;

@@ -16,13 +16,14 @@ class GiftController extends Controller
     public function __construct(private GiftService $giftService) {}
     public function index(Request $request)
     {
-        $gifts = $this->giftService->index($request);
+        $type = $request->type;
+        $gifts = $this->giftService->index($type);
         return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
 
-    public function allGifts()
+    public function allGifts(Request $request)
     {
-        $gifts = $this->giftService->index();
+        $gifts = $this->giftService->allGift($request->page, $request->per_page);
         return Common::apiResponse(1, '',  $gifts);
     }
 
@@ -31,11 +32,11 @@ class GiftController extends Controller
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
-            'type'         => 'required',
+            'type'         => 'required|numeric',
             'vip_level'         => 'nullable|lt:256',
             'price'         => 'required|numeric',
-            'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'show_img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img'          => 'required|mimes:jpeg,png,jpg,gif|max:2048',
+            'show_img'          => 'required|mimes:jpeg,png,jpg,gif,svg,mp4,svga',
             'image_type'         => 'required|string|max:255',
             'show_img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort'         => 'nullable|numeric',
@@ -60,6 +61,12 @@ class GiftController extends Controller
 
     public function show(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'gift_id'  => 'required|integer|exists:gifts,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
         $data = $this->giftService->show($request->gift_id);
         return Common::apiResponse(1, '', $data);
     }
@@ -73,8 +80,8 @@ class GiftController extends Controller
             'type'         => 'required',
             'vip_level'         => 'nullable|lt:256',
             'price'         => 'required|numeric',
-            'img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'show_img'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img'          => 'required|mimes:jpeg,png,jpg,gif|max:2048',
+            'show_img'          => 'required|mimes:jpeg,png,jpg,gif,svg,mp4,svga',
             'image_type'         => 'required|string|max:255',
             'show_img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'sort'         => 'nullable|numeric',
@@ -91,9 +98,6 @@ class GiftController extends Controller
         }
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) != 100) && ($request->type == 6)) {
             return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
-        }
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
             $this->giftService->update($request);
@@ -144,5 +148,10 @@ class GiftController extends Controller
         $value =   $this->giftService->updateSwitch($request->is_play, $request->gift_id, 'is_play');
         if (!$value)  return Common::apiResponse(1, 'failed');
         return Common::apiResponse(1, 'updated successfully');
+    }
+
+    public function typeGift(Request $request)
+    {
+        return translate(TYPE_GIFT);
     }
 }

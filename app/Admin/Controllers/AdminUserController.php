@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use function Doctrine\Common\Cache\Psr6\get;
 
-class AdminUserController extends \Encore\Admin\Controllers\UserController
+class AdminUserController extends EncorUsersController
 {
-
+// \Encore\Admin\Controllers\UserController
 
     protected $model;
+
+    public $permission_name = 'auth-users';
 
 
 

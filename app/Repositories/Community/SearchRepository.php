@@ -25,7 +25,7 @@ class SearchRepository implements SearchRepositoryInterface
         }
     }
 
-    public function searchRooms(int $userId, string $keywords, int $page = 1): array
+    public function searchRooms(int $userId, string $keywords, int $page = 1): \Illuminate\Contracts\Pagination\LengthAwarePaginator|array
     {
         $user = User::where('uuid', $keywords)->first();
 
@@ -52,17 +52,10 @@ class SearchRepository implements SearchRepositoryInterface
                 'users.name'
             ])
             ->orderBy('rooms.hot', 'desc')
-            ->forPage($page, 10)
+            ->take(2)
             ->get();
 
-        return $rooms->map(function ($room) {
-            $room->hot = Common::room_hot($room->hot);
-            $room->nickname = $room->nickname ?: '';
-            $room->room_cover = $room->room_cover ?: '';
-            $room->room_pass = !empty($room->room_pass);
-
-            return $room;
-        })->toArray();
+        return $rooms->toArray();
     }
 
     public function userSearchHand(int $userId, string $keywords, int $page = 1)
@@ -79,21 +72,15 @@ class SearchRepository implements SearchRepositoryInterface
                 $query->where('uuid', 'like', '%' . $keywords . '%')
                       ->orWhere('special_id', 'like', '%' . $keywords . '%');
             })
+            ->with(['followedByAuthUser'])
             ->where('status', 1)
             ->orWhere(function ($query) use ($whereOr) {
                 $query->where($whereOr);
             })
             ->orderBy('matching_percentage', 'desc')
-            ->forPage($page, 10)
-            ->get();
+            ->paginate();
 
-        foreach ($users as $user) {
-            $user->is_follow = DB::table('follows')
-                ->where('user_id', $userId)
-                ->where('followed_user_id', $user->id)
-                ->where('status', 1)
-                ->exists() ? 1 : 0;
-        }
+
 
         return $users;
     }

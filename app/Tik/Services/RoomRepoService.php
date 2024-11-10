@@ -181,10 +181,10 @@ class RoomRepoService
         $currentPage = $request->page ?? 1;
         $visitors = null;
 
-        if ($request->has('users') && $currentPage == 1) {
+         if ($request->has('users') && $currentPage == 1) {
             $room->enableSaving      = false;
             $visitors      = $request->users ?? '';
-        }
+       }
 
         $roomAdmin   = $room->room_admin ?? '';
         $roomVisitor = $visitors ?? $room->room_visitor;
@@ -192,15 +192,17 @@ class RoomRepoService
 
         $roomAdmin        = explode(',', $roomAdmin);
         $roomAdminActive  = array_intersect($roomVisitor, $roomAdmin);
+       
         $roomVisitorArray = array_diff($roomVisitor, array_merge($roomAdminActive, [$room->uid . '']));
         $users = $this->userRepository->usersRoom($roomAdminActive);
-
+        
         $usersCount        = count($roomVisitor);
         $countInterested   = $users->count(['users.id']);
         $perPage           = 10;
         //        $diffCountWithPage = $countInterested - ($perPage * $currentPage);
 
         $users = $users->paginate($perPage);
+      
         if ($currentPage == 1 && in_array($room->uid, $roomVisitor)) {
             $allData[] = $room->owner;
             $allData   = array_merge($allData, $users->items());
@@ -267,6 +269,32 @@ class RoomRepoService
         if ($lastMode == '3' && $currentMode != '3') {
             $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
         }
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
+        return Common::apiResponse(1, 'done', null, 201);
+    }
+    
+    public function changeModeMic($request, $currentMode)
+    {
+        $room =  $this->findRoomUser($request->owner_id);
+        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        //get last mode of rooms to if is cinema mode and change it update room background
+        $lastMode = $room->mode;
+        $room->mode = $currentMode;
+        $room->save();
+        $jsons = [];
+        $map = [];
+        $mode = $currentMode;
+        $ms   = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+      
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {

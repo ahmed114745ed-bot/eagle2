@@ -63,10 +63,21 @@ class ChargeController extends MainController
             $filter->expand();
 
         });
+
+
         $grid->column('user_id', __('User'))->display(function($userId) {
-            $user = \App\Models\User::find($userId);
-            $img = getDriverUrl().'/'. $user->profile?->avatar;
-            return "<img src='$img' style='width: 50px; height: 50px; border-radius: 50%;' /> <br> uid: #{$user->uuid}";
+            if ($this->user_type == "dash") {
+                $agency = \App\Models\Agency::find($this->agency_id);
+                $img = getDriverUrl().'/'. $agency?->img;
+                $id = $agency->id;
+                $type = "agency";
+            }else{
+                $user = \App\Models\User::find($userId);
+                $img = getDriverUrl().'/'. $user->profile?->avatar;
+                $id = $user->uuid;
+                $type = "user";
+            }
+            return "<img src='$img' style='width: 50px; height: 50px; border-radius: 50%;' /> <br> uid: #{$id} <br> type: #{$type}";
         });
         
         // $grid->column('user_type', __('User Type'))->using([

@@ -1,4 +1,5 @@
 <?php
+
 use App\Classes\AppSetting;
 use Encore\Admin\Admin;
 
@@ -6,6 +7,27 @@ const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
 const CINEMA_IMAGE = 'custom_image/back-black.png';
 const GAME_COINS_PLAY = 'game_coins_play_#';
+
+
+
+function translate($typeArray)
+{
+    $arr = [];
+    foreach ($typeArray as $key => $type) {
+        $arr[$key]  = __($type);
+    }
+    return $arr;
+}
+
+function translateCategory($typeArray)
+{
+    $arr = [];
+    foreach ($typeArray as $key => $type) {
+        $arr[$type]  = __($type);
+    }
+    return $arr;
+}
+
 
 function generateSignature($nonce, $appKey, $timestamp)
 {
@@ -189,11 +211,79 @@ if (!function_exists('isSubdomain')) {
 
         return count($hostParts) > 2;
     }
+}
+if (!function_exists('adjustColor')) {
+
+    function adjustColor($hex, $rOffset= -30, $gOffset = -90, $bOffset = -60) : string
+    {
+        // Convert the hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Apply the offsets and ensure values are within 0-255
+        $newR = max(0, min(255, $r - $rOffset));
+        $newG = max(0, min(255, $g - $gOffset));
+        $newB = max(0, min(255, $b - $bOffset));
+
+        // Convert the new RGB values back to hex format
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+
+    function getInverseColor($hex) :string
+    {
+        // Convert the hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate the inverse by subtracting each component from 255
+        $inverseR = 255 - $r;
+        $inverseG = 255 - $g;
+        $inverseB = 255 - $b;
+
+        // Convert the inverted RGB values back to hex format
+        return sprintf("#%02x%02x%02x", $inverseR, $inverseG, $inverseB);
+    }
+
+
+    function adjustTextColor($hex, $lightnessFactor = 0.8, $darknessFactor = 0.2) {
+        // Convert hex color to RGB
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate brightness (perceived luminance)
+        $brightness = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
+
+        if ($brightness > 0.5) {
+            // If color is light, make it darker
+            $newR = intval($r * $darknessFactor);
+            $newG = intval($g * $darknessFactor);
+            $newB = intval($b * $darknessFactor);
+        } else {
+            // If color is dark, make it lighter
+            $newR = intval($r + (255 - $r) * $lightnessFactor);
+            $newG = intval($g + (255 - $g) * $lightnessFactor);
+            $newB = intval($b + (255 - $b) * $lightnessFactor);
+        }
+
+        // Convert back to hex
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+    function getLighterColor($hex, $lightness  = 0.9)
+    {
+        list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
+
+        // Calculate a lighter color closer to white by increasing each component
+        $newR = intval($r + (255 - $r) * $lightness);
+        $newG = intval($g + (255 - $g) * $lightness);
+        $newB = intval($b + (255 - $b) * $lightness);
+
+        // Convert back to hex
+        return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
+    }
+
+
 
 }
 
 
-if (!function_exists( 'getPusherConfig')) {
+if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
         return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
@@ -217,17 +307,15 @@ if (!function_exists( 'getPusherConfig')) {
             ];
         });
     }
-
-
 }
-if (!function_exists('nameRoute')){
-    function nameRoute (string $name): string
+if (!function_exists('nameRoute')) {
+    function nameRoute(string $name): string
     {
         $separators = ['.', '/'];
         $separator = null;
         $requestPath = \Request::path();
 
-        if (\Str::startsWith($requestPath, 'preview')) {//admin.route.prefix,admin.auth.controller
+        if (\Str::startsWith($requestPath, 'preview')) { //admin.route.prefix,admin.auth.controller
             foreach ($separators as $s) {
                 $valuesCount = count(explode($s, $name));
                 if ($valuesCount > 1) $separator = $s;
@@ -237,13 +325,14 @@ if (!function_exists('nameRoute')){
         return $separator ? ('preview' . $separator . $name) : $name;
     }
 }
-if (!function_exists('getFileExtension')){
-    function getFileExtension($url) {
+if (!function_exists('getFileExtension')) {
+    function getFileExtension($url)
+    {
         return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
     }
 }
-if (!function_exists('handleShowImageWithTypes')){
-    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = 50, int $height= 50): string
+if (!function_exists('handleShowImageWithTypes')) {
+    function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null): string
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
@@ -259,14 +348,13 @@ if (!function_exists('handleShowImageWithTypes')){
                     Your browser does not support the video tag.
                  </video>
                 ";
-
         }
 
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important;' alt='' />";
     }
 }
 
-if (!function_exists('showSvgaImage')){
+if (!function_exists('showSvgaImage')) {
     /**
      * @param string|null $url
      * @return string
@@ -312,4 +400,3 @@ if (!function_exists('showSvgaImage')){
         return $model;
     }
 }
-

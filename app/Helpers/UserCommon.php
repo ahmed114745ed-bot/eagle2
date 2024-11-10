@@ -370,7 +370,7 @@ class UserCommon{
                 if ($ware->expire != 0){
                     DB::beginTransaction ();
                     try {
-                        $pack->expire += ($ware->expire * 86400);
+                        $pack->expire += $expir ? ($expir * 86400) : ($ware->expire * 86400);
                         $pack->save ();
                         DB::commit ();
                         Common::sendOfficialMessage ($user->id,__('congratulations'),__('لقد حصلت على اهداء'));
@@ -396,7 +396,7 @@ class UserCommon{
             $arr['get_type']=$ware->get_type;
             $arr['target_id']=$ware->id;
             $arr['num']=1;//$qty;
-            $arr['expire']= $ware->expire ? time()+($ware->expire * 86400) : 0;
+            $arr['expire']= $expir ? time() + ($expir * 86400) : ($ware->expire ? time()+($ware->expire * 86400) : 0);
             $arr['is_read']=1;
             Pack::query ()->create ($arr);
             DB::commit ();

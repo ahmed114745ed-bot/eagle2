@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
+use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
 
@@ -29,20 +30,27 @@ class AuthService
             'phone' => $request->phone, 'password' => $request->password,
         ];
 
-        $user = $this->userRepository->create($data);
+        \DB::beginTransaction();
+        try {
+            $user = $this->userRepository->create($data);
+            if (\request('tags') && is_array(\request('tags'))) {
+                $user->tags()->attach(\request('tags'));
+            }
+            if (!$request->country_id) {
+                $country = $this->countryRepository->findByPhoneCode('101');
+                $user->country_id = @$country->id;
+            }
+            $user->is_points_first = 1;
+            $user->save();
+            $token = $user->createToken('api_token')->plainTextToken;
+            UserHandling::AddUserVip($user, 'register');
 
-        if (\request('tags') && is_array(\request('tags'))) {
-            $user->tags()->attach(\request('tags'));
+            \DB::commit();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
         }
 
-        if (!$request->country_id) {
-            $country = $this->countryRepository->findByPhoneCode('101');
-            $user->country_id = @$country->id ;
-        }
-        $user->is_points_first = 1;
-        $user->save();
-        $token = $user->createToken('api_token')->plainTextToken;
-        UserHandling::AddUserVip($user, 'register');
         return [$user, $token];
     }
 
@@ -80,7 +88,7 @@ class AuthService
                     'name' => $request['name'],
                     'email' => $request['email'],
                     'google_id' => $request['google_id'],
-                    'country_id' => @$country->id ?: 0,
+                    'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => 1
                 ];
@@ -89,9 +97,9 @@ class AuthService
                     $user->tags()->attach(\request('tags'));
                 }
 
-                $user->country_id = @$country->id ?: 0;
+                /*$user->country_id = @$country->id ?: null;
                 $user->is_points_first = 1;
-                $user->save();
+                $user->save();*/
             }
         }
         $this->rule($user, '', @$request['device_token'], $request);
@@ -172,8 +180,8 @@ class AuthService
         return [$user, $token];
     }
 
-    
- 
+
+
 
     public function logoutAsConfiguration($user)
     {

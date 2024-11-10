@@ -23,7 +23,6 @@ Route::group(
     function (\Illuminate\Routing\Router $router) {
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
-        $router->resource('weekly-cp', WeeklyCpController::class);
 
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {

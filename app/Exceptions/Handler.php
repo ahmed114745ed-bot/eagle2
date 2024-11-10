@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Helpers\Common;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -14,7 +15,8 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
-        //
+        ValidationException::class,
+
     ];
 
     /**
@@ -27,6 +29,28 @@ class Handler extends ExceptionHandler
         'password',
         'password_confirmation',
     ];
+
+    // Render method to handle all exceptions
+    public function render($request, Throwable $e): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    {
+
+        if ($request->is('api/*')) {
+            if ($e instanceof CValidationException) {
+                return Common::apiResponse(0, $e->getMessage(), null, 422);
+            }elseif ($e instanceof \Illuminate\Auth\AuthenticationException) {
+
+                return Common::apiResponse (false,'Unauthenticated',[],401);
+            }
+
+            \Log::error($e->getMessage());
+            return Common::apiResponse(0, $e->getMessage(), null, 500);
+
+        }
+        // Handle validation exceptions
+
+
+        return parent::render($request, $e);
+    }
 
     /**
      * Register the exception handling callbacks for the application.

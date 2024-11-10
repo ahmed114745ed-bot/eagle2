@@ -13,20 +13,20 @@ class GiftRepository extends AbstractRepository
         parent::__construct(new Gift());
     }
 
-    public function all($request)
+    public function all($type)
     {
         $gifts = $this->model->query()->where('enable', 1)->orderBy("use_count", "desc");
-        if ($request->type) {
-            $gifts = $gifts->where('type', $request->type);
+        if ($type) {
+            $gifts = $gifts->where('type', $type);
         }
         return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
     }
 
-    public function allGifts()
+    public function allGifts($page,$perPage)
     {
         $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
-        
-        return $gifts->orderBy('price')->get();
+
+        return $gifts->orderBy('price')->paginate($perPage, ['*'], 'page', $page);
 
     }
 
@@ -57,5 +57,5 @@ class GiftRepository extends AbstractRepository
         return true;
     }
 
-    
+
 }

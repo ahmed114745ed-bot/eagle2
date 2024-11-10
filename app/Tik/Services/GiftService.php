@@ -13,10 +13,17 @@ class GiftService
         private readonly GiftRepository $giftRepository,
     ) {}
 
-    public function index()
+    public function index($type)
     {
-        return $this->giftRepository->allGifts();
+        return $this->giftRepository->all($type);
     }
+
+    public function allGift($page,$perPage)
+    {
+        return $this->giftRepository->allGifts($page,$perPage);
+    }
+
+
 
     public function show($giftId)
     {

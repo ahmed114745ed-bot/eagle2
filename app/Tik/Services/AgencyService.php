@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Exceptions\CValidationException;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Facades\UserHandling;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
+use http\Exception\RuntimeException;
 use Illuminate\Support\Facades\Storage;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AdminRepository;
@@ -21,6 +23,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
@@ -255,13 +258,17 @@ class AgencyService
     {
         $operator = $this->userRepository->findById($userId);
 
-        if ($agencyId != $operator->agency_id) throw new Exception('يجب ان يكون المستخدم في الوكاله!');
+        if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
+
+        if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
+            throw new CValidationException(__('This user already has an agency job requested!'));
+        }
+
         $data = [
             'agency_id' => $agencyId,
             'user_id' => $operator->id,
             'type' => "requestManger",
         ];
-
         $this->agencyUserJobRepository->create($data);
         return true;
     }
@@ -490,6 +497,7 @@ class AgencyService
             $data->day = Carbon::parse($data->date)->day;
             return $data;
         });
+        /** @var User $user */
         $totalDays = $user->getTotalDays();
 
         $userInfoArray = $user->getSallaryInfo();

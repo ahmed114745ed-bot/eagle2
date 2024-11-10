@@ -44,6 +44,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
+            Route::prefix('api/utd')
+            ->middleware(['api', 'localization',])
+                ->namespace($this->namespace)
+                ->group(base_path('routes/utd.php'));
+
             if (AppFeatureService::isEnable('login')){
                 Route::prefix('api')
                     ->middleware('api')
@@ -52,24 +57,22 @@ class RouteServiceProvider extends ServiceProvider
                     ->namespace($this->namespace)
                     ->group(base_path('routes/game.php'));
 
+                 Route::middleware([ 'throttle'])
+                    ->prefix('preview')
+                    ->name('.preview.')
+                    ->namespace($this->namespace)
+                    ->group(base_path('app/Admin/preview-routes.php'));
+
                 Route::middleware(['web', 'throttle:40,1'])
                     ->namespace($this->namespace)
                     ->group(base_path('routes/web.php'));
 
-                Route::middleware('api')
-                    ->namespace($this->namespace)
-                    ->prefix('api/dashboard')
-                    ->group(base_path('routes/dashboard.php'));
 
-                Route::middleware(['web', 'throttle'])
+                /*Route::middleware(['web', 'throttle'])
                     ->namespace($this->namespace)
-                    ->group(base_path('app/Agency/routes.php'));
+                    ->group(base_path('app/Agency/routes.php'));*/
 
 
-                Route::middleware([ 'throttle'])
-                    ->prefix('preview')
-                    ->namespace($this->namespace)
-                    ->group(base_path('app/Admin/preview-routes.php'));
             }
 
         });

@@ -2,18 +2,18 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Facades\UserHandling;
-use App\Helpers\Common;
-use App\Models\FamilyLevel;
-use App\Models\FamilyUser;
-use App\Models\GiftLog;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\UserSetting;
 use App\Models\Ware;
-use Illuminate\Http\Resources\Json\JsonResource;
+use App\Helpers\Common;
+use App\Models\GiftLog;
+use App\Models\FamilyUser;
+use App\Models\FamilyLevel;
+use App\Models\UserSetting;
+use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataResource extends JsonResource
 {
@@ -118,6 +118,7 @@ class MyDataResource extends JsonResource
                 }
             }
         }
+
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/
@@ -145,7 +146,7 @@ class MyDataResource extends JsonResource
                 "room_cover" => @$ownerRoom->room_cover,
                 "room_background" => @$ownerRoom->final_room_image,
                 "mode" => @$ownerRoom->mode,
-                'giftPrice' => $ownerRoom->session_string,
+                'giftPrice' => @$ownerRoom->session_string,
 
             ],
             'phone_bind' => (bool)@$this->phone,
@@ -153,21 +154,15 @@ class MyDataResource extends JsonResource
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'bio' => @$this->bio ?: '',
-            'number_of_fans' => $this->followers_ids()->count(),
-            'number_of_followings' => $this->followeds_ids()->count(),
-            'number_of_friends' => $this->numberOfFriends(),
+            'number_of_fans' => $this->followerss()->count(),
+            'number_of_followings' => $this->following()->count(),
+            'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
             'profile' => new ProfileResource(@$this->profile),
             'level' => Common::level_center(@$this->id),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_Available' => (bool)UserHandling::chickLevelToPlay($this->resource),
-            'my_store' => [
-                'id' => $this->id,
-                'coins' => $this->di,
-                'diamonds' => $this->monthly_diamond_received,
-                'silver_coins' => $this->gold,
-                'usd' => (double)$this->sallary,
-            ],
+            $this->merge((new MyStoreResource($this->resource))),
             'family_data' => $f,
             'agency' => $agency_joined,
             'Last_seen' => @$time_log->time ?? 0,

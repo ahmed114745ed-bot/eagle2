@@ -17,6 +17,13 @@ return [
     'balance_user_name'     => env('BALANCE_USER_NAME', 'superAdmin'),
     'balance_password'      => env('BALANCE_PASSWORD', '12345678'),
     'one_coins'             => env('ONE_COINS'),
+
+    'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
+
+    // fairbase
+    'fileName' => env('FILL_NAME','firebase_credentials.json'),
+    'senderId' => env('SENDER_ID','hola-chat-5554d'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -47,8 +54,8 @@ return [
 
     'app_origin_name'=>env('APP_ORIGIN_NAME', 'r-star'),
 
-    
-    
+
+
 
     /*
     |--------------------------------------------------------------------------

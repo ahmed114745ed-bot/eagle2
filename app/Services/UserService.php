@@ -19,6 +19,7 @@ use App\Tik\Repositories\VipRepository;
 use App\Repositories\User\UserRepository;
 use Illuminate\Database\Query\JoinClause;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
@@ -38,9 +39,11 @@ class UserService
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
+      private readonly  GiftLogRepository $giftLogRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
-        FollowRepository $followRepository
+        FollowRepository $followRepository,
+
     ) {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
@@ -192,7 +195,7 @@ class UserService
             case '3':
             case '6':
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
-                return Common::apiResponse(true, '', $this->getData($user, $type), 200);
+                return Common::apiResponse(true, '', $this->getData2($user, $type), 200);
 
             case '4':
                 (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
@@ -260,7 +263,7 @@ class UserService
     public function getData(User $user, $type = 1)
     {
         $userId = $user->id;
-        
+
         if ($type == 1) {
             // following in app
             $data = $this->followRepository->getByFollowed($userId);
@@ -274,7 +277,47 @@ class UserService
             $data = $this->followRepository->getByFriends($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
-        } 
+        }
+        elseif ($type == 6) {
+            // uses that follow you not friend with you
+            $users = $this->followRepository->getFollow($userId);
+
+        } else {
+            $users = collect([]);
+        }
+
+
+        [$userFollowers, $vipsSenderImages, $vipsReceivedImages] = $this->getHelperArrays($user, $users);
+
+
+        UserRelationsResource::initializeData($vipsReceivedImages, $vipsSenderImages, $userFollowers);
+
+        return UserRelationsResource::collection($users);
+    }
+
+
+    public function getData2(User $user, $type = 1)
+    {
+        $userId = $user->id;
+
+        $with = [
+            'room' => function ($query) {
+                return $query->withoutAppends()->select(['id', 'room_pass', 'uid']);
+            },
+            'followPacks',
+            'profile',
+            'ware',
+            'UserVip'
+        ];
+
+        if ($type == 1) {
+            // following in app
+            $users = $this->followRepository->getFollowing($user, $with);
+        } elseif ($type == 2) {
+            $users = $this->followRepository->getFollowers($user, $with);
+        } elseif ($type == 3) {
+            $users = $this->followRepository->getFriends($user, $with);
+        }
         elseif ($type == 6) {
             // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
@@ -342,7 +385,6 @@ class UserService
         $user = $this->userRepository->findById($userId);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
-        if (in_array($auth->id, Common::getUserBlackList($user->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;
 
         if ($auth->id != $user->id && $isVisit == true) {
@@ -374,7 +416,7 @@ class UserService
         $type     = $request->input('type', 2);
         $room_uid = $request->input('room_uid');
         $limit    = $request->input('is_home') ? 3 : 30;
-        $user_id  = $request->user()->id; 
+        $user_id  = $request->user()->id;
         $query = GiftLog::query()->where('roomowner_id', $room_uid);
 
         if ($type == 1) {
@@ -383,7 +425,7 @@ class UserService
                 Carbon::now()->endOfDay()
             ]);
         }
-       
+
         $data = $query->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')
             ->orderByRaw("exp desc")
@@ -442,7 +484,7 @@ class UserService
         $phone = $request->phone;
         $whatsappWebhookValidate = $whatsappWebhook->getLastValidatedPhone($phone);
         if (!$whatsappWebhookValidate)throw new \Exception( __('current phone not verified'));
-        
+
         $user = User::query ()->where ('phone', $phone)->first ();
 
         $user->password = $request->password;
@@ -481,5 +523,10 @@ class UserService
         }
 
         return $setting;
+    }
+
+    public function supporter($userId)
+    {
+        return $this->giftLogRepository->getByUserId($userId);
     }
 }

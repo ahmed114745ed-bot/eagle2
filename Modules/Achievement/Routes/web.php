@@ -31,9 +31,7 @@ Route::group(
     ],
     function (\Illuminate\Routing\Router $router) {
         $router->get('/test-calculat', function (){
-            $gift=\App\Models\Gift::first();
-            $user_owner=\App\Models\User::find(1260);
-            \Modules\Achievement\Jobs\CalculateAchievement::dispatch($gift,5, $user_owner);
+
             dd("dsdsdsds");
         });
 
