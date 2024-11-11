@@ -52,11 +52,11 @@ class UserResource extends JsonResource
                 'img'         => $family->image,
             ];
         }
-        if ($request->user()) {
-            $fArr = $request->user()->friends_ids()->toArray();
-        } else {
-            $fArr = [];
-        }
+        // if ($request->user()) {
+        //     $fArr = $request->user()->friends_ids()->toArray();
+        // } else {
+        //     $fArr = [];
+        // }
 
         $onlineTime      = Carbon::createFromTimestamp($this->online_time);
         $currentDateTime = Carbon::now();
@@ -109,9 +109,9 @@ class UserResource extends JsonResource
             'number_of_followings' => $this->numberOfFollowings(), // both  ---
             'number_of_friends'    => $this->numberOfFriends(), // both  ------
             'profile_visitors'     => $this->profileVisits()->count(), // both  -------
-            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id, "user_id" => $this->id])->first() != null ? true : false,
-            'is_follow'            => @(bool)Common::IsFollow(@$request->user()->id, $this->id), // user data  ----
-            'is_friend'            => in_array($this->id, $fArr),  //  -------
+            'is_followed'            => $this->is_followed,
+            'is_follow'            => $this->is_follow, // user data  ----
+            'is_friend'            => $this->isFriends(),  //  -------
             'now_room'             => [
                 'is_in_room'      => @$this->now_room_uid != 0,
                 'uid'             => @(int)$this->now_room_uid,

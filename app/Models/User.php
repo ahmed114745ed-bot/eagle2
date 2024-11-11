@@ -649,6 +649,10 @@ class User extends Authenticatable
     }
 
 
+    public function getNowRoomUidAttribute($value)
+    {
+        return $value == 0 ? null : $value;
+    }
 
 
 
