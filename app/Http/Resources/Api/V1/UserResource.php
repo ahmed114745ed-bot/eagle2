@@ -123,7 +123,6 @@ class UserResource extends JsonResource
             'family_data'          => @$f, // refactor   --------
             'profile'              => new ProfileResource(@$this->profile),
             // both       ------- img type   oge    contry   reqouerd
-            'level'                => Common::level_center(@$this->id), // both     ---- resever img   , sendr img  req
             'diamonds'             => @$this->total_diamond_received ?: 0, // both  ---------------------
             'vip'                  => @Common::ovip_center($this->id), // both
             'lang'                 => @$this->lang, // both        --------------

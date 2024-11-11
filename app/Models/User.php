@@ -159,6 +159,13 @@ class User extends Authenticatable
         };
     }
 
+    public function getFamilyIdAttribute($value)
+    {
+        return $value  == 0 ?  null : $value;
+    }
+
+
+
 
     public function getTotalDays()
     {
@@ -359,7 +366,7 @@ class User extends Authenticatable
     }
 
 
-   
+
 
 
 
@@ -1044,6 +1051,4 @@ class User extends Authenticatable
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
         return $packs->where('type', $type)->isNotEmpty();
     }
-
-    
 }
