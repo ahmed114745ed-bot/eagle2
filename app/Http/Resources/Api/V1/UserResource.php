@@ -75,7 +75,7 @@ class UserResource extends JsonResource
         //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
-
+        $userHandling = new \App\Classes\UserHandling();
         $color_image = @$this->color_image;
         $chat_setting = \App\Models\ChatSetting::where("user_id", $this->id)->first();
         if ($chat_setting == null) {
@@ -163,6 +163,7 @@ class UserResource extends JsonResource
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            "top_three_support"    => $userHandling->getTopThreeSupport($this->id)
 
         ];
 
