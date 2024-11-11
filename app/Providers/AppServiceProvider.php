@@ -36,6 +36,21 @@ use App\Services\RedisService;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
+
+use App\Modules\Tasks\Repositories\Contracts\{
+    DailyTaskRepositoryInterface,
+    TaskProgressRepositoryInterface,
+    TaskRewardRepositoryInterface,
+    DayRepositoryInterface
+};
+use App\Modules\Tasks\Repositories\{
+    DailyTaskRepository,
+    TaskProgressRepository,
+    TaskRewardRepository,
+    DayRepository
+};
+use App\Modules\Tasks\Services\TaskService;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -52,6 +67,20 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind (RoomRepoInterface::class,RoomRepo::class);
         $this->app->bind (UserRepoInterface::class,UserRepo::class);
+
+
+        //dd(\App\Modules\Tasks\Services\TaskService::class);
+
+        $this->app->bind(DailyTaskRepositoryInterface::class, DailyTaskRepository::class);
+        $this->app->bind(TaskProgressRepositoryInterface::class, TaskProgressRepository::class);
+        $this->app->bind(TaskRewardRepositoryInterface::class, TaskRewardRepository::class);
+        $this->app->bind(DayRepositoryInterface::class, DayRepository::class);
+        
+        $this->app->bind(TaskService::class, function ($app) {
+            return new TaskService($app->make(DailyTaskRepositoryInterface::class),$app->make(TaskProgressRepositoryInterface::class),$app->make(TaskRewardRepositoryInterface::class),$app->make(DayRepositoryInterface::class),$app->make(DailyTaskRepositoryInterface::class),);
+        });
+
+
         $this->app->bind ('RedisService',function($app){
             return new RedisService();
         });

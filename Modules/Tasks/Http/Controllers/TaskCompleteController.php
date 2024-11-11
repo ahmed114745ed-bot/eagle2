@@ -2,6 +2,7 @@
 
 namespace Modules\Tasks\Http\Controllers;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Day;
@@ -14,12 +15,19 @@ use Modules\Tasks\Entities\UserDayTaskProgress;
 use Modules\Tasks\Entities\UserTaskReward;
 use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
 use Illuminate\Support\Facades\DB;
+use Modules\Tasks\Services\TaskService;
 
 class TaskCompleteController extends Controller
 {
+    protected $taskService;
+
+    public function __construct(TaskService $taskService)
+    {
+        $this->taskService = $taskService;
+    }
     public function collectTaskPoints($taskId, Request $request, DailyGiftController $dailyGiftController)
     {
-        try {
+        /*try {
             return DB::transaction(function () use ($taskId, $request, $dailyGiftController) {
                 $userId = $request->user()->id;
 
@@ -29,11 +37,23 @@ class TaskCompleteController extends Controller
                     ->first();
 
                 if (!$taskProgress) {
-                    return response()->json(['error' => 'Task progress not found'], 404);
+                    return Common::apiResponse(
+                        true,
+                        'Task progress not found',
+                        null,
+                        404
+                    );
+                    //return response()->json(['error' => 'Task progress not found'], 404);
                 }
 
                 if ($taskProgress->is_completed) {
-                    return response()->json(['error' => 'Task progress already collected'], 200);
+                    return Common::apiResponse(
+                        true,
+                        'Task progress already collected',
+                        null,
+                        200
+                    );
+                    //return response()->json(['error' => 'Task progress already collected'], 200);
                 }
 
                 if ($taskProgress->count == $task->count) {
@@ -63,6 +83,15 @@ class TaskCompleteController extends Controller
 
                 if ($allTasksCompleted) {
                     $day = EntitiesDay::find($task->day_id);
+                    if($day->is_unlocked)
+                    {
+                        return Common::apiResponse(
+                            true,
+                            'day already unlocked and rewards assigned to user',
+                            null,
+                            200
+                        );
+                    }
                     if ($day && !$day->is_unlocked) {
                         $day->is_unlocked = true;
                         $day->save();
@@ -92,25 +121,53 @@ class TaskCompleteController extends Controller
                     }
 
                     if ($day && $day->is_unlocked && count($rewards) > 0) {
-                        return response()->json([
-                            'message' => 'Points collected successfully, rewards available.',
-                            'rewards' => $rewards,
-                            'total_points' => $user->total_points,
-                        ], 200);
+                        return Common::apiResponse(
+                            true,
+                            'Points collected successfully, rewards available.',
+                            [
+                                //'message' => 'Points collected successfully, rewards available.',
+                                'rewards' => $rewards,
+                                'total_points' => $user->total_points,
+                            ],
+                            200
+                        );
+                        //return response()->json([
+                        //    'message' => 'Points collected successfully, rewards available.',
+                        //    'rewards' => $rewards,
+                        //    'total_points' => $user->total_points,
+                        //], 200);
                     }
                 }
 
-                return response()->json([
-                    'message' => 'Points collected successfully',
-                    'total_points' => $user->total_points,
-                ], 200);
+                return Common::apiResponse(
+                    true,
+                    'Points collected successfully',
+                    [
+                        //'message' => 'Points collected successfully, rewards available.',
+                        //'rewards' => $rewards,
+                        'total_points' => $user->total_points,
+                    ],
+                    200
+                );
+                //return response()->json([
+                //    'message' => 'Points collected successfully',
+                //    'total_points' => $user->total_points,
+                //], 200);
             });
         } catch (\Exception $e) {
             \Log::error('Error collecting task points: ' . $e->getMessage());
             return response()->json(['error' => 'Server error'], 500);
+        }*/
+        try {
+            $userId = $request->user()->id;
+            $result = $this->taskService->collectTaskPoints($taskId, $userId);
+
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            \Log::error('Error collecting task points: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
 }
 
 
