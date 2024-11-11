@@ -37,19 +37,20 @@ use Illuminate\Support\ServiceProvider;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 
-use App\Modules\Tasks\Repositories\Contracts\{
+use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
+use Modules\Tasks\Repositories\Contracts\{
     DailyTaskRepositoryInterface,
     TaskProgressRepositoryInterface,
     TaskRewardRepositoryInterface,
     DayRepositoryInterface
 };
-use App\Modules\Tasks\Repositories\{
+use Modules\Tasks\Repositories\{
     DailyTaskRepository,
     TaskProgressRepository,
     TaskRewardRepository,
     DayRepository
 };
-use App\Modules\Tasks\Services\TaskService;
+use Modules\Tasks\Services\TaskService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -77,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(DayRepositoryInterface::class, DayRepository::class);
         
         $this->app->bind(TaskService::class, function ($app) {
-            return new TaskService($app->make(DailyTaskRepositoryInterface::class),$app->make(TaskProgressRepositoryInterface::class),$app->make(TaskRewardRepositoryInterface::class),$app->make(DayRepositoryInterface::class),$app->make(DailyTaskRepositoryInterface::class),);
+            return new TaskService($app->make(DailyTaskRepositoryInterface::class),$app->make(TaskProgressRepositoryInterface::class),$app->make(TaskRewardRepositoryInterface::class),$app->make(DayRepositoryInterface::class),$app->make(DailyGiftController::class),);
         });
 
 
