@@ -15,7 +15,6 @@ class RoomRepository extends AbstractRepository
         parent::__construct(new Room);
     }
 
-
     public function findRoomUser($userId, $withoutAppends = true)
     {
         $model = $this->model;

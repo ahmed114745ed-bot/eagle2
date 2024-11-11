@@ -267,7 +267,7 @@ trait CalcsTrait
     }
 
     //مركز الصف
-    public static function level_center($user_id)
+    public static function level_center_old($user_id)
     {
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         $user            = User::find($user_id);
@@ -299,6 +299,177 @@ trait CalcsTrait
         $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
         $next_gold_num   = self::getNextLevel(2, $gold_level, 'exp');
         $next_gold_level = self::getNextLevel(2, $gold_level, 'level');
+
+        $data['receiver_num']        = (int)$receivedNum;
+        $data['receiver_img']        = $star_level_img;
+        $data['sender_num']          = (int)$senderNum;
+        $data['sender_rem']          = floor((int)(($next_gold_num - $senderNum)));
+        $data['receiver_rem']        = floor((int)(($next_star_num - $receivedNum)));
+        $data['sender_img']          = $gold_level_img;
+
+        $data['receiver_level']      = (int)$star_level;
+        $data['next_receiver_num']   = (int)$next_star_num ?: 0;
+        $data['next_receiver_level'] = (int)$next_star_level ?: 0;
+
+        $data['sender_level']      = (int)$gold_level;
+        $data['next_sender_num']   = (int)($next_gold_num);
+        $data['next_sender_level'] = (int)$next_gold_level ?: 0;
+
+        $data['prev_receiver_num'] = (int)$current_star_num ?: 0;
+        $data['prev_sender_num'] = (int)($current_gold_num);
+        $data['current_receiver_num'] = $current_star_num;
+        $data['current_sender_num'] = $current_gold_num;
+
+        $rt = (int)$next_star_num - (int)$current_star_num;
+        $st = (int)$next_gold_num - (int)($current_gold_num);
+        $rc = (int)$receivedNum - ((int)$current_star_num);
+        $sc = (int)$senderNum - (int)($current_gold_num);
+
+        $data['rt'] = $rt;
+        $data['st'] = $st;
+        $data['rc'] = $rc;
+        $data['sc'] = $sc;
+
+
+        if ($rt > 0 && ($rc / $rt) < 1 && ($rc / $rt) > 0) {
+            $data['receiver_per'] = (float)($rc / $rt);
+        } else {
+            $data['receiver_per'] = (float)0.00;
+        }
+
+        if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
+            $data['sender_per'] = (float)($sc / $st);
+        } else {
+            $data['sender_per'] = (float)0.00;
+        }
+
+        return $data;
+    }
+
+    public static function getNextLevelData($type, $currentLevel)
+    {
+        $data = DB::table('vips')
+            ->select('level', 'exp')
+            ->where('type', $type)
+            ->where(function ($query) use ($currentLevel) {
+                $query->where('level', '>', $currentLevel)
+                    ->orWhere(function ($query) {
+                        $query->orderByDesc('exp')->limit(1);
+                    });
+            })
+            ->orderBy('level')
+            ->get();
+
+        // استخراج القيمة المطلوبة
+        $nextData = [
+            'next_exp' => 0,
+            'next_level' => 0,
+        ];
+
+        foreach ($data as $row) {
+            if ($row->level > $currentLevel) {
+                $nextData['next_exp'] = $row->exp;
+                $nextData['next_level'] = $row->level;
+                break;
+            }
+        }
+
+        // تعيين القيم القصوى في حالة عدم وجود مستوى أعلى
+        if ($nextData['next_exp'] == 0) {
+            $nextData['next_exp'] = $data->last()->exp ?? 0;
+        }
+
+        if ($nextData['next_level'] == 0) {
+            $nextData['next_level'] = $data->last()->level ?? 0;
+        }
+
+        return $nextData;
+    }
+    
+    public static function getNextLevelDataFromCache($type, $currentLevel, $vipsData)
+    {
+        // تحقق من وجود البيانات في المصفوفة
+        if (!isset($vipsData[$type])) return ['next_exp' => 0, 'next_level' => 0];
+
+        $data = $vipsData[$type];
+        $nextData = ['next_exp' => 0, 'next_level' => 0];
+
+        // البحث عن المستوى التالي
+        foreach ($data as $row) {
+            if ($row->level > $currentLevel) {
+                $nextData['next_exp'] = $row->exp;
+                $nextData['next_level'] = $row->level;
+                break;
+            }
+        }
+
+        // تعيين القيم القصوى في حالة عدم وجود مستوى أعلى
+        if ($nextData['next_exp'] == 0) {
+            $nextData['next_exp'] = $data->last()->exp ?? 0;
+        }
+
+        if ($nextData['next_level'] == 0) {
+            $nextData['next_level'] = $data->last()->level ?? 0;
+        }
+
+        return $nextData;
+    }
+    public static function getCurrentLevelFromCache($type = null, $level = 0, $field = null, $vipsData = [])
+    {
+        if (!$type || !$field || !isset($vipsData[$type])) return 0;
+
+        // الحصول على بيانات المستوى من المصفوفة المجمعة
+        $levelData = $vipsData[$type]->where('level', '=', $level)->first();
+
+        return $levelData ? $levelData->$field : 0;
+    }
+
+    public static function level_center($user_id)
+    { 
+        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+        $user            = User::find($user_id);
+        $diamondReceived = $user->total_received_diamonds;
+        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $diamondSend             = $user->total_sender_diamonds;
+        $senderNum        = floor($diamondSend  * $expPercentages[0]);
+
+        $star_level      = $user->total_received_level;
+
+        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+
+        $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
+
+
+
+        // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+
+        // تعريف المتغيرات المطلوبة من المصفوفة المجمعة
+        $current_star_num = self::getCurrentLevelFromCache(1, $star_level, 'exp', $vipsData);
+
+
+        $gold_level             = $user->total_sender_level;
+
+        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+        $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
+
+        // $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
+        // $next_gold_num   = self::getNextLevel(2, $gold_level, 'exp');
+        // $next_gold_level = self::getNextLevel(2, $gold_level, 'level');
+        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+
+        // استخدام الدالة للحصول على المستوى التالي من المصفوفة
+        $nextStarData = self::getNextLevelDataFromCache(1, $star_level, $vipsData);
+        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+
+        $next_star_num = $nextStarData['next_exp'];
+        $next_star_level = $nextStarData['next_level'];
+        $next_gold_num = $nextGoldData['next_exp'];
+        $next_gold_level = $nextGoldData['next_level'];
+
+     
+
+
 
         $data['receiver_num']        = (int)$receivedNum;
         $data['receiver_img']        = $star_level_img;

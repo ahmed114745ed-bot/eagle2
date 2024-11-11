@@ -83,6 +83,7 @@ class Common
     {
         return Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
     }
+    
     public static function apiResponse2(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
     {
 

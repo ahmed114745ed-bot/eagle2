@@ -32,6 +32,7 @@ use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Admin\Controllers\AgencyStatisticController;
+use App\Helpers\Common;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
@@ -379,9 +380,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
-
             // end coin report
-
+            // Route::get('/data-data', function(){
+            //     $id = \App\Models\User::first()?->id;
+            //     $data = Common::level_center(@$id);
+            //     return $data;
+            // });
 
         }
     );
