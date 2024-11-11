@@ -19,51 +19,26 @@ class MyDataResource extends JsonResource
 {
     public function toArray($request)
     {
-        $family = DB::table('families')->where('id', @$this->family_id)->first();
+        $family = $this->family;
         $f = null;
 
         if ($family) {
-            $fu = FamilyUser::where('family_id', $family->id)->where('status', 1)->count();
-            $giftLogs = GiftLog::where(function ($q) {
-                $q->where('receiver_family_id', $this->id)->orWhere('sender_family_id', $this->id);
-            })->sum('giftPrice');
-
-            $cur_level = FamilyLevel::where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
-            $next_level = FamilyLevel::where('exp', '>', $giftLogs)->orderBy('exp')->first();
-
-            $min_exp = @$cur_level->exp ?: 0;
-            $over = $giftLogs - $min_exp;
-            $diff = @$next_level->exp - @$cur_level->exp;
-            $lev = [
-                'level_exp' => (integer)$cur_level->exp ?: 0,
-                'level_name' => @$cur_level->name ?: '',
-                'level_img' => @$cur_level->img ?: '',
-                'family_exp' => (integer)$giftLogs,
-                'over_current_level_exp' => (integer)$over,
-                'next_exp' => (integer)$next_level->exp,
-                'next_name' => @$next_level->name,
-                'next_img' => @$next_level->img,
-                'per' => $diff == 0 ? 0 : (double)($over / $diff),
-                'rem' => (integer)($diff - $over)
-            ];
 
             $f = [
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'members_num' => $fu,
-                'level' => $lev
+                'members_num' => $family->members_count,
+                'level' => $family->level,
             ];
         }
 
         $user_id = $this->id;
 
-        $pack = $this->packs
-            ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
-            ->where('is_used', 1);
-
-        Pack::where('expire', '!=', 0)->where('expire', '<', time())->delete();
+        // $pack = $this->packs
+        //     ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
+        //     ->where('is_used', 1);
 
         $time_log = $this->timeLog()->latest()->first();
 
@@ -79,7 +54,7 @@ class MyDataResource extends JsonResource
         }
 
         $pass_status = false;
-        $now_room = Room::where('uid', $this->now_room_uid)->first();
+        $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
             $pass_status = true;
         }
@@ -87,19 +62,23 @@ class MyDataResource extends JsonResource
         $admin = $this->agencyUserJob;
         $owner = $this->ownAgency;
 
-        $dress_1_data = Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
-        $dress_1_fallback = Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
+        $dress_1_data =
+         $this->getUserDress(4, $this->dress_1, 'img2');
+        // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
+        $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
+        // Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
         $frame = $dress_1_data ?: $dress_1_fallback;
 
-        $bubble = Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
+        $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
+       // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
 
-        $dress_3_data = Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
-        $dress_3_fallback = Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
+        $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
+        // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
+        $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+       // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
 
-        $TypeIntro = Ware::where('id', $this->dress_3)->first();
-
-        $isHideCountry = Common::hasInPack($this->id, 13, true);
+        $isHideCountry = $this->getPackWithType(13);
 
         $show_user_setting = $this->userSetting;
         if ($show_user_setting == null) {
@@ -130,7 +109,7 @@ class MyDataResource extends JsonResource
             'phone' => (string)@$this->phone ?: '',
             'frame' => $frame,
             'intro' => $intro,
-            'intro_type' => @$TypeIntro?->image_type ?? '',
+            'intro_type' => @$this->dress3?->image_type ?? '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
@@ -168,8 +147,8 @@ class MyDataResource extends JsonResource
             'Last_seen' => @$time_log->time ?? 0,
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
-            'has_color_name' => $pack->where('type', 18)->count() >= 1,
-            'anonymous' => $pack->where('type', 17)->count() >= 1,
+            'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
+            'anonymous' => $this->packs->where('type', 17)->count() >= 1,
             'country' => $this->country,
             'country_hidden' => $isHideCountry,
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
@@ -193,4 +172,13 @@ class MyDataResource extends JsonResource
         return $data;
     }
 
+    public function getUserDress($type, $dress, $item = 'img1')
+    {
+        $pack = $this->getLoadedPacks()
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
+
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
+    }
 }
