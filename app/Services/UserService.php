@@ -40,7 +40,7 @@ class UserService
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
-      private readonly  GiftLogRepository $giftLogRepository,
+        private readonly  GiftLogRepository $giftLogRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -278,11 +278,9 @@ class UserService
             $data = $this->followRepository->getByFriends($userId);
             $collect = collect($data->items());
             $users    = $collect->pluck('follower');
-        }
-        elseif ($type == 6) {
+        } elseif ($type == 6) {
             // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
-
         } else {
             $users = collect([]);
         }
@@ -318,11 +316,9 @@ class UserService
             $users = $this->followRepository->getFollowers($user, $with);
         } elseif ($type == 3) {
             $users = $this->followRepository->getFriends($user, $with);
-        }
-        elseif ($type == 6) {
+        } elseif ($type == 6) {
             // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
-
         } else {
             $users = collect([]);
         }
@@ -356,7 +352,7 @@ class UserService
     }
     public function getLevel($levelsList, $type = 1)
     {
-        return $this->vipRepository->getByLevels($levelsList,$type);
+        return $this->vipRepository->getByLevels($levelsList, $type);
     }
 
     public function myStore($user, $request)
@@ -383,9 +379,9 @@ class UserService
 
     public function showUser($userId, $auth, $request, $isVisit)
     {
-        $user = $this->userRepository->findOrFail($userId, ['packs' => function($q) {
+        $user = $this->userRepository->findOrFail($userId, ['packs' => function ($q) {
             /** @var Builder $q*/
-         $q->whereIn('type', [20 ,18, 17 , 20, 19, 16, 13])->where('is_used', 1);
+            $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13])->where('is_used', 1);
         },]);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
@@ -403,15 +399,11 @@ class UserService
                     ]
                 );
 
-                if ($isVisit == true) {
-
-                    if (!$previousVisit) {
-                        CustomNotification::visitProfile($user, $auth);
-                        (new UserCounterServices)->eventUser($user, 'visit-profile');
-                    }
+                if (!$previousVisit) {
+                    CustomNotification::visitProfile($user, $auth);
+                    (new UserCounterServices)->eventUser($user, 'visit-profile');
                 }
             }
-            $this->packRepository->deleteAllExpiredPacks();
         }
         $this->packRepository->deleteAllExpiredPacks();
         return $user;
@@ -489,9 +481,9 @@ class UserService
     {
         $phone = $request->phone;
         $whatsappWebhookValidate = $whatsappWebhook->getLastValidatedPhone($phone);
-        if (!$whatsappWebhookValidate)throw new \Exception( __('current phone not verified'));
+        if (!$whatsappWebhookValidate) throw new \Exception(__('current phone not verified'));
 
-        $user = User::query ()->where ('phone', $phone)->first ();
+        $user = User::query()->where('phone', $phone)->first();
 
         $user->password = $request->password;
         $user->save();
@@ -505,7 +497,7 @@ class UserService
 
     public function userInfoWithRoles($ownerId)
     {
-       $user = $this->userRepository->findUserById($ownerId);
+        $user = $this->userRepository->findUserById($ownerId);
     }
 
     public function setting($userId, $request)
@@ -514,7 +506,7 @@ class UserService
 
         if ($setting != null) {
             $key = $request->key;
-//            $this->userSettingRepository->updateKey($setting, !$setting->$key);
+            //            $this->userSettingRepository->updateKey($setting, !$setting->$key);
             $setting->$key = !$setting->$key;
             $setting->save();
         } else {
