@@ -3,12 +3,8 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
-use App\Models\Family;
-use App\Models\Pack;
-use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\ImageColor;
 use App\Http\Resources\Api\V1\ChatSettingResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Models\Follow;
@@ -85,7 +81,6 @@ class UserResource extends JsonResource
 
         $color_image = @$this->color_image;
         $chat_setting = \App\Models\ChatSetting::where("user_id", $this->id)->first();
-        $userHandling = new \App\Classes\UserHandling();
         if ($chat_setting == null) {
             $chat_setting = \App\Models\ChatSetting::create([
                 'user_id'     => $this->id,
