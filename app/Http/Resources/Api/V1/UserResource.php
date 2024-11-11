@@ -172,7 +172,7 @@ class UserResource extends JsonResource
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
-            "top_three_support"    => $userHandling->getTopThreeSupport($this->id)
+          //  "top_three_support"    => $userHandling->getTopThreeSupport($this->id)
 
         ];
 
