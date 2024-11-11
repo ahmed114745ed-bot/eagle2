@@ -49,10 +49,7 @@ class UserResource extends JsonResource
             $f = [
                 'owner_id'    => $family->user_id,
                 'family_name' => $family->name,
-                'max_num'     => $family->num,
                 'img'         => $family->image,
-                'members_num' => $family->members_count,
-                'level'       => $family->level
             ];
         }
         if ($request->user()) {

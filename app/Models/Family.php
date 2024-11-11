@@ -10,7 +10,7 @@ class Family extends Model
     protected $guarded = ['id'];
 
     protected $appends = ['rank'];
-
+    private $cachedLevelMax = null;
 
     public function users()
     {
@@ -43,7 +43,7 @@ class Family extends Model
     public function getLevelAttribute()
     {
         $giftLogs   = $this->total_diamond;
-        $cur_level  = FamilyLevel::query()->where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
+        $cur_level  = $this->getLevelMax();
         $next      = FamilyLevel::query()->where('exp', '>', $giftLogs)->orderBy('exp')->first();
         $next_level = $next ?? $cur_level;
         $min_exp    = @$cur_level->exp ?: 0;
@@ -66,10 +66,22 @@ class Family extends Model
 
         return $lev;
     }
-    public function  getLevelMax()
+    // public function  getLevelMax()
+    // {
+    //     $giftLogs = $this->total_diamond;
+    //     return FamilyLevel::query()->where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
+    // }
+
+    public function getLevelMax()
     {
-        $giftLogs = $this->total_diamond;
-        return FamilyLevel::query()->where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
+        if ($this->cachedLevelMax === null) {
+            $giftLogs = $this->total_diamond;
+            $this->cachedLevelMax = FamilyLevel::query()
+                ->where('exp', '<=', $giftLogs)
+                ->orderByDesc('exp')
+                ->first();
+        }
+        return $this->cachedLevelMax;
     }
 
     public function getLevelMaxMembersNumAttribute()
