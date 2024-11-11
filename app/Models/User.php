@@ -31,8 +31,8 @@ use Modules\SalaryTransaction\Traits\UserTransferTrait;
  */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, FollowTrait,PaymentGetWayTrait, SoftDeletes,AchievementUser, RealRelationshipTrait,MomentRelationshipTrait;
-    use SpecialId , ChatUserTrait, UserTransferTrait;
+    use HasApiTokens, HasFactory, Notifiable, FollowTrait, PaymentGetWayTrait, SoftDeletes, AchievementUser, RealRelationshipTrait, MomentRelationshipTrait;
+    use SpecialId, ChatUserTrait, UserTransferTrait;
     /*
      * To enable and disable observer saving and updating methods
      */
@@ -47,7 +47,7 @@ class User extends Authenticatable
         'id',
 
     ];
-    protected $dates =['deleted_at'];
+    protected $dates = ['deleted_at'];
 
 
 
@@ -57,7 +57,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -75,7 +76,10 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'user_diamond', 'total_sender_level', 'total_received_level', 'original_uuid'
+        'user_diamond',
+        'total_sender_level',
+        'total_received_level',
+        'original_uuid'
     ];
 
     /* protected $appends = [
@@ -92,56 +96,59 @@ class User extends Authenticatable
 
      ];*/
 
-     public function images()
-     {
+    public function images()
+    {
         return $this->hasMany(ProfileGallary::class);
-     }
-
-     public function ignores()
-     {
-         return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')
-                     ->withTimestamps();
-     }
-
-     public function ignoredBy()
-     {
-         return $this->belongsToMany(User::class, 'profile_user_ignores', 'ignore_user_id', 'user_id')
-                     ->withTimestamps();
-     }
-
-     public function likes()
-     {
-         return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
-                     ->withTimestamps();
-     }
-
-     public function likedBy()
-     {
-         return $this->belongsToMany(User::class, 'profile_user_likes', 'liked_user_id', 'user_id')
-                     ->withTimestamps();
-     }
-
-    public function agencyUserJob(){
-        return $this->hasOne (AgencyUserJob::class,'user_id','id');
     }
 
-    public function agencyJoinRequest(){
-        return $this->hasMany(AgencyJoinRequest::class,"user_id");
+    public function ignores()
+    {
+        return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')
+            ->withTimestamps();
     }
 
-    public function timeLog(){
-        return $this->hasMany(TimeLog::class,"user_id");
+    public function ignoredBy()
+    {
+        return $this->belongsToMany(User::class, 'profile_user_ignores', 'ignore_user_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
+            ->withTimestamps();
+    }
+
+    public function likedBy()
+    {
+        return $this->belongsToMany(User::class, 'profile_user_likes', 'liked_user_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function agencyUserJob()
+    {
+        return $this->hasOne(AgencyUserJob::class, 'user_id', 'id');
+    }
+
+    public function agencyJoinRequest()
+    {
+        return $this->hasMany(AgencyJoinRequest::class, "user_id");
+    }
+
+    public function timeLog()
+    {
+        return $this->hasMany(TimeLog::class, "user_id");
     }
 
     public function vipImage()
     {
         return $this->hasOne(Vip::class, 'level', 'total_received_level')
-                    ->where('type', 1);
+            ->where('type', 1);
     }
 
     public function getUserTypeAttribute()
     {
-       return  match (intval($this->type_user)) {
+        return  match (intval($this->type_user)) {
             0 => 'user',
             1 => 'host',
             2 => 'Host agent',
@@ -160,19 +167,19 @@ class User extends Authenticatable
         if (!$month) $month = now()->month;
         if (!$year) $year = now()->year;
         $subQuery = DB::table('live_times')
-                      ->select('uid', DB::raw('COUNT(*) AS entry_count'))
-                      ->whereMonth('created_at',  $month)->whereYear('created_at', $year)
-                      ->where('uid', $this->id)
-                      ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-                      ->havingRaw('SUM(hours) > 1')
-                      ->get(); // Having condition
+            ->select('uid', DB::raw('COUNT(*) AS entry_count'))
+            ->whereMonth('created_at',  $month)->whereYear('created_at', $year)
+            ->where('uid', $this->id)
+            ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
+            ->havingRaw('SUM(hours) > 1')
+            ->get(); // Having condition
 
 
 
         return $subQuery->count('entry_count');
     }
 
-    public function getSallaryInfo() : array
+    public function getSallaryInfo(): array
     {
         $month = (int)@request()->month;
         $year  = (int)@request()->year;
@@ -190,22 +197,22 @@ class User extends Authenticatable
         return $userSallary?->toArray() ?? [];
     }
 
-     public function additionalInfo()
-     {
-        return $this->hasMany(AdditionalInfo::class,'user_id');
-     }
+    public function additionalInfo()
+    {
+        return $this->hasMany(AdditionalInfo::class, 'user_id');
+    }
     public function mangerType()
     {
-        return $this->belongsTo(MangerType::class,'manger_type_id');
+        return $this->belongsTo(MangerType::class, 'manger_type_id');
     }
 
     public function requestBackgroundImages()
     {
-        return $this->hasMany(RequestBackgroundImage::class,'owner_room_id');
+        return $this->hasMany(RequestBackgroundImage::class, 'owner_room_id');
     }
     public function giftLogsSender()
     {
-        return $this->hasMany(GiftLog::class,'sender_id');
+        return $this->hasMany(GiftLog::class, 'sender_id');
     }
 
     public function luckyGifts()
@@ -244,15 +251,17 @@ class User extends Authenticatable
 
     public function userSetting()
     {
-        return $this->hasOne(UserSetting::class,'user_id');
+        return $this->hasOne(UserSetting::class, 'user_id');
     }
 
-    public function codeInvitations(){
+    public function codeInvitations()
+    {
         return $this->belongsToMany(User::class, 'user_code_invitations', 'user_id', 'id')->withPivot('updated_at');
     }
 
-    public function codeInvitationsEarn(){
-        return $this->hasMany(UserEarnInvitation::class,'parent_id');
+    public function codeInvitationsEarn()
+    {
+        return $this->hasMany(UserEarnInvitation::class, 'parent_id');
     }
 
     public function scopeWithoutAppends($query)
@@ -408,7 +417,7 @@ class User extends Authenticatable
     //Dashboard Relations
     public function user_family()
     {
-        return $this->hasOne(Family::class,'user_id');
+        return $this->hasOne(Family::class, 'user_id');
     }
 
 
@@ -452,7 +461,7 @@ class User extends Authenticatable
 
     public function bans()
     {
-        return $this->hasMany(Ban::class , 'uid', 'uuid');
+        return $this->hasMany(Ban::class, 'uid', 'uuid');
     }
 
     public function getFollowDate($id)
@@ -556,7 +565,7 @@ class User extends Authenticatable
     public function UserVip()
     {
         return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
-            $q->where("is_used",1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
@@ -572,11 +581,6 @@ class User extends Authenticatable
 
         $level = Vip::query()->where('type', $type)->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
-    }
-
-    public function countGiftPrice($name)
-    {
-        return $this->hasMany(GiftLog::class, $name, 'id')->sum('giftPrice');
     }
 
     public function followers()
@@ -607,24 +611,24 @@ class User extends Authenticatable
     public function getSalaryAttribute()
     {
 
-//        if ($this->agency_id) {
-            $userSallary = UserSallary::query()
+        //        if ($this->agency_id) {
+        $userSallary = UserSallary::query()
 
-                                      ->where('user_id', $this->id)
-                                    //   ->where('is_paid', 0)
-                                    //   ->where('user_agency_id', $this->agency_id)
-                                      ->orderByDesc('id')
-                                      ->sum(DB::raw('sallary - cut_amount'));
-            $roomSalary = RoomSalary::query()->whereHas('room',function($q){
-                                    $q->where("uid",$this->id);
-                                } )
-                            ->orderByDesc('id')
-                            ->sum(DB::raw('salary - cut_amount'));
+            ->where('user_id', $this->id)
+            //   ->where('is_paid', 0)
+            //   ->where('user_agency_id', $this->agency_id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
+        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+            $q->where("uid", $this->id);
+        })
+            ->orderByDesc('id')
+            ->sum(DB::raw('salary - cut_amount'));
 
-            return (floor($userSallary + (int)$roomSalary) );
-//        } else {
-//            return 0;
-//        }
+        return (floor($userSallary + (int)$roomSalary));
+        //        } else {
+        //            return 0;
+        //        }
     }
 
 
@@ -718,8 +722,10 @@ class User extends Authenticatable
         // Compare with the last history record to avoid duplications
         if (!$lastHistory || $lastDiamondReceived !== $lastHistory->diamond) {
             $this->history()->create([
-                'user_id' => $this->id, 'agency_id' => $this->agency_id,
-                'diamond' => $lastDiamondReceived, 'month' => now()->month,
+                'user_id' => $this->id,
+                'agency_id' => $this->agency_id,
+                'diamond' => $lastDiamondReceived,
+                'month' => now()->month,
                 'year'    => now()->year,
                 'pid'    => $this->id,
             ]);
@@ -747,7 +753,7 @@ class User extends Authenticatable
 
     public function userPacks()
     {
-        return $this->hasMany(Pack::class,'user_id');
+        return $this->hasMany(Pack::class, 'user_id');
     }
     public function packs()
     {
@@ -758,7 +764,7 @@ class User extends Authenticatable
 
     public function sendPacks()
     {
-        return $this->hasMany(Pack::class,'sender_id');
+        return $this->hasMany(Pack::class, 'sender_id');
     }
 
 
@@ -848,11 +854,11 @@ class User extends Authenticatable
     }
     public function reals()
     {
-        return $this->hasMany(Real::class,"user_id");
+        return $this->hasMany(Real::class, "user_id");
     }
     public function moments()
     {
-        return $this->hasMany(Moment::class,"user_id");
+        return $this->hasMany(Moment::class, "user_id");
     }
 
     public function admenUsersAPP()
@@ -883,15 +889,15 @@ class User extends Authenticatable
 
     public function getTotalSallary($month = null, $year = null)
     {
-        if($month == null){
+        if ($month == null) {
             $month = now()->month;
         }
-        if($year == null){
+        if ($year == null) {
             $year = now()->year;
         }
         if ($this->agency_id) {
-            $userSallary = UserSallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -927,10 +933,10 @@ class User extends Authenticatable
 
     public function getTotalCutAmount($month = null, $year = null)
     {
-        if($month == null){
+        if ($month == null) {
             $month = now()->month;
         }
-        if($year == null){
+        if ($year == null) {
             $year = now()->year;
         }
         if ($this->agency_id) {
@@ -964,19 +970,19 @@ class User extends Authenticatable
 
     public function getSalary($month = null, $year = null)
     {
-        if($month == null){
+        if ($month == null) {
             $month = now()->month;
         }
-        if($year == null){
+        if ($year == null) {
             $year = now()->year;
         }
         if ($this->agency_id) {
-            $userSallary = UserSallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })
                 ->where('user_id', $this->id)
                 ->where('is_paid', 0)
-//                ->where('user_agency_id', $this->agency_id)
+                //                ->where('user_agency_id', $this->agency_id)
                 ->orderByDesc('id')
                 ->sum(DB::raw('sallary - cut_amount'));
 
@@ -991,18 +997,17 @@ class User extends Authenticatable
     public function carousels(): HasMany
     {
         return $this->hasMany(HomeCarousel::class, 'owner_id');
-
     }
 
     public function getUuidAttribute($value)
     {
-       $pack= $this->packs->where("ware.value",$this->special_id)->first();
-        if ($this->special_id != null && $this->special_id != 0 && $pack != null && $pack->is_used == 1){
+        $pack = $this->packs->where("ware.value", $this->special_id)->first();
+        if ($this->special_id != null && $this->special_id != 0 && $pack != null && $pack->is_used == 1) {
             return $this->special_id;
         }
         return @$value ?? null;
     }
-//originalUuid
+    //originalUuid
     public function getOriginalUuidAttribute()
     {
         return @$this->attributes['uuid'] ?? '';
@@ -1012,21 +1017,21 @@ class User extends Authenticatable
 
     public function getAprilSalaryAttribute()
     {
-        $userSallary = UserSallary::query()->where( function ($query)  {
+        $userSallary = UserSallary::query()->where(function ($query) {
             $query->where(DB::raw('concat(year,"-", month)'), '<', '2024-4');
         })
-                                  ->where('user_id', $this->id)
-                                  ->where('is_paid', 0)
+            ->where('user_id', $this->id)
+            ->where('is_paid', 0)
             //                ->where('user_agency_id', $this->agency_id)
-                                  ->orderByDesc('id')
-                                  ->sum(DB::raw('sallary - cut_amount'));
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
 
 
         return floor($userSallary ?? 0);
     }
     public function getOnlineTimeAttribute($value)
     {
-        if (Common::checkPackPrev($this->id, 20)) return null;
+        if ($this->getPackWithType(20)) return null;
         return $value;
     }
 
@@ -1034,4 +1039,14 @@ class User extends Authenticatable
     {
         return @$this->attributes['online_time'] ?? $this->online_time;
     }
+
+    public function getPackWithType($type)
+    {
+
+        $packs = $this->packs;
+        /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        return $packs->where('type', $type)->isNotEmpty();
+    }
+
+    
 }

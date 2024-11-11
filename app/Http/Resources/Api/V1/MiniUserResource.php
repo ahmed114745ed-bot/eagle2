@@ -37,13 +37,26 @@ class MiniUserResource extends JsonResource
                 'image' =>@ $this->profile->avatar?:'',
                 'image_id' => @$this->profile->image_id?:'',
             ],
-            'vip'=>@Common::ovip_center ($this->id), // both
-            'frame'=>Common::getUserDress($this->id,$this->dress_1,4,'img2', true)?:Common::getUserDress($this->id,$this->dress_1,4,'img1', true),
+            'frame'=> $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
             'frame_id'=>@$this->dress_1,
             'has_color_name'=>Common::hasInPack ($this->id,18, true),
         ];
 
         return $data;
+    }
+
+    public function getUserDress($type, $dress, $item = 'img1')
+    {
+
+        $packs = $this->packs;
+        /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        if ($pack) {
+            if ($pack->ware) {
+                return $pack->ware->{$item};
+            }
+        }
+        return '';
     }
 
 

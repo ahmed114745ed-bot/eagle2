@@ -74,12 +74,12 @@ class UserResource extends JsonResource
             $timeDifferenceFormatted = "In the future";
         }
 
-        $frame  = $this->getUserDress(5,$this->dress_2,$this->dress2,'show_img')?:$this->getUserDress(4,$this->dress_1,$this->dress1,'img1');
-           // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
-        $bubble =$this->getUserDress(5,$this->dress_2,$this->dress2,'show_img');
-          //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
-        $intro  = $this->getUserDress(6,$this->dress_3,$this->dress3,'img2')?:$this->getUserDress(6,$this->dress_3,$this->dress3,'img1');
-          //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
+        $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1');
+        // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
+        $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
+        //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
+        $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?: $this->getUserDress(6, $this->dress_3, 'img1');
+        //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
 
@@ -185,25 +185,15 @@ class UserResource extends JsonResource
         return $data;
     }
 
-
-    public function getPackWithType($type)
+    public function getUserDress($type, $dress, $item = 'img1')
     {
 
         $packs = $this->packs;
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        return $packs->where('type', $type)->isNotEmpty();
-    }
-
-    public function getUserDress($type, $dress, $relationDress, $item = 'img1')
-    {
-
-        $packs = $this->packs;
-        /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        $packs->where('type', $type)->where('target_id', $dress)->first();
-        if ($packs) {
-            $ware = $relationDress;
-            if ($ware) {
-                return $ware->{$item};
+        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        if ($pack) {
+            if ($pack->ware) {
+                return $pack->ware->{$item};
             }
         }
         return '';
