@@ -115,7 +115,6 @@ class UserResource extends JsonResource
             'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id, "user_id" => $this->id])->first() != null ? true : false,
             'is_follow'            => @(bool)Common::IsFollow(@$request->user()->id, $this->id), // user data  ----
             'is_friend'            => in_array($this->id, $fArr),  //  -------
-            'is_in_live'           => $this->is_in_live(), // user data
             'now_room'             => [
                 'is_in_room'      => @$this->now_room_uid != 0,
                 'uid'             => @(int)$this->now_room_uid,
@@ -167,7 +166,6 @@ class UserResource extends JsonResource
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
-          //  "top_three_support"    => $userHandling->getTopThreeSupport($this->id)
 
         ];
 

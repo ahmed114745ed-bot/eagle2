@@ -359,10 +359,7 @@ class User extends Authenticatable
     }
 
 
-    public function is_in_live()
-    {
-        return $this->rooms()->where('room_status', 1)->where('room_visitor', '!=', '')->exists();
-    }
+   
 
 
 
