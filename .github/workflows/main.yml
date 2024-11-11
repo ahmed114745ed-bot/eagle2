@@ -1,4 +1,4 @@
-name: SSh
+name: SSh-main
 on:
   push:
     branches: ["main"]
