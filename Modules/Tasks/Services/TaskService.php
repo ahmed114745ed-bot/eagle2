@@ -6,11 +6,17 @@ use Modules\Tasks\Repositories\Contracts\DailyTaskRepositoryInterface;
 use Modules\Tasks\Repositories\Contracts\TaskProgressRepositoryInterface;
 use Modules\Tasks\Repositories\Contracts\TaskRewardRepositoryInterface;
 use Modules\Tasks\Repositories\Contracts\DayRepositoryInterface;
-//use Http\Controllers\DailyGiftController;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
+use App\Helpers\Common;
+use Modules\Tasks\Entities\Day;
+use Modules\Tasks\Entities\TaskReward;
+use Modules\Tasks\Repositories\DailyTaskRepository;
+use Modules\Tasks\Repositories\DayRepository;
+use Modules\Tasks\Repositories\TaskProgressRepository;
+use Modules\Tasks\Repositories\TaskRewardRepository;
 
 class TaskService
 {
@@ -21,10 +27,10 @@ class TaskService
     protected $dailyGiftController;
 
     public function __construct(
-        DailyTaskRepositoryInterface $dailyTaskRepo,
-        TaskProgressRepositoryInterface $taskProgressRepo,
-        TaskRewardRepositoryInterface $taskRewardRepo,
-        DayRepositoryInterface $dayRepo,
+        DailyTaskRepository $dailyTaskRepo,
+        TaskProgressRepository $taskProgressRepo,
+        TaskRewardRepository $taskRewardRepo,
+        DayRepository $dayRepo,
         DailyGiftController $dailyGiftController
     ) {
         $this->dailyTaskRepo = $dailyTaskRepo;
@@ -36,39 +42,61 @@ class TaskService
 
     public function collectTaskPoints($taskId, $userId)
     {
-        return DB::transaction(function () use ($taskId, $userId) {
-            $task = $this->dailyTaskRepo->findById($taskId);
-            $taskProgress = $this->taskProgressRepo->findUserTaskProgress($userId, $taskId);
+        try {
+            $response = DB::transaction(function () use ($taskId, $userId) {
+                $task = $this->dailyTaskRepo->findOrFail($taskId);
+                $taskProgress = $this->taskProgressRepo->findUserTaskProgress($userId, $taskId);
 
-            if (!$taskProgress) {
-                throw new \Exception('Task progress not found');
-            }
+                if (!$taskProgress) {
+                    return Common::apiResponse(false, 'Task progress not found', null, 404);
+                }
 
-            if ($taskProgress->is_completed) {
-                return ['message' => 'Task progress already collected'];
-            }
+                if ($taskProgress->is_completed) {
+                    return Common::apiResponse(true, 'Task progress already collected', null, 200);
+                }
 
-            if ($taskProgress->count == $task->count) {
-                $taskProgress->is_completed = true;
-                $this->taskProgressRepo->save($taskProgress);
+                if ($taskProgress->count == $task->count) {
+                    $taskProgress->is_completed = true;
+                    $this->taskProgressRepo->save($taskProgress);
 
-                $user = User::findOrFail($userId);
-                $user->total_points += $task->total_points;
-                $user->save();
-            }
+                    $user = User::findOrFail($userId);
+                    $user->total_points += $task->total_points;
+                    $user->save();
+                }
 
-            $dayTasks = $this->dailyTaskRepo->findByDayId($task->day_id);
-            $allTasksCompleted = $this->areAllTasksCompleted($dayTasks, $userId);
+                $dayTasks = $this->dailyTaskRepo->getAll(['day_id' => $task->day_id]);//findByDayId($task->day_id);
+                $allTasksCompleted = $this->areAllTasksCompleted($dayTasks, $userId);
 
-            if ($allTasksCompleted) {
-                $this->unlockDayAndAssignRewards($task->day_id, $userId);
-            }
+                $day = $this->dayRepo->findOrFail($task->day_id);
+                if($day->is_unlocked)
+                {
+                    return Common::apiResponse(true,'day already unlocked and rewards assigned to user',null,200);
+                }
 
-            return [
-                'message' => 'Points collected successfully',
-                'total_points' => $user->total_points,
-            ];
-        });
+                if ($allTasksCompleted) {
+                    $this->unlockDayAndAssignRewards($task->day_id, $userId);
+                }
+                if($allTasksCompleted)
+                {
+                    $rewards = $this->taskRewardRepo->findByDayId($task->day_id);//TaskReward::where('day_id', $task->day_id)->get();
+                    return Common::apiResponse(true, 'Points collected successfully and the day is completed successfully', [
+                        'total_points' => $user->total_points,
+                        'rewards' => $rewards
+                    ], 200);
+                }
+                else 
+                {
+                    return Common::apiResponse(true, 'Points collected successfully', [
+                        'total_points' => $user->total_points,
+                    ], 200);
+                }
+            });
+
+            return $response;
+        } catch (\Exception $e) {
+            \Log::error('Error collecting task points: ' . $e->getMessage());
+            return Common::apiResponse(false, 'Server error', null, 500);
+        }
     }
 
     private function areAllTasksCompleted($dayTasks, $userId)
@@ -84,7 +112,7 @@ class TaskService
 
     private function unlockDayAndAssignRewards($dayId, $userId)
     {
-        $day = $this->dayRepo->findById($dayId);
+        $day = $this->dayRepo->findOrFail($dayId);
         if ($day && !$day->is_unlocked) {
             $day->is_unlocked = true;
             $this->dayRepo->save($day);

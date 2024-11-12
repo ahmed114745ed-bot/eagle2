@@ -3,18 +3,25 @@
 namespace Modules\Tasks\Repositories;
 
 
-use Modules\Tasks\Repositories\Contracts\DayRepositoryInterface;
+//use Modules\Tasks\Repositories\Contracts\DayRepositoryInterface;
+
+use App\Tik\Repositories\AbstractRepository;
 use Modules\Tasks\Entities\Day;
 
-class DayRepository implements DayRepositoryInterface
+class DayRepository extends AbstractRepository//implements DayRepositoryInterface
 {
-    public function findById($dayId)
+    public function __construct(Day $model)
+    {
+        parent::__construct($model);
+    }
+    /*public function findById($dayId)
     {
         return Day::find($dayId);
-    }
-
+    }*/
     public function save($day)
     {
         $day->save();
     }
 }
+
+

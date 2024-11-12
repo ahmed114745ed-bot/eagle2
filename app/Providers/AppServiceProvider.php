@@ -72,14 +72,14 @@ class AppServiceProvider extends ServiceProvider
 
         //dd(\App\Modules\Tasks\Services\TaskService::class);
 
-        $this->app->bind(DailyTaskRepositoryInterface::class, DailyTaskRepository::class);
+        /*$this->app->bind(DailyTaskRepositoryInterface::class, DailyTaskRepository::class);
         $this->app->bind(TaskProgressRepositoryInterface::class, TaskProgressRepository::class);
         $this->app->bind(TaskRewardRepositoryInterface::class, TaskRewardRepository::class);
         $this->app->bind(DayRepositoryInterface::class, DayRepository::class);
         
         $this->app->bind(TaskService::class, function ($app) {
             return new TaskService($app->make(DailyTaskRepositoryInterface::class),$app->make(TaskProgressRepositoryInterface::class),$app->make(TaskRewardRepositoryInterface::class),$app->make(DayRepositoryInterface::class),$app->make(DailyGiftController::class),);
-        });
+        });*/
 
 
         $this->app->bind ('RedisService',function($app){

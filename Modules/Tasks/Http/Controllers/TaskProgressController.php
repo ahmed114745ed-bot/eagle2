@@ -9,41 +9,21 @@ use App\Models\DailyTask;
 use Illuminate\Http\Request;
 use Modules\Tasks\Entities\DailyTask as EntitiesDailyTask;
 use Modules\Tasks\Entities\Day as EntitiesDay;
+use Modules\Tasks\Services\TaskProgressService;
 
 class TaskProgressController extends Controller
 {
+    protected $taskProgressService;
+
+    public function __construct(TaskProgressService $taskProgressService)
+    {
+        $this->taskProgressService = $taskProgressService;
+    }
+
     public function getUserProgress($userId)
     {
-        try {
-            $user = User::findOrFail($userId);
-            $totalPoints = $user->total_points;
-    
-            /*$days = EntitiesDay::with('userDaysProgress')
-                ->where('is_unlocked', true)
-                ->orderBy('day_number')
-                ->get();*/
-            $days = EntitiesDay::orderBy('day_number')->get();
-            
-            $lastUnlockedDay = $days->where('is_unlocked', 0)->last();
-            
-            $tasks = [];
-            if ($lastUnlockedDay) {
-                $tasks = EntitiesDailyTask::where('day_id', $lastUnlockedDay->id)->get();
-            }
-    
-            $response = [
-                'total_points' => $totalPoints,
-                'days' => $days,
-                'last_day_tasks' => $tasks,
-            ];
-    
-            return response()->json($response, 200);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching user progress: ' . $e->getMessage());
-            return response()->json(['error' => 'Server error'], 500);
-        }
-        //\Log::info('Getting user progress for userId: ' . $userId);
-        //return response()->json(['message' => 'Route is working'], 200);
+        $response = $this->taskProgressService->getUserProgress($userId);
+        return $response;
     }
 }
 

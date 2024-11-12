@@ -3,12 +3,19 @@
 namespace Modules\Tasks\Repositories;
 
 
-use Modules\Tasks\Repositories\Contracts\TaskRewardRepositoryInterface;
+//use Modules\Tasks\Repositories\Contracts\TaskRewardRepositoryInterface;
+
+use App\Tik\Repositories\AbstractRepository;
 use Modules\Tasks\Entities\TaskReward;
 use Modules\Tasks\Entities\UserTaskReward;
 
-class TaskRewardRepository implements TaskRewardRepositoryInterface
+class TaskRewardRepository extends AbstractRepository//implements TaskRewardRepositoryInterface
 {
+    public function __construct(UserTaskReward $model)
+    {
+        parent::__construct($model);
+    }
+
     public function findByDayId($dayId)
     {
         return TaskReward::where('day_id', $dayId)->get();
