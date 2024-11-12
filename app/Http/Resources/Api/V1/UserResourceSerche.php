@@ -26,14 +26,6 @@ class UserResourceSerche extends JsonResource
      */
     public function toArray($request)
     {
-//        $wapel = Pack::query ()
-//            ->where ('type',12)
-//            ->where ('expire','>=',time ())
-//            ->where ('user_id',$this->id)
-//            ->where ('use_num','>',0)
-//            ->first ();
-//        $reqs_count = AgencyJoinRequest::query ()->where ('user_id',@$this->id)->where ('status','!=',2)->count ();
-
         $agency_joined = $this->agency;
         if ($agency_joined != null) {
             $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
@@ -50,7 +42,7 @@ class UserResourceSerche extends JsonResource
         }
 
         $pass_status = false;
-        $now_room = Room::query ()->where ('uid',$this->now_room_uid)->first ();
+        $now_room = $this->room;
         if ($now_room){
             if($now_room->room_pass){
                 $pass_status = true;
@@ -77,8 +69,8 @@ class UserResourceSerche extends JsonResource
             // 'frame'=>Common::getUserDress($this->id,$this->dress_1,4,'img2')?:Common::getUserDress($this->id,$this->dress_1,4,'img1'), // both
             // 'frame_id'=>@$this->dress_1, // both
             'is_agent'=>$this->is_agent, // both
-            'has_color_name'=>Common::hasInPack ($this->id,18, true), // both
-            'country_hidden'=>Common::hasInPack ($this->id,13,true), // both
+            'has_color_name'=>$this->getPackWithType(18), // both
+            'country_hidden'=>$this->getPackWithType(13), // both
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             "manger_type"          =>new MangerTypeResource(@$this->mangerType),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
