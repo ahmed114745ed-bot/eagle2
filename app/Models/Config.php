@@ -15,7 +15,12 @@ class Config extends Model
         parent::boot();
 
         static::saving(function ($model) {
-
+            if ($model->valueSelect) {
+                unset($model->valueSelect);
+            }
+            if ($model->valueInteger) {
+                unset($model->valueInteger);
+            }
             $Keys = ['app_id', 'app_key', 'app_secret', 'app_cluster'];
             foreach ($Keys as $key) {
                 if ($model->isDirty('value') && $model->name == $key) {

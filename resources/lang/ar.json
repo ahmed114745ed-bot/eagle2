@@ -1546,5 +1546,10 @@
     "Is unlocked":"الحاله",
     "Total Points":"عدد النقاط",
     "Up mic":"الجلوس علي ال mic",
-    "admin" : "المدير"
+    "admin" : "المدير",
+    "string":" نص",
+    "integer":"رقم",
+    "yes_or_no":"نعم و لا",
+    "true_and_false":"ترو و فولس",
+    "select":"اختيار"
 }
