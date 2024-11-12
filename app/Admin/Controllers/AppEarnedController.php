@@ -61,8 +61,8 @@ class AppEarnedController extends MainController
 
                   //  $row->column(12, '<h3 style="color: #000; font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('earned') . ' <i class="fa fa-star"></i></h3>');
 
-                    $row->column(6, new InfoBox(__('chargeChanges'), 'dollar', 'green', route('admin.charges-details'), number_format(@$first_earned_charge ?? 0)));
-                    $row->column(6, new InfoBox(__('coinsGets'), 'dollar', 'yellow', '', number_format(@$second_earned_charge ?? 0)));
+                    $row->column(6, new InfoBox(__('chargeChanges'), 'dollar', 'green', route('admin.charges-details'), number_format(@$first_earned_charge,2)));
+                    $row->column(6, new InfoBox(__('coinsGets'), 'dollar', 'yellow', '', number_format(@$second_earned_charge,2)));
 
                 })
 
