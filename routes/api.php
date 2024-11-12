@@ -95,6 +95,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
+
 
             Route::prefix('config')->group(function() {
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
