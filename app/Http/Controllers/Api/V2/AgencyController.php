@@ -169,7 +169,6 @@ class AgencyController extends Controller
 
         if ($type == "application") {
             $list_req1 = $list_req->where('status', 0)->with('user')->get();
-            dd($list_req1);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
             $list_req = $list_req->where('status', '!=', 0)->with('user','admin')->get();
