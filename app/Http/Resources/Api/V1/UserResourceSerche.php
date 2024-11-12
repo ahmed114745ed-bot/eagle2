@@ -56,9 +56,6 @@ class UserResourceSerche extends JsonResource
                 $pass_status = true;
             }
         }
-        $packSpecial = Pack::query()->where(function ($query) {
-            $query->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
-        })->where('user_id', $this->id)->where("type", 25)->where('is_used', 1)->first();
 
         $data = [
             'id'=>@$this->id, // both
@@ -74,7 +71,7 @@ class UserResourceSerche extends JsonResource
             ], // user data
 
             'profile'=>new ProfileResourceSerche(@$this->profile), // both       ------- img type   oge    contry   reqouerd
-            'level'=>Common::level_centerSerch (@$this), // both     ---- resever img   , sendr img  req
+            'level'=>Common::level_centerSerch (@$this->id), // both     ---- resever img   , sendr img  req
             'vip'=>@Common::ovip_center ($this->id), // both
             // 'frame'=>Common::getUserDress($this->id,$this->dress_1,4,'img2')?:Common::getUserDress($this->id,$this->dress_1,4,'img1'), // both
             // 'frame_id'=>@$this->dress_1, // both
@@ -86,57 +83,7 @@ class UserResourceSerche extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
         ];
-
-
-        // $data['auth_token'] = $this->auth_token;
-        // if (@$this->is_mic == '0' || @$this->is_mic == '1'){
-        //     $data['is_mic'] = $this->is_mic;
-        // }
-        // if ($this->pivot){
-        //     $data['visit_time']=$this->pivot->updated_at;
-        // }
         return $data;
     }
 
-//    public function handelStatics($request){
-//        $user = $request->user();
-//        $visitor = 0;
-//        $fans = 0;
-//        $friends = 0;
-//        $income = 0;
-//        $frame = 0;
-//        $enteirs = 0;
-//        $bubble = 0;
-//        if ($request->visitor != null){
-//            $visitor = (integer)$user->profileVisits()->count() - (integer)$request->visitor;
-//        }
-//        if ($request->fans != null){
-//            $fans = (integer)$user->numberOfFans() - (integer)$request->fans;
-//        }
-//        if ($request->friends != null){
-//            $friends = (integer)$user->numberOfFriends() - (integer)$request->friends;
-//        }
-//        if ($request->income != null){
-//            $income = (integer)$user->coins - (integer)$request->income;
-//        }
-//        if ($request->frame != null){
-//            $frame = (integer)$user->frames_count() - (integer)$request->frame;
-//        }
-//        if ($request->enteirs != null){
-//            $enteirs = (integer)$user->intros_count() - (integer)$request->enteirs;
-//        }
-//        if ($request->bubble != null){
-//            $bubble = (integer)$user->bubble_count() - (integer)$request->bubble;
-//        }
-//
-//        return [
-//            'visitor' => $visitor,
-//            'fans' => $fans,
-//            'friends' => $friends,
-//            'income' => $income,
-//            'frame' => $frame,
-//            'enteirs' => $enteirs,
-//            'bubble' => $bubble
-//        ];
-//    }
 }

@@ -20,7 +20,14 @@ trait FollowTrait
         return $this->friends()->where("users.id", auth()->id())->exists();
     }
 
+    public function followeds_ids(){
+        return Follow::query ()->whereHas('followed')->where ('user_id',$this->id)->orderByDesc('created_at')->pluck ('followed_user_id');
+    }
 
+    public function rooms_uids(){
+        return Room::query ()->where ('room_status',1)->where ('is_afk',1)->pluck ('uid');
+        // return Room::query ()->where ('room_status',1)->pluck ('uid');
+    }
 
     public function following(): BelongsToMany
     {
@@ -89,5 +96,9 @@ trait FollowTrait
     public function numberOfFriends()
     {
         return $this->friends()->count();
+    }
+
+    public function onRoomFolloweds(){
+        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->rooms_uids ())->get ();
     }
 }
