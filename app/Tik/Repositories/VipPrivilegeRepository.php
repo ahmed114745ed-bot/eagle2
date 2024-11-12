@@ -26,6 +26,6 @@ class VipPrivilegeRepository extends AbstractRepository
         return $this->model->query()
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%")->orWhere('id', $search);
-            })->select('id', 'name', 'img1')->get();
+            })->select('id', 'name', 'img1','img2')->get();
     }
 }
