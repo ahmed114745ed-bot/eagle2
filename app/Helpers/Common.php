@@ -52,6 +52,7 @@ class Common
 
     public static function level_center_min($user_id)
     {
+        dd($user_id);
         $user = User::query()->find($user_id);
 
         $star_level = $user->received_level + $user->sub_receiver_level;
