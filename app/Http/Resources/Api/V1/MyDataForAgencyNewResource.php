@@ -38,7 +38,7 @@ class MyDataForAgencyNewResource extends JsonResource
 
             'name' => @$this->user->name ?: '', // both
             // 'vip_level' => @$this->UserVip->level,
-            // 'vip'=>@Common::ovip_center ($this->user->id), // refactor
+            'vip'=>@Common::ovip_center ($this->user->id), // refactor
             // 'level'=>Common::level_center_min (@$this->user->id), // refactor
 
             // 'profile' => new ProfileForAjancyResource(@$this->user->profile), // both
