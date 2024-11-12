@@ -39,7 +39,7 @@ class MiniUserResource extends JsonResource
             ],
             'frame'=> $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1'),
             'frame_id'=>@$this->dress_1,
-            'has_color_name'=>Common::hasInPack ($this->id,18, true),
+            'has_color_name'=>$this->getPackWithType(18),
         ];
 
         return $data;

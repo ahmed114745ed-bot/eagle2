@@ -194,9 +194,7 @@ class UserController extends Controller
 
     public function my_data(Request $request)
     {
-        $user = $request->user()->load(['packs' => function ($query) {
-            $query->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5,25])->where('is_used', 1)->with('ware');
-        }]);
+        $user = $request->user();
        
         $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
 

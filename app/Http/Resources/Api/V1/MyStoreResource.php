@@ -26,7 +26,7 @@ class MyStoreResource extends JsonResource
     public function toArray($request)
     {
 
-        $agency_owner = Agency::where('id',$this->agency_id)->first();
+        $agency_owner = $this->agency;
         $salary       = $this->salary;
         $sallary      = $salary;//
         $userSalary   = $sallary;
@@ -36,8 +36,10 @@ class MyStoreResource extends JsonResource
             $sallary = $hostSalary;
         }
 
-        $pendingDollar = UserSallary::where("user_id",$this->id)->sum("pending_dollar");
-        $roomSalary = RoomSalary::where("room_id",$this->ownerRoom?->id)->sum(DB::raw("salary - cut_amount"));
+        $pendingDollar = $this->totalUserSalary->sum("pending_dollar");
+        $roomSalary = $this->ownerRoom?->roomSalary->sum(function ($roomSalary) {
+            return $roomSalary->salary - $roomSalary->cut_amount;
+        });
 
         $data = [
 
@@ -50,7 +52,6 @@ class MyStoreResource extends JsonResource
                 'user_usd' =>(string) $userSalary ?? '',
                 'host_usd' =>(string) @$hostSalary ??'',
                 'pending_dollar' =>(string) $pendingDollar ?? '',
-                'pending_dollar' => (string)$pendingDollar ?? '',
                 'room_salary' =>(string) $roomSalary ?? '',
             ], // my
 

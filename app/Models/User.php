@@ -760,6 +760,11 @@ class User extends Authenticatable
         return $this->hasOne(UserSallary::class, 'user_id', 'id');
     }
 
+    public function totalUserSalary()
+    {
+        return $this->hasMany(UserSallary::class, 'user_id', 'id');
+    }
+
     public function userPacks()
     {
         return $this->hasMany(Pack::class, 'user_id');

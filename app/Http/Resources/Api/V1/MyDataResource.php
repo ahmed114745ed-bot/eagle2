@@ -62,8 +62,7 @@ class MyDataResource extends JsonResource
         $admin = $this->agencyUserJob;
         $owner = $this->ownAgency;
 
-        $dress_1_data =
-         $this->getUserDress(4, $this->dress_1, 'img2');
+        $dress_1_data = $this->getUserDress(4, $this->dress_1, 'img2');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
         $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
