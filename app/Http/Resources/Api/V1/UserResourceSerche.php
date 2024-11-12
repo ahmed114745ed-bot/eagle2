@@ -65,7 +65,7 @@ class UserResourceSerche extends JsonResource
 
             'profile'=>new ProfileResourceSerche(@$this->profile), // both       ------- img type   oge    contry   reqouerd
             'level'=>Common::level_centerSerch (@$this->id), // both     ---- resever img   , sendr img  req
-            'vip'=>@Common::ovip_center ($this), // both
+            'vip'=>@Common::ovip_center ($this->resource), // both
             'is_agent'=>$this->is_agent, // both
             'has_color_name'=>$this->getPackWithType(18), // both
             'country_hidden'=>$this->getPackWithType(13), // both
