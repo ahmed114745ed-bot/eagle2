@@ -47,7 +47,7 @@ class ChargeAction extends Action
 
     private function getUser(Request $request)
     {
-        if ($request->user_type == 'app') {
+        if ($request->user_type == 'dashdash') {
             return $request->id_type == '1'
                 ? User::query()->searchByUuid($request->user_id)->first()
                 : User::query()->find($request->user_id);
@@ -114,7 +114,7 @@ class ChargeAction extends Action
     {
         $charge = new Charge();
         $charge->charger_id = Auth::id();
-        $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'app';
+        $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
         $charge->user_id = $user->id;
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = $request->user_type;
@@ -128,11 +128,11 @@ class ChargeAction extends Action
     {
         $this->name = __('Charge');
         $this->hidden('charger_id')->value(Auth::id());
-        $this->hidden('charger_type')->value('dash');
+        // $this->hidden('charger_type')->value('dash');
         $this->text('user_id', __('User ID'));
         $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->select('user_type', __('User Type'))->options(['app' => __('App'), 'dash' => __('Agencies')])->default('app');
+        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('app');
         $this->text('amount', __('Amount'));
         $this->hidden('amount_type')->value(1);
     }

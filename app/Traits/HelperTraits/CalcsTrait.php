@@ -48,11 +48,7 @@ trait CalcsTrait
                         'total' => $total
                     ]
                 );
-                // self::sendOfficialMessage ($user_id,__ ('congratulations'),__ ("you $key level up"));
-                // $tokens_notfacion[] = DB::table('users')->where('id', $user_id)->value('notification_id');
-                // $title='Tik Chat';
-                // $body=__ ("you $key level up");
-                // Common::send_firebase_notification($tokens_notfacion,$title,$body);
+
                 DB::commit();
             } catch (\Exception $exception) {
                 DB::rollBack();
@@ -63,9 +59,13 @@ trait CalcsTrait
     public static function getLevel($user_id = null, $type = null, $is_image = false)
     {
         $user = User::query()->find($user_id);
-        $star_num = GiftLog::where('receiver_id', $user_id)->sum('giftPrice');
-        $gold_num = GiftLog::where('sender_id', $user_id)->sum('giftPrice');
-        $vip_num  = GiftLog::where('sender_id', $user_id)->sum('giftPrice'); //count by purchased coins
+        $giftLogs = GiftLog::where(function ($query) use ($user_id) {
+            $query->where('receiver_id', $user_id)
+                ->orWhere('sender_id', $user_id);
+        })->get(['receiver_id', 'sender_id', 'giftPrice']);
+        $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
+        $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
+        $vip_num  = $gold_num; //count by purchased coins
 
         if ($type == 1) {
             $total = $star_num;
@@ -385,7 +385,7 @@ trait CalcsTrait
 
         return $nextData;
     }
-    
+
     public static function getNextLevelDataFromCache($type, $currentLevel, $vipsData)
     {
         // تحقق من وجود البيانات في المصفوفة
@@ -424,10 +424,10 @@ trait CalcsTrait
         return $levelData ? $levelData->$field : 0;
     }
 
-    public static function level_center($user_id)
-    { 
+    public static function level_center($user)
+    {
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
-        $user            = User::find($user_id);
+       // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
         $diamondSend             = $user->total_sender_diamonds;
@@ -467,7 +467,7 @@ trait CalcsTrait
         $next_gold_num = $nextGoldData['next_exp'];
         $next_gold_level = $nextGoldData['next_level'];
 
-     
+
 
 
 

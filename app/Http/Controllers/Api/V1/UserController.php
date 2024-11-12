@@ -195,8 +195,7 @@ class UserController extends Controller
     public function my_data(Request $request)
     {
         $user = $request->user();
-        $user->enableSaving = false;
-
+       
         $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
 
         $this->userService->unlockDressHand($user->id);

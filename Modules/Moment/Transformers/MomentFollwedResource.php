@@ -18,7 +18,7 @@ class MomentFollwedResource extends JsonResource
     {
 
         $moment = $this->moment;
-        $level  = Common::level_center(@$this->moment->user->id);
+        $level  = Common::level_center(@$this->moment->user);
         if (gettype($level) == 'array') {
             $receiver_level = $level['receiver_level'] ?? 0;
             $sender_level   = $level['sender_level'] ?? 0;

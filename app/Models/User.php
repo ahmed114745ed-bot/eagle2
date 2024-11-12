@@ -38,6 +38,8 @@ class User extends Authenticatable
      */
     public static $withoutAppends = false;
     public $enableSaving = true;
+    protected $loadedPacks = null;
+    protected $specialPack = null;
     /**
      * The attributes that are mass assignable.
      *
@@ -280,17 +282,17 @@ class User extends Authenticatable
 
     public function dress1()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_1')->where('wares.type', 4)->where('wares.enable', 1)->select('id', 'img1', 'img2');
+        return $this->hasOne(Ware::class, 'id', 'dress_1')->where('wares.type', 4)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'image_type');
     }
 
     public function dress2()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_2')->where('wares.type', 5)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'show_img');
+        return $this->hasOne(Ware::class, 'id', 'dress_2')->where('wares.type', 5)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'show_img', 'image_type');
     }
 
     public function dress3()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_3')->where('wares.type', 6)->where('wares.enable', 1)->select('id', 'img1', 'img2');
+        return $this->hasOne(Ware::class, 'id', 'dress_3')->where('wares.type', 6)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'image_type');
     }
 
     public function ips()
@@ -759,6 +761,11 @@ class User extends Authenticatable
         return $this->hasOne(UserSallary::class, 'user_id', 'id');
     }
 
+    public function totalUserSalary()
+    {
+        return $this->hasMany(UserSallary::class, 'user_id', 'id');
+    }
+
     public function userPacks()
     {
         return $this->hasMany(Pack::class, 'user_id');
@@ -1007,14 +1014,29 @@ class User extends Authenticatable
         return $this->hasMany(HomeCarousel::class, 'owner_id');
     }
 
+
+
+    public function getLoadedPacks()
+    {
+        if ($this->loadedPacks === null) {
+            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25])->where('is_used', 1)->with('ware')->get();
+        }
+        return $this->loadedPacks;
+    }
+
+
+    /**
+     * Custom accessor for UUID with special pack conditions.
+     */
     public function getUuidAttribute($value)
     {
-        $pack = $this->packs->where("ware.value", $this->special_id)->first();
-        if ($this->special_id != null && $this->special_id != 0 && $pack != null && $pack->is_used == 1) {
-            return $this->special_id;
-        }
-        return @$value ?? null;
+        $pack = $this->getLoadedPacks()
+            ->where('ware.value', $this->special_id)
+            ->first();
+
+        return ($this->special_id && $pack && $pack->is_used === 1) ? $this->special_id : ($value ?? null);
     }
+
     //originalUuid
     public function getOriginalUuidAttribute()
     {
@@ -1051,7 +1073,7 @@ class User extends Authenticatable
     public function getPackWithType($type)
     {
 
-        $packs = $this->packs;
+        $packs = $this->getLoadedPacks();
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
         return $packs->where('type', $type)->isNotEmpty();
     }
