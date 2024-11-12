@@ -1073,7 +1073,7 @@ class User extends Authenticatable
     public function getPackWithType($type)
     {
 
-        $packs = $this->packs;
+        $packs = $this->getLoadedPacks();
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
         return $packs->where('type', $type)->isNotEmpty();
     }
