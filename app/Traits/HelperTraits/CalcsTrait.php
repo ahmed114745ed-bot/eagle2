@@ -424,10 +424,10 @@ trait CalcsTrait
         return $levelData ? $levelData->$field : 0;
     }
 
-    public static function level_center($user_id)
+    public static function level_center($user)
     {
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
-        $user            = User::find($user_id);
+       // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
         $diamondSend             = $user->total_sender_diamonds;

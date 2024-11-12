@@ -39,6 +39,7 @@ class User extends Authenticatable
     public static $withoutAppends = false;
     public $enableSaving = true;
     protected $loadedPacks = null;
+    protected $specialPack = null;
     /**
      * The attributes that are mass assignable.
      *
@@ -281,17 +282,17 @@ class User extends Authenticatable
 
     public function dress1()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_1')->where('wares.type', 4)->where('wares.enable', 1)->select('id', 'img1', 'img2','image_type');
+        return $this->hasOne(Ware::class, 'id', 'dress_1')->where('wares.type', 4)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'image_type');
     }
 
     public function dress2()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_2')->where('wares.type', 5)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'show_img','image_type');
+        return $this->hasOne(Ware::class, 'id', 'dress_2')->where('wares.type', 5)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'show_img', 'image_type');
     }
 
     public function dress3()
     {
-        return $this->hasOne(Ware::class, 'id', 'dress_3')->where('wares.type', 6)->where('wares.enable', 1)->select('id', 'img1', 'img2','image_type');
+        return $this->hasOne(Ware::class, 'id', 'dress_3')->where('wares.type', 6)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'image_type');
     }
 
     public function ips()
@@ -1013,15 +1014,16 @@ class User extends Authenticatable
         return $this->hasMany(HomeCarousel::class, 'owner_id');
     }
 
-   
-    
-   public function getLoadedPacks()
+
+
+    public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5,25])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25])->where('is_used', 1)->with('ware')->get();
         }
         return $this->loadedPacks;
     }
+
 
     /**
      * Custom accessor for UUID with special pack conditions.

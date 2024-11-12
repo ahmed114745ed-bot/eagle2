@@ -137,7 +137,7 @@ class MyDataResource extends JsonResource
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
             'profile' => new ProfileResource(@$this->profile),
-            'level' => Common::level_center(@$this->id),
+            'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_Available' => (bool)UserHandling::chickLevelToPlay($this->resource),
             $this->merge((new MyStoreResource($this->resource))),
