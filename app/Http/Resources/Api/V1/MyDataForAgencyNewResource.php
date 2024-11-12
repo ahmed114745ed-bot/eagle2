@@ -30,7 +30,6 @@ class MyDataForAgencyNewResource extends JsonResource
 
     public function toArray($request)
     {
-        dd($this->user);
         $data = [
             'id' => @$this->user->id, // both
            
