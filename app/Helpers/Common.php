@@ -53,7 +53,9 @@ class Common
     public static function level_center_min($user_id)
     {
         $user = User::query()->find($user_id);
-        dd($user);
+        if (!$user) {
+            return [];
+        }
 
         $star_level = $user->received_level + $user->sub_receiver_level;
         $firstVip = Vip::where('level', $star_level)->where('type', 1)->first();
