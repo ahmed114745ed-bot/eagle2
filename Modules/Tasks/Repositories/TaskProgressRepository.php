@@ -14,12 +14,12 @@ class TaskProgressRepository extends AbstractRepository//implements TaskProgress
     {
         parent::__construct($model);
     }
-    public function findUserTaskProgress($userId, $taskId)
+    /*public function findUserTaskProgress($userId, $taskId)
     {
         return UserDayTaskProgress::where('user_id', $userId)
                                   ->where('task_id', $taskId)
                                   ->first();
-    }
+    }*/
     public function save($taskProgress)
     {
         $taskProgress->save();
