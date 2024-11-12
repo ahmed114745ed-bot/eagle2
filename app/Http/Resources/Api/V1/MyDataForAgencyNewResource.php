@@ -30,6 +30,7 @@ class MyDataForAgencyNewResource extends JsonResource
 
     public function toArray($request)
     {
+        dd($this->user);
         $data = [
             'id' => @$this->user->id, // both
            
@@ -38,11 +39,11 @@ class MyDataForAgencyNewResource extends JsonResource
 
             'name' => @$this->user->name ?: '', // both
             // 'vip_level' => @$this->UserVip->level,
-            'vip'=>@Common::ovip_center ($this->user->id), // refactor
-            'level'=>Common::level_center_min (@$this->user->id), // refactor
+            // 'vip'=>@Common::ovip_center ($this->user->id), // refactor
+            // 'level'=>Common::level_center_min (@$this->user->id), // refactor
 
-            'profile' => new ProfileForAjancyResource(@$this->user->profile), // both
-            'has_color_name'=>Common::hasInPack ($this->user->id,18,true),
+            // 'profile' => new ProfileForAjancyResource(@$this->user->profile), // both
+            // 'has_color_name'=>Common::hasInPack ($this->user->id,18,true),
             'status' => $this->status,
             'type' => $this->type,
         ];
