@@ -121,7 +121,7 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->with("ownerRoom");
 
-        $grid->model()->withPhone();
+        $grid->model();
         //$grid->model()->where('phone', '!=', '');//scope
 
         if (request()->online == 1) {
