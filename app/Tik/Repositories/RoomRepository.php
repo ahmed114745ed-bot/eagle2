@@ -24,7 +24,7 @@ class RoomRepository extends AbstractRepository
 
     public function findRoomUserEnable($userId)
     {
-        return $this->model->withoutAppends()->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->where('room_status', 1)->first();
+        return $this->model->where('uid', $userId)->with(['owner', 'roomCategory', 'family'])->where('room_status', 1)->first();
     }
 
     public function findUserRoom($ownerId, $selectRow = "*")
@@ -81,7 +81,7 @@ class RoomRepository extends AbstractRepository
 
     public function all($req,$ids = [])
     {
-        
+
         $user = $req?->user();
         $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
 
