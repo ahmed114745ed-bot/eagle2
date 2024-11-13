@@ -114,14 +114,18 @@ class PkController extends Controller
     }
     public function showPK(Request $request)
     {
+        $isPkCustom = true;
         if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         try {
-            $room = $this->pkService->showPkOrHide($request->owner_id,1);
-            
+            $room = $this->pkService->showPkOrHide($request->owner_id,status: 1, isPkCustom: $isPkCustom);
+
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-       $jsons[] =  $this->changeBackground($room, $request->owner_id, PK_IMAGE);
+        \Log::info($room->id . ' rooms');
+        if ($isPkCustom) {
+            $jsons[] = $this->changeBackground($room, $request->owner_id, PK_IMAGE);
+        }
         $mc   = [
             'messageContent' => [
                 'message' => 'showPK'
@@ -129,7 +133,12 @@ class PkController extends Controller
         ];
         $jsons[] = json_encode($mc);
         // Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $jsons);
-        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
         return Common::apiResponse(1, 'done', null, 201);
     }
 

@@ -14,4 +14,9 @@ class AllGame extends Model
     {
         return $this->hasMany(CoinGameUser::class,'game_id');
     }
+
+    public function getInRoomAttribute($value)
+    {
+        return $value === null ? 0 : $value;
+    }
 }
