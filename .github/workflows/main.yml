@@ -19,7 +19,6 @@ jobs:
         first_ssh: |
           echo "$USER"
           pwd
-          echo "$USER"
           cd /var/www/Eagle
           pwd
           cat /home/${{ secrets.USERNAME }}/scripts/hub.sh
