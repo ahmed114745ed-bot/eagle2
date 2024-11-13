@@ -19,7 +19,6 @@ jobs:
         first_ssh: |
           echo "$USER"
           pwd
-          whoami
           echo "$USER"
           cd /var/www/Eagle
           pwd
