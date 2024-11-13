@@ -141,6 +141,7 @@ Route::middleware([])->group(function () {
         Route::post('/create', [CoinController::class, 'store']);
         Route::post('/update', [CoinController::class, 'update']);
         Route::post('/show', [CoinController::class, 'show']);
+        Route::get('/payment', [CoinController::class, 'paymentCoin']);
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
