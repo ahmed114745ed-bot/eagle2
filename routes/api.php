@@ -158,6 +158,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
+                Route::get('/payment', [CoinController::class, 'paymentCoin']);
+
             });
 
             Route::prefix('users')->group(function () {

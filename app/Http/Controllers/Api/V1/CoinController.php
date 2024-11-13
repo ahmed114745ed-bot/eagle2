@@ -17,7 +17,7 @@ use App\Http\Controllers\Web\OPayController;
 class CoinController extends Controller
 {
     public function __construct(private CoinService $coinService) {}
-    
+
     public function coinList(Request $request)
     {
         $user = $request->user();
@@ -50,7 +50,7 @@ class CoinController extends Controller
 
         $validator = Validator::make($request->all(), [
             'usd'         => 'required|numeric',
-            'coin'         => 'required|numeric', 
+            'coin'         => 'required|numeric',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -77,10 +77,10 @@ class CoinController extends Controller
     }
 
     public function update(Request $request)
-    { 
+    {
         $validator = Validator::make($request->all(), [
             'usd'         => 'required|numeric',
-            'coin'         => 'required|numeric', 
+            'coin'         => 'required|numeric',
             "coin_id" => 'required|integer|exists:coins,id',
         ]);
         if ($validator->fails()) {
@@ -94,5 +94,11 @@ class CoinController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function paymentCoin(Request $request)
+    {
+        $data =  $this->coinService->paymentCoin($request);
+        return Common::apiResponse(1, '', $data);
     }
 }

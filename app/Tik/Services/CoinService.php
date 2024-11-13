@@ -5,17 +5,19 @@ namespace App\Tik\Services;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
+use App\Services\FawryPaymentService;
 use App\Classes\PaymentGateways\Fawry;
 use App\Tik\Repositories\CoinRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Http\Controllers\Web\OPayController;
-use App\Services\FawryPaymentService;
+use App\Tik\Repositories\PaymentCoinRepository;
 
 class CoinService
 {
     public function __construct(
         private readonly CoinRepository $coinRepository,
         private readonly CoinLogRepository $coinLogRepository,
+        private readonly PaymentCoinRepository $paymentCoinRepository,
 
     ) {}
 
@@ -99,5 +101,11 @@ class CoinService
         ];
         $this->coinRepository->update($data, $request->coin_id);
         return true;
+    }
+
+    public function paymentCoin($request)
+    { 
+       return $this->paymentCoinRepository->index();
+
     }
 }
