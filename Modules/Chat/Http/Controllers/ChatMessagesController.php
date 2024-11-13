@@ -36,6 +36,8 @@ class ChatMessagesController extends Controller
             'message' => 'nullable|string|max:255',
             'message_id' => 'nullable|exists:chat_messages,id',
         ]);
+
+        \Log::info('chat response : ' . json_encode($request->all()));
         $user = $request->user();
 
         $check =BlackList::where("user_id", $request->user()->id)->where("from_uid", $request->user_id)
