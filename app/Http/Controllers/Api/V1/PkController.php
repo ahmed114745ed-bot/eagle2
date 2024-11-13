@@ -130,7 +130,12 @@ class PkController extends Controller
         ];
         $jsons[] = json_encode($mc);
         // Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $jsons);
-        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
         return Common::apiResponse(1, 'done', null, 201);
     }
 
