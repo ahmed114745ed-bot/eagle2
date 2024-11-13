@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Controllers;
 
+use Illuminate\Support\Facades\File;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
 use App\Http\Controllers\Controller;
@@ -80,7 +81,10 @@ class ChatMessagesController extends Controller
         if ($request->hasFile('file')) {
             $images_extensions = ['jpeg', 'jpg', 'png','gif','mp4','mp3','wav','pdf'];
             foreach ( $request->file('file') as $file) {
+                /** @var \File $file*/
                 $extension = $file->extension();
+                \Log::info('This is file extension : ' . json_encode($extension) . ' This is file name  : ' . json_encode($file->getFileInfo()->getExtension()));
+
                 $check = in_array($extension, $images_extensions);
                 if (!$check ) {
                     return response()->json([
