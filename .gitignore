@@ -19,6 +19,7 @@ yarn-error.log
 /.htaccess
 /config/broadcasting.php
 /config/websockets.php
+/config/laravel-ffmpeg.php
 docker-compose.yml
 Dockerfile
 /nginx
