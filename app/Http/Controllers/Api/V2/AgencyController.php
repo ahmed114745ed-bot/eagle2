@@ -168,10 +168,10 @@ class AgencyController extends Controller
         $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
 
         if ($type == "application") {
-            $list_req1 = $list_req->where('status', 0)->with('user')->paginate();
+            $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
-            $list_req = $list_req->where('status', '!=', 0)->with('user','admin')->paginate();
+            $list_req = $list_req->where('status', '!=', 0)->with('user','admin')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
         }
 
