@@ -295,6 +295,11 @@ class User extends Authenticatable
         return $this->hasOne(Ware::class, 'id', 'dress_3')->where('wares.type', 6)->where('wares.enable', 1)->select('id', 'img1', 'img2', 'image_type');
     }
 
+    public function is_in_live()
+    {
+        return $this->rooms()->where('room_status', 1)->where('room_visitor', '!=', '')->exists();
+    }
+
     public function ips()
     {
         return $this->hasMany(Ip::class, 'uid');
