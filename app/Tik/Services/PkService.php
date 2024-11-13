@@ -57,7 +57,7 @@ class PkService
             throw new \Exception('Mode Not Compatible');
         }
         $room->enableSaving = false;
-        $status == 1 ? $room->update(['is_show_pk' => 1]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
+        $status == 1 ? $room->update(['is_show_pk' => 1, 'is_pk_custom' => 1]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
         return $room;
     }
 }
