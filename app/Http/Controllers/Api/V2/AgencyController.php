@@ -166,7 +166,7 @@ class AgencyController extends Controller
         }
         $agency_id = $agency->id;
         $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
-        $list_req1 = [];
+
         if ($type == "application") {
             $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
@@ -176,7 +176,7 @@ class AgencyController extends Controller
         }
 
         if ($list_req) {
-            return Common::apiResponse(1, '', $list_req,200,$list_req1);
+            return Common::apiResponse(1, '', $list_req,200);
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
