@@ -90,10 +90,10 @@ class VipController extends Controller
             'name_en'         => 'required|string|max:255',
             'title' => 'nullable|string|max:255',
             'title_en' => 'nullable|string|max:255',
-            'image' => 'required||mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'img2' => 'required||mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img2' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'img2_type' => 'nullable|string',
-            'vipPrivilege_id' => 'required||integer|exists:vip_privileges,id',
+            'vipPrivilege_id' => 'required|integer|exists:vip_privileges,id',
             'ovip_id' => 'required|integer|exists:o_vips,id',
             'ware_id' => 'nullable|integer|exists:wares,id',
 
