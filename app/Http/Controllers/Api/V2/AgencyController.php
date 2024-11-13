@@ -149,45 +149,39 @@ class AgencyController extends Controller
 
     public function showAgencyRequest(Request $request)
     {
-        $user = $request->user();
+        $user   = $request->user();
         $type = $request->type;
-    
+
         $admin = AgencyUserJob::where('user_id', $user->id)->where('type', 'requestManger')->first();
         if ($admin) {
             $agency = Agency::where('id', $admin->agency_id)->first();
         } else {
             $agency = Agency::where('app_owner_id', $user->id)->first();
         }
-    
+
+
         if (!$agency) {
+
             return Common::apiResponse(0, __('api_responses.notAdmin'));
         }
-    
         $agency_id = $agency->id;
         $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
-    
+
         if ($type == "application") {
-            $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10); // هنا اضفنا paginate(10)
-            $list_req = MyDataForAgencyNewResource::collection($list_req1->items(), 'application');
+            $list_req1 = $list_req->where('status', 0)->with('user')->get();
+            return Common::apiResponse(1, '', MyDataForAgencyNewResource::collection($list_req, 'application'));
+            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
-            $list_req1 = $list_req->where('status', '!=', 0)->with('user', 'admin')->paginate(10); // هنا اضفنا paginate(10)
-            $list_req = MyDataForAgencyNewResource::collection($list_req1->items(), 'record');
+            $list_req = $list_req->where('status', '!=', 0)->with('user','admin')->get();
+            return Common::apiResponse(1, '', MyDataForAgencyNewResource::collection($list_req, 'record'));
+            $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
         }
-    
+
         if ($list_req) {
-            return Common::apiResponse(1, '', [
-                'data' => $list_req,
-                'pagination' => [
-                    'current_page' => $list_req1->currentPage(),
-                    'last_page' => $list_req1->lastPage(),
-                    'per_page' => $list_req1->perPage(),
-                    'total' => $list_req1->total()
-                ]
-            ]);
+            return Common::apiResponse(1, '', $list_req);
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
-    
 
     // public function showAgencyRequest(Request $request)
     // {
