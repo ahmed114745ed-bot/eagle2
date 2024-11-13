@@ -155,6 +155,7 @@ class MyDataResource extends JsonResource
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
+            "family_price" =>  Common::getConfig('family_price') ?? 0,
         ];
 
         $data['auth_token'] = $this->auth_token;
