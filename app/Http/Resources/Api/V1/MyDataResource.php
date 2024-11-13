@@ -96,6 +96,12 @@ class MyDataResource extends JsonResource
                 }
             }
         }
+        $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
+        $user = User::find($this->id);
+
+        $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
+            return [$item => $userCounterServices->getUserCounts($user, $item)];
+        });
 
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
