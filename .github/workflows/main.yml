@@ -1,4 +1,4 @@
-name: SSh-main
+name: SSh-main-pipline
 on:
   push:
     branches: ["main"]
