@@ -212,7 +212,7 @@ class Common
         ];
     }
 
-    public static function  getPaginates($collection)
+    public static function          getPaginates($collection)
     {
         return [
             'per_page' => $collection->perPage(),

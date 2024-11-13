@@ -176,7 +176,7 @@ class AgencyController extends Controller
         }
 
         if ($list_req) {
-            return Common::apiResponse(1, '', $list_req);
+            return Common::apiResponse(1, '', $list_req,200 , Common::getPaginates($rooms));
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
