@@ -40,10 +40,7 @@ class RoomService
     public function getRoomBackground(?Room $room)
     {
         if ($room == null) return '';
-        if ($room->is_pk_custom) return PK_IMAGE;
-        return 
-            ((@RequestBackgroundImage::where('status', 1)->where('owner_room_id', $room->uid)->orderByDesc('id')->first())->img ??
-                $room->room_background ??
-                @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img);
+        return $room->final_room_image;
+
     }
 }

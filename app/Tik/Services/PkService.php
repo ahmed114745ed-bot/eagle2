@@ -39,7 +39,7 @@ class PkService
     public function closePk($pkId)
     {
         $pk = $this->pkRepository->findById($pkId);
-        if (!$pk) throw new \Exception(__('api_responses.closed'));
+        if (!$pk) throw new \Exception(__('Already closed'));
 
         $winner = ($pk->t1_score > $pk->t2_score) ?  1 : (($pk->t2_score > $pk->t1_score) ?  2 :  0);
 
