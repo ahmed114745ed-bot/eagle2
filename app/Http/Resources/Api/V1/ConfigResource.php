@@ -26,6 +26,8 @@ class ConfigResource extends JsonResource
             'updated_at' => $this->updated_at,
             'is_hidden' => $this->is_hidden,
             'category' => __($this->category),
+            'type' => $this->type,
+            'sub_type' => $this->sub_type,
         ];
     }
 }
