@@ -83,7 +83,7 @@ class ChatMessagesController extends Controller
             foreach ( $request->file('file') as $file) {
                 /** @var \File $file*/
                 $extension = $file->extension();
-                \Log::info('This is file extension : ' . json_encode($extension) . ' This is file name  : ' . json_encode($file->getFilename()));
+                \Log::info('This is file extension : ' . json_encode($extension) . ' This is file name  : ' . json_encode($file->getFileInfo()->getExtension()));
 
                 $check = in_array($extension, $images_extensions);
                 if (!$check ) {
