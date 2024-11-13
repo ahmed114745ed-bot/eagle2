@@ -169,7 +169,7 @@ class UserResource extends JsonResource
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
-            'level'=>Common::level_center (@$this->id),
+            'level' => Common::level_center (@$this->id),
 
         ];
 
