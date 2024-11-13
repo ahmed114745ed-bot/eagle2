@@ -98,6 +98,7 @@ class MyDataResource extends JsonResource
         }
         $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
         $user = User::find($this->id);
+        $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag','mall'];
 
         $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
             return [$item => $userCounterServices->getUserCounts($user, $item)];
