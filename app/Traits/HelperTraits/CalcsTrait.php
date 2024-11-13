@@ -55,14 +55,18 @@ trait CalcsTrait
             }
         }
     }
+    public static function getTotalGiftPrice($user_id)
+    {
+        return GiftLog::where(function ($query) use ($user_id) {
+            $query->where('receiver_id', $user_id)
+                ->orWhere('sender_id', $user_id);
+        })->get(['receiver_id', 'sender_id', 'giftPrice']);
+    }
 
     public static function getLevel($user_id = null, $type = null, $is_image = false)
     {
         $user = User::query()->find($user_id);
-        $giftLogs = GiftLog::where(function ($query) use ($user_id) {
-            $query->where('receiver_id', $user_id)
-                ->orWhere('sender_id', $user_id);
-        })->get(['receiver_id', 'sender_id', 'giftPrice']);
+        $giftLogs = self::getTotalGiftPrice($user_id);
         $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
         $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
         $vip_num  = $gold_num; //count by purchased coins
@@ -424,8 +428,14 @@ trait CalcsTrait
         return $levelData ? $levelData->$field : 0;
     }
 
-    public static function level_center($user)
+    public static function level_center($user_id)
     {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
        // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
@@ -588,8 +598,9 @@ trait CalcsTrait
     public static function level_centerSerch($user_id)
     {
         $user = User::query()->find($user_id);
-        $star_num = DB::table('gift_logs')->where('receiver_id', $user_id)->sum('giftPrice');
-        $gold_num = DB::table('gift_logs')->where('sender_id', $user_id)->sum('giftPrice');
+        $giftLogs = self::getTotalGiftPrice($user_id);
+        $star_num = $giftLogs->where('receiver_id', $user_id)->sum('giftPrice');
+        $gold_num = $giftLogs->where('sender_id', $user_id)->sum('giftPrice');
 
         //--------------------------------------
         $star_num += $user->sub_receiver_num ?: 0;
