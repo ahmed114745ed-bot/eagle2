@@ -156,6 +156,9 @@ class MyDataResource extends JsonResource
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
             "family_price" =>  Common::getConfig('family_price') ?? 0,
+            $this->mergeWhen($request->show_counter == true, [
+                'unread_counter'       =>  $counters,
+            ]),
         ];
 
         $data['auth_token'] = $this->auth_token;
