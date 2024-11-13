@@ -117,10 +117,11 @@ class PkController extends Controller
         if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         try {
             $room = $this->pkService->showPkOrHide($request->owner_id,1);
-            
+
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
+        \Log::info($room->id . ' rooms');
        $jsons[] =  $this->changeBackground($room, $request->owner_id, PK_IMAGE);
         $mc   = [
             'messageContent' => [
