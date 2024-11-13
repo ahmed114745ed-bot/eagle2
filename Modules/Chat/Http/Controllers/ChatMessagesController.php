@@ -81,6 +81,8 @@ class ChatMessagesController extends Controller
             $images_extensions = ['jpeg', 'jpg', 'png','gif','mp4','mp3','wav','pdf'];
             foreach ( $request->file('file') as $file) {
                 $extension = $file->extension();
+                \Log::info('This is file extension : ' . json_encode($extension));
+
                 $check = in_array($extension, $images_extensions);
                 if (!$check ) {
                     return response()->json([
