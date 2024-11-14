@@ -2,20 +2,21 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\OVip;
 use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Enums\ConfigType;
 use App\Models\AdminUser;
 use Illuminate\Support\Str;
 use App\Enums\ConfigCategory;
-use App\Enums\ConfigType;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use App\Services\AppFeatureService;
 Use Encore\Admin\Admin;
+use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
-use App\Models\OVip;
+use Illuminate\Support\Facades\Lang;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class ConfigController extends MainController
@@ -120,7 +121,10 @@ class ConfigController extends MainController
         $grid->column('value',trans('value'))->display(function($text) {
             return Str::limit($text, 50, '...');
         })->editable ();
-        $grid->desc(trans ('description'));
+
+        $grid->column('desc',trans ('description'))->display(function($desc) {
+            return Lang::has('dashboard.' . $desc) ? __('dashboard.' . $desc) : $desc;
+        });
         Admin::style('.dropdown-toggle {
             background-color: #f8f9fa;
             color: #333;
