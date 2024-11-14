@@ -102,7 +102,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => '',
     ],
     function (Router $router) {
         $router->get('admin/auth', function () {
