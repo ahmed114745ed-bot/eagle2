@@ -138,4 +138,9 @@ class CoinService
         $this->paymentCoinRepository->update($data, $request->payment_coin_id);
         return true;
     }
+
+    public function showPayment($PaymentCoinId)
+    {
+        return $this->paymentCoinRepository->findById($PaymentCoinId);
+    }
 }

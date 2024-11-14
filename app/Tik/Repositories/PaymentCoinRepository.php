@@ -16,4 +16,9 @@ class PaymentCoinRepository extends AbstractRepository
     {
         return $this->model->with('coins')->get();
     }
+
+    public function findById($paymentCoinId)
+    {
+        return $this->model->with('coins')->find($paymentCoinId);
+    }
 }
