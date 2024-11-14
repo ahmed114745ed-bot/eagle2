@@ -39,13 +39,13 @@ class CoinController extends Controller
     }
 
 
-    public function index()
+    public function index($payment_id)
     {
-        $data = $this->coinService->coinsList();
+        $data = $this->coinService->coinsList($payment_id);
         return Common::apiResponse(1, '', $data);
     }
 
-    public function store(Request $request)
+    public function store($payment_id,Request $request)
     {
 
         $validator = Validator::make($request->all(), [
@@ -56,7 +56,7 @@ class CoinController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-            $this->coinService->create($request);
+            $this->coinService->create($request,$payment_id);
             return Common::apiResponse(1, 'created successfully');
         } catch (Exception $exception) {
 
@@ -101,4 +101,45 @@ class CoinController extends Controller
         $data =  $this->coinService->paymentCoin($request);
         return Common::apiResponse(1, '', $data);
     }
+
+    public function createPaymentGateway(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title'         => 'required|string|max:255',
+            'photo'         => 'required|mimes:jpeg,png,jpg,gif,svg',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->coinService->createPaymentCoins($request);
+            return Common::apiResponse(1, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+
+    }
+
+    public function updatePaymentGateway(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title'         => 'required|string|max:255',
+            'photo'         => 'required|mimes:jpeg,png,jpg,gif,svg',
+            'payment_coin_id' => 'required|integer|exists:payment_coins,id'
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->coinService->updatePaymentCoins($request);
+            return Common::apiResponse(1, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+
+    }
+
+    
 }
