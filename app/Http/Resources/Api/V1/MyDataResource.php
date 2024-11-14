@@ -72,7 +72,6 @@ class MyDataResource extends JsonResource
        // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
 
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
-        dd($dress_3_data);
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
 
@@ -186,7 +185,7 @@ class MyDataResource extends JsonResource
 
     public function getUserDress($type, $dress, $item = 'img1')
     {
-        $pack = $this->getLoadedPacks()
+        $pack = $this->packs
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
