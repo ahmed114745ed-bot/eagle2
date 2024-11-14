@@ -1,4 +1,4 @@
-name: SSh
+name: SSh-main-pipline
 on:
   push:
     branches: ["main"]
@@ -19,8 +19,6 @@ jobs:
         first_ssh: |
           echo "$USER"
           pwd
-          whoami
-          echo "$USER"
           cd /var/www/Eagle
           pwd
           cat /home/${{ secrets.USERNAME }}/scripts/hub.sh

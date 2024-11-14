@@ -39,7 +39,7 @@ class PkService
     public function closePk($pkId)
     {
         $pk = $this->pkRepository->findById($pkId);
-        if (!$pk) throw new \Exception(__('api_responses.closed'));
+        if (!$pk) throw new \Exception(__('Already closed'));
 
         $winner = ($pk->t1_score > $pk->t2_score) ?  1 : (($pk->t2_score > $pk->t1_score) ?  2 :  0);
 
@@ -49,7 +49,7 @@ class PkService
         return $pk;
     }
 
-    public function showPkOrHide($ownerId, $status)
+    public function showPkOrHide($ownerId, $status, bool $isPkCustom = false)
     {
         $room =  $this->roomRepository->findRoomUserEnable($ownerId);
         if (!$room) throw new \Exception('not found');
@@ -57,7 +57,7 @@ class PkService
             throw new \Exception('Mode Not Compatible');
         }
         $room->enableSaving = false;
-        $status == 1 ? $room->update(['is_show_pk' => 1]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
+        $status == 1 ? $room->update(['is_show_pk' => 1, 'is_pk_custom' => $isPkCustom]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
         return $room;
     }
 }

@@ -27,7 +27,7 @@ class ChargeAction extends Action
             if (!$user) {
                 return $this->response()->error(__('user not found'))->refresh();
             }
-    
+
             if ($this->isInvalidAmount($request->amount)) {
                 return $this->response()->error(__('amount must be more than 10'))->refresh();
             }
@@ -118,6 +118,7 @@ class ChargeAction extends Action
         $charge->user_id = $user->id;
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = $request->user_type??'dashdash';
+        //$charge->user_type = $request->user_type == 'dash' ? 'dash' : 'app';
         $charge->amount = $amount;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;

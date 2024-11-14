@@ -25,4 +25,20 @@ enum ConfigCategory : string
     {
         return translateCategory(self::getOptions());
     }
+
+    public static function getLinkedStringsByValue(string $value): ?array
+    {
+        return match ($value) {
+            self::SYSTEM_SETTINGS->value => [],
+            self::TARGET_SETTINGS->value => [],
+            self::ZEGO_SETTINGS->value => [],
+            self::SMS_SETTINGS->value => [],
+            self::FAMILY_SETTINGS->value => [],
+            self::PAYMENT_SETTINGS->value => [],
+            self::ROOM_SETTINGS->value => [],
+            self::AGENCY_SETTINGS->value => ['targets', 'target-percentage'],
+            self::LEVEL_SETTINGS->value => [ ],
+            default => null,
+        };
+    }
 }

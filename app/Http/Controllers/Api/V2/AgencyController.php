@@ -168,15 +168,15 @@ class AgencyController extends Controller
         $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
 
         if ($type == "application") {
-            $list_req1 = $list_req->where('status', 0)->with('user')->get();
+            $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
-            $list_req = $list_req->where('status', '!=', 0)->with('user','admin')->get();
-            $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
+            $list_req1 = $list_req->where('status', '!=', 0)->with('user','admin')->paginate(10);
+            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'record');
         }
 
         if ($list_req) {
-            return Common::apiResponse(1, '', $list_req);
+            return Common::apiResponse(1, '', $list_req,200);
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }

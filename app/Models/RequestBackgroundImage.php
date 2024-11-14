@@ -10,6 +10,8 @@ class RequestBackgroundImage extends Model
 {
     protected $table = 'request_background_images';
 
+    protected $guarded = ['id'];
+
     public static function boot()
     {
         parent::boot();

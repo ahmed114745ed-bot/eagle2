@@ -115,7 +115,7 @@
                 var isChecked = stopChargeCheckbox.is(':checked');
                 // Make an API call here, for example, using jQuery.ajax
                 $.ajax({
-                    url: '/send-request-stop-charge',
+                    url: '/admin/send-request-stop-charge',
                     method: 'POST',
                     data: {
                         stop_charge: isChecked

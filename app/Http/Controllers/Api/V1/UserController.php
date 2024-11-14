@@ -23,6 +23,7 @@ use App\Http\Resources\Api\V1\UserTypeResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
+use App\Http\Resources\Api\V1\ZegoCreditionalResource;
 use App\Models\Target;
 use DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -434,5 +435,18 @@ class UserController extends Controller
         $user->tokens()->delete();
         $user->delete();
         return Common::apiResponse(1, 'account deleted successfully');
+    }
+
+    public function zegoCredential()
+    {
+        $ZegoEncreyptkey = config('app.zego_credential');
+        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
+        $data = $keys->mapWithKeys(function ($item){
+            return [$item['name'] => $item['name'] == 'zego_app_id' ? (integer)$item['value'] :$item['value']];
+        });
+
+        $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
+
+        return Common::apiResponse(1, '',$encryptedData );
     }
 }

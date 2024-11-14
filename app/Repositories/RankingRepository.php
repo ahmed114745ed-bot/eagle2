@@ -54,6 +54,17 @@ class RankingRepository
                     });
     }
 
+    public function getGiftLogsUserForRoomOwnerId($class, $rel, $type, $userId,$room_id,$keywords)
+    {
+        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
+           
+            ->when($class != 3, fn($q) => $q->with($rel));
+
+        $this->applyDateFilters($query, $type);
+
+        return $query->selectRaw("sum(giftPrice) as exp, $keywords")->where($keywords,$userId)->groupBy($keywords)->first();
+    }
+
     protected function applyDateFilters(&$query, $type)
     {
         if ($type == 0) {

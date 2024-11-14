@@ -1,20 +1,11 @@
 <?php
 
-use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserController;
-use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\addTOjesonController;
-use App\Jobs\ExportGiftLogsJob;
-use App\Models\AgencyJoinRequest;
-use App\Models\Room;
-use App\Models\User;
-use App\Services\RoomLevelServices;
-use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Route;
-use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use Modules\Reals\Http\Controllers\RealsController;
+use Illuminate\Routing\Router;
+
 
 
 /*
@@ -27,43 +18,6 @@ use Modules\Reals\Http\Controllers\RealsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/t1', function () {
-    dd(User::first()->friends_ids());
-});
-
-Route::get('/deleted/users', function () {
-    $users = User::withTrashed()->where('deleted_at', '!=', null)->select('id', 'name')->get();
-    return response()->json([
-        'data' => $users
-    ]);
-});
-
-Route::get('/t2', function () {
-    return gethostname();
-});
-Route::get('/fetch_data/{id}', [CoinController::class, 'fetchData']);
-Route::get('/create_coin', [CoinController::class, 'createCoin']);
-Route::get('/create_coin/{id}', [CoinController::class, 'setPrice']);
-Route::get('/git_image', [\App\Http\Controllers\Api\V1\GiftController::class, 'gitImage']);
-Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-Route::get('/', function (HttpRequest $request) {
-    // return view ('welcome');
-//     $user=$request->user_id;
-//     $month=intval($request->month);
-//     $year=intval($request->year);
-
-//  $all=   Common::CurantUsdHistoryOwner($user ,$month,$year);
-
-
-//     return $all;
-
-// $user  = App\Models\User::query()->find(1900);
-// $token = $user->createToken('api_token')->plainTextToken;
-// echo $token;
-
-});
-//Route::post('postAddSitin', [addTOjesonController::class,'postAddSitin'])->name('postAddSitin');
 
 
 Route::prefix('payment')->group(function () {
@@ -89,14 +43,17 @@ Route::get('/clear', function () {
     }
 
     return "Cleared!";
-
 });
 
 
-Route::get('/admin/custom-export-users', [\App\Admin\Controllers\ExportController::class, 'usersSallaryTargets'
+Route::get('/admin/custom-export-users', [
+    \App\Admin\Controllers\ExportController::class,
+    'usersSallaryTargets'
 ])->name('custom-export-users');
 
-Route::get('/admin/agency-export-report', [\App\Admin\Controllers\ExportController::class, 'usersAgencyTargets'
+Route::get('/admin/agency-export-report', [
+    \App\Admin\Controllers\ExportController::class,
+    'usersAgencyTargets'
 ])->name('agency-export-report');
 
 
@@ -104,92 +61,33 @@ Route::get('/privacy-policy', function () {
     $page = \App\Models\Page::where("name", "privacy-policy")->first();
     return view('privacy.privacy', ['page' => $page]);
 });
-Route::get('/generate', function () {
-
-    $user = App\Models\User::query()->find(1770);
-    $token = $user->createToken('api_token')->plainTextToken;
-    echo $token;
-
-});
 
 
-Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
-//Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
 
 
-Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
-Route::get('test-google-pay', [\App\Http\Controllers\InAppPurchase::class, 'verifyGooglePay']);
-Route::get('old_real', [RealsController::class, 'oldReal']);
-//Route::get('/test-websocket', [WebsocketController::class, 'index']);
-Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
-Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
 Route::get('admin/auth', function () {
     return view('checkLogin');
 })->name('admin/auth');
-Route::post('/authenticate', [GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
-$router->post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
-$router->post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
 
-$router->post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
 
-$router->post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
 
-Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
-
-Route::get("update-room-socket", function () {
-
-    Room::where('count_room_socket', "!=", 0)->whereDoesntHave("roomVisitors")->update(['count_room_socket' => 0, "room_visitor" => ""]);
-
-    return "تم التعديل بنجاح";
-});
-Route::get("update-join-date", function () {
-    $results = AgencyJoinRequest::with("user")->get();
-    foreach ($results as $result) {
-        $result->user->join_agency_date = $result->updated_at;
-        $result->user->save();
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => config('admin.route.namespace'),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function (Router $router) {
+        Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
+        Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
+        Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
+        Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
     }
-    return "تم التعديل بنجاح";
-});
-
-
-Route::get("test-room-level", function () {
-    $room = Room::find(8);
-    $totalPrice = 80;
-    (new RoomLevelServices)->update_coins_and_level($room, $totalPrice);
-    return "تم التعديل بنجاح";
-});
-
-Route::get("test-user-salary", function () {
-    $user = User::find(419);
-
-    return $user->salary;
-});
-
-
-Route::get("ufu", function () {
-    $value = Config::get('broadcasting.connections.pusher.app_id');
-
-    dd($value);
-});
-
-Route::get("download-users", function () {
-    return Excel::download(new \App\Exports\UsersExport(), 'users.xlsx');
-});
-
-Route::get("download-rooms", function () {
-    return Excel::download(new \App\Exports\RoomsExport(), 'rooms.xlsx');
-});
-
-Route::get("download-agency", function () {
-    return Excel::download(new \App\Exports\AgenciesExport(), 'agencies.xlsx');
-});
-
-Route::get("download-gift-log", function () {
-    $filename = 'gift_logs_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
-    $filePath = 'exports/' . $filename;
-
-    dispatch(new ExportGiftLogsJob($filePath));
-    // return Excel::download(new \App\Exports\GiftLogExport(), 'gift_logs.xlsx');
-});
-
-
+);

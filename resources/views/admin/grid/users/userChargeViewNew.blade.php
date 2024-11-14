@@ -125,7 +125,7 @@
             $('#stopChargeCheckbox').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
-                    url: '/send-request-make-rooms-top',
+                    url: '/admin/send-request-make-rooms-top',
                     method: 'POST',
                     data: { make_rooms_top: isChecked },
                     success: function(response) { console.log(response); },
@@ -137,7 +137,7 @@
             $('#stopCharge').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
-                    url: '/send-request-stop-charge',
+                    url: '/admin/send-request-stop-charge',
                     method: 'POST',
                     data: { stop_charge: isChecked },
                     success: function(response) { console.log(response); },
@@ -161,7 +161,7 @@
             $('#stopTransferSalary').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
-                    url: '/send-request-transfer-salary',
+                    url: '/admin/send-request-transfer-salary',
                     method: 'POST',
                     data: { transfer_salary: isChecked },
                     success: function(response) { console.log(response); },

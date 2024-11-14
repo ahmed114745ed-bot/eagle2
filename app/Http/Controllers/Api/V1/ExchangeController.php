@@ -11,9 +11,7 @@ use App\Tik\Services\ExchangeService;
 
 class ExchangeController extends Controller
 {
-    public function __construct(private ExchangeService $exchangeService)
-    {
-    }
+    public function __construct(private ExchangeService $exchangeService) {}
 
 
     public function exchangeList(Request $request)
@@ -33,7 +31,7 @@ class ExchangeController extends Controller
 
         try {
             $this->exchangeService->create($user, $request->item_id);
-            return Common::apiResponse(1, $user->total_diamond_received, $user->total_diamond_received, 200);
+            return Common::apiResponse(1, $user->total_diamond_received, ['diamond' => $user->total_diamond_received, 'coins' => $user->di], 200);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

@@ -54,7 +54,6 @@ class UserResourceSerche extends JsonResource
             'uuid'=>@$this->uuid, // both
             'is_gold_id'=>(bool) @$this->is_gold_id, // both
             'name'=>@$this->name?:'', // both
-            'is_in_live'=>$this->is_in_live(), // user data
             'is_follow' => $this->is_follow,
             'now_room'=>[
                 'is_in_room'=>@$this->now_room_uid != 0,

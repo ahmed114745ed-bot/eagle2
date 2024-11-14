@@ -53,6 +53,9 @@ class Common
     public static function level_center_min($user_id)
     {
         $user = User::query()->find($user_id);
+        if (!$user) {
+            return new \stdClass();
+        }
 
         $star_level = $user->received_level + $user->sub_receiver_level;
         $firstVip = Vip::where('level', $star_level)->where('type', 1)->first();
@@ -83,7 +86,7 @@ class Common
     {
         return Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
     }
-    
+
     public static function apiResponse2(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)
     {
 
@@ -209,7 +212,7 @@ class Common
         ];
     }
 
-    public static function  getPaginates($collection)
+    public static function          getPaginates($collection)
     {
         return [
             'per_page' => $collection->perPage(),

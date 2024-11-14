@@ -74,6 +74,7 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+
        // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
 
@@ -96,6 +97,13 @@ class MyDataResource extends JsonResource
                 }
             }
         }
+        $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
+        $user = User::find($this->id);
+        $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag','mall'];
+
+        $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
+            return [$item => $userCounterServices->getUserCounts($user, $item)];
+        });
 
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
@@ -155,6 +163,10 @@ class MyDataResource extends JsonResource
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
+            "family_price" =>  Common::getConfig('family_price') ?? 0,
+            $this->mergeWhen($request->show_counter == true, [
+                'unread_counter'       =>  $counters,
+            ]),
         ];
 
         $data['auth_token'] = $this->auth_token;
@@ -173,7 +185,7 @@ class MyDataResource extends JsonResource
 
     public function getUserDress($type, $dress, $item = 'img1')
     {
-        $pack = $this->getLoadedPacks()
+        $pack = $this->packs
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
