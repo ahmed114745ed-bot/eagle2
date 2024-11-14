@@ -27,7 +27,7 @@ class ChargeAction extends Action
             if (!$user) {
                 return $this->response()->error(__('user not found'))->refresh();
             }
-    
+
             if ($this->isInvalidAmount($request->amount)) {
                 return $this->response()->error(__('amount must be more than 10'))->refresh();
             }
