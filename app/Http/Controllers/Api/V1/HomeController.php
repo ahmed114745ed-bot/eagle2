@@ -255,4 +255,52 @@ class HomeController extends Controller
 
         return Common::apiResponse(1, 'ok', null, 200);
     }
+
+    public function un_hide(Request $request)
+    {
+        $user = $request->user();
+        $privilegeArr = [
+            'has_color_name' => 18,
+            'anonymous'      => 17,
+            'country'        => 13,
+            'last_active'    => 20,
+            'visit'          => 19,
+            'room'           => 16,
+            // 'spechEfeect'    => 22
+        ];
+        $type         = $request->type;
+        $this->homeService->changePackMode($type, $privilegeArr, $user, false);
+
+        return Common::apiResponse(1, 'ok', null, 200);
+    }
+
+    // public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
+    // {
+    //     if (key_exists($type, $privilegeArr)) {
+    //         $privilegeId = $privilegeArr[$type];
+
+    //         if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
+    //             return Common::apiResponse(0, 'not found', null, 404);
+    //         } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
+
+    //             return Common::apiResponse(0, 'not allowed', null, 403);
+    //         }
+
+    //         Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
+
+    //         switch ($type) {
+    //             case 'country':
+    //                 if ($isAvailable) {
+    //                     $user->country_id = null;
+    //                     $user->save();
+    //                 }
+    //                 break;
+    //             case 'room':
+    //                 Room::query()->where('uid', $user->id)->update(['room_status' => $isAvailable ? 2 : 1]);
+    //                 break;
+    //         }
+    //     }
+    // }
+
+
 }

@@ -385,6 +385,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
             // end coin report
+            Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
+
             // Route::get('/data-data', function(){
             //     $id = \App\Models\User::first()?->id;
             //     $data = Common::level_center(@$id);
