@@ -42,7 +42,8 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->get();
+        ->orderBy("created_at", "desc")
+        ->paginate(10);  
         return ExchangeCoinsReportResource::collection($data);
     }
 
