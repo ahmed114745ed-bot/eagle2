@@ -166,6 +166,10 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
+            'intro'                => $intro, // both
+            'intro_id'             => $intro != '' ? @$this->dress_3 : 0, // both
+
+
         ];
 
         $data['auth_token'] = $this->auth_token;
