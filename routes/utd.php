@@ -137,11 +137,14 @@ Route::middleware([])->group(function () {
 
     //coin
     Route::prefix('coins')->group(function () {
-        Route::get('/all', [CoinController::class, 'index']);
-        Route::post('/create', [CoinController::class, 'store']);
+        Route::get('/all/{payment_id}', [CoinController::class, 'index']);
+        Route::post('/create/{payment_id}', [CoinController::class, 'store']);
         Route::post('/update', [CoinController::class, 'update']);
         Route::post('/show', [CoinController::class, 'show']);
-        Route::get('/payment', [CoinController::class, 'paymentCoin']);
+        Route::get('/payment-gateway', [CoinController::class, 'paymentCoin']);
+        Route::post('/payment-gateway/create', [CoinController::class, 'createPaymentGateway']);
+        Route::post('/payment-gateway/update', [CoinController::class, 'updatePaymentGateway']);
+      
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
