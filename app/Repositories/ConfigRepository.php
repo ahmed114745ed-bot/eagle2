@@ -9,6 +9,6 @@ class ConfigRepository
 {
     public function getAll()
     {
-        return Config::where('is_hidden',0)->all();
+        return Config::where('is_hidden', 0)->all();
     }
 }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConfigResource extends JsonResource
 {
@@ -17,11 +18,11 @@ class ConfigResource extends JsonResource
      */
     public function toArray($request)
     {
-          return [
+        return [
             'id' => $this->id,
             'name' => __($this->name),
             'value' => $this->value,
-            'desc' => $this->desc,
+            'desc' => Lang::has('dashboard.' . $this->desc) ? __('dashboard.' . $this->desc) : $this->desc,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'is_hidden' => $this->is_hidden,

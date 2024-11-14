@@ -71,7 +71,7 @@ class ConfigController extends Controller
 
     public function config( Request $request )
     {
-        $configs = Config::all()->groupBy('category');
+        $configs = Config::where('is_hidden', 0)->all()->groupBy('category');
         $formattedConfigs = [];
 
         foreach ($configs as $category => $items) {
