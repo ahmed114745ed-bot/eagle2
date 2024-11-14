@@ -4,7 +4,8 @@ use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
 use App\Http\Controllers\addTOjesonController;
 use Illuminate\Support\Facades\Route;
-use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use Illuminate\Routing\Router;
+
 
 
 /*
@@ -17,12 +18,6 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-
-
-Route::get('/fetch_data/{id}', [CoinController::class, 'fetchData']);
-Route::get('/create_coin', [CoinController::class, 'createCoin']);
-Route::get('/create_coin/{id}', [CoinController::class, 'setPrice']);
 
 
 Route::prefix('payment')->group(function () {
@@ -48,14 +43,17 @@ Route::get('/clear', function () {
     }
 
     return "Cleared!";
-
 });
 
 
-Route::get('/admin/custom-export-users', [\App\Admin\Controllers\ExportController::class, 'usersSallaryTargets'
+Route::get('/admin/custom-export-users', [
+    \App\Admin\Controllers\ExportController::class,
+    'usersSallaryTargets'
 ])->name('custom-export-users');
 
-Route::get('/admin/agency-export-report', [\App\Admin\Controllers\ExportController::class, 'usersAgencyTargets'
+Route::get('/admin/agency-export-report', [
+    \App\Admin\Controllers\ExportController::class,
+    'usersAgencyTargets'
 ])->name('agency-export-report');
 
 
@@ -65,15 +63,31 @@ Route::get('/privacy-policy', function () {
 });
 
 
-Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
-Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
-Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
+
 
 Route::get('admin/auth', function () {
     return view('checkLogin');
 })->name('admin/auth');
 
-Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
 
-
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => config('admin.route.namespace'),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function (Router $router) {
+        Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
+        Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
+        Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
+        Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+    }
+);
