@@ -74,6 +74,7 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+
        // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
 
@@ -166,10 +167,6 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'intro'                => $intro, // both
-            'intro_id'             => $intro != '' ? @$this->dress_3 : 0, // both
-
-
         ];
 
         $data['auth_token'] = $this->auth_token;
@@ -188,7 +185,7 @@ class MyDataResource extends JsonResource
 
     public function getUserDress($type, $dress, $item = 'img1')
     {
-        $pack = $this->getLoadedPacks()
+        $pack = $this->packs
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
