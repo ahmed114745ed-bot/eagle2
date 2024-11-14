@@ -51,9 +51,9 @@ class addTOjesonController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'chat_status'        => 'nullable',
+            'chat_status'        => 'nullable|in:on,off',
             'invitation_code_date'        => 'nullable|numeric',
-            'show_welcom_enmation'        => 'nullable',
+            'show_welcom_enmation'        => 'nullable|in:on,off',
             'android_min_version'         => 'nullable|numeric',
             'android_current_version'         => 'nullable|numeric',
             'android_update_required'         => 'nullable|numeric',
