@@ -12,9 +12,10 @@ class RankingService
 {
     protected $rankingRepo;
 
-    public function __construct(RankingRepository $rankingRepo,
-    private readonly GiftLogRepository $GiftLogRepository)
-    {
+    public function __construct(
+        RankingRepository $rankingRepo,
+        private readonly GiftLogRepository $GiftLogRepository
+    ) {
         $this->rankingRepo = $rankingRepo;
     }
 
@@ -28,7 +29,7 @@ class RankingService
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
 
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit,$keywords);
+        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
         $this->transformData($data, $class, $keywords, $rel);
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
@@ -67,8 +68,8 @@ class RankingService
             $v->remaining = numToString(ceil($v->exp_diff));
             $v->remaining_int = ceil($value2);
 
-            $v->name = $class == 3? (@$user->ownerRoom?->room_name ?? '') : $user->name;
-            $v->avatar = $class == 3? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar ;
+            $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
             $v->frame = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true) ?: Common::getUserDress($user->id, $user->dress_1, 4, 'img1', true);
             $v->frame_id = $user->dress_1;
             $v->type_user =  intval(@$user->type_user) ?: 0;
@@ -83,10 +84,11 @@ class RankingService
         })->reject(function ($v) {
             return $v == null;
         });
-
     }
 
-    protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit)
+
+
+    protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $kong['user_id']    = 0;
         $kong['uuid']       = '';
@@ -109,13 +111,13 @@ class RankingService
         $data[0] = isset($data[0]) ? $data[0] : $kong;
         $data[1] = isset($data[1]) ? $data[1] : $kong;
         $data[2] = isset($data[2]) ? $data[2] : $kong;
-//        if ($limit == 3) return $data;
+        //        if ($limit == 3) return $data;
 
 
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
 
-        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id','manger_type_id');
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id');
 
         $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
@@ -124,14 +126,14 @@ class RankingService
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
-        $arr['user']['exp'] = $arr['user']['exp'] ?? '0';
+        $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level;
         $arr['user']['sender_level']  = $user->total_sender_level;
         $arr['user']['reciver_level']  = $user->total_received_level;
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
-        $arr['user']['manger_type'] =!$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
 
 
         $toArray = $data->toArray();
@@ -147,7 +149,7 @@ class RankingService
             return ['receiver_id', 'receiver'];
         } elseif ($class == 2) {
             return ['sender_id', 'sender'];
-        }elseif ($class == 3) {
+        } elseif ($class == 3) {
             return ['roomowner_id', 'roomOwner'];
         } else {
             return ['sender_id', 'sender'];
@@ -168,9 +170,9 @@ class RankingService
 
     public function topUser()
     {
-        $giftLogs = $this->GiftLogRepository->topUser('sender','sender_id');
-        $giftLogsReceiver = $this->GiftLogRepository->topUser('receiver','receiver_id');
-        $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner','roomowner_id');
+        $giftLogs = $this->GiftLogRepository->topUser('sender', 'sender_id');
+        $giftLogsReceiver = $this->GiftLogRepository->topUser('receiver', 'receiver_id');
+        $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
         $img      = [];
         foreach ($giftLogs as $giftLog) {
             $img[] = $giftLog->sender->profile->avatar ?? '';
@@ -189,12 +191,12 @@ class RankingService
     }
     public function getRankingOneRoom($class, $type, $user, $limit, $room_id, $sent_to_owner)
     {
-        
+
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
 
-        $data = $this->rankingRepo->getGiftLogsForRoomOwnerId($class, $rel, $type, $limit,$room_id,$keywords);
+        $data = $this->rankingRepo->getGiftLogsForRoomOwnerId($class, $rel, $type, $limit, $room_id, $keywords);
+        $userExp = $this->rankingRepo->getGiftLogsUserForRoomOwnerId($class, $rel, $type, $user->id, $room_id, $keywords);
         $this->transformData($data, $class, $keywords, $rel);
-
-        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit, $userExp);
     }
 }
