@@ -56,7 +56,7 @@ class CoinReportController extends Controller
               ->whereDate("created_at", "<=", request("end_date"));
         })
         ->orderBy("created_at", "desc") 
-        ->paginate(10);//->get();
+        ->paginate(10);//->get();   
         return RecevingReportResource::collection($data);
     }
 
