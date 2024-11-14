@@ -71,13 +71,14 @@ class ConfigController extends Controller
 
     public function config( Request $request )
     {
-        $configs = Config::where('is_hidden', 0)->all()->groupBy('category');
+        $configs = Config::where('is_hidden', 0)->get()->groupBy('category');
         $formattedConfigs = [];
 
         foreach ($configs as $category => $items) {
-            $formattedConfigs[__($category)]['sub_categoory'] =  ConfigCategory::getLinkedStringsByValue($category);
+            $formattedConfigs[__($category)]['sub_category'] = ConfigCategory::getLinkedStringsByValue($category);
             $formattedConfigs[__($category)]['data'] = ConfigResource::collection($items);
         }
+
 
         return Common::apiResponse(1, '', $formattedConfigs);
     }
