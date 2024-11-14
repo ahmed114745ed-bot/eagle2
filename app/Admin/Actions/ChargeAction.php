@@ -121,7 +121,7 @@ class ChargeAction extends Action
         $charge->amount = $amount;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
-        dd($charge);
+        //dd($charge);
         $charge->save();
     }
 
