@@ -59,13 +59,15 @@ class TaskService
                     return Common::apiResponse(false, 'Task progress not found', null, 404);
                 }
 
-                if ($taskProgress->is_completed) {
+                if ($taskProgress->is_completed||$taskProgress->is_collect) {
                     DB::rollBack();
                     return Common::apiResponse(true, 'Task progress already collected', null, 200);
                 }
 
                 if ($taskProgress->count == $task->count) {
                     $taskProgress->is_completed = true;
+                    $taskProgress->is_collect = true;
+                    
                     $this->taskProgressRepo->save($taskProgress);
 
                     $user = $this->userRepository->findOrFail($userId);
@@ -83,6 +85,7 @@ class TaskService
                             'day_id'=>$task->day_id,
                             'points'=>$task->total_points,
                             'is_completed'=>false,
+                            'get_rewards'=>false,
                             'created_at'=>now()
                         ]);
                         //$this->userDayProgressRepository->save($userDayProgressRow);
@@ -155,7 +158,12 @@ class TaskService
 
     private function unlockDayAndAssignRewards($dayId, $userId)
     {
-        //$day = $this->dayRepo->findOrFail($dayId);
+        $day = $this->dayRepo->findOrFail($dayId);
+        if($day)
+        {
+            $day->get_rewards = true;
+            $this->dayRepo->save($day);
+        }
         $nextDay = $this->dayRepo->getNextDay($dayId);
         if ($nextDay) {
             $nextDay->is_unlocked = true;

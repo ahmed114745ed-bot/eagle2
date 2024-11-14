@@ -28,12 +28,14 @@ class DayTasksService
             $tasksWithCompletion = $tasks->map(function ($task) use ($taskProgress) {
                 $progress = $taskProgress->firstWhere('task_id', $task->id);
                 return [
+                    'id'=>$task->id,
                     'title' => $task->title,
                     'type' => $task->type,
                     'sub_type' => $task->sub_type,
                     'count' => $task->count,
                     'total_points' => $task->total_points,
-                    'is_completed' => $progress ? $progress->is_completed : false
+                    'is_completed' => $progress ? $progress->is_completed : false,
+                    'is_collect'=> $progress ? $progress->is_collect : false
                 ];
             });
 

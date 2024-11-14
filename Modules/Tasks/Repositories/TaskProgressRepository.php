@@ -24,4 +24,9 @@ class TaskProgressRepository extends AbstractRepository//implements TaskProgress
     {
         $taskProgress->save();
     }
+    public function getByUserIdAndTaskId($userId, $taskId)
+    {
+        return $this->model->where('user_id', $userId)->where('task_id', $taskId)->first();
+    }
+
 }

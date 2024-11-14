@@ -97,77 +97,72 @@ class TaskProgressService
 
 
     public function getDays($userId)
-{
-    try {
-        // Fetch user data
-        $user = $this->userRepository->findUserById($userId);
-        $totalPoints = $user->total_points;
+    {
+        try {
+            $user = $this->userRepository->findUserById($userId);
+            $totalPoints = $user->total_points;
 
-        // Fetch all days ordered by day_number (ascending)
-        $days = $this->dayRepository->getAll(orderBy: ['day_number' => 'asc']);
+            $days = $this->dayRepository->getAll(orderBy: ['day_number' => 'asc']);
 
-        // Fetch user's progress data from userDayProgressRepository
-        $userProgress = $this->userDayProgressRepository->getAll(['user_id' => $userId]);
+            $userProgress = $this->userDayProgressRepository->getAll(['user_id' => $userId]);
 
-        // Determine the target day for which to retrieve tasks
-        $targetDay = null;
+            $targetDay = null;
 
-        // Check if there is any incomplete day in the user progress
-        $incompleteDay = $userProgress->firstWhere('is_completed', false);
+            $incompleteDay = $userProgress->firstWhere('is_completed', false);
 
-        if ($incompleteDay) {
-            // If there is an incomplete day, set it as the target day
-            $targetDay = $days->firstWhere('id', $incompleteDay->day_id);
-        } else {
-            // If all days in progress are completed, find the first day not in user_day_progress
-            $progressDayIds = $userProgress->pluck('day_id')->toArray();
-            $targetDay = $days->firstWhere(function ($day) use ($progressDayIds) {
-                return !in_array($day->id, $progressDayIds);
-            });
-
-            // If no untracked day found, default to the first day
-            if (!$targetDay) {
-                $targetDay = $days->first();
+            if ($incompleteDay) {
+                $targetDay = $days->firstWhere('id', $incompleteDay->day_id);
+            } else {
+                $progressDayIds = $userProgress->pluck('day_id')->toArray();
+                $targetDay = $days->firstWhere(function ($day) use ($progressDayIds) {
+                    return !in_array($day->id, $progressDayIds);
+                });
+                if (!$targetDay) {
+                    $targetDay = $days->first();
+                }
             }
-        }
 
-        // Fetch tasks for the target day, ordered by task ID
-        $tasks = $this->dailyTaskRepository->getAll(['day_id' => $targetDay->id], orderBy: ['id' => 'asc'])
-            ->map(function ($task) {
+            $tasks = $this->dailyTaskRepository->getAll(['day_id' => $targetDay->id], orderBy: ['id' => 'asc'])
+                ->map(function ($task) use ($userId) {//->map(function ($task) {
+                    $progress = $this->taskProgressRepository->getByUserIdAndTaskId($userId, $task->id);
+//$progress = $this->userDayTaskProgressRepository->getByUserIdAndTaskId($userId, $task->id);
+                    return [
+                        'id' => $task->id,
+                        'title' => $task->title,
+                        'day_id' => $task->day_id,
+                        'type' => $task->type,
+                        'sub_type' => $task->sub_type,
+                        'count' => $task->count,
+                        'total_points' => $task->total_points,
+                        'is_completed' => $progress ? $progress->is_completed : false,
+                        'is_collect'=> $progress ? $progress->is_collect : false,
+                        'created_at' => $task->created_at
+                    ];
+                });
+
+            $daysWithProgress = $days->map(function ($day) use ($userProgress) {
+                $progress = $userProgress->firstWhere('day_id', $day->id);
                 return [
-                    'id' => $task->id,
-                    'title' => $task->title,
-                    'day_id' => $task->day_id,
-                    'type' => $task->type,
-                    'sub_type' => $task->sub_type,
-                    'count' => $task->count,
-                    'total_points' => $task->total_points,
-                    'created_at' => $task->created_at
+                    'id'=>$day->id,
+                    'day_number' => $day->day_number,
+                    'title' => $day->title,
+                    'is_unlocked' => $day->is_unlocked,
+                    'is_completed' => $progress ? $progress->is_completed : false,
+                    'get_rewards'=> $progress ? $progress->get_rewards : false,
+                    'created_at' => $day->created_at,
                 ];
             });
 
-        // Map the days to include user progress
-        $daysWithProgress = $days->map(function ($day) use ($userProgress) {
-            $progress = $userProgress->firstWhere('day_id', $day->id);
-            return [
-                'day_number' => $day->day_number,
-                'title' => $day->title,
-                'is_unlocked' => $day->is_unlocked,
-                'is_completed' => $progress ? $progress->is_completed : false,
-                'created_at' => $day->created_at,
-            ];
-        });
-
-        return Common::apiResponse(true, 'User progress fetched successfully.', [
-            'total_points' => $totalPoints,
-            'days' => $daysWithProgress,
-            'tasks' => $tasks, // Tasks for the target day
-        ], 200);
-    } catch (\Exception $e) {
-        \Log::error('Error fetching user progress: ' . $e->getMessage());
-        return Common::apiResponse(false, $e->getMessage(), null, 500);
+            return Common::apiResponse(true, 'User progress fetched successfully.', [
+                'total_points' => $totalPoints,
+                'days' => $daysWithProgress,
+                'tasks' => $tasks, 
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching user progress: ' . $e->getMessage());
+            return Common::apiResponse(false, $e->getMessage(), null, 500);
+        }
     }
-}
 
 
 
