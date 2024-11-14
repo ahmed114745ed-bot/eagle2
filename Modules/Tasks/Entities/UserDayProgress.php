@@ -12,5 +12,12 @@ class UserDayProgress extends Model
     {
         return $this->belongsTo(Day::class, 'day_id', 'id');
     }
+    protected $fillable = [
+        'user_id',
+        'day_id',
+        'points',
+        'is_completed',
+        'created_at'
+    ];
     use HasFactory;
 }

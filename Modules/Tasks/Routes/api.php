@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\Tasks\Http\Controllers\DayTasksController;
 use Modules\Tasks\Http\Controllers\TaskCompleteController;
 use Modules\Tasks\Http\Controllers\TaskProgressController;
 
@@ -21,9 +22,11 @@ Route::middleware('auth:api')->get('/tasks', function (Request $request) {
     return $request->user();
 });
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('user/{userId}/progress', [TaskProgressController::class, 'getUserProgress']);
+    Route::get('days', [TaskProgressController::class, 'getDays']);
     Route::post('tasks/{taskId}/collect', [TaskCompleteController::class, 'collectTaskPoints']);
+    Route::post('day/tasks/{taskId}', [DayTasksController::class, 'getDayTasks']);
+    
 });
 
-
+//is_collect==>user_tasks, get_rewards==>days
 //Route::get('user/{userId}/progress', [TaskProgressController::class, 'getUserProgress']);

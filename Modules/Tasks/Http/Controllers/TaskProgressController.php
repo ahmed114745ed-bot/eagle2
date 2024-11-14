@@ -20,9 +20,10 @@ class TaskProgressController extends Controller
         $this->taskProgressService = $taskProgressService;
     }
 
-    public function getUserProgress($userId)
+    public function getDays(Request $request)
     {
-        $response = $this->taskProgressService->getUserProgress($userId);
+        $userId = auth()->id();
+        $response = $this->taskProgressService->getDays($userId);
         return $response;
     }
 }

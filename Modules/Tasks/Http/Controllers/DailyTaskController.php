@@ -40,7 +40,7 @@ class DailyTaskController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('day_id', __('Day id'));
-        $grid->column('title', __('Title'));
+        $grid->column('title_en', __('Title'));
         $grid->column('type', __('Type'));
         $grid->column('sub_type', __('Sub type'));
         $grid->column('count', __('Count'));
@@ -48,11 +48,11 @@ class DailyTaskController extends AdminController
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
-        $grid->tools(function ($tools) {
+        /*$grid->tools(function ($tools) {
             $dayId = request()->get('day_id');
             $createUrl = route('daily-tasks.create', ['day_id' => $dayId]);
             $tools->append('<a href="' . $createUrl . '" class="btn btn-success">Create</a>');
-        });
+        });*/
     
         return $grid;
     }
@@ -69,7 +69,7 @@ class DailyTaskController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('day_id', __('Day id'));
-        $show->field('title', __('Title'));
+        $show->field('title_en', __('Title'));
         $show->field('type', __('Type'));
         $show->field('sub_type', __('Sub type'));
         $show->field('count', __('Count'));
@@ -123,7 +123,8 @@ class DailyTaskController extends AdminController
 
 
 
-    $form->text('title', __('Title'))->required();
+    $form->text('title_en', __('Title'))->required();
+    
 
     $form->number('count', __('Count'))
         ->attribute(['step' => 1])  

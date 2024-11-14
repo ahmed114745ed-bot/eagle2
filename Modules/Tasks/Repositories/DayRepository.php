@@ -22,6 +22,18 @@ class DayRepository extends AbstractRepository//implements DayRepositoryInterfac
     {
         $day->save();
     }
+    public function getNextDay($dayId)
+    {
+        $currentDay = $this->findOrFail($dayId);
+        if (!$currentDay) {
+            return null;
+        }
+        return $this->model
+            ->where('day_number', '>', $currentDay->day_number)
+            ->orderBy('day_number', 'asc')
+            ->first();
+    }
+
 }
 
 
