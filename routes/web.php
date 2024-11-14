@@ -105,9 +105,11 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::get('admin/auth', function () {
+        $router->get('admin/auth', function () {
             return view('checkLogin');
         })->name('admin/auth');
+        $router->post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+
 
     }
 );
