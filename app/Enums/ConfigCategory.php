@@ -37,7 +37,7 @@ enum ConfigCategory : string
             self::PAYMENT_SETTINGS->value => [],
             self::ROOM_SETTINGS->value => [],
             self::AGENCY_SETTINGS->value => ['targets', 'target-percentage'],
-            self::LEVEL_SETTINGS->value => [],
+            self::LEVEL_SETTINGS->value => [ ],
             default => null,
         };
     }
