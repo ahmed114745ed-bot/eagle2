@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\Api\V1\GameReportController;
 
 // utd apis
-Route::middleware([])->group(function () {
+Route::middleware(['utd.decreptHeader'])->group(function () {
     //configs
     Route::prefix('configs')->group(function () {
         Route::get('/all', [ConfigController::class, 'index']);
