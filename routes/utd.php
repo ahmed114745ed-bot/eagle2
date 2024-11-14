@@ -22,8 +22,9 @@ use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\Api\V1\GameReportController;
 
+// 'utd.decreptHeader'
 // utd apis
-Route::middleware(['utd.decreptHeader'])->group(function () {
+Route::middleware([])->group(function () {
     //configs
     Route::prefix('configs')->group(function () {
         Route::get('/all', [ConfigController::class, 'index']);
