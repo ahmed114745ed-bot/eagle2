@@ -75,9 +75,9 @@ class ConfigController extends MainController
     {
         $form = $this->form()->edit($id);
         if ($form->model()->type == 'integer') {
-            $form->valueInteger = $form->model()->value; 
+            $form->valueInteger = $form->model()->value;
         }elseif ($form->model()->type== 'select') {
-            $form->valueSelect = $form->model()->value; 
+            $form->valueSelect = $form->model()->value;
         }
         return $content
             ->header(trans('admin.edit'))
@@ -114,7 +114,7 @@ class ConfigController extends MainController
             request()->merge(['name' => null]);
             return $this->grid();
         }
-        
+
         $grid->model()->where('is_hidden',0);
         $grid->id('ID');
         $grid->name(trans('name'));
@@ -190,12 +190,13 @@ class ConfigController extends MainController
 
         $form->display('ID');
         $form->text('name', trans('name'));
+        $form->text('value', trans('value'));
 
         // if ($form->isEditing()) {
         //     if ($form->model()->type == 'integer') {
-        //         $form->valueInteger = $form->model()->value; 
+        //         $form->valueInteger = $form->model()->value;
         //     }elseif ($form->model()->type== 'select') {
-        //         $form->valueSelect = $form->model()->value; 
+        //         $form->valueSelect = $form->model()->value;
         //     }
         // }
 
@@ -230,7 +231,7 @@ class ConfigController extends MainController
                     $form->value = $form->valueInteger;
                 } elseif ($form->type == 'select') {
                     $form->value = $form->valueSelect;
-                } 
+                }
             });
 
         return $form;
