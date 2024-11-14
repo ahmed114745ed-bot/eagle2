@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\ConfigCategory;
 use App\Http\Requests\Api\ConfigValuesRequest;
 use App\Models\Config;
 use App\Helpers\Common;
@@ -74,7 +75,8 @@ class ConfigController extends Controller
         $formattedConfigs = [];
 
         foreach ($configs as $category => $items) {
-            $formattedConfigs[__($category)] = ConfigResource::collection($items);
+            $formattedConfigs[__($category)]['sub_categoory'] =  ConfigCategory::getLinkedStringsByValue($category);
+            $formattedConfigs[__($category)]['data'] = ConfigResource::collection($items);
         }
 
         return Common::apiResponse(1, '', $formattedConfigs);
