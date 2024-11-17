@@ -59,7 +59,6 @@ class AllowPacks
 
     public function getWare(int $id)
     {
-
         return $this->wares->where('type', $id)->first();
     }
 
@@ -116,9 +115,12 @@ class AllowPacks
                 'max' => @$ware->max_level,
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
+            if ($value == 16) {
+                Log::info("data is:" . json_encode($data));
+            }
+
         }
 
-        Log::info("data is:" . json_encode($data));
 
         return $data;
     }
