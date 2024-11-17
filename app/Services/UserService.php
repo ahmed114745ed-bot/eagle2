@@ -25,6 +25,8 @@ use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
+use App\Repositories\BlackListRepository;
+use DB;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -35,6 +37,7 @@ class UserService
     protected $userRepository;
     protected $packRepository;
     protected $followRepository;
+    protected $blackListRepository;
 
     public function __construct(
         private readonly VipRepository $vipRepository,
@@ -44,11 +47,14 @@ class UserService
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
+        BlackListRepository $blackListRepository,
 
     ) {
         $this->userRepository = $userRepository;
         $this->packRepository = $packRepository;
         $this->followRepository = $followRepository;
+        $this->blackListRepository = $blackListRepository;
+
     }
 
     public function searchUsers($key)
@@ -526,5 +532,34 @@ class UserService
     public function supporter($userId)
     {
         return $this->giftLogRepository->getByUserId($userId);
+    }
+
+    public function getUserBlackList($userId)
+    {
+        return $this->blackListRepository->getUserBlackList($userId);
+    }
+
+    public function removeUserFromBlackList($userId, $fromUserId)
+    {
+        return $this->blackListRepository->removeUserFromBlackList($userId, $fromUserId);
+    }
+
+    public function addUserToBlackList($userId, $fromUserId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->blackListRepository->addUserToBlackList($userId, $fromUserId);
+
+            $this->followRepository->deleteFollow($userId, $fromUserId);
+            $this->followRepository->deleteFollow($fromUserId, $userId);
+
+            DB::commit();
+
+            return true;
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return false;
+        }
     }
 }

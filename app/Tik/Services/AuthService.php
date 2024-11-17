@@ -108,6 +108,38 @@ class AuthService
         return [$user, $token, []];
     }
 
+    public function verifyGoogleToken(Request $request)
+    {
+        // الحصول على التوكن من الطلب
+        $id_token = $request->input('id_token');
+        
+        // التحقق من أن التوكن موجود
+        if (!$id_token) {
+            return response()->json(['error' => 'ID token is required'], 400);
+        }
+        
+        // إعداد Google Client
+        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+
+        // التحقق من صحة التوكن
+        $payload = $client->verifyIdToken($id_token);
+        
+        if ($payload) {
+            // استخراج معرف المستخدم من الـ payload
+            $userid = $payload['sub'];
+            
+            // يمكنك هنا القيام بأي شيء آخر مثل تسجيل المستخدم أو إرجاع بياناته
+            return response()->json([
+                'message' => 'Token is valid',
+                'user_id' => $userid,
+                'payload' => $payload
+            ], 200);
+        } else {
+            // التوكن غير صالح
+            return response()->json(['error' => 'Invalid ID token'], 401);
+        }
+    }
+
     public function loginWithApple($request, $unique_id)
     {
         $user = $this->userRepository->findByEmail($request['email']);
