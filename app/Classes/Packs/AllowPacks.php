@@ -60,6 +60,7 @@ class AllowPacks
     public function getWare(int $id)
     {
         Log::info("wares in getWare is: " . json_encode($this->wares));
+        Log::info("id is: " . $id);
         return $this->wares->where('type', $id)->first();
     }
 
