@@ -62,7 +62,13 @@ class RoomController extends MainController
         $grid->column('top_room')->switch (Common::getSwitchStates ());
         $grid->column('pin',__('pin'))->switch (Common::getSwitchStates ());
         $grid->column('sort_num',__ ('Sort Num'))->currency();
-        $grid->column('max_admin', __('max admin'));
+        //$grid->column('max_admin', __('max admin'));//$min_tx_num = self::getConfig ( 'min_tx_num' );
+        $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
+            $maxRoomAdmin = Common::getConfig('max_room_admin');
+            return $maxAdmin ?? $maxRoomAdmin;
+        });
+        
+        
         $grid->column('room_name',__ ('room name'));
         $grid->column('room_cover',__ ('room cover'))->image ('',30);
         $grid->column('room_intro',__ ('room_intro'));
