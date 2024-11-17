@@ -593,7 +593,8 @@ class Common
         ];
 
 
-        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/top-star-75039/messages:send', [
+        $projectName = config('app.projectName');
+        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/' . $projectName . '/messages:send', [
             'message' => $payload
         ]);
 

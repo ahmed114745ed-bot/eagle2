@@ -22,6 +22,7 @@ return [
 
     // fairbase
     'fileName' => env('FILE_NAME','firebase_credentials.json'),
+    'projectName' => env('FIREBASE_PROJECT_NAME',''),
     'senderId' => env('SENDER_ID','hola-chat-5554d'),
     'zego_credential' => env('ZEGOENCRYPTtkEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_secret_key' => env('UTDSECRTKEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
