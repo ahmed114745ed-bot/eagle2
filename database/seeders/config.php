@@ -28,7 +28,8 @@ class config extends Seeder
                 array('id' => '18','name' => 'group_chat','value' => '1','desc' => NULL,'created_at' => '2023-05-25 13:56:29','updated_at' => '2023-05-25 14:01:55'),
                 array('id' => '19','name' => 'all_target_or_nothing','value' => 'true','desc' => NULL,'created_at' => '2023-06-12 15:45:32','updated_at' => '2023-06-12 15:45:32'),
                 array('id' => '20','name' => 'room_rule','value' => 'الرجاء من المستخدمين الكرام التحلي بالاخلاق مع الاخرين شاكرين تفهمكم, اهلا وسهلا بكم','desc' => NULL,'created_at' => '2023-06-13 16:58:12','updated_at' => '2023-06-13 16:58:12'),
-                array('id' => '21','name' => 'cost_request_backround','value' => '2000','desc' => NULL,'created_at' => '2023-06-17 15:13:47','updated_at' => '2023-06-17 15:13:47')
+                array('id' => '21','name' => 'cost_request_backround','value' => '2000','desc' => NULL,'created_at' => '2023-06-17 15:13:47','updated_at' => '2023-06-17 15:13:47'),
+                array('id' => '43','name' => 'max_room_admin','value' => '100','desc' => 'الحد الأقصي لعدد المشرفين','created_at' => '2023-06-17 15:13:47','updated_at' => '2023-06-17 15:13:47')
               );
         
         DB::table ('configs')->insert ($configs);
