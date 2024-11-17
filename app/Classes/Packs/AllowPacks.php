@@ -98,6 +98,9 @@ class AllowPacks
 
         foreach ($this->data as $key => $value) {
             $ware      = $this->getWare($value);
+            if ($value == 16) {
+                Log::info("ware before is:" . json_encode($ware ));
+            }
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
 
