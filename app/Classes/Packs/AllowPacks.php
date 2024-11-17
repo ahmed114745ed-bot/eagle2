@@ -65,7 +65,7 @@ class AllowPacks
     {
         Log::info("wares in getWare is: " . json_encode($this->wares));
         Log::info("id is: " . $id);
-        return $this->wares->filter(fn($item) => $item->type == $id)->first();
+        return $this->wares->where('type', $id)->first();
     }
 
 
@@ -101,7 +101,7 @@ class AllowPacks
         $data = [];
 
         foreach ($this->data as $key => $value) {
-            $ware      = $this->getWare($value);
+            $ware      = $this->wares->where('type', $value)->first();
             if ($value == 16) {
                 Log::info("ware before is:" . json_encode($ware ));
             }
