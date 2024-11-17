@@ -103,9 +103,6 @@ class AllowPacks
             // if (!$isAllow) {
                 
             // }
-            if (condition) {
-                # code...
-            }
            
             $data[]    = [
                 'key' => $key,
