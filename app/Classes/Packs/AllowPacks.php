@@ -103,8 +103,10 @@ class AllowPacks
             // if (!$isAllow) {
                 
             // }
-            Log::info("min is: ".$minLevel);
-            Log::info("max is: ".$ware->max_level);
+            if (condition) {
+                # code...
+            }
+           
             $data[]    = [
                 'key' => $key,
                 'title' => __('api.' . $key . '_title'),
@@ -116,6 +118,8 @@ class AllowPacks
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
         }
+
+        Log::info("data is:" . json_encode($data));
 
         return $data;
     }
