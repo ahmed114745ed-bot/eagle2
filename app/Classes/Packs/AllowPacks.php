@@ -59,6 +59,7 @@ class AllowPacks
 
     public function getWare(int $id)
     {
+        Log::info("wares in getWare is: " . json_encode($this->wares));
         return $this->wares->where('type', $id)->first();
     }
 
@@ -71,8 +72,6 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
-
-            Log::info("wares is: " . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
     }
