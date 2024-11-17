@@ -33,10 +33,11 @@ class DayController extends AdminController
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'));
 
-        $grid->column('tasks', 'Tasks')->display(function () {
+        $grid->column(__('Actions'))->display(function () {
             $dayId = $this->getKey(); 
-            $url = url("admin/daily-tasks?day_id={$dayId}");
-            return "<a href='{$url}' class='btn btn-sm btn-primary'>Tasks</a>";
+            $createUrl = url('admin/'.$dayId.'/day-tasks');
+            $createUrlRewards = url('admin/'.$dayId.'/day-rewards');
+            return "<a href='{$createUrl}' class='btn btn-sm btn-primary'>".__("Tasks")."</a> <a href='{$createUrlRewards}' class='btn btn-sm btn-primary'>".__("rewards")."</a>";
         });
 
         return $grid;

@@ -15,7 +15,7 @@ class PrivilegeResource extends JsonResource
             'active' => $this->active,
             'type' => $this->type,
             "title"=> $this->title,
-            "img1"=> $this->imag1,
+            "img1"=> $this->img1,
             "img2"=> $this->img2,
         ];
     }

@@ -18,7 +18,7 @@ class AppSitiingCOnfigController extends MainController
     public function index(Content $content)
     {
         // return view('admin/updatePage');
-        $route = 'postAddSitin';
+        $route = 'admin.postAddSitin';
 
         $chat_enable_version=  settings()->get('chat_enable_version');
         $android_min_version=  settings()->get('android_min_version');

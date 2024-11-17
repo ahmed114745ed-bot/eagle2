@@ -10,7 +10,10 @@ class OVipResource extends JsonResource
 
     public function toArray($request)
     {
-        $userVip = UserVip::where("user_id",auth()->user()->id)->where("vip_id",$this->id)->first(); 
+        $userVip = UserVip::where("user_id",auth()->user()->id)
+            ->where("vip_id",$this->id)
+            ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+            ->first();
 
         $activePrivilegeIds = $this->privilegs->pluck('id')->toArray();
 

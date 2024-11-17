@@ -3,6 +3,7 @@
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
@@ -29,6 +30,7 @@ use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
+use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
@@ -48,8 +50,7 @@ use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\CoinController;
-use App\Admin\Controllers\PaymentCoinController;
+use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
     [
@@ -79,6 +80,7 @@ Route::group(
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
+            'production.error'
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
@@ -108,6 +110,12 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+
+        $router->post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
+        $router->post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
+        $router->post('reel-config', [UpgradeLevelController::class, 'reelConfig'])->name('reel-config');
+        $router->post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
+
         Route::post('/locale', MultiLanguageController::class . '@locale');
         if (MultiLanguage::config("show-login-page", true)) {
             Route::get('login', MultiLanguageController::class . '@getLogin');
@@ -116,8 +124,8 @@ Route::group(
         $router->resource('user-online-history', UserOnlineHistoryController::class);
         $router->post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
-        $router->resource('rooms-preview', TestController::class);//
-        
+        $router->resource('rooms-preview', TestController::class); //
+
 
 
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -130,9 +138,17 @@ Route::group(
         $router->resource('test-test', 'TestTestController');
 
         $router->resource('payment-with-method', PaymentMethodController::class);
-        $router->post('save-payment-with-method', [PaymentMethodController::class,"customStore"]);
+        $router->post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
 
-        $router->resource('auth/users', 'AdminUserController');
+        $router->resource('auth/users', 'AdminUserController')->names([
+            'index' => 'auth.users.index',
+            'create' => 'auth.users.create',
+            'store' => 'auth.users.store',
+            'show' => 'auth.users.show',
+            'edit' => 'auth.users.edit',
+            'update' => 'auth.users.update',
+            'destroy' => 'auth.users.destroy',
+        ]);
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);
         $router->resource('auth/roles', 'RoleController');
         $router->resource('auth/permissions', PermissionController::class);
@@ -197,7 +213,7 @@ Route::group(
 
             'names' => [
                 'index' => 'charges-details',
-                'show' => 'charges.show'
+                'show' => 'charges-details.show'
             ]
         ]);
         $router->resource('commissions', 'CommissionController', [
@@ -225,7 +241,7 @@ Route::group(
             'usersAgencyTargets'
         ])->name('agency-export-report');
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-        $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
+        //        $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
         $router->resource('wares-vips', WareVipController::class);
         // servers
         $router->resource('server-country', ServerCountryController::class);
@@ -234,7 +250,7 @@ Route::group(
         //--------------------
         // $router->get('/', 'HomeController@infoBox')->name('home');
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
-        $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
+        $router->get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         $router->resource('manger-types', 'MangerTypeController');
         $router->resource('chat-letters', ChatLetterController::class);
         $router->resource('userscharg', chargUsersSleemController::class);
@@ -284,12 +300,20 @@ Route::group(
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
         $router->resource('reels', ReelController::class);
-        $router->resource('levels/users', UserLevelController::class);
+        $router->resource('levels/users', UserLevelController::class)->names([
+            'index' => 'levels.users.index',
+            'create' => 'levels.users.create',
+            'store' => 'levels.users.store',
+            'show' => 'levels.users.show',
+            'edit' => 'levels.users.edit',
+            'update' => 'levels.users.update',
+            'destroy' => 'levels.users.destroy',
+        ]);
         $router->resource('trashed-users', TrashedUserAccountController::class);
         $router->resource('withdraw-types', WithdrawController::class);
         $router->resource('room-vips', RoomVipController::class);
         $router->resource('room-target', RoomTargetController::class);
-   
+
         // $router->resource('agencyMangLink', AgencyMangerLinkController::class);
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
@@ -357,6 +381,6 @@ Route::group(
         $router->resource('banners', BannerController::class);
     }
 
-    
-    
+
+
 );

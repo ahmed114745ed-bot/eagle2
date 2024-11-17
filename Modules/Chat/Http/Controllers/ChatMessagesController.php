@@ -2,6 +2,8 @@
 
 namespace Modules\Chat\Http\Controllers;
 
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
 use App\Http\Controllers\Controller;
@@ -36,6 +38,8 @@ class ChatMessagesController extends Controller
             'message' => 'nullable|string|max:255',
             'message_id' => 'nullable|exists:chat_messages,id',
         ]);
+
+        \Log::info('chat response : ' . json_encode($request->all()));
         $user = $request->user();
 
         $check =BlackList::where("user_id", $request->user()->id)->where("from_uid", $request->user_id)
@@ -78,7 +82,10 @@ class ChatMessagesController extends Controller
         if ($request->hasFile('file')) {
             $images_extensions = ['jpeg', 'jpg', 'png','gif','mp4','mp3','wav','pdf'];
             foreach ( $request->file('file') as $file) {
-                $extension = $file->extension();
+                /** @var UploadedFile $file*/
+                $extension = $file->getClientOriginalExtension();
+                \Log::info('This is file extension : ' . json_encode($extension) . ' This is file name  : ' . json_encode($file->getFileInfo()->getExtension()));
+
                 $check = in_array($extension, $images_extensions);
                 if (!$check ) {
                     return response()->json([

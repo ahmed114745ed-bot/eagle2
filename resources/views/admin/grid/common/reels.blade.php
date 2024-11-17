@@ -80,7 +80,7 @@
                     $vip=DB::table('configs')->where('name','upload_reel')->first();
                    // $users=DB::table('users')->get();
         @endphp
-            <form method="POST" action="{{ route('reel-config') }}" class="formcustomPage" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('admin.reel-config') }}" class="formcustomPage" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-3">

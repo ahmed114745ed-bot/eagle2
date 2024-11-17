@@ -39,7 +39,7 @@ class NewFamilyUserResource extends JsonResource
                 ],
 
                 'vip'=>Common::ovip_center ($this), // both
-                'level'=> $this->user ? Common::level_center (@$this->user->id) : new stdClass(), // both
+                'level'=> $this->user ? Common::level_center (@$this->user) : new stdClass(), // both
                 'frame'     => Common::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img2', true)?:Common::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img1', true),
                 'frame_id'  => @$this->dress_1,
                 'type_user'            => intval(@$this->user->type_user) ?: 0, // both

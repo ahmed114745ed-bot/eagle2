@@ -178,7 +178,7 @@ class MyDataResourceOld extends JsonResource
             'number_of_friends'    => $this->numberOfFriends(), // both
             'profile_visitors'     => $this->profileVisits()->count(), // both
             'profile'              => new ProfileResource(@$this->profile), // both
-            'level'                => Common::level_center(@$this->id), // both
+            'level'                => Common::level_center(@$this), // both
             'my_store'             => [
                 'id'           => $this->id,
                 'coins'        => $this->di,

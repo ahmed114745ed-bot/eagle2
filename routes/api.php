@@ -32,6 +32,7 @@ use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Admin\Controllers\AgencyStatisticController;
+use App\Helpers\Common;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
@@ -94,6 +95,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
+
+
+            Route::prefix('config')->group(function() {
+                Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
+                //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
+            });
             Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
@@ -150,6 +158,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
+                Route::get('/payment', [CoinController::class, 'paymentCoin']);
+
             });
 
             Route::prefix('users')->group(function () {
@@ -215,7 +225,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
-            Route::prefix('gifts')->group(function () {
+            Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 //                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
@@ -306,6 +316,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/', [RankingController::class, 'ranking']);
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
+                Route::post('/one-room', [RankingController::class, 'oneRoomRanking']);
             });
             // end ranking
 
@@ -373,10 +384,15 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
-
             // end coin report
-            
-    
+            Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
+
+            // Route::get('/data-data', function(){
+            //     $id = \App\Models\User::first()?->id;
+            //     $data = Common::level_center(@$id);
+            //     return $data;
+            // });
+
         }
     );
 

@@ -18,6 +18,10 @@ class CoinRepository extends AbstractRepository
     {
         return   $this->model->query()->select('id', 'usd', 'coin')->get();
     }
+    public function allCoinsByPaymentId($payment_id)
+    {
+        return   $this->model->query()->select('id', 'usd', 'coin')->where('payment_gateway_id',$payment_id)->get();
+    }
 
     public function findById($coinId)
     {

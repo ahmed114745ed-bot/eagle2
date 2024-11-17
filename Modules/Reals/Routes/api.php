@@ -21,8 +21,24 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])-
             Route::get('reals/user/{user_id?}', 'RealsController@getUserReals');
             Route::get('reals/user-followers', 'RealsController@getUserFollowersReals');
             Route::apiResource('/reals', 'RealsController');
-            Route::apiResource('reals/{real_id}/comment', 'RealsUserCommentController');
-            Route::apiResource('reals/{real_id}/like', 'RealsUserLikesController');
+            Route::apiResource('reals/{real_id}/comment', 'RealsUserCommentController', [
+                'names' => [
+                    'index' => 'reals.comment.index',
+                    'store' => 'reals.comment.store',
+                    'show' => 'reals.comment.show',
+                    'update' => 'reals.comment.update',
+                    'destroy' => 'reals.comment.destroy',
+                ]
+            ]);
+            Route::apiResource('reals/{real_id}/like', 'RealsUserLikesController', [
+                'names' => [
+                    'index' => 'reals.like.index',
+                    'store' => 'reals.like.store',
+                    'show' => 'reals.like.show',
+                    'update' => 'reals.like.update',
+                    'destroy' => 'reals.like.destroy',
+                ]
+            ]);
             Route::apiResource('/report', 'ReportController');
         });
 
