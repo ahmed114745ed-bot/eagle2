@@ -117,7 +117,7 @@ class AllowPacks
     {
         if (!$ware) return null;
         $userlevel = $this->userOVipLevel;
-        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level;
+        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $this->packs->where('target_id', $ware->id)->exists();
     }
 
     private function getDescription(string $key, $isAllow, $minLevel, $maxLevel)
