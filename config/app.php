@@ -21,7 +21,7 @@ return [
     'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
 
     // fairbase
-    'fileName' => env('FILL_NAME','firebase_credentials.json'),
+    'fileName' => env('FILE_NAME','firebase_credentials.json'),
     'senderId' => env('SENDER_ID','hola-chat-5554d'),
     'zego_credential' => env('ZEGOENCRYPTtkEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_secret_key' => env('UTDSECRTKEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
