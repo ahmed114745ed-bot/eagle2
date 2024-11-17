@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @property Collection $wares
+ * @property Collection $packs
+ * */
 class AllowPacks
 {
 
@@ -61,7 +65,7 @@ class AllowPacks
     {
         Log::info("wares in getWare is: " . json_encode($this->wares));
         Log::info("id is: " . $id);
-        return $this->wares->where('type', $id)->first();
+        return $this->wares->filter(fn($item) => $item->type == $id)->first();
     }
 
 
@@ -105,9 +109,9 @@ class AllowPacks
             $minLevel = @$ware->min_level;
 
             // if (!$isAllow) {
-                
+
             // }
-           
+
             $data[]    = [
                 'key' => $key,
                 'title' => __('api.' . $key . '_title'),
