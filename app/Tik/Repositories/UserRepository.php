@@ -144,6 +144,10 @@ class UserRepository extends AbstractRepository
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
         $user->is_points_first = 0;
+        $notification_id = @request()->notification_id;
+        if ($notification_id) {
+            $user->notification_id = $notification_id;
+        }
         $this->updateUser($user);
     }
 

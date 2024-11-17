@@ -73,6 +73,8 @@ class AuthController extends Controller
     {
         $globalKeys = [
             'is_multi' => @$request->is_multi ?? false,
+            'notification_id' => @$request->notification_id,
+
         ];
         switch ($request['type']) {
             case 'phone_pass':
@@ -245,7 +247,7 @@ class AuthController extends Controller
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
 
-    
+
 
     public function canLogin($user)
     {
