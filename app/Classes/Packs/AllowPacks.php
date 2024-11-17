@@ -73,6 +73,8 @@ class AllowPacks
             ->groupBy('type')
             ->get();
 
+            Log::info("wares is: " . json_encode($this->wares));
+
         $this->vipPrices = $this->getVipPrices();
     }
 
