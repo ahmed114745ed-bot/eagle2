@@ -63,8 +63,6 @@ class AllowPacks
 
     public function getWare(int $id)
     {
-        Log::info("wares in getWare is: " . json_encode($this->wares));
-        Log::info("id is: " . $id);
         return $this->wares->where('type', $id)->first();
     }
 
@@ -77,6 +75,8 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
+
+        Log::info('this is wares : ' . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
     }
@@ -101,7 +101,7 @@ class AllowPacks
         $data = [];
 
         foreach ($this->data as $key => $value) {
-            $ware      = $this->wares->where('type', $value)->first();
+            $ware      = $this->getWare($value);
             if ($value == 16) {
                 Log::info("ware before is:" . json_encode($ware ));
             }
@@ -123,7 +123,7 @@ class AllowPacks
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
             if ($value == 16) {
-                Log::info("ware on is:" . json_encode($ware ));
+
             }
 
         }
@@ -136,12 +136,8 @@ class AllowPacks
     {
         if (!$ware) return null;
         $userlevel = $this->userOVipLevel;
-        if ($ware->type = 16) {
-            \Log::info('This is ware id ' . $ware->id . '  and this is bool : ' . $userlevel >= $ware->min_level && $userlevel <= $ware->max_level);
-            \Log::info('This is ware id ' . $ware->id . '  and this is un regular bool : ' . $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $this->packs->where('target_id', $ware->id)->isNotEmpty());
-        }
+
         $packs = $this->packs;
-        /**@var \Illuminate\Database\Eloquent\Collection $packs*/
         return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->id)->isNotEmpty();
     }
 
