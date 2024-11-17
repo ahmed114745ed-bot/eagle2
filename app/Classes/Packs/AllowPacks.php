@@ -116,7 +116,7 @@ class AllowPacks
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
             if ($value == 16) {
-                Log::info("data is:" . json_encode($data));
+                Log::info("ware on is:" . json_encode($ware ));
             }
 
         }
