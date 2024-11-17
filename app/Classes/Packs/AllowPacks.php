@@ -121,7 +121,9 @@ class AllowPacks
             \Log::info('This is ware id ' . $ware->id . '  and this is bool : ' . $userlevel >= $ware->min_level && $userlevel <= $ware->max_level);
             \Log::info('This is ware id ' . $ware->id . '  and this is un regular bool : ' . $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $this->packs->where('target_id', $ware->id)->exists());
         }
-        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $this->packs->where('target_id', $ware->id)->exists();
+        $packs = $this->packs;
+        /**@var \Illuminate\Database\Eloquent\Collection $packs*/
+        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->id)->isNotEmpty();
     }
 
     private function getDescription(string $key, $isAllow, $minLevel, $maxLevel)
