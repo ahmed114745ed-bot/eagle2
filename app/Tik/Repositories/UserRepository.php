@@ -143,7 +143,7 @@ class UserRepository extends AbstractRepository
     {
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
-        $user->is_points_first = 1;
+        $user->is_points_first = 0;
         $this->updateUser($user);
     }
 

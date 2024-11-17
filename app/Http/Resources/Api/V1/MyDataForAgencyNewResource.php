@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataForAgencyNewResource extends JsonResource
 {
-    public $type; 
+    public $type;
 
     public function __construct($resource, $type = 'default')
     {
@@ -32,7 +32,7 @@ class MyDataForAgencyNewResource extends JsonResource
     {
         $data = [
             'id' => @$this->user->id, // both
-           
+
             'uuid' => @$this->user->uuid, // both
             'diamonds' => @$this->user->monthly_diamond_received ?: 0,
 
@@ -41,8 +41,8 @@ class MyDataForAgencyNewResource extends JsonResource
             'vip'=>@Common::ovip_center ($this->user->id), // refactor
             'level'=>Common::level_center_min (@$this->user->id), // refactor
 
-            'profile' => new ProfileForAjancyResource(@$this->user->profile), // both
-            'has_color_name'=>Common::hasInPack ($this->user->id,18,true),
+             'profile' => new ProfileForAjancyResource(@$this->user->profile), // both
+            // 'has_color_name'=>Common::hasInPack ($this->user->id,18,true),
             'status' => $this->status,
             'type' => $this->type,
         ];

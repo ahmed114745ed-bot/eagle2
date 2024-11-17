@@ -5,23 +5,29 @@ namespace App\Tik\Services;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
+use App\Services\FawryPaymentService;
 use App\Classes\PaymentGateways\Fawry;
 use App\Tik\Repositories\CoinRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Http\Controllers\Web\OPayController;
-use App\Services\FawryPaymentService;
+use App\Tik\Repositories\PaymentCoinRepository;
 
 class CoinService
 {
     public function __construct(
         private readonly CoinRepository $coinRepository,
         private readonly CoinLogRepository $coinLogRepository,
+        private readonly PaymentCoinRepository $paymentCoinRepository,
 
     ) {}
 
     public function coinsList()
     {
         return $this->coinRepository->allCoins();
+    }
+    public function coins($payment_id)
+    {
+        return $this->coinRepository->allCoinsByPaymentId($payment_id);
     }
 
     public function buyCoins($user, $request)
@@ -52,17 +58,16 @@ class CoinService
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
                 $fawryService = new FawryPaymentService();
-                $exterData = ["type"=>'charge_coin','paymentType' => "revenue"];
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
                 //  get url
-                $paymentUrl = $fawryService->makePayment($log->id, $coin->usd,$exterData);
+                $paymentUrl = $fawryService->makePayment($log->id, $coin->usd, $exterData);
 
-                if(isset($response['status']) && $paymentUrl['status']  == 0){
+                if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
 
                 return response()->json($paymentUrl, 200);
-
             } else if ($request->pay_method == 'opay') {
                 $opay = new OPayController();
                 return $opay->make($data, $user);
@@ -80,11 +85,12 @@ class CoinService
         return $this->coinRepository->findById($coinId);
     }
 
-    public function create($request)
+    public function create($request, $payment_id)
     {
         $data = [
             'usd'         => $request->usd,
             'coin'         => $request->coin,
+            'payment_gateway_id' => $payment_id,
         ];
 
         $this->coinRepository->create($data);
@@ -99,5 +105,42 @@ class CoinService
         ];
         $this->coinRepository->update($data, $request->coin_id);
         return true;
+    }
+
+    public function paymentCoin()
+    {
+        return $this->paymentCoinRepository->index();
+    }
+
+    public function createPaymentCoins($request)
+    {
+        $image = null;
+        if ($request->hasFile('image')) {
+            $image = Common::upload('images', $request->file('image'));
+        }
+        $data = [
+            'photo' => $image,
+            'title' => $request->title,
+        ];
+        $this->paymentCoinRepository->create($data);
+        return true;
+    }
+
+    public function updatePaymentCoins($request)
+    {
+        $data = [
+            'title' => $request->title,
+        ];
+        if ($request->hasFile('image')) {
+            $data['photo'] = Common::upload('images', $request->file('image'));
+        }
+
+        $this->paymentCoinRepository->update($data, $request->payment_coin_id);
+        return true;
+    }
+
+    public function showPayment($PaymentCoinId)
+    {
+        return $this->paymentCoinRepository->findById($PaymentCoinId);
     }
 }

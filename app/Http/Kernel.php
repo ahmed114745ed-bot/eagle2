@@ -95,6 +95,8 @@ class Kernel extends HttpKernel
         'auth.redirect' => CheckLoginAdmin::class,
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
+        'production.error' => \App\Http\Middleware\StopInProduction::class,
+        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
 
     ];
 }

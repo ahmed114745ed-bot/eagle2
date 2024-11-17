@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\V1\RoleResource;
 use Illuminate\Validation\ValidationException;
 use App\Http\Resources\Api\V1\PermissionResource;
 
@@ -17,17 +18,11 @@ class RoleController extends Controller
     {
         $roleModel = config('admin.database.roles_model');
 
-        $roles = $roleModel::with('permissions:name')
+            $roles = $roleModel::with('permissions')
             ->select('id', 'slug', 'name', 'created_at', 'updated_at')
             ->get();
-
-        $roles = $roles->map(function ($role) {
-            $role->can_delete = !in_array($role->slug, ['administrator', 'admin', 'developer', 'agency', 'charger']);
-            $role->permissions = $role->permissions->pluck('name')->take(7);
-            return $role;
-        });
-
-        return Common::apiResponse(1, '', $roles);
+    
+        return Common::apiResponse(1, '', RoleResource::collection($roles));
     }
 
     public function show($id)

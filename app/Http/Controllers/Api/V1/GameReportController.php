@@ -22,9 +22,9 @@ class GameReportController extends Controller
     {
         // $startDate = request('start_date') ?? date("Y-m-d"); 
         // $endDate = request('end_date') ?? date("Y-m-d"); 
-        
-        $players = CoinGameUser::with(["user" => function($q){
-            $q->with("profile:id,user_id,avatar")->select("id","name");
+
+        $players = CoinGameUser::with(["user" => function ($q) {
+            $q->with("profile:id,user_id,avatar")->select("id", "name");
         }])->selectRaw('
                 MAX(coin_game_users.created_at) as earliest_created_at, 
                 coin_game_users.user_id, 
@@ -57,29 +57,29 @@ class GameReportController extends Controller
                 SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
                 SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
             ')
-            ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-            ->where('users.id', $userId)
-            ->when($gameId, function ($q) use ($gameId) {
-                $q->where('coin_game_users.game_id', $gameId);
-            })
-            ->groupBy('coin_game_users.game_id');
+                ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+                ->where('users.id', $userId)
+                ->when($gameId, function ($q) use ($gameId) {
+                    $q->where('coin_game_users.game_id', $gameId);
+                })
+                ->groupBy('coin_game_users.game_id');
         }])
-        ->select('id', 'name')
-        ->get();
-        $sortedData = $data->sortByDesc(function($game) {
+            ->select('id', 'name')
+            ->get();
+        $sortedData = $data->sortByDesc(function ($game) {
             return $game->coinGameUser[0]?->total_coins_win ?? 0;
         });
-        
+
         $sortedResource = GamePlayerReportResource::collection($sortedData);
-        return Common::apiResponse(1, '',$sortedResource);
+        return Common::apiResponse(1, '', $sortedResource);
     }
 
     public function gameRanking($id, Request $request)
     {
         $gameId = $id;
         $type = $request->input('type');
-        $filterType = $request->input('filter') ;
-        $data = CoinGameUser::with(['game:id,name', 'user:id,name'])
+        $filterType = $request->input('filter');
+        $data = CoinGameUser::with(['game:id,name', 'user:id,name','user.profile'])
             ->selectRaw('
                 coin_game_users.user_id,
                 SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
@@ -109,36 +109,39 @@ class GameReportController extends Controller
             ->orderByRaw($type == 1 ? 'total_coins_win DESC' : 'total_coins_lose DESC')
             ->limit(10)
             ->get();
-        
+
 
         return Common::apiResponse(1, '', $data);
     }
 
-    public function gameInfo()
+    public function gameInfo($id)
     {
-        $data = CoinGameUser::with(["game:id,name"])
-        ->selectRaw('
-            coin_game_users.game_id,
-            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
-            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+        $data = CoinGameUser::with("game")
+            ->selectRaw('
+            CAST(coin_game_users.game_id AS UNSIGNED) as game_id,
+        CAST(SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) AS SIGNED) as total_coins_win, 
+        CAST(SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) AS SIGNED) as total_coins_lose,
+        CAST(
+            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) - 
+            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END)
+            AS SIGNED
+        ) as total_app_gain
         ')
-        ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-        ->groupBy('coin_game_users.game_id')
-        ->get()
-        ->map(function ($player) {
-            // Calculate total_app_gain for each player
-            $player->total_app_gain = $player->total_coins_lose - $player->total_coins_win;
-            return $player;
-        });
+            ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+            ->groupBy('coin_game_users.game_id')
+            ->where('coin_game_users.game_id', $id)->first();
 
         return Common::apiResponse(1, '', $data);
     }
 
-    public function gamePlay($id)
+    public function gamePlay($id, Request $request)
     {
-        $data = User::where(['game_id' => $id,'online' => 1])->paginate();
-        return Common::apiResponse(1, '', $data);
-    }
+        try {
+            $data = User::where(['game_id' => $id, 'online' => 1])->with('profile')->paginate($request->perPage, ['*'], 'page', $request->page);
+            return Common::apiResponse(1, '', $data);
+        } catch (\Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }
- 

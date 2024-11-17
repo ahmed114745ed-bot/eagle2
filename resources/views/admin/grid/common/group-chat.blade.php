@@ -80,7 +80,7 @@
                     $data=DB::table('configs')->where('name','send_world_chat')->first();
                    // $users=DB::table('users')->get();
         @endphp
-            <form method="POST" action="{{ route('group-chat-config') }}" class="formcustomPage" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('admin.group-chat-config') }}" class="formcustomPage" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-3">

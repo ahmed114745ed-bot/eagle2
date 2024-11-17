@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Traits;
 
 use App\Models\Follow;
@@ -6,11 +7,26 @@ use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-Trait FollowTrait{
+trait FollowTrait
+{
 
     public function friends_ids()
     {
         return $this->friends()->pluck('users.id');
+    }
+
+    public function isFriends()
+    {
+        return $this->friends()->where("users.id", auth()->id())->exists();
+    }
+
+    public function followeds_ids(){
+        return Follow::query ()->whereHas('followed')->where ('user_id',$this->id)->orderByDesc('created_at')->pluck ('followed_user_id');
+    }
+
+    public function rooms_uids(){
+        return Room::query ()->where ('room_status',1)->where ('is_afk',1)->pluck ('uid');
+        // return Room::query ()->where ('room_status',1)->pluck ('uid');
     }
 
     public function following(): BelongsToMany
@@ -35,7 +51,7 @@ Trait FollowTrait{
     {
         return $this->following()
             ->wherePivot('status', 1) // Active status for mutual relationships
-            ->whereHas('followerss', function($query) {
+            ->whereHas('followerss', function ($query) {
                 $query->where('user_id', $this->id);
             })
             ->orderBy('follows.created_at', 'desc');
@@ -48,6 +64,11 @@ Trait FollowTrait{
         return $this->hasOne(Follow::class, 'followed_user_id', 'id')
             ->where('user_id', auth()->id());
     }
+    public function followerByAuthUser()
+    {
+        return $this->hasOne(Follow::class, 'user_id', 'id')
+            ->where('followed_user_id', auth()->id());
+    }
 
     // Accessor for is_follow property
     public function getIsFollowAttribute()
@@ -55,18 +76,29 @@ Trait FollowTrait{
         // Check if the authenticated user follows this user
         return $this->followedByAuthUser()->exists();
     }
+    public function getIsFollowedAttribute()
+    {
+        // Check if the authenticated user follows this user
+        return $this->followerByAuthUser()->exists();
+    }
 
 
-    public function numberOfFans(){
+    public function numberOfFans()
+    {
         return $this->followers()->count();
     }
 
-    public function numberOfFollowings(){
+    public function numberOfFollowings()
+    {
         return $this->following()->count();
     }
 
-    public function numberOfFriends(){
+    public function numberOfFriends()
+    {
         return $this->friends()->count();
     }
 
+    public function onRoomFolloweds(){
+        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->rooms_uids ())->get ();
+    }
 }

@@ -121,7 +121,7 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->with("ownerRoom");
 
-        $grid->model()->withPhone();
+        $grid->model();
         //$grid->model()->where('phone', '!=', '');//scope
 
         if (request()->online == 1) {
@@ -388,8 +388,8 @@ class UserController extends MainController
                     $user->save();
                 }
                 $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user->id)['sender_level']));
-                $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user->id)['receiver_level']));
+                $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
+                $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
                 $row->column(3, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->coins));
             }
         )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
@@ -518,8 +518,8 @@ class UserController extends MainController
                         $user->save();
                     }
                     $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user->id)['sender_level']));
-                    $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user->id)['receiver_level']));
+                    $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
+                    $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
                     $row->column(3, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->coins));
                 }
             );

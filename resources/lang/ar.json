@@ -1534,5 +1534,22 @@
     "salary-transaction": "معاملة الراتب",
     "Session":"سيشن",
     "Uid":"المعرف المميز للمستخدم",
-    "Room name":"اسم الغرفة"
+    "Room name":"اسم الغرفة",
+    "Enter Room":"دخول الغرفة",
+    "Sub Type":"تفاصيل النوع",
+    "Profile":"صور الحساب",
+    "Title":"العنوان",
+    "Count":"العدد",
+    "Tasks":"المهام",
+    "rewards":"الهدايا",
+    "Day number":"رقم اليوم",
+    "Is unlocked":"الحاله",
+    "Total Points":"عدد النقاط",
+    "Up mic":"الجلوس علي ال mic",
+    "admin" : "المدير",
+    "string":" نص",
+    "integer":"رقم",
+    "yes_or_no":"نعم و لا",
+    "true_and_false":"ترو و فولس",
+    "select":"اختيار"
 }

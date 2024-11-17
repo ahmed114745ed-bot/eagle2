@@ -251,6 +251,7 @@ class GiftLogService
                     'num_gift'    => $zigoData['number'],
                     "plural"      => $zigoData['plural'],
                     'gift_price'  => $zigoData['room_session'],
+                    'giftTP' =>  $totalPrice,
                     'coins'  => @$zigoData['coins'] ?? '0',
                     'type'  => @$zigoData['gift_image_type'] ?? 'mp4',
 
@@ -275,6 +276,8 @@ class GiftLogService
                         'rrl' => $zigoData['r_receiver_level'],
                         'oId'    => (int)$zigoData['owner_id'],
                         'isPass' => $zigoData['is_password'],
+                        'GTP' =>  $totalPrice,
+
                     ]
                 ];
                 $json  = json_encode($d);

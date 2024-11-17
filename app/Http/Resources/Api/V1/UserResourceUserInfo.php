@@ -112,7 +112,7 @@ class UserResourceUserInfo extends JsonResource
 //            'family_name'=>@$fn, // refactor
             'family_data'=>@$f, // refactor
             'profile'=>new ProfileResource(@$this->profile), // both
-            'level'=>Common::level_center (@$this->id), // both
+            'level'=>Common::level_center (@$this), // both
             'diamonds'=>@$this->monthly_diamond_received?:0, // both
 //            'usd'=>@$this->salary, // my
             'vip'=>@Common::ovip_center ($this->id), // both

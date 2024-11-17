@@ -17,13 +17,13 @@ class ProfileResource extends JsonResource
     {
 
         return [
-            'image'=>$this->avatar?:'',
-            'image_id' => $this->image_id?:'',
-            'gender'=>$this->gender !== null ? intval($this->gender) : 2,
-            'birthday'=>$this->birthday?Carbon::parse($this->birthday)->format ('Y-m-d'):'',
-            'age'=>Carbon::parse ($this->birthday)->age,
-            'province'=>$this->province?:'',
-            'city'=>$this->city?:'',
+            'image' => $this->avatar ?: '',
+            'image_id' => $this->image_id ?: '',
+            'gender' => $this->gender !== null ? intval($this->gender) : 2,
+            'birthday' => $this->birthday ? Carbon::parse($this->birthday)->format('Y-m-d') : '',
+            'age' => Carbon::parse($this->birthday)->age,
+            'province' => $this->province ?: '',
+            'city' => $this->city ?: '',
         ];
     }
 }

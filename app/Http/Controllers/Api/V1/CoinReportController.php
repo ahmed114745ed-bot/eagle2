@@ -42,7 +42,8 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->get();
+        ->orderBy("created_at", "desc") 
+        ->paginate(10);//->get();
         return ExchangeCoinsReportResource::collection($data);
     }
 
@@ -54,7 +55,8 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->get();
+        ->orderBy("created_at", "desc") 
+        ->paginate(10);//->get();
         return RecevingReportResource::collection($data);
     }
 
@@ -67,7 +69,8 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->get();
+        ->orderBy("created_at", "desc") 
+        ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
 

@@ -18,7 +18,7 @@ class UserResource extends JsonResource
     public function toArray($request)
     {
 
-        $level = Common::level_center(@$this->id);
+        $level = Common::level_center(@$this);
         if (gettype($level) == 'array') {
             $receiver_level = $level['receiver_level'] ?? 0;
             $sender_level   = $level['sender_level'] ?? 0;

@@ -25,8 +25,8 @@ class ExchangeService
         $ex = $this->exchangeRepository->findById($exchangeId);
 
         if (!$ex) throw new \Exception('not found');
-        if ($user->type_user != 0 || $user->agency_id != 0) throw new \Exception('not allowed');
-        if ($user->total_diamond_received < $ex->diamonds) throw new \Exception('balance low');
+       // if ($user->type_user != 0 || $user->agency_id != 0) throw new \Exception('not allowed');
+       // if ($user->total_diamond_received < $ex->diamonds) throw new \Exception('balance low');
 
 
         $data = [

@@ -2,18 +2,21 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\OVip;
 use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Enums\ConfigType;
 use App\Models\AdminUser;
 use Illuminate\Support\Str;
 use App\Enums\ConfigCategory;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use App\Services\AppFeatureService;
 Use Encore\Admin\Admin;
+use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Lang;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class ConfigController extends MainController
@@ -70,10 +73,16 @@ class ConfigController extends MainController
      */
     public function edit($id, Content $content)
     {
+        $form = $this->form()->edit($id);
+        if ($form->model()->type == 'integer') {
+            $form->valueInteger = $form->model()->value; 
+        }elseif ($form->model()->type== 'select') {
+            $form->valueSelect = $form->model()->value; 
+        }
         return $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($form);
     }
 
     /**
@@ -112,7 +121,10 @@ class ConfigController extends MainController
         $grid->column('value',trans('value'))->display(function($text) {
             return Str::limit($text, 50, '...');
         })->editable ();
-        $grid->desc(trans ('description'));
+
+        $grid->column('desc',trans ('description'))->display(function($desc) {
+            return Lang::has('dashboard.' . $desc) ? __('dashboard.' . $desc) : $desc;
+        });
         Admin::style('.dropdown-toggle {
             background-color: #f8f9fa;
             color: #333;
@@ -178,11 +190,48 @@ class ConfigController extends MainController
 
         $form->display('ID');
         $form->text('name', trans('name'));
-        $form->text('value', trans('value'));
+
+        // if ($form->isEditing()) {
+        //     if ($form->model()->type == 'integer') {
+        //         $form->valueInteger = $form->model()->value; 
+        //     }elseif ($form->model()->type== 'select') {
+        //         $form->valueSelect = $form->model()->value; 
+        //     }
+        // }
+
         $form->textarea ('desc',trans ('description'));
         $form->select('category', trans('category'))
          ->options(ConfigCategory::getTranslatedOptions())
          ->required();
+        $form->select('type', trans('type'))
+         ->options(ConfigType::getTranslatedOptions())
+         ->required()
+         ->when("select", function () use ($form) {
+                $form->select('sub_type', trans('sub_type'))->options(function () {
+                    $ops = ['1' => __("yes_or_no"),'2' => __("true_and_false")];
+                    return $ops;
+                }) ->when("1", function () use ($form) {
+                    $ops = ['yes' => __("yes"),'no' => __("no")];
+                    $form->select('valueSelect', trans('value'))->options($ops);
+                })->when("2", function () use ($form) {
+                    $ops = ['true' => __("true"),'false' => __("false")];
+                    $form->select('valueSelect', trans('value'))->options($ops);
+                });
+            })
+         ->when("integer", function () use ($form) {
+                $form->number('valueInteger', trans('value'));
+            })
+         ->when("string", function () use ($form) {
+                $form->text('value', trans('value'));
+            });
+
+            $form->saving(function (Form $form) {
+                if ($form->type == 'integer') {
+                    $form->value = $form->valueInteger;
+                } elseif ($form->type == 'select') {
+                    $form->value = $form->valueSelect;
+                } 
+            });
 
         return $form;
     }

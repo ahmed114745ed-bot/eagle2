@@ -13,9 +13,11 @@ class WeeklyCpService
 
     public function perviousCpWinners()
     {
-        $weeklyCp = $this->weeklyCpRepository->currentWeeklyCp();
-        if (!$weeklyCp) throw new \Exception('there is not weekly cp now');
-        return $this->weeklyCpRepository->perviousWeeklyCpWinners($weeklyCp->start_date);
+        
+        $perviousWeeklyCpWinners = $this->weeklyCpRepository->perviousWeeklyCpWinners(limit:5);
+        
+        if (!$perviousWeeklyCpWinners) throw new \Exception('there is not weekly cp');
+        return $perviousWeeklyCpWinners;
     }
 
     public function weeklyCpDetails()
@@ -43,9 +45,9 @@ class WeeklyCpService
 
     public function topOnePerviousWeeklyCp()
     {
-        $perviousWeeklyCp = $this->weeklyCpRepository->perviousWeeklyCp();
+        $perviousWeeklyCp = $this->weeklyCpRepository->perviousWeeklyCpTopWinner();
         if (!$perviousWeeklyCp) throw new \Exception('there is not weekly cp ');
-        return$perviousWeeklyCp ;
+        return $perviousWeeklyCp->WeeklyCpWinners->first();
     }
 
     public function userDetails($user)

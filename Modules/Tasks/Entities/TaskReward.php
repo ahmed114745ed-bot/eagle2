@@ -2,6 +2,8 @@
 
 namespace Modules\Tasks\Entities;
 
+use App\Models\OVip;
+use App\Models\Ware;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Events\Entities\Reward;
@@ -19,4 +21,28 @@ class TaskReward extends Model
         });
     }*/
     use HasFactory;
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($model) {
+            if ($model->coins) {
+                unset($model->coins);
+            }
+            if ($model->achievement) {
+                unset($model->achievement);
+            }
+        });
+       
+    }
+
+    public function vip()
+    {
+        return $this->belongsTo(OVip::class,'target');   
+    }
+    public function ware()
+    {
+        return $this->belongsTo(Ware::class,'target');   
+    }
+
 }

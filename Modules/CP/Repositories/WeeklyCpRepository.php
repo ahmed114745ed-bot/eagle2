@@ -17,19 +17,23 @@ class WeeklyCpRepository
     {
         return WeeklyStar::currentEvent()->WeeklyCP()->with('gifts', 'weeklyCpGifts')->first();
     }
-
-    public function perviousWeeklyCp()
+    public function perviousWeeklyCpTopWinner()
     {
-        return WeeklyStar::previousEvent()->WeeklyCP()->with(['WeeklyCpWinners' => function ($query) {
+        return $this->perviousWeeklyCp(['WeeklyCpWinners' => function ($query) {
             $query->where('type_relation', 'lover')->where('level', 1);
-        }])->latest()->first();
+        }]);
     }
 
-    public function perviousWeeklyCpWinners($startDate)
+    public function perviousWeeklyCp($withRelation = [])
     {
-        return WeeklyStar::where("start_date", '<', $startDate)->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
-            $query->where('type_relation', 'lover');
-        }])->limit(3)->get();
+        return WeeklyStar::previousEvent()->WeeklyCP()->with($withRelation)->latest()->first();
+    }
+
+    public function perviousWeeklyCpWinners($limit = 3)
+    {
+        return WeeklyStar::previousEvent()->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
+            $query->where('type_relation', 'lover')->with('userOne.profile','userTwo.profile');
+        }])->limit($limit)->get();
     }
 
 
