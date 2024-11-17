@@ -84,6 +84,7 @@ class UserCounterServices
         switch ($type) {
             case "system_message":
                 return OfficialMessage::where("type", 1)
+                    ->where('user_id', $user->id)
                     ->where("created_at", ">", $date)
                     ->count();
             case "official_message":
