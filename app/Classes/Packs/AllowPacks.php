@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class AllowPacks
 {
@@ -98,6 +99,12 @@ class AllowPacks
             $ware      = $this->getWare($value);
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
+
+            // if (!$isAllow) {
+                
+            // }
+            Log::info("min is: ".$minLevel);
+            Log::info("max is: ".$ware->max_level);
             $data[]    = [
                 'key' => $key,
                 'title' => __('api.' . $key . '_title'),
