@@ -36,6 +36,8 @@ use App\Services\RedisService;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
+use Schema;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -81,6 +83,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Schema::defaultStringLength(191);
         User::observe (UserObserver::class);
         Gift::observe (GiftObserver::class);
         Emoji::observe (EmojiObserver::class);
