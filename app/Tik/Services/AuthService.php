@@ -90,7 +90,8 @@ class AuthService
                     'google_id' => $request['google_id'],
                     'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
-                    'status' => 1
+                    'status' => true,
+
                 ];
                 $user = $this->userRepository->create($data);
                 if (\request('tags') && is_array(\request('tags'))) {
@@ -102,6 +103,7 @@ class AuthService
                 $user->save();*/
             }
         }
+        \Log::info('This is login from google :  ' . gettype($user). ' '. json_encode($user));
         $this->rule($user, '', @$request['device_token'], $request);
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0);
@@ -112,22 +114,22 @@ class AuthService
     {
         // الحصول على التوكن من الطلب
         $id_token = $request->input('id_token');
-        
+
         // التحقق من أن التوكن موجود
         if (!$id_token) {
             return response()->json(['error' => 'ID token is required'], 400);
         }
-        
+
         // إعداد Google Client
         $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
 
         // التحقق من صحة التوكن
         $payload = $client->verifyIdToken($id_token);
-        
+
         if ($payload) {
             // استخراج معرف المستخدم من الـ payload
             $userid = $payload['sub'];
-            
+
             // يمكنك هنا القيام بأي شيء آخر مثل تسجيل المستخدم أو إرجاع بياناته
             return response()->json([
                 'message' => 'Token is valid',
