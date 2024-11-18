@@ -196,8 +196,8 @@ class UserController extends Controller
     public function my_data(Request $request)
     {
         $user = $request->user();
-       
-        $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
+
+        $userWithMedals = $this->userService->processUserData($user, $request->header('device_token'), $request->header('lat'), $request->header('long'));
 
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
