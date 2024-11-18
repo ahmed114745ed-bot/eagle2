@@ -24,7 +24,9 @@ class AchievementDetailResource extends JsonResource
             'id' => $this->id,
             'type' => $achievementLevel?->achievement?->type ?? 'no achievement',
             'image' => $achievementLevel?->valid_image ?? $this->custom_image,
-            'description' =>    $achievementLevel ? (auth()->user()->lan == "ar" ? $achievementLevel?->ar_description : $achievementLevel?->ar_description) : __('get it by admin'),
+            'description' =>    $achievementLevel ?  $achievementLevel?->ar_description  : __('get it by admin'),
+            'description_en' =>    $achievementLevel ?   $achievementLevel?->en_description : __('get it by admin'),
+
         ];
     }
 }
