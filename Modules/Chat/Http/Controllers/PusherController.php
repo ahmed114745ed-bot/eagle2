@@ -9,12 +9,18 @@ use Modules\Chat\Entities\ChatRoom;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Modules\Chat\Http\Services\PusherService;
 
 class PusherController extends Controller
 {
+
+    public function __construct(public PusherService $pusherService)
+    {
+
+    }
     public function edit_user(Request $request) {
 
-        if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
+        /* if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
             Log::info('Pusehr error');
 
             abort(403, 'Invalid Pusher webhook request');
@@ -52,6 +58,20 @@ class PusherController extends Controller
             }
           }
         }
+        return response()->json(['status' => 'Webhook received']); */
+
+        if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
+            Log::info('Pusher error');
+            abort(403, 'Invalid Pusher webhook request');
+        }
+
+        // Extract relevant data from the request
+        $channel = $request->events[0]['channel'];
+        $eventName = $request->events[0]['name'];
+
+        // Delegate handling user status to the service
+        $this->pusherService->handleUserStatusChange($channel, $eventName);
+
         return response()->json(['status' => 'Webhook received']);
     }
 
