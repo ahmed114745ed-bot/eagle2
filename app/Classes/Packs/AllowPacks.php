@@ -115,7 +115,8 @@ class AllowPacks
             $data[]    = [
                 'key' => $key,
                 'title' => __('api.' . $key . '_title'),
-                'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level),
+                'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'ar'),
+                'description_en' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'en'),
                 'is_active' => $this->isPackUsedAndExist($value),
                 'is_allow_to_user' => $isAllow,
                 'min' => $minLevel,
@@ -141,12 +142,12 @@ class AllowPacks
         return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->id)->isNotEmpty();
     }
 
-    private function getDescription(string $key, $isAllow, $minLevel, $maxLevel)
+    private function getDescription(string $key, $isAllow, $minLevel, $maxLevel,$lang ='en')
     {
-        if ($minLevel == null) return __('api.pack_not_allow_yet');
+        if ($minLevel == null) return __('api.pack_not_allow_yet',[],$lang);
 
-        if ($isAllow) return __('api.' . $key . '_description_allow');
+        if ($isAllow) return __('api.' . $key . '_description_allow',[],$lang);
 
-        return __('api.' . $key . '_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel]);
+        return __('api.' . $key . '_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel],$lang);
     }
 }
