@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Helpers\Common;
 use App\Facades\UserHandling;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Tik\Repositories\UserRepository;
@@ -71,7 +72,7 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
-        $user = $this->userRepository->findByGoogleId($request['google_id']);
+        $user = User::where('google_id', $request['google_id'])->first();
         \Log::info('This is user ' . json_encode($user));
         if (!$user) {
             if ($this->userRepository->checkTrashedEmail($request['email'], $request['google_id'])) {
