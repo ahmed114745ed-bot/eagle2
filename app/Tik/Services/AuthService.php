@@ -80,7 +80,7 @@ class AuthService
                     'email' => $request['email'],
                     'name' => $request['name'],
                 ];
-                return  [[], '', $resource];
+                return  [$user, '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);
             } else {
                 $country = $this->countryRepository->findByPhoneCode('101');
