@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
+use Google_Client;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-
+use Google\Client as GoogleClient;
 
 
 class AuthController extends Controller
@@ -82,7 +83,7 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request->google_id, 'device_token' => $request['device_token']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request->google_id, 'device_token' => $request['device_token'],'id_token' => $request['id_token']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
@@ -153,6 +154,10 @@ class AuthController extends Controller
         );
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
+    
+   
+
+    
 
     protected function loginWithApple($data)
     {

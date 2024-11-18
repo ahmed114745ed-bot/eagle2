@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\VipPrivilege;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -38,30 +39,9 @@ class WareVipController extends MainController
 
             $filter->column(1 / 2, function ($filter) {
 
-                $filter->equal('type', __('type'))->select([
-                    1 => trans('Gemstone'),
-                    3 => trans('Card Scroll'),
-                    4 => trans('Avatar Frame'),
-                    5 => trans('Bubble Frame'),
-                    6 => trans('Entering Special Effects'),
-                    7 => trans('Microphone Aperture'),
-                    8 => trans('Badge'),
-                    9 => trans('NoKick'),
-                    10 => trans('Icon'),
-                    11 => trans('intro animation'),
-                    12 => trans('wapel'),
-                    13 => trans('hide country and last login'),
-                    14 => trans('vip gifts'),
-                    15 => trans('no pan'),
-                    16 => trans('hidden room'),
-                    17 => trans('anonymous man'),
-                    18 => trans('colored name'),
-                    19 => trans('profile visitors hide in'),
-                    20 => trans('hide last active'),
-                    21 => trans('sound effect'),
-                    22 => trans('upload GIF image')
-
-                ]);
+                $filter->equal('type', __('type'))->select(
+                    VipPrivilege::pluck('name', 'id')->toArray()
+                );
             });
         });
 
@@ -178,32 +158,13 @@ class WareVipController extends MainController
                 //               8=>trans ('cp level unlock'),
             ]
         )->default(1);
-        $form->select('type', trans('type'))->options(
-            [
-                1 => trans('Gemstone'),
-                3 => trans('Card Scroll'),
-                4 => trans('Avatar Frame'),
-                5 => trans('Bubble Frame'),
-                6 => trans('Entering Special Effects'),
-                7 => trans('Microphone Aperture'),
-                8 => trans('Badge'),
-                9 => trans('NoKick'),
-                10 => trans('Icon'),
-                11 => trans('intro animation'),
-                12 => trans('wapel'),
-                13 => trans('hide country'),
-                14 => trans('vip gifts'),
-                15 => trans('no pan'),
-                16 => trans('hidden room'),
-                17 => trans('anonymous man'),
-                18 => trans('colored name'),
-                19 => trans('profile visitors hide in'),
-                20 => trans('hide last active'),
-                21 => trans('sound effect'),
-                22 => trans('upload GIF image')
-
-            ]
-        )->rules('required');
+        $form->select('type', trans('type'))->options(function ($value) {
+            $privileges = [];
+            foreach (VipPrivilege::get() as $pri) {
+                $privileges[$pri->type] =  $pri->name;
+            }
+            return $privileges;
+        })->rules('required');
         //        ->rules (function ($form){
         //            if (!$id = $form->model()->id) {
         //                return 'required';

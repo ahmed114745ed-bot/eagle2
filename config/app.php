@@ -27,6 +27,7 @@ return [
     'zego_credential' => env('ZEGOENCRYPTtkEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_secret_key' => env('UTDSECRTKEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_client_id' => env('UTDCLIENTID','3030'),
+    'google_client_id' => env('GOOGLE_CLIENT_ID','790444932875-co6ri5d8e3m59ktv73h7eana2gfqbv34.apps.googleusercontent.com'),
 
     /*
     |--------------------------------------------------------------------------

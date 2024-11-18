@@ -13,6 +13,7 @@ use App\Tik\Repositories\CountryRepository;
 use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
+use Google\Client as GoogleClient;
 
 class AuthService
 {
@@ -21,6 +22,34 @@ class AuthService
         private readonly UserRepository $userRepository,
         private readonly CountryRepository $countryRepository,
     ) {
+    }
+
+    public function verifyGoogleToken($id_token)
+    {
+        if (!$id_token) {
+            return false;
+        }
+
+        if (substr_count($id_token, '.') !== 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Wrong number of segments in ID token',
+                'data' => null,
+                'paginates' => null
+            ], 400);
+        }
+        $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
+            'id_token' => $id_token
+        ]);
+        if ($googleResponse->successful()) {
+            if ($googleResponse->json('aud') === config("app.google_client_id")) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+          return false;
+        }
     }
 
 
@@ -96,6 +125,10 @@ class AuthService
                     'status' => true,
 
                 ];
+                $checkValidation = $this->verifyGoogleToken($request['id_token']);
+                if (!$checkValidation) {
+                    throw new CValidationException('some thing wrong');
+                }
                 $user = $this->userRepository->create($data);
                 if (\request('tags') && is_array(\request('tags'))) {
                     $user->tags()->attach(\request('tags'));
@@ -112,37 +145,6 @@ class AuthService
         return [$user, $token, []];
     }
 
-    public function verifyGoogleToken(Request $request)
-    {
-        // الحصول على التوكن من الطلب
-        $id_token = $request->input('id_token');
-
-        // التحقق من أن التوكن موجود
-        if (!$id_token) {
-            return response()->json(['error' => 'ID token is required'], 400);
-        }
-
-        // إعداد Google Client
-        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-
-        // التحقق من صحة التوكن
-        $payload = $client->verifyIdToken($id_token);
-
-        if ($payload) {
-            // استخراج معرف المستخدم من الـ payload
-            $userid = $payload['sub'];
-
-            // يمكنك هنا القيام بأي شيء آخر مثل تسجيل المستخدم أو إرجاع بياناته
-            return response()->json([
-                'message' => 'Token is valid',
-                'user_id' => $userid,
-                'payload' => $payload
-            ], 200);
-        } else {
-            // التوكن غير صالح
-            return response()->json(['error' => 'Invalid ID token'], 401);
-        }
-    }
 
     public function loginWithApple($request, $unique_id)
     {

@@ -395,12 +395,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post ('/remove',[\App\Http\Controllers\Api\V1\BlackListController::class,'remove']);
                 Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
             });
-            
+
             // Route::get('/data-data', function(){
             //     $id = \App\Models\User::first()?->id;
             //     $data = Common::level_center(@$id);
             //     return $data;
             // });
+
+            Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
 
         }
     );
