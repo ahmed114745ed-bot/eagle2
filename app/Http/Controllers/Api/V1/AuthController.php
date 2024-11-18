@@ -253,6 +253,6 @@ class AuthController extends Controller
     {
         $status = $user instanceof User ? $user->status : ($user['status'] ?? null);
 
-        return $status === 1;
+        return $status == 1;
     }
 }
