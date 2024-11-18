@@ -7,9 +7,15 @@ use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Entities\PinToTop;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Chat\Http\Services\PinToTopService;
 
 class PinToTopController extends Controller
 {
+
+    public function __construct(public PinToTopService $pinToTopService)
+    {
+
+    }
 
     public function index(Request $request)
     {
@@ -24,14 +30,22 @@ class PinToTopController extends Controller
             'chat_id' => 'required|exists:chat_rooms,id',
         ]);
         $user = $request->user();
-        $check_room = ChatRoom::where('user_id', $user->id)->where('user_id2', $request->user_id)
+
+
+        $response = $this->pinToTopService->store($user->id, $request->user_id);
+
+        return response()->json($response, $response['status']);
+        /* $check_room = ChatRoom::where('user_id', $user->id)->where('user_id2', $request->user_id)
             ->orWhere('user_id', $request->user_id)->where('user_id2', $user->id)->first();
+
         if (!$check_room) {
             return response()->json([
                 'status' => 404,
                 'status' => 'Chat not Found',
             ], 404);
         }
+
+
         $chat = new PinToTop();
         $chat->chat_room_id = $check_room->id;
         $chat->user_id = $user->id;
@@ -40,13 +54,13 @@ class PinToTopController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'chat added to top',
-        ]);
+        ]); */
     }
 
 
     public function destroy(Request $request ,string $id)
     {
-        $user = $request->user();
+/*         $user = $request->user();
         $check_room = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->first();
         if (!$check_room) {
             return response()->json([
@@ -58,6 +72,11 @@ class PinToTopController extends Controller
         return response()->json([
             'status' => 200,
             'status' => 'Chat Removed',
-        ]);
+        ]); */
+
+        $user = $request->user();
+        $response = $this->pinToTopService->removePinFromTop($user->id, $id);
+
+        return response()->json($response, $response['status']);
     }
 }

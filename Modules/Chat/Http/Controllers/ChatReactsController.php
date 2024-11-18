@@ -12,13 +12,19 @@ use Modules\Chat\Entities\React;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Modules\Chat\Http\Requests\ReactStoreRequest;
+use Modules\Chat\Http\Services\ReactService;
 
 class ChatReactsController extends Controller
 {
 
-    public function store(Request $request)
+    public function __construct(public ReactService $reactService)
     {
-        try {
+
+    }
+    public function store(ReactStoreRequest $request)
+    {
+        /* try {
             $request->validate([
                 'message_id' => 'required|exists:chat_messages,id',
                 'react' => 'required',
@@ -31,7 +37,7 @@ class ChatReactsController extends Controller
             {
                 return 2020;
             }
-    
+
             $status = 0 ;
             if($request->react )
             {
@@ -40,7 +46,7 @@ class ChatReactsController extends Controller
                     $react->delete();
                     $status = 'react removed';
                 }
-    
+
                 if( $react &&  $react->react !== $request->react)
                 {
                     $react->delete();
@@ -51,9 +57,9 @@ class ChatReactsController extends Controller
                     $data->react  = $request->react;
                     $data->save();
                     $status = 'react changed';
-    
+
                 }
-    
+
                 else if (!$react) {
                     $data = new React();
                     $data->chat_message_id  = $request->message_id;
@@ -62,7 +68,7 @@ class ChatReactsController extends Controller
                     $data->react  = $request->react;
                     $data->save();
                     $status = ' react added';
-    
+
                 }
             }
             if($message && $chat_room)
@@ -83,7 +89,7 @@ class ChatReactsController extends Controller
                    return $th->getMessage();
                 }
             }
-    
+
             return response()->json([
                 'status' => 200,
                 'react' => $status,
@@ -92,8 +98,29 @@ class ChatReactsController extends Controller
         } catch (\Throwable $th) {
          //  Log::info($th->getMessage());
            return $th->getMessage();
+        } */
+        try {
+
+            $user = $request->user();
+            $response = $this->reactService->handleReact(
+                $user,
+                $request->message_id,
+                $request->react
+            );
+
+            if ($response['status'] !== 200) {
+                return response()->json(['status' => $response['status'], 'message' => $response['message']], 404);
+            }
+
+            return response()->json([
+                'status' => $response['status'],
+                'react' => $response['react'],
+                'message' => $response['message'],
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->json(['status' => 500, 'error' => $e->getMessage()], 500);
         }
-       
     }
 
     // public function store(Request $request)

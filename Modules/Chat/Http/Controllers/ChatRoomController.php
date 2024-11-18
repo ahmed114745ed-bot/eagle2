@@ -3,32 +3,25 @@
 namespace Modules\Chat\Http\Controllers;
 
 use App\Helpers\Common;
-use App\Models\Room;
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Chat\Events\OpenChat;
 use App\Http\Controllers\Controller;
-use Modules\Chat\Http\Resources\ChatMessageResource;
-use Modules\Chat\Http\Resources\ChatRoomResource;
-use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
-use  Modules\Chat\Jobs\ReciveChatMessagejob;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 // use Modules\Chat\Entities\Follow;
-use Modules\Chat\Entities\MessageAlbum;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Modules\Chat\Entities\React;
-use Modules\Chat\Jobs\SendMessageToAllUsers;
+use Modules\Chat\Http\Services\ChatRoomService;
 
 class ChatRoomController extends Controller
 {
+
+    public function __construct(public ChatRoomService $chatRoomService)
+    {
+
+    }
     public function inviteRoom(Request $request)
     {
-        $userId = \Auth::id();
+       /*  $userId = \Auth::id();
 
         $message = $request->message;
         $imageUrl = $request->image_url;
@@ -61,18 +54,40 @@ class ChatRoomController extends Controller
 
         $this->sendMessageToUsers($userId, $userIds, $data);
 
+        return Common::apiResponse(true, __('success')); */
+
+        $userId = auth()->id();
+
+        $data = [
+            'message' => $request->message,
+            'url'     => $request->image_url,
+        ];
+
+        $type = $request->type;
+        $userIds = $request->users ? explode(',', $request->users) : [];
+        $exceptIds = $request->except_ids ? explode(',', $request->except_ids) : [];
+
+        $this->chatRoomService->handleInvite($data, $userId, $type, $userIds, $exceptIds);
+
         return Common::apiResponse(true, __('success'));
+
     }
     public function find_user(Request $request)
     {
-        $data = User::where('name', 'LIKE', '%' . $request->name . '%')->select('id', 'name', 'img')->get();
+        $request->validate([
+            'name' => 'required|string|min:1|max:255',
+        ]);
+
+        $data = $this->chatRoomService->findUsersByName($request->name);
+
         return response()->json($data);
+
     }
 
     public function index(Request $request)
     {
 
-        $user = User::with('chats')->find($request->user()->id);
+        /* $user = User::with('chats')->find($request->user()->id);
         if (!$user) {
             return response()->json('user not found', 200);
         }
@@ -112,7 +127,22 @@ class ChatRoomController extends Controller
             'total_unread_messages' => $total_unread->count(),
             'unread_messages' => ChatMessageResource::collection($total_unread),
         ];
-        return Common::apiResponse(1, 'successfully', $data, 200, '', 'chat');
+        return Common::apiResponse(1, 'successfully', $data, 200, '', 'chat'); */
+
+        $response = $this->chatRoomService->getChatRooms($request->user());
+
+        if (!$response['success']) {
+            return response()->json($response['message'], $response['status']);
+        }
+
+        return Common::apiResponse(
+            1,
+            $response['message'],
+            $response['data'],
+            $response['status'],
+            '',
+            'chat'
+        );
     }
     public function close_Chat(Request $request)
     {
@@ -124,7 +154,7 @@ class ChatRoomController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        /* $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
         $user = $request->user();
@@ -183,7 +213,39 @@ class ChatRoomController extends Controller
                 'has_password'  =>  $pass_status
             ]
         ];
-        return Common::apiResponse(1, 'successfully', $dataResource, 200, '', 'messages');
+        return Common::apiResponse(1, 'successfully', $dataResource, 200, '', 'messages'); */
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = $request->user();
+        $checkRoom = $this->chatRoomService->getOrCreateChatRoom($user, $request->user_id);
+
+        // Update user's current room chat
+
+        $user->current_room_chat = $checkRoom->id;
+        $user->update();
+        // Retrieve and paginate chat messages
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id);
+
+        // Mark unread messages as seen
+        $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
+
+        // Find the second user in the chat room
+        $user2 = $this->chatRoomService->getUserInChatRoom($checkRoom, $user);
+
+        // Handle chat opening event
+        $this->chatRoomService->handleChatOpenEvent($checkRoom, $user, $user2);
+
+        // Check if room has a password
+        $roomData = $this->chatRoomService->getRoomData($user2);
+
+        // Prepare data for response
+        $responseData = $this->chatRoomService->prepareResponseData($messages, $checkRoom, $user2, $roomData);
+
+        return Common::apiResponse(1, 'successfully', $responseData, 200, '', 'messages');
+
     }
 
     // public function store(Request $request)
@@ -244,7 +306,7 @@ class ChatRoomController extends Controller
     public function destroy(Request $request, $id)
     {
 
-        $user = $request->user();
+        /* $user = $request->user();
         $check_room = ChatRoom::where('user_id', $user->id)->where('user_id2', $id)->orWhere('user_id', $id)->where('user_id2', $user->id)->first();
         if (!$check_room) {
             return response()->json([
@@ -273,7 +335,15 @@ class ChatRoomController extends Controller
             'status' => 200,
             'message' => 'Chat Deleted',
             'midea' => $mideaStrings
-        ]);
+        ]); */
+
+
+        $user = $request->user();
+
+        // Call the service method to handle chat room deletion
+        $response = $this->chatRoomService->deleteChatRoom($user, $id);
+
+        return response()->json($response);
     }
 
     public function accept_request(Request $request)
@@ -282,7 +352,7 @@ class ChatRoomController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $user = $request->user();
+        /* $user = $request->user();
         $check_room = ChatRoom::where('user_id', $request->user_id)->where('user_id2', $user->id)->where('type', 'guest')->first();
         if (!$check_room) {
             return response()->json([
@@ -293,7 +363,12 @@ class ChatRoomController extends Controller
         $check_room->type = 'friends';
         $check_room->update();
         $data = ChatMessage::where('chat_room_id', $check_room->id)->with('reacts', 'albums')->get();
-        return ChatMessageResource::collection($data);
+        return ChatMessageResource::collection($data); */
+
+        $response = $this->chatRoomService->acceptRequest($request);
+
+        return response()->json($response);
+
     }
 
     /**
@@ -302,10 +377,11 @@ class ChatRoomController extends Controller
      * @param mixed $message
      * @return mixed
      */
-    public function sendMessages(int|string|null $userId, mixed $userIds, array $data): mixed
+/*     public function sendMessages(int|string|null $userId, mixed $userIds, array $data): mixed
     {
         $message = @$data['message'];
         $url = @$data['url'];
+
         ChatRoom::query()
             ->select(['id', 'user_id', 'user_id2'])
             ->where(fn(Builder $q) => $q->where('user_id', $userId)->whereIn('user_id2', $userIds))
@@ -336,14 +412,14 @@ class ChatRoomController extends Controller
                 ChatMessage::insert($data);
             });
         return $userIds;
-    }
+    } */
 
     /**
      * @param mixed $userIds
      * @param int|string|null $userId
      * @return void
      */
-    public function createNewChatRooms(mixed $userIds, int|string|null $userId): void
+/*     public function createNewChatRooms(mixed $userIds, int|string|null $userId): void
     {
         $data = [];
         // create chat room and store message
@@ -358,7 +434,7 @@ class ChatRoomController extends Controller
         foreach ($chunks as $chunk) {
             ChatRoom::query()->insert($chunk);
         }
-    }
+    } */
 
     /**
      * @param int|string|null $userId
@@ -366,7 +442,7 @@ class ChatRoomController extends Controller
      * @param mixed $message
      * @return void
      */
-    public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
+    /* public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
     {
         $timeZone = request()->hasHeader('tz') ? request()->header()['tz'][0] : 'UTC';
         dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
@@ -375,5 +451,5 @@ class ChatRoomController extends Controller
         // $this->createNewChatRooms($userIds, $userId);
 
         // $this->sendMessages($userId, $userIds, $message);
-    }
+    } */
 }

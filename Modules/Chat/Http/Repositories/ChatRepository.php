@@ -12,6 +12,15 @@ class ChatRepository
         return ChatRoom::BetweenUsers($userId, $userId2)->first();
     }
 
+    public function findChatRoomForUser(int $userId, string $chatRoomId): ?ChatRoom
+    {
+        return ChatRoom::where(function ($query) use ($userId, $chatRoomId) {
+                $query->where('user_id', $userId)->orWhere('user_id2', $userId);
+            })
+            ->where('id', $chatRoomId)
+            ->first();
+    }
+    
     public function countMessagesByUserInRoom($chatRoomId, $userId)
     {
         return ChatMessage::ByUserInRoom($chatRoomId, $userId)->count();
