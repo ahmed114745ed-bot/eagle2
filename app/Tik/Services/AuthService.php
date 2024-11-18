@@ -71,6 +71,7 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
+        \Log::info($request['google_id']);
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         if (!$user) {
             if ($this->userRepository->checkTrashedEmail($request['email'], $request['google_id'])) {
@@ -80,7 +81,7 @@ class AuthService
                     'email' => $request['email'],
                     'name' => $request['name'],
                 ];
-                return  [$user, '', $resource];
+                return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);
             } else {
                 $country = $this->countryRepository->findByPhoneCode('101');
