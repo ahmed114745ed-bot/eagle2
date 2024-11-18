@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Exceptions\CValidationException;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
 use App\Models\User;
@@ -73,7 +74,6 @@ class AuthService
     public function loginWithGoogle($request)
     {
         $user = User::where('google_id', $request['google_id'])->first();
-        \Log::info('This is user ' . json_encode($user));
         if (!$user) {
             if ($this->userRepository->checkTrashedEmail($request['email'], $request['google_id'])) {
                 $resource = [
@@ -82,8 +82,9 @@ class AuthService
                     'email' => $request['email'],
                     'name' => $request['name'],
                 ];
-                return  [[], '', $resource];
-                Common::apiResponse(false, 'email already taken', $resource, 405);
+                throw new CValidationException('email already taken');
+                /*return  [[], '', $resource];
+                Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
