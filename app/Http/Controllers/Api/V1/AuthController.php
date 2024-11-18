@@ -251,9 +251,8 @@ class AuthController extends Controller
 
     public function canLogin($user)
     {
-        if ($user->status == 1) {
-            return true;
-        }
-        return false;
+        $status = $user instanceof User ? $user->status : ($user['status'] ?? null);
+
+        return $status === 1;
     }
 }
