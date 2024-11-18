@@ -3,11 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ware;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use Illuminate\Support\Str;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -188,9 +189,9 @@ class WareController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        });
+        $form->file('img2', trans('svg'))->name(function () {
+            return 'svga_' . Str::random(6);
+       });
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
