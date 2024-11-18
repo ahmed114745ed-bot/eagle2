@@ -71,8 +71,8 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
-        \Log::info($request['google_id']);
         $user = $this->userRepository->findByGoogleId($request['google_id']);
+        \Log::info('This is user ' . json_encode($user));
         if (!$user) {
             if ($this->userRepository->checkTrashedEmail($request['email'], $request['google_id'])) {
                 $resource = [
