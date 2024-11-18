@@ -136,6 +136,8 @@ class AuthController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+        \Log::info('This is login from google :  ' . gettype($user). ' '. json_encode($user));
+
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }

@@ -103,7 +103,6 @@ class AuthService
                 $user->save();*/
             }
         }
-        \Log::info('This is login from google :  ' . gettype($user). ' '. json_encode($user));
         $this->rule($user, '', @$request['device_token'], $request);
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0);
