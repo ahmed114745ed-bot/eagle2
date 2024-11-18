@@ -114,7 +114,8 @@ class AllowPacks
 
             $data[]    = [
                 'key' => $key,
-                'title' => __('api.' . $key . '_title'),
+                'title' => __('api.' . $key . '_title',[],'ar'),
+                'title_en' => __('api.' . $key . '_title',[],'en'),
                 'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'ar'),
                 'description_en' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'en'),
                 'is_active' => $this->isPackUsedAndExist($value),
