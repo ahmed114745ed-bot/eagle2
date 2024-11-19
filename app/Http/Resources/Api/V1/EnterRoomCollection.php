@@ -71,7 +71,7 @@ class EnterRoomCollection extends JsonResource
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'        => @$owner->UserVip?->level ?? null,
-            'owner_country'        => new CountryResource(@$owner),
+            'owner_country'        => new CountryResource(@$owner->country),
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
             'password_status'     => !($this->room_pass == ""),
