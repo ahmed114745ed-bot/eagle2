@@ -70,7 +70,7 @@ class EnterRoomCollection extends JsonResource
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
-            'owner_vip_id'        => @$owner->UserVip?->id ?? null,
+            'owner_vip_level'        => @$owner->UserVip?->level ?? null,
             'owner_country'        => new CountryResource(@$owner),
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
