@@ -65,19 +65,25 @@ class AchievementsLevelsController extends MainController
         $grid->column('target', __('Target'));
         $grid->column('target_type', __('Target type'));
 
-        $grid->column('valid_image', __('Valid image'))->display(function ($value) {
-            $value = getDriverUrl() . '/' . $value;
-            return "<img src='$value' width='80' height='80'>";
+        $grid->column('valid_image', __('Valid image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('invalid_image', __('Invalid image'))->display(function ($value) {
-            $value = getDriverUrl() . '/' . $value;
-            return "<img src='$value' width='80' height='80'>";
+        $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-
         $grid->column('ar_description', __('ar_description'));
         $grid->column('en_description', __('en_description'));
 
         $grid->disableExport();
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
