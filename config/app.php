@@ -212,7 +212,6 @@ return [
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
-
     ],
 
     /*

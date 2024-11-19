@@ -245,7 +245,7 @@ class AuthController extends Controller
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
 
-    
+
 
     public function canLogin($user)
     {

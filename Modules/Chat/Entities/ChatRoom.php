@@ -33,4 +33,11 @@ class ChatRoom extends Model
     public function userTwo(){
         return $this->belongsTo(User::class,'user_id2');
     }
+
+    public function scopeBetweenUsers($query, $userId, $otherUserId){
+
+        return $query->where('user_id', $userId)->where('user_id2', $otherUserId)
+        ->orWhere('user_id', $otherUserId)->where('user_id2', $userId);
+
+    }
 }
