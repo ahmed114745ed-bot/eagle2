@@ -13,22 +13,6 @@ class ChatRepository
         return ChatRoom::BetweenUsers($userId, $userId2)->first();
     }
 
-    public function getUserByUUID($uuid){
-
-        $chats = ChatRoom::where(function($q) use($uuid){
-            $q->when($uuid, function($qf) use($uuid){
-                $qf->whereHas('userOne', function($qq) use($uuid){
-                    $qq->where('uuid', 'like', "%$uuid%");
-                })
-                ->orWhereHas('userTwo', function($qq2) use($uuid){
-                    $qq2->where('uuid', 'like', "%$uuid%");
-                });
-            });
-        })->get();
-
-        return $chats;
-    }
-
     public function getUserChatRooms(int $userId): array
     {
         return ChatRoom::where('user_id', $userId)

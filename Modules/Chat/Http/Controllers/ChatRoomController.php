@@ -22,24 +22,6 @@ class ChatRoomController extends Controller
 
     }
 
-    public function findUserByUUID(Request $request){
-
-        $uuid = $request->keyword;
-
-        $users = $this->chatService->getUserByUUID($uuid);
-
-
-        return [
-            'success' => true,
-            'message' => 'successfully',
-            'data' => [
-                'chat' => ChatRoomResource::collection($users)
-            ],
-            'status' => 200
-        ];
-
-    }
-
     public function inviteRoom(Request $request)
     {
 
@@ -73,8 +55,9 @@ class ChatRoomController extends Controller
 
     public function index(Request $request)
     {
+        $uuid = $request->keyword;
+        $response = $this->chatRoomService->getChatRooms($request->user(), $uuid);
 
-        $response = $this->chatRoomService->getChatRooms($request->user());
 
         if (!$response['success']) {
             return response()->json($response['message'], $response['status']);
