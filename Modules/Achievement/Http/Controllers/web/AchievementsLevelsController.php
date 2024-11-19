@@ -22,7 +22,7 @@ class AchievementsLevelsController extends MainController
      * @return Grid
      */
 
-    public function create(Content $content, $id = null)
+    public function create2(Content $content, $id = null)
     {
 
         $id_achi = $id;
@@ -34,7 +34,7 @@ class AchievementsLevelsController extends MainController
             ->body(view('admin/grid/users/addAchievementLevel', compact('id_achi', 'targetTypes')));
     }
 
-    public function create2(Content $content)
+    public function create(Content $content)
     {
         return $content
             ->header(trans('admin.create'))
@@ -48,7 +48,7 @@ class AchievementsLevelsController extends MainController
         return $this->form()->update($id);
     }
 
-    public function edit2($id, Content $content)
+    public function edit($id, Content $content)
     {
         $id = request()->route('id');
         return $content
@@ -67,28 +67,36 @@ class AchievementsLevelsController extends MainController
             ->description(trans('admin.description'))
             ->body(view('admin/grid/users/addAchievementLeveledit', compact('id_achi', 'targetTypes')));
     }
+    public function index(Content $content)
+    {
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->body($this->grid());
+    }
 
 
     protected function grid()
     {
         $grid = new Grid(new AchievementLevel());
-        $grid->disableRowSelector();
-        $id = request()->input('achievement_id');
-        if (!$id) {
-            return  redirect()->route(nameRoute('admin.achievements.index'));
-        }
-        $grid->model()->where('achievement_id', $id);
+        $achievement_id = request('achievement_id');
+       // $grid->disableRowSelector();
+       // $id = request()->input('achievement_id');
+        // if (!$id) {
+        //     return  redirect()->route(nameRoute('admin.achievements.index'));
+        // }
+        $grid->model()->where('achievement_id', $achievement_id);
 
         $grid->column('id', __('Id'));
         $grid->column('achievement.type', __('Achievement'));
         $grid->column('target', __('Target'));
         $grid->column('target_type', __('Target type'));
 
-        $grid->column('valid_image', __('Valid image'))->display(function ($value) use ($id) {
+        $grid->column('valid_image', __('Valid image'))->display(function ($value)  {
             $value = getDriverUrl() . '/' . $value;
             return "<img src='$value' width='80' height='80'>";
         });
-        $grid->column('invalid_image', __('Invalid image'))->display(function ($value) use ($id) {
+        $grid->column('invalid_image', __('Invalid image'))->display(function ($value)  {
             $value = getDriverUrl() . '/' . $value;
             return "<img src='$value' width='80' height='80'>";
         });
@@ -104,23 +112,23 @@ class AchievementsLevelsController extends MainController
         // $grid->column('deleted_at', __('Deleted at'));
 
 
-        $grid->disableCreateButton();
+       // $grid->disableCreateButton();
         $grid->disableExport();
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="achievement-levels/create/' . request()->input('achievement_id') . '" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> New</a>');
-        });
-        $grid->actions(function ($actions) {
-            // $actions->disableEdit();
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $tools->append('<a href="achievement-levels/create/' . request()->input('achievement_id') . '" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> New</a>');
+        // });
+        // $grid->actions(function ($actions) {
+        //     // $actions->disableEdit();
 
 
-            $actions->append('<a href="">gdfgdfg</a>');
-        });
+        //     $actions->append('<a href="">gdfgdfg</a>');
+        // });
 
-        if ($id) {
+        // if ($id) {
             return $grid;
-        } else {
-            return route(nameRoute('admin.achievements'));
-        }
+        // } else {
+        //     return route(nameRoute('admin.achievements'));
+        // }
     }
 
     /**
@@ -214,7 +222,7 @@ class AchievementsLevelsController extends MainController
     protected function form()
     {
         $form = new Form(new AchievementLevel());
-        $form->hidden('achievement_id')->value(request('id'));
+        $form->hidden('achievement_id')->value(request('achievement_id'));
         $form->number('target', __('Target'))->rules('required');
         $form->select('target_type', __('Target type'))->options(function ($value) {
             return collect(TargetType::cases())
@@ -230,10 +238,6 @@ class AchievementsLevelsController extends MainController
         })->rules('required');
         $form->textarea('ar_description', 'Description Ar');
         $form->textarea('en_description', 'Description En');
-        $form->saved(function (Form $form) {
-            $route = url('admin/achievements');
-            return redirect($route);
-        });
         return $form;
     }
 }
