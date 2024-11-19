@@ -19,7 +19,7 @@ class CustomNotification
 {
     public function appName($lang)
     {
-        return $lang == 'ar' ? config('app.name') : config('app.name_en');
+        return $lang == 'ar' ? config('app.name_ar') : config('app.name_en');
     }
 
     public function senderLevel(int $userId)
@@ -452,7 +452,7 @@ class CustomNotification
 
 
         Common::send_firebase_notification($usersTokenEn, config('app.name_en'), $body_en, icon: $icon, data: $data, messageType: 'family-level-upgrade');
-        Common::send_firebase_notification($usersTokenAr, config('app.name'), $body_ar, icon: $icon, data: $data, messageType: 'family-level-upgrade');
+        Common::send_firebase_notification($usersTokenAr, config('app.name_ar'), $body_ar, icon: $icon, data: $data, messageType: 'family-level-upgrade');
     }
 
     public function wareVip(User $user, $duration, $name, $image)
