@@ -129,8 +129,8 @@ class AchievementsLevelsController extends MainController
         $form->file('invalid_image', trans('Invalid image'))->name(function () {
             return 'svga_' . Str::random(6);
         })->rules('required');
-        $form->textarea('ar_description', 'Description Ar');
-        $form->textarea('en_description', 'Description En');
+        $form->textarea('ar_description', __('ar_description'));
+        $form->textarea('en_description', __('en_description'));
         return $form;
     }
 }
