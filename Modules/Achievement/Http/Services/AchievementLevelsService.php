@@ -245,11 +245,11 @@ class AchievementLevelsService
         if ($notificationIds == null || count($notificationIds) < $this->countTargets) return;
 
         if (count($notificationIds[0]) > 0) {
-            Common::send_firebase_notification($notificationIds[0], env('APP_NAME'), 'Congratulation you achieve new monthly achievement ends at ' . Carbon::now()->endOfMonth()->shortAbsoluteDiffForHumans());
+            Common::send_firebase_notification($notificationIds[0], config('app.name_en'), 'Congratulation you achieve new monthly achievement ends at ' . Carbon::now()->endOfMonth()->shortAbsoluteDiffForHumans());
         }
 
         if (count($notificationIds[1]) > 0) {
-            Common::send_firebase_notification($notificationIds[1], env('APP_NAME'), 'تهانينا لقد ربحت وسام جديد دائم 🥇');
+            Common::send_firebase_notification($notificationIds[1],config('app.name_ar'), 'تهانينا لقد ربحت وسام جديد دائم 🥇');
         }
     }
 

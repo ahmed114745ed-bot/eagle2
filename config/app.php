@@ -41,6 +41,9 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'name_en' => env('APP_NAME_EN', 'Laravel'),
+    'name_ar' => env('APP_NAME_AR', 'لارافيل'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -213,7 +216,6 @@ return [
         App\Providers\ConfigServiceProvider::class,
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-
 
     ],
 
