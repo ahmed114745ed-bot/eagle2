@@ -6,6 +6,7 @@
         --text-primary-color: {{ config('themes.textPrimaryColor') }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
         --background-image: {{ config('themes.backgroundImage') }};
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
@@ -98,6 +99,12 @@
         border-top: 3px solid var(--second-alpha) !important;
         border-radius: 20px!important;
         padding: 15px;
+
+    }
+
+    .table {
+        background: var(--table-background-color) !important;
+        
 
     }
 
