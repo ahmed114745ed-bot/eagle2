@@ -1551,5 +1551,12 @@
     "integer":"رقم",
     "yes_or_no":"نعم و لا",
     "true_and_false":"ترو و فولس",
-    "select":"اختيار"
+    "select":"اختيار",
+    "Valid image" : "صورة صالحة",
+    "Invalid image":"صورة غير صالحة",
+    "redirect_button":"زر إعادة التوجيه",
+    "Achievement":" الويسام",
+    "Target type":"نوع الهدف",
+    "ar_description":" وصف بالعربى",
+    "en_description" : " وصف بالانجلش"
 }
