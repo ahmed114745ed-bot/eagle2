@@ -18,10 +18,10 @@ class ChatRepository
         $chats = ChatRoom::where(function($q) use($uuid){
             $q->when($uuid, function($qf) use($uuid){
                 $qf->whereHas('userOne', function($qq) use($uuid){
-                    $qq->where('uuid', $uuid);
+                    $qq->where('uuid', 'like', "%$uuid%");
                 })
                 ->orWhereHas('userTwo', function($qq2) use($uuid){
-                    $qq2->where('uuid', $uuid);
+                    $qq2->where('uuid', 'like', "%$uuid%");
                 });
             });
         })->get();
