@@ -20,4 +20,9 @@ class BlackList extends Model
     {
         return $this->belongsTo(User::class,'from_uid');
     }
+
+    public function scopeBetweenUsers($query, $userId, $otherUserId){
+        return $query->where("user_id", $userId)->where("from_uid", $otherUserId)
+        ->orwhere("user_id", $otherUserId)->where("from_uid",$userId);
+    }
 }

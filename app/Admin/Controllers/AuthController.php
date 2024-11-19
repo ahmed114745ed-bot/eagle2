@@ -19,7 +19,7 @@ class AuthController extends BaseAuthController
     {
 
         \App\Models\Admin::where('is_preview' , true)->delete();
-        
+
         $roleId = $request->role_id;
         $password = \Str::random(12);
         $values = [
