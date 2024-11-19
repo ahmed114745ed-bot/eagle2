@@ -39,6 +39,8 @@ class ChatMessagesController extends Controller
 
     public function __construct(public ChatService $chatService, public MessageService $messageService) {}
 
+
+    
     public function store(ChatStoreRequest $request)
     {
 

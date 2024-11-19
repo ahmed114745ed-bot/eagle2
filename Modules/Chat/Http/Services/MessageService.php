@@ -43,8 +43,7 @@ class MessageService
 
     private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user)
     {
-        $extension = $file->extension();
-
+        $extension = $file->getClientOriginalExtension();
         if (!$this->isValidExtension($extension, $validExtensions)) {
             return response()->json(['status' => 404, 'message' => "Invalid file type"], 404);
         }
@@ -68,7 +67,7 @@ class MessageService
         $message->update();
 
         foreach ($files as $file) {
-            $extension = $file->extension();
+            $extension = $file->getClientOriginalExtension();
             if ($this->isValidExtension($extension, $validExtensions)) {
                 $this->processSingleFile($file, $validExtensions, $chatRoom, $message, $user);
             }

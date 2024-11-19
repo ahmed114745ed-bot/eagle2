@@ -10,7 +10,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\Real;
-use Modules\Moment\Entities\ReportMoment;
+use Modules\Moment\Entities\ReportMoment as ReportMoment;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class ReportController extends Controller
@@ -29,9 +29,9 @@ class ReportController extends Controller
      * @return Renderable
      */
     public function create(Request $request )
-    {
-
-
+    {    
+     
+      
 
         return view('reals::create');
     }
@@ -39,40 +39,37 @@ class ReportController extends Controller
     /**
      * Store a newly created resource in storage.
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return Renderable
      */
-    public function store(Request $request, $momentId)
+    public function store(Request $request)
     {
-        $userId = Auth::id();
-        $data = [];
-        if (!$request['description']) return Common::apiResponse(false, 'please add description to help owner to remove this moment');
-        if (!$request['type']) return Common::apiResponse(false, 'please select type');
-        $data['description'] = $request['description'];
-        $data['type'] = $request['type'];
-        $data['moment_id'] = $momentId;
-        $data['Reporter_id'] = $userId;
-        $moment= Moment::where('id',$data['moment_id'])->first();
-        if(!$moment){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
-        }
-        $data['Reported_id'] = $moment->user_id;
+        $data =$request->all();
+        $data['Reporter_id'] = Auth::user()->uuid;
 
         $is_set_report = ReportMoment::where('moment_id',$data['moment_id'])->where('Reported_id',$data['Reported_id'])->where('Reporter_id',$data['Reporter_id'])->first();
         if($is_set_report){
             return Common::apiResponse(0, 'You already reported it', [], 402);
 
         }
+        
+        $moment= Moment::where('id',$data['moment_id'])->first();
+          if(!$moment){
+            return Common::apiResponse(0, 'Moment not founded', [], 402);
+        }
 
-        $user= User::withoutAppends()->where('id',$data['Reported_id'])->first();
+        $data['Reported_id'] = $moment->user_id;
+
+
+        $user= User::where('id',$data['Reported_id'])->first();
           if(!$user){
-            return Common::apiResponse(0, 'user not found', [], 402);
+            return Common::apiResponse(0, 'User not found', [], 402);
 
         }
-        $data['Reported_id'] = $user->id;
+        $data['Reported_id'] = $user->uuid;
 
         ReportMoment::create($data);
         if (!$data) {
-            return Common::apiResponse(0, 'try again later', [], 402);
+            return Common::apiResponse(0, 'try agane leter', [], 402);
         }
         return Common::apiResponse(1, 'successful','', 200);
 

@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('moment', function (Blueprint $table) {
-            $table->text('description')->change();
+        Schema::table('moment_user_comments', function (Blueprint $table) {
+            $table->text('comment')->change();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('moment', function (Blueprint $table) {
-            $table->string('description')->change();
+        Schema::table('moment_user_comments', function (Blueprint $table) {
+            $table->string('comment')->change();
         });
     }
 };

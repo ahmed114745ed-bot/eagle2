@@ -2,21 +2,18 @@
 
 namespace Modules\Moment\Http\Controllers;
 
-use DB;
-use App\Models\Gift;
-use App\Models\User;
+use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Exceptions\NotInfMoneyException;
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Models\Gift;
 use App\Models\GiftLog;
+use App\Models\User;
+use DB;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use GuzzleHttp\Promise\Utils;
 use Illuminate\Routing\Controller;
 use Modules\Moment\Entities\Moment;
-use App\Classes\Gifts\SendGiftService;
-use App\Exceptions\NotInfMoneyException;
-use Illuminate\Contracts\Support\Renderable;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Facades\CustomNotification;
-use Modules\Moment\Transformers\MomentGiftsResource;
 
 class MomentUserGiftsController extends Controller
 {
@@ -176,6 +173,7 @@ class MomentUserGiftsController extends Controller
         GiftLog::query()->create($info);
         CustomNotification::sendMomentGift($senderUser, $gift, $receivedUser,$momentId);
 
+
     }
 
     public function getGifts($id)
@@ -188,6 +186,7 @@ class MomentUserGiftsController extends Controller
       $data = $moment->gifts()->select('gifts.img', DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
       ->groupBy('gifts.id', 'gifts.img', 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id' )->orderByDesc('num_gift')
       ->get();
+
 
       return Common::apiResponse(1, 'successful', $data, 200);
     }

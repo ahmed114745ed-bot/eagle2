@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Repositories;
 
+use App\Models\User;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 

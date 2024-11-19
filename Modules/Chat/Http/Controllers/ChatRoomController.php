@@ -10,15 +10,18 @@ use Modules\Chat\Entities\ChatRoom;
 // use Modules\Chat\Entities\Follow;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Services\ChatRoomService;
+use Modules\Chat\Http\Services\ChatService;
 
 class ChatRoomController extends Controller
 {
 
-    public function __construct(public ChatRoomService $chatRoomService)
+    public function __construct(public ChatRoomService $chatRoomService, public ChatService $chatService)
     {
 
     }
+
     public function inviteRoom(Request $request)
     {
 
@@ -52,8 +55,9 @@ class ChatRoomController extends Controller
 
     public function index(Request $request)
     {
+        $uuid = $request->keyword;
+        $response = $this->chatRoomService->getChatRooms($request->user(), $uuid);
 
-        $response = $this->chatRoomService->getChatRooms($request->user());
 
         if (!$response['success']) {
             return response()->json($response['message'], $response['status']);

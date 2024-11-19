@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MomentFollwedResource extends JsonResource
+class MomentfollwedResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,7 +18,7 @@ class MomentFollwedResource extends JsonResource
     {
 
         $moment = $this->moment;
-        $level  = Common::level_center(@$this->moment->user);
+        $level  = Common::level_center(@$this->moment->user->id);
         if (gettype($level) == 'array') {
             $receiver_level = $level['receiver_level'] ?? 0;
             $sender_level   = $level['sender_level'] ?? 0;

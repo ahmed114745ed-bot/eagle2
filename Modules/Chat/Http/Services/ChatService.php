@@ -24,6 +24,9 @@ class ChatService
         $this->blacklistRepository = $blacklistRepository;
     }
 
+    public function getUserByUUID($uuid){
+        return $this->chatRepository->getUserByUUID($uuid);
+    }
     public function isUserBlocked($userId, $fromUserId)
     {
         return $this->blacklistRepository->isUserBlocked($userId, $fromUserId);
