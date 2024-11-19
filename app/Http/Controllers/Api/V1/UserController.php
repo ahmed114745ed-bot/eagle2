@@ -404,15 +404,17 @@ class UserController extends Controller
                 Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img2', true) ?: Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img1', true);
             return [
                 'id'           => $result->sender_id,
-                'name'         => $result->sender->name,
+                'uuid'         => $result->sender?->uuid,
+                'name'         => $result->sender?->name,
                 'image'        => $image,
-                'gender'       => $result->sender->gender,
+                'gender'       => $result->sender?->gender,
                 'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
                 'sender_level' => $result->sender->total_sender_level ?? 0,
                 'total'        => $currentTotal,
                 'total_diff'   => $totalDiff,
                 'frame'        => $frame,
                 'frame_id'     => $frame != '' ? @$result->sender->dress_1 : 0,
+                'vip'     => $result->sender?->userVip?->level,
             ];
         })->all();
 
