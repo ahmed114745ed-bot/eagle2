@@ -22,7 +22,7 @@ class AchievementsLevelsController extends MainController
      * @return Grid
      */
 
-    public function create2(Content $content, $id = null)
+    public function create(Content $content, $id = null)
     {
 
         $id_achi = $id;
@@ -34,7 +34,7 @@ class AchievementsLevelsController extends MainController
             ->body(view('admin/grid/users/addAchievementLevel', compact('id_achi', 'targetTypes')));
     }
 
-    public function create(Content $content)
+    public function create2(Content $content)
     {
         return $content
             ->header(trans('admin.create'))
@@ -48,7 +48,7 @@ class AchievementsLevelsController extends MainController
         return $this->form()->update($id);
     }
 
-    public function edit($id, Content $content)
+    public function edit2($id, Content $content)
     {
         $id = request()->route('id');
         return $content
@@ -57,7 +57,7 @@ class AchievementsLevelsController extends MainController
             ->body($this->form()->edit($id));
     }
 
-    public function edit2($id, Content $content)
+    public function edit1($id, Content $content)
     {
         $id_achi = $id;
         $targetTypes = TargetType::cases();
