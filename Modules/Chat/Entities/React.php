@@ -26,4 +26,10 @@ class React extends Model
         return $this->belongsTo(ChatMessage::class);
     }
 
+    public function scopeFindReact($query, $chatRoomId, $messageId, $userId)
+    {
+        return $query->where('chat_room_id', $chatRoomId)
+                     ->where('chat_message_id', $messageId)
+                     ->where('user_id', $userId);
+    }
 }

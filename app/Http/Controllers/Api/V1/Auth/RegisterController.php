@@ -86,7 +86,7 @@ class RegisterController extends Controller
             return Common::apiResponse(false, __('api_responses.invalid_code'));
         }
         $isValid  = $whatsappOtpService->isValidate($phone, $request->code);
-        
+
         \Log::info('isValid:', ['isValid' => $isValid]);
         error_log('isValid: ' . ($isValid ? 'true' : 'false'));
 

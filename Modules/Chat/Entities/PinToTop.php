@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class PinToTop extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 }

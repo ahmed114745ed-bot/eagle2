@@ -6,8 +6,6 @@ use App\Http\Controllers\addTOjesonController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes

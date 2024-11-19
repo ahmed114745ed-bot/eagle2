@@ -5,6 +5,7 @@ namespace Modules\Chat\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
+
 class ChatServiceProvider extends ServiceProvider
 {
     /**
