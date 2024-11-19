@@ -186,8 +186,8 @@ class GiftController extends MainController
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'));
         $form->currency('price', __('price'))->symbol('💎');
         $form->file('img', __('img'));
-        $form->file('show_img', __('show_img'))->name(function () {
-             return 'svga_' . Str::random(6);
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+             return 'svga_' . Str::random(6). '.' . $file->guessExtension();
         })->required();
         $form->select('image_type', __('image_type'))->options(
             [

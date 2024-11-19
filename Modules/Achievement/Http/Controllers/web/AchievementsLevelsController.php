@@ -128,8 +128,12 @@ class AchievementsLevelsController extends MainController
         $form->select('target_type', __('Target type'))->options(function ($value) {
             return TargetType::getTranslatedOptions();
         })->rules('required');
-        $form->file('valid_image', trans('Valid image'))->rules('required');
-        $form->file('invalid_image', trans('Invalid image'))->rules('required');
+        $form->file('valid_image', trans('Valid image'))->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->guessExtension();
+        })->rules('required');
+        $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->guessExtension();
+        })->rules('required');
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
         return $form;

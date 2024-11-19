@@ -141,8 +141,8 @@ class SpecialWareController extends  MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png')->rules ('required');
-        $form->file('img2', trans('svg'))->name(function () {
-            return 'svga_' . Str::random(6);
+        $form->file('img2', trans('svg'))->name(function ($file) {
+            return 'svga_' . Str::random(6). '.' . $file->guessExtension();
        })->rules ('required');
         $form->color('color', trans('color'));
 

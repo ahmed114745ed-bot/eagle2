@@ -189,7 +189,7 @@ class DedicateWareController extends MainController
         $form->image('show_img', trans('img'))->default('1.png')->rules('required');
 
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function () {
+        $form->file('img2', trans('svg'))->name(function ($file) {
             return 'svga_' . Str::random(6);
        });
         $form->select('image_type', __('image_type'))->options (

@@ -185,8 +185,8 @@ class WareVipController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'))->name(function () {
-            return 'svga_' . Str::random(6);
+        $form->file('img2', trans('svg'))->name(function ($file) {
+            return 'svga_' . Str::random(6). '.' . $file->guessExtension();
        });
         $form->select('image_type', __('image_type'))->options (
             [
