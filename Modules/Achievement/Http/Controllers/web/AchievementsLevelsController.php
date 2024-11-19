@@ -72,7 +72,7 @@ class AchievementsLevelsController extends MainController
         });
 
         $grid->column('ar_description', __('ar_description'));
-        $grid->column('en_description', __('ar_description'));
+        $grid->column('en_description', __('en_description'));
 
 
 
