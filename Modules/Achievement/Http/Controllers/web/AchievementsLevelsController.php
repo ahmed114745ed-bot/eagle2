@@ -129,10 +129,10 @@ class AchievementsLevelsController extends MainController
             return TargetType::getTranslatedOptions();
         })->rules('required');
         $form->file('valid_image', trans('Valid image'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->guessExtension();
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->rules('required');
         $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->guessExtension();
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->rules('required');
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
