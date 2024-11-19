@@ -10,6 +10,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Achievement\Enums\TargetType;
 use Modules\Achievement\Entities\AchievementLevel;
+use Encore\Admin\Facades\Admin;
 
 class AchievementsLevelsController extends MainController
 {
@@ -125,16 +126,10 @@ class AchievementsLevelsController extends MainController
         $form->hidden('achievement_id')->value(request('achievement_id'));
         $form->number('target', __('Target'))->rules('required');
         $form->select('target_type', __('Target type'))->options(function ($value) {
-            return collect(TargetType::cases())
-                ->mapWithKeys(fn($case) => [$case->value => ucfirst($case->name)])
-                ->toArray();
+            return TargetType::getTranslatedOptions();
         })->rules('required');
-        $form->file('valid_image', trans('Valid image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->rules('required');
-        $form->file('invalid_image', trans('Invalid image'))->name(function () {
-            return 'svga_' . Str::random(6);
-        })->rules('required');
+        $form->file('valid_image', trans('Valid image'))->rules('required');
+        $form->file('invalid_image', trans('Invalid image'))->rules('required');
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
         return $form;

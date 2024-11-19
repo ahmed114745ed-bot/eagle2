@@ -1558,5 +1558,9 @@
     "Achievement":" الويسام",
     "Target type":"نوع الهدف",
     "ar_description":" وصف بالعربى",
-    "en_description" : " وصف بالانجلش"
+    "en_description" : " وصف بالانجلش",
+    "default" :" عادى",
+    "week":"أسبوع",
+    "monthly":"شهريا",
+    "yearly":"سنوي"
 }
