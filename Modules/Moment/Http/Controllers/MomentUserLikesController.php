@@ -2,19 +2,17 @@
 
 namespace Modules\Moment\Http\Controllers;
 
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use Database\Seeders\config;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
-use Modules\Moment\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
-use Modules\Moment\Entities\MomentLikes;
-use Illuminate\Contracts\Support\Renderable;
-use Modules\Moment\Http\Services\MomentService;
+use Modules\Moment\Entities\Moment;
 use Modules\Moment\Http\Services\MomentLikesService;
+use Modules\Moment\Http\Services\MomentService;
 use Modules\Moment\Transformers\MomentlikesResource;
+use Modules\Reals\Transformers\LikesResource;
 
 class MomentUserLikesController extends Controller
 {
@@ -35,7 +33,7 @@ class MomentUserLikesController extends Controller
         $moment = Moment::where('id',$moment_id)->first();
 
         if (!$moment){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
+            return Common::apiResponse(0, 'moment not founded', [], 402);
         }
 
         $paginateLikes = $this->momentLikesService->showLikes($moment);
@@ -87,25 +85,22 @@ class MomentUserLikesController extends Controller
         // return Common::apiResponse(1, 'success');
         $user = Auth::user();
         try {
-            $moment =  Moment::findOrFail($moment_id);
+            $moment = $this->momentsService->findOrFail($moment_id);
         } catch (\Exception $e) {
             $moment = null;
         }
         if ($moment == null){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
+            return Common::apiResponse(0, 'moment not founded', [], 402);
         }
 
         $add =  $this->momentLikesService->likeOrUnLike( $moment, $user);
         if ($add == 'un Like'){
-            return Common::apiResponse(1, 'success', [], 200);
+            return Common::apiResponse(1, 'success Un Like', [], 200);
         }
         if ($add == 'Like'){
-
             CustomNotification::likeMoment($moment, $user);
-            return Common::apiResponse(1, 'success', [], 200);
+             return Common::apiResponse(1, 'success Like', [], 200);
         }
-
-
         return Common::apiResponse(1, 'success', [], 200);
     }
 
