@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Moment\Http\Controllers\MomentController;
 use Modules\Moment\Http\Controllers\MomentUserGiftsController;
-use Modules\Moment\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,14 +16,14 @@ use Modules\Moment\Http\Controllers\ReportController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan','appFeatureEnable:moment'])->group (
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])->group (
     function (){
             Route::apiResource('/moment', 'MomentController');
             Route::apiResource('moment/{moment_id}/comment', 'MomentUserCommentController');
             Route::apiResource('moment/{moment_id}/like', 'MomentUserLikesController');
             Route::apiResource('moment/{moment_id}/gift/', 'MomentUserGiftsController');
 //            Route::apiResource('moment/{moment_id}/users/gifts/', 'MomentUserGiftsController');
-            Route::post('moment/{moment_id}/report', [ReportController::class, 'store']);
+            Route::apiResource('/report', 'ReportController');
             Route::get('moments/{id}/gifts',  [MomentUserGiftsController::class, 'getGifts']);
 
 
