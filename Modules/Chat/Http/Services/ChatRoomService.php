@@ -93,10 +93,9 @@ class ChatRoomService
             ->get();
     }
 
-    public function getChatRooms($user)
+    public function getChatRooms($user, $uuid)
     {
         $user = User::with('chats')->find($user->id);
-
         if (!$user) {
             return [
                 'success' => false,
@@ -114,15 +113,27 @@ class ChatRoomService
                 'chat_rooms.*',
                 DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at')
             )
-            ->where(function ($query) use ($topChats, $user) {
-                $query->whereNotIn('chat_rooms.id', $topChats)
-                    ->where('chat_rooms.user_id', $user->id)
-                    ->where('chat_rooms.type', 'friends');
+            ->where(function($q) use($topChats, $user){
+                $q->where(function ($query) use ($topChats, $user) {
+                    $query->whereNotIn('chat_rooms.id', $topChats)
+                        ->where('chat_rooms.user_id', $user->id)
+                        ->where('chat_rooms.type', 'friends');
+                })
+                ->orWhere(function ($query) use ($topChats, $user) {
+                    $query->whereNotIn('chat_rooms.id', $topChats)
+                        ->where('chat_rooms.user_id2', $user->id)
+                        ->where('chat_rooms.type', 'friends');
+                });
             })
-            ->orWhere(function ($query) use ($topChats, $user) {
-                $query->whereNotIn('chat_rooms.id', $topChats)
-                    ->where('chat_rooms.user_id2', $user->id)
-                    ->where('chat_rooms.type', 'friends');
+            ->when($uuid, function($q) use($uuid){
+                $q->where(function($q) use($uuid){
+                        $q->whereHas('userOne', function($qq) use($uuid){
+                            $qq->where('uuid', 'like', "%$uuid%");
+                        })
+                        ->orWhereHas('userTwo', function($qq2) use($uuid){
+                            $qq2->where('uuid', 'like', "%$uuid%");
+                        });
+                    });
             })
             ->groupBy([
                 'chat_rooms.id',
