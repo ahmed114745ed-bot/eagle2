@@ -10,15 +10,36 @@ use Modules\Chat\Entities\ChatRoom;
 // use Modules\Chat\Entities\Follow;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Services\ChatRoomService;
+use Modules\Chat\Http\Services\ChatService;
 
 class ChatRoomController extends Controller
 {
 
-    public function __construct(public ChatRoomService $chatRoomService)
+    public function __construct(public ChatRoomService $chatRoomService, public ChatService $chatService)
     {
 
     }
+
+    public function findUserByUUID(Request $request){
+
+        $uuid = $request->keyword;
+
+        $users = $this->chatService->getUserByUUID($uuid);
+
+
+        return [
+            'success' => true,
+            'message' => 'successfully',
+            'data' => [
+                'chat' => ChatRoomResource::collection($users)
+            ],
+            'status' => 200
+        ];
+
+    }
+
     public function inviteRoom(Request $request)
     {
 

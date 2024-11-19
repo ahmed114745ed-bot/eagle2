@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Repositories;
 
+use App\Models\User;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 
@@ -10,6 +11,22 @@ class ChatRepository
     public function findChatRoomBetweenUsers($userId, $userId2)
     {
         return ChatRoom::BetweenUsers($userId, $userId2)->first();
+    }
+
+    public function getUserByUUID($uuid){
+
+        $chats = ChatRoom::where(function($q) use($uuid){
+            $q->when($uuid, function($qf) use($uuid){
+                $qf->whereHas('userOne', function($qq) use($uuid){
+                    $qq->where('uuid', $uuid);
+                })
+                ->orWhereHas('userTwo', function($qq2) use($uuid){
+                    $qq2->where('uuid', $uuid);
+                });
+            });
+        })->get();
+
+        return $chats;
     }
 
     public function getUserChatRooms(int $userId): array

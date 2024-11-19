@@ -14,12 +14,14 @@ Route::get('user-status/{id}',   [PusherController::class,'user_status']);
 
 Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization'])->group(function () {
     //Chat Room
+    Route::get('/Chat-room/search-user', [ChatRoomController::class, 'findUserByUUid']);
     Route::resource('/Chat-room', ChatRoomController::class);
     Route::post('/Chat-room/accept-request', [ChatRoomController::class,'accept_request']);
     Route::get('/close-chat', [ChatRoomController::class,'close_Chat']);
     Route::resource('/Chat-PinToTop', PinToTopController::class);
 
     //Chat Message
+
     Route::resource('/Chat-Message', ChatMessagesController::class);
     Route::post('/delete-Chat-Message', [ChatMessagesController::class,'deleteForAll']);
     Route::post('/delete-Chat-Message-ForMe', [ChatMessagesController::class,'deleteForMe']);
