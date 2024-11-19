@@ -102,8 +102,9 @@
 
     }
 
-    .table {
+    .table .table {
         background: var(--table-background-color) !important;
+        color: var(--table-background-color) !important;
         
 
     }
