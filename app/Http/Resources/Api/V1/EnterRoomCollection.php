@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
+use App\Http\Resources\CountryResource;
 use App\Models\BoxUse;
 use App\Models\configesModel;
 use App\Models\Pk;
@@ -34,6 +35,8 @@ class EnterRoomCollection extends JsonResource
         $topUser = $this->getTopUser($this->uid);
 
         request()->type = 1;
+        $owner = $this->owner;
+        /** @var User $owner*/
         return [
             "id"                  => $this->id,
             "room_id_num"         => $this->numid,
@@ -51,7 +54,7 @@ class EnterRoomCollection extends JsonResource
             "microphone"          => $this->microphone,
             "room_welcome"        => $this->room_welcome,
             "session"             => $this->session,
-            "uuid"                => $this->owner?->uuid ?? '',
+            "uuid"                => $owner?->uuid ?? '',
             "room_family"         => is_null($this->family) ? new \stdClass() : [
                 'family_id'    => @$this->family->id ?? '',
                 'family_name'  => @$this->family->name ?? '',
@@ -65,8 +68,10 @@ class EnterRoomCollection extends JsonResource
             'admins'              => explode(',', $this->room_admin ?? ''),
             'owner_sound'         => $this->getOwnerSound($this->uid, $this->room_sound) ? 2 : 1,
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
-            'owner_name'          => @$this->owner->name ?? '',
-            'owner_avatar'        => @$this->owner->profile->avatar ?? '',
+            'owner_name'          => @$owner->name ?? '',
+            'owner_avatar'        => @$owner->profile->avatar ?? '',
+            'owner_vip_id'        => @$owner->UserVip?->id ?? null,
+            'owner_country'        => new CountryResource(@$owner),
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
             'password_status'     => !($this->room_pass == ""),
