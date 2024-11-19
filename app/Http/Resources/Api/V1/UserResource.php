@@ -112,18 +112,7 @@ class UserResource extends JsonResource
             'is_followed'            => $this->is_followed,
             'is_follow'            => $this->is_follow, // user data  ----
             'is_friend'            => $this->isFriends(),  //  -------
-            'now_room'             => [
-                'is_in_room'      => @$this->now_room_uid != 0,
-                'uid'             => @(int)$this->now_room_uid,
-                'is_mine'         => @$this->id == $this->now_room_uid,
-                'password_status' => $pass_status,
-                "id" => @$now_room->id,
-                "room_name" => @$now_room->room_name,
-                "room_cover" => @$now_room->room_cover,
-                "room_background" => @$now_room->final_room_image,
-                "mode" => @$now_room->mode,
-                'giftPrice' => @$now_room->session_string,
-            ], // user data
+            'now_room'             => $this->now_room_uid ? new NowRoomResource($now_room) : null, // user data
             'agency'               => @$agency_joined, // both  -------
             'family_id'            => @$this->family_id, // both   ----
             'family_data'          => @$f, // refactor   --------
