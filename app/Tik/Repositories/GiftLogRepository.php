@@ -68,15 +68,16 @@ class GiftLogRepository extends AbstractRepository
     {
         return $this->model->query()
         ->has('sender')
-        ->with('sender')
-        ->select('sender_id')
+        ->with('sender', 'receiver')
+        ->select('sender_id', \DB::raw('ANY_VALUE(receiver_id) AS receiver_id'))
         ->selectRaw('SUM(giftNum * giftPrice) AS total')
-        ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total')
+        ->selectRaw('CAST(SUM(giftNum * giftPrice) AS DECIMAL(10, 2)) AS total_decimal')
         ->where('receiver_id', $userId)
         ->groupBy('sender_id')
         ->orderByDesc('total')
         ->take(20)
         ->get();
+
     }
 
 }

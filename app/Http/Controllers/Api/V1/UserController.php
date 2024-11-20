@@ -396,6 +396,7 @@ class UserController extends Controller
 
         $previousTotal = null;
         $data          = $results->map(function ($result) use ($achievement, &$previousTotal) {
+
             $image         = optional(optional($result->sender)->profile)->avatar ?? '';
             $currentTotal  = $result->total;
             $totalDiff     = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
