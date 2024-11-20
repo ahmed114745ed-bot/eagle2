@@ -112,7 +112,7 @@ class UserResource extends JsonResource
             'is_followed'            => $this->is_followed,
             'is_follow'            => $this->is_follow, // user data  ----
             'is_friend'            => $this->isFriends(),  //  -------
-            'now_room'             => $this->now_room_uid ? new NowRoomResource($now_room) : null, // user data
+            'now_room'             =>  new NowRoomResource($this), // user data
             'agency'               => @$agency_joined, // both  -------
             'family_id'            => @$this->family_id, // both   ----
             'family_data'          => @$f, // refactor   --------
