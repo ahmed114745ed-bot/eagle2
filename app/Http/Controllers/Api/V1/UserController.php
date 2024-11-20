@@ -410,6 +410,7 @@ class UserController extends Controller
                 'gender'       => $result->sender?->gender,
                 'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
                 'sender_level' => $result->sender->total_sender_level ?? 0,
+                'receiver_level' => $result->receiver->total_received_level ?? 0,
                 'total'        => $currentTotal,
                 'total_diff'   => $totalDiff,
                 'frame'        => $frame,
