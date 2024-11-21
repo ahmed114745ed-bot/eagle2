@@ -22,6 +22,9 @@ class ChatRoomController extends Controller
 
     }
 
+    public function users_list(){
+        return Common::get_users_list();
+    }
     public function inviteRoom(Request $request)
     {
 

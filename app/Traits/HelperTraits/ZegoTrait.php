@@ -24,6 +24,36 @@ Trait ZegoTrait
         return $signature;
     }
 
+    public static function get_users_list(){
+
+        $url = 'https://rtc-api.zego.im';
+        $AppId = self::getConf ('zego_app_id');
+        $SignatureNonce = self::getSignatureNonce ();
+        $Timestamp = time();
+        $str = 	$AppId.$SignatureNonce.self::getConf('zego_server_secret').$Timestamp;;
+        $signature = md5($str);
+        $SignatureVersion = '2.0';
+        $params = [
+            'Action'=>'DescribeUserList',
+            'RoomId'=> 916,
+            'AppId'=> $AppId,
+            'SignatureNonce'=>$SignatureNonce,
+            'Timestamp'=>$Timestamp,
+            'Signature'=>$signature,
+            'SignatureVersion'=>$SignatureVersion,
+            //'IsTest'=>$IsTest
+        ];
+        $headers = [
+
+        ];
+        try {
+            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
+        }catch (\Exception $exception){
+
+        }
+
+        return null;
+    }
     public static function sendToZego($Action,$RoomId,$FromUserId,$MessageContent,$IsTest = 'false'){
         $url = 'https://rtc-api.zego.im';
         $AppId = self::getConf ('zego_app_id');
