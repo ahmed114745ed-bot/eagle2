@@ -13,6 +13,7 @@ use Modules\Chat\Http\Repositories\MessageRepository;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Traits\FfmpegTrait;
+use Modules\Public\Events\UnreadCounterIndividual;
 
 class MessageService
 {
@@ -165,6 +166,9 @@ class MessageService
         if ($user2->online == 1) {
             $status = ($user2->current_room_chat == $chatRoom->id) ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
+        } else {
+            //asdd TODO fire an event to increment unread messages by 1
+            event(new UnreadCounterIndividual($message,$user2,1));
         }
     }
 
