@@ -24,8 +24,9 @@ Dockerfile
 /nginx
 /data
 php.ini
-public/settings.json
-config/filesystems.php
-public/images/app-logo.png
+/public/settings.json
+/config/filesystems.php
+/public/images/app-logo.png
 gcp.json
-public/settings.json
+/public/settings.json
+/config/laravel-ffmpeg.php
