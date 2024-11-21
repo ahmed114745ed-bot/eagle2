@@ -35,6 +35,11 @@ class UserAchievementLevel extends Model
         return $this->belongsTo(Achievement::class, 'achievement_id');
     }
 
+    public function giftAchievement(): BelongsTo
+    {
+        return $this->belongsTo(GiftAchievement::class, 'gift_achievement_id');
+    }
+
     // public function achievement()
     // {
     //     return $this->belongsTo(Achievement::class, 'achievement_id');

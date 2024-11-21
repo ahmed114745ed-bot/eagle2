@@ -7,9 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\UserTarget;
 use App\Models\Ware;
-use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
@@ -20,15 +18,9 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function __construct ()
-    {
-
-    }
 
     public function index(Content $content)
     {
-
-
         return $content
             ->title('Dashboard')
             ->description('Description...')

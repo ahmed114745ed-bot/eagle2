@@ -165,10 +165,10 @@ class UserController extends MainController
         $grid->column('uuid', __('uuid used'))->display(function () {
             return $this->uuid . ' ' . $this->original_uuid;
         });
-        
+
 
         //        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
-        $grid->column('name3', __('Name'));//->display(function ($value){//attribute
+        $grid->column('name', __('Name'));//->display(function ($value){//attribute
          //   return $value??'undefined name';
         //});
 
@@ -460,7 +460,7 @@ class UserController extends MainController
             $actions->add(new DeletePackAction());
             $actions->add(new EditPackExpireAction());
         });
-       
+
         $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();
@@ -494,7 +494,7 @@ class UserController extends MainController
             $actions->add(new DeleteUserVipAction());
             //            $actions->add(new EditPackExpireAction());
         });
-        
+
         $grid->disablePagination();
         $grid->disableCreateButton();
         $grid->disableFilter();

@@ -68,19 +68,13 @@ class UserAchievementLevelController extends MainController
             return "<img src='$value' width='80' height='80'>";
         });
 
-        // $grid->column('gift_achievement_id', __('Gift achievement id'));
-        // $grid->column('unique_value', __('Unique value'));
-        // $grid->column('end_at', __('End at'));
-        // $grid->column('is_enable', __('Is enable'));
-       // $grid->column('is_enable',trans ('enable'))->states (Common::getSwitchStates ());
         $states = [
             'off'=>['value'=>0,'text'=>'no','color'=>'danger'],
             'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
         ];
         $grid->column('is_enable')->switch($states);
 
-        // $grid->column('created_at', __('Created at'));
-        // $grid->column('updated_at', __('Updated at'));
+        
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();

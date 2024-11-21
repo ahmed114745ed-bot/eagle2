@@ -13,7 +13,7 @@ class TargetPercentageController extends MainController
     public $permission_name = 'target-percentage';
     public function index(Content $content)
     {
-        $route = 'target-percentage';
+        $route = 'admin.target-percentage';
 
         $hours =  settings()->get('hours');
         $days =  settings()->get('days');
