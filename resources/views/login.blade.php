@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/flat/green.css") }}">
     <link rel="stylesheet" href="{{asset('css/dashboard.css')}}">
 
+    <!--@include('css.dynamic-style')-->
     <!--[if lt IE 9]>
     <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -30,7 +31,7 @@
     <div class="login-logo">
         <div><img src="{{asset('images/app-logo.png')}}" style="width: 150px;"></div>
         <div class="box-title">
-            <a href="{{ admin_url('/') }}" style="color: #25D366;">{{__('dashboard.login.title')}}</a>
+            <a href="{{ admin_url('/') }}" style="color: var(--green-color);">{{__('dashboard.login.title')}}</a>
         </div>
 
     </div>
@@ -75,7 +76,7 @@
             -->
         </form>
         <div class="language-switch text-center">
-            <a href="#" id="language-switcher" style="color: #25D366;">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
+            <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang')}}</span></a>
         </div>
 
     </div>

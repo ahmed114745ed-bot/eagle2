@@ -54,6 +54,7 @@ class UserRepository extends Repository
     public function updateOnlineTime(User $user, $currentTime)
     {
         $user->online_time = $currentTime;
+        $user->lan = app()->getLocale();
         $user->save();
     }
 

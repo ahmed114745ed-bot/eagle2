@@ -38,6 +38,7 @@ use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
+use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\TargetPercentageController;
@@ -110,6 +111,8 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+        Route::post('targe-percentage', [AddTargetToJsonController::class,'targetPercentage'])->name('target-percentage');
+
 
         $router->post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
         $router->post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');

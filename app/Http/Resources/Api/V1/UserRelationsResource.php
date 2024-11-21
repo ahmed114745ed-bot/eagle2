@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
+use App\Http\Resources\CountryResource;
 use App\Models\Follow;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -54,23 +55,25 @@ class UserRelationsResource extends JsonResource
             'id'             => @$this->id,
             'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
-            'uuid'                 => @$this->uuid, // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
                 'age'    => Carbon::parse(@$this->profile->birthday)->age,
                 'gender' => @$this->profile->gender ?? 1,
-                'country'=> @$this->profile->country?:''
+                'country'=> @$this->profile->country?:'',
             ],
+            'country'=> new CountryResource($this->resource),
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
-            'now_room'       => [
-                'is_in_room'      => @$this->now_room_uid != 0,
-                'uid'             => @$this->now_room_uid,
-                'is_mine'         => @$this->id == $this->now_room_uid,
-                'password_status' => $pass_status
-            ],
+            'now_room'             =>  new NowRoomResource($this)
+                        // [
+            //     'is_in_room'      => @$this->now_room_uid != 0,
+            //     'uid'             => @$this->now_room_uid,
+            //     'is_mine'         => @$this->id == $this->now_room_uid,
+            //     'password_status' => $pass_status
+            // ]
+            ,
             'vip'            => [
                 'level' => @$this->UserVip->level,
             ],

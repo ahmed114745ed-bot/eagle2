@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\RegisterRequest;
+use Google_Client;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-
+use Google\Client as GoogleClient;
 
 
 class AuthController extends Controller
@@ -73,6 +74,8 @@ class AuthController extends Controller
     {
         $globalKeys = [
             'is_multi' => @$request->is_multi ?? false,
+            'notification_id' => @$request->notification_id,
+
         ];
         switch ($request['type']) {
             case 'phone_pass':
@@ -80,7 +83,7 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request->google_id, 'device_token' => $request['device_token']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request->google_id, 'device_token' => $request['device_token'],'id_token' => $request['id_token']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
@@ -134,6 +137,8 @@ class AuthController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+        \Log::info('This is login from google :  ' . gettype($user). ' '. json_encode($user));
+
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
@@ -149,6 +154,10 @@ class AuthController extends Controller
         );
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
+    
+   
+
+    
 
     protected function loginWithApple($data)
     {
@@ -249,9 +258,8 @@ class AuthController extends Controller
 
     public function canLogin($user)
     {
-        if ($user->status == 1) {
-            return true;
-        }
-        return false;
+        $status = $user instanceof User ? $user->status : ($user['status'] ?? null);
+
+        return $status == 1;
     }
 }

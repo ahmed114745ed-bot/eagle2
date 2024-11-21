@@ -354,7 +354,7 @@ class UserCommon{
 
         Common::sendOfficialMessage ($user->id,__('تهانينا'),__('لقد حصلت على مستوى VIP جديد كهدية'));
         $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $title='تيك شات';
+        $title=config('app.name_ar');
         $body=__('لقد حصلت على مستوى VIP جديد كهدية') .$user->name ;
         Common::send_firebase_notification($tokens_notfacion,$title,$body);
 //            CustomNotification::vips($user, $expir, $vip->img);
@@ -377,7 +377,7 @@ class UserCommon{
                         (new UserCounterServices)->eventUser($user,'official-messages');
 
                         $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-                        $title='تيك شات';
+                        $title=config('app.name_ar');
                         $body=__('لقد حصلت على اهداء') .$user->name ;
                         Common::send_firebase_notification($tokens_notfacion,$title,$body);
                     }catch (\Exception $exception){

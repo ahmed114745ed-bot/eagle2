@@ -196,8 +196,8 @@ class UserController extends Controller
     public function my_data(Request $request)
     {
         $user = $request->user();
-       
-        $userWithMedals = $this->userService->processUserData($user, $request->header('device'), $request->header('lat'), $request->header('long'));
+
+        $userWithMedals = $this->userService->processUserData($user, $request->header('device_token'), $request->header('lat'), $request->header('long'));
 
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
@@ -396,6 +396,7 @@ class UserController extends Controller
 
         $previousTotal = null;
         $data          = $results->map(function ($result) use ($achievement, &$previousTotal) {
+
             $image         = optional(optional($result->sender)->profile)->avatar ?? '';
             $currentTotal  = $result->total;
             $totalDiff     = isset($previousTotal) ? $previousTotal - $currentTotal : 0;
@@ -404,15 +405,18 @@ class UserController extends Controller
                 Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img2', true) ?: Common::getUserDress($result->sender?->id, $result->sender?->dress_1, 4, 'img1', true);
             return [
                 'id'           => $result->sender_id,
-                'name'         => $result->sender->name,
+                'uuid'         => $result->sender?->uuid,
+                'name'         => $result->sender?->name,
                 'image'        => $image,
-                'gender'       => $result->sender->gender,
+                'gender'       => $result->sender?->gender,
                 'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
                 'sender_level' => $result->sender->total_sender_level ?? 0,
-                'total'        => $currentTotal,
+                'receiver_level' => $result->receiver->total_received_level ?? 0,
+                'total'        => numToString($currentTotal),
                 'total_diff'   => $totalDiff,
                 'frame'        => $frame,
                 'frame_id'     => $frame != '' ? @$result->sender->dress_1 : 0,
+                'vip'     => $result->sender?->userVip?->level,
             ];
         })->all();
 

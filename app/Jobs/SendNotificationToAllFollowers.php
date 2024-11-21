@@ -43,8 +43,8 @@ class SendNotificationToAllFollowers implements ShouldQueue
         $data['image'] = getDriverUrl(). '/'. $OwnerRoom->profile->avatar;
         $data['owner_id'] = $this->userId;
         $data['name'] = $OwnerRoom->name;
-        Common::send_firebase_notification($usersTokenEn,__('api.tik_chat', locale: 'en'), $body_en,$icon,$data, messageType: 'enter-room', );
-        Common::send_firebase_notification( $usersTokenAr,__('api.tik_chat', locale: 'ar'),$body_ar,$icon,$data,messageType: 'enter-room');
+        Common::send_firebase_notification($usersTokenEn,config('app.name_en'), $body_en,$icon,$data, messageType: 'enter-room', );
+        Common::send_firebase_notification( $usersTokenAr,config('app.name_ar'),$body_ar,$icon,$data,messageType: 'enter-room');
 
     }
 }

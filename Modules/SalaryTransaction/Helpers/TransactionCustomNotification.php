@@ -29,8 +29,8 @@ class TransactionCustomNotification
         $body_en = __('salaryTransaction::api_responses.request_added', ['user'=>$user->name_en], 'en');
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $title =__('salaryTransaction::api_responses.request_title');
-
-        Common::send_firebase_notification($tokens_notfacion, __('top chat'), $firebaseBody);
+        $titleAppName = ($user->lan == 'ar') ?  config('app.name_ar') : config('app.name_en');
+        Common::send_firebase_notification($tokens_notfacion, $titleAppName, $firebaseBody);
         Common::sendOfficialMessage($user->id, title: $body_en, content: $title, titleAr: $body_ar);
     }
 
@@ -64,8 +64,8 @@ class TransactionCustomNotification
 
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $title =__('salaryTransaction::api_responses.action_title');
-
-        Common::send_firebase_notification($tokens_notfacion, __('top chat'), $firebaseBody);
+        $titleAppName = ($user->lan == 'ar') ?  config('app.name_ar') : config('app.name_en');
+        Common::send_firebase_notification($tokens_notfacion,  $titleAppName, $firebaseBody);
         Common::sendOfficialMessage($user->id, title: $body_en, content: $title, titleAr: $body_ar);
     }
 

@@ -17,6 +17,9 @@ class HomeCarouselController extends Controller
         if ($request->type != null) {
             $items = $items->where('type', $request->type);
         }
+        if ($request->category == 'charge_event') {
+            $items = $items->where('event_type', 'charge_event');
+        }
         $items = $items->get();
         $data = HomeCarouselResource::collection($items);
         return Common::apiResponse(1, '', $data);

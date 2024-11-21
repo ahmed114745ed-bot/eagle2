@@ -28,14 +28,12 @@ class AchievementOneLevelsResource extends JsonResource
             'target_type' => $this->target_type,
             'levels' => $this->whenLoaded('levels', function () {
                 return $this->levels->map(function ($level) {
-                    $img= $level->invalid_image;
-                    if($level->enable == true){
-                        $img=$level->valid_image;
+                    $img = $level->invalid_image;
+                    if ($level->enable == true) {
+                        $img = $level->valid_image;
                     }
-                    $description=$level->en_description;
-                    if(app()->getLocale() == 'ar'){
-                        $description=$level->ar_description;
-                    }
+                    $description_en = $level->en_description;
+                    $description = $level->ar_description;
                     return [
                         'id' => $level->id,
                         'achievement_id' => $level->achievement_id,
@@ -48,6 +46,7 @@ class AchievementOneLevelsResource extends JsonResource
                         'deleted_at' => $level->deleted_at,
                         'enable' => $level->enable,
                         'description' => $description,
+                        'description_en' => $description_en,
 
                     ];
                 });

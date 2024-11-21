@@ -3,14 +3,11 @@
 namespace App\Admin\Controllers;
 
 use Carbon\Carbon;
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\HomeCarousel;
-use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class HomeCarouselController extends MainController
@@ -29,20 +26,19 @@ class HomeCarouselController extends MainController
     {
         $grid = new Grid(new HomeCarousel);
 
-        $grid->id( __ ('ID'));
-        $grid->column('img',trans ('img'))->image ('',235, 77);
-        $grid->column('url',trans ('url'))->url();
-        $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ())->display(function($enable, $column) {
-            if($this->duration > carbon::now()->timestamp ||$this->duration == null )
-            {
-              return $enable;
+        $grid->id(__('ID'));
+        $grid->column('img', trans('img'))->image('', 235, 77);
+        $grid->column('url', trans('url'))->url();
+        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates())->display(function ($enable, $column) {
+            if ($this->duration > carbon::now()->timestamp || $this->duration == null) {
+                return $enable;
             }
             return null;
         });
 
-        $grid->column('contents',trans ('contents'));
-        $grid->column('sort',trans ('sort'))->editable();
-        $this->extendGrid ($grid);
+        $grid->column('contents', trans('contents'));
+        $grid->column('sort', trans('sort'))->editable();
+        $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
     }
@@ -79,49 +75,30 @@ class HomeCarouselController extends MainController
         $form = new Form(new HomeCarousel);
 
         $form->display(__('admin.ID'));
-        $form->number('sort',__('sort'));
-
+        $form->number('sort', __('sort'));
         $form->image('img', trans('img'))->required();
-        $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ())->default(true);
-
-
+        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
         $form->select('form', trans('form'))->options([0 => __(''), 1 => __('hours'), 2 => __('days'), 3 => __('month')])
-        ->when(1, function (Form $form) {
-            $form->text('input', trans('input'));
-        })->when(2, function (Form $form) {
-            $form->text('input', trans('input'));
-        })->when(3, function (Form $form) {
-            $form->text('input', trans('input'));
-        });
+            ->when(1, function (Form $form) {
+                $form->text('input', trans('input'));
+            })->when(2, function (Form $form) {
+                $form->text('input', trans('input'));
+            })->when(3, function (Form $form) {
+                $form->text('input', trans('input'));
+            });
 
-
-        $form->select ('type',trans ('type'))
-//                ->addElementClass('roomlist')
-                ->options(['room'=>__ ('Room'),'normal'=>__ ('normal'),'link'=>__ ('url'),'event'=>__('events')])
-                ->when('room', function(Form $form){
-                    // $form->select('owner_id', __('owner'))->options(function($_){
-                    //     $all = User::withoutAppends()->select(['id', 'name', 'uuid'])->get();
-                    //     return $all->mapWithKeys(function($item){
-                    //         return [
-                    //             $item['id'] => $item['name'] . ' - ' . $item['uuid']
-                    //         ];
-                    //     });
-                    // });
-
-                    $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
-                })->when('link', function (Form $form) {
-                    $form->url('url', trans('url'))->rules('required|url');
-
-                })->when('event', function(Form $form){
-                    $form->select ('event_type',trans ('events'))->options(['event'=>__ ('events'),'pk_event'=>__ ('pk_event'),'weekly_star'=>__ ('weekly_star'),'charge_event' =>__('charge_event'),'event_period' =>__('event_period')])->when('event', function(Form $form){
-                        $form->url('url', trans('url'));
-                    });
-
+        $form->select('type', trans('type'))
+            ->options(['room' => __('Room'), 'normal' => __('normal'), 'link' => __('url'), 'event' => __('events')])
+            ->when('room', function (Form $form) {
+                $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
+            })->when('link', function (Form $form) {
+                $form->url('url', trans('url'))->rules('required|url');
+            })->when('event', function (Form $form) {
+                $form->select('event_type', trans('events'))->options(['event' => __('events'), 'pk_event' => __('pk_event'), 'weekly_star' => __('weekly_star'), 'charge_event' => __('charge_event'), 'event_period' => __('event_period')])->when('event', function (Form $form) {
+                    $form->url('url', trans('url'));
                 });
+            });
 
-            return $form;
-        }
-
-
-
+        return $form;
+    }
 }
