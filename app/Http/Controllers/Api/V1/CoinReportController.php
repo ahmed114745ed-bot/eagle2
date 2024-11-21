@@ -42,7 +42,7 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->orderBy("created_at", "desc") 
+        ->orderBy("created_at", "desc")
         ->paginate(10);//->get();
         return ExchangeCoinsReportResource::collection($data);
     }
@@ -55,12 +55,10 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->orderBy("created_at", "desc") 
-<<<<<<< HEAD
-        ->paginate(10);//->get();   
-=======
+        ->orderBy("created_at", "desc")
+
         ->paginate(10);//->get();
->>>>>>> 30a2e53b37bffdb8f40d724807ffff767edb98d3
+
         return RecevingReportResource::collection($data);
     }
 
@@ -73,7 +71,7 @@ class CoinReportController extends Controller
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         })
-        ->orderBy("created_at", "desc") 
+        ->orderBy("created_at", "desc")
         ->paginate(10);//->get();
         return RechargeCoinsReportResource::collection($data);
     }
@@ -81,13 +79,13 @@ class CoinReportController extends Controller
     public function eventCoins()
     {
         $user = auth()->user();
-    
+
         $result1 = $this->getCoinsData(
             DailyUserGift::class,
             ['user_id' => $user->id, 'gift_type' => 'coins'],
             'daily_prize'
         );
-    
+
         $result2 = $this->getCoinsData(
             WinnerReward::class,
             ['winner_id' => $user->id],
@@ -98,28 +96,28 @@ class CoinReportController extends Controller
                 });
             }
         );
-    
+
         $result = array_merge($result1, $result2);
         return Common::apiResponse(1, '', $result, 200);
     }
-    
+
     private function getCoinsData($model, array $conditions, $type, $additionalQuery = null)
     {
         $query = $model::where($conditions);
-    
+
         if ($additionalQuery) {
             $additionalQuery($query);
         }
-    
+
         $query->when(request("start_date") && request("end_date"), function ($q) {
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
         });
-    
+
         return $query->get()->map(function ($item) use ($type) {
             return new EventCoinsReportResource($item, $type);
         })->toArray();
     }
-    
+
 
 }
