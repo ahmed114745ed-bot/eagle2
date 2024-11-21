@@ -566,7 +566,7 @@ class AgencyService
 
         $total_hosts_percentages = $this->userSalaryRepository->sum($hosts->pluck("id")->toArray(), 'agency_sallary');
 
-        $data = [
+        return [
             'id'                =>  $agency->id,
             'name'              =>  $agency->name,
             'notice'            =>  $agency->notice,
@@ -640,7 +640,7 @@ class AgencyService
         }
 
 
-        $data = [
+        return [
             'monthly_diamond' => $host->monthly_diamond_received,
             'last_month_diamond' => $last_month_di,
             'date_of_join' => $joinDate,
