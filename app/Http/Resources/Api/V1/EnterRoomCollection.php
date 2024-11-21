@@ -15,13 +15,6 @@ use Illuminate\Support\Facades\DB;
 class EnterRoomCollection extends JsonResource
 {
 
-    public $userId;
-
-    public function __construct($resource, $userId)
-    {
-        parent::__construct($resource);
-        $this->userId = $userId;
-    }
 
     /**
      * Transform the resource collection into an array.
@@ -31,7 +24,6 @@ class EnterRoomCollection extends JsonResource
      */
     public function toArray($request)
     {
-        \Log::info('this is the owner data : ' . json_encode(@$this->owner));
 
         $pks     = $this->getRoomTwoLastPk($this->id);
         $topUser = $this->getTopUser($this->uid);
@@ -117,7 +109,7 @@ class EnterRoomCollection extends JsonResource
     }
 
 
-    private function getBoxes()
+ /*   private function getBoxes()
     {
         return BoxUse::query()
                      ->with('user', fn($q) => $q->withoutAppends()->select(['id', 'name']))
@@ -128,7 +120,7 @@ class EnterRoomCollection extends JsonResource
                          $q->where('user_id', $this->userId);
                      })
                      ->get();
-    }
+    }*/
 
     private function getTopUser(int $roomOwner)
     {
@@ -240,16 +232,16 @@ class EnterRoomCollection extends JsonResource
         $isAdminInRoom = false;
         $roomAdmin     = explode(',', $roomAdmins ?? '');
 
-        if (in_array((string)$this->userId, $roomAdmin)) $isAdminInRoom = true;
+        if (in_array((string)auth()->id(), $roomAdmin)) $isAdminInRoom = true;
         return [$isAdminInRoom, $roomAdmin];
     }
 
-    private function getJudgeAndType($roomJudge)
+    /*private function getJudgeAndType($roomJudge)
     {
         $isUserIsJudge = false;
         $roomJudge     = explode(',', $roomJudge ?? '');
 
         if (in_array((string)$this->userId, $roomJudge)) $isUserIsJudge = true;
         return [$isUserIsJudge, $roomJudge];
-    }
+    }*/
 }

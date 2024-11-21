@@ -367,7 +367,9 @@ class EnteranceRoomServices
                 dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
             }
         }
-        $room_info = (new EnterRoomCollection($room,$user->id));
+        \Log::info('this is the owner data : ' . json_encode(@$room->owner));
+
+        $room_info = (new EnterRoomCollection($room));
 
 //        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
 //        $room_info = $room_info->toArray($request);
