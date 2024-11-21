@@ -517,12 +517,11 @@ class AgencyService
             'user_salary' => [
                 'cut_amount' => $totalCutAmount,
                 'salary' => $totalSalary,
-
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => numToString((int)$minutes),
-            'active_days' => numToString($totalDays),
+            'live_minutes' => (int)$minutes,
+            'active_days' => $totalDays,
             'daly_reports' => []
         ];
         for (; $startDay <= $endDay; $startDay++) {
