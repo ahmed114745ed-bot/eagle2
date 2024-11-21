@@ -10,7 +10,7 @@ Trait RequestTrait{
             [
                 'success'   => false,
 
-                'message'   => __ ('validation errors'),
+                'message'   => implode(',',$validator->errors()->all()),
 
                 'data'      => $validator->errors()
             ],
