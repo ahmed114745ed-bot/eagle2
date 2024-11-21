@@ -15,12 +15,12 @@ class CountryResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'=>$this->id,
-            'name'=> app ()->getLocale () == 'ar' ? ($this->name?:'') : ($this->e_name?:''),
-            'flag'=>$this->flag?:'',
-            'lang'=>$this->language?:'',
-            'phone_code'=>$this->phone_code?:'',
-            'iso'=>$this->iso?:''
+            'id' => @$this->id ?? '',
+            'name' => (app()->getLocale() == 'ar' ? (@$this->name ?: '') : (@$this?->e_name ?? '')),
+            'flag' => @$this->flag ?: '',
+            'lang' => @$this->language ?: '',
+            'phone_code' => @$this->phone_code ?: '',
+            'iso' => @$this->iso ?: ''
         ];
     }
 }
