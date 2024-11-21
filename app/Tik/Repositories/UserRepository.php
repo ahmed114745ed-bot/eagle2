@@ -144,12 +144,16 @@ class UserRepository extends AbstractRepository
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
         $user->is_points_first = 0;
+        $notification_id = @request()->notification_id;
+        if ($notification_id) {
+            $user->notification_id = $notification_id;
+        }
         $this->updateUser($user);
     }
 
     public function findByGoogleId($googleId)
     {
-        return $this->model->query()->whereNotNull('google_id')->where('google_id', $googleId)->first();
+        return $this->model->whereNotNull(['google_id'])->where('google_id', $googleId)->first();
     }
     public function checkTrashedEmail($email, $googleId)
     {

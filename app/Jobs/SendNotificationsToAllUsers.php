@@ -43,7 +43,7 @@ class SendNotificationsToAllUsers implements ShouldQueue
 
         foreach ($notificationsIdsChunks as $notificationsIds) {
             $notificationsIds = $notificationsIds->pluck('notification_id')->toArray();
-            $title = ($this->user->name ?? '') . ' (Safwa Chat Group)';
+            $title = ($this->user->name ?? '') . ' (' . config('app.name_en') .' Chat Group)';
             Common::send_firebase_notification(
                 $notificationsIds,
                 $title,

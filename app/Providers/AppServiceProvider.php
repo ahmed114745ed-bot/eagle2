@@ -36,6 +36,8 @@ use App\Services\RedisService;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
+use Schema;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -55,6 +57,11 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind (RoomRepoInterface::class,RoomRepo::class);
         $this->app->bind (UserRepoInterface::class,UserRepo::class);
+
+
+    
+
+
         $this->app->bind ('RedisService',function($app){
             return new RedisService();
         });
@@ -81,6 +88,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Schema::defaultStringLength(191);
         User::observe (UserObserver::class);
         Gift::observe (GiftObserver::class);
         Emoji::observe (EmojiObserver::class);

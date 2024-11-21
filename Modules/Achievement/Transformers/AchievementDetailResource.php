@@ -22,9 +22,12 @@ class AchievementDetailResource extends JsonResource
         $achievementLevel = $this->achievementLevel;
         return [
             'id' => $this->id,
+            'name' =>'قام ' .$this->user?->name .' بشحن قيمه'. $achievementLevel?->target ?? '',
             'type' => $achievementLevel?->achievement?->type ?? 'no achievement',
             'image' => $achievementLevel?->valid_image ?? $this->custom_image,
-            'description' =>    $achievementLevel ? (auth()->user()->lan == "ar" ? $achievementLevel?->ar_description : $achievementLevel?->ar_description) : __('get it by admin'),
+            'description' =>    $achievementLevel ?  $achievementLevel?->ar_description  : __('get it by admin'),
+            'description_en' =>    $achievementLevel ?   $achievementLevel?->en_description : __('get it by admin'),
+
         ];
     }
 }

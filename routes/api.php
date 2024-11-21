@@ -3,44 +3,32 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
-use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PackController;
-use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
-use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V2\AgencyController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CountryController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
-use App\Http\Controllers\Api\V1\UtdUserController;
-use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
-use App\Admin\Controllers\AgencyStatisticController;
-use App\Helpers\Common;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
-use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\ReportUserController;
-use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
@@ -50,8 +38,11 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\AgencyStatisticController as V1AgencyStatisticController;
-use App\Http\Controllers\Api\V1\GameReportController;
+
+
+
+
+
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -387,11 +378,22 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
 
+
+            
+            Route::prefix ('black_list')->group (function (){
+                Route::get ('/',[\App\Http\Controllers\Api\V1\BlackListController::class,'index']);
+                Route::post ('/add',[\App\Http\Controllers\Api\V1\BlackListController::class,'add']);
+                Route::post ('/remove',[\App\Http\Controllers\Api\V1\BlackListController::class,'remove']);
+                Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
+            });
+
             // Route::get('/data-data', function(){
             //     $id = \App\Models\User::first()?->id;
             //     $data = Common::level_center(@$id);
             //     return $data;
             // });
+
+            Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
 
         }
     );

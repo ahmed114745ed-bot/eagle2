@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Admin;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -188,7 +189,9 @@ class DedicateWareController extends MainController
         $form->image('show_img', trans('img'))->default('1.png')->rules('required');
 
         //        $form->image('img1', trans('img'));
-        $form->file('img2', trans('svg'));
+        $form->file('img2', trans('svg'))->name(function ($file) {
+            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
+       });
         $form->select('image_type', __('image_type'))->options (
             [
                 'svga'=>__ ('svga'),

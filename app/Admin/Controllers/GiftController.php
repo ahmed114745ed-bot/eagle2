@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Gift;
-use Encore\Admin\Admin;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Admin;
+use Illuminate\Support\Str;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class GiftController extends MainController
 {
@@ -185,7 +186,9 @@ class GiftController extends MainController
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'));
         $form->currency('price', __('price'))->symbol('💎');
         $form->file('img', __('img'));
-        $form->file('show_img', __('show_img'))->required();
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+             return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
+        })->required();
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),

@@ -3,16 +3,15 @@
 namespace Modules\Moment\Http\Controllers;
 
 use App\Facades\CustomNotification;
-use App\Models\User;
 use App\Helpers\Common;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\Moment\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
+use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentCommint;
-use Illuminate\Contracts\Support\Renderable;
-use Modules\Moment\Http\Services\MomentService;
 use Modules\Moment\Http\Services\MomentCommentsService;
+use Modules\Moment\Http\Services\MomentService;
 use Modules\Moment\Transformers\MomentCommmintResource;
 
 class MomentUserCommentController extends Controller
@@ -33,7 +32,7 @@ class MomentUserCommentController extends Controller
     {
         $moment = Moment::where('id',$moment_id)->first();
         if (!$moment){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
+            return Common::apiResponse(0, 'moment not founded', [], 402);
         }
 
         $paginateComments = $this->momentCommentsService->showComments($moment);
@@ -62,14 +61,17 @@ class MomentUserCommentController extends Controller
             $moment = null;
         }
         if ($moment == null){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
+            return Common::apiResponse(0, 'moment not founded', [], 402);
         }
 
 
         $comment =$request->comment;
-        // $moment_id =$moment_id;
+        if (!$comment) {
+
+            return Common::apiResponse(0, 'you messing your comment');
+         }
         $user_id =Auth::id();
-         $user = User::find($user_id);
+
          $created=MomentCommint::create([
             'user_id' => $user_id,
             'comment' => $comment,
@@ -79,7 +81,8 @@ class MomentUserCommentController extends Controller
 
             return Common::apiResponse(0, 'try_again');
          }
-        CustomNotification::momentComment($moment, $user);
+         $user=$request->user();
+         CustomNotification::momentComment($moment, $user);
 
         return Common::apiResponse(1, 'success');
 
@@ -130,14 +133,14 @@ class MomentUserCommentController extends Controller
             $moment = null;
         }
         if ($moment == null){
-            return Common::apiResponse(0, 'Moment not founded', [], 402);
+            return Common::apiResponse(0, 'moment not founded', [], 402);
         }
         try {
             $this->momentCommentsService->delete($id, $moment);
             return Common::apiResponse(1, 'success', [], 200);
 
         } catch (\Exception $e) {
-            return Common::apiResponse(0, 'try later', [], 402);
+            return Common::apiResponse(0, 'try leter', [], 402);
 
         }
 

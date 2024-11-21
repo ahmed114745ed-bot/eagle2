@@ -5,11 +5,12 @@ namespace Modules\Achievement\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Illuminate\Support\Str;
+use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Achievement\Enums\TargetType;
-use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Entities\AchievementLevel;
-use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
 
 class AchievementsLevelsController extends MainController
 {
@@ -21,88 +22,71 @@ class AchievementsLevelsController extends MainController
      * @return Grid
      */
 
-     public function create(Content $content ,$id = null)
-     {
+    public function create(Content $content)
+    {
+        return $content
+            ->header(trans('admin.create'))
+            ->description(trans('admin.description'))
+            ->body($this->form());
+    }
 
-       $id_achi= $id;
-       $targetTypes = TargetType::cases();
+    public function update($id)
+    {
+        $id = request()->route('id');
+        return $this->form()->update($id);
+    }
 
-         return $content
-             ->header(trans('admin.create'))
-             ->description(trans('admin.description'))
-             ->body(view('admin/grid/users/addAchievementLevel',compact('id_achi','targetTypes')));
+    public function edit($id, Content $content)
+    {
+        $id = request()->route('id');
+        return $content
+            ->header(trans('admin.edit'))
+            ->description(trans('admin.description'))
+            ->body($this->form()->edit($id));
+    }
 
-
-     }
-
-     public function edit($id, Content $content)
-     {
-       $id_achi= $id;
-       $targetTypes = TargetType::cases();
-
-         return $content
-             ->header(trans('admin.create'))
-             ->description(trans('admin.description'))
-             ->body(view('admin/grid/users/addAchievementLeveledit',compact('id_achi','targetTypes')));
-     }
+    public function index(Content $content)
+    {
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->body($this->grid());
+    }
 
 
     protected function grid()
     {
         $grid = new Grid(new AchievementLevel());
-        $grid->disableRowSelector();
-        $id = request()->input('achievement_id');
-        if(!$id) {
-            return  redirect()->route(nameRoute('admin.achievements.index'));
-        }
-        $grid->model()->where('achievement_id', $id);
+        $achievement_id = request('achievement_id');
+
+        $grid->model()->where('achievement_id', $achievement_id);
 
         $grid->column('id', __('Id'));
         $grid->column('achievement.type', __('Achievement'));
         $grid->column('target', __('Target'));
         $grid->column('target_type', __('Target type'));
 
-        $grid->column('valid_image', __('Valid image'))->display(function ($value) use ($id) {
-            $value = getDriverUrl() . '/'.$value;
-            return "<img src='$value' width='80' height='80'>";
+        $grid->column('valid_image', __('Valid image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('invalid_image', __('Invalid image'))->display(function ($value) use ($id) {
-            $value = getDriverUrl() . '/'.$value;
-            return "<img src='$value' width='80' height='80'>";
+        $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-
         $grid->column('ar_description', __('ar_description'));
-        $grid->column('en_description', __('ar_description'));
+        $grid->column('en_description', __('en_description'));
 
-
-
-        // $grid->column('invalid_image', __('Invalid image'));
-        // $grid->column('created_at', __('Created at'));
-        // $grid->column('updated_at', __('Updated at'));
-        // $grid->column('deleted_at', __('Deleted at'));
-
-
-        $grid->disableCreateButton();
         $grid->disableExport();
-        $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="achievement-levels/create/'. request()->input('achievement_id').'" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> New</a>');
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
-        });
-        $grid->actions(function ($actions) {
-            // $actions->disableEdit();
-
-
-            $actions->append('<a href="">gdfgdfg</a>');
-
-
-        });
-
-        if ($id) {
-            return $grid;
-        }else {
-            return route(nameRoute('admin.achievements'));
-        }
-
+        return $grid;
     }
 
     /**
@@ -136,61 +120,22 @@ class AchievementsLevelsController extends MainController
      *
      *
      */
-
-
-    protected function form($id = null)
+    protected function form()
     {
-        if(!$id) {
-            return  redirect()->route(nameRoute('admin.achievements.index'));
-        }
         $form = new Form(new AchievementLevel());
-
-        if (!$form->isEditing()) {
-
-                if ($id) {
-                    $ache = Achievement::find(intval($id));
-                    $form->display('valid_image', __('Valid image'))->with(function ($value) use ($ache) {
-                        $value = getDriverUrl() . '/'.$ache->valid_image;
-                        return "<img src='$value' width='100' height='100'>";
-                    });
-                    $form->display('invalid_image', __('Invalid image'))->with(function ($value) use ($ache) {
-                        $value = getDriverUrl() . '/'.$ache->invalid_image;
-                        return "<img src='$value' width='100' height='100'>";
-                    });
-                }
-        }
-        if ($form->isEditing()) {
-            $form->hidden('achievement_id', __('achievement_id'));
-
-            $instances = $form->model()->all();
-            $index = 0;
-
-            if (isset($instances[$index])) {
-                $id = $instances[$index]->achievement_id;
-
-            }
-            $ache = Achievement::find(intval($id));
-            $form->display('valid_image', __('Valid image'))->with(function ($value) use ($ache) {
-                return "<img src='$ache->valid_image' width='100' height='100'>";
-            });
-            $form->display('invalid_image', __('Invalid image'))->with(function ($value) use ($ache) {
-                return "<img src='$ache->invalid_image' width='100' height='100'>";
-            });
-        }
-
-        $form->number('target', __('Target'))->required();
-        // $form->text('target_type', __('Target type'));
-        $form->select ('target_type',__('Target type'))->options(function (){
-            $ops = [0=>''];
-            $typs = TargetType::cases();
-            foreach ($typs as  $cases){
-                $ops[$cases->value]=__($cases->value);
-            }
-            return $ops;
-        })->required();
-        $form->image('valid_image', __('Valid image'))->required();
-        $form->image('invalid_image', __('Invalid image'))->required();
-
+        $form->hidden('achievement_id')->value(request('achievement_id'));
+        $form->number('target', __('Target'))->rules('required');
+        $form->select('target_type', __('Target type'))->options(function ($value) {
+            return TargetType::getTranslatedOptions();
+        })->rules('required');
+        $form->file('valid_image', trans('Valid image'))->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })->rules('required');
+        $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })->rules('required');
+        $form->textarea('ar_description', __('ar_description'));
+        $form->textarea('en_description', __('en_description'));
         return $form;
     }
 }

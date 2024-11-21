@@ -8,7 +8,7 @@ namespace Modules\Tasks\Http\Controllers;//App\Admin\Controllers;
 
 use Modules\Tasks\Entities\DailyTask;
 use Modules\Tasks\Entities\Day;
-use Modules\Tasks\Selectable\Days; 
+use Modules\Tasks\Selectable\Days;
 use Illuminate\Support\Facades\Request;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
@@ -32,7 +32,7 @@ class DailyTaskController extends AdminController
     {
         $id = request()->route('id');
         $model = DailyTask::findOrFail($id);
-        
+
         $form = $this->form()->edit($id);
 
         return $content
@@ -79,14 +79,14 @@ class DailyTaskController extends AdminController
         return $grid;
     }
 
-   
+
     protected function detail($id)
     {
         $show = new Show(DailyTask::findOrFail($id));
 
         $show->field('id', __('Id'));
         $show->field('day_id', __('Day id'));
-        $show->field('title', __('Title'));
+        $show->field('title_en', __('Title'));
         $show->field('type', __('Type'));
         $show->field('sub_type', __('Sub type'));
         $show->field('count', __('Count'));
@@ -131,7 +131,7 @@ class DailyTaskController extends AdminController
         $form->text('title', __('Title'))->required();
 
         $form->number('count', __('Count'))
-            ->attribute(['step' => 1])  
+            ->attribute(['step' => 1])
             ->min(0)
             ->default(0)
             ->required();
@@ -148,9 +148,57 @@ class DailyTaskController extends AdminController
                     $form->day_id = $dayId;
                 }
             });
-        
+
         return $form;
     }
+
+    $form->select('type', __('Type'))
+        ->options([
+            'images' => 'Images',
+            'video' => 'Video',
+            'enter_room' => 'Enter Room',
+            'background_room' => 'Background Room'
+        ])
+        ->required()
+        ->when('images', function (Form $form) {
+
+            $form->select('sub_type', __('Sub Type'))
+                ->options([
+                    'profile' => 'Profile',
+                    'row' => 'Row'
+                ])
+                ->placeholder('Select Sub Type')
+                ->default(null);
+
+        });
+
+
+
+
+    $form->text('title_en', __('Title'))->required();
+
+
+    $form->number('count', __('Count'))
+        ->attribute(['step' => 1])
+        ->min(0)
+        ->default(0)
+        ->required();
+
+    $form->number('total_points', __('Total Points'))
+        ->attribute(['step' => 1])
+        ->min(0)
+        ->default(0)
+        ->required();
+
+
+        $form->saving(function (Form $form) use ($dayId) {
+            if ($dayId) {
+                $form->day_id = $dayId;
+            }
+        });
+
+    return $form;
+}
 
 
 }

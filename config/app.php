@@ -21,11 +21,13 @@ return [
     'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
 
     // fairbase
-    'fileName' => env('FILL_NAME','firebase_credentials.json'),
+    'fileName' => env('FILE_NAME','firebase_credentials.json'),
+    'projectName' => env('FIREBASE_PROJECT_NAME',''),
     'senderId' => env('SENDER_ID','hola-chat-5554d'),
     'zego_credential' => env('ZEGOENCRYPTtkEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_secret_key' => env('UTDSECRTKEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
     'utd_client_id' => env('UTDCLIENTID','3030'),
+    'google_client_id' => env('GOOGLE_CLIENT_ID','790444932875-co6ri5d8e3m59ktv73h7eana2gfqbv34.apps.googleusercontent.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,6 +41,9 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'name_en' => env('APP_NAME_EN', 'Laravel'),
+    'name_ar' => env('APP_NAME_AR', 'لارافيل'),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -211,7 +216,6 @@ return [
         App\Providers\ConfigServiceProvider::class,
 //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-
 
     ],
 

@@ -6,8 +6,6 @@ use App\Http\Controllers\addTOjesonController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Router;
 
-
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -65,9 +63,7 @@ Route::get('/privacy-policy', function () {
 
 
 
-Route::get('admin/auth', function () {
-    return view('checkLogin');
-})->name('admin/auth');
+
 
 
 
@@ -89,5 +85,29 @@ Route::group(
         Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
+
+
+    }
+);
+Route::group(
+    [
+        'prefix' => '',
+        'namespace' => '',
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+        ],
+        'as' => '',
+    ],
+    function (Router $router) {
+        $router->get('admin/auth', function () {
+            return view('checkLogin');
+        })->name('admin/auth');
+        $router->post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+
+
     }
 );

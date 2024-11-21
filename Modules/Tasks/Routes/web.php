@@ -14,6 +14,7 @@ use Illuminate\Routing\Router;
 use Modules\Tasks\Http\Controllers\DayController;
 //use Modules\Tasks\Http\Controllers\DayController;
 use Modules\Tasks\Http\Controllers\DailyTaskController;
+use Modules\Tasks\Http\Controllers\TaskProgressController;
 use Modules\Tasks\Http\Controllers\UserDayProgressController;
 use Modules\Tasks\Http\Controllers\UserDayTaskProgressController;
 use Modules\Tasks\Http\Controllers\TaskRewardController;

@@ -13,4 +13,5 @@
     'textSecondaryColor' => '#c1b9b9', // Used for sidebar list words and box text
     'boxBackgroundColor' => '#222222', // Background color for boxes
     'backgroundImage' => '', // Background color for boxes
+    'tableBackGroundColor' => '#c88213'
 ];

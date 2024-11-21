@@ -441,7 +441,9 @@ trait CalcsTrait
         $diamondReceived = $user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
         $diamondSend             = $user->total_sender_diamonds;
+
         $senderNum        = floor($diamondSend  * $expPercentages[0]);
+        //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
         $star_level      = $user->total_received_level;
 
@@ -484,8 +486,8 @@ trait CalcsTrait
         $data['receiver_num']        = (int)$receivedNum;
         $data['receiver_img']        = $star_level_img;
         $data['sender_num']          = (int)$senderNum;
-        $data['sender_rem']          = floor((int)(($next_gold_num - $senderNum)));
-        $data['receiver_rem']        = floor((int)(($next_star_num - $receivedNum)));
+        $data['sender_rem']          = (($next_gold_num - $senderNum) < 0? 0 : floor((int)($next_gold_num - $senderNum)));
+        $data['receiver_rem']        = (($next_star_num - $receivedNum) < 0? 0 : floor((int)($next_star_num - $receivedNum)));
         $data['sender_img']          = $gold_level_img;
 
         $data['receiver_level']      = (int)$star_level;
@@ -506,10 +508,10 @@ trait CalcsTrait
         $rc = (int)$receivedNum - ((int)$current_star_num);
         $sc = (int)$senderNum - (int)($current_gold_num);
 
-        $data['rt'] = $rt;
-        $data['st'] = $st;
-        $data['rc'] = $rc;
-        $data['sc'] = $sc;
+        $data['rt'] = $rt < 0? 0 : $rt;
+        $data['st'] = $st < 0? 0: $st;
+        $data['rc'] = $rc <0? 0: $rc;
+        $data['sc'] = $sc <0? 0 : $sc;
 
 
         if ($rt > 0 && ($rc / $rt) < 1 && ($rc / $rt) > 0) {

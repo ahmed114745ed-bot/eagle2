@@ -7,10 +7,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class SpecialWareController extends  MainController
 {
@@ -141,8 +142,8 @@ class SpecialWareController extends  MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png')->rules ('required');
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->rules ('required');
+            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
+       })->rules ('required');
         $form->color('color', trans('color'));
 
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());

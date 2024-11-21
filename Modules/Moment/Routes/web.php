@@ -11,9 +11,6 @@
 |
 */
 
-Route::prefix('moment')->middleware(['appFeatureEnable:moment'])->group(function() {
+Route::prefix('moment')->group(function() {
     Route::get('/', 'MomentController@index');
 });
-
-Route::get('delete-moment/{moment_id}/{id}', 'MomentController@destroy_dash')->name('delete-moment')->middleware(['appFeatureEnable:moment']);
-

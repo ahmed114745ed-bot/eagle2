@@ -8,7 +8,12 @@ use App\Models\User;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * @property Collection $wares
+ * @property Collection $packs
+ * */
 class AllowPacks
 {
 
@@ -58,7 +63,6 @@ class AllowPacks
 
     public function getWare(int $id)
     {
-
         return $this->wares->where('type', $id)->first();
     }
 
@@ -71,6 +75,8 @@ class AllowPacks
             ->where('is_active_for_vip', true)
             ->groupBy('type')
             ->get();
+
+        Log::info('this is wares : ' . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
     }
@@ -96,19 +102,34 @@ class AllowPacks
 
         foreach ($this->data as $key => $value) {
             $ware      = $this->getWare($value);
+            if ($value == 16) {
+                Log::info("ware before is:" . json_encode($ware ));
+            }
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
+
+            // if (!$isAllow) {
+
+            // }
+
             $data[]    = [
                 'key' => $key,
-                'title' => __('api.' . $key . '_title'),
-                'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level),
+                'title' => __('api.' . $key . '_title',[],'ar'),
+                'title_en' => __('api.' . $key . '_title',[],'en'),
+                'description' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'ar'),
+                'description_en' => $this->getDescription($key, $isAllow, $minLevel, @$ware->max_level,'en'),
                 'is_active' => $this->isPackUsedAndExist($value),
                 'is_allow_to_user' => $isAllow,
                 'min' => $minLevel,
                 'max' => @$ware->max_level,
                 'min_price' => @$this->vipPrices->where('id', $minLevel)?->first()?->price,
             ];
+            if ($value == 16) {
+
+            }
+
         }
+
 
         return $data;
     }
@@ -117,15 +138,17 @@ class AllowPacks
     {
         if (!$ware) return null;
         $userlevel = $this->userOVipLevel;
-        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level;
+
+        $packs = $this->packs;
+        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->id)->isNotEmpty();
     }
 
-    private function getDescription(string $key, $isAllow, $minLevel, $maxLevel)
+    private function getDescription(string $key, $isAllow, $minLevel, $maxLevel,$lang ='en')
     {
-        if ($minLevel == null) return __('api.pack_not_allow_yet');
+        if ($minLevel == null) return __('api.pack_not_allow_yet',[],$lang);
 
-        if ($isAllow) return __('api.' . $key . '_description_allow');
+        if ($isAllow) return __('api.' . $key . '_description_allow',[],$lang);
 
-        return __('api.' . $key . '_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel]);
+        return __('api.' . $key . '_description', ['minLevel' => $minLevel, 'maxLevel' => $maxLevel],$lang);
     }
 }

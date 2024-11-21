@@ -145,9 +145,9 @@ class AgencyController extends MainController
             });
         }
         $grid->id(__('ID'));
-        $grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
-            return Common::getusersShow($model->owner_id);
-        });
+        //$grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
+        //    return Common::getusersShow($model->owner_id);
+        //});
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
         $grid->column('owner.name', trans('Owner'));
@@ -299,7 +299,7 @@ class AgencyController extends MainController
                 return $ops2;
             })->ajax('/api/search/users3', 'id', 'name');
         if (!$form->isEditing()) {
-            $form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
+            //$form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
             // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
         }
 
