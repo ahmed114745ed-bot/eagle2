@@ -515,8 +515,8 @@ class AgencyService
         $minutes = $hours * 60;
         $data = [
             'user_salary' => [
-                'cut_amount' => $totalCutAmount,
-                'salary' => $totalSalary
+                'cut_amount' => numToString($totalCutAmount),
+                'salary' => numToString($totalSalary),
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
