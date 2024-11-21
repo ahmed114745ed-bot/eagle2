@@ -196,13 +196,18 @@ class UserController extends Controller
     public function my_data(Request $request)
     {
         $user = $request->user();
+        try {
 
-        $userWithMedals = $this->userService->processUserData($user, $request->header('device_token'), $request->header('lat'), $request->header('long'));
+            $userWithMedals = $this->userService->processUserData($user, $request->header('device_token'), $request->header('lat'), $request->header('long'));
+        } catch (\Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
         $data = new MyDataResource($userWithMedals);
+
         return Common::apiResponse(true, '', $data, 200);
     }
 
@@ -409,14 +414,19 @@ class UserController extends Controller
                 'name'         => $result->sender?->name,
                 'image'        => $image,
                 'gender'       => $result->sender?->gender,
+                'country'      => [
+                    'id' => @$result->sender?->country?->id ?? '',
+                    'name' => @$result->sender?->country?->name ?? '',
+                    'flag' => @$result->sender?->country?->flag ?? '',
+                ],
                 'achievements'  => UserAchievementLevelsResource::collection($achievement->getUserAchievement($result->sender)),
-                'sender_level' => $result->sender->total_sender_level ?? 0,
-                'receiver_level' => $result->receiver->total_received_level ?? 0,
+                // 'sender_level' => $result->sender->total_sender_level ?? 0,
+                // 'receiver_level' => $result->receiver->total_received_level ?? 0,
                 'total'        => numToString($currentTotal),
                 'total_diff'   => $totalDiff,
                 'frame'        => $frame,
                 'frame_id'     => $frame != '' ? @$result->sender->dress_1 : 0,
-                'vip'     => $result->sender?->userVip?->level,
+                //'vip'     => $result->sender?->userVip?->level,
             ];
         })->all();
 
@@ -445,12 +455,44 @@ class UserController extends Controller
     {
         $ZegoEncreyptkey = config('app.zego_credential');
         $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
-        $data = $keys->mapWithKeys(function ($item){
-            return [$item['name'] => $item['name'] == 'zego_app_id' ? (integer)$item['value'] :$item['value']];
+        $data = $keys->mapWithKeys(function ($item) {
+            return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
         });
 
         $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
 
-        return Common::apiResponse(1, '',$encryptedData );
+        return Common::apiResponse(1, '', $encryptedData);
+    }
+
+    public function switchAccountAnonymous(Request $request)
+    {
+        $user = $request->user();
+        try {
+            [$user, $token] = $this->userService->anonymous($user, $request);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        if (!$this->canLogin($user)) {
+            return Common::apiResponse(false, 'you are blocked', [], 408);
+        }
+        $user->auth_token = $token;
+        return Common::apiResponse(
+            true,
+            __('api_responses.logged'),
+            [
+                'id'            => $user->id,
+                'is_first'      => @(bool)$user->is_points_first,
+                'auth_token'    => $user->auth_token
+            ]
+        );
+        return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
+    }
+
+    public function canLogin($user)
+    {
+        $status = $user instanceof User ? $user->status : ($user['status'] ?? null);
+
+        return $status == 1;
     }
 }
