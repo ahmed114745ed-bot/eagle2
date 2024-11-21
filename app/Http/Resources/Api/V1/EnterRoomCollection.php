@@ -37,6 +37,7 @@ class EnterRoomCollection extends JsonResource
         request()->type = 1;
         $owner = $this->owner;
         /** @var User $owner*/
+        \Log::info('this is the owner data : ' . json_encode($owner));
         return [
             "id"                  => $this->id,
             "room_id_num"         => $this->numid,
