@@ -164,11 +164,12 @@ class MessageService
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
         if ($user2->online == 1) {
-            $status = ($user2->current_room_chat == $chatRoom->id) ? 'seen' : 'received';
+            $condition = ($user2->current_room_chat == $chatRoom->id);
+            $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
-        } else {
-            //asdd TODO fire an event to increment unread messages by 1
-            event(new UnreadCounterIndividual($message,$user2,1));
+            if(!$condition){
+                event(new UnreadCounterIndividual('message',$user2,1));
+            }
         }
     }
 
