@@ -142,4 +142,6 @@ return [
     'notAdmin' => 'Sorry, you are not agency owner or admin.',
     'negativePosition' => 'you sent negative Position',
     'agency_shipping' => 'You cannot send a request to the shipping agency',
+    'expireAccount' => 'your account expired',
+    'reserved' => 'The phone is reserved',
 ];

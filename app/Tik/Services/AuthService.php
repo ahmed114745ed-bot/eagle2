@@ -21,8 +21,7 @@ class AuthService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly CountryRepository $countryRepository,
-    ) {
-    }
+    ) {}
 
     public function verifyGoogleToken($id_token)
     {
@@ -48,7 +47,7 @@ class AuthService
                 return false;
             }
         } else {
-          return false;
+            return false;
         }
     }
 
@@ -56,9 +55,11 @@ class AuthService
     public function registration($request)
     {
         if ($this->userRepository->findByPhoneUser($request->phone))  throw new \Exception('already exists');
+        if ($this->userRepository->findByPhoneUserTrashed($request->phone))  throw new \Exception(__('api_responses.reserved'));
 
         $data = [
-            'phone' => $request->phone, 'password' => $request->password,
+            'phone' => $request->phone,
+            'password' => $request->password,
         ];
 
         \DB::beginTransaction();
