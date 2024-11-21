@@ -145,9 +145,15 @@ class AgencyController extends MainController
             });
         }
         $grid->id(__('ID'));
+<<<<<<< HEAD
+        /*$grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
+            return Common::getusersShow($model->owner_id);
+        });*/
+=======
         //$grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
         //    return Common::getusersShow($model->owner_id);
         //});
+>>>>>>> 30a2e53b37bffdb8f40d724807ffff767edb98d3
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
         $grid->column('owner.name', trans('Owner'));
