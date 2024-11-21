@@ -80,7 +80,7 @@ class UserCounterServices
      * @param string $date
      * @return int
      */
-    private function getCountByType(User $user, string $type, string $date)
+    public function getCountByType(User $user, string $type, string $date = null)
     {
         switch ($type) {
             case "system_message":
