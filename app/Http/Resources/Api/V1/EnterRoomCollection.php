@@ -31,13 +31,14 @@ class EnterRoomCollection extends JsonResource
      */
     public function toArray($request)
     {
+        \Log::info('this is the owner data : ' . json_encode(@$this->owner));
+
         $pks     = $this->getRoomTwoLastPk($this->id);
         $topUser = $this->getTopUser($this->uid);
 
         request()->type = 1;
         $owner = $this->owner;
         /** @var User $owner*/
-        \Log::info('this is the owner data : ' . json_encode($owner));
         return [
             "id"                  => $this->id,
             "room_id_num"         => $this->numid,
