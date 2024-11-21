@@ -18,6 +18,9 @@ use Modules\Moment\Http\Controllers\MomentUserGiftsController;
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])->group (
     function (){
+
+        Route::get('/user/gifts/{id}', [MomentUserGiftsController::class, 'get_users_gifts']);
+
             Route::apiResource('/moment', 'MomentController');
             Route::apiResource('moment/{moment_id}/comment', 'MomentUserCommentController');
             Route::apiResource('moment/{moment_id}/like', 'MomentUserLikesController');

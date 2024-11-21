@@ -13,6 +13,8 @@ Route::post('/puhser-edit-user', [PusherController::class, 'edit_user']);
 Route::get('user-status/{id}',   [PusherController::class,'user_status']);
 
 Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localization'])->group(function () {
+
+    Route::get('/users/list', [ChatRoomController::class, 'users_list']);
     //Chat Room
     Route::get('/Chat-room/search-user', [ChatRoomController::class, 'findUserByUUid']);
     Route::resource('/Chat-room', ChatRoomController::class);

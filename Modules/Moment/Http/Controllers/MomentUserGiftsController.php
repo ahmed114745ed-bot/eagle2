@@ -6,9 +6,11 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Exceptions\NotInfMoneyException;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
+use App\Http\Resources\GiftResource;
 use App\Models\Gift;
 use App\Models\GiftLog;
 use App\Models\User;
+use App\Models\UserLuckyGift;
 use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -36,6 +38,63 @@ class MomentUserGiftsController extends Controller
         return view('moment::create');
     }
 
+    public function get_users_gifts($id){
+
+        $types = [
+            1 => __('normal'),
+            2 => __('hot'),
+            3 => __('country'),
+            4 => __('Moment'),
+            5 => __('Famous gifts'),
+            6 => __('Lucky gifts'),
+            7 => __('events')
+        ];
+
+        $data = GiftLog::select(
+            'gifts.type',
+            'gifts.id as gift_id',
+            'gifts.*',
+            DB::raw('COUNT(gift_logs.id) as send_count')
+        )
+        ->rightJoin('gifts', 'gifts.id', '=', 'gift_logs.giftId') // Use RIGHT JOIN to include all gifts
+        ->where(function ($query) {
+            $query->where('gift_logs.sender_id', 1) // Filter by specific user in gift_logs
+                  ->orWhereNull('gift_logs.sender_id'); // Include gifts not in gift_logs
+        })
+        ->groupBy('gifts.type', 'gifts.id')
+        ->orderByDesc(DB::raw('COUNT(gift_logs.id)')) // Order by send_count in descending order
+        ->get()
+        ->groupBy('type')
+        ->map(function ($gifts, $type) use ($types) {
+            return [
+                $types[$type] => $gifts->map(function ($gift) {
+                    return [
+                        'id' => $gift->gift_id,
+                        'name' => app()->getLocale() == 'ar' ? $gift->name : $gift->e_name,
+                        'type' => $gift->type == 1 ? 'normal' : 'hot',
+                        'price' => $gift->price ?: 0,
+                        'img' => $gift->img ?: '',
+                        'show_img' => $gift->show_img ?: '',
+                        'show_img2' => $gift->show_img2 ?: '',
+                        'vip_level' => $gift->vip_level ?: 0,
+                        'is_on' => ($gift->vip_level <= Common::getLevel(request()->user()->id, 3)) ? 1 : 0,
+                        'music_gift' => $gift->music_gift ? 1 : 0,
+                        'international_gift' => $gift->international_gift ? 1 : 0,
+                        'image_type' => $gift->image_type ?? '',
+                        'send_count' => $gift->send_count ?: 0, // Default to 0 if no logs
+                    ];
+                }),
+            ];
+        })
+        ->values();
+
+        return response()->json([
+            'data' => $data,
+            'message' => 'user gifts returned successfully',
+            'staus' => 200
+        ]);
+        //$user->luckyGifts
+    }
     /**
      * Store a newly created resource in storage.
      * @param Request $request
