@@ -57,8 +57,8 @@ class MomentUserGiftsController extends Controller
             DB::raw('COUNT(gift_logs.id) as send_count')
         )
         ->rightJoin('gifts', 'gifts.id', '=', 'gift_logs.giftId') // Use RIGHT JOIN to include all gifts
-        ->where(function ($query) {
-            $query->where('gift_logs.sender_id', 1) // Filter by specific user in gift_logs
+        ->where(function ($query) use ($id){
+            $query->where('gift_logs.sender_id', $id) // Filter by specific user in gift_logs
                   ->orWhereNull('gift_logs.sender_id'); // Include gifts not in gift_logs
         })
         ->groupBy('gifts.type', 'gifts.id')
