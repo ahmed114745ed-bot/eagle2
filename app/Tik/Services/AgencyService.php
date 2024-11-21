@@ -515,13 +515,13 @@ class AgencyService
         $minutes = $hours * 60;
         $data = [
             'user_salary' => [
-                'cut_amount' => numToString($totalCutAmount),
+                'cut_amount' => $totalCutAmount,
                 'salary' => numToString($totalSalary),
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (int)$minutes,
-            'active_days' => $totalDays,
+            'live_minutes' => numToString((int)$minutes),
+            'active_days' => numToString($totalDays),
             'daly_reports' => []
         ];
         for (; $startDay <= $endDay; $startDay++) {
