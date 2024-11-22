@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use App\Helpers\Common;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -43,11 +42,8 @@ class Handler extends ExceptionHandler
                 return Common::apiResponse (false,'Unauthenticated',[],401);
             }
 
-            Log::error('Error occurred: ' . $e->getMessage(), [
-                'url' => $request->fullUrl(),
-                'input' => $request->all(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            \Log::error($e->getMessage() );
+            \Log::error($request->fullUrl() );
             return Common::apiResponse(0, $e->getMessage(), null, 500);
 
         }
