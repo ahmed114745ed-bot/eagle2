@@ -132,6 +132,11 @@ class UserRepository extends AbstractRepository
         return $this->model->query()->where('phone', $phone)->first();
     }
 
+    public function findByPhoneUserTrashed($phone)
+    {
+        return $this->model->withTrashed()->query()->where('phone', $phone)->first();
+    }
+
     public function updateDeviceToken($user, $deviceToken)
     {
         $user->device_token = $deviceToken;
