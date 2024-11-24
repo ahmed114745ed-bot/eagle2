@@ -369,7 +369,7 @@ class EnteranceRoomServices
         }
         $room_info = (new EnterRoomCollection($room,$user->id));
 
-        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
+//        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
         $room_info = $room_info->toArray($request);
         // $room_info['zego_keys'] = $keys->mapWithKeys(function ($item){
         //     return [$item['name'] => (($item['name'] == 'zego_app_id') ? (integer)$item['value'] :$item['value'])];

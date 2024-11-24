@@ -211,6 +211,7 @@ class EnteranceController extends Controller
         $user   = $request->user();
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
+        Log::info('here');
        return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $owner_id);
     }
 

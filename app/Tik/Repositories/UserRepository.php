@@ -234,7 +234,7 @@ class UserRepository extends AbstractRepository
         if ($hostId != null) {
             $hosts = $hosts->where("id", $hostId);
         }
-        $hosts = $hosts->get();
+        return $hosts->get();
     }
 
     public function updateShowGift($user)

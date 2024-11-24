@@ -511,17 +511,18 @@ class AgencyService
 
         if ($isThisMonth) $endDay = today()->day;
 
+        \Log::info('this is error');
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
         $data = [
             'user_salary' => [
-                'cut_amount' => $totalCutAmount,
-                'salary' => numToString($totalSalary),
+                'cut_amount' => (string)$totalCutAmount,
+                'salary' => (string) $totalSalary,
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => numToString((int)$minutes),
-            'active_days' => numToString($totalDays),
+            'live_minutes' => (string)$minutes,
+            'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
         for (; $startDay <= $endDay; $startDay++) {
@@ -566,7 +567,7 @@ class AgencyService
 
         $total_hosts_percentages = $this->userSalaryRepository->sum($hosts->pluck("id")->toArray(), 'agency_sallary');
 
-        $data = [
+        return [
             'id'                =>  $agency->id,
             'name'              =>  $agency->name,
             'notice'            =>  $agency->notice,
@@ -640,7 +641,7 @@ class AgencyService
         }
 
 
-        $data = [
+        return [
             'monthly_diamond' => $host->monthly_diamond_received,
             'last_month_diamond' => $last_month_di,
             'date_of_join' => $joinDate,

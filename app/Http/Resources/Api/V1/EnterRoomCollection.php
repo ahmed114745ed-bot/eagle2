@@ -15,13 +15,6 @@ use Illuminate\Support\Facades\DB;
 class EnterRoomCollection extends JsonResource
 {
 
-    public $userId;
-
-    public function __construct($resource, $userId)
-    {
-        parent::__construct($resource);
-        $this->userId = $userId;
-    }
 
     /**
      * Transform the resource collection into an array.
@@ -31,6 +24,7 @@ class EnterRoomCollection extends JsonResource
      */
     public function toArray($request)
     {
+
         $pks     = $this->getRoomTwoLastPk($this->id);
         $topUser = $this->getTopUser($this->uid);
 
@@ -71,7 +65,15 @@ class EnterRoomCollection extends JsonResource
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'        => @$owner->UserVip?->level ?? null,
-            'owner_country'        => new CountryResource(@$owner?->country),
+            'owner_country' => $owner && $owner->country
+                ? new CountryResource($owner->country)
+                : [
+                    'id' => 0,
+                    'name' => '',
+                    'flag' => '',
+                    'lang' => '',
+                    'phone_code' => ''
+                ],
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
             'password_status'     => !($this->room_pass == ""),
@@ -107,7 +109,7 @@ class EnterRoomCollection extends JsonResource
     }
 
 
-    private function getBoxes()
+ /*   private function getBoxes()
     {
         return BoxUse::query()
                      ->with('user', fn($q) => $q->withoutAppends()->select(['id', 'name']))
@@ -118,7 +120,7 @@ class EnterRoomCollection extends JsonResource
                          $q->where('user_id', $this->userId);
                      })
                      ->get();
-    }
+    }*/
 
     private function getTopUser(int $roomOwner)
     {
@@ -230,16 +232,16 @@ class EnterRoomCollection extends JsonResource
         $isAdminInRoom = false;
         $roomAdmin     = explode(',', $roomAdmins ?? '');
 
-        if (in_array((string)$this->userId, $roomAdmin)) $isAdminInRoom = true;
+        if (in_array((string)auth()->id(), $roomAdmin)) $isAdminInRoom = true;
         return [$isAdminInRoom, $roomAdmin];
     }
 
-    private function getJudgeAndType($roomJudge)
+    /*private function getJudgeAndType($roomJudge)
     {
         $isUserIsJudge = false;
         $roomJudge     = explode(',', $roomJudge ?? '');
 
         if (in_array((string)$this->userId, $roomJudge)) $isUserIsJudge = true;
         return [$isUserIsJudge, $roomJudge];
-    }
+    }*/
 }
