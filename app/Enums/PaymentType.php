@@ -8,7 +8,7 @@ enum PaymentType: string
     case GOOGLE_PAY = 'google_pay';
     case SKY_PAY = 'sky_pay';
     case STRIP = 'strip';
-    case OPY = 'opy';
+    case OPAY = 'opay';
    
     
 
