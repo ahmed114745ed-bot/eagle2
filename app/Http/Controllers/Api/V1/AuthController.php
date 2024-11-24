@@ -130,7 +130,7 @@ class AuthController extends Controller
 
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
-            if ($resource== null) {
+            if ($resource!= null) {
                 Common::apiResponse(false, 'email already taken', $resource, 405);
             }
         } catch (\Exception $exception) {
