@@ -6,9 +6,10 @@ namespace App\Admin\Controllers;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Enums\PaymentType;
+use App\Models\PaymentCoin;
 use App\Models\PaymentGateway;
 use App\Admin\Controllers\MainController;
-use App\Models\PaymentCoin;
 use Encore\Admin\Controllers\AdminController;
 
 class PaymentCoinController extends MainController
@@ -69,7 +70,9 @@ class PaymentCoinController extends MainController
     {
         $form = new Form(new PaymentCoin());
 
-        $form->text('title', __('Title'));
+        $form->select('title', trans('Title'))
+         ->options(PaymentType::getTranslatedOptions())
+         ->creationRules(['required', "unique:payment_coins,title,{{id}}"])->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
         $form->image('photo', __('Photo'));
 
         return $form;
