@@ -228,4 +228,9 @@ class Room extends Model
             ($this->backgroundImage?->img ?: ($this->background?->img ?: (request()->default_background ?? \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img)));
         return $var;
     }
+
+    public function getModeAttribute($value)
+    {
+        return $value === 0 ? 3 : $value;
+    }
 }

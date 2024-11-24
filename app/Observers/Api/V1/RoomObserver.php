@@ -38,6 +38,7 @@ class RoomObserver
 
 
     public function creating(Room $room){
+        $room->mode = 3;
 
     }
 
@@ -59,7 +60,7 @@ class RoomObserver
 //        $v = $room->room_visitor;
 //        $av = explode (',',$v);
 //        $room->visitor_count = count ($av);
-    } 
+    }
 
     public function changeMode(Room &$room){
         if ( $room->isDirty('mode')){
