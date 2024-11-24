@@ -108,7 +108,7 @@ class AuthService
         if (!$user) {
             $trashedEmail = $this->userRepository->checkTrashedEmail($request['email'], $request['google_id']);
             if ($trashedEmail) {
-                $trashedEmail->delete_at = null;
+                $trashedEmail->deleted_at = null;
                 $trashedEmail->Save();
                 $user= $trashedEmail;
                 $resource = [
