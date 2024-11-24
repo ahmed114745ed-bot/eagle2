@@ -517,7 +517,7 @@ class AgencyService
         $data = [
             'user_salary' => [
                 'cut_amount' => (int)$totalCutAmount,
-                'salary' => (string) $totalSalary,
+                'salary' => (string) intval($totalSalary),
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
