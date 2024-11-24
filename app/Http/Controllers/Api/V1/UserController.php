@@ -415,7 +415,7 @@ class UserController extends Controller
                 'image'        => $image,
                 'gender'       => $result->sender?->gender,
                 'country'      => [
-                    'id' => @$result->sender?->country?->id ?? '',
+                    'id' => @$result->sender?->country?->id ?? 0,
                     'name' => @$result->sender?->country?->name ?? '',
                     'flag' => @$result->sender?->country?->flag ?? '',
                 ],
