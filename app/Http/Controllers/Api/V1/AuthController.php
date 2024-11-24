@@ -83,7 +83,7 @@ class AuthController extends Controller
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithPhonePassword($fields);
             case 'google':
-                $fields = ['name' => $request->name, 'email' => $request->email, 'google' => $request->google_id, 'device_token' => $request['device_token'],'id_token' => $request['id_token']];
+                $fields = ['name' => $request->name, 'email' => $request->email, 'google_id' => $request['google_id'], 'device_token' => $request['device_token'],'id_token' => $request['id_token']];
                 $fields = array_merge($globalKeys, $fields);
                 return $this->loginWithGoogle($fields);
             case 'apple':
