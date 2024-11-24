@@ -511,12 +511,12 @@ class AgencyService
 
         if ($isThisMonth) $endDay = today()->day;
 
-        \Log::info('this is error');
+        \Log::info('this2 is error');
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
         $data = [
             'user_salary' => [
-                'cut_amount' => (string)$totalCutAmount,
+                'cut_amount' => (int)$totalCutAmount,
                 'salary' => (string) $totalSalary,
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
@@ -530,7 +530,7 @@ class AgencyService
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
             $data['daly_reports'][] = [
-                'day' => $startDay,
+                'day' => (int)$startDay,
                 'live_minutes' => (int)$minutes,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
