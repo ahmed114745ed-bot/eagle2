@@ -69,7 +69,7 @@ class WhatsappOtp
 
     public function resetCodes(string $phone)
     {
-        return Code::query()->where('phone', $phone)->delete();
+        return Code::where('phone', $phone)->delete();
     }
 
 }
