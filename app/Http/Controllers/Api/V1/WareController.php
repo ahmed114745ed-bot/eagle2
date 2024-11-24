@@ -19,7 +19,7 @@ class WareController extends Controller
 
     public function index(Request $request)
     {
-        $wares = $this->wareService->index($request->page,$request->per_page);
+        $wares = $this->wareService->index($request->page, $request->per_page);
         return Common::apiResponse(1, '',  $wares);
     }
 
@@ -56,6 +56,45 @@ class WareController extends Controller
         }
         return Common::apiResponse(1, 'created successfully');
     }
+
+    public function storeList(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'wares' => 'required|array', // Validate that 'wares' is an array
+            'wares.*.name' => 'nullable|string|max:255',
+            'wares.*.name_en' => 'nullable|string|max:255',
+            'wares.*.type' => 'required|numeric',
+            'wares.*.level' => 'nullable|numeric',
+            'wares.*.price' => 'required|numeric',
+            'wares.*.img2' => 'required|mimes:jpeg,png,jpg,gif,svg,mp4,svga',
+            'wares.*.show_img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'wares.*.image_type' => 'required|string|max:255',
+            'wares.*.color' => 'nullable',
+            'wares.*.is_active_for_vip' => 'nullable|boolean',
+            'wares.*.enable' => 'nullable|boolean',
+            'wares.*.get_type' => 'required|numeric',
+            'wares.*.title' => 'nullable|string|max:255',
+            'wares.*.title_en' => 'nullable|string|max:255',
+            'wares.*.exp' => 'nullable|numeric',
+            'wares.*.expire' => 'required|numeric',
+            'wares.*.num' => 'nullable|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            foreach ($request->wares as $ware) {
+                $this->wareService->create(new Request($ware));
+            }
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+
+        return Common::apiResponse(1, 'created successfully');
+    }
+
 
     public function show(Request $request)
     {
@@ -129,5 +168,4 @@ class WareController extends Controller
     {
         return translate(GET_TYPE_WARE);
     }
-
 }
