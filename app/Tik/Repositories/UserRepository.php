@@ -158,7 +158,7 @@ class UserRepository extends AbstractRepository
 
     public function findByGoogleId($googleId)
     {
-        return $this->model->whereNotNull(['google_id'])->where('google_id', $googleId)->first();
+        return $this->model->whereNotNull('google_id')->where('google_id', $googleId)->first();
     }
     public function checkTrashedEmail($email, $googleId)
     {
