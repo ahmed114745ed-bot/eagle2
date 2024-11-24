@@ -48,7 +48,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 class UserCommon{
 
 
-    public function specialTransfer($amount)
+    public static function specialTransfer($amount)
     {
         $usd_trans = Config::where("name",'special_transfer_to_usd')->first();
         $data = 0;
@@ -277,10 +277,10 @@ class UserCommon{
     //     $englishNumbers = range(0, 9);
     //     // الأرقام العربية
     //     $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    
+
     //     return str_replace($englishNumbers, $arabicNumbers, $string);
     // }
-    
+
 
     public static function englishToArabicNumbers($string) {
         $numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -305,13 +305,13 @@ class UserCommon{
     public static function arabicToEnglishNumbersDate($string) {
         $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    
+
         // تحويل التاريخ إلى صيغة يمكن فهمها باستخدام Carbon
         $createdAt = Carbon::parse($string)->format('Y-m-d');
-        
+
         // استبدال الأرقام العربية بالأرقام الإنجليزية
         $createdAt = str_replace($arabicNumbers, $englishNumbers, $createdAt);
-    
+
         return $createdAt;
     }
 

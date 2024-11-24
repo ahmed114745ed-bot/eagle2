@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
+use Database\Seeders\config;
 use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\Stripe;
 
 class StripeService {
 
 
-    public function pay($apiKey, array $input){
+    public function pay($apiKey, $request){
 
         Stripe::setApiKey($apiKey);
         try {
@@ -17,22 +18,28 @@ class StripeService {
                 'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
-                        'currency' => $input['currency'] ?? 'usd',
+                        'currency' => config('stripe.currency') ?? 'usd',
                         'product_data' => [
-                            'name' => $input['product_name'],
+                            'name' => $request->product_name,
                         ],
-                        'unit_amount' => $input['amount'], // amount in cents
+                        'unit_amount' => $request->amount, // amount in cents
                     ],
-                    'quantity' => $input['quantity'] ?? 1,
+                    'quantity' => $request->quantity ?? 1,
                 ]],
                 'mode' => 'payment',
-                'success_url' => 'https://www.google.com',
-                'cancel_url' => 'https://www.google.com',
+                'success_url' => config('stripe.success_url'),
+                'cancel_url' => config('stripe.cancel_url'),
+                'metadata' => [
+                    'user_id' => $request->user_id,
+                    'order_id' => $request->order_id,
+                    'product_id' => $request->product_id,
+                ]
             ]);
 
             // Return the payment link
             return $session->url;
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             // Handle exceptions and rethrow for the caller
             throw new \Exception('Error generating payment link: ' . $e->getMessage());
         }

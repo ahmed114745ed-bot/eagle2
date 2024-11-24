@@ -82,7 +82,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
-            Route::get('/pay', [StripeController::class, 'pay']);
+
+            Route::get('/stripe-pay', [StripeController::class, 'pay']);
+            Route::post('/stripe-callback', [StripeController::class, 'handleWebhook']);
 
             Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
 
