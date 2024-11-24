@@ -15,7 +15,7 @@ class CountryResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => @$this->id ?? '',
+            'id' => @$this->id ?? 0,
             'name' => (app()->getLocale() == 'ar' ? (@$this->name ?: '') : (@$this?->e_name ?? '')),
             'flag' => @$this->flag ?: '',
             'lang' => @$this->language ?: '',

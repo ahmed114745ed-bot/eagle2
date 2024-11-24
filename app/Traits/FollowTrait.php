@@ -20,12 +20,14 @@ trait FollowTrait
         return $this->friends()->where("users.id", auth()->id())->exists();
     }
 
-    public function followeds_ids(){
-        return Follow::query ()->whereHas('followed')->where ('user_id',$this->id)->orderByDesc('created_at')->pluck ('followed_user_id');
+    public function followeds_ids()
+    {
+        return Follow::query()->whereHas('followed')->where('user_id', $this->id)->orderByDesc('created_at')->pluck('followed_user_id');
     }
 
-    public function rooms_uids(){
-        return Room::query ()->where ('room_status',1)->where ('is_afk',1)->pluck ('uid');
+    public function rooms_uids()
+    {
+        return Room::query()->where('room_status', 1)->where('is_afk', 1)->pluck('uid');
         // return Room::query ()->where ('room_status',1)->pluck ('uid');
     }
 
@@ -47,14 +49,28 @@ trait FollowTrait
     }
 
     // Define mutual followers as friends
-    public function friends(): BelongsToMany
+    // public function friends(): BelongsToMany
+    // {
+    //     return $this->following()
+    //         ->wherePivot('status', 1) // Active status for mutual relationships
+    //         ->whereHas('followerss', function ($query) {
+    //             $query->where('user_id', $this->id);
+    //         })
+    //         ->orderBy('follows.created_at', 'desc');
+    // }
+
+    public function friends()
     {
-        return $this->following()
-            ->wherePivot('status', 1) // Active status for mutual relationships
-            ->whereHas('followerss', function ($query) {
-                $query->where('user_id', $this->id);
-            })
-            ->orderBy('follows.created_at', 'desc');
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'user_id',
+            'followed_user_id'
+        )->whereIn('followed_user_id', function ($query) {
+            $query->select('user_id')
+                ->from('follows')
+                ->where('followed_user_id', $this->id);
+        })->wherePivot('status', 1)->orderBy('follows.created_at', 'desc');
     }
 
 
@@ -98,7 +114,8 @@ trait FollowTrait
         return $this->friends()->count();
     }
 
-    public function onRoomFolloweds(){
-        return self::query ()->whereIn('id',$this->followeds_ids ())->whereIn('id',$this->rooms_uids ())->get ();
+    public function onRoomFolloweds()
+    {
+        return self::query()->whereIn('id', $this->followeds_ids())->whereIn('id', $this->rooms_uids())->get();
     }
 }
