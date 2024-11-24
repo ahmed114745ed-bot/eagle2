@@ -104,11 +104,12 @@ class AuthService
     public function loginWithGoogle($request)
     {
         $user = $this->userRepository->findByGoogleId($request['google_id']);
-        $trashedEmail = $this->userRepository->checkTrashedEmail($request['email'], $request['google_id']);
-        dd( $user, $trashedEmail,);
+        
         if (!$user) {
             $trashedEmail = $this->userRepository->checkTrashedEmail($request['email'], $request['google_id']);
             if ($trashedEmail) {
+                $trashedEmail->delete_at = null;
+                $trashedEmail->Save();
                 $resource = [
                     'google_id' => $request['google_id'],
                     'status' => true,

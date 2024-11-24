@@ -162,7 +162,7 @@ class UserRepository extends AbstractRepository
     }
     public function checkTrashedEmail($email, $googleId)
     {
-        return $this->model->withTrashed()->where(fn($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->exists();
+        return $this->model->withTrashed()->where(fn($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->first();
     }
 
     public function findByEmail($email)
