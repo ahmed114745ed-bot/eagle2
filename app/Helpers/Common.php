@@ -742,6 +742,14 @@ class Common
         if ($uvip) {
             $user->update(['vip' => $uvip->id]);
         }
+
+        $users_vips = UserVip::with('OVip')->where('user_id',$user->id)->first();
+        $preveliage = $users_vips->OVip->preveliage;
+        $wareIds = Ware::where('type', $preveliage)->where('get_type',1)->where('is_active_for_vip', 1)->pluck('id')->toArray();
+        $packs = Pack::where('user_id', $user->id)->whereIn('target_id', $wareIds)->get();
+        $exception_packs = $packs->pluck('id')->toArray();
+        Pack::where('user_id', $user->id)->whereNotIn('id', $exception_packs)->update(['is_used'=> 0]);
+        Pack::whereIn('id', $exception_packs)->update(['is_used' => 1]);
     }
 
 

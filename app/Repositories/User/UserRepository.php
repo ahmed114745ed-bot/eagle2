@@ -4,7 +4,7 @@ namespace App\Repositories\User;
 use App\Models\Follow;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use App\Tik\Repositories\UserRepository as Repository; 
+use App\Tik\Repositories\UserRepository as Repository;
 
 class UserRepository extends Repository
 {
@@ -114,7 +114,7 @@ class UserRepository extends Repository
         $user = $this->findUserById($userId);
         $user->likes()->detach($likedUserId);
     }
-    
+
     public function hasIgnored($userId, $likedUserId)
     {
         $user = $this->findUserById($userId);
