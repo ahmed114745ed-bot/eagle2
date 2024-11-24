@@ -57,9 +57,9 @@ class WhatsappOtp
 
     public function isValidate(string $phone, string $code): bool
     {
-        \Log::info("Phone matches: ", [Code::query()->where('phone', $phone)->exists()]);
-        \Log::info("Code matches: ", [Code::query()->where('code', $code)->exists()]);
-        \Log::info("Created at matches: ", [Code::query()->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists()]);
+        // \Log::info("Phone matches: ", [Code::query()->where('phone', $phone)->exists()]);
+        // \Log::info("Code matches: ", [Code::query()->where('code', $code)->exists()]);
+        // \Log::info("Created at matches: ", [Code::query()->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists()]);
         //error_log("Phone matches: " . [Code::query()->where('phone', $phone)->exists()]);
         //error_log("Code matches: " . [Code::query()->where('code', $code)->exists()]);
         //error_log("Created at matches: " . [Code::query()->where('created_at', '>', Carbon::now()->subHours()->toDate())->exists()]);
