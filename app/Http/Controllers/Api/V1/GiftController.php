@@ -59,49 +59,7 @@ class GiftController extends Controller
         return Common::apiResponse(1, 'created successfully');
     }
 
-    public function storeList(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'gifts'                     => 'required|array',
-            'gifts.*.name'              => 'nullable|string|max:255',
-            'gifts.*.e_name'            => 'nullable|string|max:255',
-            'gifts.*.type'              => 'required|numeric',
-            'gifts.*.vip_level'         => 'nullable|lt:256',
-            'gifts.*.price'             => 'required|numeric',
-            'gifts.*.img'               => 'required|mimes:jpeg,png,jpg,gif',
-            'gifts.*.show_img'          => 'required|mimes:jpeg,png,jpg,gif,svg,mp4,svga,ZZ',
-            'gifts.*.image_type'        => 'required|string|max:255',
-            'gifts.*.show_img2'         => 'nullable|mimes:jpeg,png,jpg,gif,svg',
-            'gifts.*.sort'              => 'nullable|numeric',
-            'gifts.*.enable'            => 'nullable|boolean',
-            'gifts.*.music_gift'        => 'nullable|boolean',
-            'gifts.*.min_percentage'    => 'nullable|numeric',
-            'gifts.*.mid_percentage'    => 'nullable|numeric',
-            'gifts.*.max_percentage'    => 'nullable|numeric',
-            'gifts.*.win_probability'   => 'nullable|numeric',
-        ]);
 
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-
-        foreach ($request->gifts as $gift) {
-            // Check percentage sum for type 6
-            if (isset($gift['type']) && $gift['type'] == 6) {
-                $totalPercentage = ($gift['min_percentage'] ?? 0) +
-                    ($gift['mid_percentage'] ?? 0) +
-                    ($gift['max_percentage'] ?? 0);
-                if ($totalPercentage != 100) {
-                    return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
-                }
-            }
-
-            // Pass each gift to the service for creation
-            $this->giftService->create(new Request($gift));
-        }
-
-        return Common::apiResponse(1, 'Gifts created successfully');
-    }
 
 
     public function show(Request $request)
