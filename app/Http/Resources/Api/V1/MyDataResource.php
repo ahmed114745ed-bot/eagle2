@@ -69,13 +69,13 @@ class MyDataResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
 
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
-       // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
+        // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
 
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
 
-       // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
+        // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
 
         $isHideCountry = $this->getPackWithType(13);
@@ -97,13 +97,17 @@ class MyDataResource extends JsonResource
                 }
             }
         }
-        $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-        $user = User::find($this->id);
-        $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag','mall'];
+        $counters = [];
+        if ($request->show_counter == true) {
+            $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
+            $user = User::find($this->id);
+            $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
-        $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
-            return [$item => $userCounterServices->getUserCounts($user, $item)];
-        });
+            $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
+                return [$item => $userCounterServices->getUserCounts($user, $item)];
+            });
+        }
+
 
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
