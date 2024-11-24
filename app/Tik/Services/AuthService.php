@@ -104,7 +104,7 @@ class AuthService
     public function loginWithGoogle($request)
     {
         $user = User::where('google_id', $request['google_id'])->first();
-        dd($user);
+        dd($user,$request) ;
         if (!$user) {
             if ($this->userRepository->checkTrashedEmail($request['email'], $request['google_id'])) {
                 $resource = [
