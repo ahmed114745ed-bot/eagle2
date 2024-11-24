@@ -38,11 +38,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-
-
-
-
-
+use App\Http\Controllers\StripeController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
 
@@ -86,6 +82,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::get('/pay', [StripeController::class, 'pay']);
+
             Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
 
 
@@ -379,7 +377,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
 
 
-            
+
             Route::prefix ('black_list')->group (function (){
                 Route::get ('/',[\App\Http\Controllers\Api\V1\BlackListController::class,'index']);
                 Route::post ('/add',[\App\Http\Controllers\Api\V1\BlackListController::class,'add']);
