@@ -110,6 +110,7 @@ class AuthService
             if ($trashedEmail) {
                 $trashedEmail->delete_at = null;
                 $trashedEmail->Save();
+                $user= $trashedEmail;
                 $resource = [
                     'google_id' => $request['google_id'],
                     'status' => true,
