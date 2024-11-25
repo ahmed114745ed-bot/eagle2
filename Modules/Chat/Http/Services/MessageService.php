@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Chat\Http\Services;
 
 use Illuminate\Http\Request;
@@ -177,8 +178,7 @@ class MessageService
             $body = $message->message;
             $type = $message->type ?? 'text';
 
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type, user: $user2);
         }
     }
-
 }

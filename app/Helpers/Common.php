@@ -538,12 +538,13 @@ class Common
         return $token['access_token'];
     }
 
-    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
+    public static function send_firebase_notification($tokens, $title, $body, $icon = '', $data = [], $messageType = null, $user = null, $action = '', $type = '', $id = '', $notification_type = 'user_notification')
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
 
         $isGroup = false;
+        $userData =[];
         $key = time();
 
         if (gettype($tokens) == 'string') {
@@ -566,6 +567,18 @@ class Common
             $isGroup = true;
         }
 
+        if($user)
+        {
+            $userData = [
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid,
+                'has_color_name'       => self::hasInPack($user->id, 18, true),
+                'image' => $user->profile->avatar,
+                // Any other user-specific data
+            ];
+        }
+
         $payload = [
             'token' => $token,
             'notification'     => $notification,
@@ -580,6 +593,9 @@ class Common
         //        if (!empty($icon)) {
         //            $payload['notification']['icon'] = $icon;
         //        }
+        if (isset($userData) && is_array($userData)) {
+            $payload['data']['user'] = json_encode($userData);
+        }
 
         if (isset($data['image']) && !empty($data['image'])) {
             $payload['notification']['image'] = $data['image'];
