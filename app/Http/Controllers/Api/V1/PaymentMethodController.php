@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Models\GameChargeHistory;
+use App\Helpers\Common;
 use App\Models\GameWallet;
-use App\Models\PaymentMethodHistory;
 use Illuminate\Http\Request;
+use App\Models\GameChargeHistory;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentMethodHistory;
 
 
 class PaymentMethodController extends Controller
@@ -18,7 +19,7 @@ class PaymentMethodController extends Controller
         $merchantRefNumber = $callbackData['merchantRefNumber'];
         $orderStatus = $callbackData['orderStatus'];
 
-        $order = PaymentMethodHistory::where("utd_code",$merchantRefNumber)->first();
+        $order = PaymentMethodHistory::where("utd_code", $merchantRefNumber)->first();
         if ($orderStatus === 'PAID') {
             $order->status = "paid";
             if ($order->type == "game_type") {
@@ -43,14 +44,26 @@ class PaymentMethodController extends Controller
     public function updateDiForUser($amount)
     {
         $balance  = $amount * config("app.one_coins") * 2;
-        $gameWallet = GameWallet::whereMonth("created_at",date("m"))->whereYear("created_at",date("Y"))->first();
+        $gameWallet = GameWallet::whereMonth("created_at", date("m"))->whereYear("created_at", date("Y"))->first();
         if ($gameWallet) {
             $gameWallet->balance += $balance;
             $gameWallet->save();
-        }else{
+        } else {
             GameWallet::create([
                 'balance' => $balance,
             ]);
         }
+    }
+
+    public function store(Request $request)
+    {
+        $trx = PaymentMethodHistory::create([
+            "amount" => $request->amount,
+            "type" => 'game_type',
+           // "utd_code" => $request->merchantRefNum,
+        ]);
+
+        $trxId = $trx->id;
+        return Common::apiResponse(1, 'created successfully', $trxId, 200);
     }
 }

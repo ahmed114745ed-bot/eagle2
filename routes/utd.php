@@ -17,10 +17,11 @@ use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
+use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
-use App\Http\Controllers\Api\V1\GameReportController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -99,6 +100,9 @@ Route::middleware([])->group(function () {
        
 
     });
+    Route::post('/create-paymentMethod', [PaymentMethodController::class, 'store']);
+
+
     // roles
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"]);
