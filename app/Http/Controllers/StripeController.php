@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -69,6 +69,7 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
+        Log::info(json_encode($request->all()));
         $apiKey = config('stripe.test_secret_key');
 
         Stripe::setApiKey($apiKey);
@@ -101,13 +102,7 @@ class StripeController extends Controller
                     break;
 
                 case 'payment_intent.succeeded':
-                    Log::info('payment succeeded');
-                    $session = $event->data->object; // Contains session details
-                    
-                    $userId = $session->metadata->user_id;
-                    $orderId = $session->metadata->order_id;
 
-                    $this->makePayment($orderId, $userId);
 
                     break;
                 case 'payment_intent.failed':
