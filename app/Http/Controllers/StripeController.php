@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
+use Log;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -24,11 +25,30 @@ class StripeController extends Controller
             'product_name' => 'required|string|max:255',
             'amount' => 'required|numeric',
             'quantity' => 'required|integer|min:1',
+            'coin_id' => 'required|numeric'
         ]);
-
         try {
+
             $apiKey = config('stripe.test_secret_key');
 
+            $request->user_id = auth()->id();
+
+            $coin = Coin::query()->find($request->coin_id);
+
+            $trx = rand (111111111111111111,999999999999999999);
+
+            $order = CoinLog::query()->create(
+                [
+                    'paid_usd' => $coin->usd,
+                    'user_id' => auth()->id(),
+                    'obtained_coins' => $coin->coin,
+                    'method' => 'card',
+                    'trx' => $trx,
+                    'status' => 0
+                ]
+            );
+
+            $request->order_id = $order->id;
 
             $link = $this->stripeService->pay($apiKey, $request);
 
@@ -58,7 +78,7 @@ class StripeController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
 
         // Your Stripe webhook secret, which you get from the Stripe dashboard
-        $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
+        $endpointSecret = config('stripe.my_webhook_secret'); // Set this in your .env file
 
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
@@ -72,9 +92,8 @@ class StripeController extends Controller
 
                     $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
-                    $product_id = $session->metadata->product_id;
 
-                    $this->makePayment($orderId, $product_id, $userId);
+                    $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
                     \Log::info("Payment successful for session: {$session->id}");
@@ -82,7 +101,13 @@ class StripeController extends Controller
                     break;
 
                 case 'payment_intent.succeeded':
+                    Log::info('payment succeeded');
+                    $session = $event->data->object; // Contains session details
+                    
+                    $userId = $session->metadata->user_id;
+                    $orderId = $session->metadata->order_id;
 
+                    $this->makePayment($orderId, $userId);
 
                     break;
                 case 'payment_intent.failed':
@@ -111,32 +136,24 @@ class StripeController extends Controller
         }
     }
 
-    public function makePayment($orderId, mixed $productId, int|string|null $userId): false | CoinLog
+    public function makePayment($orderId, int|string|null $userId)
     {
         if ($userId === null) return false;
-        $item  = CoinLog::where("trx", $orderId)->first();
-        $coins = Coin::find($productId);
 
-        $data = false;
+        $item  = CoinLog::where("id", $orderId)->first();
 
-        if (!$item && $coins) {
-            $user = User::find($userId);
-
-            $user->di += $coins->coin;
-            $user->save();
-
-            $paid_usd = UserCommon::specialTransfer($coins?->coin);
-            $data = CoinLog::create([
-                "paid_usd" => $paid_usd,
-                "obtained_coins" => $coins?->coin,
-                "user_id"        => $userId,
-                'method'         => "google_pay",
-                'donor_id'       => 0,
-                'donor_type'     => 0,
-                'status'         => 1,
-                'trx'            => $orderId,
-            ]);
+        if($item->status == 1){
+            return false;
         }
-        return $data;
+
+        $item->status = 1;
+
+        $item->save();
+
+        $user = User::find($userId);
+
+        $user->di += $item->obtained_coins;
+
+        $user->save();
     }
 }

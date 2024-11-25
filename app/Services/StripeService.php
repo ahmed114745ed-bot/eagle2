@@ -32,7 +32,6 @@ class StripeService {
                 'metadata' => [
                     'user_id' => $request->user_id,
                     'order_id' => $request->order_id,
-                    'product_id' => $request->product_id,
                 ]
             ]);
 
