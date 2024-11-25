@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -49,6 +50,7 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
+        Log::info(json_encode($request->all()));
         $apiKey = config('stripe.test_secret_key');
 
         Stripe::setApiKey($apiKey);
