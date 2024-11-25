@@ -64,10 +64,7 @@ class FamilyController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
-        $em = [
-            'id' => 0, 'name' => '', 'introduce' => '', 'image' => '',
-            'rank' => '0',
-        ];
+        
 
         $data = FamilyRankResource::collection($data);
         return Common::apiResponse(1, '',$data);
