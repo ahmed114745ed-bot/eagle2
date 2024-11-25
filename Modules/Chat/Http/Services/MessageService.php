@@ -178,7 +178,7 @@ class MessageService
             $body = $message->message;
             $type = $message->type ?? 'text';
 
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type, user: $user2);
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type, user: $message->user);
         }
     }
 }
