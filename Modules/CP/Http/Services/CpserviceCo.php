@@ -6,8 +6,12 @@ use App\Repositories\CpRepository;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use Modules\Chat\Entities\ChatMessage;
+use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Events\Chat;
 use Modules\Chat\Events\Conversation;
+use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Http\Services\ChatService;
 use Modules\CP\Entities\CpRelation;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
@@ -38,14 +42,14 @@ class CpserviceCo
             return Common::apiResponse(0, 'لقد تعديت العدد المسموح به!');
         }
         if ($cpRelation->cp_one == 1) {
-            $existingCpOne = $this->cpRepository->checkExistingCpOne($user->id, $cpRelation->id);
-            $existingCptwo = $this->cpRepository->checkExistingCpOne($request->user_id, $cpRelation->id);
+            $existingCpOne = $this->cpRepository->checkExistingCpOne($user->id,$cpRelation->id);
+            $existingCptwo = $this->cpRepository->checkExistingCpOne($request->user_id,$cpRelation->id);
 
             if ($existingCpOne) {
                 return Common::apiResponse(0, 'انت تتمتع ب cp مع شخص اخر!');
             }
 
-            if ($existingCptwo) {
+            if ( $existingCptwo) {
                 return Common::apiResponse(0, 'هذا المستخدم يتمتع ب cp مع شخص اخر!');
             }
         }
@@ -66,15 +70,17 @@ class CpserviceCo
             }
         }
 
-        $cp_request = $this->cpRepository->createCp([
+        $this->cpRepository->createCp([
             "cp_relation_id" => $request->cp_relation_id,
             "user_one_id" => $user->id,
             "user_two_id" => $request->user_id,
             "price" => $cpRelation->price,
         ]);
 
+        $user->di -= $cpRelation->price;
+        $user->save();
 
-        $chatRoom = $this->chatService->findChatRoomBetweenUsers($user->id, $request->user_id);
+        $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
 
 
         if (!$chatRoom) {
@@ -91,8 +97,8 @@ class CpserviceCo
         $user2 = User::find($request->user_id);
 
         $data = [
-            'id' => $cp_request->id,
-            'title' => $cp_request->description,
+            'id' => $cpRelation->id,
+            'title' => $cpRelation->description,
             'price' => $cpRelation->price,
             'image' => $cpRelation->image,
             'status' => 0
@@ -100,12 +106,42 @@ class CpserviceCo
 
         $key = env('MESSAGE_KEY');
 
-        $message = 'CP_'.$this->encryptArray($data,$key);
+        $message = $this->encryptArray($data,$key);
 
-        event(new Conversation($message, $user2, $chatRoom));
 
-        event(new Chat($message, $user2));
+        $chatMessageData = [
+            'chat_room_id' => $chatRoom->id,
+            'user_id' => $user->id,
+            'message' => $message,
+            'type' => 'CP'
+        ];
 
+        if($user2->online == 1 && $user2->current_room_chat == $chatRoom->id )
+        {
+
+            $chatMessageData['status'] = 'seen';
+        }
+        else if($user2->online == 1)
+        {
+            $chatMessageData['status'] = 'received';
+        }
+        $chatMessage = ChatMessage::create($chatMessageData);
+
+        if($user2->is_logout != 1) {
+            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
+            $title=$user->name;
+            $body= $message ;
+            $type = $message->type ?? 'text';
+            Common::send_firebase_notification($tokens_notfacion,$title,$body,messageType:$type );
+
+        }
+
+        $message_resource = new ChatMessageResource($chatMessage);
+        $room_resource =  new ChatRoomResourcePusher($chatRoom) ;
+
+        event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
+
+        event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
 
         return Common::apiResponse(1, 'تم الاضافه بنجاح');
     }
