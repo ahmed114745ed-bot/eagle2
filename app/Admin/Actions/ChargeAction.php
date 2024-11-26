@@ -117,11 +117,11 @@ class ChargeAction extends Action
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
         $charge->user_id = $user->id;
         $charge->agency_id = $agency->id ?? null;
-        $charge->user_type = $request->user_type??'dashdash';
-        //$charge->user_type = $request->user_type == 'dash' ? 'dash' : 'app';
+        $charge->user_type = $request->user_type ?? 'app';
         $charge->amount = $amount;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
+        //dd($charge);
         $charge->save();
     }
 

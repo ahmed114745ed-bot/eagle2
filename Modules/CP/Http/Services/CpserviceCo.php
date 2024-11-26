@@ -1,10 +1,18 @@
 <?php
+
 namespace Modules\CP\Http\Services;
 
 use App\Repositories\CpRepository;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use Modules\Chat\Entities\ChatMessage;
+use Modules\Chat\Entities\ChatRoom;
+use Modules\Chat\Events\Chat;
+use Modules\Chat\Events\Conversation;
+use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Modules\Chat\Http\Services\ChatService;
 use Modules\CP\Entities\CpRelation;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 use Modules\CP\Transformers\CpListResource;
@@ -15,7 +23,7 @@ class CpserviceCo
 {
     protected $cpRepository;
 
-    public function __construct(RepositoriesCpRepository $cpRepository)
+    public function __construct(RepositoriesCpRepository $cpRepository, public ChatService $chatService)
     {
         $this->cpRepository = $cpRepository;
     }
@@ -72,7 +80,108 @@ class CpserviceCo
         $user->di -= $cpRelation->price;
         $user->save();
 
+        $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
+
+
+        if (!$chatRoom) {
+            return response()->json([
+                'status' => 404,
+                'status' => 'Chat not Found',
+            ], 404);
+        }
+
+        $user->di -= $cpRelation->price;
+        $user->save();
+
+
+        $user2 = User::find($request->user_id);
+
+        $data = [
+            'id' => $cpRelation->id,
+            'title' => $cpRelation->description,
+            'price' => $cpRelation->price,
+            'image' => $cpRelation->image,
+            'status' => 0
+        ];
+
+        $key = env('MESSAGE_KEY');
+
+        $message = $this->encryptArray($data,$key);
+
+
+        $chatMessageData = [
+            'chat_room_id' => $chatRoom->id,
+            'user_id' => $user->id,
+            'message' => $message,
+            'type' => 'CP'
+        ];
+
+        if($user2->online == 1 && $user2->current_room_chat == $chatRoom->id )
+        {
+
+            $chatMessageData['status'] = 'seen';
+        }
+        else if($user2->online == 1)
+        {
+            $chatMessageData['status'] = 'received';
+        }
+        $chatMessage = ChatMessage::create($chatMessageData);
+
+        if($user2->is_logout != 1) {
+            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
+            $title=$user->name;
+            $body= $message ;
+            $type = $message->type ?? 'text';
+            Common::send_firebase_notification($tokens_notfacion,$title,$body,messageType:$type );
+
+        }
+
+        $message_resource = new ChatMessageResource($chatMessage);
+        $room_resource =  new ChatRoomResourcePusher($chatRoom) ;
+
+        event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
+
+        event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
+
         return Common::apiResponse(1, 'تم الاضافه بنجاح');
+    }
+
+
+    function encryptArray(array $data, string $key): string
+    {
+        $ivLength = openssl_cipher_iv_length('AES-256-CBC');
+        $iv = openssl_random_pseudo_bytes($ivLength);
+        $encrypted = openssl_encrypt(
+            json_encode($data), // Convert the array to JSON
+            'AES-256-CBC',      // Encryption algorithm
+            $key,               // Your custom key
+            0,                  // Options (0 for default)
+            $iv                 // Initialization vector
+        );
+
+        // Combine IV and encrypted data, then encode it to base64
+        return base64_encode($iv . $encrypted);
+    }
+
+    function decryptArray(string $encryptedData, string $key): array
+    {
+        $ivLength = openssl_cipher_iv_length('AES-256-CBC');
+        $data = base64_decode(substr($encryptedData, 3));
+
+        // Extract the IV and the encrypted string
+        $iv = substr($data, 0, $ivLength);
+        $encrypted = substr($data, $ivLength);
+
+        $decrypted = openssl_decrypt(
+            $encrypted,
+            'AES-256-CBC',
+            $key,
+            0,
+            $iv
+        );
+
+        // Decode JSON back to an array
+        return json_decode($decrypted, true);
     }
 
     public function getRequestCp($user)
@@ -127,5 +236,4 @@ class CpserviceCo
         $data = $this->cpRepository->getCpList($userId, true);
         return Common::apiResponse(1, '', CpListResource::collection($data));
     }
-
 }

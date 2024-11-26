@@ -27,6 +27,7 @@ use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Events\UnreadCounterIndividual;
 use Modules\Achievement\Entities\UserAchievementLevel;
+use Modules\Chat\Entities\ChatMessage;
 
 class UserCounterServices
 {
@@ -79,7 +80,7 @@ class UserCounterServices
      * @param string $date
      * @return int
      */
-    private function getCountByType(User $user, string $type, string $date)
+    public function getCountByType(User $user, string $type, string $date = null)
     {
         switch ($type) {
             case "system_message":
@@ -121,6 +122,8 @@ class UserCounterServices
                 // \Log::info('ware '. $ware,);
                 // \Log::info('date'.  $date);
                 return $ware;
+            case 'message':
+                return ChatMessage::where('user_id', $user->id)->where('status', 'received')->count();
             default:
                 return 0;
         }

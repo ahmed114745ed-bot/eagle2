@@ -109,6 +109,7 @@ class MyDataResource extends JsonResource
         }
 
 
+        $counters['message'] = $userCounterServices->getCountByType($user, 'message');
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/

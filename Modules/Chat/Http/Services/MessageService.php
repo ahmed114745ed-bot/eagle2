@@ -14,6 +14,7 @@ use Modules\Chat\Http\Repositories\MessageRepository;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Traits\FfmpegTrait;
+use Modules\Public\Events\UnreadCounterIndividual;
 
 class MessageService
 {
@@ -164,8 +165,12 @@ class MessageService
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
         if ($user2->online == 1) {
-            $status = ($user2->current_room_chat == $chatRoom->id) ? 'seen' : 'received';
+            $condition = ($user2->current_room_chat == $chatRoom->id);
+            $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
+            if(!$condition){
+                event(new UnreadCounterIndividual('message',$user2,1));
+            }
         }
     }
 

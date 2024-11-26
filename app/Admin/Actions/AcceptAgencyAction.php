@@ -19,7 +19,7 @@ use Modules\AgencyApp\Entities\AdditionalInfo;
 class AcceptAgencyAction extends RowAction
 {
     public $name;
-    
+
     public $id;
 
     public function __construct($id = 0)
@@ -56,7 +56,7 @@ class AcceptAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-    
+
     }
 
     public function html()
