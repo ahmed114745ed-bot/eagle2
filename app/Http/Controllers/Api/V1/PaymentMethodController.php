@@ -60,7 +60,7 @@ class PaymentMethodController extends Controller
         $trx = PaymentMethodHistory::create([
             "amount" => $request->amount,
             "type" => 'game_type',
-           // "utd_code" => $request->merchantRefNum,
+            "utd_code" => $request->utd_code,
         ]);
 
         $trxId = $trx->id;
