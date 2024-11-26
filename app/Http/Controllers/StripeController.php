@@ -70,6 +70,7 @@ class StripeController extends Controller
     public function handleWebhook(Request $request)
     {
         Log::info(json_encode($request->all()));
+        Log::info('mohamed-gamal');
         $apiKey = config('stripe.test_secret_key');
 
         Stripe::setApiKey($apiKey);
