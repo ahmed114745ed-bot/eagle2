@@ -8,12 +8,13 @@ use Illuminate\Http\Request;
 use App\Models\GameChargeHistory;
 use App\Http\Controllers\Controller;
 use App\Models\PaymentMethodHistory;
-
+use Illuminate\Support\Facades\Log;
 
 class PaymentMethodController extends Controller
 {
     public function callback(Request $request)
     {
+        Log::info(json_encode($request->all()));
         $callbackData = $request->all();
         $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];
