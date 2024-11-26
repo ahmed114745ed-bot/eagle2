@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
@@ -86,6 +87,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         function () {
 
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
+            Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
 
             Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
 
