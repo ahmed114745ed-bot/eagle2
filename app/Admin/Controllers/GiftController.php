@@ -51,7 +51,7 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select($types);
+        $grid->column('type', __('type'))->select(translate(TYPE_GIFT) );
         $grid->vip_level(__('vip_level'));
         $grid->column('hot', trans('hot'));
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
