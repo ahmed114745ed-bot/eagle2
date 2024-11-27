@@ -70,8 +70,6 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        Log::info('mohamed-gamal');
-
         $apiKey = config('stripe.test_secret_key');
 
         Stripe::setApiKey($apiKey);
@@ -80,14 +78,11 @@ class StripeController extends Controller
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
         // Your Stripe webhook secret, which you get from the Stripe dashboard
-        $endpointSecret = 'whsec_2PTszrAQTltl0FksfIytAfSyQMx3dQqq'; // Set this in your .env file
+        $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
 
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
-
-
-            $session = $event->data->object; // Contains session details
 
             // Handle the event types
             switch ($event->type) {
@@ -97,24 +92,21 @@ class StripeController extends Controller
 
                     $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
-                    Log::info(json_encode(['user_id' =>$userId, 'order_id' => $orderId]));
 
                     $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
-                    \Log::info("Payment successful for session: {$session->id}");
                     Log::info('completed');
                     break;
 
                 case 'payment_intent.succeeded':
 
                     $session = $event->data->object; // Contains session details
-                    $fullSession = Session::retrieve($session->id);
 
+                    $userId = $session->metadata->user_id;
+                    $orderId = $session->metadata->order_id;
 
-                    // Access metadata
-                    $metadata = $fullSession->metadata;
-
+                    $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
                     Log::info('succeeded');
@@ -149,8 +141,6 @@ class StripeController extends Controller
 
     public function makePayment($orderId, int|string|null $userId)
     {
-        Log::info('inside_payment');
-        Log::info(json_encode(['order_id_inside' => $orderId, 'user_id_inside' => $userId]));
         if ($userId === null) return false;
 
         $item  = CoinLog::where("id", $orderId)->first();
