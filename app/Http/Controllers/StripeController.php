@@ -88,7 +88,7 @@ class StripeController extends Controller
 
 
             $session = $event->data->object; // Contains session details
-            Log::info(json_encode(['meta_data' =>$$session->metadata]));
+            Log::info(json_encode(['meta_data' =>$session->metadata]));
 
             // Handle the event types
             switch ($event->type) {
