@@ -10,6 +10,7 @@ use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -88,7 +89,7 @@ class StripeController extends Controller
 
 
             $session = $event->data->object; // Contains session details
-            Log::info(json_encode(['meta_data' =>$session->metadata]));
+            Log::info(json_encode(['meta_data1' =>$session->metadata]));
 
             // Handle the event types
             switch ($event->type) {
@@ -110,12 +111,13 @@ class StripeController extends Controller
                 case 'payment_intent.succeeded':
 
                     $session = $event->data->object; // Contains session details
+                    $fullSession = Session::retrieve($session->id);
 
-                    $userId = $session->metadata->user_id;
-                    $orderId = $session->metadata->order_id;
-                    Log::info(json_encode(['user_id' =>$userId, 'order_id' => $orderId]));
 
-                    $this->makePayment($orderId, $userId);
+                    // Access metadata
+                    $metadata = $fullSession->metadata;
+                    Log::info(json_encode(['metadata2' => $metadata]));
+
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
                     Log::info('succeeded');
