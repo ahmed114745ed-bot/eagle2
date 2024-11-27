@@ -28,15 +28,6 @@ class GiftController extends MainController
      */
     protected function grid()
     {
-        $types = [
-            1 => __('normal'),
-            2 => __('hot'),
-            3 => __('country'),
-            4 => __('Moment'),
-            5 => __('Famous gifts'),
-            6 => __('Lucky gifts'),
-            7 => __('events'),
-        ];
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
 
@@ -44,7 +35,7 @@ class GiftController extends MainController
             $filter->disableIdFilter();
             // $filter->like('type', __('type'));
             $filter->in('type', __('type'))->multipleSelect(
-                $types
+                translate(TYPE_GIFT) 
             );
 
             $filter->expand();
