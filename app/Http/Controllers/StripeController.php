@@ -79,13 +79,19 @@ class StripeController extends Controller
         // Retrieve the request's body and Stripe signature header
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
-        Log::info(json_encode(['stripe_signature' => $sigHeader]));
         // Your Stripe webhook secret, which you get from the Stripe dashboard
         $endpointSecret = 'whsec_2PTszrAQTltl0FksfIytAfSyQMx3dQqq'; // Set this in your .env file
 
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+
+
+            $session = $event->data->object; // Contains session details
+
+                    $userId = $session->metadata->user_id;
+                    $orderId = $session->metadata->order_id;
+                    Log::info(json_encode(['user_id' =>$userId, 'order_id' => $orderId]));
 
             // Handle the event types
             switch ($event->type) {
@@ -101,11 +107,22 @@ class StripeController extends Controller
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
                     \Log::info("Payment successful for session: {$session->id}");
-
+                    Log::info('completed');
                     break;
 
                 case 'payment_intent.succeeded':
 
+                    $session = $event->data->object; // Contains session details
+
+                    $userId = $session->metadata->user_id;
+                    $orderId = $session->metadata->order_id;
+                    Log::info(json_encode(['user_id' =>$userId, 'order_id' => $orderId]));
+
+                    $this->makePayment($orderId, $userId);
+                    // Handle successful payment here (e.g., update database)
+                    // You can access $session->id, $session->payment_status, etc.
+                    Log::info('succeeded');
+                    \Log::info("Payment successful for session: {$session->id}");
 
                     break;
                 case 'payment_intent.failed':
