@@ -1,7 +1,7 @@
 <div>
     <form action="">
         <input type="month" name="date">
-        <button>filter</button>
+        <button>{{ __('admin.filter') }}</button>
     </form>
 </div>
 <style>
@@ -83,7 +83,7 @@ ul.list-unstyled {
             @endif
             <!-- Add a button here -->
             <button type="button" class="btn btn-primary mt-3" onclick="window.location.href='admin/payment-with-method';">
-                {{ __('admin.pay') }} 
+                {{ __('admin.pay') }}
             </button>
         </div>
     </div>
