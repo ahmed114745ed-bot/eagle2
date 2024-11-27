@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Database\Seeders\config;
+use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\Stripe;
 
@@ -34,7 +35,6 @@ class StripeService {
                     'order_id' => $request->order_id,
                 ]
             ]);
-
             // Return the payment link
             return $session->url;
         }
