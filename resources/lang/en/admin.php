@@ -3,6 +3,7 @@
 return [
     'online'                => 'Online',
     'login'                 => 'Login',
+    'register'              => 'register',
     'logout'                => 'Logout',
     'setting'               => 'Setting',
     'name'                  => 'Name',
@@ -150,6 +151,7 @@ return [
     'availableBalance' => 'available balance ',
     'used' =>'used',
     'pay' => 'pay',
+    'home' => 'Home',
     'you_must_pay' => "Please charge to avoid stopping the games",
     'admin'=>'admin',
 
