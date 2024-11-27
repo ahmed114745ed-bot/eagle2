@@ -71,7 +71,6 @@ class StripeController extends Controller
     {
         Log::info(json_encode($request->all()));
         Log::info('mohamed-gamal');
-        Log::info('Webhook payload: ' . $request->getContent());
 
         $apiKey = config('stripe.test_secret_key');
 
@@ -82,20 +81,21 @@ class StripeController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
 
         // Your Stripe webhook secret, which you get from the Stripe dashboard
-        //$endpointSecret = config('stripe.my_webhook_secret'); // Set this in your .env file
+        $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
 
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
-            //$event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+            $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
 
             // Handle the event types
-            switch ($request->type) {
+            switch ($event->type) {
                 case 'checkout.session.completed':
                     // Payment successful
                     $session = $event->data->object; // Contains session details
 
                     $userId = $session->metadata->user_id;
                     $orderId = $session->metadata->order_id;
+                    Log::info(json_encode(['user_id' =>$userId, 'order_id' => $orderId]));
 
                     $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)

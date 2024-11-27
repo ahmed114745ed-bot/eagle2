@@ -12,10 +12,6 @@ class StripeService {
 
     public function pay($apiKey, $request){
 
-        Log::info('Creating Stripe session with metadata: ', [
-            'user_id' => $request->user_id,
-            'order_id' => $request->order_id,
-        ]);
         Stripe::setApiKey($apiKey);
         try {
             // Create a checkout session
