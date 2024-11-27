@@ -31,7 +31,7 @@ class GiftController extends MainController
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
 
-        $grid->filter(function (Grid\Filter $filter) use($types){
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             // $filter->like('type', __('type'));
             $filter->in('type', __('type'))->multipleSelect(
