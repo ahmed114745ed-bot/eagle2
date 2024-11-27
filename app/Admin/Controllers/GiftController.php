@@ -28,23 +28,14 @@ class GiftController extends MainController
      */
     protected function grid()
     {
-        $types = [
-            1 => __('normal'),
-            2 => __('hot'),
-            3 => __('country'),
-            4 => __('Moment'),
-            5 => __('Famous gifts'),
-            6 => __('Lucky gifts'),
-            7 => __('events'),
-        ];
         $grid = new Grid(new Gift);
         $grid->model()->orderBy("use_count", "desc");
 
-        $grid->filter(function (Grid\Filter $filter) use($types){
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             // $filter->like('type', __('type'));
             $filter->in('type', __('type'))->multipleSelect(
-                $types
+                translate(TYPE_GIFT) 
             );
 
             $filter->expand();
@@ -60,7 +51,7 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select($types);
+        $grid->column('type', __('type'))->select(translate(TYPE_GIFT) );
         $grid->vip_level(__('vip_level'));
         $grid->column('hot', trans('hot'));
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
