@@ -79,7 +79,7 @@ class StripeController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
         // Your Stripe webhook secret, which you get from the Stripe dashboard
         $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
-
+        Log::info(json_encode(['stripe_webhook_secret' => $endpointSecret]));
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
