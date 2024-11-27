@@ -35,13 +35,6 @@ class StripeService {
                     'order_id' => $request->order_id,
                 ]
             ]);
-
-
-            Log::info('Session created successfully: ', [
-                'id' => $session->id,
-                'url' => $session->url,
-                'metadata' => $session->metadata,
-            ]);
             // Return the payment link
             return $session->url;
         }

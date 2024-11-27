@@ -70,7 +70,6 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        Log::info(json_encode($request->all()));
         Log::info('mohamed-gamal');
 
         $apiKey = config('stripe.test_secret_key');
@@ -89,7 +88,6 @@ class StripeController extends Controller
 
 
             $session = $event->data->object; // Contains session details
-            Log::info(json_encode(['meta_data1' =>$session->metadata]));
 
             // Handle the event types
             switch ($event->type) {
@@ -116,7 +114,6 @@ class StripeController extends Controller
 
                     // Access metadata
                     $metadata = $fullSession->metadata;
-                    Log::info(json_encode(['metadata2' => $metadata]));
 
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
@@ -152,6 +149,8 @@ class StripeController extends Controller
 
     public function makePayment($orderId, int|string|null $userId)
     {
+        Log::info('inside_payment');
+        Log::info(json_encode(['order_id_inside' => $orderId, 'user_id_inside' => $userId]));
         if ($userId === null) return false;
 
         $item  = CoinLog::where("id", $orderId)->first();
