@@ -38,11 +38,11 @@ class WeeklyEventGiftNController extends MainController
     public function index(Content $content)
     {
         $url = url('/admin/weekly-events-new'); // Define your button URL
-
+        $translation = __(' back');
         $buttonHTML = <<<HTML
-    <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
-        <i class="fa fa-arrow-left"></i> رجوع
-    </a>
+    <a href="{{ $url }}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+         <i class="fa fa-arrow-left"></i>{$translation}
+       </a>
     HTML;
         return $content
             ->header(trans('admin.index'))
@@ -111,7 +111,7 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img ;
+                $path = $ware->img2 ?? $ware->show_img;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -134,12 +134,14 @@ class WeeklyEventGiftNController extends MainController
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('weekly_event_id') . "/1/create";
+            $add = __('add');
+            $gifts = __('winner first gifts');
             $customButtonHTML = <<<HTML
 
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                    <i class="fa fa-plus"></i> ضيف
+                    <i class="fa fa-plus"></i> {$add}
                 </a>
-                <h3 style="margin-right: 10px;">جوائز للفائز الأول</h3>
+                <h3 style="margin-right: 10px;">{ $gifts}</h3>
 
             HTML;
             $tools->append($customButtonHTML);
@@ -176,7 +178,7 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img ;
+                $path = $ware->img2 ?? $ware->show_img;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -199,11 +201,13 @@ class WeeklyEventGiftNController extends MainController
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('weekly_event_id') . "/2/create";
+            $add = __('add');
+            $gifts = __('winner second gifts');
             $customButtonHTML = <<<HTML
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                <i class="fa fa-plus"></i>ضيف
+                <i class="fa fa-plus"></i>{$add}
             </a>
-            <h3 style="margin-right: 10px;">جوائز للفائز الثاني</h3>
+            <h3 style="margin-right: 10px;">{$gifts}</h3>
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -239,7 +243,7 @@ class WeeklyEventGiftNController extends MainController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img ;
+                $path = $ware->img2 ?? $ware->show_img;
             } elseif ($this->type == 'vip') {
                 $vips = OVip::find($this->target);
                 $path = $vips->img;
@@ -262,11 +266,13 @@ class WeeklyEventGiftNController extends MainController
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
             $url = request()->route('weekly_event_id') . "/3/create";
+            $add = __('add');
+            $gifts = __('winner third gifts');
             $customButtonHTML = <<<HTML
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-                <i class="fa fa-plus"></i>ضيف
+                <i class="fa fa-plus"></i>{$add}
             </a>
-            <h3 style="margin-right: 10px;"> جوائز للفائز الثالث </h3>
+            <h3 style="margin-right: 10px;"> {$gifts}</h3>
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -322,7 +328,7 @@ class WeeklyEventGiftNController extends MainController
             });
         $form->number('expire', __('expire'));
         $form->saved(function (Form $form) {
-            $route = url('admin/weekly-events-gift/'.request('weekly_event_id'));
+            $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));
             return redirect($route);
         });
         return $form;
