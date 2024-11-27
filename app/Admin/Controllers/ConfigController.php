@@ -190,8 +190,6 @@ class ConfigController extends MainController
 
         $form->display('ID');
         $form->text('name', trans('name'));
-        $form->text('value', trans('value'));
-
         // if ($form->isEditing()) {
         //     if ($form->model()->type == 'integer') {
         //         $form->valueInteger = $form->model()->value;
