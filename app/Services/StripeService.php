@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Database\Seeders\config;
+use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session as StripeCheckoutSession;
 use Stripe\Stripe;
 
@@ -11,6 +12,10 @@ class StripeService {
 
     public function pay($apiKey, $request){
 
+        Log::info('Creating Stripe session with metadata: ', [
+            'user_id' => $request->user_id,
+            'order_id' => $request->order_id,
+        ]);
         Stripe::setApiKey($apiKey);
         try {
             // Create a checkout session
@@ -35,6 +40,12 @@ class StripeService {
                 ]
             ]);
 
+
+            Log::info('Session created successfully: ', [
+                'id' => $session->id,
+                'url' => $session->url,
+                'metadata' => $session->metadata,
+            ]);
             // Return the payment link
             return $session->url;
         }

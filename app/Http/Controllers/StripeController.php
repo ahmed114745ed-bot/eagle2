@@ -10,7 +10,6 @@ use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -72,18 +71,12 @@ class StripeController extends Controller
     {
         Log::info(json_encode($request->all()));
         Log::info('mohamed-gamal');
+        Log::info('Webhook payload: ' . $request->getContent());
+
         $apiKey = config('stripe.test_secret_key');
 
         Stripe::setApiKey($apiKey);
 
-
-
-        $sessionId = $request->data['object']['id']; // Get the session ID from the webhook payload
-        $session = Session::retrieve($sessionId);   // Retrieve the full session object from Stripe
-        $metadata = $session->metadata;
-        Log::info(json_encode($metadata));
-
-        
         // Retrieve the request's body and Stripe signature header
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
