@@ -10,6 +10,7 @@ use App\Services\StripeService;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -75,19 +76,27 @@ class StripeController extends Controller
 
         Stripe::setApiKey($apiKey);
 
+
+
+        $sessionId = $request->data['object']['id']; // Get the session ID from the webhook payload
+        $session = Session::retrieve($sessionId);   // Retrieve the full session object from Stripe
+        $metadata = $session->metadata;
+        Log::info(json_encode($metadata));
+
+        
         // Retrieve the request's body and Stripe signature header
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
 
         // Your Stripe webhook secret, which you get from the Stripe dashboard
-        $endpointSecret = config('stripe.my_webhook_secret'); // Set this in your .env file
+        //$endpointSecret = config('stripe.my_webhook_secret'); // Set this in your .env file
 
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
-            $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+            //$event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
 
             // Handle the event types
-            switch ($event->type) {
+            switch ($request->type) {
                 case 'checkout.session.completed':
                     // Payment successful
                     $session = $event->data->object; // Contains session details
