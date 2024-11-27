@@ -141,6 +141,7 @@ class StripeController extends Controller
 
     public function makePayment($orderId, int|string|null $userId)
     {
+        Log::info(json_encode(['order_id_inside' => $orderId, 'user_id_inside' => $userId]));
         if ($userId === null) return false;
 
         $item  = CoinLog::where("id", $orderId)->first();
