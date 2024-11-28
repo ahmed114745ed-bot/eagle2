@@ -11,7 +11,6 @@
     {!! $form->open() !!}
 
     <div class="box-body">
-
         @if(!$tabObj->isEmpty())
             @include('admin::form.tab', compact('tabObj'))
         @else

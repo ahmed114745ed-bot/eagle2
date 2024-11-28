@@ -85,6 +85,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::get('/countries/users', [CountryController::class, 'countries']);
 
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
             Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
