@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use Doctrine\DBAL\Schema\Index;
+use Illuminate\Support\Facades\DB;
 
 class CountryController extends Controller
 {
@@ -34,5 +35,29 @@ class CountryController extends Controller
     public function index()
     {
         return $this->countryService->index2();
+    }
+
+    public function countries(){
+
+        $allTypesWithCountries = DB::table('countries')
+        ->leftJoin('users', 'users.country_id', '=', 'countries.id')
+        ->select(
+            'countries.name as country_name',
+            'countries.flag as image',
+            DB::raw('COUNT(users.id) as user_count')
+        )
+        ->groupBy('countries.id', 'countries.name', 'countries.flag')
+        ->get();
+        
+        // تقسيم النتائج إلى المصفوفتين
+        $allCountriesSortedByName = $allTypesWithCountries->sortBy('country_name')->values();
+        $hotCountries = $allTypesWithCountries->sortByDesc('user_count')->take(20)->values();
+        
+        $data = [
+            'all' => $allCountriesSortedByName,
+            'hot' => $hotCountries,
+        ];
+
+        return Common::apiResponse(1,'', $data);
     }
 }
