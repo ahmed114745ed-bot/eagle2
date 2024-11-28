@@ -61,7 +61,7 @@ class GeneralRoleController extends MainController
             'charge_event' => 'charge_event',
             'event_period' => 'period_event',
             'weekly_cp' => 'weekly_cp',
-        ])->creationRules(['required', "unique:general_roles"], ['unique' => 'هذا النوع مستخدم من قبل روح عدل عليه '])
+        ])->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
             ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
         $form->url('url', trans('url'))->required();
         $form->text('sub_type', 'sub_type');

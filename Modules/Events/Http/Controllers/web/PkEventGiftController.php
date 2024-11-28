@@ -29,10 +29,10 @@ class PkEventGiftController extends MainController
     public function index(Content $content)
 {
     $url = url('/admin/pk-events'); // Define your button URL
-    $translation = __(' back');
+    $back = __(' back');
     $buttonHTML = <<<HTML
     <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
-        <i class="fa fa-arrow-left"></i> {$translation}
+        <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
 

@@ -111,12 +111,14 @@ class RewardTargetController extends MainController
 
         $grid->tools(function (Grid\Tools $tools) use ($target){
             $url = url('admin/target-events');
+            $back = __(' back');
+            $gifts = __('gifts');
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
                         <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                            <i class="fa fa-arrow-left"></i> الرجوع إلى targets
+                            <i class="fa fa-arrow-left"></i> {$back}
                         </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$target->value} </label>
+                        <label style="margin: 0;" { $gifts} : {$target->value} </label>
                     </div>
                 HTML;
             $tools->append($customButtonHTML);
