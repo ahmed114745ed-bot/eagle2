@@ -117,7 +117,8 @@ class DedicateWareController extends MainController
             if ($typeSpecial) {
                 $url = "/admin/special-wares/create";
             }
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;Create New</a>';
+            $create_new = __('admin.create_new');
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;' .$create_new . '</a>';
             $tools->append($button);
         });
         Admin::script("

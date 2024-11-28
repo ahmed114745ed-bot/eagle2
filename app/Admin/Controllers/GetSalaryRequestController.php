@@ -68,14 +68,14 @@ class GetSalaryRequestController extends MainController
         $grid->column ('country',__ ('country'));
         $grid->column('paymentWithDraw.name', 'طرق الدفع')->modal('البيانات', function ($model) {
             $data =$this->paymentWithDraw?->userWithdrawFields->where("user_id",$model->user_id);
-            $results = [];  
+            $results = [];
             if ($data != null) {
                 foreach ($data as $da) {
                     $key = $da->payment_withdraw_field->name ?? null;
                     $value = $da->value ?? null;
-            
-                    if ($key) {  
-                        $results[$key] = $value; 
+
+                    if ($key) {
+                        $results[$key] = $value;
                     }
                 }
             }
@@ -90,7 +90,7 @@ class GetSalaryRequestController extends MainController
                 2=>__ ('denied')
             ]
         );
-     
+
         $grid->column('created_at',trans('time'));
         $this->extendGrid ($grid);
         $grid->disableCreateButton();
@@ -107,7 +107,7 @@ class GetSalaryRequestController extends MainController
         });
         $grid->tools(function (Grid\Tools $tools){
             $url = '/admin/requests-for-get-salary-history';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("history").'</a>';
+            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
             $tools->append($button);
         });
         return $grid;
@@ -202,7 +202,7 @@ class GetSalaryRequestController extends MainController
               $reason= $form->reason_rejected;
               $value=$form->model()->amount;
                 CustomNotification::acceptRequestToGetMony($user,2,$reason,$value);
-               
+
             }elseif ($form->status == 1) {
                 $value = $form->model()->amount;
                 UserSallary::updateOrCreate(
@@ -217,7 +217,7 @@ class GetSalaryRequestController extends MainController
                 );
                 CustomNotification::acceptRequestToGetMony($user,1,'',$value);
                 if($user->email) Notification::route('mail',  $user->email)->notify(new AcceptRequestToGetSalary($value));
-            }   
+            }
         });
 
 

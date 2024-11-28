@@ -46,14 +46,14 @@ class RequestAgencyController extends MainController
                 $filter->equal('owner.uuid', __('uuid'));
 
             });
-        
+
         });
         $grid->column('id', __('Id'));
         $grid->column('owner.name',trans ('name'));
         $grid->column('owner.uuid',trans ('uuid'));
-        $grid->column('name', __('Name'));  
-        $grid->column('phone', __('whats app'));  
-        $grid->column('additionalInfo.country', __('country'));  
+        $grid->column('name', __('Name'));
+        $grid->column('phone', __('whats app'));
+        $grid->column('additionalInfo.country', __('country'));
         $grid->column('img', __('Img'))->image ('',30);
         $grid->column('additionalInfo.gmail', __('Email'));
         $grid->column('additionalInfo.video', __('video'))->display(function () {
@@ -64,7 +64,7 @@ class RequestAgencyController extends MainController
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
         });
         // $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->image ('https://storage.googleapis.com/tik-chat/',30);
-      
+
         $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->display(function () {
             $img = $this->additionalInfo?->face_image_nationalId;
             if($img == null || $img == ''){
@@ -83,8 +83,8 @@ class RequestAgencyController extends MainController
             $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
-        
-        
+
+
         $grid->column('additionalInfo.salary', __('salary'));
         $grid->column('additionalInfo.host','host');
         $grid->column('additionalInfo.user_id','معرف المستخدم الذي اوصلك الينا');
@@ -101,7 +101,7 @@ class RequestAgencyController extends MainController
 
         $grid->tools(function (Grid\Tools $tools){
             $url = '/admin/request-agencies-filteration';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("history").'</a>';
+            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
             $tools->append($button);
         });
 

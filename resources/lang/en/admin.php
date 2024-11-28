@@ -5,6 +5,7 @@ return [
     'login'                 => 'Login',
     'register'              => 'register',
     'logout'                => 'Logout',
+    "create_new" => "Create new",
     'setting'               => 'Setting',
     'name'                  => 'Name',
     'username'              => 'Username',
