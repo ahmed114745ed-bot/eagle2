@@ -28,7 +28,7 @@ class TargetEventController extends MainController
     }
     protected function grid()
     {
-//        dd(ChargeTargetEvent::with('rewards.ware')->first());
+        //        dd(ChargeTargetEvent::with('rewards.ware')->first());
         $grid = new Grid(new ChargeTargetEvent());
 
         $grid->column('id', __('Id'));
@@ -36,12 +36,12 @@ class TargetEventController extends MainController
         $grid->column('الاجرائات')->display(function () {
             // توليد الروابط
             $url1 = url('admin/target-events-gift/' . $this->id);
-
+            $gifts = __('gifts');
             // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>   هداية </a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" .   $gifts . "</a>";
 
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1 ;
+            return $button1;
         });
 
         return $grid;
@@ -76,7 +76,7 @@ class TargetEventController extends MainController
         $form = new Form(new ChargeTargetEvent());
         $form->number('value', __('value'));
         $form->saved(function (Form $form) {
-            return redirect()->to('admin/target-events-gift/'.$form->model()->id);
+            return redirect()->to('admin/target-events-gift/' . $form->model()->id);
         });
         return $form;
     }

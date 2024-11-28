@@ -63,13 +63,12 @@ class WeeklyEventNController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column( 'الاجرائات')->display(function () {
+        $grid->column( __ ('procedures'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/weekly-events-gift/'.$this->id);
 
             // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية الفائز </a>";
-
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
             // دمج الأزرار في سلسلة واحدة وإرجاعها
             return $button1 ;
         });

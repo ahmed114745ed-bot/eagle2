@@ -155,5 +155,6 @@ return [
     'home' => 'Home',
     'you_must_pay' => "Please charge to avoid stopping the games",
     'admin'=>'admin',
+    "receiver" => "Total sent to",
 
 ];

@@ -1562,5 +1562,14 @@
     "default" :" عادى",
     "week":"أسبوع",
     "monthly":"شهريا",
-    "yearly":"سنوي"
+    "yearly":"سنوي",
+    "procedures" : "الاجرائات",
+    "winner first gifts" : "هداية الفائز الاول",
+    "winner second gifts":"هداية الفائز الثاني",
+    "winner third gifts":"هداية الفائز الثالث",
+    "winners gifts":"هداية الفائز ",
+    "back":"  رجوع",
+    "add":" اضف",
+    "This type is used before; please modify it":"هذا النوع مستخدم من قبل روح عدل عليه "
+    
 }
