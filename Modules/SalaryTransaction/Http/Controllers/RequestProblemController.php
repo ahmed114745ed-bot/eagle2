@@ -21,56 +21,58 @@ use Modules\SalaryTransaction\Actions\CancelRequestAction;
 class RequestProblemController extends MainController
 {
     use HasResourceActions;
-    // public $permission_name = 'emoji';
-    // public $hiddenColumns = [
 
-    // ];
     public $permission_name = 'request-problem';
+    protected $title;
 
+    public function __construct()
+    {
+        $this->title = __('transaction-request-problem');
+    }
     protected function grid()
     {
         $grid = new Grid(new AdminCheck());
-        $grid->model()->where("admin_check",'!=',1);
+        $grid->model()->where("admin_check", '!=', 1);
         $grid->column('id', __('Id'));
         $grid->column('request_id', __('request'))->modal('request info', function ($model) {
             $show = new Show($model);
             $show->id('ID');
-            $show->field('request.agency_id',__('agency id'));
-            $show->field('request.agency_owner_id',__('agency owner id'));
-            $show->field('request.host_id',__('host id'));
-            $show->field('request.status',__('status'));
-            $show->field('request.usd',__('usd'));
-            $show->field('request.coins',__('coins'));
-            $show->field('request.host_check',__('host_check'))->display(function($q){
-                if ($q->host_check == 1 ) {
-                    return "قبول";
-                }elseif ($q->host_check == 2 ) {
-                    return "رفض";
-                }else{
-                    return "انتظار";
-                }  
+            $show->field('request.agency_id', __('agency id'));
+            $show->field('request.agency_owner_id', __('agency owner id'));
+            $show->field('request.host_id', __('host id'));
+            $show->field('request.status', __('status'));
+            $show->field('request.usd', __('usd'));
+            $show->field('request.coins', __('coins'));
+            $show->field('request.host_check', __('host_check'))->display(function ($q) {
+                if ($q->host_check == 1) {
+                    return __('Accept');
+                } elseif ($q->host_check == 2) {
+                    return __('Reject');
+                } else {
+                    return __('Pending');
+                }
             });
-            $show->field('request.bill_image',__('bill image'))->image();
+            $show->field('request.bill_image', __('bill image'))->image();
             return $show;
         });
-        $grid->column('request.bill_image',__ ('bill image'))->image ('',50);
-        $grid->column('request', 'معرف وكيل الشحن')->display(function(){
-           return $this->request?->agency?->owner?->uuid;
+        $grid->column('request.bill_image', __('bill image'))->image('', 50);
+        $grid->column('request',__('Shipping agent ID'))->display(function () {
+            return $this->request?->agency?->owner?->uuid;
         });
-        $grid->column('اسم وكيل الشحن')->display(function(){
-           return $this->request?->agency?->owner?->name;
+        $grid->column(__('Shipping Agent Name'))->display(function () {
+            return $this->request?->agency?->owner?->name;
         });
-        
-        $grid->column( 'معرف المضيف')->display(function(){
-           return $this->request?->host?->uuid;
+
+        $grid->column(__('Host ID'))->display(function () {
+            return $this->request?->host?->uuid;
         });
-        $grid->column('اسم المضيف')->display(function(){
-           return $this->request?->host?->name;
+        $grid->column(__('Host Name'))->display(function () {
+            return $this->request?->host?->name;
         });
 
         $grid->column('type', __('type'));
         $grid->disableCreateButton();
-        $grid->actions (function ($actions){
+        $grid->actions(function ($actions) {
             $actions->disableEdit();
             $actions->disableDelete();
             $actions->add(new AccepRequestAction());
@@ -97,7 +99,7 @@ class RequestProblemController extends MainController
         $show->t_length('t_length');
         $show->enable('enable');
         $show->sort('sort');
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -111,10 +113,10 @@ class RequestProblemController extends MainController
         $form = new Form(new Emoji);
 
         $form->display(__('admin.ID'));
-        $form->select('pid', __('pid'))->options (function (){
-            $ops = [0=>'root'];
-            $ps = Emoji::query ()->where ('enable',1)->where ('pid',0)->where ('id','!=',$this->id)->get ();
-            foreach ($ps as $p){
+        $form->select('pid', __('pid'))->options(function () {
+            $ops = [0 => 'root'];
+            $ps = Emoji::query()->where('enable', 1)->where('pid', 0)->where('id', '!=', $this->id)->get();
+            foreach ($ps as $p) {
                 $ops[$p->id] = $p->name;
             }
             return $ops;
@@ -122,7 +124,7 @@ class RequestProblemController extends MainController
         $form->text('name', __('name'));
         $form->file('emoji', __('emoji'));
         $form->number('t_length', __('t_length'));
-        $form->switch('enable', __('enable'))->states (Common::getSwitchStates ());
+        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
         $form->number('sort', __('sort'));
 
         return $form;
