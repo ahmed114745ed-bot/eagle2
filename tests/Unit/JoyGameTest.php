@@ -17,7 +17,7 @@ class JoyGameTest extends TestCase
     {
 
         $user = User::where('id',525)->first();
-        
+
         (new RoomGameServices())->updateRoomCoins($user , (-100));
     }
 }

@@ -35,21 +35,21 @@ class GiftService
     public function httpImage($image)
     {
         $response =  http::get($image);
-        $folder = 'images/' . basename($response->body());
+        $folder = 'images/' . basename($image);
         Storage::disk('gcs')->put($folder,  $response->body());
         return $folder;
     }
-    public function create($request)
+    public function create(\Request $request)
     {
         if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->file('img'));
-        } else {
+        } elseif($request->has($request->img)) {
             $image =    $this->httpImage($request->img);
         }
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
-        } else {
-            $image =    $this->httpImage($request->show_img);
+        } elseif($request->has($request->show_img)) {
+            $showImg =    $this->httpImage($request->show_img);
         }
 
         $data = [
