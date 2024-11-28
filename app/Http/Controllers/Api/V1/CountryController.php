@@ -40,24 +40,24 @@ class CountryController extends Controller
     public function countries(){
 
         $allTypesWithCountries = DB::table('countries')
-        ->select('countries.name as country_name', 'countries.flag as image')
+        ->leftJoin('users', 'users.country_id', '=', 'countries.id')
+        ->select(
+            'countries.name as country_name',
+            'countries.flag as image',
+            DB::raw('COUNT(users.id) as user_count')
+        )
+        ->groupBy('countries.id', 'countries.name', 'countries.flag')
         ->get();
+        
+        // تقسيم النتائج إلى المصفوفتين
+        $allCountriesSortedByName = $allTypesWithCountries->sortBy('country_name')->values();
+        $hotCountries = $allTypesWithCountries->sortByDesc('user_count')->take(20)->values();
+        
+        $data = [
+            'all' => $allCountriesSortedByName,
+            'hot' => $hotCountries,
+        ];
 
-        $hotCountries = DB::table('users')
-            ->join('countries', 'users.country_id', '=', 'countries.id')
-            ->select('countries.name as country_name', DB::raw('count(users.id) as user_count'), 'countries.flag as image')
-            ->groupBy('countries.name', 'image')
-            ->orderByDesc('user_count')
-            ->take(20)
-            ->get();
-
-        return response()->json([
-            'data' => [
-                'all' => $allTypesWithCountries,
-                'hot' => $hotCountries
-            ],
-            'status' => 'success',
-            'message' => 'Countries returned successfully'
-        ]);
+        return Common::apiResponse(1,'', $data);
     }
 }
