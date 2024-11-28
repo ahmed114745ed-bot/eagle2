@@ -18,9 +18,9 @@ class GiftService
         return $this->giftRepository->all($type);
     }
 
-    public function allGift($page,$perPage)
+    public function allGift($page, $perPage)
     {
-        return $this->giftRepository->allGifts($page,$perPage);
+        return $this->giftRepository->allGifts($page, $perPage);
     }
 
 
@@ -34,13 +34,15 @@ class GiftService
     {
         if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->file('img'));
+        } else {
+            $image = $request->img;
         }
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
+        } else {
+            $showImg = $request->show_img;
         }
-        if ($request->hasFile('show_img2')) {
-            $showImg2 = Common::upload('images', $request->file('show_img2'));
-        }
+
         $data = [
             'name'         => $request->name,
             'e_name'         => $request->e_name,
@@ -50,7 +52,7 @@ class GiftService
             'img'          =>  $image ?? "",
             'show_img'          => $showImg ?? "",
             'image_type'         => $request->image_type,
-            'show_img2'          => $showImg2 ?? '',
+            'show_img2'          =>  '',
             'sort'         => $request->sort,
             'enable'         => $request->enable,
             'music_gift'         => $request->music_gift,
