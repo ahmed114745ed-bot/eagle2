@@ -19,8 +19,8 @@ class WeeklyCpGiftsResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => app()->getLocale() == 'ar' ? $this->name : $this->e_name,
-            'image' => $this->price ?? '',
-            'price' => $this->img ?? '',
+            'image' => $this->img ?? '',
+            'price' => $this->price  ?? '',
             'show_img' => $this->show_img ?: '',
             'show_img2' => $this->show_img2 ?: '',
 
