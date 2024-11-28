@@ -3,8 +3,10 @@
 namespace App\Tik\Services;
 
 
+use Illuminate\Support\Facades\Http;
 use App\Helpers\Common;
 use App\Tik\Repositories\GiftRepository;
+use Illuminate\Support\Facades\Storage;
 
 class GiftService
 {
@@ -30,17 +32,24 @@ class GiftService
         return $this->giftRepository->findByGiftId($giftId);
     }
 
+    public function httpImage($image)
+    {
+        $response =  http::get($image);
+        $folder = 'images/' . basename($response->body());
+        Storage::disk('gcs')->put($folder,  $response->body());
+        return $folder;
+    }
     public function create($request)
     {
         if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->file('img'));
         } else {
-            $image = $request->img;
+            $image =    $this->httpImage($request->img);
         }
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
         } else {
-            $showImg = $request->show_img;
+            $image =    $this->httpImage($request->show_img);
         }
 
         $data = [

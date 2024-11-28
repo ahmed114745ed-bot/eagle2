@@ -26,6 +26,11 @@ class AgentRequestController extends MainController
     use HasResourceActions;
     public $permission_name = 'agent-request-transaction';
 
+    public function __construct()
+    {
+        $this->title = __('agent-salary-requests');
+    }
+
     protected function grid()
     {
         $grid = new Grid(new AgentSalaryRequest());
@@ -34,8 +39,8 @@ class AgentRequestController extends MainController
         $grid->column('agency.name',__("agency"));
         $grid->column('agent.name',__("name"));
         $grid->column('agent.uuid',__("Id"));
-        $grid->column('type','طريقه الدفع')->display(function($q){
-            return $this->type == 1 ? 'coins' : 'usd' ;
+        $grid->column('type',__('Payment method'))->display(function($q){
+            return $this->type == 1 ? __('coins') : 'usd' ;
         });
         $grid->column('usd',__("amount usd"));
         $grid->column('coins',__("amount coins"));

@@ -19,9 +19,14 @@ class WareVipController extends MainController
      *
      * @var string
      */
-    protected $title = 'wares vips';
     use HasResourceActions;
     public $permission_name = 'wares-vips';
+
+    public function __construct()
+    {
+        $this->title = __('wares-vips');
+    }
+    
     /**
      * Make a grid builder.
      *

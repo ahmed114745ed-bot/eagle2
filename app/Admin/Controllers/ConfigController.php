@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use App\Enums\ConfigCategory;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-Use Encore\Admin\Admin;
+use Encore\Admin\Admin;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Lang;
@@ -23,13 +23,12 @@ class ConfigController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'config';
-    public $hiddenColumns = [
-
-    ];
+    protected $title;
 
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("config");
+        $this->title = __('configs');
     }
 
     /**
@@ -40,8 +39,8 @@ class ConfigController extends MainController
      */
     public function index(Content $content)
     {
-        if (! \Encore\Admin\Facades\Admin ::user()->can( '*')){
-            Permission::check('browse-'.$this->permission_name);
+        if (! \Encore\Admin\Facades\Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
         }
         return $content
             ->header(trans('admin.index'))
@@ -76,7 +75,7 @@ class ConfigController extends MainController
         $form = $this->form()->edit($id);
         if ($form->model()->type == 'integer') {
             $form->valueInteger = $form->model()->value;
-        }elseif ($form->model()->type== 'select') {
+        } elseif ($form->model()->type == 'select') {
             $form->valueSelect = $form->model()->value;
         }
         return $content
@@ -108,21 +107,21 @@ class ConfigController extends MainController
     {
         $grid = new Grid(new Config);
         if (request("name") != null) {
-            $admin_user=AdminUser::find(auth()->user()->id);
-            $admin_user->time_zone=request("name");
+            $admin_user = AdminUser::find(auth()->user()->id);
+            $admin_user->time_zone = request("name");
             $admin_user->save();
             request()->merge(['name' => null]);
             return $this->grid();
         }
 
-        $grid->model()->where('is_hidden',0);
+        $grid->model()->where('is_hidden', 0);
         $grid->id('ID');
         $grid->name(trans('name'));
-        $grid->column('value',trans('value'))->display(function($text) {
+        $grid->column('value', trans('value'))->display(function ($text) {
             return Str::limit($text, 50, '...');
-        })->editable ();
+        })->editable();
 
-        $grid->column('desc',trans ('description'))->display(function($desc) {
+        $grid->column('desc', trans('description'))->display(function ($desc) {
             return Lang::has('dashboard.' . $desc) ? __('dashboard.' . $desc) : $desc;
         });
         Admin::style('.dropdown-toggle {
@@ -157,7 +156,7 @@ class ConfigController extends MainController
             </div>
         </div>');
         });
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
 
         return $grid;
     }
@@ -175,7 +174,7 @@ class ConfigController extends MainController
         $show->id('ID');
         $show->name(trans('name'));
         $show->value(trans('value'));
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -190,49 +189,40 @@ class ConfigController extends MainController
 
         $form->display('ID');
         $form->text('name', trans('name'));
-        // if ($form->isEditing()) {
-        //     if ($form->model()->type == 'integer') {
-        //         $form->valueInteger = $form->model()->value;
-        //     }elseif ($form->model()->type== 'select') {
-        //         $form->valueSelect = $form->model()->value;
-        //     }
-        // }
-
-        $form->textarea ('desc',trans ('description'));
+        $form->textarea('desc', trans('description'));
         $form->select('category', trans('category'))
-         ->options(ConfigCategory::getTranslatedOptions())
-         ->required();
+            ->options(ConfigCategory::getTranslatedOptions())
+            ->required();
         $form->select('type', trans('type'))
-         ->options(ConfigType::getTranslatedOptions())
-         ->required()
-         ->when("select", function () use ($form) {
+            ->options(ConfigType::getTranslatedOptions())
+            ->required()
+            ->when("select", function () use ($form) {
                 $form->select('sub_type', trans('sub_type'))->options(function () {
-                    $ops = ['1' => __("yes_or_no"),'2' => __("true_and_false")];
+                    $ops = ['1' => __("yes_or_no"), '2' => __("true_and_false")];
                     return $ops;
-                }) ->when("1", function () use ($form) {
-                    $ops = ['yes' => __("yes"),'no' => __("no")];
+                })->when("1", function () use ($form) {
+                    $ops = ['yes' => __("yes"), 'no' => __("no")];
                     $form->select('valueSelect', trans('value'))->options($ops);
                 })->when("2", function () use ($form) {
-                    $ops = ['true' => __("true"),'false' => __("false")];
+                    $ops = ['true' => __("true"), 'false' => __("false")];
                     $form->select('valueSelect', trans('value'))->options($ops);
                 });
             })
-         ->when("integer", function () use ($form) {
+            ->when("integer", function () use ($form) {
                 $form->number('valueInteger', trans('value'));
             })
-         ->when("string", function () use ($form) {
+            ->when("string", function () use ($form) {
                 $form->text('value', trans('value'));
             });
 
-            $form->saving(function (Form $form) {
-                if ($form->type == 'integer') {
-                    $form->value = $form->valueInteger;
-                } elseif ($form->type == 'select') {
-                    $form->value = $form->valueSelect;
-                }
-            });
+        $form->saving(function (Form $form) {
+            if ($form->type == 'integer') {
+                $form->value = $form->valueInteger;
+            } elseif ($form->type == 'select') {
+                $form->value = $form->valueSelect;
+            }
+        });
 
         return $form;
     }
-
 }

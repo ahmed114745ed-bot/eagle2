@@ -1577,6 +1577,12 @@
     "Host Name":"اسم المضيف",
     "Accept":"قبول",
     "Reject":"رفض",
-    "":"انتظار"
+    "Pending":"انتظار",
+    "Payment method":"طريقه الدفع",
+    "data":"بيانات",
+    "Field Name":"اسم الحقل",
+    "Value":"القيمه",
+    "Edit Image and Description":">تعديل الصورة والوصف<",
+    "Save Changes":"حفظ التغييرات"
     
 }

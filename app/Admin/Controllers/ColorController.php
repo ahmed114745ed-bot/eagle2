@@ -19,8 +19,13 @@ class ColorController extends MainController
      *
      * @var string
      */
-    protected $title = 'Color';
+   
     public $permission_name = 'color';
+
+    public function __construct()
+    {
+        $this->title = __('colors');
+    }
 
     /**
      * Make a grid builder.

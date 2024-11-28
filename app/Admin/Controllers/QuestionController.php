@@ -11,7 +11,11 @@ use Encore\Admin\Controllers\AdminController;
 
 class QuestionController extends AdminController
 {
-    protected $title = 'Question';
+
+    public function __construct()
+    {
+        $this->title = __('questions');
+    }
 
     protected function grid()
     {

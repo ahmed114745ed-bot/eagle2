@@ -15,8 +15,13 @@ class WithdrawController extends  MainController
      *
      * @var string
      */
-    protected $title = 'PaymentWithdrawType';
     public $permission_name = 'withdraw-type';
+    
+
+    public function __construct()
+    {
+        $this->title = __('withdraw-types');
+    }
 
     /**
      * Make a grid builder.

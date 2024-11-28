@@ -28,11 +28,16 @@ class ChargeCountryController extends MainController
     use HasResourceActions;
     public $permission_name = 'charge-country';
 
+    public function __construct()
+    {
+        $this->title = __('charge-country');
+    }
+
     protected function grid()
     {
         $grid = new Grid(new ChargeCountry());
 
-        $grid->id(__('admin.ID'));
+        $grid->id(__('Id'));
         $grid->column('country.name',trans('name'));
         $grid->column('country.e_name',trans('english name'));
         $grid->column('country.phone_code',trans('phone code'));

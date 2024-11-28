@@ -31,23 +31,11 @@ class GetSalaryRequestController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'get-salary-requests';
-    public $hiddenColumns = [
 
-    ];
-
-
-    // public function update ( $id )
-    // {
-
-    //     if (request ('_edit_inline') == "true"){
-    //         if (request ('status')){
-    //             request ()->request->add(['change_status_admin_id'=>Auth::id ()]);
-    //         }
-    //     }
-    //     return $this->form()->update($id);
-    // }
-
-
+    public function __construct()
+    {
+        $this->title = __('requests-for-get-salary');
+    }
 
     /**
      * Make a grid builder.
@@ -66,7 +54,7 @@ class GetSalaryRequestController extends MainController
         $grid->column ('phone',__ ('phone'));
         $grid->column ('gmail',__ ('gmail'));
         $grid->column ('country',__ ('country'));
-        $grid->column('paymentWithDraw.name', 'طرق الدفع')->modal('البيانات', function ($model) {
+        $grid->column('paymentWithDraw.name', __('Payment method'))->modal(__('data'), function ($model) {
             $data =$this->paymentWithDraw?->userWithdrawFields->where("user_id",$model->user_id);
             $results = [];
             if ($data != null) {
@@ -79,7 +67,7 @@ class GetSalaryRequestController extends MainController
                     }
                 }
             }
-            return new Table(['اسم الحقل','القيمه'], $results);
+            return new Table([__('Field Name'),__('Value')], $results);
         });
         // $grid->column ('bank_num',__ ('bank_num'));
         // $grid->column ('other',__ ('other'));

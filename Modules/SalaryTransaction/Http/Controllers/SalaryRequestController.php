@@ -16,8 +16,13 @@ class SalaryRequestController extends AdminController
      *
      * @var string
      */
-    protected $title = 'SalaryRequest';
+    
     public $permission_name = 'salary-request';
+
+    public function __construct()
+    {
+        $this->title = __('salary-requests');
+    }
 
     /**
      * Make a grid builder.
