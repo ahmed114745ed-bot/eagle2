@@ -1570,6 +1570,13 @@
     "winners gifts":"هداية الفائز ",
     "back":"  رجوع",
     "add":" اضف",
-    "This type is used before; please modify it":"هذا النوع مستخدم من قبل روح عدل عليه "
+    "This type is used before; please modify it":"هذا النوع مستخدم من قبل روح عدل عليه ",
+    "Shipping agent ID":"معرف وكيل الشحن",
+    "Shipping Agent Name":"اسم وكيل الشحن",
+    "Host ID":"معرف المضيف",
+    "Host Name":"اسم المضيف",
+    "Accept":"قبول",
+    "Reject":"رفض",
+    "":"انتظار"
     
 }

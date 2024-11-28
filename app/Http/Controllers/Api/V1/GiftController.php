@@ -62,46 +62,36 @@ class GiftController extends Controller
     public function storeList(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'gifts'                     => 'required|array',
-            'gifts.*.name'              => 'nullable|string|max:255',
-            'gifts.*.e_name'            => 'nullable|string|max:255',
-            'gifts.*.type'              => 'required|numeric',
-            'gifts.*.vip_level'         => 'nullable|lt:256',
-            'gifts.*.price'             => 'required|numeric',
-            'gifts.*.img'               => 'required',
-            'gifts.*.show_img'          => 'required',
-            'gifts.*.image_type'        => 'required|string|max:255',
-            'gifts.*.show_img2'         => 'nullable|mimes:jpeg,png,jpg,gif,svg',
-            'gifts.*.sort'              => 'nullable|numeric',
-            'gifts.*.enable'            => 'nullable|boolean',
-            'gifts.*.music_gift'        => 'nullable|boolean',
-            'gifts.*.min_percentage'    => 'nullable|numeric',
-            'gifts.*.mid_percentage'    => 'nullable|numeric',
-            'gifts.*.max_percentage'    => 'nullable|numeric',
-            'gifts.*.win_probability'   => 'nullable|numeric',
-        ]);
+            'name'         => 'nullable|string|max:255',
+            'e_name'         => 'nullable|string|max:255',
+            'type'         => 'required|numeric',
+            'vip_level'         => 'nullable|lt:256',
+            'price'         => 'required|numeric',
+            'img'          => 'required',
+            'show_img'          => 'required',
+            'image_type'         => 'required|string|max:255',
+            'show_img2'          => 'nullable|mimes:jpeg,png,jpg,gif,svg',
+            'sort'         => 'nullable|numeric',
+            'enable'         => 'nullable|boolean',
+            'music_gift'         => 'nullable|boolean',
+            'min_percentage'         => 'nullable|numeric',
+            'mid_percentage'         => 'nullable|numeric',
+            'max_percentage'         => 'nullable|numeric',
+            'win_probability'         => 'nullable|numeric',
 
+        ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-
-        foreach ($request->gifts as $gift) {
-            // Check percentage sum for type 6
-            if (isset($gift['type']) && $gift['type'] == 6) {
-                $totalPercentage = ($gift['min_percentage'] ?? 0) +
-                    ($gift['mid_percentage'] ?? 0) +
-                    ($gift['max_percentage'] ?? 0);
-                if ($totalPercentage != 100) {
-                    return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
-                }
-            }
-
-            // Pass each gift to the service for creation
-            $this->giftService->create(new Request($gift));
+        if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) != 100) && ($request->type == 6)) {
+            return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
+        $this->giftService->create($request);
 
-        return Common::apiResponse(1, 'Gifts created successfully');
+        return Common::apiResponse(1, 'created successfully');
     }
+
+   
 
 
 
