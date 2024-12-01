@@ -1590,7 +1590,9 @@
     "appear-charger-agency" : "عرض وكالة الشاحن",
     "group Chat":"الشات الجماعي",
     "box-use":" السندوق المستخدم",
-    "bill image":"صورة الفاتورة"
+    "bill image":"صورة الفاتورة",
+    "Agency owner":"مالك الوكالة",
+    "Payment gateway":"بوابة الدفع"
     
     
 }

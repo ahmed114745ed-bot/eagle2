@@ -80,8 +80,8 @@ class AgentRequestController extends MainController
         $grid->column('type',__('Payment method'))->display(function($q){
             return $this->type == 1 ? __('coins') : 'usd' ;
         });
-        $grid->column('usd',__("amount usd"));
-        $grid->column('coins',__("amount coins"));
+        $grid->column('usd',__("usd"));
+        $grid->column('coins',__("coins"));
         // $grid->column('payment_gateway.title',__("payment title"));
         // $grid->column('country.name',__("country"));
         $grid->disableCreateButton();
