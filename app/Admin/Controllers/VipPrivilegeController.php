@@ -24,6 +24,41 @@ class VipPrivilegeController extends MainController
     {
         (new AppFeatureService)->validateStatusEnable("vips");
     }
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('vip_privilege'))
+            ->body($this->grid());
+    }
+
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip_privilege'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip_privilege'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('vip_privilege'))
+            ->body($this->form());
+    }
     /**
      * Make a grid builder.
      *

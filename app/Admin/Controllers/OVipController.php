@@ -23,7 +23,7 @@ class OVipController extends MainController
     use HasResourceActions;
     public $permission_name = 'ovip';
 
-    protected $title = 'VIPs';
+   
     public $hiddenColumns = [
 
     ];
@@ -35,13 +35,41 @@ class OVipController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(__($this->title))
+            ->title(__('vip'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
+    }
+
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->form());
     }
 
     /**
