@@ -71,7 +71,7 @@ class RequestProblemController extends MainController
         $grid = new Grid(new AdminCheck());
         $grid->model()->where("admin_check", '!=', 1);
         $grid->column('id', __('Id'));
-        $grid->column('request_id', __('request'))->modal('request info', function ($model) {
+        $grid->column('request_id', __('requests'))->modal('request info', function ($model) {
             $show = new Show($model);
             $show->id('ID');
             $show->field('request.agency_id', __('agency id'));
