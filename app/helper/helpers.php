@@ -1,7 +1,8 @@
 <?php
 
-use App\Classes\AppSetting;
+use Illuminate\Support\Facades\Http;
 use Encore\Admin\Admin;
+use App\Classes\AppSetting;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
@@ -147,6 +148,17 @@ if (!function_exists('get_file_details')) {
             return $path == null ? null : getDriverUrl() . '/' . $path;
         }
     }
+    
+    if (!function_exists('httpImage')) {
+        function httpImage($image)
+        {
+            $response =  http::get($image);
+
+            $folder = 'images/' . basename($image);
+            Storage::disk(\config('filesystems.default'))->put($folder,  $response->body());
+            return $folder;
+        }
+    }
 
     if (!function_exists('getDriverUrl')) {
 
@@ -214,7 +226,7 @@ if (!function_exists('isSubdomain')) {
 }
 if (!function_exists('adjustColor')) {
 
-    function adjustColor($hex, $rOffset= -30, $gOffset = -90, $bOffset = -60) : string
+    function adjustColor($hex, $rOffset = -30, $gOffset = -90, $bOffset = -60): string
     {
         // Convert the hex color to RGB
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
@@ -228,7 +240,7 @@ if (!function_exists('adjustColor')) {
         return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
     }
 
-    function getInverseColor($hex) :string
+    function getInverseColor($hex): string
     {
         // Convert the hex color to RGB
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
@@ -243,7 +255,8 @@ if (!function_exists('adjustColor')) {
     }
 
 
-    function adjustTextColor($hex, $lightnessFactor = 0.8, $darknessFactor = 0.2) {
+    function adjustTextColor($hex, $lightnessFactor = 0.8, $darknessFactor = 0.2)
+    {
         // Convert hex color to RGB
         list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 
@@ -277,9 +290,6 @@ if (!function_exists('adjustColor')) {
         // Convert back to hex
         return sprintf("#%02x%02x%02x", $newR, $newG, $newB);
     }
-
-
-
 }
 
 

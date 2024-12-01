@@ -20,6 +20,11 @@ class WareController extends MainController
     public $permission_name = 'wares';
     public $hiddenColumns = [];
 
+    public function __construct()
+    {
+        $this->title = __('wares');
+    }
+
     /**
      * Make a grid builder.
      *

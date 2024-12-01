@@ -22,12 +22,12 @@ class WareService
         if ($request->hasFile('img2')) {
             $image = Common::upload('images', $request->file('img2'));
         } else {
-            $image = $request->img2;
+            $image =  httpImage($request->img2);
         }
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
         } else {
-            $showImg = $request->show_img;
+            $showImg =  httpImage($request->show_img);
         }
         
         $data = [

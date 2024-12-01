@@ -7,6 +7,7 @@ use App\Models\Gift;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\GiftService;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GiftResource;
 use Illuminate\Support\Facades\Validator;
@@ -61,6 +62,7 @@ class GiftController extends Controller
 
     public function storeList(Request $request)
     {
+        Log::info(json_encode($request->all()));
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
@@ -86,9 +88,14 @@ class GiftController extends Controller
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) != 100) && ($request->type == 6)) {
             return Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
+        try{
         $this->giftService->create($request);
 
         return Common::apiResponse(1, 'created successfully');
+        }catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
    

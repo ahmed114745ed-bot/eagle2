@@ -23,11 +23,48 @@ class RequestProblemController extends MainController
     use HasResourceActions;
 
     public $permission_name = 'request-problem';
-    protected $title;
+   
 
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('transaction-request-problem');
+        return $content
+            ->title(trans('transaction-request-problem'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('transaction-request-problem'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('transaction-request-problem'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('transaction-request-problem'))
+            ->body($this->form());
     }
     protected function grid()
     {

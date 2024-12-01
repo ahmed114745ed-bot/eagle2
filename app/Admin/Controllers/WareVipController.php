@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\VipPrivilege;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Layout\Content;
 
 class WareVipController extends MainController
 {
@@ -21,12 +22,49 @@ class WareVipController extends MainController
      */
     use HasResourceActions;
     public $permission_name = 'wares-vips';
-
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('wares-vips');
+        return $content
+            ->title(trans('wares-vips'))
+            ->body($this->grid());
     }
-    
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('wares-vips'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('wares-vips'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('wares-vips'))
+            ->body($this->form());
+    }
+
+
     /**
      * Make a grid builder.
      *
@@ -183,21 +221,23 @@ class WareVipController extends MainController
         $form->currency('price', trans('price'))->symbol('💰');
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'))->rules(
-               'required|numeric|min:1',[
+            'required|numeric|min:1',
+            [
                 'min'   => 'levels can not be 0',
-            ]);
+            ]
+        );
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
-       });
-        $form->select('image_type', __('image_type'))->options (
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        });
+        $form->select('image_type', __('image_type'))->options(
             [
-                'svga'=>__ ('svga'),
-                'alpha'=>__ ('alpha'),
-                'mp4'=>__ ('mp4'),
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
             ]
         )->required();
         //        $form->file('img3', trans('video'));

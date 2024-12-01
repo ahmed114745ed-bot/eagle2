@@ -32,24 +32,20 @@ class GiftService
         return $this->giftRepository->findByGiftId($giftId);
     }
 
-    public function httpImage($image)
-    {
-        $response =  http::get($image);
-        $folder = 'images/' . basename($image);
-        Storage::disk('gcs')->put($folder,  $response->body());
-        return $folder;
-    }
-    public function create(\Request $request)
+   
+    public function create( $request)
     {
         if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->file('img'));
-        } elseif($request->has($request->img)) {
-            $image =    $this->httpImage($request->img);
+        } elseif($request->has('img')) {
+          //  dd($request->img);
+            $image =    httpImage($request->img);
         }
+       
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
-        } elseif($request->has($request->show_img)) {
-            $showImg =    $this->httpImage($request->show_img);
+        } elseif($request->has('show_img')) {
+            $showImg =   httpImage($request->show_img);
         }
 
         $data = [
