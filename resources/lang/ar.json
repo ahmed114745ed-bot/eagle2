@@ -1592,7 +1592,10 @@
     "box-use":" السندوق المستخدم",
     "bill image":"صورة الفاتورة",
     "Agency owner":"مالك الوكالة",
-    "Payment gateway":"بوابة الدفع"
+    "Payment gateway":"بوابة الدفع",
+    "withdraw-types":"أنواع السحب",
+    "requests-for-get-salary":"طلبات الحصول على الراتب",
+    "questions":"أسئلة"
     
     
 }
