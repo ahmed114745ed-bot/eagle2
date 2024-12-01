@@ -40,7 +40,7 @@ class WeeklyEventNController extends MainController
     public function index ( Content $content )
     {
         return $content
-            ->title(__($this->title))
+            ->title(__('weekly-events-new'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })

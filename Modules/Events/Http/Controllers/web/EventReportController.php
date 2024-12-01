@@ -116,7 +116,7 @@ class EventReportController extends MainController
         });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
-        $grid->column(__('الهديه'))->display(function () {
+        $grid->column(__('gifts'))->display(function () {
             if ($this->reward != null) {
                 $target = '';
                 if ($this->reward->type == 'coins') {
@@ -170,7 +170,7 @@ class EventReportController extends MainController
             });
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
-        $grid->column(__('الهديه'))->display(function () {
+        $grid->column(__('gifts'))->display(function () {
             if ($this->reward != null) {
                 $target = '';
                 if ($this->reward->type == 'coins') {

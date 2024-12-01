@@ -9,14 +9,53 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\SpecialId\Entities\SpecialIdFram;
+use Encore\Admin\Layout\Content;
 
 class SpecialIdFramController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'special-frame';
-    public $hiddenColumns = [
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('frames'))
+            ->body($this->grid());
+    }
 
-    ];
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('frames'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('frames'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('frames'))
+            ->body($this->form());
+    }
 
 
     /**

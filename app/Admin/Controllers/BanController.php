@@ -28,8 +28,7 @@ class BanController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('bans'))
             ->row(function ($row) {
                 $row->column(10, $this->grid());
                 $row->column(2, view('admin.grid.users.ban'));
@@ -46,8 +45,7 @@ class BanController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('bans'))
             ->body($this->detail($id));
     }
 
@@ -61,8 +59,7 @@ class BanController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('bans'))
             ->body($this->form()->edit($id));
     }
 
@@ -75,8 +72,7 @@ class BanController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('bans'))
             ->body($this->form());
     }
 
@@ -92,24 +88,23 @@ class BanController extends MainController
         $grid = new Grid(new Ban);
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-             ->select('uid', 'duration', 'type', 'device_number', 'staff_id', 'description_ar', 'img', DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'),'ban_type_id')
-             ->groupBy(['uid', 'type', 'duration', 'device_number', 'staff_id', 'description_ar', 'img','ban_type_id'])->orderByDesc('created_at');
+            ->select('uid', 'duration', 'type', 'device_number', 'staff_id', 'description_ar', 'img', DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy(['uid', 'type', 'duration', 'device_number', 'staff_id', 'description_ar', 'img', 'ban_type_id'])->orderByDesc('created_at');
         //        $grid->id(__ ('ID'));
         $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
         $grid->duration(__('duration'));
         $grid->type(__('type'));
         $grid->column('description_ar', __('reason'));
-        $grid->column('ban_type_id',__ ('ban_type'))->display(function ($row){
+        $grid->column('ban_type_id', __('ban_type'))->display(function ($row) {
 
             $banType = BanType::find($this->ban_type_id);
-            $name_ar =$banType->name_ar ??'';
-            $name_en = $banType->name_en?? '';
+            $name_ar = $banType->name_ar ?? '';
+            $name_en = $banType->name_en ?? '';
 
-         return "$name_ar <br>
+            return "$name_ar <br>
          <span style=\"color: #aaa; font-size: smaller;\">  $name_en</span>" ?? "";
-
-    });
+        });
         $grid->column('img', trans('image'))->image('', 30);
 
         //        $grid->ip(__ ('ip'));
@@ -118,11 +113,11 @@ class BanController extends MainController
 
         $grid->column('created_at', __('created'))->display(function () {
             return \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-                                 ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
+                ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
         });
 
-        $grid->column ('return',__ ('delete'))->display (function (){
-            return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type,$this->ban_type_id))->render () ;
+        $grid->column('return', __('delete'))->display(function () {
+            return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
         });
 
         $grid->disableExport();
@@ -134,7 +129,6 @@ class BanController extends MainController
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('uid', __('uuid'));
-
             });
         });
         $grid->disableExport();

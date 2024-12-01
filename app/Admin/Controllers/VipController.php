@@ -7,7 +7,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Services\AppFeatureService;
-use Encore\Admin\Controllers\AdminController;
+
+use Encore\Admin\Layout\Content;
 
 class VipController extends MainController
 {
@@ -16,7 +17,6 @@ class VipController extends MainController
      *
      * @var string
      */
-    protected $title = 'المستويات';
 
     public $permission_name = 'level';
     public $hiddenColumns = [];
@@ -24,7 +24,48 @@ class VipController extends MainController
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("vips");
-        $this->title = __('Levels');
+    }
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('level'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('level'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('level'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('level'))
+            ->body($this->form());
     }
 
 

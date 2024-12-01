@@ -26,10 +26,48 @@ class AgentRequestController extends MainController
     use HasResourceActions;
     public $permission_name = 'agent-request-transaction';
 
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('agent-salary-requests');
+        return $content
+            ->title(trans('agent-salary-requests'))
+            ->body($this->grid());
     }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('agent-salary-requests'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('agent-salary-requests'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('agent-salary-requests'))
+            ->body($this->form());
+    }
+
 
     protected function grid()
     {

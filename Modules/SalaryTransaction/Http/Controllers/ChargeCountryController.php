@@ -28,9 +28,46 @@ class ChargeCountryController extends MainController
     use HasResourceActions;
     public $permission_name = 'charge-country';
 
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('charge-country');
+        return $content
+            ->title(trans('charge-country'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('charge-country'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('charge-country'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('charge-country'))
+            ->body($this->form());
     }
 
     protected function grid()

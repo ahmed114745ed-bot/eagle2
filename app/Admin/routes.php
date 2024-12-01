@@ -9,6 +9,7 @@ use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;

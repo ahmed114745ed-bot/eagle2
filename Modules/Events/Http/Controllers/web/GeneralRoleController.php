@@ -8,6 +8,7 @@ use Encore\Admin\Show;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\GeneralRole;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class GeneralRoleController extends MainController
@@ -17,6 +18,48 @@ class GeneralRoleController extends MainController
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("event_role");
+    }
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('general-rols'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('general-rols'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('general-rols'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('general-rols'))
+            ->body($this->form());
     }
     protected function grid()
     {

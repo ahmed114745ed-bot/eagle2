@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
 
 class WithdrawController extends  MainController
 {
@@ -16,11 +17,47 @@ class WithdrawController extends  MainController
      * @var string
      */
     public $permission_name = 'withdraw-type';
-    
 
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('withdraw-types');
+        return $content
+            ->title(trans('withdraw-types'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('withdraw-types'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('withdraw-types'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('withdraw-types'))
+            ->body($this->form());
     }
 
     /**

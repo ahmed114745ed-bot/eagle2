@@ -9,12 +9,55 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
 use Modules\SalaryTransaction\Entities\ChargeAgency as EntitiesChargeAgency;
 
 class ChargeAgencyController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'charge-agency';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('agency-country'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('agency-country'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('agency-country'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('agency-country'))
+            ->body($this->form());
+    }
 
     protected function grid()
     {

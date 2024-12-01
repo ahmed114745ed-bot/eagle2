@@ -27,7 +27,7 @@ class PkEventController extends MainController
 
     use HasResourceActions;
    
-    protected $title = 'PkEvent';
+
 
     public $permission_name = 'pk-event';
     public function __construct()
@@ -38,13 +38,35 @@ class PkEventController extends MainController
     public function index ( Content $content )
     {
         return $content
-            ->title(__($this->title))
+            ->title(__('pk-events'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function (Row $row) {
                 $row->column(12, $this->grid());
             });
+    }
+
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('pk-events'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('pk-events'))
+            ->body($this->form());
     }
 
     protected function grid2()
@@ -153,6 +175,7 @@ class PkEventController extends MainController
     public function show($id, Content $content)
     {
         return $content
+        ->title(trans('pk-events'))
             ->row("<h3>" . __('PK Event') . "</h3>")->row(function ($row) use ($id) {
                 $row->column(12, $this->PkEvent($id));
             })

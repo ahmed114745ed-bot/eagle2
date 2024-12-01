@@ -6,11 +6,9 @@ namespace Modules\Events\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\Gifts;
 use App\Services\AppFeatureService;
-use Modules\Events\Entities\TargetEvent;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\ChargeTargetEvent;
 
 class TargetEventController extends MainController
@@ -20,11 +18,52 @@ class TargetEventController extends MainController
      *
      * @var string
      */
-    protected $title = 'TargetEvent';
     public $permission_name = 'target-event';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("target_events");
+    }
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('target-events'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('target-events'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('target-events'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('target-events'))
+            ->body($this->form());
     }
     protected function grid()
     {

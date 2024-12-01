@@ -19,6 +19,49 @@ class DedicateVipController extends MainController
     use HasResourceActions;
     public $permission_name = 'vips-dedicate';
 
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('vip'))
+            ->body($this->form());
+    }
+
+
     protected function grid()
     {
         $grid = new Grid(new OVip);

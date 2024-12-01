@@ -162,7 +162,7 @@ class UserController extends MainController
         //$grid->column('uuid1', __('uuid used'))->display(function () {
         //    return $this->id;
         //});
-        $grid->column('uuid', __('uuid used'))->display(function () {
+        $grid->column('uuid', __('uuid'))->display(function () {
             return $this->uuid . ' ' . $this->original_uuid;
         });
 

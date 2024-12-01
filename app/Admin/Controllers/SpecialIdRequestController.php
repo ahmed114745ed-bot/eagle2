@@ -29,40 +29,48 @@ class SpecialIdRequestController extends MainController
 {
 
     public $permission_name = 'special-id-request';
-//    protected function grid()
-//    {
-//
-//        $grid = new Grid(new Ware);
-//        $grid->model ()->where ('enable',0)->whereHas('ware_users',function ($q){
-//            $q->where('disable',0);
-//        })->orderByDesc ('id');
-//
-//        $grid->id('ID');
-//        $grid->value(__("special id"));
-//
-//        $grid->column(__ ('user'))->display (function (){
-//            $userNames = $this->ware_users->pluck('name')->implode(', ');
-//            return $userNames;
-//        });
-//        $grid->column(__ ('user id'))->display (function (){
-//            $userNames = $this->ware_users->pluck('uuid')->implode(', ');
-//            return $userNames;
-//        });
-//        $grid->column(__ ('status'))->display (function (){
-//            $userNames = $this->ware_users->map(function ($user) {
-//                return ($user->pivot->disable ? __('Enabled') : __('Disabled')) ;
-//            })->join(', ');
-//            return $userNames;
-//        });
-//
-//        $grid->column('created_at',trans('time'))->diffForHumans ();
-//
-//        $grid->disableCreateButton ();
-//
-//        $grid->disableExport ();
-//
-//        return $grid;
-//    }
+
+     public function index(Content $content)
+    {
+        return $content
+            ->title(trans('special-id-request'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('special-id-request'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('special-id-request'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('special-id-request'))
+            ->body($this->form());
+    }
 
     protected function grid()
     {
@@ -70,7 +78,7 @@ class SpecialIdRequestController extends MainController
         $grid->model ()->where ('disable',0)->orderByDesc ('id');
 
         $grid->id('ID');
-        $grid->column('ware.value',__("special id"));
+        $grid->column('ware.value',__("special_id"));
 
         $grid->column('user.name',__ ('user'));
         $grid->column('user.uuid',__ ('user id'));

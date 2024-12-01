@@ -8,9 +8,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Enums\PaymentType;
 use App\Models\PaymentCoin;
-use App\Models\PaymentGateway;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 
 class PaymentCoinController extends MainController
 {
@@ -22,6 +21,47 @@ class PaymentCoinController extends MainController
     protected $title = 'paymentCoin';
     public $permission_name = 'payment-coin';
 
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('payment-coins'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('payment-coins'))
+            ->body($this->detail($id));
+    }
+
+     /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('payment-coins'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('payment-coins'))
+            ->body($this->form());
+    }
     /**
      * Make a grid builder.
      *
@@ -33,10 +73,10 @@ class PaymentCoinController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'));
-        $grid->column('photo', __('Photo'))->image('', 50);
-        $grid->column('الاجرائات')->display(function () {
+        $grid->column('photo', __('image'))->image('', 50);
+        $grid->column(__('procedures'))->display(function () {
             $url1 = url('admin/coins/' . $this->id);
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>الكوينات</a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". __('coins') ."</a>";
             return $button1;
         });
         return $grid;

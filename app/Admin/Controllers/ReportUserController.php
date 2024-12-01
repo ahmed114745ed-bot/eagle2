@@ -8,9 +8,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
+use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
 
 class ReportUserController extends MainController
 {
@@ -19,8 +18,56 @@ class ReportUserController extends MainController
      *
      * @var string
      */
-    protected $title = 'User';
+   
     public $permission_name = 'report-user';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('dashboard.users_report'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('dashboard.users_report'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('dashboard.users_report'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('dashboard.users_report'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
@@ -54,7 +101,7 @@ class ReportUserController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
-        $grid->column('uuid', __('Uuid'));
+        $grid->column('uuid', __('uuid'));
         $grid->column('total_days', __('total_days'))->display(function() {
             if (request()->year == null && request()->month == null) {
                 return $this->total_days;

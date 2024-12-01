@@ -26,7 +26,7 @@ class ChargeReportController extends MainController {
     public function index ( Content $content )
     {
         return $content
-            ->title("Reports")
+            ->title(trans("Reports"))
             ->description("Charges")
             ->row(function(Row $row) {
                 $row->column(12, $this->tabsComponent());

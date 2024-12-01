@@ -23,12 +23,9 @@ class ConfigController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'config';
-    protected $title;
-
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("config");
-        $this->title = __('configs');
     }
 
     /**
@@ -43,8 +40,7 @@ class ConfigController extends MainController
             Permission::check('browse-' . $this->permission_name);
         }
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('configs'))
             ->body($this->grid());
     }
 
@@ -58,8 +54,7 @@ class ConfigController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('configs'))
             ->body($this->detail($id));
     }
 
@@ -79,8 +74,7 @@ class ConfigController extends MainController
             $form->valueSelect = $form->model()->value;
         }
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('configs'))
             ->body($form);
     }
 
@@ -93,8 +87,7 @@ class ConfigController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('configs'))
             ->body($this->form());
     }
 

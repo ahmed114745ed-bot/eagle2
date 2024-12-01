@@ -2,16 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Agency;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Actions\Response;
-use Illuminate\Support\MessageBag;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Actions\DeliverdSalaryAction;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\AcceptRequestToGetSalary;
 use App\Notifications\RefuseRequestToGetSalary;
@@ -31,10 +22,46 @@ class GetSalaryRequestController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'get-salary-requests';
-
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('requests-for-get-salary');
+        return $content
+            ->title(trans('requests-for-get-salary'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('requests-for-get-salary'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('requests-for-get-salary'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('requests-for-get-salary'))
+            ->body($this->form());
     }
 
     /**

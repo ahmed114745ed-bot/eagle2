@@ -12,6 +12,7 @@ use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Widgets\Table as WidgetsTable;
 
@@ -22,12 +23,50 @@ class RequestAgencyController extends MainController
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
+    
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('request-agencies'))
+            ->body($this->grid());
+    }
+
     /**
-     * Title for current resource.
+     * Show interface.
      *
-     * @var string
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
      */
-    protected $title = 'Agency';
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('request-agencies'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('request-agencies'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('request-agencies'))
+            ->body($this->form());
+    }
+    
 
     /**
      * Make a grid builder.

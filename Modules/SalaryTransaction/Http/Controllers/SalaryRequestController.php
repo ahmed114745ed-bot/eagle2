@@ -7,6 +7,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 
 class SalaryRequestController extends AdminController
@@ -19,9 +20,46 @@ class SalaryRequestController extends AdminController
     
     public $permission_name = 'salary-request';
 
-    public function __construct()
+    public function index(Content $content)
     {
-        $this->title = __('salary-requests');
+        return $content
+            ->title(trans('salary-requests'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('salary-requests'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('salary-requests'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('salary-requests'))
+            ->body($this->form());
     }
 
     /**

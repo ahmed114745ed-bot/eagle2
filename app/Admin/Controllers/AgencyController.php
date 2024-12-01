@@ -41,6 +41,13 @@ class AgencyController extends MainController
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Agencies'))
+            ->body($this->grid());
+    }
+
     public function update($id)
     {
         $data = request()->all();
@@ -147,7 +154,7 @@ class AgencyController extends MainController
         $grid->id(__('ID'));
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
-        $grid->column('owner.name', trans('Owner'));
+        $grid->column('owner.name', trans('owner'));
         // $grid->column('status',trans ('status'))->switch(Common::getSwitchStates ());
         // $grid->column('Shipping_agency',trans ('Shipping agency'))->switch(Common::getSwitchStates ());
         // $grid->column('Host_agency',trans ('Host agency'))->switch(Common::getSwitchStates ());

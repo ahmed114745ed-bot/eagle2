@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\SpecialId\Entities\SpecialHistory;
+use Encore\Admin\Layout\Content;
 
 class SpecialHistoryController extends AdminController
 {
@@ -15,8 +16,49 @@ class SpecialHistoryController extends AdminController
      *
      * @var string
      */
-    protected $title = 'SpecialHistory';
     public $permission_name = 'special-history';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('special-histories'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('special-histories'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('special-histories'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('special-histories'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.

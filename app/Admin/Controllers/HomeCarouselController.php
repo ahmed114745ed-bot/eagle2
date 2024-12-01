@@ -9,12 +9,53 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\HomeCarousel;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Layout\Content;
 
 class HomeCarouselController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'carousel';
-    public $hiddenColumns = [];
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('HomeCarousel'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('HomeCarousel'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('HomeCarousel'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('HomeCarousel'))
+            ->body($this->form());
+    }
 
 
     /**

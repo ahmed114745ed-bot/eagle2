@@ -16,6 +16,7 @@ use Encore\Admin\Show;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Widgets\Table;
+use Encore\Admin\Layout\Content;
 
 class AgencyMangerAgencyesController extends MainController
 {
@@ -25,8 +26,50 @@ class AgencyMangerAgencyesController extends MainController
      *
      * @var string
      */
-    protected $title = 'Agency';
+    
     public $permission_name = 'agency-manager';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('agency'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('agency'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('agency'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('agency'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
@@ -44,19 +87,19 @@ class AgencyMangerAgencyesController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
-        $grid->column('notice', __('Notice'));
-        $grid->column('status', __('Status'));
+        $grid->column('notice', __('notice'));
+        $grid->column('status', __('status'));
         $grid->column('phone', __('Phone'));
         $grid->column('img', __('Img'))->image('', 30, 30); // Consider resizing images for better performance
-        $grid->column('contents', __('Contents'));
+        $grid->column('contents', __('contents'));
         $grid->column('salary', __('Salary'))->display(function () {
             return AgencySallary::where('agency_id', $this->id)
                                 ->where('month', now()->month)
                                 ->where('year', now()->year)
                                 ->sum('sallary') ?? 0;
         });
-        $grid->column('target_usd', __('Target usd'));
-        $grid->column('members', __('Members'))->expand(function ($model) {
+        $grid->column('target_usd', __('target usd'));
+        $grid->column('members', __('members'))->expand(function ($model) {
             $members = $model->mempers()
                              ->with([
                                  'userSallary' => function ($query) {
