@@ -18,9 +18,8 @@ class ChargeController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'charge';
-    public $hiddenColumns = [
+    
 
-    ];
     /**
      * Index interface.
      *
@@ -33,8 +32,7 @@ class ChargeController extends MainController
             Permission::check('browse-'.$this->permission_name);
         }
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('charges'))
             ->row(function($row) {
                 $row->column(10, $this->grid());
                 $row->column(2, view('admin.grid.users.actions'));

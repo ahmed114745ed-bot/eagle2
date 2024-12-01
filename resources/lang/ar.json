@@ -1585,7 +1585,11 @@
     "Edit Image and Description":">تعديل الصورة والوصف<",
     "Save Changes":"حفظ التغييرات",
     "special-id-request" : "طلب معرف خاص",
-    "HomeCarousel" : "السلايدر الرئيسي"
+    "HomeCarousel" : "السلايدر الرئيسي",
+    "request-background-image" : "طلب صورة الخلفية",
+    "appear-charger-agency" : "عرض وكالة الشاحن",
+    "group Chat":"الشات الجماعي",
+    "box-use":" السندوق المستخدم"
     
     
 }

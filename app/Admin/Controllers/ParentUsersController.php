@@ -20,7 +20,6 @@ class ParentUsersController extends MainController {
 
     public function index ( Content $content )
     {
-        $title = "Parents";
         if (request("name") != null) {
             if (request("name") == 'users') {
                 $user=User::select("id","name")->find(request("ids"));
@@ -31,7 +30,7 @@ class ParentUsersController extends MainController {
             }
         }
         return $content
-            ->title('Parents')
+            ->title(__('parent-users'))
             ->description($title)
             ->row(function($row) {
                 $row->column(12, $this->grid());

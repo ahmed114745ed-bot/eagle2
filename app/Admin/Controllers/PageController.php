@@ -23,8 +23,7 @@ class PageController extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('Pages'))
             ->body($this->grid());
     }
 
@@ -38,8 +37,7 @@ class PageController extends Controller
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('Pages'))
             ->body($this->detail($id));
     }
 
@@ -53,8 +51,7 @@ class PageController extends Controller
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('Pages'))
             ->body($this->form()->edit($id));
     }
 
@@ -67,8 +64,7 @@ class PageController extends Controller
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('Pages'))
             ->body($this->form());
     }
 
@@ -84,7 +80,7 @@ class PageController extends Controller
         $grid->id('ID');
         // $grid->type(__('type'));
         $grid->name(__('name'));
-        $grid->column('link',__('url'))->display (function (){
+        $grid->column('link', __('url'))->display(function () {
             $url = url("/$this->name");
             return "<a href='$url'>$url</a>";
         });
@@ -92,7 +88,7 @@ class PageController extends Controller
         $grid->content(__('content'))->display(function ($content) {
             // Decode JSON content
             $decodedContent = json_decode($content, true);
-    
+
             // You can customize how you display the decoded content here
             // For example, you can return specific values from the JSON
             // For simplicity, let's just return the entire decoded content
@@ -135,36 +131,35 @@ class PageController extends Controller
         $form->display('ID');
         // $form->text('type', __('type'));
         $form->text('name', __('name'));
-         $form->textarea('content', __('content'));
-         $form->textarea('content_en', __('content_en'));
+        $form->textarea('content', __('content'));
+        $form->textarea('content_en', __('content_en'));
         if ($form->model) {
 
-        $content = json_decode($form->model->content, true);
+            $content = json_decode($form->model->content, true);
 
-        // Check if $content is a string (not an array), and then perform str_replace
-        if (is_string($content)) {
-            $content = str_replace('search_string', 'replacement_string', $content);
+            // Check if $content is a string (not an array), and then perform str_replace
+            if (is_string($content)) {
+                $content = str_replace('search_string', 'replacement_string', $content);
+            }
+
+            $form->textarea('content', function ($form) use ($content) {
+                // You can use $content here, which may or may not have been replaced
+                return $content;
+            });
+
+
+            $content_en = json_decode($form->model->content_en, true);
+
+            // Check if $content is a string (not an array), and then perform str_replace
+            if (is_string($content_en)) {
+                $content = str_replace('search_string', 'replacement_string', $content_en);
+            }
+
+            $form->textarea('content', function ($form) use ($content_en) {
+                // You can use $content here, which may or may not have been replaced
+                return $content_en;
+            });
         }
-        
-        $form->textarea('content', function ($form) use ($content) {
-            // You can use $content here, which may or may not have been replaced
-            return $content;
-        });
-
-
-        $content_en = json_decode($form->model->content_en, true);
-
-        // Check if $content is a string (not an array), and then perform str_replace
-        if (is_string($content_en)) {
-            $content = str_replace('search_string', 'replacement_string', $content_en);
-        }
-        
-        $form->textarea('content', function ($form) use ($content_en) {
-            // You can use $content here, which may or may not have been replaced
-            return $content_en;
-        });
-
-    }
 
         return $form;
     }

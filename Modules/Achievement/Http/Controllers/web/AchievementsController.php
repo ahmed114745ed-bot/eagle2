@@ -8,10 +8,32 @@ use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Enums\AchievementType;
+use Encore\Admin\Layout\Content;
 
 class AchievementsController extends MainController
 {
     public $permission_name = 'achievement';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Achievements'))
+            ->body($this->grid());
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Achievements'))
+            ->body($this->form());
+    }
+
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Achievements'))
+            ->body($this->form()->edit($id));
+    }
 
     /**
      * Make a grid builder.

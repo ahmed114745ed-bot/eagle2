@@ -19,9 +19,53 @@ class RoomController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'rooms';
-    public $hiddenColumns = [
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Rooms'))
+            ->body($this->grid());
+    }
 
-    ];
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('Rooms'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Rooms'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Rooms'))
+            ->body($this->form());
+    }
 
 
     /**
@@ -33,54 +77,54 @@ class RoomController extends MainController
     {
         $grid = new Grid(new Room);
         $grid->model()->orderByDesc('rooms.pin')
-             ->orderByDesc('rooms.top_room')
+            ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
-             ->orderByDesc('count_room_socket');
+            ->orderByDesc('count_room_socket');
 
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
             $filter->disableIdFilter();
-            $filter->column(1/2, function ($filter) {
-              //  $filter->equal('uid',__ ('owner id'));
-              $filter->where(function ($query) {
-                $input = $this->input;
+            $filter->column(1 / 2, function ($filter) {
+                //  $filter->equal('uid',__ ('owner id'));
+                $filter->where(function ($query) {
+                    $input = $this->input;
 
-                $query->whereHas('owner', function ($query) use ($input) {
-                    $query->where('name', 'like', "%$input%")
-                    ->orWhere('uuid', 'like', "%$input%");
-                });
-            }, __('User'))->placeholder(__('Search by name or numId'));
+                    $query->whereHas('owner', function ($query) use ($input) {
+                        $query->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%");
+                    });
+                }, __('User'))->placeholder(__('Search by name or numId'));
             });
         });
 
-        $grid->id(__ ('ID'));
+        $grid->id(__('ID'));
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = $this->owner->uuid ?? '';
             return "$name <br> <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
         });
-        $grid->column('room_status')->switch (Common::getSwitchStates ());
-        $grid->column('top_room')->switch (Common::getSwitchStates ());
-        $grid->column('pin',__('pin'))->switch (Common::getSwitchStates ());
-        $grid->column('sort_num',__ ('Sort Num'))->currency();
+        $grid->column('room_status')->switch(Common::getSwitchStates());
+        $grid->column('top_room')->switch(Common::getSwitchStates());
+        $grid->column('pin', __('pin'))->switch(Common::getSwitchStates());
+        $grid->column('sort_num', __('Sort Num'))->currency();
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
             return $maxAdmin ?? $maxRoomAdmin;
         });
 
-        $grid->column('room_name',__ ('room name'));
-        $grid->column('room_cover',__ ('room cover'))->image ('',30);
-        $grid->column('room_intro',__ ('room_intro'));
-        $grid->column('microphone',__ ('microphone'));
-        $grid->column('count_room_socket',__ ('Number of users'));
-        $grid->column('is_afk',__ ('owner in'))->switch (Common::getSwitchStates ());
-//        $grid->column('free_mic',__ ('is mic free'))->switch (Common::getSwitchStates ());
+        $grid->column('room_name', __('room name'));
+        $grid->column('room_cover', __('room cover'))->image('', 30);
+        $grid->column('room_intro', __('room_intro'));
+        $grid->column('microphone', __('microphone'));
+        $grid->column('count_room_socket', __('Number of users'));
+        $grid->column('is_afk', __('owner in'))->switch(Common::getSwitchStates());
+        //        $grid->column('free_mic',__ ('is mic free'))->switch (Common::getSwitchStates ());
 
-        $grid->actions (function ($action){
-            $action->disableView ();
+        $grid->actions(function ($action) {
+            $action->disableView();
         });
         $grid->disableExport();
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -132,7 +176,7 @@ class RoomController extends MainController
         //$show->free_mic('free_mic');
         //$show->created_at(__('admin.created_at'));
         //$show->updated_at(__('admin.updated_at'));
-        $this->extendShow ($show);
+        $this->extendShow($show);
         return $show;
     }
 
@@ -145,29 +189,29 @@ class RoomController extends MainController
     {
         $form = new Form(new Room);
 
-        $form->display(__ ('ID'));
+        $form->display(__('ID'));
         $form->text('numid', __('numid'));
-        $form->switch('room_status', __('room status'))->options (Common::getSwitchStates ());
-        $form->switch('top_room', __('top room'))->options (Common::getSwitchStates ());
-        $form->switch('pin', __('pin'))->options (Common::getSwitchStates ());
+        $form->switch('room_status', __('room status'))->options(Common::getSwitchStates());
+        $form->switch('top_room', __('top room'))->options(Common::getSwitchStates());
+        $form->switch('pin', __('pin'))->options(Common::getSwitchStates());
         $form->text('max_admin', __('max admin'));
         $form->text('room_name', __('room name'));
         $form->image('room_cover', __('room cover'));
         $form->text('room_intro', __('room intro'));
         $form->text('room_pass', __('room pass'));
         $form->hidden('is_afk', __('owner in'));
-        $form->select ('room_class')->options (function (){
+        $form->select('room_class')->options(function () {
             $options = [];
-            $cats = RoomCategory::query ()->where ('enable',1)->where ('parent_id',0)->get ();
-            foreach ($cats as $cat){
+            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
+            foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
             return $options;
         });
-        $form->select('room_type', __('room type'))->options (function (){
+        $form->select('room_type', __('room type'))->options(function () {
             $options = [];
-            $cats = RoomCategory::query ()->where ('enable',1)->where ('parent_id',$this->room_class)->get ();
-            foreach ($cats as $cat){
+            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
+            foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
             return $options;

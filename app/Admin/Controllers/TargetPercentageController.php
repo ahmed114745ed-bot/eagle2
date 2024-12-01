@@ -47,8 +47,7 @@ class TargetPercentageController extends MainController
        
 
         return $content
-            ->header('percentage target')
-            ->description('This is a percentage target')
+            ->title(trans('percentage-target'))
             ->body(new HtmlString($form));
     }
 

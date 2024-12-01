@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -18,8 +18,50 @@ class AppearChargerAgencyController extends MainController
      *
      * @var string
      */
-    protected $title = 'User';
+    
     public $permission_name = 'appear-charger-agency';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('appear-charger-agency'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('appear-charger-agency'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('appear-charger-agency'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('appear-charger-agency'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.

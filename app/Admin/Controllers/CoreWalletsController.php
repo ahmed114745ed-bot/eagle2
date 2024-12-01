@@ -3,7 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\CoreWallets;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -15,9 +15,51 @@ class CoreWalletsController extends MainController
      *
      * @var string
      */
-    protected $title = 'CoreWallets';
+
 
     public $permission_name = 'core-wallets';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('level-intervals'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('level-intervals'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('level-intervals'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('level-intervals'))
+            ->body($this->form());
+    }
     
 
     /**

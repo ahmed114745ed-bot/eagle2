@@ -29,9 +29,8 @@ class ImageColorController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
-            ->row(function($row) {
+            ->title(trans('image-color'))
+            ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
     }
@@ -47,14 +46,14 @@ class ImageColorController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ImageColor);
-        $grid->model ()->orderByDesc ('id');
-        $grid->id("id",__ ('id'));
-        $grid->column('image',__('image'))->image ('',30);
+        $grid->model()->orderByDesc('id');
+        $grid->id("id", __('id'));
+        $grid->column('image', __('image'))->image('', 30);
         $grid->Column('color', __('color'))->display(function () {
             return "<div style='width: 50px; height: 50px; background-color: $this->color'></div>";
         });
         $grid->disableExport();
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
         return $grid;
     }
 
@@ -68,16 +67,16 @@ class ImageColorController extends MainController
     {
         $show = new Show(Charge::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->charger_id('charger_id');
-//        $show->charger_type('charger_type');
-//        $show->user_id('user_id');
-//        $show->user_type('user_type');
-//        $show->amount('amount');
-//        $show->amount_type('amount_type');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
+        //        $show->id('ID');
+        //        $show->charger_id('charger_id');
+        //        $show->charger_type('charger_type');
+        //        $show->user_id('user_id');
+        //        $show->user_type('user_type');
+        //        $show->amount('amount');
+        //        $show->amount_type('amount_type');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
+        $this->extendShow($show);
         return $show;
     }
 
@@ -90,10 +89,10 @@ class ImageColorController extends MainController
     {
         $form = new Form(new ImageColor);
 
-       $form->display('id');
-       $form->text('name', __('name'));
-       $form->file('image', __('image'));
-       $form->color('color', __('color'));
+        $form->display('id');
+        $form->text('name', __('name'));
+        $form->file('image', __('image'));
+        $form->color('color', __('color'));
 
         return $form;
     }

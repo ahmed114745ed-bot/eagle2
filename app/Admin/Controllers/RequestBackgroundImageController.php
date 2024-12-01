@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Room;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -10,7 +9,6 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
-use App\Http\Controllers\Controller;
 use App\Models\RequestBackgroundImage;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -29,8 +27,7 @@ class RequestBackgroundImageController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('request-background-image'))
             ->body($this->grid());
     }
 
@@ -44,8 +41,7 @@ class RequestBackgroundImageController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('request-background-image'))
             ->body($this->detail($id));
     }
 
@@ -59,8 +55,7 @@ class RequestBackgroundImageController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('request-background-image'))
             ->body($this->form()->edit($id));
     }
 
@@ -73,8 +68,7 @@ class RequestBackgroundImageController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('request-background-image'))
             ->body($this->form());
     }
 
@@ -86,15 +80,15 @@ class RequestBackgroundImageController extends MainController
     protected function grid()
     {
         $grid = new Grid(new RequestBackgroundImage);
-        $grid->model ()->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
         $grid->id(__('admin.ID'));
         $grid->owner_room_id(__('admin.owner_room_id'));
-        $grid->img(__('admin.img'))->image ('',30);;
-        $grid->status(__('status'))->using (
+        $grid->img(__('admin.img'))->image('', 30);;
+        $grid->status(__('status'))->using(
             [
-                0=>__('pending'),
-                1=>__ ('accepted'),
-                2=>__ ('denied')
+                0 => __('pending'),
+                1 => __('accepted'),
+                2 => __('denied')
             ]
         );
         $grid->created_at(trans('admin.created_at'));
@@ -114,12 +108,12 @@ class RequestBackgroundImageController extends MainController
 
         $show->id('ID');
         $show->owner_room_id('owner_room_id');
-        $show->img('img')->image ('',30);
-        $show->status(__('status'))->using (
+        $show->img('img')->image('', 30);
+        $show->status(__('status'))->using(
             [
-                0=>__('pending'),
-                1=>__ ('accepted'),
-                2=>__ ('denied')
+                0 => __('pending'),
+                1 => __('accepted'),
+                2 => __('denied')
             ]
         );
         $show->created_at(trans('admin.created_at'));
@@ -138,22 +132,22 @@ class RequestBackgroundImageController extends MainController
         $form = new Form(new RequestBackgroundImage);
         $form->display('ID');
         // $form->display('owner_room_id', 'owner_room_id');
-        $form->select('owner_room_id',__('admin.owner_room_id'))->options(function () {
+        $form->select('owner_room_id', __('admin.owner_room_id'))->options(function () {
             $options = [];
-            $users = User::query()->where('id',$this->owner_room_id)->get();
+            $users = User::query()->where('id', $this->owner_room_id)->get();
             foreach ($users as $cat) {
-                $options[$cat->id] = $cat->uuid .'-'.$cat->name;
+                $options[$cat->id] = $cat->uuid . '-' . $cat->name;
             }
             return $options;
-    })->ajax('/api/search/users2', 'id', 'name')->default(2)->creationRules('required');
+        })->ajax('/api/search/users2', 'id', 'name')->default(2)->creationRules('required');
         // $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
 
         $form->image('img', 'img')->creationRules('required');
-        $form->select('status', 'status')->options (
+        $form->select('status', 'status')->options(
             [
-                0=>__('pending'),
-                1=>__ ('accepted'),
-                2=>__ ('denied')
+                0 => __('pending'),
+                1 => __('accepted'),
+                2 => __('denied')
             ]
         )->default(1);
         $form->number("expair")->default(30);
@@ -162,19 +156,18 @@ class RequestBackgroundImageController extends MainController
         $form->display(trans('admin.updated_at'));
 
         $form->saving(function (Form $form) {
-            
+
             $model = $form->model();
             $status = $model->status;
-            $user=User::find($model->owner_room_id);
+            $user = User::find($model->owner_room_id);
             if (($status == 2) && $user) {
                 $costRequestBackGround = Common::getConfig('cost_request_background') ?: 2000;
                 $user->di += $costRequestBackGround;
                 $user->save();
-                CustomNotification::BackgroudRequest($user,1);
+                CustomNotification::BackgroudRequest($user, 1);
             } elseif (($status == 1) && $user) {
-                CustomNotification::BackgroudRequest($user,0);
+                CustomNotification::BackgroudRequest($user, 0);
             }
-
         });
 
         return $form;

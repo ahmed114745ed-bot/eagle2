@@ -24,8 +24,7 @@ class BackgroundController extends Controller
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('backgrounds'))
             ->body($this->grid());
     }
 
@@ -39,8 +38,7 @@ class BackgroundController extends Controller
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('backgrounds'))
             ->body($this->detail($id));
     }
 
@@ -54,8 +52,7 @@ class BackgroundController extends Controller
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('backgrounds'))
             ->body($this->form()->edit($id));
     }
 
@@ -68,8 +65,7 @@ class BackgroundController extends Controller
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('backgrounds'))
             ->body($this->form());
     }
 
@@ -82,9 +78,9 @@ class BackgroundController extends Controller
     {
         $grid = new Grid(new Background);
 
-        $grid->id(__ ('ID'));
-        $grid->column('img',trans ('image'))->image ('',30);
-        $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
+        $grid->id(__('ID'));
+        $grid->column('img', trans('image'))->image('', 30);
+        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         $grid->disableExport();
 
         return $grid;
@@ -118,9 +114,9 @@ class BackgroundController extends Controller
     {
         $form = new Form(new Background);
 
-        $form->display(__ ('ID'));
+        $form->display(__('ID'));
         $form->image('img', trans('image'));
-        $form->switch('enable', __('enable'))->states (Common::getSwitchStates ());
+        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
         return $form;
     }

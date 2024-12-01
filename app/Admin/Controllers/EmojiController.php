@@ -17,9 +17,54 @@ class EmojiController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'emoji';
-    public $hiddenColumns = [
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Emojis'))
+            ->body($this->grid());
+    }
 
-    ];
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('Emojis'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Emojis'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Emojis'))
+            ->body($this->form());
+    }
+
 
 
     /**

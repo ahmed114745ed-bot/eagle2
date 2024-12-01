@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Extensions\CheckRow;
 use Modules\Moment\Entities\Moment;
-use App\Admin\Extensions\DeleteMoment;
+use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
 use Encore\Admin\Controllers\AdminController;
@@ -20,8 +20,50 @@ class ReportMomentController extends MainController
      *
      * @var string
      */
-    protected $title = 'ReportMoment';
+   
     public $permission_name = 'report-moment';
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('report-moments'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('report-moments'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('report-moments'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('report-moments'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.

@@ -25,7 +25,7 @@ class GroupChatController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title("الشات الجماعي")
+            ->title("group Chat")
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
@@ -58,8 +58,7 @@ class GroupChatController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title("group Chat")
             ->body($this->detail($id));
     }
 
@@ -73,8 +72,7 @@ class GroupChatController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title("group Chat")
             ->body($this->form()->edit($id));
     }
 
@@ -87,8 +85,7 @@ class GroupChatController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title("group Chat")
             ->body($this->form());
     }
 
@@ -101,24 +98,24 @@ class GroupChatController extends MainController
     {
         $grid = new Grid(new GroupChat);
         $grid->model()->orderByDesc('id');
-        $grid->quickSearch ();
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
+        $grid->quickSearch();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
             $filter->disableIdFilter();
-                $filter->column('1/2', function ($filter) {
-                    $filter->where(function ($query) {
-                        $input = $this->input;
-                        $query->whereHas('user', function ($query) use ($input) {
-                            $query->where('name', 'like', "%$input%")
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->whereHas('user', function ($query) use ($input) {
+                        $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%");
-                        });
-                    }, __('User'))->placeholder(__('Search by name or UUID '));
-                });
+                    });
+                }, __('User'))->placeholder(__('Search by name or UUID '));
             });
-        $grid->id(__ ('ID'));
-        $grid->column('user.uuid',__ ('uuid'));
-        $grid->column('user.name',__ ('name'));
-        $grid->text(__ ('text'));
+        });
+        $grid->id(__('ID'));
+        $grid->column('user.uuid', __('uuid'));
+        $grid->column('user.name', __('name'));
+        $grid->text(__('text'));
 
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         $grid->disableExport();
@@ -154,7 +151,7 @@ class GroupChatController extends MainController
         $form = new Form(new GroupChat);
 
         $form->display('ID');
-        $form->text(__ ('text'), __ ('text'));
+        $form->text(__('text'), __('text'));
         $form->text(__('user_id'), __('user_id'));
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));

@@ -14,9 +14,53 @@ class SilverController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'gold-coins';
-    public $hiddenColumns = [
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Silver'))
+            ->body($this->grid());
+    }
 
-    ];
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('Silver'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Silver'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Silver'))
+            ->body($this->form());
+    }
 
 
     /**

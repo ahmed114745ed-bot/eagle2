@@ -22,13 +22,13 @@ class ReelController extends MainController
      *
      * @var string
      */
-    protected $title = 'Real';
+    
 
     public $permission_name = 'Real';
     public function index(Content $content)
     {
         return $content
-            ->title(__($this->title))
+            ->title(__('reels'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })

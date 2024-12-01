@@ -6,6 +6,7 @@ use App\Models\Exchange;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
 
 class ExchangeController extends MainController
 {
@@ -14,12 +15,57 @@ class ExchangeController extends MainController
      *
      * @var string
      */
-    protected $title = 'تبديل العملات';
+    
 
     public $permission_name = 'exchange';
-    public $hiddenColumns = [
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Exchanges'))
+            ->body($this->grid());
+    }
 
-    ];
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('Exchanges'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Exchanges'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Exchanges'))
+            ->body($this->form());
+    }
+
 
     /**
      * Make a grid builder.

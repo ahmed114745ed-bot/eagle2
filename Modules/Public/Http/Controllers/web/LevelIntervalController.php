@@ -7,7 +7,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
 use Modules\Public\Entities\LevelInterval;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 
 
 
@@ -19,7 +19,47 @@ class LevelIntervalController extends MainController
      *
      * @var string
      */
-    protected $title = 'levelInterval';
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('core-wallets'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('core-wallets'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('core-wallets'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('core-wallets'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
@@ -33,7 +73,7 @@ class LevelIntervalController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('name', __('name'));
         $grid->column('type', __('type'))->display(function ($value) {
-            return  $this->type == 3?"room":($this->type == 1? "receiver":"sender");
+            return  $this->type == 3 ? "room" : ($this->type == 1 ? "receiver" : "sender");
         });
         $grid->column('min', __('min'));
         $grid->column('max', __('max'));
@@ -45,7 +85,7 @@ class LevelIntervalController extends MainController
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>   هداية </a>";
 
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1 ;
+            return $button1;
         });
 
         return $grid;
@@ -65,7 +105,7 @@ class LevelIntervalController extends MainController
         $show->field('name', __('name'));
         $show->field('min', __('min'));
         $show->field('max', __('max'));
-       
+
 
         return $show;
     }
@@ -80,13 +120,13 @@ class LevelIntervalController extends MainController
         $form = new Form(new LevelInterval());
 
         $form->text('name', __('name'));
-        $form->select('type', trans('type'))->options (
+        $form->select('type', trans('type'))->options(
             [
-                1=>trans ('receiver'),
-                 2=>trans ('sender'),
-                 3=>trans ('room'),
+                1 => trans('receiver'),
+                2 => trans('sender'),
+                3 => trans('room'),
             ]
-         )->default (2);
+        )->default(2);
         $form->number('min', __('min'));
         $form->number('max', __('max'));
 

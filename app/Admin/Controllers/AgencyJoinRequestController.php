@@ -24,9 +24,6 @@ class AgencyJoinRequestController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'agency-join-requests';
-    public $hiddenColumns = [
-
-    ];
 
 
     public function __construct()
@@ -47,6 +44,47 @@ class AgencyJoinRequestController extends MainController
         return $this->form()->update($id);
     }
 
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('Join To Agency Requests'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('Join To Agency Requests'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('Join To Agency Requests'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('Join To Agency Requests'))
+            ->body($this->form());
+    }
 
 
     /**

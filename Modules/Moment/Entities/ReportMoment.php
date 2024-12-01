@@ -10,5 +10,10 @@ class ReportMoment extends Model
     protected $guarded = [];
 
     // protected $table = ['Report_reals'];
+
+    public function moment()
+    {
+        return $this->hasOne(Moment::class, 'id', 'moment_id');
+    }
 }
 

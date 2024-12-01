@@ -24,36 +24,34 @@ class MangerTypeController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('manger-types'))
             ->body($this->grid());
     }
 
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('manger-types'))
             ->body($this->form());
     }
 
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('manger-types'))
             ->body($this->form()->edit($id));
     }
+
 
 
     protected function grid()
     {
         $grid = new Grid(new MangerType);
 
-        $grid->id(__ ('ID'));
+        $grid->id(__('ID'));
         $grid->column('name_en', __("Name en"));
         $grid->column('name_ar', __("Name ar"));
-        $grid->column('img',trans ('image'))->image ('',30);
+        $grid->column('img', trans('image'))->image('', 30);
         $grid->column('description_en', __('Description en'));
         $grid->column('description_ar', __('Description ar'));
         $grid->disableExport();
@@ -64,11 +62,11 @@ class MangerTypeController extends MainController
     {
         $form = new Form(new MangerType);
 
-        $form->display(__ ('ID'));
+        $form->display(__('ID'));
         $form->text('name_en', __('Name en'));
         $form->text('name_ar', __('Name ar'));
         $form->image('img', trans('image'))->name(function ($file) {
-            return now()->timestamp.rand(0,999).'.'.$file->guessExtension();
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
         $form->text('description_en', __('Description en'));
         $form->text('description_ar', __('Description ar'));

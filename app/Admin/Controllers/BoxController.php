@@ -25,8 +25,7 @@ class BoxController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->header(trans('admin.index'))
-            ->description(trans('admin.description'))
+            ->title(trans('boxes'))
             ->body($this->grid());
     }
 
@@ -40,8 +39,7 @@ class BoxController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
+            ->title(trans('boxes'))
             ->body($this->detail($id));
     }
 
@@ -55,8 +53,7 @@ class BoxController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->header(trans('admin.edit'))
-            ->description(trans('admin.description'))
+            ->title(trans('boxes'))
             ->body($this->form()->edit($id));
     }
 
@@ -69,8 +66,7 @@ class BoxController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->header(trans('admin.create'))
-            ->description(trans('admin.description'))
+            ->title(trans('boxes'))
             ->body($this->form());
     }
 
@@ -83,13 +79,13 @@ class BoxController extends MainController
     {
         $grid = new Grid(new Box);
 
-        $grid->id( __ ('ID'));
-        $grid->column('type',__ ('type'))->using ([0=>__('normal'),1=>__('super')]);
-        $grid->column('coins',__ ('coins'));
-        $grid->column('users',__ ('users'));
-        $grid->column('image',__ ('image'))->image ('',30);
-        $grid->column('has_label',__ ('has_label'));
-        $grid->column('duration',__ ('duration'));
+        $grid->id(__('ID'));
+        $grid->column('type', __('type'))->using([0 => __('normal'), 1 => __('super')]);
+        $grid->column('coins', __('coins'));
+        $grid->column('users', __('users'));
+        $grid->column('image', __('image'))->image('', 30);
+        $grid->column('has_label', __('has_label'));
+        $grid->column('duration', __('duration'));
         $grid->disableExport();
 
         return $grid;
@@ -105,15 +101,15 @@ class BoxController extends MainController
     {
         $show = new Show(Box::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->type('type');
-//        $show->coins('coins');
-//        $show->users('users');
-//        $show->image('image');
-//        $show->has_label('has_label');
-//        $show->duration('duration');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
+        //        $show->id('ID');
+        //        $show->type('type');
+        //        $show->coins('coins');
+        //        $show->users('users');
+        //        $show->image('image');
+        //        $show->has_label('has_label');
+        //        $show->duration('duration');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
 
         return $show;
     }
@@ -127,14 +123,14 @@ class BoxController extends MainController
     {
         $form = new Form(new Box);
 
-        $form->display( __ ('ID'));
-        $form->select('type', __('type'))->options ([0=> __ ('normal'),1=> __ ('super')]);
+        $form->display(__('ID'));
+        $form->select('type', __('type'))->options([0 => __('normal'), 1 => __('super')]);
         $form->number('coins', __('coins'));
         $form->number('users', __('users'));
         $form->image('image', __('image'));
-        $form->switch('has_label', __('has label'))->states (Common::getSwitchStates ());
+        $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
-        $form->number('duration', __('duration'))->help (__ ('in minutes'));
+        $form->number('duration', __('duration'))->help(__('in minutes'));
 
         return $form;
     }

@@ -6,29 +6,21 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Facades\ManagerHelper;
 use App\Models\User;
 use App\Models\Agency;
-use Encore\Admin\Actions\Action;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\AdminUser;
-
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\HostUserAction;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
 use Illuminate\Support\Facades\Hash;
 
 class AdminUsersController extends MainController
 {
-
-
-
     public $permission_name = 'admin-users';
     public function show($id, Content $content)
     {
 
-        return $content->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
+        return $content ->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->agencies($id));
         });
     }
@@ -36,7 +28,7 @@ class AdminUsersController extends MainController
     public function show2($id, Agency $agency, Content $content)
     {
 
-        return $content->row("<h3>" . __('Users Agencies in'). ' ' . $agency->name. "</h3>")->row(function ($row) use ($id, $agency) {
+        return $content ->title(trans('admins'))->row("<h3>" . __('Users Agencies in'). ' ' . $agency->name. "</h3>")->row(function ($row) use ($id, $agency) {
             $row->column(12, $this->usersGrid( $agency));
         });
     }
@@ -45,7 +37,46 @@ class AdminUsersController extends MainController
      *
      * @var string
      */
-    protected $title = 'AdminUser';
+   /**
+     * Index interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('admins'))
+            ->body($this->grid());
+    }
+
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('admins'))
+            ->body($this->form()->edit($id));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('admins'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
