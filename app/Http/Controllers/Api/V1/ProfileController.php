@@ -124,7 +124,8 @@ class ProfileController extends Controller
     public function myProfileVisitorsList(Request $request)
     {
         $user = $request->user();
-        return $this->profileService->getProfileVisitorsList($user);
+        $keyword = $request->keywords ?? '';
+        return $this->profileService->getProfileVisitorsList($user,$keyword);
     }
 
     public function related()
