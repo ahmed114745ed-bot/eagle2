@@ -54,7 +54,6 @@ class UserService
         $this->packRepository = $packRepository;
         $this->followRepository = $followRepository;
         $this->blackListRepository = $blackListRepository;
-
     }
 
     public function searchUsers($key)
@@ -194,7 +193,7 @@ class UserService
         }
     }
 
-    public function handleUserRelations($user, $type)
+    public function handleUserRelations($user, $type, $keyword)
     {
         switch ($type) {
             case '1':
@@ -202,7 +201,7 @@ class UserService
             case '3':
             case '6':
                 (new UserCounterServices)->UpgradeDateForType($user, 'friend');
-                return Common::apiResponse(true, '', $this->getData2($user, $type), 200);
+                return Common::apiResponse(true, '', $this->getData2($user, $type, $keyword), 200);
 
             case '4':
                 (new UserCounterServices)->UpgradeDateForType($user, 'followeds');
@@ -301,7 +300,7 @@ class UserService
     }
 
 
-    public function getData2(User $user, $type = 1)
+    public function getData2(User $user, $type = 1, $keyword = '')
     {
         $userId = $user->id;
 
@@ -317,11 +316,11 @@ class UserService
 
         if ($type == 1) {
             // following in app
-            $users = $this->followRepository->getFollowing($user, $with);
+            $users = $this->followRepository->getFollowing($user, $with,$keyword);
         } elseif ($type == 2) {
-            $users = $this->followRepository->getFollowers($user, $with);
+            $users = $this->followRepository->getFollowers($user, $with,$keyword);
         } elseif ($type == 3) {
-            $users = $this->followRepository->getFriends($user, $with);
+            $users = $this->followRepository->getFriends($user, $with,$keyword);
         } elseif ($type == 6) {
             // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
@@ -387,8 +386,8 @@ class UserService
     {
         $user = $this->userRepository->findOrFail($userId, ['packs' => function ($q) {
             /** @var Builder $q*/
-            $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13,3,4,5])->where('is_used', 1)->with('ware');
-        },'profile','room','family']);
+            $q->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5])->where('is_used', 1)->with('ware');
+        }, 'profile', 'room', 'family']);
         if (!$user) throw new \Exception('not found');
         if (in_array($user->id, Common::getUserBlackList($auth->id))) throw new \Exception('in black list');
         $request['user_id'] = $userId;

@@ -214,7 +214,8 @@ class UserController extends Controller
     public function userFriend(Request $request)
     {
         $user = $request->user();
-        return $this->userService->handleUserRelations($user, $request->type);
+        $keyword = $request->keywords ?? '';
+        return $this->userService->handleUserRelations($user, $request->type,$keyword);
     }
 
     public function follow(Request $request)

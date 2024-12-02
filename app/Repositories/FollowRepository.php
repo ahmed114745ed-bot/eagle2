@@ -53,7 +53,7 @@ class FollowRepository
         })->orderByDesc('id')->paginate(15);
     }
 
-    public function getFollowing(User $user, array $with = [])
+    public function getFollowing(User $user, array $with = [],$keyword)
     {
 
         if (empty($with)) {
@@ -67,20 +67,20 @@ class FollowRepository
                 'UserVip'
             ];
         }
-        return $user->following()->with($with)->paginate(10); // Set pagination limit
+        return $user->following()->with($with)->where('uuid', 'like', '%' . $keyword . '%')->paginate(10); // Set pagination limit
 
     }
 
     // Get paginated list of users that are following the current user
-    public function getFollowers(User $user, array $with = [])
+    public function getFollowers(User $user, array $with = [],$keyword)
     {
-        return $user->followerss()->with($with)->paginate(10);
+        return $user->followerss()->with($with)->where('uuid', 'like', '%' . $keyword . '%')->paginate(10);
     }
 
     // Get paginated list of mutual followers (friends)
-    public function getFriends(User $user, array $with = [])
+    public function getFriends(User $user, array $with = [],$keyword)
     {
-        return $user->friends()->with($with)->paginate(10);
+        return $user->friends()->with($with)->where('uuid', 'like', '%' . $keyword . '%')->paginate(10);
     }
 
     public function getByFollower($userId)
