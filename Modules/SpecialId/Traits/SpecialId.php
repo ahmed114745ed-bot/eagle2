@@ -19,6 +19,10 @@ trait SpecialId
     {
         return $builder->where('uuid', $toId)->orWhere(fn($q) => $q->where('special_id', $toId)->whereHas('specialId'));
     }
+    public function scopeFitterByUuid(Builder $builder, $toId) :Builder
+    {
+        return $builder->where('uuid', 'like', '%' . $toId . '%' )->orWhere(fn($q) => $q->where('special_id', 'like', '%' . $toId . '%')->whereHas('specialId'));
+    }
 
     public function soundEffect()
     {

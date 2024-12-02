@@ -67,20 +67,20 @@ class FollowRepository
                 'UserVip'
             ];
         }
-        return $user->following()->with($with)->searchByUuid($keyword)->paginate(10); // Set pagination limit
+        return $user->following()->with($with)->fitterByUuid($keyword)->paginate(10); // Set pagination limit
 
     }
 
     // Get paginated list of users that are following the current user
     public function getFollowers(User $user, array $with = [],$keyword)
     {
-        return $user->followerss()->with($with)->searchByUuid($keyword)->paginate(10);
+        return $user->followerss()->with($with)->fitterByUuid($keyword)->paginate(10);
     }
 
     // Get paginated list of mutual followers (friends)
     public function getFriends(User $user, array $with = [],$keyword)
     {
-        return $user->friends()->with($with)->searchByUuid($keyword)->paginate(10);
+        return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(10);
     }
 
     public function getByFollower($userId)
