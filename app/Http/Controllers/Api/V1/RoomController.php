@@ -8,22 +8,13 @@ use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\BoxUse;
-use App\Models\Charge;
 use App\Helpers\Common;
 use App\Models\AllGame;
-use App\Models\Country;
-use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\KickRecord;
-use App\Models\RoomSalary;
-use App\Helpers\UserCommon;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use GuzzleHttp\Promise\Utils;
-use Illuminate\Http\Response;
-use App\Exceptions\NotInfCoins;
 use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
 use App\Services\RoomService;
@@ -46,30 +37,25 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
-use App\Tik\Services\CountryService;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 class RoomController extends Controller
 {
-
     use MultiQueryPagination;
 
     protected $repo;
-
     protected $roomService;
-    protected $countryService;
     protected $roomServiceMain;
 
     public function __construct(
         RoomRepoInterface $repo,
         RoomRepoService $roomService,
         RoomService $roomServiceMain,
-        CountryService $countryService
+
     ) {
         $this->repo = $repo;
         $this->roomService = $roomService;
-        $this->countryService = $countryService;
         $this->roomServiceMain = $roomServiceMain;
     }
 
@@ -111,7 +97,7 @@ class RoomController extends Controller
 
     public function room_countries()
     {
-        $data = $this->countryService->index2();
+        $data = $this->roomService->index2();
         return RoomCountriesResource::collection($data);
     }
     /**
@@ -575,90 +561,7 @@ class RoomController extends Controller
     {
 
         try {
-            $room = $this->repo->find($id);
-            if (!$room) {
-                return Common::apiResponse(false, 'Room not found', null, 404);
-            }
-            if ($room->uid != $request->user()->id && !in_array($request->user()->id, explode(',', $room->room_admin))) {
-                return Common::apiResponse(false, 'not allowed', null, 403);
-            }
-            if ($request->room_name) {
-                $room->room_name = $request->room_name;
-            }
-
-            if ($request->hasFile('room_cover')) {
-                $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
-            }
-
-            if ($request->free_mic) {
-                $room->free_mic = $request->free_mic;
-            }
-
-            if ($request->room_intro) {
-                $room->room_intro = $request->room_intro;
-            }
-
-            if ($request->room_pass) {
-                $room->room_pass = $request->room_pass;
-            }
-
-            $RoomCategoryides = RoomCategory::where('enable', 1)->pluck('id');
-
-            if ($request->room_type !== null) {
-                // if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
-                if (!in_array($request->room_type, $RoomCategoryides)) {
-                    return Common::apiResponse(0, 'Type not found', null, 404);
-                }
-                $room->room_type = $request->room_type;
-            }
-
-            if ($request->room_class !== null) {
-                if (!in_array($request->room_class, $RoomCategoryides)) {
-                    return Common::apiResponse(0, 'Type not found', null, 404);
-                }
-                // if (!RoomCategory::query()->where('id', $request->room_class)->where('enable', 1)->exists()) return Common::apiResponse(0, 'class not found', null, 404);
-                $room->room_type = $request->room_type;
-            }
-
-
-            $background_me = '';
-            if ($request->room_background) {
-                /*if (!Background::query ()->where ('id',$request->room_background)->where ('enable',1)->exists ()){
-                    return Common::apiResponse (0,'background not found',null,404);
-                }*/
-                if ($request->change == 'app') {
-                    Common::backgroundCount($room->room_background, $request->room_background);
-                    $room->room_background = $request->room_background;
-                    RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('status', 1)->update(['status' => 3]);
-                }
-                if ($request->change == 'me') {
-                    RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('id', '!=', $request->room_background)->where('status', 1)->update(['status' => 3]);
-                    $background_update         =
-                        RequestBackgroundImage::where('id', $request->room_background)->first();
-                    $background_update->status = 1;
-                    $background_update->save();
-                    $background_me         = $background_update->img;
-                    Common::backgroundCount($room->room_background, 0);
-                    $room->room_background = null;
-                }
-            }
-            //            $this->repo->save ($room);
-            $room->save();
-            $request['owner_id'] = $room->uid;
-
-            $data               = [
-                "messageContent" => [
-                    "message"   => "changeBackground",
-                    "imgbackground" => $room->room_background ?: $background_me,
-                    "roomIntro" => $room->room_intro ?: "",
-                    "roomImg" => $room->room_cover ?: "",
-                    "room_type" => @$room->myType->name ?: "",
-                    "room_name" => @$room->room_name ?: ""
-                ]
-            ];
-            $json               = json_encode($data);
-            $res                = Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-            $request->is_update = true;
+            $this->roomService->update($request, $id);
             return $this->enter_room($request);
         } catch (Exception $exception) {
             return Common::apiResponse(false, 'failed', $exception, 400);
@@ -1688,7 +1591,7 @@ class RoomController extends Controller
     public function userRooms()
     {
         $user = \Auth::user();
-        $room =$this->roomService->userRooms($user->id);
+        $room = $this->roomService->userRooms($user->id);
         if ($room != null) {
             $room = new RoomResource($room);
         }

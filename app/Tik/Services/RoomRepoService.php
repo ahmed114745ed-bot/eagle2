@@ -6,13 +6,18 @@ use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\AllGame;
+use App\Models\RoomCategory;
 use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
+use App\Classes\Room\RoomComments;
 use App\Http\Services\RoomService;
 use App\Traits\MultiQueryPagination;
+use App\Models\RequestBackgroundImage;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
+use App\Tik\Repositories\CountryRepository;
 use App\Tik\Repositories\GiftLogRepository;
+use App\Repositories\Room\RoomRepoInterface;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 
@@ -21,7 +26,7 @@ use App\Tik\Repositories\RequestBackgroundImageRepository;
 class RoomRepoService
 {
     use MultiQueryPagination;
-
+    protected $repo;
     /**
      * @param Model $model
      */
@@ -30,11 +35,13 @@ class RoomRepoService
         private readonly UserRepository $userRepository,
         private readonly GiftLogRepository $giftLogRepository,
         private readonly RequestBackgroundImageRepository $requestBackgroundImageRepository,
+        private readonly CountryRepository $countryRepository,
+        RoomRepoInterface $repo,
     ) {}
 
     public function getAllRooms($request)
     {
-//        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        //        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         return $this->repository->all($request);
     }
 
@@ -181,10 +188,10 @@ class RoomRepoService
         $currentPage = $request->page ?? 1;
         $visitors = null;
 
-         if ($request->has('users') && $currentPage == 1) {
+        if ($request->has('users') && $currentPage == 1) {
             $room->enableSaving      = false;
             $visitors      = $request->users ?? '';
-       }
+        }
 
         $roomAdmin   = $room->room_admin ?? '';
         $roomVisitor = $visitors ?? $room->room_visitor;
@@ -192,17 +199,17 @@ class RoomRepoService
 
         $roomAdmin        = explode(',', $roomAdmin);
         $roomAdminActive  = array_intersect($roomVisitor, $roomAdmin);
-       
+
         $roomVisitorArray = array_diff($roomVisitor, array_merge($roomAdminActive, [$room->uid . '']));
         $users = $this->userRepository->usersRoom($roomAdminActive);
-        
+
         $usersCount        = count($roomVisitor);
         $countInterested   = $users->count(['users.id']);
         $perPage           = 10;
         //        $diffCountWithPage = $countInterested - ($perPage * $currentPage);
 
         $users = $users->paginate($perPage);
-      
+
         if ($currentPage == 1 && in_array($room->uid, $roomVisitor)) {
             $allData[] = $room->owner;
             $allData   = array_merge($allData, $users->items());
@@ -277,7 +284,7 @@ class RoomRepoService
         }
         return Common::apiResponse(1, 'done', null, 201);
     }
-    
+
     public function changeModeMic($request, $currentMode)
     {
         $room =  $this->findRoomUser($request->owner_id);
@@ -294,7 +301,7 @@ class RoomRepoService
         ];
         $json = json_encode($ms);
         $jsons[] = $json;
-      
+
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {
@@ -324,5 +331,98 @@ class RoomRepoService
     public function userRooms($userId)
     {
         return  $this->repository->roomUsers($userId);
+    }
+
+    public function index2()
+    {
+        return $this->countryRepository->countryGet();
+    }
+
+    public function update($request,$id)
+    {
+        $room = $this->repo->find($id);
+        if (!$room) {
+            return Common::apiResponse(false, 'Room not found', null, 404);
+        }
+        if ($room->uid != $request->user()->id && !in_array($request->user()->id, explode(',', $room->room_admin))) {
+            return Common::apiResponse(false, 'not allowed', null, 403);
+        }
+        if ($request->room_name) {
+            $room->room_name = $request->room_name;
+        }
+
+        if ($request->hasFile('room_cover')) {
+            $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+        }
+
+        if ($request->free_mic) {
+            $room->free_mic = $request->free_mic;
+        }
+
+        if ($request->room_intro) {
+            $room->room_intro = $request->room_intro;
+        }
+
+        if ($request->room_pass) {
+            $room->room_pass = $request->room_pass;
+        }
+
+        $RoomCategoryides = RoomCategory::where('enable', 1)->pluck('id');
+
+        if ($request->room_type !== null) {
+            // if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
+            if (!in_array($request->room_type, $RoomCategoryides)) {
+                return Common::apiResponse(0, 'Type not found', null, 404);
+            }
+            $room->room_type = $request->room_type;
+        }
+
+        if ($request->room_class !== null) {
+            if (!in_array($request->room_class, $RoomCategoryides)) {
+                return Common::apiResponse(0, 'Type not found', null, 404);
+            }
+            // if (!RoomCategory::query()->where('id', $request->room_class)->where('enable', 1)->exists()) return Common::apiResponse(0, 'class not found', null, 404);
+            $room->room_type = $request->room_type;
+        }
+
+
+        $background_me = '';
+        if ($request->room_background) {
+            /*if (!Background::query ()->where ('id',$request->room_background)->where ('enable',1)->exists ()){
+                return Common::apiResponse (0,'background not found',null,404);
+            }*/
+            if ($request->change == 'app') {
+                Common::backgroundCount($room->room_background, $request->room_background);
+                $room->room_background = $request->room_background;
+                RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('status', 1)->update(['status' => 3]);
+            }
+            if ($request->change == 'me') {
+                RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('id', '!=', $request->room_background)->where('status', 1)->update(['status' => 3]);
+                $background_update         =
+                    RequestBackgroundImage::where('id', $request->room_background)->first();
+                $background_update->status = 1;
+                $background_update->save();
+                $background_me         = $background_update->img;
+                Common::backgroundCount($room->room_background, 0);
+                $room->room_background = null;
+            }
+        }
+        $room->save();
+        $request['owner_id'] = $room->uid;
+
+        $data               = [
+            "messageContent" => [
+                "message"   => "changeBackground",
+                "imgbackground" => $room->room_background ?: $background_me,
+                "roomIntro" => $room->room_intro ?: "",
+                "roomImg" => $room->room_cover ?: "",
+                "room_type" => @$room->myType->name ?: "",
+                "room_name" => @$room->room_name ?: ""
+            ]
+        ];
+        $json               = json_encode($data);
+        $res                = Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+        $request->is_update = true;
+        return true;
     }
 }
