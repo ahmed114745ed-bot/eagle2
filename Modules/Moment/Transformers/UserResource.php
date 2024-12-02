@@ -2,10 +2,11 @@
 
 namespace Modules\Moment\Transformers;
 
+use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use App\Http\Resources\Api\V1\MangerTypeResource;
 class UserResource extends JsonResource
 {
     /**
@@ -32,22 +33,45 @@ class UserResource extends JsonResource
 
         $vip       = @Common::ovip_center($this->id) ?? 0;
         $vip_level = (gettype($vip) == 'array') ? $vip['level'] : 0;
+       // $frame  = Common::getUserDress($this->id, $this->dress_1, 4, 'img2') ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1');
+       $frameDress  = $this->dress1;
+       $frame  = ($this->packs->where('type', 4)->first() != null)? (($frameDress != null) ? $frameDress->img2: ''): '';
 
+       $pass_status = false;
+       $now_room    = Room::query()->where('uid', $this->now_room_uid)->first();
+       if ($now_room) {
+           if ($now_room->room_pass) {
+               $pass_status = true;
+           }
+       }
 
         return [
-            'id'             => @$this->id, // both
-            'uuid'           => @$this->uuid ?? '', // both
-            'name'           => @$this->name ?: '', // both
-            'image'          => @$this->profile->avatar ?: '', // both
-            'receiver_level' => $receiver_level ?? 0, // both
-            'sender_level'   => $sender_level, // both
-            'receiver_img'   => $receiver_img, // both
-            'sender_img'     => $sender_img, // both
-            'charge_level' => Common::chargeLevel (@$this->id),
-            'vip'            => $vip_level, // both
-            'has_color_name' => Common::hasInPack($this->id, 18), // both
+            'id'                 => @$this->id, // both
+            'uuid'               => @$this->uuid ?? '', // both
+            'name'               => @$this->name ?: '', // both
+            'image'              => @$this->profile->avatar ?: '', // both
+            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
+            'receiver_level'     => $receiver_level ?? 0, // both
+            'sender_level'       => $sender_level, // both
+            'receiver_img'       => $receiver_img, // both
+            'sender_img'         => $sender_img, // both
+            'vip'                => $vip_level, // both
+            'has_color_name'     => Common::hasInPack($this->id, 18), // both
+            'frame_id'           => $frame != ''? @$this->dress_1 : 0,
+            'frame'              => $frame,
+            'senderLevel'        =>$this->total_sender_level,
+            'reciverLevel'        =>$this->total_received_level,
+            'now_room'             => [
+                'is_in_room'      => @$this->now_room_uid != 0,
+                'uid'             => @(integer)$this->now_room_uid,
+                'is_mine'         => @$this->id == $this->now_room_uid,
+                'password_status' => $pass_status
+            ],
+            'type_user'            => intval(@$this->type_user) ?: 0, // both
+            "manger_type"          =>new MangerTypeResource(@$this->mangerType)
 
-            
+
         ];
 
     }

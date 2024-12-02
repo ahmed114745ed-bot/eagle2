@@ -2,45 +2,130 @@
 
 namespace Modules\Moment\Http\Controllers;
 
-use App\Helpers\Common;
-use App\Models\Follow;
+use DB;
 use App\Models\User;
-use Illuminate\Contracts\Support\Renderable;
+use App\Models\Follow;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Modules\Moment\Entities\Moment;
+use Illuminate\Support\Facades\Auth;
 use Modules\Moment\Entities\MomentLikes;
 use Modules\Moment\Entities\ReportMoment;
+use Illuminate\Contracts\Support\Renderable;
+use Modules\Reals\Http\Services\MomentService;
 use Modules\Moment\Transformers\MomentResource;
-use DB;
-use Modules\Moment\Http\Services\MomentService;
+use Modules\Public\Http\Services\UpgradeLevelServices;
 
 class MomentController extends Controller
 {
 
-    public function __construct(public MomentService $momentService) {}
 
     public function index(Request $request)
     {
-        $type = $request->type;
-        $page = $request->get('page', 1);
-        $userId = $request->user_id;
-        $currentUser = Auth::id();
 
-        if (!$page || $page == 1) {
-            $user = Auth::user();
-            $user->moment_type = $user->id . random_int(1000, 9999);
-            $user->save();
+        $type   = $request->type;
+        $userId = Auth::id();
+        $user=$request->user();
+
+        switch ($type) {
+            case 1:
+                $user_id = $request->user_id;
+                if (!isset($user_id)) {
+                    $user_id = Auth::id();
+                }
+                $data = Moment::where('user_id', $user_id)->likeExists($userId)->with('user')->withCount(['likes','comments',])->with(['gifts' => function ($query) {
+                    $query ->select( DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }])->orderByDesc('id')->paginate(10);
+
+                return Common::apiResponse(1, '', MomentResource::collection($data), 200);
+            case 2: // moment  u like it
+                $user_id = Auth::id();
+
+                $likedMoments = MomentLikes::with([
+                    'moment.user', 'moment' => function ($query) use ($userId) {
+                        $query->likeExists($userId)->withCount(['likes', 'comments',])->with(["user",'gifts' => function ($query) {
+                            $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                            ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                        }]);
+                    }
+                ])->where('user_id', $user_id)
+                    ->orderByDesc('id')
+                    ->paginate(10);
+                if ($likedMoments->isEmpty()) {
+                    return Common::apiResponse(1, 'No liked moments found', [], 200);
+                }
+                $likedMoments = $likedMoments->pluck('moment')->flatten();
+                $likedMoments = $likedMoments->shuffle();
+
+                return Common::apiResponse(1, '', MomentResource::collection($likedMoments), 200);
+                // return $likedMoments;
+                //  $data = MomentResource::collection($likedMoments->pluck('moment'));
+                /* $data = TransformersMomentfollwedResource::collection($likedMoments);
+                return Common::apiResponse(1, '',$data,200);*/
+            case 3: // moment u follwed
+              $user = auth()->user(); 
+             $moments =    Moment::whereHas('user', function ($query) use ($user) {
+                $query->whereHas('followersMoment', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                });
+            })->likeExists($userId)->with('user')->withCount(['likes','comments',])->with(['gifts' => function ($query) {
+                $query ->select( DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+            }])->inRandomOrder($user->moment_type)->paginate(10);
+   
+
+            // $follwedMoments = Follow::where('user_id', $user->id)
+            // ->whereHas('moments')
+            // ->with([
+            //     'moments.user',
+            //     'moments' => function ($query) use ($user) {
+            //         $query ->withCount(['likes', 'comments'])
+            //             ->likeExists($user->id)
+            //             ->with(["user",'gifts' => function ($query) {
+            //                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+            //                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+            //             }])
+            //             ->inRandomOrder($user->moment_type); // Apply random order here
+            //     }
+            // ])
+            //         // ->orderByDesc('id')
+            //         ->paginate(10);
+  
+                if ($moments->isEmpty()) {
+                    return Common::apiResponse(1, 'No following moments found', [], 200);
+                }
+
+                // $follwedMoments = $follwedMoments->pluck('moments')->flatten();
+                // $follwedMoments = $follwedMoments->shuffle();
+              
+               
+                return Common::apiResponse(1, '', MomentResource::collection($moments), 200);
+
+            case 4:
+                $user=$request->user();
+                // $data = Moment::likeExists($userId)->withCount(['likes','comments',])->with(['user','gifts' => function ($query) {
+                //     $query ->select( DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                //            ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                // }])->orderByDesc('id')->paginate(10);
+                $user_id        = Auth::id();
+                $data = Moment::withCount(['likes', 'comments'])
+                ->with(['user', 'gifts' => function ($query) {
+                    $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                        ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+                }])
+                ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $user_id) > 0 THEN 1 ELSE 0 END ASC")
+                ->inRandomOrder($user->moment_type)
+                ->paginate(10);
+                return Common::apiResponse(1, '', MomentResource::collection($data), 200);
+            default:
+                break;
         }
 
-        $data = $this->momentService->getMomentsByType($type, $userId, $page, $currentUser);
 
-        if (!$data) {
-            return Common::apiResponse(1, 'Please select a valid type', '', 200);
-        }
+        return Common::apiResponse(1, 'please select valid type', '', 200);
 
-        return Common::apiResponse(1, '', MomentResource::collection($data), 200);
     }
 
     /**
@@ -49,14 +134,27 @@ class MomentController extends Controller
      */
     public function store(Request $request)
     {
-        $contacts = $request->contacts ?? '';
-        $image = $request->file('img');
+        $user = $request->user();
+        $contacts = @$request->contacts ?? '';
+        $img_path = '';
+        $user_id  = Auth::id();
 
-        // Delegate to the service layer
-        $result = $this->momentService->createMoment($contacts, $image);
 
-        // Format and return response
-        return Common::apiResponse($result['success'], $result['message']);
+        if ($request->hasFile('img')) {
+            $img_path = Common::upload('moment', $request->file('img'));
+        }
+        if ($contacts == '' && $img_path == '') return Common::apiResponse(false, 'Not allowed Post empty content');
+
+        $created = Moment::create([
+                                      'user_id'     => $user_id,
+                                      'description' => $contacts,
+                                      'img'         => $img_path,
+                                  ]);
+        if (!$created) {
+            return Common::apiResponse(0, 'try_again');
+        }
+        (new UpgradeLevelServices())->uploadMoment($user);
+        return Common::apiResponse(1, 'success');
     }
 
     /**
@@ -76,22 +174,22 @@ class MomentController extends Controller
     /**
      * Show the form for editing the specified resource.
      * @param int $id
-     * @return Renderable
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Request $request, $id)
-    {
-        $userId = Auth::id();
+      public function show(Request $request, $id)
+     {
+         $userId = Auth::id();
 
-        // Delegate to the service
-        $result = $this->momentService->getMoment($id, $userId);
+         $data = Moment::where('id', $id)->likeExists($userId)->with('user',)->withCount(['likes','comments',])->with(['gifts' => function ($query) {
+             $query ->select( DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+         }])->first();
+         if (!$data){
+             return Common::apiResponse(0, __('Moment not founded'), 402);
 
-        // Format and return response
-        if (!$result['success']) {
-            return Common::apiResponse(0, $result['message'], $result['status']);
-        }
-
-        return Common::apiResponse(1, $result['message'], new MomentResource($result['data']), $result['status']);
-    }
+         }
+         return Common::apiResponse(1, '', new MomentResource($data), 200);
+     }
 
     /**
      * Update the specified resource in storage.
@@ -111,22 +209,27 @@ class MomentController extends Controller
      */
     public function destroy($id)
     {
-        $result = $this->momentService->deleteMomentById($id);
-
-        // Return the response
-        return Common::apiResponse($result['success'] ? 1 : 0, $result['message'], $result['status']);
+        $moment = Moment::query()->find($id);
+        if (!$moment) {
+            return Common::apiResponse(1, 'Item Not Found');
+        }
+        $moment->delete();
+        return Common::apiResponse(1, 'success Deleted');
 
     }
 
     public function destroy_dash($moment_id, $id)
     {
-        $result = $this->momentService->deleteMomentAndReport($moment_id, $id);
 
-        // Check result and return the appropriate response
-        if (!$result['success']) {
-            return redirect()->back()->with('error', $result['message']);
+        $moment        = Moment::query()->find($moment_id);
+
+        if (!$moment) {
+            return redirect()->back();
         }
+        ReportMoment::query()->where('moment_id', $moment_id)->delete();
+        $moment->delete();
+        // $moment_report->delete();
+        return redirect()->back();
 
-        return redirect()->back()->with('success', $result['message']);
     }
 }

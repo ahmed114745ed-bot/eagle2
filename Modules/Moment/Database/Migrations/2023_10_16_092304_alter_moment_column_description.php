@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
+class AlterMomentColumnDescription extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('moment_user_comments', function (Blueprint $table) {
-            $table->text('comment')->change();
+        Schema::table('moment', function (Blueprint $table) {
+            $table->text('description')->change();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('moment_user_comments', function (Blueprint $table) {
-            $table->string('comment')->change();
+        Schema::table('moment', function (Blueprint $table) {
+            $table->string('description')->change();
         });
     }
-};
+}
