@@ -147,7 +147,7 @@ class CoinController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
-        $data = $this->coinService->show($request->coin_id);
+        $data = $this->coinService->showPayment($request->payment_coin_id);
         return Common::apiResponse(1, '', $data);
     }
 }
