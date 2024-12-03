@@ -128,7 +128,7 @@
                     
                         return {
                         results: data.data.map(function(user) {
-                            return { id: user.id, text: user.name ?? ''};
+                            return { id: user.id, text: user.name || '' };
 
                         }), // Set the results array to the received data
                         pagination: {
