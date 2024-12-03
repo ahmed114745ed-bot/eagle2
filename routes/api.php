@@ -340,6 +340,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('wares', [MallController::class, 'index']);
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
+                Route::get('best-sale', [MallController::class, 'bestWareSale']);
+
             });
             //start games
             Route::prefix('all-games1')->group(function () {
