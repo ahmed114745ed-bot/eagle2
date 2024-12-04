@@ -159,7 +159,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
-                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgincy']);
+                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
 
             });
 
