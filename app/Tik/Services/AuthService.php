@@ -104,7 +104,7 @@ class AuthService
     public function loginWithGoogle($request)
     {
         $user = $this->userRepository->findByGoogleId($request['google_id']);
-        
+
         if (!$user) {
             $trashedEmail = $this->userRepository->checkTrashedEmail($request['email'], $request['google_id']);
             if ($trashedEmail) {
@@ -131,10 +131,10 @@ class AuthService
                     'status' => true,
 
                 ];
-                $checkValidation = $this->verifyGoogleToken($request['id_token']);
-                if (!$checkValidation) {
-                    throw new CValidationException('some thing wrong');
-                }
+//                $checkValidation = $this->verifyGoogleToken($request['id_token']);
+//                if (!$checkValidation) {
+//                    throw new CValidationException('some thing wrong');
+//                }
                 $user = $this->userRepository->create($data);
                 if (\request('tags') && is_array(\request('tags'))) {
                     $user->tags()->attach(\request('tags'));
