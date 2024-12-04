@@ -7,6 +7,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
 
 class DeleteAccountController extends AdminController
 {
@@ -15,7 +16,49 @@ class DeleteAccountController extends AdminController
      *
      * @var string
      */
-    protected $title = 'DeleteAccount';
+   
+
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('delete-accounts'))
+            ->body($this->grid());
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('delete-accounts'))
+            ->body($this->detail($id));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return $content
+            ->title(trans('delete-accounts'))
+            ->body($this->form()->edit($id));
+    }
+
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('delete-accounts'))
+            ->body($this->form());
+    }
 
     /**
      * Make a grid builder.
@@ -29,9 +72,6 @@ class DeleteAccountController extends AdminController
         $grid->column('id', __('Id'));
         $grid->column('title', __('Title'));
         $grid->column('image', __('Image'));
-        $grid->column('created_at', __('Created at'));
-        $grid->column('updated_at', __('Updated at'));
-
         return $grid;
     }
 
@@ -63,9 +103,25 @@ class DeleteAccountController extends AdminController
     {
         $form = new Form(new DeleteAccount());
 
-        $form->table('entries', __('Entries'), function ($table) {
-            $table->textarea('title', __('Title'));
-            $table->image('image', __('Image'));
+        $form->table('entries', __('data'), function ($table) {
+            $table->textarea('title', __('Title'))->required();
+            $table->image('image', __('Image'))->required();
+        });
+
+        $form->saving(function (Form $form) {
+            $entries = $form->entries; // This is already an array
+    
+            if (is_array($entries)) {
+                foreach ($entries as $entry) {
+                    DeleteAccount::create([
+                        'title' => $entry['title'],
+                        'image' => $entry['image'],
+                    ]);
+                }
+            }
+    
+            // Prevent saving the entries as a single field in the database
+            unset($entries);
         });
     
         return $form;
