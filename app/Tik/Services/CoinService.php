@@ -115,8 +115,8 @@ class CoinService
     public function createPaymentCoins($request)
     {
         $image = null;
-        if ($request->hasFile('image')) {
-            $image = Common::upload('images', $request->file('image'));
+        if ($request->hasFile('photo')) {
+            $image = Common::upload('images', $request->file('photo'));
         }
         $data = [
             'photo' => $image,
@@ -131,8 +131,8 @@ class CoinService
         $data = [
             'title' => $request->title,
         ];
-        if ($request->hasFile('image')) {
-            $data['photo'] = Common::upload('images', $request->file('image'));
+        if ($request->hasFile('photo')) {
+            $data['photo'] = Common::upload('images', $request->file('photo'));
         }
 
         $this->paymentCoinRepository->update($data, $request->payment_coin_id);
