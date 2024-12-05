@@ -4,14 +4,10 @@ namespace Modules\Moment\Entities;
 
 use App\Models\Gift;
 use App\Models\User;
-use Database\Factories\MomentFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Moment extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['user_id','description','img'];
     protected $table = 'moment';
     protected $guarded = ['id'];
@@ -33,6 +29,7 @@ class Moment extends Model
     }
 
 
+
     public function user()
     {
         return $this->belongsTo(User::class,);
@@ -50,11 +47,6 @@ class Moment extends Model
         } ]);
     }
 
-   // public
-   protected static function newFactory()
-   {
-       return MomentFactory::new();
-   }
 
 
 }

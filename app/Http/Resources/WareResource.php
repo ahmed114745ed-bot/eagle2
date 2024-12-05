@@ -14,23 +14,24 @@ class WareResource extends JsonResource
      */
     public function toArray($request)
     {
-        if ($this->type == 25){
-            $title= $this->value;
-        }else{
-            $title= app()->getLocale() == 'ar' ? ($this->title?:'') : ($this->title_en ?? '');
+        if ($this->type == 25) {
+            $title = $this->value;
+        } else {
+            $title = app()->getLocale() == 'ar' ? ($this->title ?: '') : ($this->title_en ?? '');
         }
         return [
             'id'        =>  $this->id,
-            'name'      =>  app()->getLocale() == 'ar' ? ($this->name?:'') : ($this->name_en ??''),
+            'name'      =>  app()->getLocale() == 'ar' ? ($this->name ?: '') : ($this->name_en ?? ''),
             'title'     =>  $title,
-            'price'     =>  $this->price?:0,
-            'color'     =>  $this->color?:'',
+            'price'     =>  $this->price ?: 0,
+            'color'     =>  $this->color ?: '',
             'expire'    =>  $this->expire == 0 ? 99999999 : $this->expire,
             'image'     =>  $this->show_img == null ? '' : $this->show_img,
             'img'       =>  $this->img1 == null ? '' : $this->img1,
             'svg'       =>  $this->img2 == null ? '' : $this->img2,
             'video'     =>  $this->img3  == null ? '' : $this->img3,
-            'image_type' => $this->image_type??"",
+            'image_type' => $this->image_type ?? "",
+            'type'       => $this->type,
         ];
     }
 }

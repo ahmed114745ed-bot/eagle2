@@ -159,7 +159,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
-                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgincy']);
+                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
 
             });
 
@@ -340,6 +340,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('wares', [MallController::class, 'index']);
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
+                Route::get('best-sale', [MallController::class, 'bestWareSale']);
+
             });
             //start games
             Route::prefix('all-games1')->group(function () {

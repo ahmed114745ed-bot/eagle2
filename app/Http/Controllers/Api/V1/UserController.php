@@ -39,13 +39,12 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function chargerAgincy(Request $request, ProfileRelationsService $profileRelationsService)
+    public function chargerAgency(Request $request, ProfileRelationsService $profileRelationsService)
     {
-        $users = User::where('type_user', 3)->orWhere('type_user', 4)->orderByDesc('id')->paginate(10);
+        $users = $this->userService->userCharge();
         $usersType = UserTypeResource::collection($users);
         [$senderLevels, $receivedImage] = $profileRelationsService->getLevelsSenderAndReceiver($usersType);
         UserTypeResource::initializeData($senderLevels, $receivedImage, null);
-        $data = UserTypeResource::collection($usersType);
         return Common::apiResponse(1, '', $usersType);
     }
 
@@ -81,49 +80,7 @@ class UserController extends Controller
         if (now()->month == $month && now()->year == $year) {
             (new FixedTargetService($user))->calculateTarget();
         }
-        $totalSalary = UserSallary::query()->where('user_id', $user->id)
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
-            })
-            ->sum(DB::raw('sallary - cut_amount'));
-
-        $user_sallary = UserSallary::query()->where('user_id', $user->id)
-            ->where('month', $month)
-            ->where('year', $year)
-            ->orderByDesc('id')
-            ->first();
-
-
-        $total_usd = 0;
-        $current_total_hour = "0 / 0";
-        $current_total_day = "0 / 0";
-        $current_diamond = "0 / 0";
-        if ($user_sallary != null) {
-            $total_usd          = $totalSalary;
-            $current_total_hour = $user_sallary->hours;
-            $current_total_day  = $user_sallary->days;
-            $diamonds            = $user_sallary->diamond;
-            $current_diamond    = $diamonds ?? $current_diamond;
-            if ($diamonds) {
-                $stringWithoutSpaces = str_replace(' ', '', $diamonds);
-                $parts = explode('/', $stringWithoutSpaces);
-
-                // Convert the parts to integers
-                $firstNumber = intval($parts[0]);
-                //                $secondNumber = intval($parts[1]);
-                $nextTarget = Target::query()->where('diamonds', '>', $firstNumber)->orderBy('diamonds')->first();
-                if ($nextTarget) {
-                    $current_diamond = $firstNumber . ' / ' . $nextTarget->diamonds;
-                }
-            }
-        }
-        $data = [
-            "total_diamond" => $user->total_diamond_received,
-            "total_usd" => floor($total_usd),
-            "current_total_hour" => $current_total_hour,
-            "current_total_day" => $current_total_day,
-            "diamond" => $current_diamond,
-        ];
+        $data = $this->userService->userStatic($user,  $month, $year);
         return Common::apiResponse(true, '', $data, 200);
     }
 

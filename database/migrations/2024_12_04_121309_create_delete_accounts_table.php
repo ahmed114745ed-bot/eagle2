@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('moment_type')->nullable()->default(0);
+        Schema::create('delete_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->text('title');
+            $table->string('image');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('moment_type');
-        });
+        Schema::dropIfExists('delete_accounts');
     }
 };

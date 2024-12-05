@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use DB;
 use Carbon\Carbon;
 use App\Models\Vip;
 use App\Models\User;
@@ -14,19 +15,19 @@ use App\Facades\CustomNotification;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
+use Illuminate\Database\Query\Builder;
 use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
+use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Query\JoinClause;
+use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\GiftLogRepository;
+use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
-use App\Repositories\BlackListRepository;
-use DB;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -44,6 +45,8 @@ class UserService
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
         private readonly  GiftLogRepository $giftLogRepository,
+        private readonly UserSalaryRepository $userSalaryRepository,
+        private readonly TargetRepository $targetRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -316,11 +319,11 @@ class UserService
 
         if ($type == 1) {
             // following in app
-            $users = $this->followRepository->getFollowing($user, $with,$keyword);
+            $users = $this->followRepository->getFollowing($user, $with, $keyword);
         } elseif ($type == 2) {
-            $users = $this->followRepository->getFollowers($user, $with,$keyword);
+            $users = $this->followRepository->getFollowers($user, $with, $keyword);
         } elseif ($type == 3) {
-            $users = $this->followRepository->getFriends($user, $with,$keyword);
+            $users = $this->followRepository->getFriends($user, $with, $keyword);
         } elseif ($type == 6) {
             // uses that follow you not friend with you
             $users = $this->followRepository->getFollow($userId);
@@ -560,5 +563,48 @@ class UserService
             DB::rollBack();
             return false;
         }
+    }
+
+
+    public function userCharge()
+    {
+        return $this->userRepository->userCharge();
+    }
+
+    public function userStatic($user,  $month, $year)
+    {
+        $totalSalary = $this->userSalaryRepository->TotalSalary($user->id, $month, $year);
+        $user_sallary = $this->userSalaryRepository->getByUser($user->id, $month, $year, 1);
+
+        $total_usd = 0;
+        $current_total_hour = "0 / 0";
+        $current_total_day = "0 / 0";
+        $current_diamond = "0 / 0";
+
+        if ($user_sallary != null) {
+            $total_usd          = $totalSalary;
+            $current_total_hour = $user_sallary->hours;
+            $current_total_day  = $user_sallary->days;
+            $diamonds            = $user_sallary->diamond;
+            $current_diamond    = $diamonds ?? $current_diamond;
+            if ($diamonds) {
+                $stringWithoutSpaces = str_replace(' ', '', $diamonds);
+                $parts = explode('/', $stringWithoutSpaces);
+
+                // Convert the parts to integers
+                $firstNumber = intval($parts[0]);
+                $nextTarget = $this->targetRepository->getByDiamonds($firstNumber);
+                if ($nextTarget) {
+                    $current_diamond = $firstNumber . ' / ' . $nextTarget->diamonds;
+                }
+            }
+        }
+        return    $data = [
+            "total_diamond" => $user->total_diamond_received,
+            "total_usd" => floor($total_usd),
+            "current_total_hour" => $current_total_hour,
+            "current_total_day" => $current_total_day,
+            "diamond" => $current_diamond,
+        ];
     }
 }

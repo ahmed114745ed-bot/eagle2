@@ -33,6 +33,7 @@ use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportMomentController;
+use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
@@ -187,6 +188,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+        $router->resource('delete-accounts', DeleteAccountController::class);
         $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         $router->resource('test-pusher', TestPusherController::class);
         $router->resource('report_user', ReportUserController::class);

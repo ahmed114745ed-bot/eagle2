@@ -1596,7 +1596,12 @@
     "withdraw-types":"أنواع السحب",
     "requests-for-get-salary":"طلبات الحصول على الراتب",
     "questions":"أسئلة",
-    "payment-coins":"عملات الدفع"
+    "payment-coins":"عملات الدفع",
+    "host":"مضيف",
+    "categories":"التصنيفات",
+    "Fields": "الحقول",
+    "Details":"التفاصيل",
+    "delete-accounts" :" سياسه الحسبات المحذوفه"
     
     
 }

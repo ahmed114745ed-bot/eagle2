@@ -68,6 +68,11 @@ class UserRepository extends Repository
                     ->find($userId);
     }
 
+    public function userCharge()
+    {
+        return User::where('type_user', 3)->orWhere('type_user', 4)->orderByDesc('id')->paginate(10);
+    }
+
     public function updateLocation($userId,$lat,$long)
     {
         User::whereId($userId)->update([

@@ -94,7 +94,7 @@
             <select name="gift_achievement_id" id="gift_achievement_id" class="form-control" >
                 <option value="">{{__('admin.selectAchievement')}}</option>
                 @foreach ($gifts as $gift)
-                    <option value="{{ $gift->id }}">{{ $gift->gift->name }}</option>
+                    <option value="{{ $gift->id }}">{{ $gift->gift->name ?? '' }}</option>
                 @endforeach
             </select>
         </div>
@@ -128,7 +128,7 @@
                     
                         return {
                         results: data.data.map(function(user) {
-                            return { id: user.id, text: user.name ?? ''};
+                            return { id: user.id, text: user.name || '' };
 
                         }), // Set the results array to the received data
                         pagination: {

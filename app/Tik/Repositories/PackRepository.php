@@ -131,4 +131,9 @@ class PackRepository extends AbstractRepository
         $this->model->query()->where(['user_id' => $userId, 'id' => $packId])->update(['is_used' => 1, 'use_num' => 1]);
         return true;
     }
+
+    public function  bestSale()
+    {
+        return $this->model->select('target_id', \DB::raw('SUM(num) as total_num'))->groupBy('target_id')->with('ware')->orderByDesc('total_num')->limit(10)->get();
+    }
 }

@@ -102,7 +102,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProfileGallary::class);
     }
-
+    public function mutualFollows()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'user_id', 'followed_user_id')
+            ->withPivot('status', 'created_at')
+            ->wherePivot('status', 1)
+            ->whereIn('followed_user_id', function ($query) {
+                $query->select('user_id')
+                    ->from('follows')
+                    ->whereColumn('follows.user_id', 'follows.followed_user_id')
+                    ->where('follows.status', 1);
+            });
+    }
     public function ignores()
     {
         return $this->belongsToMany(User::class, 'profile_user_ignores', 'user_id', 'ignore_user_id')

@@ -15,9 +15,7 @@ class RoomCategoryController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'categories';
-    public $hiddenColumns = [
-
-    ];
+   
 
     public function index(Content $content)
     {

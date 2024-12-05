@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\WareResource;
+use App\Http\Resources\BestWareSaleResource;
 use Modules\Public\Http\Services\UserCounterServices;
 
 
@@ -62,4 +63,11 @@ class MallController extends Controller
         }
         return $wares;
     }
+
+    public function bestWareSale()
+    {
+        $pestSaleProduct = $this->mallService->bestSaleWare();
+        return Common::apiResponse(true, '', BestWareSaleResource::collection($pestSaleProduct), 200);
+    }
+
 }

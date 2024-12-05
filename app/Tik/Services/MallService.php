@@ -137,4 +137,9 @@ class MallService
 
         $this->userRepository->decrementUserCoins($user, $totalPrice);
     }
+
+    public function bestSaleWare()
+    {
+        return $this->packRepository->bestSale();
+    }
 }

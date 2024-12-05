@@ -18,7 +18,7 @@ class ProfileService
     protected $userRepository;
     protected $profileRelationService;
 
-    public function __construct(ProfileRepository $profileRepo,UserRepository $userRepository,ProfileRelationService $profileRelationService)
+    public function __construct(ProfileRepository $profileRepo, UserRepository $userRepository, ProfileRelationService $profileRelationService)
     {
         $this->profileRepo = $profileRepo;
         $this->userRepository = $userRepository;
@@ -45,7 +45,7 @@ class ProfileService
 
         if ($request->hasFile('multi_image')) {
             foreach ($user->images as $image) {
-                Storage::delete('profile/'.$image->img);
+                Storage::delete('profile/' . $image->img);
                 $image->delete();
             }
 
@@ -88,11 +88,11 @@ class ProfileService
         return Common::apiResponse(false, 'user not found', [], 404);
     }
 
-    public function getProfileVisitorsList($user)
+    public function getProfileVisitorsList($user, $keyword = '')
     {
         (new ServicesUserCounterServices)->UpgradeDateForType($user, 'visitor');
 
-        $profileVisitors = $this->profileRepo->getProfileVisits($user);
+        $profileVisitors = $this->profileRepo->getProfileVisits($user,$keyword);
 
         [$userFollowers, $senderLevels, $receivedImage] = $this->profileRelationService->getHelperArrays($user, $profileVisitors);
 
@@ -110,7 +110,4 @@ class ProfileService
     {
         return $this->profileRepo->getRandomUsers($limit);
     }
-
-
-
 }

@@ -1,10 +1,11 @@
 <?php
 
+use App\Models\DeleteAccount;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
 use App\Http\Controllers\addTOjesonController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Router;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,11 @@ Route::get('/admin/agency-export-report', [
 Route::get('/privacy-policy', function () {
     $page = \App\Models\Page::where("name", "privacy-policy")->first();
     return view('privacy.privacy', ['page' => $page]);
+});
+
+Route::get('delete-account', function () {
+    $data = DeleteAccount::get();
+    return view('deleteAccount', compact("data"));
 });
 
 
