@@ -234,7 +234,6 @@ class UserService
         }
 
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
-
         if (!$follow) {
             $this->followRepository->createFollow([
                 'user_id' => $userId,
@@ -259,9 +258,11 @@ class UserService
     {
         if ($user->followBack($receiver)) {
             CustomNotification::followBack($receiver, $user);
+            (new UserCounterServices)->UpgradeDateForType($receiver, 'friend');
             (new UserCounterServices)->eventUser($receiver, 'friend', 1);
         } else {
             CustomNotification::follow($receiver, $user);
+            (new UserCounterServices)->UpgradeDateForType($receiver, 'followeds');
             (new UserCounterServices)->eventUser($receiver, 'follow', 1);
         }
         (new UserCounterServices)->eventUser($receiver, 'follower', 1);
