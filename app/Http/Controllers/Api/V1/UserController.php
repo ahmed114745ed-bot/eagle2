@@ -161,6 +161,12 @@ class UserController extends Controller
         $key = $request->search;
         $users = $this->userService->searchUsers($key);
 
+
+        $users = $users->through(function($user){
+            $user->level = Common::level_centerSerch ($user->id);
+
+            return $user;
+        });
         return response()->json($users);
     }
 
