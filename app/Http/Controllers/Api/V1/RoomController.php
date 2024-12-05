@@ -37,6 +37,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -122,6 +123,7 @@ class RoomController extends Controller
             $room = $this->roomService->create($request, $user->id);
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
         } catch (Exception $exception) {
+            Log::info($exception->getMessage());
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
