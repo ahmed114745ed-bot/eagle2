@@ -102,7 +102,7 @@ class UserResource extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'chat_id' => @$this->chat_id ?: "", // both                     ///////
-            'notification_id'      => @$this->notification_id ?: "", // both   
+            'notification_id'      => @$this->notification_id ?: "", // both
             'name'                 => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid, // both
             'nick_name'            => @$this->nick_name, // both                      ////
             'number_of_fans'       => $this->numberOfFans(), // both   ---
@@ -158,7 +158,7 @@ class UserResource extends JsonResource
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
-            'level' => Common::level_center (@$this->id),
+            'level' => Common::level_centerSerch(@$this->id),
 
         ];
 
