@@ -241,7 +241,6 @@ class UserService
                 'followed_user_id' => $followedUserId,
                 'status' => 1
             ]);
-
             $this->handleFollowBack($request->user(), $receiver);
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);

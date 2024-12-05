@@ -122,7 +122,7 @@ class RoomController extends Controller
             $room = $this->roomService->create($request, $user->id);
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
         } catch (Exception $exception) {
-            return Common::apiResponse(false, 'failed', null, 400);
+            return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
 
