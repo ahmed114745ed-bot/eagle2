@@ -39,7 +39,7 @@ class RoomObserver
 
     public function creating(Room $room){
         $room->mode = 3;
-
+        $room->muted_users = '';
     }
 
 
