@@ -92,22 +92,36 @@ class UserCounterServices
                 return OfficialMessage::where("type", 2)
                     ->where("created_at", ">", $date)
                     ->count();
-            case "followers":
-                return Follow::where("followed_user_id", $user->id)
-                    ->where("created_at", ">", $date)
-                    ->count();
-            case "followeds":
-                return Follow::where("user_id", $user->id)
-                    ->where("created_at", ">", $date)
-                    ->count();
-            case "friend":
-                return Follow::where(function ($query) use ($user) {
-                    $query->where("user_id", $user->id)
-                        ->orWhere("followed_user_id", $user->id);
-                })
-                    ->where("status", 1)
-                    ->where("created_at", ">", $date)
-                    ->count();
+                    case " followeds":
+                        return Follow::where("followed_user_id", $user->id)
+                            ->where("created_at", ">", $date)
+                            ->count();
+                    case "followers":
+                        return Follow::where("user_id", $user->id)
+                            ->where("created_at", ">", $date)
+                            ->count();
+                    case "friend":
+                        return DB::table('follows as f1')
+                            ->selectRaw('
+                            LEAST(f1.user_id, f1.followed_user_id) AS user_id,
+                            GREATEST(f1.user_id, f1.followed_user_id) AS followed_user_id,
+                            MAX(f1.created_at) AS created_at
+                        ')
+                            ->join('follows as f2', function ($join) {
+                                $join->on('f1.user_id', '=', 'f2.followed_user_id')
+                                    ->on('f1.followed_user_id', '=', 'f2.user_id');
+                            })
+                            ->where('f1.status', 1)
+                            ->where('f2.status', 1)
+                            ->groupBy([
+                                DB::raw('LEAST(f1.user_id, f1.followed_user_id)'),
+                                DB::raw('GREATEST(f1.user_id, f1.followed_user_id)')
+                            ])->where(function ($query) use ($user) {
+                                // Filter for records involving the authenticated user
+                                $query->where('f1.user_id', $user->id)
+                                      ->orWhere('f1.followed_user_id', $user->id);
+                            })->having("created_at", ">", $date)
+                            ->count();
             case "visitor":
                 return ProfileVisitor::where("user_id", $user->id)
                     ->where("created_at", ">", $date)
