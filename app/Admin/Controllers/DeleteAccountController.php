@@ -103,10 +103,8 @@ class DeleteAccountController extends AdminController
     protected function form()
     {
         $form = new Form(new DeleteAccount());
-        $form->hasMany('items', 'Add Titles and Images', function (Form\NestedForm $nestedForm) {
-            $nestedForm->textarea('title', __('Title'))->required();
-            $nestedForm->image('image', __('Image'))->required();
-        });
+        $form->textarea('title', __('Title'))->required();
+        $form->image('image', __('Image'))->required();
 
     
         return $form;
