@@ -2,12 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\DeleteAccount;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\DeleteAccount;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Controllers\AdminController;
 
 class DeleteAccountController extends AdminController
 {
@@ -113,9 +114,10 @@ class DeleteAccountController extends AdminController
     
             if (is_array($entries)) {
                 foreach ($entries as $entry) {
+                    $image = Common::upload('images', $entry->file('image'));
                     DeleteAccount::create([
                         'title' => $entry['title'],
-                        'image' => $entry['image'],
+                        'image' => $image,
                     ]);
                 }
             }
