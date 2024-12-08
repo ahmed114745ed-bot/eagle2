@@ -135,10 +135,11 @@ class VipService
         if (!$user_vip || $user_vip->user_id != $from->id)  throw new \Exception(__("api_responses.vip_not_found"));
 
         if ($user_vip->is_used == 1  || $user_vip->num_used >= 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
-
+        $user = $this->userRepository->searchUser($request->user_id);
+        if(!$user)throw new \Exception('المستخدم غير موجود');
         $data = [
             'sender_id' => $from->id,
-            'user_id' => $request->user_id,
+            'user_id' => $user->id,
         ];
         $this->userVipRepository->update($data, $user_vip->id);
         return $user_vip;
