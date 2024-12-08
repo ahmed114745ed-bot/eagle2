@@ -71,7 +71,7 @@ class DeleteAccountController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('Title'));
-        $grid->column('image', __('Image'));
+        $grid->column('image', __('Image'))->image('', 50);
         return $grid;
     }
 
