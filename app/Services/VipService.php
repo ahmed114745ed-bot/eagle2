@@ -3,6 +3,7 @@
 namespace App\Services;
 
 
+use App\Models\User;
 use App\Helpers\Common;
 use App\Tik\Repositories\VipRepository;
 use App\Tik\Repositories\OvipRepository;
@@ -10,8 +11,8 @@ use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
-use App\Tik\Repositories\VipPrivilegeRepository;
 use Illuminate\Database\Eloquent\Collection;
+use App\Tik\Repositories\VipPrivilegeRepository;
 
 
 class VipService
@@ -135,7 +136,7 @@ class VipService
         if (!$user_vip || $user_vip->user_id != $from->id)  throw new \Exception(__("api_responses.vip_not_found"));
 
         if ($user_vip->is_used == 1  || $user_vip->num_used >= 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
-        $user = $this->userRepository->searchUser($request->user_id);
+        $user = User::query()->searchByUuid($request->user_id)->first();
         if (!$user) throw new \Exception('api_responses.notFound');
         if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
             $data = [
