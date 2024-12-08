@@ -103,28 +103,29 @@ class DeleteAccountController extends AdminController
     protected function form()
     {
         $form = new Form(new DeleteAccount());
+        $form->textarea('title', __('Title'))->required();
+        $form->image('image', __('Image'))->required();
+        // $form->table('entries', __('data'), function ($table) {
+            
+        //     $form->image('img', __('img'))->rules('required');
+        // });
 
-        $form->table('entries', __('data'), function ($table) {
-            $table->textarea('title', __('Title'))->required();
-            $table->image('image', __('Image'))->required();
-        });
-
-        $form->saving(function (Form $form) {
-            $entries = $form->entries; // This is already an array
+        // $form->saving(function (Form $form) {
+        //     $entries = $form->entries; // This is already an array
     
-            if (is_array($entries)) {
-                foreach ($entries as $entry) {
-                    $image = Common::upload('images', $entry->file('image'));
-                    DeleteAccount::create([
-                        'title' => $entry['title'],
-                        'image' => $image,
-                    ]);
-                }
-            }
+        //     if (is_array($entries)) {
+        //         foreach ($entries as $entry) {
+        //             $image = Common::upload('images', $entry->file('image'));
+        //             DeleteAccount::create([
+        //                 'title' => $entry['title'],
+        //                 'image' => $image,
+        //             ]);
+        //         }
+        //     }
     
-            // Prevent saving the entries as a single field in the database
-            unset($entries);
-        });
+        //     // Prevent saving the entries as a single field in the database
+        //     unset($entries);
+        // });
     
         return $form;
     }
