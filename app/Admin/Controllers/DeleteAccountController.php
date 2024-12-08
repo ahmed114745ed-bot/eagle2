@@ -106,8 +106,9 @@ class DeleteAccountController extends AdminController
         $form->textarea('title', __('Title'))->required();
         $form->image('image', __('Image'))->required();
         // $form->table('entries', __('data'), function ($table) {
+        //     $table->textarea('title', __('Title'))->required();
+        //     $table->image('image', __('Image'))->required();
             
-        //     $form->image('img', __('img'))->rules('required');
         // });
 
         // $form->saving(function (Form $form) {
