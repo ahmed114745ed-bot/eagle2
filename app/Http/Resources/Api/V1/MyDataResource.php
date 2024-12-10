@@ -106,10 +106,11 @@ class MyDataResource extends JsonResource
             $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
                 return [$item => $userCounterServices->getUserCounts($user, $item)];
             });
+            $counters['message'] = $userCounterServices->getCountByType($user, 'message');
         }
 
 
-        $counters['message'] = $userCounterServices->getCountByType($user, 'message');
+       
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/
