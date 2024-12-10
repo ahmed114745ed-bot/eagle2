@@ -77,7 +77,7 @@ class VipService
             $sender_id = $sender->id;
             $from = $sender;
             if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
-            if ($sender->di < $total) return Common::apiResponse(0, 'balance low', null, 407);
+            if ($sender->di < $total) throw new \Exception('balance low');
         } else {
             $type = 0;
             $user = $request->user();
@@ -139,10 +139,10 @@ class VipService
         $user = $this->userRepository->searchUser($request->user_id);
         if (!$user) throw new \Exception('api_responses.notFound');
         if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
-            $data = [
-                'sender_id' => $from->id,
-                'user_id' => $user->id,
-            ];
+        $data = [
+            'sender_id' => $from->id,
+            'user_id' => $user->id,
+        ];
         $this->userVipRepository->update($data, $user_vip->id);
         return $user_vip;
     }
