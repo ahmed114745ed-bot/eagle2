@@ -161,7 +161,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
 
-            \Log::info('This is the device token '. json_encode($request->headers->all()));
+            \Log::info('This is the device token '. $request->get('device_token'));
             $userWithMedals = $this->userService->processUserData($user, $request->header('device_token'), $request->header('lat'), $request->header('long'));
         } catch (\Exception $exception) {
 
