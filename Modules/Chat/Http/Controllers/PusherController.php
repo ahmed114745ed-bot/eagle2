@@ -26,11 +26,13 @@ class PusherController extends Controller
         }
 
         // Extract relevant data from the request
-        $channel = $request->events[0]['channel'];
-        $eventName = $request->events[0]['name'];
-
-        // Delegate handling user status to the service
-        $this->pusherService->handleUserStatusChange($channel, $eventName);
+        foreach ($request->events as $event) {
+            $channel = $event['channel'];
+            $eventName = $event['name'];
+    
+            // Delegate handling user status to the service
+            $this->pusherService->handleUserStatusChange($channel, $eventName);
+        }
 
         return response()->json(['status' => 'Webhook received']);
     }
