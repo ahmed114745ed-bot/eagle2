@@ -76,6 +76,7 @@ class VipService
             $sender = $request->user();
             $sender_id = $sender->id;
             $from = $sender;
+            if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
             if ($sender->di < $total) return Common::apiResponse(0, 'balance low', null, 407);
         } else {
             $type = 0;
