@@ -154,11 +154,16 @@ class RoomRepoService
         } else {
             $room->count_room_socket = 0;
         }*/
+        
+        if(isset($room->microphone)){
 
-        $microphones = explode(',', $room->microphone);
-        if (in_array($user->id, $microphones)) {
-            UserHandling::calcTime($user->id);
+            $microphones = explode(',', $room->microphone);
+            if (in_array($user->id, $microphones)) {
+                UserHandling::calcTime($user->id);
+            }
+    
         }
+    
 
 
         if ($room->is_afk == null && $room->room_admin == null) {
