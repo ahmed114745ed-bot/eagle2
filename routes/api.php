@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
@@ -312,6 +313,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/room', [UserController::class, 'ranking_room']);
                 Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
                 Route::post('/one-room', [RankingController::class, 'oneRoomRanking']);
+
+
+                //v2
+                Route::post('/v2', [Ranking2Controller::class, 'ranking']);
+                Route::post('/v2/room', [Ranking2Controller::class, 'ranking_room']);
+                Route::get('/v2/top_user_ranking', [Ranking2Controller::class, 'topUserRanking']);
+                Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
+
             });
             // end ranking
 

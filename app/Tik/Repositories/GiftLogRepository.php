@@ -14,7 +14,23 @@ class GiftLogRepository extends AbstractRepository
         parent::__construct(new GiftLog());
     }
 
+    public function getRoomRankingData($roomOwnerId, $type, $limit)
+    {
+        $query = GiftLog::with(['sender.profile', 'sender.mangerType']) // Eager load relationships
+            ->where('roomowner_id', $roomOwnerId);
 
+        // Filter for today's data if type is 1
+        if ($type == 1) {
+            $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+        }
+
+        return $query->selectRaw("SUM(giftPrice) as exp, sender_id")
+            ->groupBy('sender_id')
+            ->orderByDesc('exp')
+            ->limit($limit)
+            ->get()
+            ->reject(fn ($item) => $item->exp == 0);
+    }
     public function getFirstRoomByOwnerId($ownerId)
     {
         return $this->model->query()->selectRaw('sender_id, SUM(giftNum * giftPrice) AS total')->where('roomowner_id', $ownerId)->groupBy('sender_id')->orderByDesc('total')->first();

@@ -109,7 +109,6 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('begin');
         $request['show']  = true;
         $request['numid'] = rand(111111, 999999);
         $user = $request->user();
