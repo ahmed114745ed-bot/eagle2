@@ -79,7 +79,7 @@ class VipController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-        return Common::apiResponse(1, 'success', $data);
+        return Common::apiResponse(1, 'success', $data,200);
     }
 
 

@@ -387,7 +387,7 @@ class EnteranceController extends Controller
             }
             // return  $request->user ()->id;
             if ($room->uid != $request->user ()->id && !in_array ($request->user ()->id,explode (',',$room->room_admin))){
-                return Common::apiResponse (false,'not allowed',null,403);
+                return Common::apiResponse (false,'not allowed',null,422);
             }
             if ($request->room_name){
                 $room->room_name = $request->room_name;

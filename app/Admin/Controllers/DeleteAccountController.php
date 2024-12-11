@@ -2,12 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\DeleteAccount;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\DeleteAccount;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Controllers\AdminController;
 
 class DeleteAccountController extends AdminController
 {
@@ -71,7 +72,7 @@ class DeleteAccountController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('title', __('Title'));
-        $grid->column('image', __('Image'));
+        $grid->column('image', __('Image'))->image('', 50);
         return $grid;
     }
 
@@ -102,27 +103,9 @@ class DeleteAccountController extends AdminController
     protected function form()
     {
         $form = new Form(new DeleteAccount());
+        $form->textarea('title', __('Title'))->required();
+        $form->image('image', __('Image'))->required();
 
-        $form->table('entries', __('data'), function ($table) {
-            $table->textarea('title', __('Title'))->required();
-            $table->image('image', __('Image'))->required();
-        });
-
-        $form->saving(function (Form $form) {
-            $entries = $form->entries; // This is already an array
-    
-            if (is_array($entries)) {
-                foreach ($entries as $entry) {
-                    DeleteAccount::create([
-                        'title' => $entry['title'],
-                        'image' => $entry['image'],
-                    ]);
-                }
-            }
-    
-            // Prevent saving the entries as a single field in the database
-            unset($entries);
-        });
     
         return $form;
     }

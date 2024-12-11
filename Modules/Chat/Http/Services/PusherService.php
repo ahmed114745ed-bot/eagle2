@@ -59,8 +59,8 @@ class PusherService
         $totalUnread = ChatMessage::whereIn('chat_room_id', $chatsId)
             ->where('user_id', '!=', $user->id)
             ->where('status', 'sended')
-            ->get();
+            ->update(['status' => 'received']);
 
-        dispatch(new ReciveChatMessagejob($totalUnread, 'received'));
+        // dispatch(new ReciveChatMessagejob($totalUnread, 'received'));
     }
 }
