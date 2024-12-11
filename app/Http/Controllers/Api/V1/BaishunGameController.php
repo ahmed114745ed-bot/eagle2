@@ -149,7 +149,7 @@ class BaishunGameController extends Controller
 
     public function obtianSstoken(Request $request)
     {
-//        Log::info('This ' . request()->method() . ' obtianSstoken ' . json_encode(request()->all()));
+        Log::info('This ' . request()->method() . ' obtianSstoken ' . json_encode(request()->all()));
         $timestamp = $request->timestamp;
         $signatureNonce = $request->signature_nonce;
         $signature = $request->signature;
@@ -177,7 +177,7 @@ class BaishunGameController extends Controller
                 'expire_date' => today()->timestamp * 1000,
             ]
         ];
-//        Log::info('This is data ' . request()->method() . ' obtianSstoken ' . json_encode($data));
+        Log::info('This is data ' . request()->method() . ' obtianSstoken ' . json_encode($data));
 
         return response()->json($data);
     }
