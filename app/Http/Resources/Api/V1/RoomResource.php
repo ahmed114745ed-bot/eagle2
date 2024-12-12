@@ -18,7 +18,7 @@ class RoomResource extends JsonResource
         $achievement_images = [];
         if ($this->owner->medals) {
             foreach ($this->owner->medals as $medal) {
-                if ($medal->achievementLevel) {
+                if ($medal->achievementLevel && $medal->achievementLevel->achievement && $medal->achievementLevel->achievement->type?->value == 'room_target') {
                     $achievement_images[] = $medal->achievementLevel->valid_image;
                 }
             }
