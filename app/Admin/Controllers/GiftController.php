@@ -194,6 +194,7 @@ class GiftController extends MainController
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
+                'vap' => __('vap'),
             ]
         )->required();
         $form->file('show_img2', __('show_img2'));
