@@ -174,7 +174,7 @@ class BaishunGameController extends Controller
             'unique_id' => (string) $id,
             'data' => [
                 'ss_token' => $token,
-                'expire_date' => today()->timestamp * 1000,
+                'expire_date' => today()->addDay()->timestamp * 1000,
             ]
         ];
         Log::info('This is data ' . request()->method() . ' obtianSstoken ' . json_encode($data));
