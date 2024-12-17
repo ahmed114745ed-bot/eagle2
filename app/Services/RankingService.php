@@ -196,9 +196,9 @@ class RankingService
         $arr['user']['vip_level']  = $vip_level;
         $arr['user']['sender_level']  = $user->total_sender_level;
         $arr['user']['reciver_level']  = $user->total_received_level;
-        $arr['user']['vip_level_img']  = $vip_level_img->img;
-        $arr['user']['sender_level_img']  = $total_sender_level_img->img;
-        $arr['user']['reciver_level_img']  = $total_received_level_img->img;
+        // $arr['user']['vip_level_img']  = $vip_level_img->img;
+        // $arr['user']['sender_level_img']  = $total_sender_level_img->img;
+        // $arr['user']['reciver_level_img']  = $total_received_level_img->img;
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
