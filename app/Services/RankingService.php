@@ -183,10 +183,10 @@ class RankingService
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id');
 
         $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-        $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
-        $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
+        // $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
+        // $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
-        $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
+        // $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
