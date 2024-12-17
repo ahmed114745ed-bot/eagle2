@@ -177,8 +177,8 @@ class RankingService
         //        if ($limit == 3) return $data;
 
 
-        // $user->sort = $this->getUserSortValue($data, $userId);
-        // $user->user_id = $user->id;
+        $user->sort = $this->getUserSortValue($data, $userId);
+        $user->user_id = $user->id;
 
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id');
 
@@ -188,9 +188,9 @@ class RankingService
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
         // $levels =Common::getSenderAndReceiverLevels($user->id);
-        // if (gettype($vip_level) != 'integer') {
-        //     $vip_level = 0;
-        // }
+        if (gettype($vip_level) != 'integer') {
+            $vip_level = 0;
+        }
         $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level;
