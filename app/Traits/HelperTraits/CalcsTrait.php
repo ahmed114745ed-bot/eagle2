@@ -729,7 +729,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (isset($user->UserVip)) return 0;
+        if (!isset($user->UserVip)) return 0;
         $uvip = $user?->UserVip;
         if (!$uvip) return new \stdClass();
 
