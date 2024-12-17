@@ -749,6 +749,35 @@ trait CalcsTrait
 
     }
 
+    public static function ovip_center_rank_img($user_id)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+        $uvip = $user->UserVip;
+        if (!$uvip) return new \stdClass();
+
+        $vip = OVip::query()->find($uvip->vip_id);
+        if (!$vip) return new \stdClass();
+        $vipIcon = Ware::where('level', $vip->level)->where('type', 12)->where('get_type', 1)->first();
+
+        return $vip;
+        // [
+        // 'id'        => 1,
+        // 'level'     => $vip->level?? 0,
+        // 'name'      => $vip->name?? '',
+        // 'price'     => $vip->price ??0,
+        // 'image'     => $vip->image??'',
+        // 'image_from_wares'     => $vipIcon->show_img??'',
+        // 'expire'    => $vip->expire??0
+        // ];
+
+    }
+
+
     public static function ovip_centerforFaml($user_id)
     {
         if (gettype($user_id) == 'integer') {
