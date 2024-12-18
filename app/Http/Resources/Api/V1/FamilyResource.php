@@ -42,10 +42,15 @@ class FamilyResource extends JsonResource
         }
 
         $mems = FamilyUser::query()->where('family_id', @$this->id)->where('status', 1)->pluck('user_id');
+
+        $userType = FamilyUser::where('family_id', @$this->id)->first();
+
         return [
+
             'id' => @$this->id,
             'name' => @$this->name ?: '',
             'introduce' => @$this->introduce ?: '',
+            'family_status' => $userType?->user_type,
             'image' => @$this->image ?: '',
             'max_num_of_members' => @$this->num ?: 0,
             'max_num_of_admins' => @$this->num_admins ?: 0,
