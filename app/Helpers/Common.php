@@ -1100,4 +1100,12 @@ class Common
         $minutes = ceil(((float)$TotalHours - $hoursInt) * 60);
         return sprintf('%02d:%02d:00', $hours, $minutes);
     }
+
+
+    // public  static function getImageTotalReceiverOrSender($amount)
+    // {
+    //     $level = Vip::query()->where('level', $amount)->orderByDesc('exp')->first();
+    //     return $level;
+    // }
+
 }
