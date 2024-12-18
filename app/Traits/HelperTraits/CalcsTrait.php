@@ -732,7 +732,6 @@ trait CalcsTrait
 
         $uvip = isset($user->UserVip) ? int($user->UserVip) : 0;
 
-        dd($uvip);
 
         // if (!isset($user->UserVip)) return 0;
         // $uvip = $user?->UserVip;
