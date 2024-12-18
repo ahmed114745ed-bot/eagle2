@@ -145,9 +145,9 @@ class RankingService
             $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
             $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
 
-            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? 0;
-            $v->sender_level_img = @$total_received_level_img->img;
-            $v->reciver_level_img = @$total_sender_level_img->img;
+            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? '';
+            $v->sender_level_img = @$total_received_level_img->img ?? '';
+            $v->reciver_level_img = @$total_sender_level_img->img ?? '';
 
             $v->country = @$user->country;
             unset($v->$relation);
