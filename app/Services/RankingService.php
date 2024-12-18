@@ -173,7 +173,7 @@ class RankingService
         $kong['frame_id']   = 0;
         $kong['sender_img'] = '';
         $kong['reseverimg'] = '';
-        $kong['vip_level'] = 0;
+        $kong['vip_level'] = '';
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
 
@@ -206,13 +206,13 @@ class RankingService
         }
         $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
-        $arr['user']['vip_level']  = $vip_level;
+        $arr['user']['vip_level']  = $vip_level == 0 ? '' : $vip_level;
         $arr['user']['sender_level']  = $user->total_sender_level;
         $arr['user']['reciver_level']  = $user->total_received_level;
         $arr['user']['vip_level_img']  = $vip_level_img->img ?? '';
         $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
         $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
-        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0; 
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
 
@@ -327,82 +327,81 @@ class RankingService
 
 
     private function removeZeroExp($data)
-{
-    return $data->reject(fn ($item) => $item->exp == 0);
-}
-
-private function calculateExpDifference($data)
-{
-    return $data->values()->map(function ($item, $index) use ($data) {
-        $item->exp_diff = $index === 0 ? 0 : $data[$index - 1]->exp - $item->exp + 1;
-        return $item;
-    });
-}
-
-private function mapUserData($data, $class, $relation)
-{
-    return $data->map(function ($item) use ($class, $relation) {
-        $user = $item->$relation;
-
-        if (!$user) {
-            return null; // Skip if user data is missing
-        }
-
-        $this->populateUser2Data($item, $user, $class);
-
-        // Safely remove the relation property
-        if (property_exists($item, $relation)) {
-            unset($item->$relation);
-        }
-        return $item;
-
-    })->reject(fn ($item) => is_null($item));
-}
-
-private function populateUser2Data(&$item, $user, $class)
-{
-    $item->user_id = $user->id;
-
-    // EXP transformations
-    $item->exp_int = ceil($item->exp);
-    $item->exp = numToString($item->exp_int);
-
-    // Remaining EXP
-    $item->remaining_int = ceil($item->exp_diff);
-    $item->remaining = numToString($item->remaining_int);
-
-    // Name and Avatar handling
-    $item->name = $class == 3 ? optional($user->ownerRoom)->room_name ?? '' : $user->name;
-    $item->avatar = $class == 3 ? optional($user->ownerRoom)->room_cover ?? '' : optional($user->profile)->avatar;
-
-    // Frame and User Dress
-    $item->frame = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true)
-        ?: Common::getUserDress($user->id, $user->dress_1, 4, 'img1', true);
-    $item->frame_id = $user->dress_1;
-
-    // Additional User Info
-    $item->type_user = intval(optional($user)->type_user) ?: 0;
-    $item->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
-
-    $item->vip_level = optional($user->UserVip)->level ?? 0;
-    $item->sender_level = $user->total_sender_level ?? 0;
-    $item->reciver_level = $user->total_received_level ?? 0;
-    $item->country = $user->country ?? null;
-}
-
-public function getRanking2($class, $type, $user, $limit, $room_uid, $sent_to_owner)
-{
-    if ($class == 4) {
-        $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
-        $this->transformData2($data, $class, 'user_id', 'user');
-        return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+    {
+        return $data->reject(fn($item) => $item->exp == 0);
     }
 
-    [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+    private function calculateExpDifference($data)
+    {
+        return $data->values()->map(function ($item, $index) use ($data) {
+            $item->exp_diff = $index === 0 ? 0 : $data[$index - 1]->exp - $item->exp + 1;
+            return $item;
+        });
+    }
 
-    $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
-    $this->transformData2($data, $class, $keywords, $rel);
+    private function mapUserData($data, $class, $relation)
+    {
+        return $data->map(function ($item) use ($class, $relation) {
+            $user = $item->$relation;
 
-    return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
-}
+            if (!$user) {
+                return null; // Skip if user data is missing
+            }
+
+            $this->populateUser2Data($item, $user, $class);
+
+            // Safely remove the relation property
+            if (property_exists($item, $relation)) {
+                unset($item->$relation);
+            }
+            return $item;
+        })->reject(fn($item) => is_null($item));
+    }
+
+    private function populateUser2Data(&$item, $user, $class)
+    {
+        $item->user_id = $user->id;
+
+        // EXP transformations
+        $item->exp_int = ceil($item->exp);
+        $item->exp = numToString($item->exp_int);
+
+        // Remaining EXP
+        $item->remaining_int = ceil($item->exp_diff);
+        $item->remaining = numToString($item->remaining_int);
+
+        // Name and Avatar handling
+        $item->name = $class == 3 ? optional($user->ownerRoom)->room_name ?? '' : $user->name;
+        $item->avatar = $class == 3 ? optional($user->ownerRoom)->room_cover ?? '' : optional($user->profile)->avatar;
+
+        // Frame and User Dress
+        $item->frame = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true)
+            ?: Common::getUserDress($user->id, $user->dress_1, 4, 'img1', true);
+        $item->frame_id = $user->dress_1;
+
+        // Additional User Info
+        $item->type_user = intval(optional($user)->type_user) ?: 0;
+        $item->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
+
+        $item->vip_level = optional($user->UserVip)->level ?? 0;
+        $item->sender_level = $user->total_sender_level ?? 0;
+        $item->reciver_level = $user->total_received_level ?? 0;
+        $item->country = $user->country ?? null;
+    }
+
+    public function getRanking2($class, $type, $user, $limit, $room_uid, $sent_to_owner)
+    {
+        if ($class == 4) {
+            $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
+            $this->transformData2($data, $class, 'user_id', 'user');
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        }
+
+        [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+
+        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
+        $this->transformData2($data, $class, $keywords, $rel);
+
+        return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
 }
