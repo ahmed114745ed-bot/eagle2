@@ -729,13 +729,9 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-
-        $uvip = isset($user->UserVip) ? int($user->UserVip) : 0;
-
-
-        // if (!isset($user->UserVip)) return 0;
-        // $uvip = $user?->UserVip;
-        // if (!$uvip) return new \stdClass();
+        if (!isset($user->UserVip)) return 0;
+        $uvip = $user?->UserVip;
+        if (!$uvip) return new \stdClass();
 
         $vip = OVip::query()->find($uvip->vip_id);
 
