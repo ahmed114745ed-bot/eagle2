@@ -31,6 +31,7 @@ class FamilyResource extends JsonResource
                     'name' => @$user->country->name,
                     'flag' => @$user->country->flag,
                 ],
+                'family_status' => 2,
                 'type_user'            => intval(@$user->type_user) ?: 0, // both
                 "manger_type"          => new MangerTypeResource(@$user->mangerType),
                 'uuid'                 => @$user->uuid, // both
@@ -41,16 +42,14 @@ class FamilyResource extends JsonResource
             $owner = new \stdClass();
         }
 
-        $mems = FamilyUser::query()->where('family_id', @$this->id)->where('status', 1)->pluck('user_id');
+        $mems = FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
 
-        $userType = FamilyUser::where('family_id', @$this->id)->first();
 
         return [
 
             'id' => @$this->id,
             'name' => @$this->name ?: '',
             'introduce' => @$this->introduce ?: '',
-            'family_status' => $userType?->user_type,
             'image' => @$this->image ?: '',
             'max_num_of_members' => @$this->num ?: 0,
             'max_num_of_admins' => @$this->num_admins ?: 0,
@@ -58,7 +57,7 @@ class FamilyResource extends JsonResource
             'am_i_member' => FamilyUser::query()->where('user_id', $request->user()->id)->where('family_id', $this->id)->where('status', 1)->exists(),
             'am_i_owner' => (@$this->user_id == $request->user()->id) ? true : false,
             'am_i_admin' => $request->user()->is_family_admin ? true : false,
-            'members' => ShortFamilyUserResource::collection(User::query()->whereIn('id', $mems)->where('id', '!=', $this->user_id)->get()),
+            'members' => ShortFamilyUserResource::collection($mems),
             'num_of_requests' => FamilyUser::query()->where('family_id', $this->id)->where('status', 0)->count(),
             'num_of_members' => ($this->members_count + 1),
             'level' => @$this->level ?: '',
