@@ -22,4 +22,5 @@ jobs:
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           php artisan migrate
           php artisan optimize:clear
+          php public/reset_opcache.php
           
