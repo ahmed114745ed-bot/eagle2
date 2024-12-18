@@ -141,6 +141,14 @@ class RankingService
             $v->vip_level = @$user->UserVip->level ?? 0;
             $v->sender_level = @$user->total_sender_level;
             $v->reciver_level = @$user->total_received_level;
+
+            $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
+            $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
+
+            $v->vip_level_img = @$user->UserVip?->OVip?->img ?? 0;
+            $v->sender_level_img = @$total_received_level_img->img;
+            $v->reciver_level_img = @$total_sender_level_img->img;
+
             $v->country = @$user->country;
             unset($v->$relation);
             return $v;
@@ -168,6 +176,11 @@ class RankingService
         $kong['vip_level'] = 0;
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
+
+        $kong['vip_level_img'] = '';
+        $kong['sender_level_img'] = '';
+        $kong['reciver_level_img'] = '';
+
         $kong['type_user'] = 0;
         $kong['manger_type'] = null;
 
@@ -183,7 +196,7 @@ class RankingService
         $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id');
 
         $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
-        $total_received_level_img = Common::getImageTotalReceiverOrSender(4);
+        $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
@@ -196,10 +209,10 @@ class RankingService
         $arr['user']['vip_level']  = $vip_level;
         $arr['user']['sender_level']  = $user->total_sender_level;
         $arr['user']['reciver_level']  = $user->total_received_level;
-        $arr['user']['vip_level_img']  = $vip_level_img->image ?? '';
+        $arr['user']['vip_level_img']  = $vip_level_img->img ?? '';
         $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
         $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
-        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
+        $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0; 
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
 
