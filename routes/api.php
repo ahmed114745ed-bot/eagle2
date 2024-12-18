@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\MallController as ControllersMallController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 
@@ -328,6 +329,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
+                Route::post('/buyVipPercentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
 
