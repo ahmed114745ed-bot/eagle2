@@ -191,7 +191,6 @@ class RankingService
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
-        dd($total_sender_level_img);
         $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level;
