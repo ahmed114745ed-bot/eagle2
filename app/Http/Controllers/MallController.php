@@ -61,7 +61,8 @@ class MallController extends Controller
                     'expire'=>$ex,
                     'qty'=>$qty,
                     'price'=>$vip->price,
-                    'total'=>$total
+                    'total'=>$total,
+                    'is_used' => 1,
                 ]
             );
             Common::handelVip ($vip,$user);
