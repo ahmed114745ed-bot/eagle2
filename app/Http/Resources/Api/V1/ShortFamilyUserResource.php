@@ -31,15 +31,17 @@ class ShortFamilyUserResource extends JsonResource
        }
 
         $data = [
-            'id'=>@$this->id,
-            'is_family_admin'=>@$this->is_family_admin,
-            'name'  => $this->name,
+            'id'=>@$this->user?->id,
+            'is_family_admin'=>@$this->user_type == 1 ? true : false,
+            'name'  => $this->user?->name,
 //            'profile'=>new ProfileResource(@$this->profile),
             'profile'=> [
-                'image' => $this->avatar,
+                'image' => $this->user?->profile?->avatar,
             ],
-            'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType),
+            
+            'family_status' => @$this->user_type,
+            'type_user'            => intval(@$this->user?->type_user) ?: 0, // both
+            "manger_type"          =>new MangerTypeResource(@$this->user?->mangerType),
         ];
         return $data;
     }

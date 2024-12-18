@@ -734,6 +734,7 @@ trait CalcsTrait
         if (!$uvip) return new \stdClass();
 
         $vip = OVip::query()->find($uvip->vip_id);
+
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 12)->where('get_type', 1)->first();
 
@@ -758,15 +759,17 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (isset($user->UserVip)) return new \stdClass();
-
+        if (!isset($user->UserVip)) return 0;
         $uvip = $user?->UserVip;
         if (!$uvip) return new \stdClass();
 
         $vip = OVip::query()->find($uvip->vip_id);
+
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 12)->where('get_type', 1)->first();
 
+        // return $vip->level;
+        // [
         return $vip;
         // [
         // 'id'        => 1,
