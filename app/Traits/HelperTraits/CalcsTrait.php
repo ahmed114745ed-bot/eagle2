@@ -730,7 +730,7 @@ trait CalcsTrait
             $user = $user_id;
         }
 
-        $uvip = isset($user->UserVip) ? int($user->UserVip) : 1;
+        $uvip = isset($user->UserVip) ? int($user->UserVip) : 0;
 
         dd($uvip);
 
