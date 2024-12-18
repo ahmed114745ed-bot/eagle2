@@ -329,7 +329,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
-                Route::post('/buyVipPercentage', [ControllersMallController::class, 'buyVip']);
+                Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
 
