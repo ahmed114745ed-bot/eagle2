@@ -52,6 +52,7 @@ class MomentRepository
     public function getUserMoments($userId, $page)
     {
         return Moment::where('user_id', $userId)
+            ->whereHas('user')
             ->likeExists($userId)
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
