@@ -114,6 +114,7 @@ class MomentRepository
     public function getAllMoments($userId, $page)
     {
         return Moment::likeExists($userId)
+            ->whereHas('user')
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
