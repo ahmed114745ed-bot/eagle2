@@ -89,18 +89,18 @@ class ProfileController extends Controller
     public function getNearbyUsers($userId, $distance = 10)
     {
         $user = Auth::user();
-
         $latitude = $user->lat;
         $longitude = $user->long;
 
         if ($latitude && $longitude) {
             $users = User::query()
+                ->with('profile')
                 ->select(
                     'users.*',
-                    DB::raw("(6371 * acos(cos(radians($latitude)) 
-                        * cos(radians(users.lat)) 
-                        * cos(radians(users.long) - radians($longitude)) 
-                        + sin(radians($latitude)) 
+                    DB::raw("(6371 * acos(cos(radians($latitude))
+                        * cos(radians(users.lat))
+                        * cos(radians(users.long) - radians($longitude))
+                        + sin(radians($latitude))
                         * sin(radians(users.lat)))) AS distance")
                 )
                 ->whereNotNull('lat')
@@ -112,10 +112,12 @@ class ProfileController extends Controller
                 ->paginate(10);
         } else {
             $users = User::query()
+                ->with('profile')
                 ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
                 ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
                 ->where('id', '!=', $user->id)
                 ->paginate(10);
+
         }
         return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
