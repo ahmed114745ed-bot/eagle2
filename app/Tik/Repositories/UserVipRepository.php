@@ -37,7 +37,7 @@ class UserVipRepository extends AbstractRepository
         return $this->model->find($id);
     }
 
-    public function getByUserId($userId) : Collection
+    public function getByUserId($userId): Collection
     {
         return $this->model->where("user_id", $userId)->get();
     }
@@ -72,5 +72,10 @@ class UserVipRepository extends AbstractRepository
     {
         $userVip->save();
         return true;
+    }
+
+    public function deleteByLevel($userId, $level)
+    {
+        $this->model->where('user_id', $userId)->where('level', '<=', $level)->delete();
     }
 }

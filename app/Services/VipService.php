@@ -4,14 +4,16 @@ namespace App\Services;
 
 
 use App\Helpers\Common;
+use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use App\Tik\Repositories\VipRepository;
 use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
-use App\Tik\Repositories\VipPrivilegeRepository;
 use Illuminate\Database\Eloquent\Collection;
+use App\Tik\Repositories\VipPrivilegeRepository;
 
 
 class VipService
@@ -202,5 +204,70 @@ class VipService
         $ware = $this->wareRepository->findById($wareId);
         $ware->delete();
         return true;
+    }
+
+
+    public function buyVipWithActive($request)
+    {
+        $vip = $this->ovipRepository->findById($request->vip_id);
+        if (!$vip) return Common::apiResponse(0, __('api_responses.not_found'), null, 404);
+        $qty = $request->qty ?: 1;
+        $total = $vip->price * $qty;
+        $expire = $vip->expire;
+        if ($expire == 0) {
+            $ex = 0;
+        } else {
+            $ex = now()->addDays($expire * $qty)->timestamp;
+        }
+        if ($request->type == 1) {
+            $type = 1;
+            if (!$request->to_user) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+            $user_id = $request->to_user;
+            $user = $this->userRepository->searchUser($user_id);
+            if (!$user) return Common::apiResponse(0, __('api_responses.not_found'), null, 404);
+            $user_id = $user->id;
+            $sender = $request->user();
+            $sender_id = $sender->id;
+            if ($sender->di < $total) return Common::apiResponse(0, __('api_responses.low_balance'), null, 407);
+            $from = $sender;
+        } else {
+            $type = 0;
+            $user = $request->user();
+            $user_id = $user->id;
+            $sender_id = 0;
+            if ($user->di < $total) return Common::apiResponse(0, __('api_responses.low_balance'), null, 407);
+            $from = $user;
+        }
+
+        DB::beginTransaction();
+        try {
+            $from->decrement('di', $total);
+            $this->userVipRepository->deleteByLevel($user_id, $vip->level);
+            $this->packRepository->deleteExpirePack();
+
+            $data = [
+                'type' => $type,
+                'sender_id' => $sender_id,
+                'user_id' => $user_id,
+                'vip_id' => $vip->id,
+                'level' => $vip->level,
+                'expire' => $ex,
+                'qty' => $qty,
+                'price' => $vip->price,
+                'total' => $total,
+                'is_used' => 1,
+            ];
+
+            $this->userVipRepository->create($data);
+            Common::handelVip($vip, $user);
+            DB::commit();
+            CustomNotification::vips($user, $ex, $vip->img);
+
+
+            return Common::apiResponse(1, 'done', null, 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }
