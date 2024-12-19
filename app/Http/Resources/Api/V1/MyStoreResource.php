@@ -37,6 +37,7 @@ class MyStoreResource extends JsonResource
         }
 
         $pendingDollar = $this->totalUserSalary->sum("pending_dollar");
+        $paid = $this->totalUserSalary->sum("cut_amount");
         $roomSalary = $this->ownerRoom?->roomSalary->sum(function ($roomSalary) {
             return $roomSalary->salary - $roomSalary->cut_amount;
         });
@@ -53,6 +54,7 @@ class MyStoreResource extends JsonResource
                 'host_usd' =>(string) @$hostSalary ??'',
                 'pending_dollar' =>(string) $pendingDollar ?? '',
                 'room_salary' =>(string) $roomSalary ?? '',
+                'paid' =>  $paid ?? 0,
             ], // my
 
         ];
