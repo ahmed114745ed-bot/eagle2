@@ -41,7 +41,7 @@ class MomentCommentsService
     public function showComments($moment)
     {
         return $moment->comments()
-        ->whereHas('user') 
+        ->has('user') 
         ->with([
             'user' => function ($query) {
                 $query->withoutAppends()->with('profile')->select(['id', 'uuid', 'name']);
