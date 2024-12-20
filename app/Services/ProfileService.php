@@ -94,16 +94,8 @@ class ProfileService
 
         $profileVisitors = $this->profileRepo->getProfileVisits($user,$keyword);
 
-        [$userFollowers, $senderLevels, $receivedImage] = $this->profileRelationService->getHelperArrays($user, $profileVisitors);
+        return  [$profileVisitors, ...$this->profileRelationService->getHelperArrays($user, $profileVisitors)];
 
-        UserVisitorResource::initializeData($senderLevels, $receivedImage, $userFollowers);
-
-        $visitors = UserVisitorResource::collection($profileVisitors);
-        $jsonResponse = Common::apiResponse(1, '', $visitors);
-
-        UserVisitorResource::clear();
-
-        return $jsonResponse;
     }
 
     public function getRelatedUsers($limit = 10)

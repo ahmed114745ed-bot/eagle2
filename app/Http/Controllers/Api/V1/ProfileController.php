@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
+use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Services\ProfileService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Profile\ProfileRequest;
@@ -127,7 +128,14 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $keyword = $request->keywords ?? '';
-        return $this->profileService->getProfileVisitorsList($user,$keyword);
+
+        [$profileVisitors, $userFollowers, $senderLevels, $receivedImage] = $this->profileService->getProfileVisitorsList($user,$keyword);
+        UserVisitorResource::initializeData($senderLevels, $receivedImage, $userFollowers);
+
+        $visitors = UserVisitorResource::collection($profileVisitors);
+
+        UserVisitorResource::clear();
+        return Common::apiResponse(1, '', $visitors);
     }
 
     public function related()
