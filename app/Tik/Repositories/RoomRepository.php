@@ -79,7 +79,7 @@ class RoomRepository extends AbstractRepository
         return true;
     }
 
-    public function all($req,$ids = [])
+    public function all($req, $ids = [])
     {
 
         $user = $req?->user();
@@ -94,11 +94,11 @@ class RoomRepository extends AbstractRepository
         ])
             ->withCount('roomVisitors')
             ->whereHas('owner')
-            ->when(!$allRooms, function ($query){
-                $query->where(function ($query){
+            ->when(!$allRooms, function ($query) {
+                $query->where(function ($query) {
                     $query->where(fn($q) => $q->has("roomVisitors"))
                         ->orWhere(fn($q) => $q->where('pin', 1));
-                        // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
+                    // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
                 });
             })
             ->where('room_status', 1);
@@ -127,19 +127,21 @@ class RoomRepository extends AbstractRepository
                 break;
 
             case 'popular':
-                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
-                    ;
+                $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc');
+                break;
+            case 'pk':
+                $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
                 break;
 
             case 'festival':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
-                    ;
+                ;
                 break;
             case 'recently':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
-                    ;
+                ;
                 break;
             case 'interested':
 
@@ -151,20 +153,20 @@ class RoomRepository extends AbstractRepository
                     ->pluck('room.room_type')
                     ->unique();
 
-                $result->whereIn("room_type",$roomTypes)->orderByDesc('top_room')
+                $result->whereIn("room_type", $roomTypes)->orderByDesc('top_room')
                     ->orderByDesc('session')
-                   ;
+                ;
                 break;
             case 'following':
                 $result->whereIn('uid', function ($query) use ($user) {
                     /* @var Builder $query*/
                     $query->select('user_id')
-                          ->from('follows')
-                          ->where('followed_user_id', $user->id);
+                        ->from('follows')
+                        ->where('followed_user_id', $user->id);
                 })
                     ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
-                    ;
+                ;
                 break;
 
             case 'nearby':
