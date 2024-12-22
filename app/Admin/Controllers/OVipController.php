@@ -230,14 +230,6 @@ class OVipController extends MainController
 
          });
 
-//        $form->display(trans('admin.created_at'));
-//        $form->display(trans('admin.updated_at'));
-
-
-
-
-
-
         return $form;
     }
 }
