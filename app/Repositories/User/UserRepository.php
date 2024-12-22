@@ -43,6 +43,21 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function searchUserFamily($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')
+            ->where(function ($query) {
+                $query->where('family_id', 0)
+                    ->orWhereNull('family_id');
+            })
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function updateDeviceToken($user, $deviceToken = null)
     {
         if (is_null($user->device_token) || $user->device_token != $deviceToken ) {

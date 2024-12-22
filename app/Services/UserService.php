@@ -79,6 +79,12 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+    public function searchUsersInFamily($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchUserFamily($key, $page, $perPage);
+    }
+
     public function bind($user, $request)
     {
         if ($request->google_id && !$user->google_id) {

@@ -145,6 +145,15 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function userFamily(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchUsersInFamily($key, $page);
+
+        return response()->json($users);
+    }
+
     public function joinAccount(Request $request)
     {
         $user = $request->user();
