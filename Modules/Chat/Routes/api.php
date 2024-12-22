@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum', 'verified','generalBan','userBan','localizati
     Route::resource('/Chat-room', ChatRoomController::class);
     Route::post('/Chat-room/accept-request', [ChatRoomController::class,'accept_request']);
     Route::get('/close-chat', [ChatRoomController::class,'close_Chat']);
+    Route::get('/guest-chat', [ChatRoomController::class,'guestChat']);
     Route::resource('/Chat-PinToTop', PinToTopController::class);
 
     //Chat Message
