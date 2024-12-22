@@ -159,10 +159,9 @@ class ChatRoomService
         //     ->paginate(20);
 
         // Get unread messages
-        $chatRoomIds = ChatRoom::where('user_id', $user->id)
-            ->orWhere('user_id2', $user->id)->where('type', 'friends')
-            ->pluck('id')
-            ->toArray();
+        $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
+        })->where('type', 'friends') ->pluck('id')->toArray();
 
         $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
             ->where('user_id', '!=', $user->id)
@@ -205,10 +204,9 @@ class ChatRoomService
             ->paginate(20);
 
         // Get unread messages
-        $chatRoomIds = ChatRoom::where('user_id', $user->id)
-            ->orWhere('user_id2', $user->id)->where('type', 'guest')
-            ->pluck('id')
-            ->toArray();
+        $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
+        })->where('type', 'guest')->pluck('id')->toArray();
 
         $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
             ->where('user_id', '!=', $user->id)
@@ -239,7 +237,7 @@ class ChatRoomService
         })->first();
 
         if (!$chatRoom) {
-            
+
             $user2 = User::find($userId2);
             $type = 'guest';
             if ($user->followBack($user2)) {
