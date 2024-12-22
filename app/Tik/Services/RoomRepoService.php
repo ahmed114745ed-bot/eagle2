@@ -161,16 +161,16 @@ class RoomRepoService
         } else {
             $room->count_room_socket = 0;
         }*/
-        
+
         if(isset($room->microphone)){
 
             $microphones = explode(',', $room->microphone);
             if (in_array($user->id, $microphones)) {
                 UserHandling::calcTime($user->id);
             }
-    
+
         }
-    
+
 
 
         if ($room->is_afk == null && $room->room_admin == null) {
@@ -255,10 +255,10 @@ class RoomRepoService
             $mode = 'party';
         } elseif ($currentMode == '2') {
             $mode = 'seats12';
-        } elseif ($currentMode == '3') {
+        } elseif ($currentMode == '5') {
             $mode = 'cinema';
-            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
-            $jsons[] = $json;
+//            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
+//            $jsons[] = $json;
         } elseif ($currentMode == '4') {
             $mode = 'game';
             if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
