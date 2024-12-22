@@ -130,7 +130,8 @@ class RoomRepository extends AbstractRepository
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc');
                 break;
             case 'pk':
-                $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
+                // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
+                $result->has('lastPk');
                 break;
 
             case 'festival':
