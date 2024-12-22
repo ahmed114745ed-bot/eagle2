@@ -429,7 +429,7 @@ class UserController extends Controller
     public function zegoCredential()
     {
         $ZegoEncreyptkey = config('app.zego_credential');
-        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id']);
+        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
         $data = $keys->mapWithKeys(function ($item) {
             return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
         });
