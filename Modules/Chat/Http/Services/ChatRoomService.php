@@ -113,27 +113,27 @@ class ChatRoomService
                 'chat_rooms.*',
                 DB::raw('(SELECT MAX(created_at) FROM chat_messages WHERE chat_messages.chat_room_id = chat_rooms.id) AS last_message_created_at')
             )
-            ->where(function($q) use($topChats, $user){
+            ->where(function ($q) use ($topChats, $user) {
                 $q->where(function ($query) use ($topChats, $user) {
                     $query->whereNotIn('chat_rooms.id', $topChats)
                         ->where('chat_rooms.user_id', $user->id)
                         ->where('chat_rooms.type', 'friends');
                 })
-                ->orWhere(function ($query) use ($topChats, $user) {
-                    $query->whereNotIn('chat_rooms.id', $topChats)
-                        ->where('chat_rooms.user_id2', $user->id)
-                        ->where('chat_rooms.type', 'friends');
-                });
+                    ->orWhere(function ($query) use ($topChats, $user) {
+                        $query->whereNotIn('chat_rooms.id', $topChats)
+                            ->where('chat_rooms.user_id2', $user->id)
+                            ->where('chat_rooms.type', 'friends');
+                    });
             })
-            ->when($uuid, function($q) use($uuid){
-                $q->where(function($q) use($uuid){
-                        $q->whereHas('userOne', function($qq) use($uuid){
-                            $qq->where('uuid', 'like', "%$uuid%");
-                        })
-                        ->orWhereHas('userTwo', function($qq2) use($uuid){
+            ->when($uuid, function ($q) use ($uuid) {
+                $q->where(function ($q) use ($uuid) {
+                    $q->whereHas('userOne', function ($qq) use ($uuid) {
+                        $qq->where('uuid', 'like', "%$uuid%");
+                    })
+                        ->orWhereHas('userTwo', function ($qq2) use ($uuid) {
                             $qq2->where('uuid', 'like', "%$uuid%");
                         });
-                    });
+                });
             })
             ->groupBy([
                 'chat_rooms.id',
@@ -148,21 +148,20 @@ class ChatRoomService
             ->orderByDesc('last_message_created_at')
             ->paginate(20);
 
-        // Get chat requests (guest)
-        $guestChats = ChatRoom::WhereHas('messages')
-            ->select('chat_rooms.*')
-            ->where('chat_rooms.user_id2', $user->id)
-            ->where('chat_rooms.type', 'guest')
-            ->with('messages')
-            ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
-            ->orderBy('chat_messages.id', 'desc')
-            ->paginate(20);
+        // // Get chat requests (guest)
+        // $guestChats = ChatRoom::WhereHas('messages')
+        //     ->select('chat_rooms.*')
+        //     ->where('chat_rooms.user_id2', $user->id)
+        //     ->where('chat_rooms.type', 'guest')
+        //     ->with('messages')
+        //     ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
+        //     ->orderBy('chat_messages.id', 'desc')
+        //     ->paginate(20);
 
         // Get unread messages
-        $chatRoomIds = ChatRoom::where('user_id', $user->id)
-            ->orWhere('user_id2', $user->id)
-            ->pluck('id')
-            ->toArray();
+        $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
+        })->where('type', 'friends') ->pluck('id')->toArray();
 
         $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
             ->where('user_id', '!=', $user->id)
@@ -175,6 +174,49 @@ class ChatRoomService
             'data' => [
                 'top_chats' => ChatRoomResource::collection($user->chats),
                 'chat' => ChatRoomResource::collection($friends),
+                // 'request_chat' => ChatRoomResource::collection($guestChats),
+                'total_unread_messages' => $unreadMessages->count(),
+                'unread_messages' => ChatMessageResource::collection($unreadMessages),
+            ],
+            'status' => 200,
+        ];
+    }
+
+    public function getGUestChatRooms($user)
+    {
+        $user = User::with('chats')->find($user->id);
+        if (!$user) {
+            return [
+                'success' => false,
+                'message' => 'user not found',
+                'status' => 200,
+            ];
+        }
+
+        // Get chat requests (guest)
+        $guestChats = ChatRoom::WhereHas('messages')
+            ->select('chat_rooms.*')
+            ->where('chat_rooms.user_id2', $user->id)
+            ->where('chat_rooms.type', 'guest')
+            ->with('messages')
+            ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
+            ->orderBy('chat_messages.id', 'desc')
+            ->paginate(20);
+
+        // Get unread messages
+        $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
+        })->where('type', 'guest')->pluck('id')->toArray();
+
+        $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
+            ->where('user_id', '!=', $user->id)
+            ->where('status', '!=', 'seen')
+            ->paginate(20);
+
+        return [
+            'success' => true,
+            'message' => 'successfully',
+            'data' => [
                 'request_chat' => ChatRoomResource::collection($guestChats),
                 'total_unread_messages' => $unreadMessages->count(),
                 'unread_messages' => ChatMessageResource::collection($unreadMessages),
@@ -196,9 +238,16 @@ class ChatRoomService
 
         if (!$chatRoom) {
 
+            $user2 = User::find($userId2);
+            $type = 'guest';
+            if ($user->followBack($user2)) {
+                $type = 'friends';
+            }
+
             $chatRoom = ChatRoom::create([
                 'user_id' => $user->id,
                 'user_id2' => $userId2,
+                'type' => $type,
             ]);
         }
 
@@ -316,9 +365,9 @@ class ChatRoomService
         $user = $request->user();
         // Check if the chat room exists
         $checkRoom = ChatRoom::where('user_id', $request->user_id)
-                             ->where('user_id2', $user->id)
-                             ->where('type', 'guest')
-                             ->first();
+            ->where('user_id2', $user->id)
+            ->where('type', 'guest')
+            ->first();
 
         if (!$checkRoom) {
             return [
@@ -333,8 +382,8 @@ class ChatRoomService
 
         // Get the messages related to the chat room
         $data = ChatMessage::where('chat_room_id', $checkRoom->id)
-                           ->with('reacts', 'albums')
-                           ->get();
+            ->with('reacts', 'albums')
+            ->get();
 
         // Return the formatted message data
         return ChatMessageResource::collection($data);

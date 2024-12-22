@@ -17,7 +17,8 @@ class WareSeeder extends Seeder
     {
         DB::table ('wares')->insert (
             [
-                ['name'=>'ثلاث مقاعد اضافيه', 'type'=>'100','get_type'=>'100', 'expire'=>0, 'value'=>3],
+                ['name'=>'ثلاث مقاعد اضافيه', 'type'=>'100','price'=>1000,'expire'=>10,'get_type'=>'100', 'expire'=>0,'show_img'=>"ddsdsd", 'num'=>6],
+                
             ]
         );
     }

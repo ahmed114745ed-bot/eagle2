@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\CP\Http\Services;
 
 use App\Repositories\WareRepository;
@@ -7,6 +8,7 @@ use App\Models\Pack;
 use Illuminate\Support\Facades\Auth;
 use Modules\CP\Repositories\CpRepository;
 use Modules\CP\Repositories\PackRepository;
+
 class ExtendCardService
 {
     protected $cpRepository;
@@ -41,9 +43,10 @@ class ExtendCardService
 
         // card ends today at midnight
         /// create another pack // from today to 30 days
-        if ($existingPack && $countPack == 2) {
-            $existingPack->expire = $existingPack->expire ? now()->timestamp + ($expire * 86400) : now()->addDays($expire)->timestamp;
-            $existingPack->save();
+        //if ($existingPack && $countPack == 2) {
+        if ($existingPack) {
+                $existingPack->expire = $existingPack->expire ? now()->timestamp + ($expire * 86400) : now()->addDays($expire)->timestamp;
+                $existingPack->save();
         } else {
             $this->packRepository->createPack([
                 'user_id' => $user->id,
@@ -55,6 +58,7 @@ class ExtendCardService
                 'use_num' => $ware->num,
             ]);
         }
+
 
         $user->di -= $ware->price;
         $user->save();

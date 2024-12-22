@@ -1,11 +1,12 @@
 <?php
+
 namespace Modules\CP\Repositories;
 
-use App\Models\Cp;
 use App\Models\GiftLog;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\CP\Entities\Cp;
 use Modules\CP\Entities\CpRelation;
 use Modules\CP\Entities\UserRelationAvilable;
 use Modules\CP\Enums\CpStatus;
@@ -18,46 +19,122 @@ class CpRepository
         return CpRelation::find($id);
     }
 
+    public function findStoppedRelationBetweenTwoUsers($userOne, $userTwo, $type){
+        return Cp::where(function($q) use($userOne, $userTwo){
+            $q->where(function($q) use($userOne, $userTwo){
+                $q->where('user_one_id', $userOne)->where('user_two_id', $userTwo);
+            })
+            ->orWhere(function($q)use($userOne, $userTwo){
+                $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
+            });
+        })
+        ->whereHas('cpRelation', function($q)use($type){
+            $q->where('type', $type);
+        })
+        ->where("status", CpStatus::STOPED)
+        ->first();
+    }
+
+    public function findCpBetweenUsers($userOne, $userTwo, $type=null){
+        return Cp::where(function($q) use($userOne, $userTwo){
+            $q->where(function($q) use($userOne, $userTwo){
+                $q->where('user_one_id', $userOne)->where('user_two_id', $userTwo);
+            })
+            ->orWhere(function($q)use($userOne, $userTwo){
+                $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
+            });
+        })
+        ->whereHas("cpRelation", function ($q) {
+            $q->where('type','!=', 'solution');
+        })
+        ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+        ->first();
+    }
+
     public function getCpCount($userId)
     {
         return Cp::where(function ($query) use ($userId) {
             $query->where("user_one_id", $userId)
-                  ->orWhere("user_two_id", $userId);
+                ->orWhere("user_two_id", $userId);
         })
-        ->whereIn("status", [0, 1, 4])
-        ->count();
+        ->whereHas("cpRelation", function ($q) {
+            $q->where('type','!=', 'solution');
+        })
+            ->whereIn("status", [0, 1, 4])
+            ->count();
     }
 
     public function checkExistingCp($userId, $otherUserId)
     {
         return Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
-                  ->where("user_two_id", $otherUserId)
-                  ->orWhere(function ($query) use ($userId, $otherUserId) {
-                      $query->where("user_two_id", $userId)
-                            ->where("user_one_id", $otherUserId);
-                  });
+                ->where("user_two_id", $otherUserId)
+                ->orWhere(function ($query) use ($userId, $otherUserId) {
+                    $query->where("user_two_id", $userId)
+                        ->where("user_one_id", $otherUserId);
+                });
         })
-            /// TODO convert these status to enum
+            ->whereHas("cpRelation", function ($q) {
+                $q->where('type','!=', 'solution');
+            })
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
-    public function checkExistingCpOne($userId,$cpId)
+    public function checkExistingCpLovlyForUser($userId)
     {
-        return Cp::where("cp_relation_id",$cpId)->where(function ($query) use ($userId) {
-                $query->where('user_one_id', $userId)
-                    ->orWhere('user_two_id', $userId);
+        return Cp::where(function ($query) use ($userId) {
+            $query->where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId);
+        })
+            ->whereHas('relation', function ($q) {
+                $q->where('relations_number', 1);
             })
-            ->whereIn("status", [ CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
+    }
+
+    public function checkExistingCpLovly($userId, $otherUserId)
+    {
+        return Cp::where(function ($query) use ($userId, $otherUserId) {
+            $query->where("user_one_id", $userId)
+                ->where("user_two_id", $otherUserId)
+                ->orWhere(function ($query) use ($userId, $otherUserId) {
+                    $query->where("user_two_id", $userId)
+                        ->where("user_one_id", $otherUserId);
+                });
+        })->relation()
+            /// TODO convert these status to enum
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // ->where("cp_relation_id",5)
+            ->first();
+    }
+
+    public function countExistingCpSameRelation($userId, $relationId)
+    {
+        return Cp::where(function ($query) use ($userId,) {
+            $query->where(function ($query) use ($userId,) {
+                $query->where("user_two_id", $userId);
+            });
+        })->where('cp_relation_id', $relationId)
+            /// TODO convert these status to enum
+            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->count();
+    }
+
+    public function checkExistingCpOne($userId, $cpId)
+    {
+        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+            $query->where('user_one_id', $userId)
+                ->orWhere('user_two_id', $userId);
+        })->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])->first();
     }
 
     public function getUserRelationAvailable($userId, $cpRelationId)
     {
         return UserRelationAvilable::where(["user_id" => $userId, "cp_relation_id" => $cpRelationId])
-                                   ->where("count", ">", 0)
-                                   ->first();
+            ->where("count", ">", 0)
+            ->first();
     }
 
     public function decrementUserRelationCount($relation)
@@ -74,8 +151,8 @@ class CpRepository
     public function getRequestsForUser($userId)
     {
         return Cp::where("user_two_id", $userId)
-                 ->where("status", 0)
-                 ->get();
+            ->where("status", 0)
+            ->get();
     }
 
     public function findCpById($cpId)
@@ -108,7 +185,7 @@ class CpRepository
             ->whereNotNull("cp_id")
             ->with(['cp' => function ($query) use ($relationType) {
                 $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id')
-                      ->where('cp_relation_id', $relationType);
+                    ->where('cp_relation_id', $relationType);
             }])
             ->whereHas("cp", function ($q) use ($relationType) {
                 $q->where('cp_relation_id', $relationType);
@@ -132,14 +209,14 @@ class CpRepository
 
     public function getCpList($userId, $activeOnly = false)
     {
-       $var = $activeOnly ? [ 1, 4] : [0,1,4];
+        $var = $activeOnly ? [1, 4] : [0, 1, 4];
 
         return Cp::where(function ($query) use ($userId) {
-                $query->where("user_one_id", $userId)
-                      ->orWhere(function ($query) use ($userId) {
-                          $query->where("user_two_id", $userId);
-                      });
-            })
+            $query->where("user_one_id", $userId)
+                ->orWhere(function ($query) use ($userId) {
+                    $query->where("user_two_id", $userId);
+                });
+        })
             ->whereIn("status", $var)
             ->get();
     }
@@ -151,10 +228,13 @@ class CpRepository
 
     public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
-        return Cp::with('relation:id,title')
+        return Cp::with('relation:id,title,type')
+            ->whereHas("cpRelation",function ($q){
+                $q->where('type',"!=",'solution');
+            })
             ->where(function ($query) use ($userId) {
                 $query->where('user_one_id', $userId)
-                      ->orWhere('user_two_id', $userId);
+                    ->orWhere('user_two_id', $userId);
             })
             ->whereIn('status', $statuses)
             ->orderByDesc('di')

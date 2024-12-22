@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class CpRelation extends Model
 {
-    protected $fillable = [];
+    protected $guarded = [];
+
+    public function levels(){
+        return $this->hasMany(CpLevel::class, 'cp_relation_id');
+    }
 }

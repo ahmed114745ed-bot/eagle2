@@ -75,6 +75,26 @@ class ChatRoomController extends Controller
             'chat'
         );
     }
+
+    public function guestChat(Request $request)
+    {
+        $response = $this->chatRoomService->getGUestChatRooms($request->user());
+
+
+        if (!$response['success']) {
+            return response()->json($response['message'], $response['status']);
+        }
+
+        return Common::apiResponse(
+            1,
+            $response['message'],
+            $response['data'],
+            $response['status'],
+            '',
+            'request_chat'
+        );
+    }
+
     public function close_Chat(Request $request)
     {
         $user = User::find($request->user()->id);

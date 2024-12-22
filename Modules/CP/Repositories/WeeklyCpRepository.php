@@ -20,7 +20,7 @@ class WeeklyCpRepository
     public function perviousWeeklyCpTopWinner()
     {
         return $this->perviousWeeklyCp(['WeeklyCpWinners' => function ($query) {
-            $query->where('type_relation', 'lover')->where('level', 1);
+            $query->where('type_relation', 'lovely')->where('level', 1);
         }]);
     }
 
@@ -32,7 +32,7 @@ class WeeklyCpRepository
     public function perviousWeeklyCpWinners($limit = 3)
     {
         return WeeklyStar::previousEvent()->WeeklyCP()->orderBy('start_date', 'desc')->with(['WeeklyCpWinners' => function ($query) {
-            $query->where('type_relation', 'lover')->with('userOne.profile','userTwo.profile');
+            $query->where('type_relation', 'lovely')->with('userOne.profile','userTwo.profile');
         }])->limit($limit)->get();
     }
 
