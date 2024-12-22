@@ -6,14 +6,9 @@ namespace Modules\CP\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\Gifts;
-use App\Services\AppFeatureService;
-use Modules\Events\Entities\TargetEvent;
 use App\Admin\Controllers\MainController;
-use App\Models\Vip;
-use Encore\Admin\Controllers\AdminController;
 use Modules\CP\Entities\CpLevel;
-use Modules\Events\Entities\ChargeTargetEvent;
+use Encore\Admin\Layout\Content;
 
 class LevelController extends MainController
 {
@@ -23,33 +18,52 @@ class LevelController extends MainController
     // {
     //     (new AppFeatureService)->validateStatusEnable("target_events");
     // }
+
+    public function index(Content $content)
+    {
+        $url = url('/admin/cp-relations'); // Define your button URL
+
+        $buttonHTML = <<<HTML
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> رجوع
+        </a>
+        HTML;
+        return $content
+            ->header(trans('admin.index'))
+            ->description(trans('admin.description'))
+            ->breadcrumb(
+                ['text' => trans('admin.eventGift')]
+            )
+            ->row($buttonHTML)
+            ->row($this->grid());
+    }
     protected function grid()
     {
         $relation_id = request("relation_id");
         if (!$relation_id) {
             abort(400, 'Relation ID is required');
         }
-    
+
         $grid = new Grid(new CpLevel());
         $grid->model()->where('cp_relation_id', $relation_id);
-    
+
         $grid->column('id', __('Id'));
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($value) {
             return number_format($value);
         })->editable();
         $grid->column('img', __('Image'))->image('', '30');
-    
+
         $grid->column('الاجرائات')->display(function () use ($relation_id) {
             $url1 = url('admin/cp-level-gifts/' . $this->id);
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
             return $button1;
         });
-    
+
         return $grid;
     }
-    
-    
+
+
     /**
      * Make a show builder.
      *
@@ -60,16 +74,16 @@ class LevelController extends MainController
     protected function detail($id, $relation_id)
     {
         $show = new Show(CpLevel::where('id', $id)->where('cp_relation_id', $relation_id)->firstOrFail());
-    
+
         $show->field('id', __('Id'));
         $show->field('tile', __('Tile'));
         $show->field('value', __('Value'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
-    
+
         return $show;
     }
-    
+
     /**
      * Make a form builder.
      *
@@ -91,8 +105,7 @@ class LevelController extends MainController
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-    
+
         return $form;
     }
-    
 }

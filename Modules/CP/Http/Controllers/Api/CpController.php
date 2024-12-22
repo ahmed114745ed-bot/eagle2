@@ -3,10 +3,8 @@
 namespace Modules\CP\Http\Controllers\Api;
 
 use App\Helpers\Common;
-use App\Models\Cp;
 use App\Models\GiftLog;
 use App\Models\Pack;
-use App\Models\User;
 use App\Models\Ware;
 use Auth;
 use DB;
@@ -14,8 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\CP\Entities\CpRelation;
 use Illuminate\Support\Facades\Validator;
+use Modules\CP\Entities\Cp;
 use Modules\CP\Entities\UserRelationAvilable;
-use Modules\CP\Events\SendMessage;
+use Modules\CP\Http\Resources\CpLevelResource;
 use Modules\CP\Http\Services\CpProfileService;
 use Modules\CP\Http\Services\CpserviceCo;
 use Modules\CP\Http\Services\ExtendCardService;
@@ -25,14 +24,83 @@ use Modules\CP\Transformers\RequestCpResource;
 
 class CpController extends Controller
 {
-    protected $cpService,$extendCardService,$cpProfileService;
+    protected $cpService, $extendCardService, $cpProfileService;
 
-    public function __construct(CpserviceCo $cpService,ExtendCardService $extendCardService,CpProfileService $cpProfileService)
+    public function __construct(CpserviceCo $cpService, ExtendCardService $extendCardService, CpProfileService $cpProfileService)
     {
         $this->cpService = $cpService;
         $this->extendCardService = $extendCardService;
         $this->cpProfileService = $cpProfileService;
     }
+    public function cpLevels()
+    {
+        $type = request('type') ?? 'lovely';
+        $levelsIds = Cp::where(function ($q) {
+            $q->where('user_one_id', Auth::id())
+                ->orWhere('user_two_id', Auth::id());
+        })
+            ->whereHas('relation', function ($q) use ($type) {
+                $q->where('type', $type);
+            })
+            ->pluck('level_id')
+            ->toArray();
+    
+        $cp_relations = CpRelation::with('levels.gifts')
+            ->where('type', $type)
+            ->first();
+    
+        $result = [];
+        if (!$cp_relations) return Common::apiResponse(1, 'not found', $result);
+    
+        foreach ($cp_relations->levels as $level) {
+            $have = in_array($level->id, $levelsIds);
+    
+            // تصنيف الهدايا وتجهيز البيانات
+            $levelGifts = [];
+            foreach ($level->gifts as $gift) {
+                $image = null;
+                switch ($gift->type) {
+                    case 'ware':
+                        $image = $gift->ware->show_img;
+                        break;
+                    case 'vip':
+                        $image = $gift->vip->img;
+                        break;
+                    case 'coins':
+                        $image ='custom_image/gold_coin_icon.png'; 
+                        break;
+                    case 'acheivment':
+                        $image = $gift->item_id; 
+                        break;
+                }
+    
+                if ($image) {
+                    if (!isset($levelGifts[$gift->type])) {
+                        $levelGifts[$gift->type] = [
+                            'title' => $gift->type,
+                            'images' => [],
+                        ];
+                    }
+                    $levelGifts[$gift->type]['images'][] = $image;
+                }
+            }
+    
+            $levelGifts = array_values($levelGifts);
+    
+            $data = [
+                'level' => $level->level,
+                'title' => $level->name_en,
+                'have' => $have,
+                'gifts' => $levelGifts,
+            ];
+    
+            $result[] = $data;
+        }
+    
+        return Common::apiResponse(1, '', $result);
+    }
+    
+
 
     public function makeRequestCp(Request $request)
     {
@@ -45,6 +113,8 @@ class CpController extends Controller
             $errors = implode(',', $validator->errors()->all());
             return Common::apiResponse(0, $errors);
         }
+
+
 
         $user = $request->user();
         return $this->cpService->makeRequestCp($request, $user);
@@ -81,8 +151,7 @@ class CpController extends Controller
 
     public function cpProfile()
     {
-        $userId = Auth::id();
+        $userId = request('user_id') ?? Auth::id();
         return $this->cpProfileService->getCpProfiles($userId);
     }
-
 }

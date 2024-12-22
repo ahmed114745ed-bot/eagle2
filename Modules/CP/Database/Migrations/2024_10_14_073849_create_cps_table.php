@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger("cp_relation_id")->default(0);
             $table->foreignId ('user_one_id')->constrained('users')->onDelete ('cascade');
             $table->foreignId ('user_two_id')->constrained('users')->onDelete ('cascade');
-            $table->integer("status")->default(0)->comment("pending=>0,accepted=>1,refused=>2,stop=>3,restore=>4");
+            $table->integer("status")->default(0)->comment("pending=>0,accepted=>1,refused=>2,stop=>3,restore=>4,pending_restore=>5");
             $table->integer('di')->default(0);
             $table->unsignedBigInteger("level_id")->default(0);
             $table->double("price")->default(0);

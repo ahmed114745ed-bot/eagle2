@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpRelation;
 
 class Cp extends Model
@@ -14,6 +15,9 @@ class Cp extends Model
         return $this->belongsTo(User::class,"user_one_id");
     }
 
+    public function level(){
+        return $this->belongsTo(CpLevel::class, 'level_id');
+    }
     public function toUser()
     {
         return $this->belongsTo(User::class,"user_two_id");

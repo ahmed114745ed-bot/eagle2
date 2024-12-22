@@ -11,6 +11,11 @@ class CpLevelGift extends Model
 {
     protected $guarded = ['id'];
 
+    public function cp_level()
+    {
+        return $this->belongsTo(CpLevel::class,'vip_id');   
+    }
+
     public function vip()
     {
         return $this->belongsTo(OVip::class,'item_id');   
