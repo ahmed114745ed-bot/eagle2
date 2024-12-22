@@ -1,10 +1,11 @@
 <?php
 
-use Modules\CP\Http\Controllers\web\CpRelationController;
 use Modules\CP\Http\Controllers\web\LevelController;
-use Modules\CP\Http\Controllers\web\LevelGiftController;
 use Modules\CP\Http\Controllers\web\WeeklyCpController;
+use Modules\CP\Http\Controllers\web\LevelGiftController;
+use Modules\CP\Http\Controllers\web\CpRelationController;
 use Modules\CP\Http\Controllers\web\WeeklyCpGiftController;
+use Modules\CP\Http\Controllers\web\CpReportRelationController;
 
 Route::group(
     [
@@ -16,13 +17,14 @@ Route::group(
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
-            'appFeatureEnable:achievement',
         ],
         'as' => config('admin.route.prefix') . '.',
     ],
     function (\Illuminate\Routing\Router $router) {
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource ('weekly-cp',WeeklyCpController::class);
+        $router->resource ('cp-reports',CpReportRelationController::class);//'CpReportRelationController');
+
 
 
         Route::prefix('cp-levels/{relation_id}')->group(function () {

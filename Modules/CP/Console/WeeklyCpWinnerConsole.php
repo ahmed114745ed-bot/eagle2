@@ -52,21 +52,21 @@ class WeeklyCpWinnerConsole extends Command
 
 
         foreach ($leaderBoard as $index => $entry) {
-            $alreadyWinner = WeeklyCpWinner::where(['weekly_cp_id' => $weeklyCp->id, 'user_one_id' => $entry->cp->user_one_id, 'user_two_id' => $entry->cp->user_two_id, 'type_relation' => $entry->cp->relation->title])->exists();
+            $alreadyWinner = WeeklyCpWinner::where(['weekly_cp_id' => $weeklyCp->id, 'user_one_id' => $entry->cp->user_one_id, 'user_two_id' => $entry->cp->user_two_id, 'type_relation' => $entry->cp->relation->type])->exists();
 
             if (!$alreadyWinner) {
                 $winner = WeeklyCpWinner::create([
                     'weekly_cp_id' => $weeklyCp->id,
                     'user_one_id' => $entry->cp->user_one_id,
                     'user_two_id' => $entry->cp->user_two_id,
-                    'type_relation' => $entry->cp->relation->title,
+                    'type_relation' => $entry->cp->relation->type,
                     'level' => $index + 1,
                     'total_price' => $entry->totalGiftNum,
                 ]);
                 $userOne =  UserRewardsWeeklyCp::getUserById($entry->cp->user_one_id);
                 $userTwo = UserRewardsWeeklyCp::getUserById($entry->cp->user_two_id);
                 $rewards = $weeklyCp->weeklyCpGifts->where('level', $index + 1);
-                
+
                 if (count($rewards) > 0) {
 
                     foreach ($rewards as $reward) {
@@ -87,7 +87,6 @@ class WeeklyCpWinnerConsole extends Command
                         }
 
                         CpWinnerReward::create(['winner_id'=>$userOne->id,'reward_id'=>$reward->id]);
-                        CpWinnerReward::create(['winner_id'=>$userTwo->id,'reward_id'=>$reward->id]);
                     }
                 }
             }

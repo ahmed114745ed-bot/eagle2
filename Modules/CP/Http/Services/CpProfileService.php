@@ -1,10 +1,13 @@
 <?php
+
 namespace Modules\CP\Http\Services;
 
 use App\Repositories\WareRepository;
 use App\Helpers\Common;
 use App\Models\Pack;
+use App\Models\Ware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Modules\CP\Repositories\CpRepository;
 use Modules\CP\Repositories\PackRepository;
 use Modules\CP\Transformers\CpListResource;
@@ -25,9 +28,50 @@ class CpProfileService
         $statuses = [1, 4];
         $vipCount = $this->packRepository->countUserVipPacks($userId);
 
-        if ($vipCount == 1) $count =  7; elseif ($vipCount >= 2) $count =  10; else $count =  4;
+        if ($vipCount == 1) $count =  7;
+        elseif ($vipCount >= 2) $count =  10;
+        else $count =  4;
         $data = $this->cpRepository->getUserCpProfiles($userId, $statuses, $count);
 
-        return Common::apiResponse(1, '', CpListResource::collection($data));
+        $pack = Pack::where('user_id', Auth::id())
+            ->where('type', 100)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', time());
+            })
+            ->orderBy('target_id', 'desc')
+            ->first();
+
+        $seats = 3;
+
+        if ($pack) {
+            $ware = Ware::where('id', $pack->target_id)->first();
+            if ($ware->num == 6) {
+                $seats = 6;
+                $ware = Ware::where('num', 9)->where('type', 100)->first();
+            } elseif ($ware->num == 3) {
+                $seats = 3;
+                $ware = Ware::where('num', 6)->where('type', 100)->first();
+            } else {
+                $ware = null;
+                $seats = 9;
+            }
+        } else {
+            $ware = Ware::select('id', 'price', 'num')->where('type', 100)->where('get_type', 100)->where('num', 6)->first();
+        }
+        $mainCp = $data->firstWhere('relation.type', 'lovely') ?? $data->sortByDesc('level')->first();
+
+
+        $remainingCps = $data->reject(function ($cp) use ($mainCp) {
+            return $cp->id === $mainCp->id;
+        });
+
+        $result = [
+            'seats' => $seats,
+            'wares' => $ware,
+            'main_cp' => $mainCp ? new CpListResource($mainCp) : null,
+            'remaining_cp' => $remainingCps ? CpListResource::collection($remainingCps) : []
+        ];
+
+        return Common::apiResponse(1, '', $result);
     }
 }

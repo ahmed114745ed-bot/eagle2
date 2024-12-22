@@ -17,7 +17,7 @@ use Modules\CP\Http\Controllers\Api\CpRelationController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'appFeatureEnable:achievement'])->group(function () {
+Route::middleware(['auth:sanctum', ])->group(function () {
     Route::get('/cp-relations', [CpRelationController::class, 'index']);
     Route::post('/make-cp-request', [CpController::class, 'makeRequestCp']);
     Route::get('/get-cp-request', [CpController::class, 'getRequestCp']);
@@ -26,9 +26,10 @@ Route::middleware(['auth:sanctum', 'appFeatureEnable:achievement'])->group(funct
     Route::get('/cp-list', [CpController::class, 'cpList']);
     Route::post('/buy-sets', [CpController::class, 'extendCard']);
     Route::get('/cp-profile', [CpController::class, 'cpProfile']);
+    Route::get('/cp-levels-gifts', [CpController::class , 'cpLevels']);
 });
 
-Route::prefix('weekly-cp')->middleware(['auth:sanctum', 'appFeatureEnable:weekly_cp'])->group(function () {
+Route::prefix('weekly-cp')->middleware(['auth:sanctum', ])->group(function () {
     Route::get('pervious-Winners', [WeeklyCpController::class, 'perviousWeeklyCpWinners']);
     Route::get('details', [WeeklyCpController::class, 'weeklyCpDetails']);
     Route::get('top-users', [WeeklyCpController::class, 'topUsers']);

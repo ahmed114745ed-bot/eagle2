@@ -38,6 +38,6 @@ class GiftLog extends Model
 
     public function cp()
     {
-        return $this->belongsTo(Cp::class, 'cp_id')->with("fromUser:id,uuid,name", "toUser:id,uuid,name");
+        return $this->belongsTo(Cp::class, 'cp_id')->with("fromUser:id,uuid,name", "toUser:id,uuid,name", 'level');
     }
 }

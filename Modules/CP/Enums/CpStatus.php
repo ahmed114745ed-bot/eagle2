@@ -9,4 +9,5 @@ enum CpStatus: int
     case ACCEPTED = 2;
     case STOPED = 3;
     case RESTORED = 4;
+    case PENDING_RESTORED = 5;
 }
