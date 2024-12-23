@@ -544,7 +544,7 @@ class Common
         $api_access_key = self::getGoogleAccessToken();
 
         $isGroup = false;
-        $userData =[];
+        $userData = [];
         $key = time();
 
         if (gettype($tokens) == 'string') {
@@ -567,8 +567,7 @@ class Common
             $isGroup = true;
         }
 
-        if($user)
-        {
+        if ($user) {
             $userData = [
                 'user_id' => $user->id,
                 'name' => $user->name,
@@ -948,6 +947,16 @@ class Common
         return $ch->exists();
     }
 
+    public static function hasProfileFramePack($user_id, $type, $use_status = false)
+    {
+        $ch =  self::checkPack($user_id, $type);
+        if ($use_status) {
+            $ch = $ch->where('is_used', 1);
+        }
+        $ch = $ch->first();
+        return $ch->first()->ware->show_img ?? '';
+    }
+
     /*
       * 19 vip package
       * */
@@ -1107,5 +1116,4 @@ class Common
         $level = Vip::query()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
     }
-
 }

@@ -172,6 +172,7 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
+            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true)
         ];
 
         $data['auth_token'] = $this->auth_token;
