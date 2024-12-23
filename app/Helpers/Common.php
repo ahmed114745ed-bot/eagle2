@@ -954,7 +954,7 @@ class Common
             $ch = $ch->where('is_used', 1);
         }
         $ch = $ch->first();
-        return $ch->first()->ware->show_img ?? '';
+        return $ch->ware->show_img ?? '';
     }
 
     /*
