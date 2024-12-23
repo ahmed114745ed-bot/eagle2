@@ -110,11 +110,10 @@ class MyDataResource extends JsonResource
         }
 
 
-       
+
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/
-
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
+use Encore\Admin\Tree;
 use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
@@ -104,7 +105,7 @@ class AuthService
     public function loginWithGoogle($request)
     {
         $user = $this->userRepository->findByGoogleId($request['google_id']);
-
+        $is_new = false;
         if (!$user) {
             $trashedEmail = $this->userRepository->checkTrashedEmail($request['email'], $request['google_id']);
             if ($trashedEmail) {
@@ -135,6 +136,7 @@ class AuthService
 //                if (!$checkValidation) {
 //                    throw new CValidationException('some thing wrong');
 //                }
+                $is_new = true;
                 $user = $this->userRepository->create($data);
                 if (\request('tags') && is_array(\request('tags'))) {
                     $user->tags()->attach(\request('tags'));
@@ -147,7 +149,7 @@ class AuthService
         }
         $this->rule($user, '', @$request['device_token'], $request);
         $token = $user->createToken('api_token')->plainTextToken;
-        $this->userRepository->updateIsLogout($user, 0);
+        $this->userRepository->updateIsLogout($user, 0, $is_new);
         return [$user, $token, []];
     }
 

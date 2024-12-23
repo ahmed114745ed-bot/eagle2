@@ -144,11 +144,16 @@ class UserRepository extends AbstractRepository
         return true;
     }
 
-    public function updateIsLogout($user, $isLogout)
+    public function updateIsLogout($user, $isLogout, $is_new= false)
     {
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
-        $user->is_points_first = 0;
+        if($is_new){
+            $user->is_points_first = true;
+        } else {
+            $user->is_points_first = false;
+
+        }
         $notification_id = @request()->notification_id;
         if ($notification_id) {
             $user->notification_id = $notification_id;
