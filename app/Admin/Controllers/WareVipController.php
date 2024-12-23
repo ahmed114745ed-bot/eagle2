@@ -231,7 +231,27 @@ class WareVipController extends MainController
         })->default('1.png');
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            $wareId = request()->route('wares-vips'); // Retrieve the current Ware ID (if editing)
+            $wareId = $wareId ?? Ware::max('id') + 1; // Predict next ID if creating
+
+            // Determine the file prefix based on type and environment
+            $type = request()->input('type'); // Get the selected type
+            $prefix = '';
+
+            if (app()->environment('local')) {
+                $prefix = 't-';
+            }
+
+            if ($type == 4) { // For "Avatar Frame"
+                return $prefix . 'w-f' . $wareId . '.' . $file->guessExtension();
+            } elseif ($type == 5) { // For "Bubble Frame"
+                return $prefix . 'w-b' . $wareId . '.' . $file->guessExtension();
+            } elseif ($type == 10) { // For "Bubble Frame"
+                return $prefix . 'w-vb' . $wareId . '.' . $file->guessExtension();
+            } else {
+                // Default fallback naming (optional)
+                return $prefix . 'w-default' . $wareId . '.' . $file->guessExtension();
+            }
         });
         $form->select('image_type', __('image_type'))->options(
             [
