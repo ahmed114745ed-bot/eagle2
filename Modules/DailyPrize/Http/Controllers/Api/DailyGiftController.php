@@ -58,7 +58,7 @@ class DailyGiftController extends Controller
 
         $dailyGift=$this->dailyPrizeService->getDayGift($currentDay);
         if (!$dailyGift) {
-            return Common::apiResponse(0, 'يوجد شئ ما خطا', []);
+            return Common::apiResponse(0, '  لا يوجد هديه اليوم ', []);
         }
         $result=DailyGiftCount::query()->where('user_id',$user->id)->orderByDesc('id')->first();
         if (!$this->dailyPrizeService->isNewDay($user->id) && $result != null) {
