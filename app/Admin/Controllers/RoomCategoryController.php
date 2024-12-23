@@ -73,6 +73,7 @@ class RoomCategoryController extends MainController
         $grid->name(trans('name'));
         $grid->column('name_en',trans ('name_en'));
         $grid->column('img',trans ('img'))->image ('',30);
+        $grid->column('type',trans ('type'));
         $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
         $this->extendGrid ($grid);
         $grid->disableExport();
@@ -121,7 +122,10 @@ class RoomCategoryController extends MainController
         });
         $form->text('name', trans('name'))->rules ('required');
         $form->text('name_en', trans('name_en'))->rules ('required');
-        $form->image('img', trans('img'))->rules ('required');
+        $form->select('type', trans('type'))->options([
+            'party' => trans('party') 
+        ]);
+        $form->image('img', trans('img'));
         $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ());
 
         return $form;
