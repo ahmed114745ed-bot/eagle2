@@ -1601,7 +1601,8 @@
     "categories":"التصنيفات",
     "Fields": "الحقول",
     "Details":"التفاصيل",
-    "delete-accounts" :" سياسه الحسبات المحذوفه"
-    
+    "delete-accounts" :" سياسه الحسبات المحذوفه",
+    "party" :"حفله",
+    "profile frame" : "إطار الملف الشخصي"
     
 }

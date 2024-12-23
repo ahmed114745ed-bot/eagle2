@@ -133,7 +133,11 @@ class RoomRepository extends AbstractRepository
                 // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
                 $result->has('lastPk');
                 break;
-
+            case 'party':
+                        $result->whereHas('roomCategory', function($query) {
+                            $query->where('type', 'party'); 
+                        })->get();
+                break;
             case 'festival':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session')
@@ -183,7 +187,7 @@ class RoomRepository extends AbstractRepository
                     ->join('users as owner', 'rooms.uid', '=', 'owner.id')
                     ->orderBy('distance');
                 break;
-
+           
             default:
                 $result->orderByDesc('hour_hot');
                 break;

@@ -13,6 +13,7 @@ use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
+use Illuminate\Support\Facades\Session;
 
 class WareController extends MainController
 {
@@ -208,7 +209,7 @@ class WareController extends MainController
         )->default(4);
         $form->select('type', trans('type'))->options(
             translate(TYPE_WARE)
-        )->rules('required');
+        )->attribute(['id' => 'type'])->rules('required');
         //        ->rules (function ($form){
         //            if (!$id = $form->model()->id) {
         //                return 'required';
@@ -242,7 +243,45 @@ class WareController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->required();
+        )->attribute(['id' => 'image_type']);
+
+        $form->select('image_type', __('image_type'))->options(
+            [
+                'svga' => __('svga'),
+                'png' => __('png'),
+
+            ]
+        )->attribute(['id' => 'profile_frame']);
+
+        $script = <<<SCRIPT
+             $(document).ready(function() {
+                 function toggleWinProbability() {
+                     var type = $('#type').val();
+                     if(type == '28') {
+                         $('#profile_frame').closest('.form-group').show();
+                          $('#image_type').closest('.form-group').hide();
+                     } else {
+                         $('#profile_frame').closest('.form-group').hide();
+                         $('#image_type').closest('.form-group').show();
+                         
+                     }
+                 }
+                 toggleWinProbability();
+
+                 $('#type').change(function() {
+                     toggleWinProbability();
+                 });
+             });
+             SCRIPT;
+        Admin::script($script);
+
+        if (Session::has('show_alert')) {
+            $form->html('<script>
+             $(document).ready(function () {
+                 alert("الرجاء اختيار نوع  الصوره");
+             });
+         </script>');
+        }
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
@@ -251,6 +290,11 @@ class WareController extends MainController
         $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
+            if ( $form->input('image_type') == null) {
+
+                session()->flash('show_alert', 'Your alert message');
+                return redirect()->back();
+            }
             (new UserCounterServices)->eventUsers('ware');
         });
 

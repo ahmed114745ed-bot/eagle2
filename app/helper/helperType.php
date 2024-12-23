@@ -34,11 +34,12 @@ const TYPE_WARE =
     18 => 'colored name',
     19 => 'profile visitors hide in',
     20 => 'hide last active',
+    28 => 'profile frame',
 ];
 
 const  GET_TYPE_WARE =
 [
- 4=>'purchase',
- 6=>'limited time purchase',
+    4 => 'purchase',
+    6 => 'limited time purchase',
 
 ];

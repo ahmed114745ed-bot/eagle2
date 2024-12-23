@@ -23,7 +23,7 @@ class RoomResource extends JsonResource
                 }
             }
         }
-
+        $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse;
         /**@var Room $this*/
         $data = [
@@ -48,6 +48,7 @@ class RoomResource extends JsonResource
             'is_recommended' => $this->is_recommended ?: 0,
             'lang' => $this->lang ?: '',
             'is_pk' => (bool) $pk,
+            'is_party' => $isParty,
             'room_background' => $this->final_room_image,
             'country' => $this->country
                 ? new CountryResource($this->country)

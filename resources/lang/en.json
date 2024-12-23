@@ -417,7 +417,9 @@
     "totalDiamond" :"Monthly total of diamonds",
      "Main" : "Main",
      "commission": "The amount deducted from the commission",
-     "date":"date"
+     "date":"date",
+     "party" :"Party"
+
 
 
 }

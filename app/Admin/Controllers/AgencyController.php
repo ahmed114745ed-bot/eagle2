@@ -343,11 +343,6 @@ class AgencyController extends MainController
             });
         }
 
-
-
-
-
-
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
