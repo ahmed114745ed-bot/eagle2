@@ -187,6 +187,7 @@ class WareVipController extends MainController
      */
     protected function form()
     {
+        dd(1);
         $form = new Form(new Ware());
 
         $form->display('ID');
@@ -231,6 +232,7 @@ class WareVipController extends MainController
         })->default('1.png');
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
+
             $wareId = request()->route('wares-vips'); // Retrieve the current Ware ID (if editing)
             $wareId = $wareId ?? Ware::max('id') + 1; // Predict next ID if creating
 
