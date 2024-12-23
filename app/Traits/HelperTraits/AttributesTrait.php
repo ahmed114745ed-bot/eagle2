@@ -12,7 +12,7 @@ trait AttributesTrait
 
     public static function checkPack($userId, $type, $dress = null)
     {
-        $pack = Pack::query()
+        $pack = Pack::query()->with('ware')
             ->where('user_id', $userId)
             ->where('type', $type)
             ->where(function ($q) {
