@@ -29,7 +29,7 @@ class ProfileRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'=>[Rule::unique('users')->ignore($this->user()->id),'email'],
+            // 'email'=>[Rule::unique('users')->ignore($this->user()->id),'email'],
             'phone'=>[Rule::unique('users')->ignore($this->user()->id)]
         ];
     }
