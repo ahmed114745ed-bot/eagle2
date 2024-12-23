@@ -19,6 +19,7 @@ use App\Jobs\SendNotificationToAllFollowers;
 use App\Tik\Repositories\EnteranceRoomRepository;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\CP\Entities\CpRoomHistory;
 
 class EnteranceRoomServices
 {
@@ -166,6 +167,8 @@ class EnteranceRoomServices
         }
         if ($event == 'room_logout' ){
             $this->removeUserToVisitors($room->id, $user->id);
+            $this->handleLeaveCp($user, $room);
+
         }
 
         if ($event == 'room_logout' && $room->charizma_status) {
@@ -181,6 +184,42 @@ class EnteranceRoomServices
 
         Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
+    }
+
+    public function handleLeaveCp($user,$room)
+    {
+        $userId = $user->id;
+        $this->removeUserCpInRoom($userId);
+        return $this->sendCpLovelyMessage($room, $user);
+    }
+    public function removeUserCpInRoom(mixed $userId): void
+    {
+        CpRoomHistory::where("user_one_id", $userId)
+            ->orWhere("user_two_id", $userId)->delete();
+    }
+
+    public function sendCpLovelyMessage($room, $user)
+    {
+        $cpRoomHistories = CpRoomHistory::where("room_id",$room->id)->get(['index1', 'index2']);
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
+
+        $json = $this->cpMapJson($indices);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+    }
+
+    public function cpMapJson($indices): string|false
+    {
+        $ms = [
+            'messageContent' => [
+                "message" => "cpLovelyZego",
+                "data" => $indices,
+            ]
+        ];
+        $json = json_encode($ms);
+        return $json;
     }
     /*public function updateRoomCountFromZego(Request $request)
     {

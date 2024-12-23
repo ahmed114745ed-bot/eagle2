@@ -225,7 +225,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
-                //                        Route::post('/send', [GiftLogController::class, 'gift_queue_six2']);
+                // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
+
+                //todo
                 Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
                 Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);

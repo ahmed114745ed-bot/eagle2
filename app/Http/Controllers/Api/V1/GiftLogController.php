@@ -29,12 +29,25 @@ use App\Jobs\UpdateUserDataWhenSendGift;
 use Modules\CP\Http\Services\CpServices;
 use Illuminate\Support\Facades\Validator;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Facades\UserHandling;
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
+use App\Traits\Gifts\WinLuckyGift;
+
+use App\Services\Gifts\GiftService;
+
+use Illuminate\Support\Facades\Redis;
+use Modules\CP\Http\Services\CpService;
+
+use App\Traits\Gifts\LuckyGiftProbability;
+use Illuminate\Database\Eloquent\Collection;
+
+use App\Models\Cp;
+
 
 class GiftLogController extends Controller
 {
@@ -48,8 +61,393 @@ class GiftLogController extends Controller
         $this->roomTopUsersRepository = $roomTopUsersRepository;
     }
 
+    public function gift_queue_six2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    {
+        $owner_wallet = CoreWallet::find(2);
+        $app_wallet   = CoreWallet::find(1);
+        //update when send the gift
+        $data    = $request;
+        $user    = $request->user();
+        $userId  = $user->id;
+        $ownerId = $data['owner_id'];
+        $giftId  = $data['id'];
+        $number  = $data['num'];
+
+        //validation parameter
+        if (!$data['id'] || !$data['owner_id'] || !$data['toUid'] || !$data['num'])
+            return Common::apiResponse(0, __('api_responses.missing_params'), $data->all());
+
+        //validation if pass num < 1
+        if ($data['num'] < 1) return Common::apiResponse(0, 'The number of gifts cannot be less than 1', null, 422);
+
+        //get the gift data from id in the parameter
+        $gift = Gift::query()->select([
+            'id',
+            'name',
+            'type',
+            'price',
+            'vip_level',
+            'is_play',
+            'img',
+            'show_img',
+            'show_img2',
+            'image_type'
+        ])->where('id', $giftId)->where('enable', 1)->first();
+        // Validation if gift return null
+        if (!$gift) return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
+        // receivers ids
+        $receiversIds = explode(',', $data['toUid']);
+        $numberOfGift = $number * count($receiversIds);
+
+        $totalPrice = $gift->price * $numberOfGift;
+        $totalPriceForOnlyReceiver = $gift->price * $number;
 
 
+        // if user didn't have inf coins throw exception
+        if ($user->di < $totalPrice) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+
+        // Get Room Data
+        $room =
+            Room::query()->withoutAppends()->where(['uid' => $ownerId])->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,mode,top_user_id,charizma_status')->first();
+        // Validation if no room
+        if (!$room) return Common::apiResponse(0, 'room does not exist', null, 404);
+
+        // if not a visitor in this room
+        $roomVisitors   = explode(",", $room->room_visitor);
+        $roomVisitors[] = $ownerId;
+        //        if (!in_array($userId, $roomVisitors)) return Common::apiResponse(0, 'you are not in this room', null, 403);
+
+        // validation if this gift vip < user vip then throw Exception
+        $vip_level = @Common::ovip_center($user);
+        if (@$vip_level->level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
+
+        //decrement the user coins
+        try {
+            $updateUserWhenSendGift->send($totalPrice, $user);
+        } catch (NotInfMoneyException $e) {
+            return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+        }
+        //increase room session
+        $room->enableSaving = false;
+        $room->session      += $totalPrice;
+        $room->save();
+
+
+        //update family level to the sender user
+        // get received users data
+        $receivedUsers =
+            User::query()->withoutAppends()->with(['agency', 'profile', 'family'])->whereIn('id', $receiversIds)->get();
+
+        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
+        $cpIds = [];
+
+        //check type of cp
+        if ($cpId != null) {
+            try {
+                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                // dd($cpIds);
+            } catch (\Exception $e) {
+                return Common::apiResponse(0, $e->getMessage());
+            }
+        }
+
+        if (is_array($receiversIds) && count($receiversIds) > 1) {
+            $to_id = $receiversIds[0];
+            $to    = 'الغرفة';
+        } else {
+            $to_id = $receiversIds[0];
+            $to    = @$receivedUsers->first()->name;
+        }
+
+        $fromName         = $user->name;
+        $sendGiftServices = new SendGiftService();
+
+        $jsonSendGiftData =
+            $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1));
+        //send to zego if pk not null
+        if ($room->lastPk) {
+            dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePkAndSendToZigo');
+        } else if ($room->charizma_status) {
+            dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
+        }
+
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
+
+
+        foreach ($receivedUsers as $receivedUser) {
+            // Lucky gift code
+            if ($gift->type == 6) {
+                $price               = $number * ($gift->price * 0.1);
+                $owner_wallet->coins += $price;
+                $app_wallet->coins   += $price * 8;
+                $app_wallet->save();
+                $owner_wallet->save();
+            } else {
+                $price = $number * $gift->price;
+            }
+            $cpId = @$cpIds[$receivedUser->id] ?? null;
+            $sendGiftServices->sendGift($number, $room, $gift, $user, $receivedUser, isPK: $room->lastPk != null, totalPrice: $price, cpId: $cpId);
+            $updateUserWhenSendGift->update($price, $receivedUser);
+        }
+
+        //update sender family
+        /*if ($user->family) {
+            //            $sendGiftServices->updateFamilyLevel($user->family, $totalPrice);
+        }*/
+        //  $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
+        $senderUser = new Collection([$user]);
+        $this->updateFamilyLevelForSender($senderUser, $totalPrice);
+        //this code for add percentage when send gift to user and the host
+        $this->updateRoomPercentageAndHost($ownerId, $receiversIds, $totalPrice, ($gift->price * $number));
+
+        Utils::unwrap($promises);
+
+
+        if ($room->mode != '1' && $room->mode != '2') {
+            //            $isFirstTopUser = $this->roomTopUsersRepository->isFirstTopUser($room->id);//update room coins to user
+            $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
+            //            if (!$isFirstTopUser) {
+            $topUser =
+                $this->roomTopUsersRepository->getRoomTopUser($room->id, ['user' => function ($q) {
+                    $q->withoutAppends();
+                }]);
+
+            $fUser = $topUser?->user;
+            /*} else {
+                $fUser = $user;
+            }*/
+            if ($room->top_user_id != $userId) {
+                $room->top_user_id = $fUser->id;
+                $room->save();
+                $ms1 = [
+                    'messageContent' => [
+                        'message'        => 'topSendGifts',
+                        'img'            => $fUser->profile->avatar,
+                        'id'             => $fUser->id,
+                        'name'           => $fUser->name,
+                        'has_color_name' => Common::hasInPack($fUser->id, 18),
+                        'frame'          => Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img2', true) ?: Common::getUserDress($fUser->id, $fUser->dress_1, 4, 'img1', true),
+                        'fid'            => @$fUser->dress_1,
+                        'vlev'           => @$fUser->UserVip->level
+                    ]
+                ];
+
+                $json = json_encode($ms1);
+
+                Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+            }
+        }
+
+        CalculateAchievement::dispatch($gift, $number, $room->owner, $user)->onQueue('achievement');
+
+
+        $message = "  {$number} x ارسل هدية  " . " قيمتها {$gift->price} " . " الى {$to}";
+
+
+        return Common::apiResponse(1, $message);
+    }
+
+    public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
+    {
+        $this->addRoomCoins($ownerId, $totalCoins);
+        $this->addHostCoins($receiverIds, $coinsPerUser);
+    }
+    public function addHostCoins( array $receiverIds, int  $totalCoins)
+    {
+        $receiverIds = UserHandling::checkIfUserHostByIds($receiverIds);
+
+        if (count($receiverIds) == 0) return;
+
+        $coins = floor($totalCoins * 0.03);
+        DB::table('users')->whereIn('id', $receiverIds)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
+        $data = [];
+        foreach ($receiverIds as $receiverId ) {
+            $data[] = [
+                'user_id'    => $receiverId,
+                'coins'      => $coins,
+                'from_coins' => $totalCoins,
+                'type'       => 'host_coins'
+            ];
+        }
+        $this->insertGiftPercentage($data);
+    }
+    public function addRoomCoins(int $ownerId, int $totalCoins)
+    {
+        $coins = floor($totalCoins * 0.03);
+
+        DB::table('users')->where('id', $ownerId)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
+        $data = [
+            'user_id' => $ownerId,
+            'coins' => $coins,
+            'from_coins' => $totalCoins,
+            'type' => 'room_coins'
+        ];
+        $this->insertGiftPercentage($data);
+    }
+    public function updateFamilyLevelForSender(\Illuminate\Database\Eloquent\Collection $users, $totalCoinsPerUser): bool
+    {
+        $families    = $users->pluck('family')->where('id', '!=', null);
+        $familiesIds = $families->pluck('id')->toArray();
+        if (count($familiesIds) == 0) return false;
+        $repeatedData = $this->getDuplication($familiesIds);
+
+        foreach ($repeatedData as $data) {
+            $family = $families->where('id', $data['id'])->first();
+            $this->updateFamilyModel($totalCoinsPerUser * $data['count'], $family);
+        }
+        $this->addFamilyCoins($families->pluck('user_id')->toArray(), $totalCoinsPerUser);
+
+        return true;
+    }
+
+    public function addFamilyCoins(array $ownerIda, int $totalCoins)
+    {
+        $coins = floor($totalCoins * 0.01);
+
+
+        DB::table('users')->whereIn('id', $ownerIda)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
+
+        $data = [];
+        foreach ($ownerIda as $ownerId ) {
+            $data[] = [
+                'user_id' => $ownerId,
+                'coins' => $coins,
+                'from_coins' => $totalCoins,
+                'type' => 'family_coins'
+            ];
+        }
+        $this->insertGiftPercentage($data);
+    }
+    public function insertGiftPercentage(array $data): void
+    {
+
+        $isTwoDiminutionsArray = false;
+        foreach ($data as &$value) {
+            if (is_array($value)) {
+                $isTwoDiminutionsArray = true;
+                $value['created_at'] = now();
+                $value['updated_at'] = now();
+            }else break;
+        }
+        if( ! $isTwoDiminutionsArray){
+            $data['created_at'] = now();
+            $data['updated_at'] = now();
+        }
+
+        DB::table('gift_percentage_logs')->insert($data);
+    }
+    public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
+    {
+
+
+        $userCoins = User::where('id', $user->id)->value('di') ?? 0;
+
+        $zigoData = collect(
+            [
+                'show_gift'     => $gift->show_img ?: $gift->show_img2,
+                'gift_img'      => $gift->img,
+                'gift_id'       => $gift->id,
+                'sender_id'     => (int)$user->id,
+                'receiver_id'   => (int)$to_id,
+                'num_gift'      => $totalPrice,
+                "plural"        => is_array($receiversIds) && count($receiversIds) > 1,
+                'room_session'  => $room->session_string,
+                'is_password'   => (bool)(@$room->room_pass),
+                'room_id'       => $room->id,
+                'from_name'     => $user->name,
+                'to_name'       => $toName,
+                'gift_price'    => $gift->price,
+                'owner_id'      => $ownerId,
+                'number'        => $number,
+                'coins'         => numToString($userCoins)/*$user->coins_string*/,
+                'is_lucky_gift' => ($gift->type == 6),
+                'gift_image_type'            => $gift->image_type,
+
+            ]
+        );
+
+        if ($totalPrice >= 2000) {
+            $levels         = [
+                $user->total_sender_level,
+                $user->total_received_level,
+                $firstReceiver->total_received_level,
+                $firstReceiver->total_sender_level,
+            ];
+            $levels         = Common::getLevels($levels);
+            $senderLevels   = $levels->where('type', '=', 2);
+            $receiverLevels = $levels->where('type', '=', 1);
+            $values         = [
+                's_vip_level'      => @$user->userVip->level ?? 0,
+                's_image'          => @$user->profile->avatar ?? '',
+                's_name'           => @$user->name ?? '',
+                's_sender_level'   => @$senderLevels->where('level', '=', $user->total_sender_level)->first()->img ?? '',
+                's_receiver_level' => @$receiverLevels->where('level', '=', $user->total_received_level)->first()->img ?? '',
+                'r_vip_level'      => @$firstReceiver->userVip->level ?? 0,
+                'r_name'           => @$firstReceiver->name ?? '',
+                'r_image'          => @$firstReceiver->profile->avatar ?? '',
+                'r_sender_level'   => @$senderLevels->where('level', '=', $firstReceiver->total_sender_level)->first()->img ?? '',
+                'r_receiver_level' => @$receiverLevels->where('level', '=', $firstReceiver->total_received_level)->first()->img ?? '',
+            ];
+            $zigoData       = $zigoData->merge($values);
+        }
+
+        //        dispatch(new SendGiftToZegoJob($zigoData, $totalPrice, ($request->to_zego == 1)))->onQueue('sendGiftToZigo');
+        /* $startTime = microtime(true);*/
+        return $this->sendZigoGifts($zigoData, $totalPrice, ($isToZigo));
+    }
+
+    public function sendZigoGifts($zigoData, $totalPrice, $isToZego): array
+    {
+        //        Common::sendToZego_2('SendBroadcastMessage', $zigoData['room_id'], $zigoData['sender_id'], $zigoData['from_name'], "  {$zigoData['number']} x ارسل هدية  " . " قيمتها {$zigoData['gift_price']} " . " الى {$zigoData['to_name']}");
+        if ($isToZego) {
+            $d       = [
+                "messageContent" => [
+                    "message"       => "showGifts",
+                    "showGift"      => $zigoData['show_gift'],
+                    'giftImg'       => $zigoData['gift_img'],
+                    'gift_id'       => $zigoData['gift_id'],
+                    'send_id'       => $zigoData['sender_id'],
+                    'receiver_id'   => $zigoData['receiver_id'],
+                    'isExpensive'   => $totalPrice >= 2000,
+                    'num_gift'      => $zigoData['number'],
+                    "plural"        => $zigoData['plural'],
+                    'gift_price'    => $zigoData['room_session'],
+                    'coins'         => @$zigoData['coins'] ?? '0',
+                    'is_lucky_gift' => (bool)$zigoData['is_lucky_gift'],
+                    'type' => @$zigoData['gift_image_type'] ?? 'mp4'
+
+                ]
+            ];
+            $json    = json_encode($d);
+            $jsons[] = $json;
+            //            Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
+            if ($totalPrice >= 2000) {
+                $d    = [
+                    "messageContent" => [
+                        "msg"    => "SHB",
+                        'sv'     => $zigoData['s_vip_level'],
+                        'si'     => $zigoData['s_image'],
+                        'sn'     => $zigoData['s_name'],
+                        'ssl'    => $zigoData['s_sender_level'],
+                        'srl'    => $zigoData['s_receiver_level'],
+                        'rv'     => $zigoData['r_vip_level'],
+                        'rn'     => $zigoData['r_name'],
+                        'ri'     => $zigoData['r_image'],
+                        'rsl'    => $zigoData['r_sender_level'],
+                        'rrl'    => $zigoData['r_receiver_level'],
+                        'oId'    => (int)$zigoData['owner_id'],
+                        'isPass' => $zigoData['is_password'],
+                    ]
+                ];
+                $json = json_encode($d);
+
+                //                Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
+
+                dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+            }
+        }
+        return @$jsons ?? [];
+    }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         //update when send the gift
@@ -64,7 +462,7 @@ class GiftLogController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-       
+
       return  $this->giftLogService->sendGift($request , $updateUserWhenSendGift);
     }
 
@@ -102,7 +500,7 @@ class GiftLogController extends Controller
     }
 
 
-    
+
 
     public function is_winner($gift): bool
     {

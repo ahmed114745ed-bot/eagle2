@@ -52,6 +52,14 @@ class UserHandling
         }
     }
 
+    public function checkIfUserHostByIds(array $userIds): array
+    {
+        return \App\Models\User::query()
+            ->whereIn('id', $userIds)
+            ->where(fn($q) => $q->where('agency_id', '!=', 0)->where('agency_id', '!=', null))
+            ->where('type_user', '!=', 0)
+            ->pluck('id')->toArray();
+    }
     public function AddUserVip(User $user, $type = null)
     {
         $vip = OVip::query()->whereLevel(2)->first();
@@ -279,7 +287,7 @@ class UserHandling
         }
     }
 
-    
+
 
     public function getLevel(int $type, int $totalCoins)
     {

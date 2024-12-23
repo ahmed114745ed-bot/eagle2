@@ -36,7 +36,7 @@ class MicrophoneController extends Controller
 
 
     // on the mic
-  
+
     public function upMicrophone(Request $request)
     {
         $data = $request;
@@ -107,7 +107,7 @@ class MicrophoneController extends Controller
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
         if (true) {
-           
+
             $ms = [
                 'messageContent' => [
                     'message' => 'unmuteMic',

@@ -34,6 +34,7 @@ use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Tik\Services\EnteranceRoomServices;
 use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\CP\Entities\CpRoomHistory;
 
 class EnteranceController extends Controller
 {
@@ -285,7 +286,45 @@ class EnteranceController extends Controller
 
             Common::sendToZego('SendCustomCommand', $room->id,$request->owner_id, $json);
         }
+
+        $this->handleLeaveCp($user, $room);
+
         return Common::apiResponse(true,'exited',['visitor_ids_list'=>$visitor_ids_list]);
+    }
+
+    public function handleLeaveCp($user,$room)
+    {
+        $userId = $user->id;
+        $this->removeUserCpInRoom($userId);
+        return $this->sendCpLovelyMessage($room, $user);
+    }
+
+    public function cpMapJson($indices): string|false
+    {
+        $ms = [
+            'messageContent' => [
+                "message" => "cpLovelyZego",
+                "data" => $indices,
+            ]
+        ];
+        $json = json_encode($ms);
+        return $json;
+    }
+    public function sendCpLovelyMessage($room, $user)
+    {
+        $cpRoomHistories = CpRoomHistory::where("room_id",$room->id)->get(['index1', 'index2']);
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
+
+        $json = $this->cpMapJson($indices);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+    }
+    public function removeUserCpInRoom(mixed $userId): void
+    {
+        CpRoomHistory::where("user_one_id", $userId)
+            ->orWhere("user_two_id", $userId)->delete();
     }
 
     public function out_room(Request $request){

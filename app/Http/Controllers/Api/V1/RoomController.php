@@ -40,6 +40,7 @@ use App\Http\Resources\Api\V1\RoomVisitorsResource;
 use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\CP\Entities\CpRoomHistory;
 
 class RoomController extends Controller
 {
@@ -242,10 +243,45 @@ class RoomController extends Controller
 
             Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
         }
+        $this->handleLeaveCp($user, $roomId);
 
         return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
     }
 
+    public function handleLeaveCp($user,$roomId)
+    {
+        $userId = $user->id;
+        $this->removeUserCpInRoom($userId);
+        return $this->sendCpLovelyMessage($roomId, $user);
+    }
+    public function removeUserCpInRoom(mixed $userId): void
+    {
+        CpRoomHistory::where("user_one_id", $userId)
+            ->orWhere("user_two_id", $userId)->delete();
+    }
+
+    public function sendCpLovelyMessage($roomId, $user)
+    {
+        $cpRoomHistories = CpRoomHistory::where("room_id",$roomId)->get(['index1', 'index2']);
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
+
+        $json = $this->cpMapJson($indices);
+
+        Common::sendToZego('SendCustomCommand', $roomId, $user->id, $json);
+    }
+    public function cpMapJson($indices): string|false
+    {
+        $ms = [
+            'messageContent' => [
+                "message" => "cpLovelyZego",
+                "data" => $indices,
+            ]
+        ];
+        $json = json_encode($ms);
+        return $json;
+    }
     public function calcTime($uid)
     {
 

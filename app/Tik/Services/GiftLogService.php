@@ -18,6 +18,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
+use App\Models\Cp;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 
@@ -67,7 +68,7 @@ class GiftLogService
         // get received users data
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
-        $cpId = null;
+        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
         $cpIds = [];
         //check type of cp
         if ($cpId != null) {
