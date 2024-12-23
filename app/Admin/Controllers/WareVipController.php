@@ -187,7 +187,6 @@ class WareVipController extends MainController
      */
     protected function form()
     {
-        dd(1);
         $form = new Form(new Ware());
 
         $form->display('ID');
