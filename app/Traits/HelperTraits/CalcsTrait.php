@@ -711,9 +711,9 @@ trait CalcsTrait
 
         return [
             'id'        => 1,
-            'level'     => $vip->level ?? 0,
+            'level'     => $vip->level ?? '',
             'name'      => $vip->name ?? '',
-            'price'     => $vip->price ?? 0,
+            'price'     => $vip->price ?? '',
             'image'     => $vip->image ?? '',
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0
@@ -766,11 +766,11 @@ trait CalcsTrait
         $vip = OVip::query()->find($uvip->vip_id);
 
         if (!$vip) return new \stdClass();
-        $vipIcon = Ware::where('level', $vip->level)->where('type', 12)->where('get_type', 1)->first();
+        $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
 
         // return $vip->level;
         // [
-        return $vip;
+        return $vipIcon->show_img;
         // [
         // 'id'        => 1,
         // 'level'     => $vip->level?? 0,
