@@ -22,9 +22,10 @@ class AddingCpsSeeder extends Seeder
             if($userOne->id == $userTwo->id)
                 continue;
 
-            $find = Cp::where('user_one_id', $userOne->id)->where('user_two_id', $userTwo->id)->exists();
+                $find = Cp::where('user_one_id', $userOne->id)->where('user_two_id', $userTwo->id)->exists();
+                $find2 = Cp::where('user_one_id', $userTwo->id)->where('user_two_id', $userOne->id)->exists();
 
-            if($find)
+            if($find || $find2)
                 continue;
 
             Cp::create([
