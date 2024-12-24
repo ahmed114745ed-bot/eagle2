@@ -711,9 +711,9 @@ trait CalcsTrait
 
         return [
             'id'        => 1,
-            'level'     => $vip->level ?? 0,
+            'level'     => $vip->level ?? '',
             'name'      => $vip->name ?? '',
-            'price'     => $vip->price ?? 0,
+            'price'     => $vip->price ?? '',
             'image'     => $vip->image ?? '',
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0
