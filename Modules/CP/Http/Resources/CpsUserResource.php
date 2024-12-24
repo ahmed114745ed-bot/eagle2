@@ -33,7 +33,7 @@ class CpsUserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'uuid' => $this->uuid,
-            'image' => $this->profile->avatar,
+            'image' => $this->profile->avatar ?? '',
             'exp'           => $cp?->di ?? 0,
             'reciver_level_img'  => $total_received_level_img->img ?? '',
             'sender_level_img'  => $total_sender_level_img->img ?? '',
