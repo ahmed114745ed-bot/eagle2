@@ -770,7 +770,7 @@ trait CalcsTrait
 
         // return $vip->level;
         // [
-        return $vipIcon;
+        return $vipIcon->show_img;
         // [
         // 'id'        => 1,
         // 'level'     => $vip->level?? 0,
