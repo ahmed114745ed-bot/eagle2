@@ -82,6 +82,10 @@ class DedicateAction extends RowAction
                 $arr['num'] = 1; //$qty;
                 $arr['expire'] = $request->days ? time() + (($request->days ?? $ware->expire) * 86400) : 0;
                 $arr['is_read'] = 1;
+                
+                $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
+                $arr['is_used'] = $enableVipAuto === "true" ? 1 : 0;
+                
                 Pack::query()->create($arr);
                 if ($ware->type == 25) {
                     $user->special_id = $ware->value;
@@ -152,5 +156,19 @@ class DedicateAction extends RowAction
     {
         $this->integer('days', 'days');
         $this->text('user_uuid', 'user uuid');
+
+    //      // Use 'saving' to set data before save
+    // $form->saving(function ($form) {
+    //     $enableIsTrue = config('your_config_file.enable_is_true');
+    //     $form->model()->is_is_true = $enableIsTrue;
+    // });
+
+    // // Use 'saved' to perform actions after saving
+    // $this->saved(function ($form) {
+    //     // Example action after save
+    //     admin_toastr('Saved successfully!', 'success');
+    // });
     }
+    // $form = new Form(new Reward());
+
 }
