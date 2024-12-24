@@ -89,7 +89,6 @@ class ProfileController extends Controller
 
     public function getNearbyUsers($userId, $distance = 10)
     {
-        dd("dsdsdss");
         $user = Auth::user();
         $latitude = $user->lat;
         $longitude = $user->long;
