@@ -1,0 +1,25 @@
+name: SSh-main-pipline
+on:
+  push:
+    branches: ["test"]
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Eagle
+      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      with:
+        host: "34.18.65.238"
+        user: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        first_ssh: |
+          echo "$USER"
+          pwd
+          cd /var/www/Eagle
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          php artisan migrate
+          php artisan optimize:clear
+          php public/reset_opcache.php
