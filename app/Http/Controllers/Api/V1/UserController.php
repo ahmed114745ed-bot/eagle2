@@ -41,6 +41,7 @@ class UserController extends Controller
 
     public function chargerAgency(Request $request, ProfileRelationsService $profileRelationsService)
     {
+        
         $users = $this->userService->userCharge();
         $usersType = UserTypeResource::collection($users);
         [$senderLevels, $receivedImage] = $profileRelationsService->getLevelsSenderAndReceiver($usersType);
