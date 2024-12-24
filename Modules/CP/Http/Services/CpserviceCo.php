@@ -2,23 +2,23 @@
 
 namespace Modules\CP\Http\Services;
 
-use App\Repositories\CpRepository;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Modules\Chat\Entities\ChatMessage;
-use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Events\Chat;
-use Modules\Chat\Events\Conversation;
 use Modules\Chat\Events\OpenChat;
-use Modules\Chat\Http\Resources\ChatMessageResource;
-use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Illuminate\Support\Facades\Log;
+use Modules\Chat\Entities\ChatRoom;
 use Modules\CP\Entities\CpRelation;
-use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use Modules\Chat\Events\Conversation;
+use Modules\Chat\Entities\ChatMessage;
 use Modules\CP\Transformers\CpListResource;
 use Modules\CP\Transformers\RankingResource;
+use Modules\CP\Http\Resources\CpsUserResource;
 use Modules\CP\Transformers\RequestCpResource;
+use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 
 class CpserviceCo
 {
@@ -241,7 +241,6 @@ class CpserviceCo
                 $cp->status = 4; // restored
                 $cp->price += $cp->cpRelation->price;
                 $cp->save();
-
             } else {
                 $this->cpRepository->updateCpStatus($cp, 1);
             }
@@ -274,9 +273,11 @@ class CpserviceCo
 
         $first = $data->take(3);
         $second = $data->skip(3);
+        $user = request()->user();
         $result = [
             "firstThree" => RankingResource::collection($first),
             "remain" => RankingResource::collection($second),
+            'user' => new CpsUserResource($user,$relationType),
         ];
 
         return Common::apiResponse(1, '', $result);

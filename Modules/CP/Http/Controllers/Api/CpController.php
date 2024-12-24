@@ -132,7 +132,7 @@ class CpController extends Controller
     }
 
     public function CpRanking()
-    {
+    { 
         return $this->cpService->getCpRanking();
     }
 
