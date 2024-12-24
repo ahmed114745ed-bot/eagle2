@@ -72,7 +72,7 @@ class SearchRepository implements SearchRepositoryInterface
                 $query->where('uuid', 'like', '%' . $keywords . '%')
                       ->orWhere('special_id', 'like', '%' . $keywords . '%');
             })
-            ->with(['followedByAuthUser'])
+            ->with(['followedByAuthUser' , 'country']  )
             ->where('status', 1)
             ->orWhere(function ($query) use ($whereOr) {
                 $query->where($whereOr);
