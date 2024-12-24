@@ -206,7 +206,7 @@ class RankingService
         }
         $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
-        $arr['user']['vip_level']  = $vip_level;
+        $arr['user']['vip_level']  = $vip_level ??'';
         $arr['user']['sender_level']  = $user->total_sender_level;
         $arr['user']['reciver_level']  = $user->total_received_level;
         $arr['user']['vip_level_img']  = $vip_level_img ?? '';
