@@ -173,7 +173,7 @@ class RankingService
         $kong['frame_id']   = 0;
         $kong['sender_img'] = '';
         $kong['reseverimg'] = '';
-        $kong['vip_level'] = 0;
+        $kong['vip_level'] = '';
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
 
