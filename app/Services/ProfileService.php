@@ -92,14 +92,20 @@ class ProfileService
     {
         (new ServicesUserCounterServices)->UpgradeDateForType($user, 'visitor');
 
-        $profileVisitors = $this->profileRepo->getProfileVisits($user,$keyword);
+        $profileVisitors = $this->profileRepo->getProfileVisits($user, $keyword);
 
         return  [$profileVisitors, ...$this->profileRelationService->getHelperArrays($user, $profileVisitors)];
-
     }
 
     public function getRelatedUsers($limit = 10)
     {
         return $this->profileRepo->getRandomUsers($limit);
+    }
+
+    public function getNearbyUsers($user)
+    {
+        $latitude = $user->lat;
+        $longitude = $user->long;
+        return $this->userRepository->users($user->id, $latitude, $longitude);
     }
 }

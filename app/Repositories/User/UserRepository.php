@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\User;
 
 use App\Models\Follow;
@@ -60,7 +61,7 @@ class UserRepository extends Repository
 
     public function updateDeviceToken($user, $deviceToken = null)
     {
-        if (is_null($user->device_token) || $user->device_token != $deviceToken ) {
+        if (is_null($user->device_token) || $user->device_token != $deviceToken) {
             $user->device_token = $deviceToken;
             $user->save();
         }
@@ -75,12 +76,15 @@ class UserRepository extends Repository
 
     public function getUserWithMedals($userId)
     {
-        return User::with(['medals'=> fn($q) => $q->userPickProfile(),'userSetting','ownAgency'
-                            ,'agencyUserJob'=> fn($q)=>$q->where('type', 'requestManger')
-                            ,'agencyJoinRequest'=> fn($q)=>$q->where('status', '!=', 2)
-                            ,'packs'
-                            ])
-                    ->find($userId);
+        return User::with([
+            'medals' => fn($q) => $q->userPickProfile(),
+            'userSetting',
+            'ownAgency',
+            'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
+            'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
+            'packs'
+        ])
+            ->find($userId);
     }
 
     public function userCharge()
@@ -88,7 +92,7 @@ class UserRepository extends Repository
         return User::where('type_user', 3)->orWhere('type_user', 4)->orderByDesc('id')->paginate(10);
     }
 
-    public function updateLocation($userId,$lat,$long)
+    public function updateLocation($userId, $lat, $long)
     {
         User::whereId($userId)->update([
             "lat"   => $lat,
@@ -162,7 +166,7 @@ class UserRepository extends Repository
     public function getFollowers($user, $type)
     {
         // Query to get followers based on the type
-        return User::whereHas('followers', function($q) use($user){
+        return User::whereHas('followers', function ($q) use ($user) {
             $q->where('user_id', $user->id);
         })->paginate(15);
     }
@@ -201,4 +205,40 @@ class UserRepository extends Repository
             })->select('id', 'name', 'uuid')->get();
     }
 
+    public function nearUsers($userId, $latitude, $longitude)
+    {
+        return  User::query()
+            ->with('profile')
+            ->select(
+                'users.*',
+                DB::raw("(6371 * acos(cos(radians($latitude))
+                * cos(radians(users.lat))
+                * cos(radians(users.long) - radians($longitude))
+                + sin(radians($latitude))
+                * sin(radians(users.lat)))) AS distance")
+            )->whereNotNull('lat')->whereNotNull('long')
+            ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
+            ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
+            ->where('id', '!=', $userId)->orderBy('distance', 'asc')->paginate(10);
+    }
+
+    public function users($userId, $latitude = null, $longitude = null)
+    {
+        $builder = User::query()
+            ->with('profile')
+            ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $userId))
+            ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $userId)])
+            ->where('id', '!=', $userId);
+        if (($latitude != null) && ($longitude != null)) {
+            $builder = $builder->select(
+                'users.*',
+                DB::raw("(6371 * acos(cos(radians($latitude))
+                    * cos(radians(users.lat))
+                    * cos(radians(users.long) - radians($longitude))
+                    + sin(radians($latitude))
+                    * sin(radians(users.lat)))) AS distance")
+            )->whereNotNull('lat')->whereNotNull('long');
+        }
+        return     $builder->paginate(10);
+    }
 }

@@ -90,36 +90,7 @@ class ProfileController extends Controller
     public function getNearbyUsers($userId, $distance = 10)
     {
         $user = Auth::user();
-        $latitude = $user->lat;
-        $longitude = $user->long;
-
-        if ($latitude && $longitude) {
-            $users = User::query()
-                ->with('profile')
-                ->select(
-                    'users.*',
-                    DB::raw("(6371 * acos(cos(radians($latitude))
-                        * cos(radians(users.lat))
-                        * cos(radians(users.long) - radians($longitude))
-                        + sin(radians($latitude))
-                        * sin(radians(users.lat)))) AS distance")
-                )
-                ->whereNotNull('lat')
-                ->whereNotNull('long')
-                ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
-                ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
-                ->where('id', '!=', $user->id)
-                ->orderBy('distance', 'asc')
-                ->paginate(10);
-        } else {
-            $users = User::query()
-                ->with('profile')
-                ->whereDoesntHave('ignores', fn($q) => $q->where("ignore_user_id", $user->id))
-                ->withExists(['likedBy' => fn($q) => $q->where("liked_user_id", $user->id)])
-                ->where('id', '!=', $user->id)
-                ->paginate(10);
-
-        }
+        $users = $this->profileService->getNearbyUsers($user);
         return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
 
@@ -129,7 +100,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $keyword = $request->keywords ?? '';
 
-        [$profileVisitors, $userFollowers, $senderLevels, $receivedImage] = $this->profileService->getProfileVisitorsList($user,$keyword);
+        [$profileVisitors, $userFollowers, $senderLevels, $receivedImage] = $this->profileService->getProfileVisitorsList($user, $keyword);
         UserVisitorResource::initializeData($senderLevels, $receivedImage, $userFollowers);
 
         $visitors = UserVisitorResource::collection($profileVisitors);
@@ -147,8 +118,8 @@ class ProfileController extends Controller
 
     public function getFollowingUsers()
     {
-        $followedIds = Follow::query ()->whereHas('followed')->where ('user_id',Auth::id())->pluck ('followed_user_id');
-        $users = User::query()->whereIn("id",$followedIds)->get();
+        $followedIds = Follow::query()->whereHas('followed')->where('user_id', Auth::id())->pluck('followed_user_id');
+        $users = User::query()->whereIn("id", $followedIds)->get();
         return Common::apiResponse(true, '', NewProfileResource::collection($users), 200);
     }
 }
