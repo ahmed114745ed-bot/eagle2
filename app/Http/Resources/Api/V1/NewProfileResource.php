@@ -29,7 +29,7 @@ class NewProfileResource extends JsonResource
             'liked'=>$this->likes_exists ?? false,
             "multi_images"          => $this->images?->select("img"),
             'gender' => intval(@$this->type_user) ?: 0,
-            'vip_level_img' => $vip_level_img->img ?? '',
+            'vip_level_img' => $vip_level_img ?? '',
             'sender_level_img' =>$total_sender_level_img->img ?? '',
             'reciver_level_img' => $total_received_level_img->img ?? '',
             'has_color_name'=>Common::hasInPack ($this->id,18,true), // both
