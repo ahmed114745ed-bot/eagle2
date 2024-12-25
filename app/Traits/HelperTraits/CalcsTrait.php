@@ -714,6 +714,7 @@ trait CalcsTrait
             'level'     => $vip->level ?? '',
             'name'      => $vip->name ?? '',
             'price'     => $vip->price ?? 0,
+            'img'     => $vip->img ?? '',
             'image'     => $vip->image ?? '',
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0
