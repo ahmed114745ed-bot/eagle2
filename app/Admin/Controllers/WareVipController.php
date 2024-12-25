@@ -84,7 +84,7 @@ class WareVipController extends MainController
             $filter->column(1 / 2, function ($filter) {
 
                 $filter->equal('type', __('type'))->select(
-                    VipPrivilege::pluck('name', 'id')->toArray()
+                    VipPrivilege::pluck('name', 'type')->toArray()
                 );
             });
         });
@@ -103,7 +103,6 @@ class WareVipController extends MainController
             ]
         );
         $grid->column('type', __('type'))->select(
-            // VipPrivilege::pluck('name', 'id')->toArray()
             [
                 1 => trans('Gemstone'),
                 3 => trans('Card Scroll'),
