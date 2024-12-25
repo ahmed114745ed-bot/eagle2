@@ -12,4 +12,8 @@ class Profile extends Model
 
     protected $guarded = ['id'];
 
+    public function getAgeAttribute()
+    {
+        return Carbon::parse($this->birthday)->age;
+    }
 }
