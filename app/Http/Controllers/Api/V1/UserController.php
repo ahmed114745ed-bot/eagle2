@@ -41,7 +41,7 @@ class UserController extends Controller
 
     public function chargerAgency(Request $request, ProfileRelationsService $profileRelationsService)
     {
-        
+
         $users = $this->userService->userCharge();
         $usersType = UserTypeResource::collection($users);
         [$senderLevels, $receivedImage] = $profileRelationsService->getLevelsSenderAndReceiver($usersType);
@@ -339,7 +339,7 @@ class UserController extends Controller
         $rules = [
             'phone' => [
                 'required',
-                Rule::unique('users', 'phone')->withoutTrashed()->ignore($user->id),
+                Rule::unique('users', 'phone')->ignore($user->id),
             ],
         ];
         if ($user->phone != $request->current_phone) return Common::apiResponse(0, 'Old phone is wronge', null, 404);
