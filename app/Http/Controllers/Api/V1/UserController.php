@@ -339,9 +339,7 @@ class UserController extends Controller
         $rules = [
             'phone' => [
                 'required',
-                Rule::unique('users', 'phone')
-                    ->whereNull('deleted_at') // Exclude soft-deleted users
-                    ->ignore($user->id), // Ignore current user's phone
+                Rule::unique('users', 'phone')->ignore($user->id),
             ],
         ];
         if ($user->phone != $request->current_phone) return Common::apiResponse(0, 'Old phone is wronge', null, 404);
