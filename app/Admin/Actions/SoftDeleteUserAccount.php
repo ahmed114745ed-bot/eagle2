@@ -4,6 +4,7 @@ namespace App\Admin\Actions;
 
 
 use App\Models\User;
+use DB;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class SoftDeleteUserAccount extends RowAction
     public function handle(Model $model,Request $request)
     {
         $user = User::query()->onlyTrashed()->find($request->id);
+        DB::table('reports')->where('Reporter_id', $user->id)->delete();
         $user->forceDelete();
         return $this->response()->success('success')->refresh();
     }

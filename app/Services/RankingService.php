@@ -173,7 +173,7 @@ class RankingService
         $kong['frame_id']   = 0;
         $kong['sender_img'] = '';
         $kong['reseverimg'] = '';
-        $kong['vip_level'] = 0;
+        $kong['vip_level'] = '';
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
 
@@ -209,7 +209,7 @@ class RankingService
         $arr['user']['vip_level']  =($vip_level === 0) ? '' : $vip_level;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
         $arr['user']['reciver_level']  = $user->total_received_level ?? '';
-        $arr['user']['vip_level_img']  = $vip_level_img ?? '';
+        $arr['user']['vip_level_img']  = $vip_level_img == 0 ? "" : $vip_level_img;
         $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
         $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
