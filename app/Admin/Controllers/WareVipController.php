@@ -84,7 +84,7 @@ class WareVipController extends MainController
             $filter->column(1 / 2, function ($filter) {
 
                 $filter->equal('type', __('type'))->select(
-                    VipPrivilege::pluck('name', 'id')->toArray()
+                    VipPrivilege::pluck('name', 'type')->toArray()
                 );
             });
         });
@@ -260,7 +260,13 @@ class WareVipController extends MainController
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
             ]
-        )->required();
+        )->rules(function ($form) {
+            // Add a conditional validation rule for 'image_type'
+            if ($form->model()->img2) {  // Check if img2 is uploaded
+                return 'required';
+            }
+            return 'nullable';  // If no image uploaded, 'image_type' is not required
+        });
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));

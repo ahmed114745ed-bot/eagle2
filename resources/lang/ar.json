@@ -1603,6 +1603,7 @@
     "Details":"التفاصيل",
     "delete-accounts" :" سياسه الحسبات المحذوفه",
     "party" :"حفله",
-    "profile frame" : "إطار الملف الشخصي"
+    "profile frame" : "إطار الملف الشخصي",
+    "User ID / Agency ID" : "معرّف المستخدم / معرّف الوكالة"
     
 }
