@@ -360,9 +360,10 @@ class User extends Authenticatable
         return @$this->country()->first()->flag ?: '';
     }
 
+
     public function country()
     {
-        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language');
+        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name');
     }
 
     public function getLangAttribute()
