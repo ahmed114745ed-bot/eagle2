@@ -103,30 +103,7 @@ class WareVipController extends MainController
             ]
         );
         $grid->column('type', __('type'))->select(
-            [
-                1 => trans('Gemstone'),
-                3 => trans('Card Scroll'),
-                4 => trans('Avatar Frame'),
-                5 => trans('Bubble Frame'),
-                6 => trans('Entering Special Effects'),
-                7 => trans('Microphone Aperture'),
-                8 => trans('Badge'),
-                9 => trans('NoKick'),
-                10 => trans('Icon'),
-                11 => trans('intro animation'),
-                12 => trans('wapel'),
-                13 => trans('hide country and last login'),
-                14 => trans('vip gifts'),
-                15 => trans('no pan'),
-                16 => trans('hidden room'),
-                17 => trans('anonymous man'),
-                18 => trans('colored name'),
-                19 => trans('profile visitors hide in'),
-                20 => trans('hide last active'),
-                21 => trans('sound effect'),
-                22 => trans('upload GIF image')
-
-            ]
+            VipPrivilege::pluck('name', 'id')->toArray()
         );
         $grid->column('name', __('name'))->editable();
         $grid->title(__('title'));
