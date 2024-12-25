@@ -130,7 +130,7 @@ class ChargeAction extends Action
         $this->name = __('Charge');
         $this->hidden('charger_id')->value(Auth::id());
         // $this->hidden('charger_type')->value('dash');
-        $this->text('user_id', __('User ID'));
+        $this->text('user_id', __('User ID / Agency ID'));
         $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
         $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash');//dashdash
