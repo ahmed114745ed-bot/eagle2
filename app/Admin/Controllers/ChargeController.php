@@ -82,7 +82,7 @@ class ChargeController extends MainController
             if ($this->user_type == "dash") {
                 $agency = \App\Models\Agency::find($this->agency_id);
                 $img = getDriverUrl().'/'. $agency?->img;
-                $id = $agency->id;
+                $id = $agency->id ?? 0;
                 $type = "agency";
             }else{
                 $user = \App\Models\User::find($userId);
