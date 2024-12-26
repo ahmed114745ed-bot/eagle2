@@ -99,7 +99,7 @@ class ChargeController extends MainController
         // ]);
         
         $grid->amount(__('coins'));
-        // $grid->column('created_at', trans('admin.created_at'));
+        $grid->column('created_at', trans('admin.created_at'));
         
         
         
