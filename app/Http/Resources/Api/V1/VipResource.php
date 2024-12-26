@@ -23,43 +23,33 @@ class VipResource extends JsonResource
             'level' => $this->level,
             'exp' => $this->exp,
             'img' => $this->img,
-            'sender' => $this->getLevelData(2,10),
-            'receiver' => $this->getLevelData(1,10),
-            'badge' => Vip::query()->orderBy('id', 'desc')->first()?->img
+            'levels' => $this->getLevelGroups()
         ];
     }
 
-private function getLevelData($type, $patternNum)
+private function getLevelGroups()
 {
-    // Create a unique cache key based on the function parameters
-    $cacheKey = "level_data_{$type}_{$patternNum}";
 
-    // Use Laravel's cache helper to retrieve or store the data
-    return Cache::remember($cacheKey, 3600, function () use ($type, $patternNum) {
-        // Query for the minimum level
-        $min_level = Vip::query()
-            ->where(function ($query) use ($patternNum) {
-                $query->whereRaw("level % $patternNum = 1")->orWhere('level', 1);
-            })
-            ->where('type', $type)
-            ->orderBy('level', 'asc')
-            ->first();
+    // Use Cache::remember to cache the results for 1 hour
+    return Cache::remember('levels_chunks', 3600, function () {
+        // Fetch all rows for the given type and order by level
+        $vips = Vip::all();
 
-        // Query for the maximum level
-        $max_level = Vip::query()
-            ->where(function ($query) use ($patternNum) {
-                $query->whereRaw("level % $patternNum = 1")->orWhere('level', 1);
-            })
-            ->where('type', $type)
-            ->orderBy('level', 'desc')
-            ->first();
+        // Group rows into chunks of 9
+        $chunks = $vips->chunk(10);
 
-        // Return the result as an array
-        return [
-            'min_level' => $min_level,
-            'max_level' => $max_level,
-        ];
+        // Transform each chunk into the desired structure
+        $levelGroups = $chunks->map(function ($chunk) {
+            return [
+                'minlevel' => $chunk->first()->level, // Minimum level in the chunk
+                'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
+                'badge' => $chunk->last()->img,
+            ];
+        });
+
+        return $levelGroups->toArray(); // Convert collection to array
     });
 }
+
 
 }
