@@ -178,8 +178,9 @@ class RankingService
         $kong['vip_level']  =  0;
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
-
+        
         $kong['vip_level_img'] = '';
+        $kong['vip_level_img_test'] = '';
         $kong['sender_level_img'] = '';
         $kong['reciver_level_img'] = '';
         $kong['age'] = 0;
