@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Models\AppFeature;
+use App\Models\Ware;
 use App\Repositories\RankingRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -202,6 +203,8 @@ class RankingService
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
+        $vipIcon = Ware::where('level', $vip_level)->where('type', 10)->where('get_type', 1)->first();
+
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
@@ -211,7 +214,8 @@ class RankingService
         $arr['user']['vip_level']  = $vip_level ?? 0;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
         $arr['user']['reciver_level']  = $user->total_received_level ?? '';
-        $arr['user']['vip_level_img']  = $vip_level_img == 0 ? "" : $vip_level_img;
+        // $arr['user']['vip_level_img']  = $vip_level_img == 0 ? "" : $vip_level_img;
+        $arr['user']['vip_level_img']  = $vipIcon->show_img ?? '';
         $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
         $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
