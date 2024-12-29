@@ -15,10 +15,7 @@ class FamilyObserver
      * @param  \App\Models\Family  $family
      * @return void
      */
-    public function created(Family $family)
-    {
-
-    }
+    public function created(Family $family) {}
 
     /**
      * Handle the Family "updated" event.
@@ -39,8 +36,8 @@ class FamilyObserver
      */
     public function deleted(Family $family)
     {
-        User::query ()->where ('family_id',$family->id)->update (['family_id'=>0]);
-        FamilyUser::query ()->where ('family_id',$family->id)->delete ();
+        User::query()->where('family_id', $family->id)->update(['family_id' => null]);
+        FamilyUser::query()->where('family_id', $family->id)->delete();
     }
 
     /**
