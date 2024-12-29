@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 
 use App\Helpers\Common;
+use App\Models\User;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Utils;
 use App\Jobs\UpdatePkAndSendToZigo;
@@ -62,23 +63,13 @@ class GiftLogService
         if (!$room) return Common::apiResponse(0, 'room does not exist', null, 404);
 
         // validation if this gift vip < user vip then throw Exception
-        $vip_level = @Common::ovip_center($user);
-        if (@$vip_level->level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
+        /** @var User $user*/
+        $vip_level = $user->UserVip?->level;
+        if (@$vip_level < $gift->vip_level) return Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');
 
         // get received users data
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
-        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
-        $cpIds = [];
-        //check type of cp
-        if ($cpId != null) {
-            try {
-                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
-                // dd($cpIds);
-            } catch (\Exception $e) {
-                return Common::apiResponse(0, $e->getMessage());
-            }
-        }
 
 
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
@@ -111,7 +102,21 @@ class GiftLogService
         $jsonSendGiftData =
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
         //send to zego if pk not null
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
+
+
+        $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
+        $cpIds = [];
+        //check type of cp
+        if ($cpId != null) {
+            try {
+                $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                // dd($cpIds);
+            } catch (\Exception $e) {
+                return Common::apiResponse(0, $e->getMessage());
+            }
+        }
 
         if ($room->lastPk != null) {
 
@@ -120,7 +125,6 @@ class GiftLogService
             dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
         }
 
-        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
 
         $realPrice = (int)($number * $gift->price);
@@ -132,11 +136,6 @@ class GiftLogService
         }
 
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
-
-        try {
-            Utils::unwrap($promises);
-        } catch (BadResponseException $e) {
-        }
 
 
 
@@ -175,6 +174,10 @@ class GiftLogService
 
 
         $message = "  {$number} x" . __('api.sendGift') . __("api.value") . "{$gift->price} " .  __('api.to') . "{$to}";
+        try {
+            Utils::unwrap($promises);
+        } catch (BadResponseException $e) {
+        }
 
         return Common::apiResponse(1, $message);
     }
