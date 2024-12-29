@@ -173,7 +173,7 @@ class MyDataResource extends JsonResource
                 'unread_counter'       =>  $counters,
             ]),
             'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true),
-            'company_number' =>(int) Common::getConfig('company_number'),
+            'company_number' => Common::getConfig('company_number'),
         ];
 
         $data['auth_token'] = $this->auth_token;
