@@ -96,6 +96,7 @@ class AdminPermission extends Seeder
             'charge-agency',
             'salary-request',
             "agent-request-history",
+            "agencies"
 
 
 
@@ -119,14 +120,14 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'bans', 'trashed-account-user', 'user-target',],
+            'user' => ['users', 'trashed-account-user', 'user-target',],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips'],
             'moment' => ['moment',],
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies'],
             'agent' => ['agent-user', 'agent-request', 'agent-target',],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
@@ -150,6 +151,7 @@ class AdminPermission extends Seeder
             'carousel' => ['carousel'],
             'user-levels' => ['user-levels'],
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
+            'bans' => ['bans'],
 
         ];
 

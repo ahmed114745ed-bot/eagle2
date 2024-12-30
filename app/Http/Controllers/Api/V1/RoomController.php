@@ -1655,4 +1655,37 @@ class RoomController extends Controller
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
     }
+
+    protected function removeBlock(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'room_id'        => 'required|integer|exists:rooms,id',
+            'user_id'        => 'required|integer|exists:users,id',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $userId = $request->user()->id;
+            $room = Room::findOrFail($request->room_id);
+            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
+            $ids = explode(',', $room->room_black);
+            $updatedIds = [];
+            $userToRemove = $request->user_id;
+
+            foreach ($ids as $entry) {
+                $parts = explode('#', $entry);
+                $id = $parts[0] ?? null;
+
+                if ($id != $userToRemove)   return   Common::apiResponse(0, 'this user not in black list', 400);
+            }
+
+            $room->room_black = implode(',', $updatedIds);
+            $room->save();
+            return   Common::apiResponse(true, 'block removed', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+    }
 }
