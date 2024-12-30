@@ -96,6 +96,7 @@ class AdminPermission extends Seeder
             'charge-agency',
             'salary-request',
             "agent-request-history",
+            "agencies"
 
 
 
@@ -126,7 +127,7 @@ class AdminPermission extends Seeder
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies'],
             'agent' => ['agent-user', 'agent-request', 'agent-target',],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
