@@ -180,7 +180,7 @@ class RoomRepository extends AbstractRepository
 
                 // Use lat/long from the related `owner` (User) model
                 $result->selectRaw(
-                    '*,
+                    'rooms.*,
                         ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
                     [$userLat, $userLong, $userLat]
                 )
