@@ -198,9 +198,9 @@ class ChatRoomService
             ->select('chat_rooms.*')
             ->where('chat_rooms.user_id2', $user->id)
             ->where('chat_rooms.type', 'guest')
-            ->with('messages')
-            ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
-            ->orderBy('chat_messages.id', 'desc')
+            ->has('messages')
+            // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
+            // ->orderBy('chat_messages.id', 'desc')
             ->paginate(20);
 
         // Get unread messages
