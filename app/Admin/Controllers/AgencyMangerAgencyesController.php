@@ -82,6 +82,7 @@ class AgencyMangerAgencyesController extends MainController
         $this->extendGrid($grid);
 
         $loggedInUserId = Admin::user()->app_id;
+
         $grid->model()->where('agency_manger_id', $loggedInUserId);
 
 
@@ -116,16 +117,16 @@ class AgencyMangerAgencyesController extends MainController
                              ->take(5)
                              ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
                              ->map(function ($member) {
-                                 $avatar = $member->profile ? getImagePath($member->profile->avatar) : null;
+                                 $avatar = $member->profile ? getImagePath($member->profile?->avatar) : null;
                                  $imageHtml = $avatar ? "<img src='{$avatar}' style='max-width:50px;max-height:50px;' />" : 'No Image';
                                  return [
-                                     'id' => $member->id,
-                                     'uuid' => $member->uuid,
-                                     'name' => $member->name,
-                                     'reals_count' => count($member->reals),
-                                     'total_days' => $member->total_days,
-                                     'total_hours' => $member->liveTime->sum("hours"),
-                                     'monthly_diamond_received' => $member->monthly_diamond_received,
+                                     'id' => $member->id?? 0,
+                                     'uuid' => $member->uuid ?? 0,
+                                     'name' => $member->name ?? '',
+                                     'reals_count' => count($member->reals) ?? 0,
+                                     'total_days' => $member->total_days ?? 0,
+                                     'total_hours' => $member->liveTime->sum("hours") ?? 0,
+                                     'monthly_diamond_received' => $member->monthly_diamond_received ?? 0,
                                      'image' => $imageHtml,
                                      'salary' => $member->userSallary->sallary ?? '',
                                  ];
