@@ -1645,8 +1645,9 @@ class RoomController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
+            $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
-
+            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
             $ids = explode(',', $room->room_black);
             $data = UserResource::collection(User::query()->whereIn('id', $ids)->get());
             return   Common::apiResponse(true, '', $data, 200);
