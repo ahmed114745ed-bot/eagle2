@@ -120,7 +120,7 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'bans', 'trashed-account-user', 'user-target',],
+            'user' => ['users', 'trashed-account-user', 'user-target',],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips'],
             'moment' => ['moment',],
@@ -151,6 +151,7 @@ class AdminPermission extends Seeder
             'carousel' => ['carousel'],
             'user-levels' => ['user-levels'],
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
+            'bans' => ['bans'],
 
         ];
 
