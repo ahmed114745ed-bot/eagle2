@@ -131,6 +131,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
                 Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
                 Route::post('remove_admin', [RoomController::class, 'remove_admin']);
+                Route::post('black-list', [RoomController::class, 'blackList']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
