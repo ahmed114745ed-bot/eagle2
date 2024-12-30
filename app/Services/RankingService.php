@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Models\AppFeature;
+use App\Models\Ware;
 use App\Repositories\RankingRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -177,7 +178,7 @@ class RankingService
         $kong['vip_level']  =  0;
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
-
+        
         $kong['vip_level_img'] = '';
         $kong['sender_level_img'] = '';
         $kong['reciver_level_img'] = '';
@@ -202,6 +203,7 @@ class RankingService
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
+
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;

@@ -72,7 +72,7 @@ class UserResourceSerche extends JsonResource
             "manger_type"          =>new MangerTypeResource(@$this->mangerType),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
-            'country'          =>  @$this->country ?? [],
+            'country'          =>  @$this->country ?? (object)[],
         ];
         return $data;
     }
