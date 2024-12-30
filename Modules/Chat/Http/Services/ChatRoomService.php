@@ -230,10 +230,14 @@ class ChatRoomService
     {
         // Find existing chat room or create a new one
         $chatRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
-            $query->where('user_id', $user->id)
-                ->where('user_id2', $userId2)
-                ->orWhere('user_id', $userId2)
+            $query->where(function($q) use($user, $userId2){
+                $q->where('user_id', $user->id)
+                ->where('user_id2', $userId2);
+            })
+            ->orWhere(function($q)use($user, $userId2){
+                $q->where('user_id', $userId2)
                 ->where('user_id2', $user->id);
+            });
         })->first();
 
         if (!$chatRoom) {
