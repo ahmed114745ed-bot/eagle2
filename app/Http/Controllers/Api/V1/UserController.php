@@ -309,7 +309,7 @@ class UserController extends Controller
         $month  =   \request('month');
         $year  =   \request('year');
 
-        $agency = Agency::query()->with('owner')->where('app_owner_id', $user->id)->first();
+        $agency = Agency::query()->with('owner')->where('app_owner_id', $user->id)->withCount('joinRequests')->first();
         if (!$agency) return Common::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
         $total_host_target = UserSallary::where('user_agency_id', $agency->id);
 
@@ -318,7 +318,8 @@ class UserController extends Controller
                 ->where('year', $year);
         }
         $total_host_target = $total_host_target->sum('sallary');
-
+        $owner =       $agency->owner;
+        $owner->avatar = $agency->owner->avatar; 
         $data = [
             'id'                => $agency->id,
             'name'              => $agency->name,
@@ -327,7 +328,8 @@ class UserController extends Controller
             'num_of_hosts'      => $agency->mempers->count(),
             'total_salary'      => $total_host_target,
             'agency_target'     => $agency->getSalary($month, $year),
-            'owner' => $agency->owner
+            'number_request'              => $agency->joinRequests->count(),
+            'owner' => $owner
         ];
         return Common::apiResponse(1, '', $data);
     }
