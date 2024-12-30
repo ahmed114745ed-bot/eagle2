@@ -248,7 +248,7 @@ class RoomController extends Controller
         return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
     }
 
-    public function handleLeaveCp($user,$roomId)
+    public function handleLeaveCp($user, $roomId)
     {
         $userId = $user->id;
         $this->removeUserCpInRoom($userId);
@@ -262,7 +262,7 @@ class RoomController extends Controller
 
     public function sendCpLovelyMessage($roomId, $user)
     {
-        $cpRoomHistories = CpRoomHistory::where("room_id",$roomId)->get(['index1', 'index2']);
+        $cpRoomHistories = CpRoomHistory::where("room_id", $roomId)->get(['index1', 'index2']);
         $indices = $cpRoomHistories->map(function ($history) {
             return [$history->index1, $history->index2];
         })->toArray();
@@ -1633,5 +1633,26 @@ class RoomController extends Controller
             $room = new RoomResource($room);
         }
         return Common::apiResponse(true, '', $room, 200);
+    }
+
+    protected function blackList(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'room_id'        => 'required|integer|exists:rooms,id',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $userId = $request->user()->id;
+            $room = Room::findOrFail($request->room_id);
+            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
+            $ids = explode(',', $room->room_black);
+            $data = UserResource::collection(User::query()->whereIn('id', $ids)->get());
+            return   Common::apiResponse(true, '', $data, 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
     }
 }
