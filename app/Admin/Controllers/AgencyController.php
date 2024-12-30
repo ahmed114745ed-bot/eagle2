@@ -174,20 +174,19 @@ class AgencyController extends MainController
                 }])
                 ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received',]) // selecting specific fields from `mempers`
                 ->map(function ($memper) {
-                    $memper->image = $memper->profile->avatar ?? null;
+                    $memper->image = @$memper->profile?->avatar ?? null;
                     $imageHtml = $memper->profile && $memper->profile->avatar
                         ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
                         : 'No Image';
                     $salary = $memper->userSallary->sallary ?? '';
                     return [
-                        'id' => $memper->id,
-                        'uuid' => $memper->uuid,
-                        'uuid' => $memper->uuid,
-                        'name' => $memper->name,
-                        'reals_count' => count($memper->reals),
-                        'total_days' => $memper->total_days,
+                        'id' => $memper->id ?? 0,
+                        'uuid' => $memper->uuid ?? 0,
+                        'name' => $memper->name ?? '',
+                        'reals_count' => count($memper->reals) ?? 0,
+                        'total_days' => $memper->total_days ?? 0,
                         'total_hours' => $memper->liveTime->sum("hours"),
-                        'monthly_diamond_received' => $memper->monthly_diamond_received,
+                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
                         'image' => $imageHtml,
                         'salary' => $salary ?? '',
 
