@@ -33,11 +33,8 @@ class AdminUsersController extends MainController
      */
     public function index(Content $content)
     {
-        parent::index($content);
-
-        return $content
-            ->title(trans('admins'))
-            ->body($this->grid());
+        $content = parent::index($content);
+        return $content->title(trans('admins'));
     }
 
 
@@ -50,9 +47,8 @@ class AdminUsersController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
-            ->title(trans('admins'))
-            ->body($this->form()->edit($id)));
+        return  parent::edit($id, $content)
+            ->title(trans('admins'));
     }
 
     /**
@@ -63,25 +59,22 @@ class AdminUsersController extends MainController
      */
     public function create(Content $content)
     {
-        return parent::create($content
-            ->title(trans('admins'))
-            ->body($this->form()));
+        return parent::create($content)
+            ->title(trans('admins'));
     }
 
     public function show($id, Content $content)
     {
-
-        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
+        return  parent::show($id, $content)->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->agencies($id));
-        }));
+        });
     }
 
     public function show2($id, Agency $agency, Content $content)
     {
-
-        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
+        return  parent::show($id, $content)->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
             $row->column(12, $this->usersGrid($agency));
-        }));
+        });
     }
 
     /**
