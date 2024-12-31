@@ -33,9 +33,12 @@ class AdminUsersController extends MainController
      */
     public function index(Content $content)
     {
-        return parent::index($content
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_name);
+        }
+        return $content
             ->title(trans('admins'))
-            ->body($this->grid()));
+            ->body($this->grid());
     }
 
 
@@ -48,9 +51,9 @@ class AdminUsersController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($content
+        return $content
             ->title(trans('admins'))
-            ->body($this->form()->edit($id)));
+            ->body($this->form()->edit($id));
     }
 
     /**
