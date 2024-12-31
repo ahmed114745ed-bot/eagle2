@@ -45,6 +45,7 @@ class MainController extends AdminController
 
     public function index ( Content $content )
     {
+        dd('i"m here');
         if (!Admin::user()->can('*')){
             Permission::check('browse-'.$this->permission_name);
         }
