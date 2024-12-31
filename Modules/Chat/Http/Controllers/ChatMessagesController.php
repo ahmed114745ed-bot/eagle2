@@ -68,7 +68,7 @@ class ChatMessagesController extends Controller
         if ($chatRoom->type == 'guest' && $total_message >= 3) {
             return response()->json([
                 'status' => 404,
-                'message' => 'unauthorized',
+                'message' => 'You have reached the limit for sending messages',
             ], 404);
         }
 
