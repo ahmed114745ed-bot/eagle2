@@ -13,13 +13,25 @@ use App\Helpers\Common;
 use App\Models\AdminUser;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Hash;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Facades\Admin;
 
 class AdminUsersController extends MainController
 {
     public $permission_name = 'admin-users';
+    
+    public function show($id, Content $content)
+    {
 
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
+            $row->column(12, $this->agencies($id));
+        }));
+    }
+
+    public function show2($id, Agency $agency, Content $content)
+    {
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
+            $row->column(12, $this->usersGrid($agency));
+        }));
+    }
     /**
      * Title for current resource.
      *
@@ -33,8 +45,9 @@ class AdminUsersController extends MainController
      */
     public function index(Content $content)
     {
-        $content = parent::index($content);
-        return $content->title(trans('admins'));
+        return parent::index($content
+            ->title(trans('admins'))
+            ->body($this->grid()));
     }
 
 
@@ -47,8 +60,9 @@ class AdminUsersController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return  parent::edit($id, $content)
-            ->title(trans('admins'));
+        return parent::edit($id, $content
+            ->title(trans('admins'))
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -59,22 +73,9 @@ class AdminUsersController extends MainController
      */
     public function create(Content $content)
     {
-        return parent::create($content)
-            ->title(trans('admins'));
-    }
-
-    public function show($id, Content $content)
-    {
-        return  parent::show($id, $content)->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
-            $row->column(12, $this->agencies($id));
-        });
-    }
-
-    public function show2($id, Agency $agency, Content $content)
-    {
-        return  parent::show($id, $content)->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
-            $row->column(12, $this->usersGrid($agency));
-        });
+        return parent::create($content
+            ->title(trans('admins'))
+            ->body($this->form()));
     }
 
     /**
