@@ -121,7 +121,7 @@ class UserResource extends JsonResource
             'diamonds'             => @$this->total_diamond_received ?: 0, // both  ---------------------
             'vip'                  => @Common::ovip_center($this->id), // both
             'lang'                 => @$this->lang, // both        --------------
-            'country'              => !$isHideCountry ? ($this->country ?? '') : '',
+            'country'              => !$isHideCountry ? ($this->country ?? (object)[]) : (object)[],
             'have_country'         => ($this->country != null),
             'medals'               => $this->medals()->where('is_enable', true)->get(),
             // both    --------------
