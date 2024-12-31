@@ -21,13 +21,13 @@ class SallariesController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Sallaries'))
             ->description(__(request('desc') ?: 'users'))
             ->row(function ($row) {
             $row->column(3, $this->salaryNavbar());
             $row->column(9, $this->grid());
-        });
+        }));
     }
 
     protected function grid()
