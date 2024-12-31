@@ -632,7 +632,7 @@ class UserService
                 $q->where('user_id', $user_id2)
                   ->where('user_id2', $user_id);
             })
-            ->update(['type' => 'friend']);
+            ->update(['type' => 'friends']);
 
             return $updateType;
     }
