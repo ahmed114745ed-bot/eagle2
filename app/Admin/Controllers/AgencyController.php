@@ -43,9 +43,9 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Agencies'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     public function update($id)
@@ -87,7 +87,7 @@ class AgencyController extends MainController
     public function show($id, Content $content)
     {
 
-        return $content
+        return parent::show($id,$content
             ->title(__("agency details"))
             ->row(function ($row) use ($id) {
                 $agency = Agency::find($id);
@@ -117,7 +117,7 @@ class AgencyController extends MainController
 
                 // ;
 
-            });
+            }));
     }
 
     public function destroy($id)

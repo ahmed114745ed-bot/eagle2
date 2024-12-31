@@ -23,13 +23,13 @@ class RequestAgencyController extends MainController
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
-    
+
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('request-agencies'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -41,9 +41,9 @@ class RequestAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('request-agencies'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -55,18 +55,18 @@ class RequestAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('request-agencies'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('request-agencies'))
-            ->body($this->form());
+            ->body($this->form()));
     }
-    
+
 
     /**
      * Make a grid builder.
@@ -76,28 +76,26 @@ class RequestAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $grid->model()->where('status',0)->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
+        $grid->model()->where('status', 0)->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         });
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('owner.uuid', __('uuid'));
-
             });
-
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name',trans ('name'));
-        $grid->column('owner.uuid',trans ('uuid'));
+        $grid->column('owner.name', trans('name'));
+        $grid->column('owner.uuid', trans('uuid'));
         $grid->column('name', __('Name'));
         $grid->column('phone', __('whats app'));
         $grid->column('additionalInfo.country', __('country'));
-        $grid->column('img', __('Img'))->image ('',30);
+        $grid->column('img', __('Img'))->image('', 30);
         $grid->column('additionalInfo.gmail', __('Email'));
         $grid->column('additionalInfo.video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath ='https://storage.googleapis.com/tik-chat/'.$this->additionalInfo?->video;
+            $videoPath = 'https://storage.googleapis.com/tik-chat/' . $this->additionalInfo?->video;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
@@ -106,28 +104,28 @@ class RequestAgencyController extends MainController
 
         $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->display(function () {
             $img = $this->additionalInfo?->face_image_nationalId;
-            if($img == null || $img == ''){
+            if ($img == null || $img == '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
         $grid->column('additionalInfo.back_image_nationalId', __('back nationalId'))->display(function () {
             $img = $this->additionalInfo?->back_image_nationalId;
-            if($img == null || $img == ''){
+            if ($img == null || $img == '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
 
 
         $grid->column('additionalInfo.salary', __('salary'));
-        $grid->column('additionalInfo.host','host');
-        $grid->column('additionalInfo.user_id','معرف المستخدم الذي اوصلك الينا');
-        $grid->column('additionalInfo.history_app_info','المنصه التي عملت به');
+        $grid->column('additionalInfo.host', 'host');
+        $grid->column('additionalInfo.user_id', 'معرف المستخدم الذي اوصلك الينا');
+        $grid->column('additionalInfo.history_app_info', 'المنصه التي عملت به');
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableEdit();
@@ -138,9 +136,9 @@ class RequestAgencyController extends MainController
         });
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools){
+        $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/request-agencies-filteration';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
             $tools->append($button);
         });
 
