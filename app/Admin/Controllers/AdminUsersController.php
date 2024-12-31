@@ -17,27 +17,27 @@ use Illuminate\Support\Facades\Hash;
 class AdminUsersController extends MainController
 {
     public $permission_name = 'admin-users';
+    
     public function show($id, Content $content)
     {
 
-        return $content ->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->agencies($id));
-        });
+        }));
     }
 
     public function show2($id, Agency $agency, Content $content)
     {
-
-        return $content ->title(trans('admins'))->row("<h3>" . __('Users Agencies in'). ' ' . $agency->name. "</h3>")->row(function ($row) use ($id, $agency) {
-            $row->column(12, $this->usersGrid( $agency));
-        });
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
+            $row->column(12, $this->usersGrid($agency));
+        }));
     }
     /**
      * Title for current resource.
      *
      * @var string
      */
-   /**
+    /**
      * Index interface.
      *
      * @param Content $content
@@ -45,9 +45,9 @@ class AdminUsersController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('admins'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
 
@@ -60,9 +60,9 @@ class AdminUsersController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('admins'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -73,9 +73,9 @@ class AdminUsersController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('admins'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**
@@ -87,10 +87,10 @@ class AdminUsersController extends MainController
     {
         $grid = new Grid(new AdminUser());
         $grid->model()
-             ->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
-             ->where('app_id','!=',0)->with(['user' => fn ($q) => $q->withCount('agencies')]);
+            ->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
+            ->where('app_id', '!=', 0)->with(['user' => fn($q) => $q->withCount('agencies')]);
 
-        $grid->model()->with([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')]);
+        $grid->model()->with(['managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')]);
 
         /*$adminUser = AdminUser::load([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')])->get();
         dd($adminUser->get(11));*/
@@ -117,7 +117,7 @@ class AdminUsersController extends MainController
             return 0;
         });
 
-        $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_){
+        $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_) {
             return ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
         });
 
@@ -128,7 +128,6 @@ class AdminUsersController extends MainController
             // $actions->disableEdit(); // Disable the "Edit" action
             $actions->disableDelete();
             $actions->disableEdit();
-
         });
 
         return $grid;
@@ -156,7 +155,7 @@ class AdminUsersController extends MainController
         // $show->field('Agency_manger', __('Agency manger'));
         // $show->field('app_id', __('App id'));
 
-        $this->extendShow ($show);
+        $this->extendShow($show);
 
         return $show;
     }
@@ -207,12 +206,12 @@ class AdminUsersController extends MainController
                 $form->password = Hash::make($form->password);
             }
             User::where('id', @request()->app_id)->update([
-                'is_manger' =>true,
+                'is_manger' => true,
             ]);
-            $form->Agency_manger= true;
+            $form->Agency_manger = true;
         });
         $form->saved(function (Form $form) {
-            $form->model()->roles()->attach(['role_id'=> 13, 'user_id'=>$form->model()->getAttribute('id')]);
+            $form->model()->roles()->attach(['role_id' => 13, 'user_id' => $form->model()->getAttribute('id')]);
         });
 
 
@@ -222,12 +221,12 @@ class AdminUsersController extends MainController
 
     protected function agencies($id)
     {
-         $AdmenUser = AdminUser::find($id);
+        $AdmenUser = AdminUser::find($id);
 
 
         $grid = new Grid(new Agency());
         $grid->id(__('ID'));
-        $grid->model ()->where ('agency_manger_id',$AdmenUser->app_id);
+        $grid->model()->where('agency_manger_id', $AdmenUser->app_id);
         $grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
             return Common::getusersShow($model->app_owner_id);
         });
@@ -249,21 +248,20 @@ class AdminUsersController extends MainController
             // $actions->disableEdit(); // Disable the "Edit" action
             $actions->disableDelete();
             $actions->disableEdit();
-
         });
         $grid->disableCreateButton();
 
         return $grid;
     }
 
-    protected function usersGrid( $agency)
+    protected function usersGrid($agency)
     {
-        if (gettype($agency) == 'string'){
+        if (gettype($agency) == 'string') {
             $agency = Agency::find($agency);
         }
 
         $grid = new Grid(new User());
-        $grid->model ()->where ('agency_id',$agency->id);
+        $grid->model()->where('agency_id', $agency->id);
         $grid->id(__('ID'));
 
         $grid->column('name', trans('name'));
@@ -271,23 +269,21 @@ class AdminUsersController extends MainController
         $grid->column('salary', trans('salary'));
         $grid->column('monthly_diamond_received', trans('monthly diamond'));
 
-        $grid->actions(function ($actions) use($agency){
+        $grid->actions(function ($actions) use ($agency) {
             $model = $actions->row;
 
             // Disable the "View" action
             // $actions->disableEdit(); // Disable the "Edit" action
             $actions->disableDelete();
             $actions->disableEdit();
-                        $actions->disableView();
+            $actions->disableView();
             if ($model->agency_id >= 1 && $model->id != $agency->app_owner_id) {
                 $actions->add(new KickOfAgencyAction());
             }
-
         });
 
         $grid->disableCreateButton();
 
         return $grid;
     }
-
 }
