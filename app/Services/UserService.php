@@ -28,6 +28,7 @@ use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
+use Modules\Chat\Entities\ChatRoom;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -230,6 +231,7 @@ class UserService
         $userId = $request->user()->id;
         $followedUserId = $request->user_id;
 
+
         if ($userId == $followedUserId) {
             return Common::apiResponse(false, 'cant follow your self', null, 403);
         }
@@ -241,6 +243,9 @@ class UserService
 
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
         if (!$follow) {
+
+            $this->typeRoomChat($userId , $followedUserId);
+
             $this->followRepository->createFollow([
                 'user_id' => $userId,
                 'followed_user_id' => $followedUserId,
@@ -612,5 +617,24 @@ class UserService
             "current_total_day" => $current_total_day,
             "diamond" => $current_diamond,
         ];
+
+        
     }
+
+
+    protected function typeRoomChat($user_id, $user_id2)
+    {
+        $updateType = ChatRoom::where(function ($q) use ($user_id, $user_id2) {
+                $q->where('user_id', $user_id)
+                  ->where('user_id2', $user_id2);
+            })
+            ->orWhere(function ($q) use ($user_id, $user_id2) {
+                $q->where('user_id', $user_id2)
+                  ->where('user_id2', $user_id);
+            })
+            ->update(['type' => 'friend']);
+
+            return $updateType;
+    }
+    
 }

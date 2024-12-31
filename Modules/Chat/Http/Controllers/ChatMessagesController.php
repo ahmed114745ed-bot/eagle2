@@ -59,8 +59,8 @@ class ChatMessagesController extends Controller
         if (!$chatRoom) {
             return response()->json([
                 'status' => 404,
-                'status' => 'Chat not Found',
-            ], 404);
+                'message' => 'Chat not Found',
+            ], status: 404);
         }
 
         $total_message = $this->chatService->countMessagesByUserInRoom($chatRoom->id, $user->id);
@@ -68,7 +68,7 @@ class ChatMessagesController extends Controller
         if ($chatRoom->type == 'guest' && $total_message >= 3) {
             return response()->json([
                 'status' => 404,
-                'status' => 'unauthorized',
+                'message' => 'unauthorized',
             ], 404);
         }
 
