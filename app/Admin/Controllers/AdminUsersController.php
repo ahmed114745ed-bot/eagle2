@@ -33,7 +33,7 @@ class AdminUsersController extends MainController
      */
     public function index(Content $content)
     {
-        parent::index($content);
+       // parent::index($content);
 
         return $content
             ->title(trans('admins'))
