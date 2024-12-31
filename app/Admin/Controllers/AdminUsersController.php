@@ -48,9 +48,9 @@ class AdminUsersController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('admins'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -61,25 +61,25 @@ class AdminUsersController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('admins'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function show($id, Content $content)
     {
 
-        return $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->agencies($id));
-        });
+        }));
     }
 
     public function show2($id, Agency $agency, Content $content)
     {
 
-        return $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
             $row->column(12, $this->usersGrid($agency));
-        });
+        }));
     }
 
     /**
