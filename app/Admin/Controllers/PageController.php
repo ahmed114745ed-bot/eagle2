@@ -23,7 +23,7 @@ class PageController extends Controller
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Pages'))
+            ->title(trans('pages'))
             ->body($this->grid()));
     }
 
