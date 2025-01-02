@@ -90,6 +90,13 @@ class UserController extends MainController
             ->body($this->form()->edit($id)));
     }
 
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
+    }
+
     public function index(Content $content)
     {
         if (!Admin::user()->can('*')) {
