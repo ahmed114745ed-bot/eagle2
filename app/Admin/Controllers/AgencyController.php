@@ -311,8 +311,7 @@ class AgencyController extends MainController
         $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
             $ops2 = [];
             foreach (User::Where('id', $value)->get() as $user) {
-                $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                $ops2[$user->id] = $user->id . '_' . $user->name;
             }
             return $ops2;
         })->ajax('/api/search/users3', 'id', 'name');
