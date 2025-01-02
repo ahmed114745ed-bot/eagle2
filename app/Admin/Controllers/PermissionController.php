@@ -7,6 +7,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Support\Str;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Content;
 
 class PermissionController extends MainController
 {
@@ -18,6 +19,33 @@ class PermissionController extends MainController
     {
         return trans('admin.permissions');
     }
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('admin.permissions'))
+            ->body($this->grid()));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('admin.permissions'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('admin.permissions'))
+            ->body($this->form()));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('admin.permissions'))
+            ->body($this->detail($id)));
+    }
+
 
     /**
      * Make a grid builder.
