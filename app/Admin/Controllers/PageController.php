@@ -3,14 +3,14 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Page;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
-class PageController extends Controller
+class PageController extends MainController
 {
     use HasResourceActions;
 
