@@ -304,7 +304,6 @@ class AgencyController extends MainController
         foreach (DB::table('admin_users')->get() as $user) {
             $opsAgencyMangerDash[$user->id] = $user->name;
         }
-dd('ff');
 
         $form->display('ID');
 
