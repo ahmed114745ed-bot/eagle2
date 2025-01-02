@@ -310,7 +310,8 @@ class AgencyController extends MainController
 
         $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
             $ops2 = [];
-            foreach (User::Where('uuid', $value)->get() as $user) {
+            foreach (User::Where('id', $value)->get() as $user) {
+                $ops2[$user->id] = $user->uuid . '_' . $user->name;
                 $ops2[$user->id] = $user->uuid . '_' . $user->name;
             }
             return $ops2;
