@@ -48,6 +48,20 @@ class AgencyController extends MainController
             ->body($this->grid()));
     }
 
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
+    }
+
     public function update($id)
     {
         $data = request()->all();
@@ -87,7 +101,7 @@ class AgencyController extends MainController
     public function show($id, Content $content)
     {
 
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(__("agency details"))
             ->row(function ($row) use ($id) {
                 $agency = Agency::find($id);
@@ -147,7 +161,7 @@ class AgencyController extends MainController
             );
         })->orderByDesc('id');
         if (request("active") == true) {
-            $grid->model()->whereHas("agencySalaries", function ($q){
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)->where('year', now()->year);
             });
         }
@@ -295,12 +309,12 @@ class AgencyController extends MainController
         $form->display('ID');
 
         $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name');
+            $ops2 = [];
+            foreach (User::Where('id', $value)->get() as $user) {
+                $ops2[$user->id] = $user->uuid . '_' . $user->name;
+            }
+            return $ops2;
+        })->ajax('/api/search/users3', 'id', 'name');
         if (!$form->isEditing()) {
             //$form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
             // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
@@ -414,7 +428,7 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType,'agency_id' => $form->model()->id,]);
+            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'agency_id' => $form->model()->id,]);
             // }
 
 
