@@ -282,6 +282,6 @@ return [
     'kick_out_less_than_day'           => 'أول يوم مسموح به لطرد العميل من الوكالة',
     'kick_out_greater_than_day'        => 'آخر يوم مسموح به لطرد العميل من الوكالة',
     'system_default_manager'           => 'قيمة UUID لتعيين العميل كمدير للتطبيق',
-
+    'add_coins' => 'أضافة رصبد',
 
 ];

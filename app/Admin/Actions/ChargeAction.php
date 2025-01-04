@@ -140,8 +140,9 @@ class ChargeAction extends Action
 
     public function html()
     {
+        $title = __('dashboard.add_coins');
         return <<<HTML
-            <li><a href="javascript:void(0);" class="charge_action"><i class="fa fa-dollar text-red"></i> إضافة رصيد</a></li>
+            <li><a href="javascript:void(0);" class="charge_action"><i class="fa fa-dollar text-red"></i> $title</a></li>
 HTML;
     }
 }

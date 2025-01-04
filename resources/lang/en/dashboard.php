@@ -270,6 +270,7 @@ return [
     'kick_out_less_than_day'           => 'Earliest day allowed for kicking a client from the agency',
     'kick_out_greater_than_day'        => 'Latest day allowed for kicking a client from the agency',
     'system_default_manager'           => 'UUID value for a client to become the app manager',
+    'add_coins' => "Add coins"
 
 
 
