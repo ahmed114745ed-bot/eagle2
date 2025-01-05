@@ -1619,6 +1619,7 @@ class RoomController extends Controller
 
     public function gameRoom()
     {
+        dd(123);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
         $game_id = request("game_id");
         $rooms = $this->roomService->getRoomsForGame($game_id);
