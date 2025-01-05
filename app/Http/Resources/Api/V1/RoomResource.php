@@ -61,7 +61,7 @@ class RoomResource extends JsonResource
                 ],
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
-            'medals'               => @$this->owner?->medals()->where('is_enable', true)->get(),
+            'medals'               => @$this->owner?->medals()?->where('is_enable', true)->get() ?? [],
             $this->mergeWhen($this->distance, [
                 'distance' => $this->distance,
             ]),
@@ -94,39 +94,46 @@ class RoomResource extends JsonResource
     }
 
 
-    protected function owner(){
-        return new UserResource(User::query ()->find ($this->uid));
+    protected function owner()
+    {
+        return new UserResource(User::query()->find($this->uid));
     }
 
-    protected function admins(){
-        $ids = explode (',',$this->room_admin);
-        $ids = $this->removeOwner ($ids);
-        return UserResource::collection (User::query ()->whereIn ('id',$ids)->get ());
+    protected function admins()
+    {
+        $ids = explode(',', $this->room_admin);
+        $ids = $this->removeOwner($ids);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
 
-    protected function visitors(){
-        $ids = explode (',',$this->room_visitor);
-        $ids = $this->removeOwner ($ids);
-        return UserResource::collection (User::query ()->whereIn ('id',$ids)->get ());
+    protected function visitors()
+    {
+        $ids = explode(',', $this->room_visitor);
+        $ids = $this->removeOwner($ids);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
-    protected function blackList(){
-        $ids = explode (',',$this->room_black);
-        return UserResource::collection (User::query ()->whereIn ('id',$ids)->get ());
+    protected function blackList()
+    {
+        $ids = explode(',', $this->room_black);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
-    protected function banList(){
-        $ids = explode (',',$this->room_speak);
-        return UserResource::collection (User::query ()->whereIn ('id',$ids)->get ());
+    protected function banList()
+    {
+        $ids = explode(',', $this->room_speak);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
-    protected function muteList(){
-        $ids = explode (',',$this->room_sound);
-        return UserResource::collection (User::query ()->whereIn ('id',$ids)->get ());
+    protected function muteList()
+    {
+        $ids = explode(',', $this->room_sound);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
-    protected function removeOwner($ids){
+    protected function removeOwner($ids)
+    {
         if (($key = array_search($this->uid, $ids)) !== false) {
             unset($ids[$key]);
         }
