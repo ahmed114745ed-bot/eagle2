@@ -16,13 +16,13 @@ class RoomResource extends JsonResource
         // Common::setHourHot($this->uid);
         $pk = $this->lastPk;
         $achievement_images = [];
-        if ($this->owner->medals) {
-            foreach ($this->owner->medals as $medal) {
-                if ($medal->achievementLevel && $medal->achievementLevel->achievement && $medal->achievementLevel->achievement->type?->value == 'room_target') {
-                    $achievement_images[] = $medal->achievementLevel->valid_image;
-                }
-            }
-        }
+        // if ($this->owner->medals) {
+        //     foreach ($this->owner->medals as $medal) {
+        //         if ($medal->achievementLevel && $medal->achievementLevel->achievement && $medal->achievementLevel->achievement->type?->value == 'room_target') {
+        //             $achievement_images[] = $medal->achievementLevel->valid_image;
+        //         }
+        //     }
+        // }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
         $have_luck_box = $this->boxUse;
         /**@var Room $this*/
