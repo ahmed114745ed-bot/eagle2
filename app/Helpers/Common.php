@@ -2,48 +2,52 @@
 
 namespace App\Helpers;
 
-use App\Classes\Facades\Agency as FacadesAgency;
-use App\Http\Resources\CountryResource;
-use App\Models\Agency;
-use App\Models\AgencyMangerPullingOut;
-use App\Models\Config;
-use App\Models\Country;
-use App\Models\Follow;
-use App\Models\GiftLog;
-use App\Models\OfficialMessage;
-use App\Models\Owner_pid_target;
-use App\Models\Pack;
-use App\Models\PackLog;
-use App\Models\Room;
-use App\Models\Background;
-use App\Models\Target;
-use App\Models\User;
-use App\Models\UserSallary;
-use App\Models\UserVip;
 use App\Models\Vip;
+use App\Models\Pack;
+use App\Models\Role;
+use App\Models\Room;
+use App\Models\User;
 use App\Models\Ware;
-use App\Traits\HelperTraits\AdminTrait;
-use App\Traits\HelperTraits\AttributesTrait;
-use App\Traits\HelperTraits\CalcsTrait;
-use App\Traits\HelperTraits\FilterTrait;
-use App\Traits\HelperTraits\InfoTrait;
-use App\Traits\HelperTraits\MoneyTrait;
-use App\Traits\HelperTraits\RoomTrait;
-use App\Traits\HelperTraits\ZegoTrait;
-use Encore\Admin\Facades\Admin;
+use App\Models\Agency;
+use App\Models\Config;
+use App\Models\Follow;
+use App\Models\Target;
 use Encore\Admin\Show;
 use GuzzleHttp\Client;
-use Illuminate\Database\Eloquent\Collection;
-
-use GuzzleHttp\Psr7\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Models\Country;
+use App\Models\GiftLog;
+use App\Models\PackLog;
+use App\Models\UserVip;
+use App\Models\Background;
+use App\Models\UserSallary;
 use Illuminate\Support\Str;
+use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
-use Twilio\Rest\Client as TwilioClint;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
+use App\Models\OfficialMessage;
+use Encore\Admin\Facades\Admin;
+use App\Models\Owner_pid_target;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use App\Models\AgencyMangerPullingOut;
+use App\Notifications\AgencyOwnerRole;
+use App\Traits\HelperTraits\InfoTrait;
+use App\Traits\HelperTraits\RoomTrait;
+
+use App\Traits\HelperTraits\ZegoTrait;
+use Twilio\Rest\Client as TwilioClint;
+use App\Http\Resources\CountryResource;
+use App\Traits\HelperTraits\AdminTrait;
+use App\Traits\HelperTraits\CalcsTrait;
+use App\Traits\HelperTraits\MoneyTrait;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\HelperTraits\FilterTrait;
+use App\Traits\HelperTraits\AttributesTrait;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Classes\Facades\Agency as FacadesAgency;
+use Illuminate\Support\Facades\Notification;
 
 class Common
 {
@@ -1115,5 +1119,27 @@ class Common
     {
         $level = Vip::query()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
+    }
+
+    public static  function createUserAdmin($appOwnerId)
+    {
+        $user = User::find($appOwnerId);
+        if (!$user) return true;
+        $password = Str::random(8);
+        DB::table('admin_users')->insert([
+            'username' => $user->uuid,
+            'password' => Hash::make($password),
+            'name' => $user->name,
+        ]);
+        $admin = \App\Models\Admin::where('username', $user->uuid)->first();
+        $role = Role::where('slug', 'agency-owner')->first();
+        DB::table('admin_role_users')->insert([
+            'user_id' =>  $admin->id,
+            'role_id' => $role->id,
+        ]);
+        if ($user->email != null) {
+            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+        }
+        return true;
     }
 }

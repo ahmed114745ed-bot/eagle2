@@ -326,12 +326,12 @@ class AgencyController extends MainController
         }
 
         $form->text('name', __('name'))->rules('required');
-        $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
+        // $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->text('notice', __('notice'))->rules('required');
         $form->switch('status', __('status'));
         $form->text('phone', __('phone'))->rules('required');
         $form->url('url', __('url'));
-        $form->image('img', __('img'))->rules('required');
+       // $form->image('img', __('img'))->rules('required');
         $form->textarea('contents', __('contents'));
 
 
@@ -380,9 +380,11 @@ class AgencyController extends MainController
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-
+            if (!$form->model()->exists)  Common::createUserAdmin($appOwnerId);
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-                User::find($originalOwnerId)->update([
+                $user = User::find($originalOwnerId);
+                Admin::where('username', $user->uuid)->delete();
+                $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
                 ]);
