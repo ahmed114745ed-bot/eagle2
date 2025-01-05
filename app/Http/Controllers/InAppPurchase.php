@@ -20,37 +20,36 @@ use Tests\Products\ProductPurchaseTest;
 class InAppPurchase extends Controller
 {
     protected $client;
-
-//     public function __construct()
-//     {
-// //        $this->client = new \Google_Client();
+     public function __construct()
+     {
+         $this->client = new \Google_Client();
 //         $this->client = new Google_Client();
-//         $credentialPath = public_path('google_payment.json');
-//         if (!file_exists($credentialPath)) {
-//             throw new \Exception('Google payment credential file does not exist at path: ' . $credentialPath);
-//         }
-//         $this->client->setApplicationName('Tik chat');
-//         $this->client->setAuthConfig($credentialPath);
-//         $this->client->setScopes([AndroidPublisher::ANDROIDPUBLISHER]);
+         $credentialPath = public_path('google_payment.json');
+         if (!file_exists($credentialPath)) {
+             throw new \Exception('Google payment credential file does not exist at path: ' . $credentialPath);
+         }
+         $this->client->setApplicationName('Tik chat');
+         $this->client->setAuthConfig($credentialPath);
+         $this->client->setScopes([AndroidPublisher::ANDROIDPUBLISHER]);
 // //        $this->client->setSubject('google-pay-new-key@r-star-shop.iam.gserviceaccount.com'); // Replace with your service account email
 
 // //        $this->client->setScopes(['https://www.googleapis.com/auth/androidpublisher']);
-//     }
+     }
 
 
-    // public function googlePay($token, $productId, )
-    // {
-    //     $client = ClientFactory::create([ClientFactory::SCOPE_ANDROID_PUBLISHER]);
-    //     $product = new Product();
-    //     try {
-    //         $response = $product->googlePlay($client)->packageName('com.tikkchat.app')->token($token)->id($productId)->get();
-    //         dd($response, 'this');
-    //     } catch (GuzzleException $e) {
-    //         dd($e->getMessage(), 'this');
-    //     }
+     public function googlePay($token, $productId, )
+     {
+         $client = ClientFactory::create([ClientFactory::SCOPE_ANDROID_PUBLISHER]);
+         $product = new Product();
+         try {
+             $response = $product->googlePlay($client)->packageName('com.tikkchat.app')->token($token)->id($productId)->get();
+             dd($response, 'this');
+         } catch (GuzzleException $e) {
+             dd($e->getMessage(), 'this');
+         }
 
-    //     //        $subscription->verifyReceipt($client);
-    // }
+                 $subscription->verifyReceipt($client);
+     }
 
 
     function xorDecrypt($input, $key)

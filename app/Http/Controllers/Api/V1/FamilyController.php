@@ -64,7 +64,7 @@ class FamilyController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
-        
+
 
         $data = FamilyRankResource::collection($data);
         return Common::apiResponse(1, '',$data);
@@ -252,24 +252,43 @@ class FamilyController extends Controller
 
     public function getMembersList(Request $request)
     {
-        if (!$request->family_id) return Common::apiResponse(0, 'missing params', null, 422);
+        // Validate family_id
+        if (!$request->family_id) {
+            return Common::apiResponse(0, 'missing params', null, 422);
+        }
+
         try {
+            // Fetch owner, admins, and members
             [$owner, $admins, $members] = $this->familyServices->memberList($request->family_id);
         } catch (\Exception $exception) {
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+
+        // Set family_status for owner
         request()->family_status = 2;
-        $membersUserResource = (new MembersUserResource($owner))->toJson();
+        $owner->family_id = $request->family_id;
+        $membersUserResource = (new MembersUserResource($owner, $request->family_id))->toJson();
+
+        // Set family_status for admins
         request()->family_status = 1;
-        $anonymousResourceCollection = MembersUserResource::collection($admins)->toJson();
+        $anonymousResourceCollection = MembersUserResource::collection($admins)->additional([
+            'family_id' => $request->family_id, // Pass family_id to the collection
+        ])->toJson();
+
+        // Set family_status for members
         request()->family_status = 0;
-        $anonymousResourceCollection1 = MembersUserResource::collection($members)->toJson();
+        $anonymousResourceCollection1 = MembersUserResource::collection($members)->additional([
+            'family_id' => $request->family_id, // Pass family_id to the collection
+        ])->toJson();
+
+        // Prepare the response data
         $data = [
             'owner' => json_decode($membersUserResource),
             'admins' => json_decode($anonymousResourceCollection),
-            'members' => json_decode($anonymousResourceCollection1)
+            'members' => json_decode($anonymousResourceCollection1),
         ];
+
         return Common::apiResponse(1, '', $data, 200);
     }
 
