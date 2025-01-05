@@ -26,14 +26,14 @@ class AgencyMangerAgencyesController extends MainController
      *
      * @var string
      */
-    
+
     public $permission_name = 'agency-manager';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('agency'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -45,9 +45,9 @@ class AgencyMangerAgencyesController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('agency'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -59,16 +59,16 @@ class AgencyMangerAgencyesController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('agency'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('agency'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**
@@ -82,6 +82,7 @@ class AgencyMangerAgencyesController extends MainController
         $this->extendGrid($grid);
 
         $loggedInUserId = Admin::user()->app_id;
+
         $grid->model()->where('agency_manger_id', $loggedInUserId);
 
 
@@ -94,43 +95,43 @@ class AgencyMangerAgencyesController extends MainController
         $grid->column('contents', __('contents'));
         $grid->column('salary', __('Salary'))->display(function () {
             return AgencySallary::where('agency_id', $this->id)
-                                ->where('month', now()->month)
-                                ->where('year', now()->year)
-                                ->sum('sallary') ?? 0;
+                ->where('month', now()->month)
+                ->where('year', now()->year)
+                ->sum('sallary') ?? 0;
         });
         $grid->column('target_usd', __('target usd'));
         $grid->column('members', __('members'))->expand(function ($model) {
             $members = $model->mempers()
-                             ->with([
-                                 'userSallary' => function ($query) {
-                                     $query->select('id', 'user_id', 'sallary')
-                                           ->where('month', now()->month)
-                                           ->where('year', now()->year);
-                                 },
-                                 'profile' => function ($query) {
-                                     $query->select('id', 'user_id', 'avatar');
-                                 },
-                                 'liveTime'
-                             ])
-                             ->orderBy('monthly_diamond_received', 'desc')
-                             ->take(5)
-                             ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
-                             ->map(function ($member) {
-                                 $avatar = $member->profile ? getImagePath($member->profile->avatar) : null;
-                                 $imageHtml = $avatar ? "<img src='{$avatar}' style='max-width:50px;max-height:50px;' />" : 'No Image';
-                                 return [
-                                     'id' => $member->id,
-                                     'uuid' => $member->uuid,
-                                     'name' => $member->name,
-                                     'reals_count' => count($member->reals),
-                                     'total_days' => $member->total_days,
-                                     'total_hours' => $member->liveTime->sum("hours"),
-                                     'monthly_diamond_received' => $member->monthly_diamond_received,
-                                     'image' => $imageHtml,
-                                     'salary' => $member->userSallary->sallary ?? '',
-                                 ];
-                             });
-    
+                ->with([
+                    'userSallary' => function ($query) {
+                        $query->select('id', 'user_id', 'sallary')
+                            ->where('month', now()->month)
+                            ->where('year', now()->year);
+                    },
+                    'profile' => function ($query) {
+                        $query->select('id', 'user_id', 'avatar');
+                    },
+                    'liveTime'
+                ])
+                ->orderBy('monthly_diamond_received', 'desc')
+                ->take(5)
+                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
+                ->map(function ($member) {
+                    $avatar = $member->profile ? getImagePath($member->profile?->avatar) : null;
+                    $imageHtml = $avatar ? "<img src='{$avatar}' style='max-width:50px;max-height:50px;' />" : 'No Image';
+                    return [
+                        'id' => $member->id ?? 0,
+                        'uuid' => $member->uuid ?? 0,
+                        'name' => $member->name ?? '',
+                        'reals_count' => count($member->reals) ?? 0,
+                        'total_days' => $member->total_days ?? 0,
+                        'total_hours' => $member->liveTime->sum("hours") ?? 0,
+                        'monthly_diamond_received' => $member->monthly_diamond_received ?? 0,
+                        'image' => $imageHtml,
+                        'salary' => $member->userSallary->sallary ?? '',
+                    ];
+                });
+
             return new Table(
                 ['ID', 'UID', __('Name'), __('Reals Count'), __('Total Days'), __('Total Hours'), __('Monthly DI'), __('Image'), __('Salary')],
                 $members->toArray()
@@ -240,7 +241,7 @@ class AgencyMangerAgencyesController extends MainController
             //     }
             //     return $ops2;
             // });
-          //  $form->select('app_owner_id', __('app owner id'))->options($ops2);
+            //  $form->select('app_owner_id', __('app owner id'))->options($ops2);
             // $form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
             // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
         }
@@ -315,11 +316,9 @@ class AgencyMangerAgencyesController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-          $user =   User::where('id', $appOwnerId)->first();
-          $user->type_user = 2;
-          $user->save();
-
-
+            $user =   User::where('id', $appOwnerId)->first();
+            $user->type_user = 2;
+            $user->save();
         });
         return $form;
     }

@@ -13,6 +13,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\Request;
 
 class ChargeController extends MainController
 {
@@ -58,6 +59,20 @@ class ChargeController extends MainController
         
             // فلتر "من تاريخ إلى تاريخ" على عمود created_at
             $filter->between('created_at', __('Filter by date'))->date();
+            
+                
+            $filter->column('1/2', function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input; // Retrieve the selected value
+                    $query->where('user_type', $input);
+                }, __('User Type'))->select([
+                    'dashdash' => __(trans('Users')),
+                    'dash' => __(trans('Agency')),
+                ]);
+            });
+
+           
+    
             $filter->expand();
 
         });
@@ -66,8 +81,8 @@ class ChargeController extends MainController
         $grid->column('user_id', __('User'))->display(function($userId) {
             if ($this->user_type == "dash") {
                 $agency = \App\Models\Agency::find($this->agency_id);
-                $img = getDriverUrl().'/'. $agency?->img;
-                $id = $agency->id;
+                $img = $agency ? getDriverUrl() . '/' . $agency->img : null;
+                $id = $agency->id ?? 0;
                 $type = "agency";
             }else{
                 $user = \App\Models\User::find($userId);

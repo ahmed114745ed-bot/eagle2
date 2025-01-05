@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Models\AppFeature;
+use App\Models\Ware;
 use App\Repositories\RankingRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -150,6 +151,7 @@ class RankingService
             $v->reciver_level_img = @$total_sender_level_img->img ?? '';
 
             $v->country = @$user->country;
+            $v->age = $user->profile->age;
             unset($v->$relation);
             return $v;
         })->reject(function ($v) {
@@ -173,13 +175,14 @@ class RankingService
         $kong['frame_id']   = 0;
         $kong['sender_img'] = '';
         $kong['reseverimg'] = '';
-        $kong['vip_level'] = 0;
+        $kong['vip_level']  =  0;
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
-
+        
         $kong['vip_level_img'] = '';
         $kong['sender_level_img'] = '';
         $kong['reciver_level_img'] = '';
+        $kong['age'] = 0;
 
         $kong['type_user'] = 0;
         $kong['manger_type'] = null;
@@ -193,28 +196,30 @@ class RankingService
         $user->sort = $this->getUserSortValue($data, $userId);
         $user->user_id = $user->id;
 
-        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id');
+        $arr['user'] = $user->only('user_id', 'uuid', 'exp', 'name', 'avatar', 'frame', 'frame_id', 'manger_type_id', 'age');
 
         $sender_img = @$user->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
         $total_received_level_img = Common::getImageTotalReceiverOrSender($user->total_received_level);
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
+
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
         $arr['user']['exp'] = $userExp->exp ?? '0';
         $arr['user']['sender_img'] = $sender_img;
-        $arr['user']['vip_level']  =($vip_level === 0) ? '' : $vip_level;
+        $arr['user']['vip_level']  = $vip_level ?? 0;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
         $arr['user']['reciver_level']  = $user->total_received_level ?? '';
-        $arr['user']['vip_level_img']  = $vip_level_img ?? '';
+        $arr['user']['vip_level_img']  = $vip_level_img == 0 ? "" : $vip_level_img;
         $arr['user']['sender_level_img']  = $total_sender_level_img->img ?? '';
         $arr['user']['reciver_level_img']  = $total_received_level_img->img ?? '';
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
+        $arr['user']['age'] = $user->profile->age;
 
 
         $toArray = $data->toArray();

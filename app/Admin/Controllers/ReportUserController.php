@@ -18,14 +18,14 @@ class ReportUserController extends MainController
      *
      * @var string
      */
-   
+
     public $permission_name = 'report-user';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('dashboard.users_report'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -84,58 +84,56 @@ class ReportUserController extends MainController
                 $filter->equal('uuid', __('uuid'));
             });
             $filter->where(function ($query) {
-             //   $year = Request::input('year');
+                //   $year = Request::input('year');
 
             }, __('Year'), 'year')->integer();
-           $filter->where(function ($query) {
-              //  $month = Request::input('month');
+            $filter->where(function ($query) {
+                //  $month = Request::input('month');
 
             }, __('Month'), 'month')->integer();
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter_with_owner_id());
             });
-
-
         });
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
         $grid->column('uuid', __('uuid'));
-        $grid->column('total_days', __('total_days'))->display(function() {
+        $grid->column('total_days', __('total_days'))->display(function () {
             if (request()->year == null && request()->month == null) {
                 return $this->total_days;
             } else {
                 // The subquery equivalent in Laravel
                 $subQuery = DB::table('live_times')
-                              ->select('uid', DB::raw('COUNT(*) AS entry_count'))
-                              ->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)
+                    ->select('uid', DB::raw('COUNT(*) AS entry_count'))
+                    ->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)
                     ->where('uid', $this->id)
-                              ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-                              ->havingRaw('SUM(hours) > 1')
-                ->get(); // Having condition
+                    ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
+                    ->havingRaw('SUM(hours) > 1')
+                    ->get(); // Having condition
 
 
 
                 return $subQuery->count('entry_count');
             }
         });
-        $grid->column( __('reals_count'))->display(function(){
+        $grid->column(__('reals_count'))->display(function () {
 
-            return request()->year==null &&request()->month ==null ?$this->reals()->count():$this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+            return request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
         });
-        $grid->column( __('moment_count'))->display(function(){
-            return request()->year==null &&request()->month ==null ?$this->moments()->count(): $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+        $grid->column(__('moment_count'))->display(function () {
+            return request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
         });
-        $grid->column( __('total_hours'))->display(function(){
-            return  request()->year==null &&request()->month ==null ?$this->liveTime()->sum("hours"):$this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
-        });
-
-        $grid->column( __('Filtered salary'))->display(function(){
-            return  request()->year==null &&request()->month ==null ?$this->salary :$this->getSalary(request()->month,request()->year);
+        $grid->column(__('total_hours'))->display(function () {
+            return  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
         });
 
-        $grid->column( __('Current Salary'))->display(function(){
+        $grid->column(__('Filtered salary'))->display(function () {
+            return  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
+        });
+
+        $grid->column(__('Current Salary'))->display(function () {
             return  $this->salary;
         });
 
@@ -233,7 +231,7 @@ class ReportUserController extends MainController
         $show->field('lan', __('Lan'));
         $show->field('unread_count_message', __('Unread count message'));
         $show->field('country_id', __('Country id'));
-//        $show->field('image_color_id', __('Image color id'));
+        //        $show->field('image_color_id', __('Image color id'));
         $show->field('deleted_at', __('Deleted at'));
         $show->field('current_app_version', __('Current app version'));
 
@@ -326,7 +324,7 @@ class ReportUserController extends MainController
         $form->text('lan', __('Lan'))->default('en');
         $form->number('unread_count_message', __('Unread count message'));
         $form->number('country_id', __('Country id'));
-//        $form->number('image_color_id', __('Image color id'));
+        //        $form->number('image_color_id', __('Image color id'));
         $form->number('current_app_version', __('Current app version'));
 
         return $form;

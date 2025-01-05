@@ -33,12 +33,12 @@ class AgencyJoinRequestController extends MainController
 
 
 
-    public function update ( $id )
+    public function update($id)
     {
 
-        if (request ('_edit_inline') == "true"){
-            if (request ('status')){
-                request ()->request->add(['change_status_admin_id'=>Auth::id ()]);
+        if (request('_edit_inline') == "true") {
+            if (request('status')) {
+                request()->request->add(['change_status_admin_id' => Auth::id()]);
             }
         }
         return $this->form()->update($id);
@@ -46,9 +46,9 @@ class AgencyJoinRequestController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Join To Agency Requests'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -60,9 +60,9 @@ class AgencyJoinRequestController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('Join To Agency Requests'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -74,16 +74,16 @@ class AgencyJoinRequestController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('Join To Agency Requests'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Join To Agency Requests'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 
@@ -95,48 +95,46 @@ class AgencyJoinRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AgencyJoinRequest);
-        $grid->model ()->orderByDesc ('id');
-        $grid->filter (function (Grid\Filter $filter){
+        $grid->model()->orderByDesc('id');
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('status',__('status'))->select([0=>'pending',1=>'accepted',2=>'denied']);
-
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('status', __('status'))->select([0 => 'pending', 1 => 'accepted', 2 => 'denied']);
             });
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('agency.id',__ ('agency id'));
-
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency.id', __('agency id'));
             });
         });
 
-        $grid->id(__ ('ID'));
-        $grid->column('user_id',__('user id'))->modal ('user info',function ($model){
-            if ($model->user_id){
-                return Common::getUserShow ($model->user_id);
+        $grid->id(__('ID'));
+        $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
+            if ($model->user_id) {
+                return Common::getUserShow($model->user_id);
             }
             return null;
         });
-        $grid->column('agency_id',__ ('agency id'))->modal ('agency info',function ($model){
-            if ($model->agency_id){
-                return Common::getAgencyShow ($model->agency_id);
+        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
+            if ($model->agency_id) {
+                return Common::getAgencyShow($model->agency_id);
             }
             return null;
         });
-        $grid->column ('whatsapp',__ ('whatsapp'));
-        $grid->column('status',__('status'))->using (
+        $grid->column('whatsapp', __('whatsapp'));
+        $grid->column('status', __('status'))->using(
             [
-                0=>__('pending'),
-                1=>__ ('accepted'),
-                2=>__ ('denied')
+                0 => __('pending'),
+                1 => __('accepted'),
+                2 => __('denied')
             ]
         );
-        $grid->column('change_status_admin_id',__('change status admin id'))->modal ('admin info',function ($model){
-            if ($model->change_status_admin_id){
-                return Common::getAdminShow ($model->change_status_admin_id);
+        $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
+            if ($model->change_status_admin_id) {
+                return Common::getAdminShow($model->change_status_admin_id);
             }
             return null;
         });
-        $grid->column('created_at',trans('time'))->diffForHumans ();
-        $this->extendGrid ($grid);
+        $grid->column('created_at', trans('time'))->diffForHumans();
+        $this->extendGrid($grid);
 
 
         $grid->disableCreateButton();
@@ -154,15 +152,15 @@ class AgencyJoinRequestController extends MainController
     {
         $show = new Show(AgencyJoinRequest::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->user_id('user_id');
-//        $show->agency_id('agency_id');
-//        $show->status('status');
-//        $show->change_status_admin_id('change_status_admin_id');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
+        //        $show->id('ID');
+        //        $show->user_id('user_id');
+        //        $show->agency_id('agency_id');
+        //        $show->status('status');
+        //        $show->change_status_admin_id('change_status_admin_id');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
 
-        $this->extendShow ($show);
+        $this->extendShow($show);
 
         return $show;
     }
@@ -176,22 +174,22 @@ class AgencyJoinRequestController extends MainController
     {
 
         $form = new Form(new AgencyJoinRequest);
-        $form->display(__ ('ID'));
-        $form->text('user_id', __ ('user id'));
-        $form->text('agency_id', __ ('agency id'));
-        $form->select('status', __('status'))->options (
+        $form->display(__('ID'));
+        $form->text('user_id', __('user id'));
+        $form->text('agency_id', __('agency id'));
+        $form->select('status', __('status'))->options(
             [
-                0=>__('pending'),
-                1=>__ ('accepted'),
-                2=>__ ('denied')
+                0 => __('pending'),
+                1 => __('accepted'),
+                2 => __('denied')
             ]
         );;
         $form->hidden('change_status_admin_id', 'change_status_admin_id');
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
-            $user = User::query ()->where ('id',$form->model ()->user_id)->first ();
-            if (@$user->agency_id){
+            $user = User::query()->where('id', $form->model()->user_id)->first();
+            if (@$user->agency_id) {
                 $error = new MessageBag(
                     [
                         'title'   => 'forbidden',
@@ -201,28 +199,26 @@ class AgencyJoinRequestController extends MainController
                 return back()->with(compact('error'));
             }
 
-            if($form->status == 1 ){
+            if ($form->status == 1) {
                 UserCommon::userVip($user);
             }
 
             $user_id = $form->model()->user_id;
 
-        $update = DB::table('users')
-            ->where('id', $user_id)
-            ->update(['type_user' => 1]);
+            $update = DB::table('users')
+                ->where('id', $user_id)
+                ->update(['type_user' => 1]);
 
-        if (!$update) {
-            $error = new MessageBag([
-                'title' => 'Error',
-                'message' => 'Failed to update user',
-            ]);
+            if (!$update) {
+                $error = new MessageBag([
+                    'title' => 'Error',
+                    'message' => 'Failed to update user',
+                ]);
 
-            // Use a flash message to display the error on the redirected page
+                // Use a flash message to display the error on the redirected page
 
-            // Redirect back to the form with the error message
-        }
-
-
+                // Redirect back to the form with the error message
+            }
         });
 
 

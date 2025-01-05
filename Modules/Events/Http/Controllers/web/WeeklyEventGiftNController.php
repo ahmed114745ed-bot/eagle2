@@ -325,7 +325,7 @@ class WeeklyEventGiftNController extends MainController
                 $form->image("target4", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
-            });
+            })->rules('required');
         $form->number('expire', __('expire'));
         $form->saved(function (Form $form) {
             $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));

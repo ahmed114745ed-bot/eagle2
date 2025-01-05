@@ -110,7 +110,6 @@ class MyDataResource extends JsonResource
         }
 
 
-
         $ownerRoom = $this->ownerRoom;
         /**@var User $this
          * @var Room $ownerRoom*/
@@ -161,7 +160,8 @@ class MyDataResource extends JsonResource
             'user_jobs' => $this->jobs,
             'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
-            'country' => $this->country,
+            'country' => $this->country ??(object) [] ,
+            'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
@@ -172,7 +172,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true)
+            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true),
+            'company_number' => Common::getConfig('company_number'),
         ];
 
         $data['auth_token'] = $this->auth_token;

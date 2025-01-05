@@ -19,9 +19,9 @@ class ChargeAgencyController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('agency-country'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -33,9 +33,9 @@ class ChargeAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('agency-country'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -47,16 +47,16 @@ class ChargeAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('agency-country'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('agency-country'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     protected function grid()

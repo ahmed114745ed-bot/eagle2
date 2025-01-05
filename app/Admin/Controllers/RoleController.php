@@ -19,6 +19,13 @@ class RoleController extends MainController
         return trans('admin.roles');
     }
 
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__($this->title))
+            ->body($this->grid()));
+    }
+
     public function edit($id, Content $content)
     {
         return $content

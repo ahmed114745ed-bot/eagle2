@@ -10,6 +10,7 @@ use App\Helpers\Common;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -24,10 +25,44 @@ class SpecialWareController extends  MainController
     protected $title = 'Ware';
     public $permission_name = 'special-Ware';
 
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__($this->title))
+            ->body($this->grid()));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(__($this->title))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
+    }
     /**
      * Make a grid builder.
      *
      * @return Grid
+     * 
      */
     protected function grid()
     {
@@ -115,14 +150,18 @@ class SpecialWareController extends  MainController
         )->default(4);
         $form->hidden('type')->value(25);
         $form->text('value', __('value'))
-            ->creationRules(['required', Rule::unique('users', 'uuid'),
-                    function ($attribute, $value, $fail) {
-                        if (DB::table('wares')->where('value', $value)->exists()) {
-                            return $fail(__('لا يمكنك استخدام القيمه هذه'));
-                        }
+            ->creationRules([
+                'required',
+                Rule::unique('users', 'uuid'),
+                function ($attribute, $value, $fail) {
+                    if (DB::table('wares')->where('value', $value)->exists()) {
+                        return $fail(__('لا يمكنك استخدام القيمه هذه'));
                     }
-                ])
-            ->updateRules(['required', Rule::unique('users', 'uuid')->ignore(request()->route('id')),
+                }
+            ])
+            ->updateRules([
+                'required',
+                Rule::unique('users', 'uuid')->ignore(request()->route('id')),
                 // نفس الشيء هنا مع التحقق من عدم وجود القيمة في جدول wares
                 // function ($attribute, $value, $fail) {
                 //     if (DB::table('wares')->where('value', $value)->exists()) {
@@ -134,16 +173,16 @@ class SpecialWareController extends  MainController
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
         $form->number('price', trans('price'))->rules('required|max:9', [
-           
+
             'max' => __('The maximum price allowed is 9 hundred million'),
         ])/*->symbol ('💰')*/;
         $form->number('level', trans('level'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->default('1.png')->rules ('required');
+        })->default('1.png')->rules('required');
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
-       })->rules ('required');
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        })->rules('required');
         $form->color('color', trans('color'));
 
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());

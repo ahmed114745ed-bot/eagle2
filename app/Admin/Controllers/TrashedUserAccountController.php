@@ -10,6 +10,7 @@ use App\Admin\Actions\RestoreUserAccount;
 use App\Admin\Actions\SoftDeleteUserAccount;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Layout\Content;
 
 class TrashedUserAccountController extends AdminController
 {
@@ -18,10 +19,16 @@ class TrashedUserAccountController extends AdminController
      *
      * @var string
      */
-    protected $title = 'User';
     public $permission_name = 'trashed-account-user';
     use HasResourceActions;
 
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('User'))
+            ->body($this->grid()));
+    }
     /**
      * Make a grid builder.
      *

@@ -33,22 +33,57 @@ class UserController extends MainController
 
 
 
-    public function __construct ()
+    public function __construct()
     {
-        $this->title ='Users';
+        $this->title = 'Users';
     }
 
-    public function index ( Content $content )
+
+    public function index(Content $content)
     {
-
-
-        return $content
+        return parent::index($content
             ->title(__($this->title))
-            ->row(function($row) {
+            ->row(function ($row) {
                 $row->column(12, $this->grid());
                 //$row->column(2, view('admin.grid.users.actions'));
-            });
+            }));
     }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(__($this->title))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
+    }
+
 
 
 
@@ -63,32 +98,31 @@ class UserController extends MainController
     {
 
         $grid = new Grid(new User());
-        $grid->model ()->ofAgency();
-        $grid->quickSearch ();
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('uuid',__ ('uuid'));
+        $grid->model()->ofAgency();
+        $grid->quickSearch();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('uuid', __('uuid'));
             });
-
         });
         $grid->column('id', __('Id'));
-        $grid->column ('uuid','uuid');
+        $grid->column('uuid', 'uuid');
 
         $grid->column('name', __('Name'));
         $grid->column('nickname', __('NickName'));
         $grid->column('email', __('Email'));
         $grid->column('phone', __('Phone'));
 
-        $grid->column ('agency_id',__ ('agency id'))->modal ('agency info',function ($model){
-            if ($model->agency_id){
-                return Common::getAgencyShow ($model->agency_id);
+        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
+            if ($model->agency_id) {
+                return Common::getAgencyShow($model->agency_id);
             }
             return null;
         });
 
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
 
         return $grid;
     }
@@ -105,10 +139,10 @@ class UserController extends MainController
 
         $show->field('id', __('Id'));
         $show->field('uuid', __('uuid'));
-        $show->field ('avatar',__('avatar'))->image ('',200);
+        $show->field('avatar', __('avatar'))->image('', 200);
         $show->field('name', __('Name'));
         $show->field('nickname', __('NickName'));
-        $show->field('flag', __('country'))->image ('',50);
+        $show->field('flag', __('country'))->image('', 50);
         $show->field('email', __('Email'));
 
 
@@ -123,9 +157,4 @@ class UserController extends MainController
      *
      * @return Form
      */
-
-
-
-
-
 }

@@ -31,7 +31,6 @@ class ParentUsersController extends MainController {
         }
         return $content
             ->title(__('parent-users'))
-            ->description($title)
             ->row(function($row) {
                 $row->column(12, $this->grid());
             });

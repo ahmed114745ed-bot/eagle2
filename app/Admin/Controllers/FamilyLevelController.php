@@ -24,6 +24,33 @@ class FamilyLevelController extends MainController
         (new AppFeatureService)->validateStatusEnable("families");
     }
 
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('family-level'))
+            ->body($this->grid()));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('family-level'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('family-level'))
+            ->body($this->form()));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('family-level'))
+            ->body($this->detail($id)));
+    }
+
 
     /**
      * Make a grid builder.

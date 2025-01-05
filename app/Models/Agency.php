@@ -276,5 +276,9 @@ class Agency extends Model
             return floor( $agencySallary ?? 0);
     }
 
+    public function joinRequests()
+    {
+        return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
+    }
     
 }

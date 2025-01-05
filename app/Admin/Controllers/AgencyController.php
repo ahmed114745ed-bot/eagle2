@@ -43,9 +43,23 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Agencies'))
-            ->body($this->grid());
+            ->body($this->grid()));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -87,7 +101,7 @@ class AgencyController extends MainController
     public function show($id, Content $content)
     {
 
-        return $content
+        return parent::show($id, $content
             ->title(__("agency details"))
             ->row(function ($row) use ($id) {
                 $agency = Agency::find($id);
@@ -117,7 +131,7 @@ class AgencyController extends MainController
 
                 // ;
 
-            });
+            }));
     }
 
     public function destroy($id)
@@ -147,7 +161,7 @@ class AgencyController extends MainController
             );
         })->orderByDesc('id');
         if (request("active") == true) {
-            $grid->model()->whereHas("agencySalaries", function ($q){
+            $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)->where('year', now()->year);
             });
         }
@@ -174,20 +188,19 @@ class AgencyController extends MainController
                 }])
                 ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received',]) // selecting specific fields from `mempers`
                 ->map(function ($memper) {
-                    $memper->image = $memper->profile->avatar ?? null;
+                    $memper->image = @$memper->profile?->avatar ?? null;
                     $imageHtml = $memper->profile && $memper->profile->avatar
                         ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
                         : 'No Image';
                     $salary = $memper->userSallary->sallary ?? '';
                     return [
-                        'id' => $memper->id,
-                        'uuid' => $memper->uuid,
-                        'uuid' => $memper->uuid,
-                        'name' => $memper->name,
-                        'reals_count' => count($memper->reals),
-                        'total_days' => $memper->total_days,
+                        'id' => $memper->id ?? 0,
+                        'uuid' => $memper->uuid ?? 0,
+                        'name' => $memper->name ?? '',
+                        'reals_count' => count($memper->reals) ?? 0,
+                        'total_days' => $memper->total_days ?? 0,
                         'total_hours' => $memper->liveTime->sum("hours"),
-                        'monthly_diamond_received' => $memper->monthly_diamond_received,
+                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
                         'image' => $imageHtml,
                         'salary' => $salary ?? '',
 
@@ -292,16 +305,15 @@ class AgencyController extends MainController
             $opsAgencyMangerDash[$user->id] = $user->name;
         }
 
-
         $form->display('ID');
 
         $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-                }
-                return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name');
+            $ops2 = [];
+            foreach (User::Where('id', $value)->get() as $user) {
+                $ops2[$user->id] = $user->uuid . '_' . $user->name;
+            }
+            return $ops2;
+        })->ajax('/api/search/users3', 'id', 'name');
         if (!$form->isEditing()) {
             //$form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
             // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
@@ -415,7 +427,7 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType,'agency_id' => $form->model()->id,]);
+            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'agency_id' => $form->model()->id,]);
             // }
 
 

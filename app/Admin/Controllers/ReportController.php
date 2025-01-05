@@ -23,13 +23,13 @@ class ReportController extends MainController
     public $permission_name = 'report';
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('reports'))
             ->description(__(request('desc') ?: 'users'))
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.actions'));
                 $row->column(10, $this->grid());
-            });
+            }));
     }
 
     protected function grid()

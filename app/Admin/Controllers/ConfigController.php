@@ -53,9 +53,9 @@ class ConfigController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('configs'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -73,9 +73,9 @@ class ConfigController extends MainController
         } elseif ($form->model()->type == 'select') {
             $form->valueSelect = $form->model()->value;
         }
-        return $content
+        return parent::edit($id,$content
             ->title(trans('configs'))
-            ->body($form);
+            ->body($form));
     }
 
     /**
@@ -86,9 +86,9 @@ class ConfigController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('configs'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**

@@ -6,7 +6,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Content;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 
 class UsersDevicesHistoriesController extends MainController
@@ -18,6 +18,33 @@ class UsersDevicesHistoriesController extends MainController
      */
     protected $title = 'UserDevicesHistory';
     public $permission_name = 'users-devices';
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans(__($this->title)))
+            ->body($this->grid()));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans(__($this->title)))
+            ->body($this->form()));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->detail($id)));
+    }
 
     /**
      * Make a grid builder.

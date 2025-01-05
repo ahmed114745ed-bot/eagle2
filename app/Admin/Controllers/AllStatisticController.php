@@ -101,9 +101,9 @@ class AllStatisticController extends MainController
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), @$app_earned_charge ?? 0));
                 });
         } else {
-            return $content
+            return parent::index($content
                 ->title(trans('statistics'))
-                ->description(__(request('desc') ?: __("Main")));
+                ->description(__(request('desc') ?: __("Main"))));
         }
     }
 

@@ -19,6 +19,13 @@ class UserTargetController extends MainController
     use HasResourceActions;
     public $permission_name = 'agent-target';
 
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('user target'))
+            ->body($this->grid()));
+    }
     /**
      * Make a grid builder.
      *

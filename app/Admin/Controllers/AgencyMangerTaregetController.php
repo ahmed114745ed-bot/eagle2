@@ -27,13 +27,13 @@ class AgencyMangerTaregetController extends MainController {
     }
     public function index ( Content $content )
     {
-        return $content
+        return parent::index($content
             ->title(trans('reports'))
             ->description(__(request ('desc')?:'agencies'))
             ->row(function($row) {
                 $row->column(2, view('admin.grid.common.AgencyMangerBlance'));
                 $row->column(10, $this->grid());
-            });
+            }));
     }
 
     protected function grid(){

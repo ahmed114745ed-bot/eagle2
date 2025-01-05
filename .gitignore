@@ -29,5 +29,6 @@ php.ini
 /public/images/app-logo.png
 gcp.json
 /public/settings.json
+/config/theme.php
 /config/laravel-ffmpeg.php
 public/settings.json

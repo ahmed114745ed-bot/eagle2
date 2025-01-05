@@ -198,9 +198,9 @@ class ChatRoomService
             ->select('chat_rooms.*')
             ->where('chat_rooms.user_id2', $user->id)
             ->where('chat_rooms.type', 'guest')
-            ->with('messages')
-            ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
-            ->orderBy('chat_messages.id', 'desc')
+            ->has('messages')
+            // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
+            // ->orderBy('chat_messages.id', 'desc')
             ->paginate(20);
 
         // Get unread messages
@@ -230,10 +230,14 @@ class ChatRoomService
     {
         // Find existing chat room or create a new one
         $chatRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
-            $query->where('user_id', $user->id)
-                ->where('user_id2', $userId2)
-                ->orWhere('user_id', $userId2)
+            $query->where(function($q) use($user, $userId2){
+                $q->where('user_id', $user->id)
+                ->where('user_id2', $userId2);
+            })
+            ->orWhere(function($q)use($user, $userId2){
+                $q->where('user_id', $userId2)
                 ->where('user_id2', $user->id);
+            });
         })->first();
 
         if (!$chatRoom) {

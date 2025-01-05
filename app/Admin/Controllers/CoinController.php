@@ -16,7 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class CoinController extends MainController
+class CoinController extends MainOldController
 {
     use HasResourceActions;
 

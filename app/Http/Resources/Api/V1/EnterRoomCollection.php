@@ -42,7 +42,8 @@ class EnterRoomCollection extends JsonResource
             "name"                => @$this->name ?? '',
             "room_intro"          => $this->room_intro,
             "room_pass"           => $this->room_pass,
-            "room_type"           => @$this->roomCategory->name ?? '',
+            'room_type'           => $this->roomCategory?->name_en ? (app()->getLocale() == 'en' ? $this->roomCategory?->name_ar : $this->roomCategory?->name_en ) : '',
+
             "hot"                 => '',
             "room_background"     => $this->final_room_image,
             "microphone"          => $this->microphone,
@@ -64,16 +65,22 @@ class EnterRoomCollection extends JsonResource
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
-            'owner_vip_level'        => @$owner->UserVip?->level ?? null,
-            'owner_country' => $owner && $owner->country
-                ? new CountryResource($owner->country)
-                : [
-                    'id' => 0,
-                    'name' => '',
-                    'flag' => '',
-                    'lang' => '',
-                    'phone_code' => ''
-                ],
+            'owner_vip_level'     => @$owner->UserVip?->level ?? null,
+            'owner_country'        =>        $owner && $owner->country
+                                    ? [
+                                        'id' => $owner->country->id,
+                                        'name' => $this->country ? (app()->getLocale() == 'en' ? $owner->country->e_name : $owner->country->name) : '',
+                                        'flag' => $owner->country->flag,
+                                        'lang' => $owner->country->lang,
+                                        'phone_code' => $owner->country->phone_code
+                                    ]
+                                    : [
+                                        'id' => 0,
+                                        'name' => '',
+                                        'flag' => '',
+                                        'lang' => '',
+                                        'phone_code' => ''
+                                    ],
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
             'password_status'     => !($this->room_pass == ""),
