@@ -96,7 +96,9 @@ class AdminPermission extends Seeder
             'charge-agency',
             'salary-request',
             "agent-request-history",
-            "agencies"
+            "agencies",
+            'user-agent-target',
+            'charges-agency'
 
 
 
@@ -152,6 +154,7 @@ class AdminPermission extends Seeder
             'user-levels' => ['user-levels'],
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
             'bans' => ['bans'],
+            'agency-owner' =>['agent-user','agent-target','user-agent-target','charges-agency','agent-request']
 
         ];
 
