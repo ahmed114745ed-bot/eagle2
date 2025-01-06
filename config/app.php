@@ -6,6 +6,7 @@ return [
     'cache'=>env ('CACHE_ENABLE','disabled'),
 
     'payment_url' => env('PAYMENT_URL'),
+    'node_server_name' => env('NODE_SERVER_NAME'),
 
     'owner_timezone' => env('OWNER_TIMEZONE','-03:00'),
 
