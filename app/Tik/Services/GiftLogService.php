@@ -71,8 +71,6 @@ class GiftLogService
         // get received users data
         $receivedUsers = $this->UserRepository->getUsers($receiversIds);
 
-
-
         //        $percentageValues = $this->getReceivedAndSanderPercentage();
         //decrement the user coins
         try {
@@ -97,6 +95,7 @@ class GiftLogService
             $to    = @$receivedUsers->first()->name;
         }
 
+
         $fromName = $user->name;
         $sendGiftServices = new SendGiftService();
 
@@ -104,7 +103,6 @@ class GiftLogService
             $this->sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, $to, $ownerId, $number, $user, $receivedUsers->first(), ($request->to_zego == 1 || !$request->has('to_zego')));
         //send to zego if pk not null
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
-
 
 
         $cpId =  Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
@@ -190,8 +188,8 @@ class GiftLogService
     }
 
     private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number){
-        $firstReceiver = User::with('profile', 'userVip')->where('id', $receivedUsers[0])->first();
 
+        $firstReceiver = User::with('profile', 'userVip')->where('id', $receivedUsers[0])->first();
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
             'gift_img'          => $gift->img,
