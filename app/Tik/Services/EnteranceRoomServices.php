@@ -373,9 +373,9 @@ class EnteranceRoomServices
                     $messageBlack = __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room');
                     $remainingTime = ['remaining_time' => "$h:$m:$s"];
 
-                    return [$messageBlack,$remainingTime];
+                    return Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
+                    // return [$messageBlack,$remainingTime];
                     // ['remaining_time' => "$h:$m:$s"]
-                    Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
                 }
 
                 if ($sjc >= $arr[2]) {
