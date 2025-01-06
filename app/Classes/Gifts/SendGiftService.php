@@ -31,6 +31,7 @@ class SendGiftService
         GiftLog::query()->create($info);
 
 
+
     }
 
     public function sendGift2($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, $cpId = null)
