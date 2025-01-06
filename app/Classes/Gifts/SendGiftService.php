@@ -310,7 +310,6 @@ class SendGiftService
      */
     public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null): array
     {
-
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
         $info['giftId']       = $gift->id;
         $info['roomowner_id'] = $room->uid;
