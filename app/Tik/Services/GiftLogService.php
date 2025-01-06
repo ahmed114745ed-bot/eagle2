@@ -16,6 +16,7 @@ use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use Modules\CP\Http\Services\CpServices;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
+use App\Events\GiftBannerEvent;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
@@ -179,9 +180,50 @@ class GiftLogService
         } catch (BadResponseException $e) {
         }
 
+        if($totalPrice > 2000){
+            $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+        }
+
+
+
         return Common::apiResponse(1, $message);
     }
 
+    private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number){
+        $firstReceiver = User::with('profile', 'userVip')->where('id', $receivedUsers[0])->first();
+
+        $gift_data = [
+            'show_gift'         => $gift->show_img ?: $gift->show_img2,
+            'gift_img'          => $gift->img,
+            'gift_id'           => $gift->id,
+            'sender_id'         => (int)$user->id,
+            'receiver_id'       => (int)$receivedUser->id,
+            'num_gift'          => $totalPrice,
+            "plural"            => is_array($receiversIds) && count($receiversIds) > 1,
+            'room_session'      => $room->session_string,
+            'is_password'       => (bool)(@$room->room_pass),
+            'room_id'           => $room->id,
+            'from_name'         => $user->name,
+            'to_name'           => $receivedUser->name,
+            'gift_price'        => $gift->price,
+            'owner_id'          => $ownerId,
+            'number'            => $number,
+            'coins'             => $user->coins_string,
+            'gift_image_type'   => $gift->image_type,
+            's_vip_level'       => @$user->userVip->level ?? 0,
+            's_image'           => @$user->profile->avatar ?? '',
+            's_name'            => @$user->name ?? '',
+            's_sender_level'    => @$user->total_sender_level,
+            's_receiver_level'  => @$user->total_received_level,
+            'r_vip_level'       => @$firstReceiver->userVip->level ?? 0,
+            'r_name'            => @$firstReceiver->name ?? '',
+            'r_image'           => @$firstReceiver->profile->avatar ?? '',
+            'r_sender_level'    => @$firstReceiver->total_received_level,
+            'r_receiver_level'  => @$firstReceiver->total_sender_level,
+        ];
+
+        event(new GiftBannerEvent($gift_data));
+    }
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {
 
