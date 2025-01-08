@@ -321,6 +321,7 @@ Route::group(
         $router->resource('room-target', RoomTargetController::class);
 
         // $router->resource('agencyMangLink', AgencyMangerLinkController::class);
+        
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
