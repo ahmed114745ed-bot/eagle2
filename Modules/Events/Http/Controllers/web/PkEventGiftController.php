@@ -3,6 +3,7 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Controllers\MainOldController;
 use App\Models\OVip;
 use App\Models\Ware;
 use App\Services\AppFeatureService;
@@ -16,7 +17,7 @@ use Modules\Events\Entities\PkReward;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class PkEventGiftController extends MainController
+class PkEventGiftController extends MainOldController
 {
 
     use HasResourceActions;
@@ -109,7 +110,7 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-               
+
                 return "achievement";
             }
 
@@ -145,12 +146,12 @@ class PkEventGiftController extends MainController
             $add = __('add');
             $gifts = __('winner first gifts');
             $customButtonHTML = <<<HTML
-            
+
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
                 <h3 style="margin-right: 10px;">{ $gifts}</h3>
-        
+
             HTML;
             $tools->append($customButtonHTML);
         });
@@ -178,7 +179,7 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-               
+
                 return "achievement";
             }
 
@@ -246,7 +247,7 @@ class PkEventGiftController extends MainController
             }elseif ($this->type == "coins"){
                 return @$this->target;
             }elseif ($this->type == "achievement"){
-                
+
                 return "achievement";
             }
 

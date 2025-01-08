@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainOldController;
 use App\Models\Vip;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -22,7 +23,7 @@ use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Entities\RewardTarget;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class RewardTargetController extends MainController
+class RewardTargetController extends MainOldController
 {
     use HasResourceActions;
     public function __construct()
