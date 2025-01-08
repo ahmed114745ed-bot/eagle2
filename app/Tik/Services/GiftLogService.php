@@ -180,7 +180,6 @@ class GiftLogService
         }
 
         if($totalPrice > 2000){
-            Log::info("price more than 2000");
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
 
@@ -191,7 +190,6 @@ class GiftLogService
 
     private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number){
 
-        $firstReceiver = User::with('profile', 'userVip')->where('id', $receivedUsers[0])->first();
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
             'gift_img'          => $gift->img,
@@ -215,11 +213,11 @@ class GiftLogService
             's_name'            => @$user->name ?? '',
             's_sender_level'    => @$user->total_sender_level,
             's_receiver_level'  => @$user->total_received_level,
-            'r_vip_level'       => @$firstReceiver->userVip->level ?? 0,
-            'r_name'            => @$firstReceiver->name ?? '',
-            'r_image'           => @$firstReceiver->profile->avatar ?? '',
-            'r_sender_level'    => @$firstReceiver->total_received_level,
-            'r_receiver_level'  => @$firstReceiver->total_sender_level,
+            'r_vip_level'       => @$receivedUser->userVip->level ?? 0,
+            'r_name'            => @$receivedUser->name ?? '',
+            'r_image'           => @$receivedUser->profile->avatar ?? '',
+            'r_sender_level'    => @$receivedUser->total_received_level,
+            'r_receiver_level'  => @$receivedUser->total_sender_level,
         ];
 
         event(new GiftBannerEvent($gift_data));
