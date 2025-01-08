@@ -37,7 +37,7 @@ class MembersUserResource extends JsonResource
     {
         $data = [
             'id' => @$this->id,
-            'family_id' => (int)$this->familyId, // Include family_id in the response
+            'family_id' => (int)$this->familyId ? (int)$this->familyId: $this->additional['family_id'], // Include family_id in the response
             'name' => @$this->name ?: '',
             'profile' => [
                 'image' => @$this->profile->avatar,
