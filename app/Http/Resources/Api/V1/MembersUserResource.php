@@ -38,8 +38,6 @@ class MembersUserResource extends JsonResource
         $data = [
             'id' => @$this->id,
             'family_id' => (int)$this->familyId ? (int)$this->familyId: (int)$request->family_id, // Include family_id in the response
-            'ss' => $request->family_id,
-            'zz' => $this->additional['family_id'],
             'name' => @$this->name ?: '',
             'profile' => [
                 'image' => @$this->profile->avatar,
