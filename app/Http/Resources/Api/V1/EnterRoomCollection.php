@@ -42,7 +42,7 @@ class EnterRoomCollection extends JsonResource
             "name"                => @$this->name ?? '',
             "room_intro"          => $this->room_intro,
             "room_pass"           => $this->room_pass,
-            'room_type'           => $this->roomCategory?->name_en ? (app()->getLocale() == 'en' ? $this->roomCategory?->name_ar : $this->roomCategory?->name_en ) : '',
+            'room_type'           =>  app()->getLocale() === 'ar' ? $this->roomCategory?->name  ?? $this->roomCategory?->name_en : $this->roomCategory?->name_en ?? $this->roomCategory?->name,
 
             "hot"                 => '',
             "room_background"     => $this->final_room_image,
@@ -67,41 +67,41 @@ class EnterRoomCollection extends JsonResource
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => @$owner->UserVip?->level ?? null,
             'owner_country'        =>        $owner && $owner->country
-                                    ? [
-                                        'id' => $owner->country->id,
-                                        'name' => $this->country ? (app()->getLocale() == 'en' ? $owner->country->e_name : $owner->country->name) : '',
-                                        'flag' => $owner->country->flag,
-                                        'lang' => $owner->country->lang,
-                                        'phone_code' => $owner->country->phone_code
-                                    ]
-                                    : [
-                                        'id' => 0,
-                                        'name' => '',
-                                        'flag' => '',
-                                        'lang' => '',
-                                        'phone_code' => ''
-                                    ],
+                ? [
+                    'id' => $owner->country->id,
+                    'name' => $this->country ? (app()->getLocale() == 'en' ? $owner->country->e_name : $owner->country->name) : '',
+                    'flag' => $owner->country->flag,
+                    'lang' => $owner->country->lang,
+                    'phone_code' => $owner->country->phone_code
+                ]
+                : [
+                    'id' => 0,
+                    'name' => '',
+                    'flag' => '',
+                    'lang' => '',
+                    'phone_code' => ''
+                ],
             'room_visitors_count' => $this->getRoomVisitorCount(@$this->room_visitor ?? ''),
             'microphones'         => $this->getMicrophones($this->microphone, $this->main_microphone),
             'password_status'     => !($this->room_pass == ""),
             'room_rule'           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')),
             'boxes'               => [],
             'muted_users'         => $this->muted_users,
-            'youtube_key'         => configesModel::query()->where("name","youtube_key")->first()?->value ?? "",
+            'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",
             'room_keys' => [
                 "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
             ],
-            'writing_disabled'    => ($this->writing_disabled)? true : false,
-            'charisma_status'    => ($this->charizma_status)? true : false,
-            'show_welcom_animation'=> settings()->get('show_welcom_enmation') == 'on' ? true : false,
+            'writing_disabled'    => ($this->writing_disabled) ? true : false,
+            'charisma_status'    => ($this->charizma_status) ? true : false,
+            'show_welcom_animation' => settings()->get('show_welcom_enmation') == 'on' ? true : false,
             'private_comment_price' => (Common::getConfig('private_comment_price') ?? 100),
             'game'               =>  $this->mode == 4 && $this->game ? new \App\Http\Resources\AllGameResource($this->game) : new \stdClass(),
             "game_key" => (string)Common::getConfig('comment_room_key') ??  (string)13456489535,
-            'room_level'   =>[
-                'name' => app()->getLocale() === 'ar' ? @$this->level->name_ar ??'':@$this->level->name_en??'',
-                'image'  => @$this->level->image ??'',
-                'exp' =>@$this->exp??0,
-                'level_num' =>@$this->level->level??0,
+            'room_level'   => [
+                'name' => app()->getLocale() === 'ar' ? @$this->level->name_ar ?? '' : @$this->level->name_en ?? '',
+                'image'  => @$this->level->image ?? '',
+                'exp' => @$this->exp ?? 0,
+                'level_num' => @$this->level->level ?? 0,
             ],
         ];
     }
@@ -109,14 +109,14 @@ class EnterRoomCollection extends JsonResource
     private function getRoomTwoLastPk(int $roomId)
     {
         return Pk::query()
-                 ->where('room_id', $roomId)
-                 ->orderByDesc('created_at')
-                 ->limit(2)
-                 ->get();
+            ->where('room_id', $roomId)
+            ->orderByDesc('created_at')
+            ->limit(2)
+            ->get();
     }
 
 
- /*   private function getBoxes()
+    /*   private function getBoxes()
     {
         return BoxUse::query()
                      ->with('user', fn($q) => $q->withoutAppends()->select(['id', 'name']))
@@ -140,8 +140,7 @@ class EnterRoomCollection extends JsonResource
      */
     public function getRoomBackground()
     {
-        return $this->mode == '3' ? 'custom_image/back-black.png' :
-            ((@RequestBackgroundImage::where('status', 1)->where('owner_room_id', $this->uid)->orderByDesc('id')->first())->img ??
+        return $this->mode == '3' ? 'custom_image/back-black.png' : ((@RequestBackgroundImage::where('status', 1)->where('owner_room_id', $this->uid)->orderByDesc('id')->first())->img ??
                 $this->room_background ??
                 @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img);
     }
@@ -170,7 +169,6 @@ class EnterRoomCollection extends JsonResource
         $roomVisitors = trim($roomVisitors);
         if ($roomVisitors == '') return 1;
         return count(explode(',', $roomVisitors)) + 1;
-
     }
 
     private function getMicrophones($microphones, $mainMicrophone)
@@ -206,20 +204,15 @@ class EnterRoomCollection extends JsonResource
                         'id'   => $user->id,
                         'name' => $user->name,
                         'img'  => $user->profile?->avatar ?? '',
-                        'seat_condition' => ($mainMicrophone[$i] == '0') ? 'empty' : ((($mainMicrophone[$i] == '-1') ? 'locked' : (($mainMicrophone[$i] == '-2') ? 'muted': 'empty'))),
+                        'seat_condition' => ($mainMicrophone[$i] == '0') ? 'empty' : ((($mainMicrophone[$i] == '-1') ? 'locked' : (($mainMicrophone[$i] == '-2') ? 'muted' : 'empty'))),
                     ];
                     $j++;
                 } else {
                     $microphones[$i] = 'empty';
-
                 }
-
-
             }
-
         }
         return $microphones;
-
     }
 
     private function getUserType($roomAdmin, $roomJudge)
