@@ -21,7 +21,7 @@ class FamilyResource extends JsonResource
             $owner = [
                 'id'        => $user->id,
                 'is_family_admin' => @$this->is_family_admin,
-                'family_id' => (string)$user->family_id,
+                'family_id' => strval($user->family_id),
                 'name'  => $user->name,
                 'profile' => [
                     'image' => $user->profile->avatar,
