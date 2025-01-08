@@ -11,16 +11,22 @@ use App\Http\Resources\Api\V1\MangerTypeResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use App\Models\User;
+use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use Modules\CP\Entities\CpRelation;
+use Modules\CP\Transformers\RankingResource;
+
 
 class RankingService
 {
-    protected $rankingRepo;
+    protected $rankingRepo ,$cpRepository ;
 
     public function __construct(
         RankingRepository $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
-        public UserAchievementService $achievementService
+        public UserAchievementService $achievementService,
+        RepositoriesCpRepository $cpRepository
     ) {
+        $this->cpRepository = $cpRepository;
         $this->rankingRepo = $rankingRepo;
     }
 
@@ -256,6 +262,8 @@ class RankingService
 
     public function topUser()
     {
+      
+ 
         $giftLogs = $this->GiftLogRepository->topUser('sender', 'sender_id');
         $giftLogsReceiver = $this->GiftLogRepository->topUser('receiver', 'receiver_id');
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
@@ -273,7 +281,18 @@ class RankingService
         foreach ($giftLogsRooms as $giftLogsRoom) {
             $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
         }
-        return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
+
+        $relationType = request("relationType") ?? CpRelation::first()?->id;
+        $type = request("type") ?? 1;
+        $data = $this->cpRepository->getCpRanking($relationType, $type);
+        $cp_top_2 = $data->take(2);
+
+        return Common::apiResponse(1, '', 
+        ['sender' => $img,
+         'receiver' => $receiverImage, 
+         'room' => $roomImage,
+         'top_cp' => RankingResource::collection($cp_top_2),
+        ]);
     }
 
     public function topUser2()
