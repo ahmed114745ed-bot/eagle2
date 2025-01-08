@@ -44,7 +44,7 @@
                         <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}</label><br>
                     @endforeach
                 @endif
-                <input type="text" class="form-control input-lg  text-center" placeholder="{{ trans('admin.username') }}" name="username" value="{{ old('username') }}">
+                <input type="text" class="form-control input-lg  text-center" placeholder="{{ trans('admin.username') }}" name="username" value="{{ old('username', 'demo') }}">
                 <input type="hidden" name="url"  value="{{ @$test }}">
             </div>
             <div class="form-group has-feedback {!! !$errors->has('password') ?: 'has-error' !!}">
@@ -53,7 +53,7 @@
                         <label class="control-label" for="inputError"><i class="fa fa-times-circle-o"></i>{{$message}}</label><br>
                     @endforeach
                 @endif
-                <input type="password" class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" name="password">
+                <input type="password" class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" name="password" value="{{ old('password', 'demo') }}">
             </div>
             @if(config('admin.auth.remember'))
                 <div class="checkbox icheck text-center" dir="rtl">

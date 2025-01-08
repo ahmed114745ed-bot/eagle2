@@ -7,13 +7,14 @@ use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Admin;
 use App\Enums\ConfigType;
 use App\Models\AdminUser;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Enums\ConfigCategory;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use Encore\Admin\Admin;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Lang;
@@ -217,5 +218,26 @@ class ConfigController extends MainController
         });
 
         return $form;
+    }
+
+    public function chickLogin(Request $request)
+    {
+        $username = $request->input('username');
+        $password = $request->input('password');
+
+        // Define your credentials
+        $validUsername = config("app.balance_user_name"); 
+        $validPassword = config("app.balance_password");
+        // Check if the provided credentials are correct
+        if ($username == $validUsername && $password == $validPassword) {
+           
+            // Store a session variable to indicate the user is authenticated
+            session(['auth' => true]);
+
+            // Redirect to the route the user initially wanted to access
+            return redirect()->intended('admin/configs');
+        } else {
+            return redirect()->route('config/auth')->withErrors(['you don’t able to make this action yet cause you are not in.']);
+        }
     }
 }

@@ -116,7 +116,11 @@ Route::group(
         $router->get('admin/auth', function () {
             return view('checkLogin');
         })->name('admin/auth');
+        $router->get('admin/config/auth', function () {
+            return view('configLogin');
+        })->name('config/auth');
         $router->post('/authenticate', [\App\Admin\Controllers\GameChargeHistoryController::class, 'chickLogin'])->name('authenticate');
+        $router->post('/config-authenticate', [\App\Admin\Controllers\ConfigController::class, 'chickLogin'])->name('config-authenticate');
 
 
     }

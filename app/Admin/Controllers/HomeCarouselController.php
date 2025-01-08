@@ -8,8 +8,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\HomeCarousel;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class HomeCarouselController extends MainController
 {
@@ -81,6 +82,12 @@ class HomeCarouselController extends MainController
         $grid->column('sort', trans('sort'))->editable();
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            $admin = Auth::user();
+            if ($admin->username == 'demo') {
+                $actions->disableDelete();
+            }
+        });
         return $grid;
     }
 

@@ -13,7 +13,7 @@ class ClearSessionAfterRequest
         $response = $next($request);
 
         // Clear the session after the request is handled
-        // $request->session()->forget('auth');
+         $request->session()->forget('auth');
 
         return $response;
     }

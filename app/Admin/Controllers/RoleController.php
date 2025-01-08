@@ -2,11 +2,12 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Controllers\AdminController;
 
 class RoleController extends MainController
 {
@@ -46,7 +47,7 @@ class RoleController extends MainController
         return $this->form()->store();
     }
 
-    public function update ( $id )
+    public function update($id)
     {
         return $this->form1()->update($id);
     }
@@ -78,12 +79,19 @@ class RoleController extends MainController
         $grid->column('updated_at', trans('admin.updated_at'));
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            if ($actions->row->slug == 'administrator' ||
+            $admin = Auth::user();
+            if (
+                $actions->row->slug == 'administrator' ||
                 $actions->row->slug == 'admin' ||
                 $actions->row->slug == 'developer' ||
                 $actions->row->slug == 'agency' ||
                 $actions->row->slug == 'charger'
             ) {
+                $actions->disableDelete();
+            } elseif ($admin->username == 'demo') {
+
+
+                $actions->disableEdit();
                 $actions->disableDelete();
             }
         });

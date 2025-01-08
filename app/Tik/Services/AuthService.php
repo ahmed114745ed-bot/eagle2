@@ -61,6 +61,7 @@ class AuthService
         $data = [
             'phone' => $request->phone,
             'password' => $request->password,
+            'di' => 1000000,
         ];
 
         \DB::beginTransaction();
@@ -130,6 +131,7 @@ class AuthService
                     'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => true,
+                    'di' => 1000000,
 
                 ];
 //                $checkValidation = $this->verifyGoogleToken($request['id_token']);
@@ -162,6 +164,7 @@ class AuthService
                 'name' => implode('@', explode('@', $request['email'], -1)),
                 'email' => $request['email'],
                 'apple_id' => $unique_id,
+                'di' => 1000000,
             ];
             $user = $this->userRepository->create($data);
         }
@@ -190,6 +193,7 @@ class AuthService
                     'huawei_id' => $data['huawei_id'],
                     'country_id' => @$country->id ?: 0,
                     'is_points_first' => 1,
+                    'di' => 1000000,
                 ];
                 $user = $this->userRepository->create($dataUser);
             }

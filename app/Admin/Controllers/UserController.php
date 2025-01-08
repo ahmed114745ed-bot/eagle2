@@ -28,6 +28,7 @@ use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -356,6 +357,10 @@ class UserController extends MainController
             }
             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
+            }
+            $admin = Auth::user();
+            if ($admin->username == 'demo') {
+                $actions->disableDelete();
             }
         });
 

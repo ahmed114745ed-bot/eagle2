@@ -10,6 +10,7 @@ use App\Http\Middleware\AgencyMiddleware;
 use App\Http\Middleware\AdminIpMiddleware;
 use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
+use App\Http\Middleware\ConfigLoginMiddleWare;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
@@ -93,6 +94,7 @@ class Kernel extends HttpKernel
         'admin.auth' => AuthenticateWeb::class,
         'prevent-delete' => \App\Http\Middleware\PreventDelete::class,
         'auth.redirect' => CheckLoginAdmin::class,
+        'auth.config' => ConfigLoginMiddleWare::class,
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
