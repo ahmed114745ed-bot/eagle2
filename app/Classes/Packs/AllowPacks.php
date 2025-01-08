@@ -76,7 +76,6 @@ class AllowPacks
         ->where('is_active_for_vip', true)
         ->groupBy('type')
         ->get();
-
         Log::info('this is wares : ' . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
@@ -141,7 +140,8 @@ class AllowPacks
         $userlevel = $this->userOVipLevel;
 
         $packs = $this->packs;
-        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->max_id)->isNotEmpty();
+        //return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->max_id)->isNotEmpty();
+        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level;
     }
 
     private function getDescription(string $key, $isAllow, $minLevel, $maxLevel,$lang ='en')
