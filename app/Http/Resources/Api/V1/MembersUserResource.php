@@ -35,6 +35,7 @@ class MembersUserResource extends JsonResource
      */
     public function toArray($request)
     {
+        dd((int)$this->familyId ? (int)$this->familyId: (int)$request->family_id);
         $data = [
             'id' => @$this->id,
             'family_id' => (int)$this->familyId ? (int)$this->familyId: (int)$request->family_id, // Include family_id in the response
