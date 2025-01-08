@@ -2,9 +2,10 @@
 
 namespace App\Observers\Api\V1;
 
+use App\Models\User;
+use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
-use App\Models\User;
 
 class AgencyObserver
 {
@@ -44,6 +45,8 @@ class AgencyObserver
         // User::query ()->where ('agency_id',$agency->id)->update (['agency_id'=>0]);
         AgencyJoinRequest::query ()->where ('agency_id',$agency->id)->delete ();
         \App\Facades\UserHandling::kickOfAllUsersFromAgency($agency);
+        $user = User::find($agency->app_owner_id);
+         Admin::where('username', $user->uuid)->delete();
     }
 
     /**
