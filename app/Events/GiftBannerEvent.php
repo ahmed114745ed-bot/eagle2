@@ -33,7 +33,7 @@ class GiftBannerEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('gift-channel');
+        return new Channel('gift_banner');
     }
 
     /**

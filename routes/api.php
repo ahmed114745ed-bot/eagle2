@@ -89,7 +89,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
-            Route::post('/google-pay-purchsed', [GooglePaymentController::class, 'purchasedFour']);
+            Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
 

@@ -21,6 +21,7 @@ use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
 use App\Models\Cp;
+use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 
@@ -179,6 +180,7 @@ class GiftLogService
         }
 
         if($totalPrice > 2000){
+            Log::info("price more than 2000");
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
 
