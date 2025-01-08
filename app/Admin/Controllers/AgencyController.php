@@ -351,7 +351,7 @@ class AgencyController extends MainController
             //     Rule::requiredIf(!$shippingAgency && !$form->input('at_least_one_selected'))
             // ];
         });
-        if (!Auth::user()->isRole('Agencies Managers')) {
+        if (!Auth::user()->isRole('Agencies Managers') && !Auth::user()->isRole('admin')) {
             $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)->rules(function ($form) {
                 // $hostAgency = $form->input('Host_agency');
                 // return [
