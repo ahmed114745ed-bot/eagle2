@@ -3,6 +3,7 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Admin\Controllers\MainOldController;
 use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -22,11 +23,11 @@ use Modules\Events\Entities\PkReward;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class PkEventController extends MainController
+class PkEventController extends MainOldController
 {
 
     use HasResourceActions;
-   
+
 
 
     public $permission_name = 'pk-event';

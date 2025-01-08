@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
@@ -88,6 +89,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+            Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
+
             Route::get('/countries/users', [CountryController::class, 'countries']);
 
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
@@ -133,6 +136,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('remove_admin', [RoomController::class, 'remove_admin']);
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
+                Route::post('add-block', [RoomController::class, 'addBlock']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {

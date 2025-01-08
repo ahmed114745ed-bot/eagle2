@@ -19,6 +19,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MembersUserResource extends JsonResource
 {
+    private $familyId;
+
+    public function __construct($resource, $familyId = null)
+    {
+        parent::__construct($resource);
+        $this->familyId = $familyId;
+    }
+
     /**
      * Transform the resource into an array.
      *
@@ -29,6 +37,7 @@ class MembersUserResource extends JsonResource
     {
         $data = [
             'id' => @$this->id,
+            'family_id' => (int)$this->familyId ? (int)$this->familyId: (int)$request->family_id, // Include family_id in the response
             'name' => @$this->name ?: '',
             'profile' => [
                 'image' => @$this->profile->avatar,
