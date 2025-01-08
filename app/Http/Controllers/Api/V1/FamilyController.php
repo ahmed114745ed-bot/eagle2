@@ -252,7 +252,6 @@ class FamilyController extends Controller
 
     public function getMembersList(Request $request)
     {
-        dd("sdsdsdds");
         // Validate family_id
         if (!$request->family_id) {
             return Common::apiResponse(0, 'missing params', null, 422);
