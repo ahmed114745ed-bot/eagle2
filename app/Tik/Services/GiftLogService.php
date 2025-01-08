@@ -178,9 +178,9 @@ class GiftLogService
         } catch (BadResponseException $e) {
         }
 
-        // if($totalPrice > 2000){
-        //     $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
-        // }
+        if($totalPrice > 2000){
+            $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
+        }
 
 
 
