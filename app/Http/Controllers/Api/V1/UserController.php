@@ -29,6 +29,10 @@ use DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
+use App\Models\Config;
+use App\Models\UserCodeInvitation;
+use App\Models\UserEarnInvitation;
+use App\Helpers\UserCommon;
 
 class UserController extends Controller
 {
@@ -472,5 +476,112 @@ class UserController extends Controller
         $status = $user instanceof User ? $user->status : ($user['status'] ?? null);
 
         return $status == 1;
+    }
+
+
+    public function explain_invitation()
+    {
+        $lang = app()->getLocale();
+        if ($lang == "en") {
+            $data = Config::where("name", "explain_invitation_english")->first();
+        } else {
+            $data = Config::where("name", "explain_invitation_arabic")->first();
+        }
+        return Common::apiResponse(true, '', $data?->desc, 200);
+    }
+
+    public function UserEarnFromInvitationStatistics()
+    {
+        $userId             = Auth::id();
+        $parentInvitations  = UserEarnInvitation::where("parent_id", $userId);
+        $UserCodeInvitation = UserCodeInvitation::where("user_id", $userId);
+        if ($parentInvitations != null) {
+            $data = [
+                "totalEarned"  => $parentInvitations->sum("parent_percentage"),
+                "earnedDay"    => $parentInvitations->whereDate("created_at", date("Y-m-d"))->sum("parent_percentage"),
+                "TotalInvited" => $UserCodeInvitation->count(),
+                "invitedDay"   => $UserCodeInvitation->whereDate("created_at", date("Y-m-d"))->count(),
+            ];
+            return Common::apiResponse(true, '', $data, 200);
+        }
+        return Common::apiResponse(true, '', $data = [], 200);
+    }
+
+    public function parentUser()
+    {
+        $userId = Auth::id();
+        $data   = UserCodeInvitation::with("user")->where("invited_id", $userId)->first();
+        $lang   = app()->getLocale();
+        if ($lang == 'ar') {
+            $mes_user_not_found = 'لم يتم العثور علي المستخدم';
+            $success_mes        = 'لا يوجد بيانات';
+        } else {
+            $mes_user_not_found = 'It was not found on the user';
+            $success_mes        = 'not found data';
+        }
+
+        if ($data) {
+            if ($data->user) {
+                return Common::apiResponse(true, '', new MyDataResource($data->user), 200);
+            }
+            return Common::apiResponse(false, $mes_user_not_found, $data = [], 200);
+        }
+        return Common::apiResponse(false, $success_mes, $data = [], 200);
+    }
+
+    public function UserEarnFromInvitation()
+    {
+        $userId = Auth::id();
+        $data   = UserEarnInvitation::with("user:id,name,uuid")->select("id", "user_id", "parent_id", "updated_at", "user_charge", "parent_percentage")->where("parent_id", $userId)->orderByDesc('created_at')->get();
+        return Common::apiResponse(true, '', $data, 200);
+    }
+
+    public function AddCodeInvitation(Request $request)
+    {
+        $user_id      = Auth::id();
+        $user_parent  = User::where("uuid", $request->code)->first();
+        $existingUser = UserCommon::CheckUserParent($user_id);
+        $CheckUserNew = UserCommon::CheckUserNew($user_id);
+        $lang         = app()->getLocale();
+        if ($lang == 'ar') {
+            $mes_user_not_found = 'لم يتم العثور علي المستخدم';
+            $mes_validation     = "لقد مر علي المستخدم 48 ساعه من تاريخ انشائه او المستخدم مسجل من قبل لدي شخص اخر";
+            $success_mes        = 'تم الاضافه بنجاح';
+        } else {
+            $mes_user_not_found = 'It was not found on the user';
+            $mes_validation     = "48 hours have passed since the user was created, or the user has already been registered with someone else";
+            $success_mes        = 'Added successfully';
+        }
+        if (!$user_parent) {
+            return Common::apiResponse(false, $mes_user_not_found, $existingUser, 404);
+        }
+        if ($CheckUserNew == false) {
+            return Common::apiResponse(false, $mes_validation, $existingUser, 404);
+        }
+
+        if ($existingUser != null) {
+            return Common::apiResponse(false, 'المستخدم مسجل من قبل', $existingUser, 404);
+        }
+        $data = UserCodeInvitation::create([
+            "user_id"    => $user_parent->id,
+            "invited_id" => $user_id,
+        ]);
+
+        return Common::apiResponse(true, $success_mes, $request->code, 200);
+    }
+
+    public function CreateCodeInvitation()
+    {
+        $user_id       = Auth::id();
+        $generatedCode = random_int(1, 100000);
+        $existingCode  = UserCodeInvitation::where('code', $user_id . $generatedCode)->exists();
+        if ($existingCode) {
+            $generatedCode = random_int(1, 100000);
+        }
+        $data = UserCodeInvitation::create([
+            "user_id" => $user_id,
+            "code"    => $user_id . $generatedCode,
+        ]);
+        return Common::apiResponse(true, 'تم انشاء الكود', $data->code, 200);
     }
 }

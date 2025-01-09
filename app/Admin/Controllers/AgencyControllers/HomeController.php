@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Auth;
 class HomeController extends Controller
 {
 
+    public $permission_name = 'agent-home';
+
 
     public function index(Content $content)
     {

@@ -297,6 +297,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
 
+
+            Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
+            Route::get('parent-statistic', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitationStatistics']);
+            Route::get('parent-user', [\App\Http\Controllers\Api\V1\UserController::class, 'parentUser']);
+            Route::get('user-earn-from-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitation']);
+            Route::get('create-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'CreateCodeInvitation']);
+            Route::get('add-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'AddCodeInvitation']);
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 
