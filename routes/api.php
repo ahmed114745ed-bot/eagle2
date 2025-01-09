@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\MallController as ControllersMallController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
@@ -89,6 +90,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
+
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
