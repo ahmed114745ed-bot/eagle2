@@ -262,8 +262,6 @@ class RankingService
 
     public function topUser()
     {
-      
- 
         $giftLogs = $this->GiftLogRepository->topUser('sender', 'sender_id');
         $giftLogsReceiver = $this->GiftLogRepository->topUser('receiver', 'receiver_id');
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
@@ -282,13 +280,12 @@ class RankingService
             $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
         }
 
-        $relationType = request("relationType") ?? CpRelation::first()?->id;
-        $type = request("type") ?? 1;
-        $data = $this->cpRepository->getCpRanking($relationType, $type);
+        $data = $this->cpRepository->getCpRankingWithOutRelation(1);
         $cp_top_2 = $data->take(2);
 
         return Common::apiResponse(1, '', 
-        ['sender' => $img,
+        [
+        'sender' => $img,
          'receiver' => $receiverImage, 
          'room' => $roomImage,
          'top_cp' => RankingResource::collection($cp_top_2),

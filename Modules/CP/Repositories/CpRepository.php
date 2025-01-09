@@ -207,6 +207,33 @@ class CpRepository
             ->get();
     }
 
+    public function getCpRankingWithOutRelation($type)
+    {
+        return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
+            ->whereNotNull("cp_id")
+            ->with(['cp' => function ($query) {
+                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id');
+            }])
+            // ->whereHas("cp", function ($q) use ($relationType) {
+            //     $q->where('cp_relation_id', $relationType);
+            // })
+            ->when($type, function ($query) use ($type) {
+                /// todo update this filter
+                switch ($type) {
+                    case 1:
+                        return $query->whereBetween('created_at', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()]);
+                    case 2:
+                        return $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    case 3:
+                        return $query->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+                }
+            })
+            ->groupBy('cp_id')
+            ->orderByDesc('total_gifts')
+            ->take(1)
+            ->get();
+    }
+
     public function getCpList($userId, $activeOnly = false)
     {
         $var = $activeOnly ? [1, 4] : [0, 1, 4];
