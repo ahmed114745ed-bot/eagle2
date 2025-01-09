@@ -205,6 +205,7 @@ class CpRepository
             ->orderByDesc('total_gifts')
             ->take(20)
             ->get();
+           
     }
 
     public function getCpRankingWithOutRelation($type)
@@ -212,11 +213,14 @@ class CpRepository
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
             ->whereNotNull("cp_id")
             ->with(['cp' => function ($query) {
-                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id');
+                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id','cp_relation_id')
+                ->with(['relation' => function ($query) {
+                    $query->select('id', 'type');  
+                }]);
             }])
-            // ->whereHas("cp", function ($q) use ($relationType) {
-            //     $q->where('cp_relation_id', $relationType);
-            // })
+            ->whereHas("cp.relation", function ($q) {
+                $q->whereNotNull('type');    
+            })
             ->when($type, function ($query) use ($type) {
                 /// todo update this filter
                 switch ($type) {
@@ -230,8 +234,16 @@ class CpRepository
             })
             ->groupBy('cp_id')
             ->orderByDesc('total_gifts')
-            ->take(1)
-            ->get();
+            // ->take(1)
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->cp->relation->type;  
+            })
+            ->map(function ($groupedLogs) {
+                return $groupedLogs->sortByDesc('total_gifts')->first();     
+            });
+
+            
     }
 
     public function getCpList($userId, $activeOnly = false)
