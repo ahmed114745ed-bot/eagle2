@@ -9,29 +9,78 @@ use App\Admin\Controllers\MainController;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Enums\AchievementType;
 use Modules\CP\Entities\CpRelation;
+use Encore\Admin\Layout\Content;
 
 class CpRelationController extends MainController
 {
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('cp-relations'))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('cp-relations'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id,$content
+            ->title(trans('cp-relations'))
+            ->body($this->form()->edit($id)));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('cp-relations'))
+            ->body($this->form()));
+    }
 
     protected function grid()
     {
         $grid = new Grid(new CpRelation());
 
         $grid->column('id', __('Id'));
-        $grid->column("title",__("title"));
-        $grid->column("description",__("description"));
+        $grid->column("title", __("title"));
+        $grid->column("description", __("description"));
         $grid->column('image', __('Img'))->image('', 30, 30);
-        $grid->column("price",__("price"));
+        $grid->column("price", __("price"));
         $grid->column("type", __("type"))->display(function () {
             return $this->type;
         });
-        $grid->column("relations_number",__("relations_number"));
+        $grid->column("relations_number", __("relations_number"));
 
         $grid->column('الاجرائات')->display(function () {
             if ($this->type === 'solution') {
                 return '';
             } else {
-                
+
                 $url = url('admin/cp-levels/' . $this->id);
                 $button = "<a href='{$url}' class='btn btn-sm btn-info'>المستويات (levels)</a>";
                 return $button;
@@ -81,10 +130,10 @@ class CpRelationController extends MainController
         $form->switch('relations_number', __('relations_number'))->default(0);
 
         $form->select('type', __('Type'))->options([
-            'bro' => __('bro'),  
-            'friend' => __('friend'), 
-            'lovely' => __('lovely'), 
-            'solution' => __('solution'), 
+            'bro' => __('bro'),
+            'friend' => __('friend'),
+            'lovely' => __('lovely'),
+            'solution' => __('solution'),
         ])->default(0); // Set the default type to "Friend"        $form->number("relations_number",__("relations_number"))->default(0);
         return $form;
     }
