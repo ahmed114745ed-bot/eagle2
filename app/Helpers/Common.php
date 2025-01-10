@@ -1126,12 +1126,13 @@ class Common
         $user = User::find($appOwnerId);
         if (!$user) return true;
         $password = Str::random(8);
+        $checkAccount = \App\Models\Admin::where('username', $user->uuid)->first();
+        if ($checkAccount) return true;
         $admin = \App\Models\Admin::create([
             'username' => $user->uuid,
             'password' => Hash::make($password),
             'name' => $user->name,
         ]);
-        //$admin = \App\Models\Admin::where('username', $user->uuid)->first();
         $role = Role::where('slug', 'agency-owner')->first();
         DB::table('admin_role_users')->insert([
             'user_id' =>  $admin->id,
