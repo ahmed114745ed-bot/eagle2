@@ -241,6 +241,11 @@ class AgencyService
         if ($request->name != null) {
             $agency->name = $request->name;
         }
+
+        if ($request->contents != null) {
+            $agency->contents = $request->contents;
+        }
+
         if ($request->get('content') != null) {
             $agency->notice = $request->get('content');
         }
