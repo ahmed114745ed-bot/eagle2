@@ -108,7 +108,6 @@ class AdminPermission extends Seeder
 
         $methods = [
             'browse',
-            'show',
             'create',
             'delete',
             'edit',

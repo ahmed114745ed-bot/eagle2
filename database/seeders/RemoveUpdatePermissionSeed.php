@@ -14,6 +14,6 @@ class RemoveUpdatePermissionSeed extends Seeder
      */
     public function run()
     {
-        DB::table('admin_permissions')->where('slug', 'like', 'update%')->delete();
+        DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
     }
 }
