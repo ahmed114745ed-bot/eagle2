@@ -110,7 +110,6 @@ class AdminPermission extends Seeder
             'browse',
             'show',
             'create',
-            'update',
             'delete',
             'edit',
         ];

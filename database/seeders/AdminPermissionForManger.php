@@ -98,7 +98,6 @@ class AdminPermissionForManger extends Seeder
             'browse',
             'show',
             'create',
-            'update',
             'delete',
             'edit',
         ];
