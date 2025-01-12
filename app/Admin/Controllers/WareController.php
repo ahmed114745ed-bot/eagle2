@@ -108,6 +108,7 @@ class WareController extends MainController
         $grid->column('name', __('name'))->editable();
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
             $grid->column('price', __('price'))->editable();
+            $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         } else {
             $grid->column('price', __('price'));
         }
@@ -153,7 +154,7 @@ class WareController extends MainController
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
         $grid->column('is_active_for_vip', __("active vip"))->switch($states);
-        $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+       
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -226,11 +227,13 @@ class WareController extends MainController
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         //        $form->number('score', trans('score'));
@@ -298,7 +301,7 @@ class WareController extends MainController
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+       
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 

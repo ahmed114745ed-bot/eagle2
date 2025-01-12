@@ -92,6 +92,7 @@ class GiftController extends MainController
         $grid->column('e_name', __('e_name'))->editable();
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('price', __('price'))->editable();
+            $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
         } else {
             $grid->column('price', __('price'));
         }
@@ -108,7 +109,7 @@ class GiftController extends MainController
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
-        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+       
         $grid->column('music_gift', trans('music_gift'))->switch(Common::getSwitchStatesGiftMucic());
         $grid->sort(__('sort'))->editable();
         $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
@@ -229,11 +230,13 @@ class GiftController extends MainController
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💎');
+                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💎');
+                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
             }
         }
 
@@ -251,7 +254,7 @@ class GiftController extends MainController
         )->required();
         $form->file('show_img2', __('show_img2'));
         $form->number('sort', __('sort'));
-        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+       
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         $form->saving(function (Form $form) {
             if ($form->model()->type != "6") {

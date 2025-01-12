@@ -141,7 +141,7 @@ class DedicateWareController extends MainController
 
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
-        if (\Encore\Admin\Facades\Admin::user()->can('*')) {
+        if (\Encore\Admin\Facades\Admin::user()->can('*') ||Admin::user()->can('edit_ware_price')) {
             $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         }
         $grid->sort(__('sort'), __('sort'));
@@ -230,11 +230,13 @@ class DedicateWareController extends MainController
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💰');
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💰');
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         //        $form->number('score', trans('score'));
@@ -255,7 +257,7 @@ class DedicateWareController extends MainController
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+       
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
