@@ -7,7 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Admin;
+//use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DedicateAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class DedicateWareController extends MainController
 {
@@ -226,7 +227,16 @@ class DedicateWareController extends MainController
         //        });
         $form->text('name', trans('name'));
         $form->text('title', trans('title'));
-        $form->currency('price', trans('price'))->symbol('💰');
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+            }
+        }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $form->image('show_img', trans('img'))->default('1.png')->rules('required');

@@ -106,7 +106,11 @@ class WareController extends MainController
 
         $grid->id(__('ID'));
         $grid->column('name', __('name'))->editable();
-        $grid->column('price', __('price'))->editable();
+        if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+            $grid->column('price', __('price'))->editable();
+        } else {
+            $grid->column('price', __('price'));
+        }
 
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2', __('show_img'))->display(function ($path) {
@@ -133,7 +137,7 @@ class WareController extends MainController
                 4 => trans('Avatar Frame'),
                 5 => trans('Bubble Frame'),
                 6 => trans('Entering Special Effects'),
-                
+
 
             ]
         );
@@ -219,7 +223,16 @@ class WareController extends MainController
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        $form->number('price', trans('price'))/*->symbol ('💰')*/;
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'));
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'));
+            }
+        }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $states = [
@@ -233,8 +246,8 @@ class WareController extends MainController
         })->default('1.png');
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
-       });
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        });
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
@@ -290,7 +303,7 @@ class WareController extends MainController
         $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
-            if ( $form->input('image_type') == null) {
+            if ($form->input('image_type') == null) {
 
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();

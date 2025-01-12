@@ -12,6 +12,7 @@ use App\Models\VipPrivilege;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
 
 class WareVipController extends MainController
 {
@@ -218,7 +219,16 @@ class WareVipController extends MainController
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        $form->currency('price', trans('price'))->symbol('💰');
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+            }
+        }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'))->rules(
             'required|numeric|min:1',
