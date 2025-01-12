@@ -97,10 +97,19 @@ class CoinReportController extends MainController {
     protected function games() 
     {
         $grid = new Grid(new CoinGameUser());
-        $grid->model()->selectRaw('MIN(coin_game_users.created_at) as earliest_created_at, coin_game_users.user_id, MAX(users.name) as user_name, SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose')
-            ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
-            ->groupBy('coin_game_users.user_id')->orderByDesc('earliest_created_at');
-
+        $grid->model()->with('game')
+        ->selectRaw('
+            MIN(coin_game_users.created_at) as earliest_created_at, 
+            coin_game_users.user_id, 
+            MAX(users.name) as user_name, 
+            games.name as game_name, 
+            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win, 
+            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+        ')
+        ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+        ->leftJoin('games', 'coin_game_users.game_id', '=', 'games.id')    
+        ->groupBy('coin_game_users.user_id', 'games.name')  
+        ->orderByDesc('earliest_created_at');
 
         $grid->filter(function ($filter) {
             $filter->expand();
