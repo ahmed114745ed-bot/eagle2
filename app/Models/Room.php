@@ -221,7 +221,7 @@ class Room extends Model
 
     public function getFinalRoomImageAttribute()
     {
-        if ($this->is_pk_custom) return PK_IMAGE;
+        if ($this->is_pk_custom && $this->mode == 3) return PK_IMAGE;
 
         $var = /*$this->mode == '3' ?
             'custom_image/back-black.png' :*/

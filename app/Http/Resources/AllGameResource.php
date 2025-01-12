@@ -18,7 +18,7 @@ class AllGameResource extends JsonResource
             'url'       => $type == 1 ? (@$this->mini_url ?? '') : (@$this->url ?? ''),
             'webView_config' => $this->type == 2 ? true : false,
             'high_safety' => (intval(@$this->hight_image) ?? 0),
-            'high' => $this->in_room == 0 ? (intval(@$this->hight_image) ?? 0) : (intval(@$this->hight) ?? 0),
+            'high' => floatval($this->in_room == 1 ? (floatval($this->hight?? 0) ) : null),
             'in_room' => @$this->in_room,
         ];
     }
