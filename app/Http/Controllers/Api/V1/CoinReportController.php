@@ -66,7 +66,7 @@ class CoinReportController extends Controller
     {
         $user = auth()->user();
         $data = CoinLog::where("user_id", $user->id)
-        ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
+        ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay','fawry'])
         ->when(request("start_date") && request("end_date"), function ($q) {
             $q->whereDate("created_at", ">=", request("start_date"))
               ->whereDate("created_at", "<=", request("end_date"));
