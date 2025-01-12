@@ -116,7 +116,7 @@ class  AdminAgencyMangerController extends MainController
         if (\request('password') != $user->password) {
             DB::table('sessions')->where('user_id', $user->id)->delete();
         }
-        return $this->form()->update($id);
+        return parent::update($id);
     }
 
     public function destroy($id)

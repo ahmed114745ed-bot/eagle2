@@ -96,7 +96,7 @@ class AgencyController extends MainController
             }
         }
 
-        return $this->form()->update($id);
+        return parent::update($id);
     }
 
     public function show($id, Content $content)
@@ -350,7 +350,7 @@ class AgencyController extends MainController
             $form->switch('status', __('status'));
             $form->text('phone', __('phone'))->rules('required');
             $form->url('url', __('url'));
-           // $form->image('img', __('img'))->rules('required');
+            $form->image('img', __('img'))->rules('required');
             $form->textarea('contents', __('contents'));
 
 
