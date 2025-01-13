@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Helpers\Common;
+use App\Http\Controllers\utd\FamilyLevelController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -173,5 +175,10 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
     });
 
+    Route::prefix('family-levels')->group(function () {
+        
+        Route::get('/all', [FamilyLevelController::class, 'index']);
+        Route::post('/show', [FamilyLevelController::class, 'show']);
 
+    });
 });

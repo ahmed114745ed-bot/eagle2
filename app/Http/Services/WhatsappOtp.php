@@ -19,7 +19,7 @@ class WhatsappOtp
     {
         $data = $this->getCodeInfo($phone);
 
-        \Log::info('this is the phone '. $phone);
+        // \Log::info('this is the phone '. $phone);
 
         if ($data?->count >= 10) {
             throw new \Exception(__('you spend all chances'));

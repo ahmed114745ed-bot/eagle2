@@ -45,9 +45,9 @@ class WhatsAppJob implements ShouldQueue
                 'code' => (string) $this->message,
                 'phone' => (string) $this->phone,
             ]);
-            Log::info($response->body());
+            // Log::info($response->body());
         } catch (RequestException $e) {
-            Log::info($e->getMessage());
+            // Log::info($e->getMessage());
         }
 
         // $client = new Client();

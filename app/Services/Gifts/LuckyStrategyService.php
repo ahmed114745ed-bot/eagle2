@@ -20,7 +20,7 @@ class LuckyStrategyService
             $this->saveThresholds($result);
         } catch (\Exception $e) {
 
-            \Log::info($e->getMessage());
+            // \Log::info($e->getMessage());
             return false;
         }
 

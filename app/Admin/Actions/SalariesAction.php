@@ -163,7 +163,6 @@ class SalariesAction extends Action
             DB::commit();
         } catch (\Exception $exception) {
 
-            \Log::info('this '. $exception->getMessage());
             DB::rollBack();
             return $this->response()->error($exception->getMessage())->refresh();
         }

@@ -21,7 +21,7 @@ class RoomChannel
     public function join(User $user, $roomId, $userId): array|bool
     {
 
-        \Illuminate\Support\Facades\Log::info($user->name .' : '. $user->id);
+        // \Illuminate\Support\Facades\Log::info($user->name .' : '. $user->id);
 
         return $userId == $user->id;
     }
