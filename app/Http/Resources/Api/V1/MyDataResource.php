@@ -174,6 +174,7 @@ class MyDataResource extends JsonResource
             ]),
             'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true),
             'company_number' => Common::getConfig('company_number'),
+            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
         ];
 
         $data['auth_token'] = $this->auth_token;
