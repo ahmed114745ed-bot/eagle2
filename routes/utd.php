@@ -164,5 +164,7 @@ Route::middleware([])->group(function () {
 
     Route::prefix('trashed-account')->group(function () {
         Route::get('/', [TrashedUserController::class, 'trashedAccount']);
+        Route::post('/restore/{id}', [TrashedUserController::class, 'restore']);
+        Route::post('/delete/{id}', [TrashedUserController::class, 'softDelete']);
     });
 });

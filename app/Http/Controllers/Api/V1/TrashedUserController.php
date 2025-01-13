@@ -26,4 +26,26 @@ class TrashedUserController extends Controller
         $trashed = $this->userService->trashedAccount($request->perPage, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'success', TrashedUserResource::collection($trashed));
     }
+
+    public function restore($id)
+    {
+        try {
+            $this->userService->restoreAccount($id);
+            return Common::apiResponse(1, 'restore successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function softDelete($id)
+    {
+        try {
+            $this->userService->delete($id);
+            return Common::apiResponse(1, 'delete successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }

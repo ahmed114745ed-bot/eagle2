@@ -639,4 +639,14 @@ class UserService
     {
         return $this->userRepository->trashedUserAccountList($perPage, $Page, $uuid);
     }
+
+    public function restoreAccount($id)
+    {
+        return $this->userRepository->restoreAccount($id);
+    }
+
+    public function delete($id)
+    {
+        return $this->userRepository->softDelete($id);
+    }
 }

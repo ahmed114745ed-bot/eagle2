@@ -250,4 +250,19 @@ class UserRepository extends Repository
             $query->where('uuid', $uuid);
         })->orderByDesc('deleted_at')->paginate($perPage, ['*'], 'page', $Page);
     }
+
+    public function restoreAccount($id)
+    {
+        $user = User::query()->onlyTrashed()->find($id);
+        $user->restore();
+        return true;
+    }
+
+    public function softDelete($id)
+    {
+        $user = User::query()->onlyTrashed()->find($id);
+        DB::table('reports')->where('Reporter_id', $user->id)->delete();
+        $user->forceDelete();
+        return true;
+    }
 }
