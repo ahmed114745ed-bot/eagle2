@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 
@@ -40,7 +41,6 @@ Route::middleware([])->group(function () {
         Route::post('/show', [AllGameController::class, 'showGame']);
         Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
         Route::get('/game-charge-details', [AllGameController::class, 'gameChargeDetails']);
-        
     });
     // target
     Route::prefix('targets')->group(function () {
@@ -59,8 +59,6 @@ Route::middleware([])->group(function () {
         Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
         Route::get('/ware-vips', [VipController::class, 'getWareVip']);
         Route::post('/delete-ware', [VipController::class, 'deleteWare']);
-
-
     });
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
@@ -84,7 +82,6 @@ Route::middleware([])->group(function () {
         Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
         Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
         Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
-
     });
 
     //ware
@@ -95,10 +92,8 @@ Route::middleware([])->group(function () {
         Route::post('/update', [WareController::class, 'update']);
         Route::post('/show', [WareController::class, 'show']);
         Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
-        Route::get('/type', [WareController::class, 'typeWare']); 
+        Route::get('/type', [WareController::class, 'typeWare']);
         Route::get('/get-type', [WareController::class, 'getTypeWare']);
-       
-
     });
     Route::post('/create-paymentMethod', [PaymentMethodController::class, 'store']);
 
@@ -107,11 +102,11 @@ Route::middleware([])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    
+
 
     // users
     Route::resource('utd-users', UtdUserController::class);
-    Route::get('utd-users/show/{id}', [UtdUserController::class,'show']);
+    Route::get('utd-users/show/{id}', [UtdUserController::class, 'show']);
 
 
 
@@ -152,14 +147,13 @@ Route::middleware([])->group(function () {
         Route::post('/payment-gateway/create', [CoinController::class, 'createPaymentGateway']);
         Route::post('/payment-gateway/update', [CoinController::class, 'updatePaymentGateway']);
         Route::post('/payment-gateway/show', [CoinController::class, 'showPaymentCoin']);
-      
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
     Route::post('roles/preview',  [RoleController::class, 'preview']);
 
-    
+
     // game report 
     Route::get('/all-players', [GameReportController::class, 'allPlayers']);
     Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
@@ -168,6 +162,7 @@ Route::middleware([])->group(function () {
     Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay']);
     // end game report
 
+    Route::prefix('trashed-account')->group(function () {
+        Route::get('/', [TrashedUserController::class, 'trashedAccount']);
+    });
 });
-
-

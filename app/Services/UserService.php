@@ -244,7 +244,7 @@ class UserService
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
         if (!$follow) {
 
-            $this->typeRoomChat($userId , $followedUserId);
+            $this->typeRoomChat($userId, $followedUserId);
 
             $this->followRepository->createFollow([
                 'user_id' => $userId,
@@ -617,24 +617,26 @@ class UserService
             "current_total_day" => $current_total_day,
             "diamond" => $current_diamond,
         ];
-
-        
     }
 
 
     protected function typeRoomChat($user_id, $user_id2)
     {
         $updateType = ChatRoom::where(function ($q) use ($user_id, $user_id2) {
-                $q->where('user_id', $user_id)
-                  ->where('user_id2', $user_id2);
-            })
+            $q->where('user_id', $user_id)
+                ->where('user_id2', $user_id2);
+        })
             ->orWhere(function ($q) use ($user_id, $user_id2) {
                 $q->where('user_id', $user_id2)
-                  ->where('user_id2', $user_id);
+                    ->where('user_id2', $user_id);
             })
             ->update(['type' => 'friends']);
 
-            return $updateType;
+        return $updateType;
     }
-    
+
+    public function trashedAccount($perPage, $Page, $uuid)
+    {
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $uuid);
+    }
 }

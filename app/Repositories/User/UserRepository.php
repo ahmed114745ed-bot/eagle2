@@ -242,4 +242,12 @@ class UserRepository extends Repository
         }
         return     $builder->paginate(10);
     }
+
+
+    public function trashedUserAccountList($perPage, $Page, $uuid)
+    {
+        return User::onlyTrashed()->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where('uuid', $uuid);
+        })->orderByDesc('deleted_at')->paginate($perPage, ['*'], 'page', $Page);
+    }
 }
