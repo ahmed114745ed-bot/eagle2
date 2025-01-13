@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Models\FamilyLevel;
 use App\Tik\Services\FamilyLevelService;
 use Illuminate\Http\Request;
 
@@ -16,11 +17,56 @@ class FamilyLevelController extends Controller
         $FamilyLevel = $this->FamilyLevelService->index();
         return Common::apiResponse(true, '', $FamilyLevel, 200);
     }
-    public function show(Request $request)
+    public function show( $id,Request $request)
     {
-        $id= $request->id;
-       
-        $FamilyLevel = $this->FamilyLevelService->show($id);
+        $FamilyLevel = FamilyLevel::find($id);
         return Common::apiResponse(true, '', $FamilyLevel, 200);
     }
+
+
+    public function store(Request $request)
+    {
+ 
+        try {
+            $FamilyLevel =   $this->FamilyLevelService->create( $request);
+        } catch (\Exception $e) {
+    
+            return Common::apiResponse(0, $e != null ? $e->getMessage() : 'missing params', 422);
+        }
+
+        return Common::apiResponse(true, '', $FamilyLevel, 200);
+
+    }
+
+
+    
+
+    public function update(Request $request)
+    {
+        return $request;
+        
+        try {
+            $family = $this->FamilyLevelService->update($userId, $request, $id);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+
+        return Common::apiResponse(1, '', new FamilyResource($family));
+    }
+
+
+    public function destroy(Request $request)
+    {
+        
+
+        try {
+
+            $this->FamilyLevelService->delete($request->id);
+
+            return Common::apiResponse(1, 'success', null, 200);
+        } catch (\Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
+        }
+    }
+    
 }

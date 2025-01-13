@@ -175,10 +175,19 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
     });
 
+    Route::prefix('device-token')->group(function () {
+        Route::get('/', [UserController::class, 'usersDeviceToken']);
+        Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
+    });
+    
     Route::prefix('family-levels')->group(function () {
-        
+
         Route::get('/all', [FamilyLevelController::class, 'index']);
-        Route::post('/show', [FamilyLevelController::class, 'show']);
+        Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
+        Route::post('/create', [FamilyLevelController::class, 'store']);
+        Route::post('/update', [FamilyLevelController::class, 'update']);
+        Route::post('/delete', [FamilyLevelController::class, 'destroy']);
+        
 
     });
 });

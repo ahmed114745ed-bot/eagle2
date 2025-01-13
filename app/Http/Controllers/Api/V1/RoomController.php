@@ -1357,6 +1357,9 @@ class RoomController extends Controller
     public function removeRoomPass(Request $request)
     {
         $room = $this->roomService->changePasswordRoom($request->owner_id);
+        if(!$room){
+            return Common::apiResponse(0, 'room not found');
+        }  
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",

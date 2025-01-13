@@ -12,6 +12,7 @@ use App\Models\GiftLog;
 use App\Facades\UserHandling;
 use App\Http\Services\WhatsappOtp;
 use App\Facades\CustomNotification;
+use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
@@ -28,9 +29,9 @@ use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
-use Modules\Chat\Entities\ChatRoom;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -48,6 +49,7 @@ class UserService
         private readonly  GiftLogRepository $giftLogRepository,
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
+        private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -661,6 +663,18 @@ class UserService
         $user->total_sender_level = $request->total_sender_level;
         $user->total_received_level = $request->total_received_level;
         $user->save();
+        return true;
+    }
+
+    public function userDeviceToken($perPage, $Page, $deviceToken)
+    {
+        return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken);
+    }
+
+    public function deleteDeviceToken($id)
+    {
+        $deviceToken = $this->userDevicesHistoryRepository->findOrFail($id);
+        $deviceToken->delete();
         return true;
     }
 }
