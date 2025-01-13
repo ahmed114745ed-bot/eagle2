@@ -173,5 +173,8 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
     });
 
-
+    Route::prefix('device-token')->group(function () {
+        Route::get('/', [UserController::class, 'usersDeviceToken']);
+        Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
+    });
 });

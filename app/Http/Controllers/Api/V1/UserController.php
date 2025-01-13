@@ -27,6 +27,7 @@ use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
@@ -601,7 +602,25 @@ class UserController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-        $trashed = $this->userService->updateUserLevel($id, $request);
+        $this->userService->updateUserLevel($id, $request);
         return Common::apiResponse(true, ' updated successfully');
+    }
+
+    public function usersDeviceToken(Request $request)
+    {
+        $data = $this->userService->userDeviceToken($request->perPage, $request->Page, $request->device_token);
+        return Common::apiResponse(true, 'success', DeviceTokenResource::collection($data));
+    }
+
+
+    public function deleteDeviceToken($id)
+    {
+        try {
+            $this->userService->deleteDeviceToken($id);
+            return Common::apiResponse(true, ' delete successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }
