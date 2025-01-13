@@ -135,7 +135,7 @@ class RoomRepoService
             $this->repository->updateRoomUser($room);
             return  $room;
         }
-        return  false;
+        return  $room;
     }
 
     public function quiteRoom($ownerId, User $user)
