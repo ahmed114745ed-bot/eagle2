@@ -24,6 +24,12 @@ class FamilyLevelRepository extends AbstractRepository
         return $FamilyLevels->paginate(10);
     }
 
+    public function store($data)
+    {
+        return  $this->model->create($data);
+     
+    }
+
 
     public function find($id)
     {
