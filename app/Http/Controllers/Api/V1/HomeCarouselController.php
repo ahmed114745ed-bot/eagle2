@@ -12,6 +12,7 @@ class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
+        \Log::info(' THis is body '. json_encode($request->all()));
         $items = HomeCarousel::query()
         ->where('enable', 1)->orderBy('sort');
         if ($request->type != null) {
