@@ -13,6 +13,7 @@ use App\Services\UserService;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\V1\TrashedUserResource;
 
 
 class TrashedUserController extends Controller
@@ -23,6 +24,6 @@ class TrashedUserController extends Controller
     public function trashedAccount(Request $request)
     {
         $trashed = $this->userService->trashedAccount($request->perPage, $request->Page, $request->uuid);
-        return Common::apiResponse(true, 'success', $trashed);
+        return Common::apiResponse(true, 'success', TrashedUserResource::collection($trashed));
     }
 }
