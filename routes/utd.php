@@ -179,7 +179,7 @@ Route::middleware([])->group(function () {
         Route::get('/', [UserController::class, 'usersDeviceToken']);
         Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
     });
-    
+
     Route::prefix('family-levels')->group(function () {
 
         Route::get('/all', [FamilyLevelController::class, 'index']);
@@ -190,4 +190,6 @@ Route::middleware([])->group(function () {
         
 
     });
+
+    
 });

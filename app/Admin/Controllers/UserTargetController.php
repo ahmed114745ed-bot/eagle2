@@ -101,7 +101,6 @@ class UserTargetController extends MainController
 //         $this->extendGrid ($grid);
 
 $grid = new Grid(new UserTarget);
-        $grid->model ()->ofAgency();
         $grid->id(__('admin.ID'));
         $grid->column('user_id',__('user id'))->modal ('user info',function ($model){
             return Common::getUserShow ($model->user_id);

@@ -619,7 +619,7 @@ class UserController extends Controller
     {
         try {
             $this->userService->deleteDeviceToken($id);
-            return Common::apiResponse(true, ' delete successfully');
+            return Common::apiResponse(true, 'delete successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -630,5 +630,10 @@ class UserController extends Controller
     {
         $data = $this->userService->usersTargets($request->perPage, $request->Page);
         return Common::apiResponse(true, 'success', $data);
+    }
+    public function allUsers(Request $request)
+    {
+        $users = $this->userService->allUser($request->perPage, $request->Page, $request->familyId, $request->agencyId, $request->search, $request->host);
+        return Common::apiResponse(true, 'done',$users);
     }
 }

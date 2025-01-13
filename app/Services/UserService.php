@@ -684,4 +684,8 @@ class UserService
     {
         return $this->userTargetRepository->all($perPage, $Page);
     }
+    public function allUser($perPage, $Page, $familyId, $agencyId, $search, $host)
+    {
+        return $this->userRepository->all($perPage, $Page, $familyId, $agencyId, $search, $host);
+    }
 }
