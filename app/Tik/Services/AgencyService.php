@@ -523,7 +523,7 @@ class AgencyService
 
         if ($isThisMonth) $endDay = today()->day;
 
-        \Log::info('this2 is error');
+        // \Log::info('this2 is error');
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
         $data = [

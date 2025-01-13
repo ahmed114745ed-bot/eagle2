@@ -67,11 +67,11 @@ class EnteranceRoomServices
         $user = $this->userRepository->findById($userId);
 
         if ($room === null || $user === null) {
-            Log::info("Room or User not found");
+            // Log::info("Room or User not found");
             return response()->json(['status' => 'Webhook received']);
         }
 
-        Log::info($name . '---' . $room->count_room_socket . '---' . $room->room_visitor . '---' . $user->now_room_uid);
+        // Log::info($name . '---' . $room->count_room_socket . '---' . $room->room_visitor . '---' . $user->now_room_uid);
 
         if ($name == 'channel_occupied' || $name == 'member_added') {
             $this->handleMemberAdded($room, $userId);
@@ -101,7 +101,7 @@ class EnteranceRoomServices
     {
         $userId = $user->id;
         if (@$room->charizma_status) {
-            Log::info('charizma status' . $userId . '----' . $room->id);
+            // Log::info('charizma status' . $userId . '----' . $room->id);
 
             $userCharismaService = new UserCharismaService();
             $userCharismaService->resetUserCharisma($userId, $room->id);
@@ -136,7 +136,7 @@ class EnteranceRoomServices
     //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
-                Log::info('goooooooooooooood');
+                // Log::info('goooooooooooooood');
         //        $app_secert='a23b121a64ee9fab4567a2d75d00269d';
         //        if (!$this->checkSignature($app_secert,$request->signature, $request->timestamp, $request->nonce)) {
         //            Log::info('Invalid signature');
@@ -152,7 +152,7 @@ class EnteranceRoomServices
         $user = User::find($userId);
 
         if (!$room || !$user) {
-            Log::info("Either room $roomId or user $userId not found.");
+            // Log::info("Either room $roomId or user $userId not found.");
             return response()->json(['status' => 'Webhook received but room or user not found']);
         }
 
@@ -182,7 +182,7 @@ class EnteranceRoomServices
 //        $room->room_visitor = implode(",", $visitors);
 //        $room->save();
 
-        Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
+        // Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
     }
 
@@ -305,7 +305,7 @@ class EnteranceRoomServices
 
     private function handleCharismaStatusOnLogout($room, $user, $ownerId)
     {
-        Log::info('charizma status' . $user->id . '----' . $room->id);
+        // Log::info('charizma status' . $user->id . '----' . $room->id);
 
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);

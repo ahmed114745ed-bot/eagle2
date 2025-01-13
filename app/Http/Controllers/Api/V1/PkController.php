@@ -122,7 +122,7 @@ class PkController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        \Log::info($room->id . ' rooms');
+        // \Log::info($room->id . ' rooms');
         if ($isPkCustom) {
             $jsons[] = $this->changeBackground($room, $request->owner_id, PK_IMAGE);
         }

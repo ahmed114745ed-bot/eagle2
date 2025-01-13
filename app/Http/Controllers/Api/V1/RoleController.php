@@ -109,10 +109,10 @@ class RoleController extends Controller
 
             return Common::apiResponse(1, 'Role updated successfully', $role);
         } catch (ValidationException $e) {
-            Log::info('Validation Error:', $e->errors());
+            // Log::info('Validation Error:', $e->errors());
             return Common::apiResponse(0, 'Validation failed', $e->errors());
         } catch (\Throwable $th) {
-            Log::info('Unexpected Error: ' . $th->getMessage());
+            // Log::info('Unexpected Error: ' . $th->getMessage());
             return Common::apiResponse(0, 'An unexpected error occurred');
         }
     }

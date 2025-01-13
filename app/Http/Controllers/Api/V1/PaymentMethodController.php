@@ -14,7 +14,7 @@ class PaymentMethodController extends Controller
 {
     public function callback(Request $request)
     {
-        Log::info(json_encode($request->all()));
+        // Log::info(json_encode($request->all()));
         $callbackData = $request->all();
         $fawryRefNumber = $callbackData['fawryRefNumber'];
         $merchantRefNumber = $callbackData['merchantRefNumber'];

@@ -181,7 +181,7 @@ class CpserviceCo
         try {
             event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
         } catch (\Throwable $th) {
-            Log::info($th->getMessage());
+            // Log::info($th->getMessage());
             return $th->getMessage();
         }
 
