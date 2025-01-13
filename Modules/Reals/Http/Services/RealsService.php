@@ -174,9 +174,10 @@ class RealsService extends BaseModelService
         if ($categoriesIds) {
             unset($data['categories']);
         }
+
         if ($data->hasFile('video')) {
             $urlVideo = $this->upload($video);
-        } elseif ($data->has('video')) {
+        } elseif ($data->has('video') && Storage::exists($video)) {
             $urlVideo =    $video;
         }
 
