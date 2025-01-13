@@ -1361,7 +1361,7 @@ class RoomController extends Controller
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",
-                "imgbackground" => $room->room_background ??  '',
+                "imgbackground" => $room->final_room_image ??  '',
                 "roomIntro" => $room->room_intro ?? "",
                 "roomImg" => $room->room_cover ?? "",
                 "room_type" => @$room->myType->name ?? "",
