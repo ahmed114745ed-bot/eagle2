@@ -649,4 +649,18 @@ class UserService
     {
         return $this->userRepository->softDelete($id);
     }
+
+    public function userLevel($perPage, $Page, $uuid)
+    {
+        return $this->userRepository->userLevel($perPage, $Page, $uuid);
+    }
+
+    public function updateUserLevel($id, $request)
+    {
+        $user = $this->userRepository->findById($id);
+        $user->total_sender_level = $request->total_sender_level;
+        $user->total_received_level = $request->total_received_level;
+        $user->save();
+        return true;
+    }
 }

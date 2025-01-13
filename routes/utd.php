@@ -167,4 +167,11 @@ Route::middleware([])->group(function () {
         Route::post('/restore/{id}', [TrashedUserController::class, 'restore']);
         Route::post('/delete/{id}', [TrashedUserController::class, 'softDelete']);
     });
+
+    Route::prefix('users-level')->group(function () {
+        Route::get('/', [UserController::class, 'userLevel']);
+        Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
+    });
+
+
 });

@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use DB;
 use Auth;
 use Exception;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Config;
+use App\Models\Target;
 use App\Helpers\Common;
+use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
 use Illuminate\Validation\Rule;
 use App\Http\Services\WhatsappOtp;
+use App\Models\UserCodeInvitation;
+use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
@@ -20,19 +26,14 @@ use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\UserTypeResource;
+use App\Http\Resources\Api\V1\LevelUserResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
+use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
-use App\Models\Target;
-use DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
-use Modules\FixedTarget\Services\FixedTargetService;
-use App\Models\Config;
-use App\Models\UserCodeInvitation;
-use App\Models\UserEarnInvitation;
-use App\Helpers\UserCommon;
 
 class UserController extends Controller
 {
@@ -124,8 +125,8 @@ class UserController extends Controller
         $users = $this->userService->searchUsers($key);
 
 
-        $users = $users->through(function($user){
-            $user->level = Common::level_centerSerch ($user->id);
+        $users = $users->through(function ($user) {
+            $user->level = Common::level_centerSerch($user->id);
 
             return $user;
         });
@@ -175,7 +176,7 @@ class UserController extends Controller
         $user = $request->user();
         try {
 
-            \Log::info('This is the device token '. json_encode(getallheaders()));
+            \Log::info('This is the device token ' . json_encode(getallheaders()));
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (\Exception $exception) {
 
@@ -193,7 +194,7 @@ class UserController extends Controller
     {
         $user = $request->user();
         $keyword = $request->keywords ?? '';
-        return $this->userService->handleUserRelations($user, $request->type,$keyword);
+        return $this->userService->handleUserRelations($user, $request->type, $keyword);
     }
 
     public function follow(Request $request)
@@ -323,7 +324,7 @@ class UserController extends Controller
         }
         $total_host_target = $total_host_target->sum('sallary');
         $owner =       $agency->owner;
-        $owner->avatar = $agency->owner->avatar; 
+        $owner->avatar = $agency->owner->avatar;
         $data = [
             'id'                => $agency->id,
             'name'              => $agency->name,
@@ -583,5 +584,24 @@ class UserController extends Controller
             "code"    => $user_id . $generatedCode,
         ]);
         return Common::apiResponse(true, 'تم انشاء الكود', $data->code, 200);
+    }
+
+    public function userLevel(Request $request)
+    {
+        $trashed = $this->userService->userLevel($request->perPage, $request->Page, $request->uuid);
+        return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
+    }
+
+    public function updateUserLevel($id, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'total_sender_level'         => 'required|numeric',
+            'total_received_level'         => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $trashed = $this->userService->updateUserLevel($id, $request);
+        return Common::apiResponse(true, ' updated successfully');
     }
 }

@@ -265,4 +265,11 @@ class UserRepository extends Repository
         $user->forceDelete();
         return true;
     }
+
+    public function userLevel($perPage, $Page, $uuid)
+    {
+        return User::when(isset($uuid), function ($query) use ($uuid) {
+            $query->where('uuid', $uuid);
+        })->paginate($perPage, ['*'], 'page', $Page);
+    }
 }
