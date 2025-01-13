@@ -25,6 +25,7 @@ use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\UserSalaryRepository;
+use App\Tik\Repositories\UserTargetRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
@@ -50,6 +51,7 @@ class UserService
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
+        private readonly UserTargetRepository $userTargetRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -676,5 +678,10 @@ class UserService
         $deviceToken = $this->userDevicesHistoryRepository->findOrFail($id);
         $deviceToken->delete();
         return true;
+    }
+
+    public function usersTargets($perPage, $Page)
+    {
+        return $this->userTargetRepository->all($perPage, $Page);
     }
 }
