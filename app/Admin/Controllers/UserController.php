@@ -141,7 +141,7 @@ class UserController extends MainController
         } else if ($haveCoins) {
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
-            $grid->model()->orderByDesc('id')->ofAgency();
+            $grid->model()->orderByDesc('id');
         }
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {

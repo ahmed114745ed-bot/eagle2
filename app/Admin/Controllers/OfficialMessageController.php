@@ -143,7 +143,7 @@ class OfficialMessageController extends MainController
         $form = new Form(new OfficialMessageAdmin);
 
         $form->display('ID');
-        $form->text('title', __ ('title'));
+        $form->text('title', __ ('title'))->rules('nullable|max:255');;
         $form->image('img', __ ('img'));
         $form->select('user_id', __('user'))->options(function ($search) {
             $ops = [0 => __('all')];

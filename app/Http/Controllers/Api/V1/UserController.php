@@ -178,7 +178,7 @@ class UserController extends Controller
         try {
 
 
-        // \Log::info('This is the device token '. json_encode(getallheaders()));
+            // \Log::info('This is the device token '. json_encode(getallheaders()));
 
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (\Exception $exception) {
@@ -619,10 +619,21 @@ class UserController extends Controller
     {
         try {
             $this->userService->deleteDeviceToken($id);
-            return Common::apiResponse(true, ' delete successfully');
+            return Common::apiResponse(true, 'delete successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function usersTarget(Request $request)
+    {
+        $data = $this->userService->usersTargets($request->perPage, $request->Page);
+        return Common::apiResponse(true, 'success', $data);
+    }
+    public function allUsers(Request $request)
+    {
+        $users = $this->userService->allUser($request->perPage, $request->Page, $request->familyId, $request->agencyId, $request->search, $request->host);
+        return Common::apiResponse(true, 'done',$users);
     }
 }
