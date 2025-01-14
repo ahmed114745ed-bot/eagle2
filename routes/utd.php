@@ -245,7 +245,6 @@ Route::middleware([])->group(function () {
         Route::post('show-invite-code', [UserController::class, 'showInviteCode']);
         Route::post('create', [UserController::class, 'create']);
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
-        Route::get('pack-vip/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
     });
 });
