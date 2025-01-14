@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FamilyLevel;
 use App\Tik\Services\FamilyLevelService;
 use Illuminate\Http\Request;
+use Exception;
 
 class FamilyLevelController extends Controller
 {
@@ -41,12 +42,11 @@ class FamilyLevelController extends Controller
 
     
 
-    public function update(Request $request)
+    public function update($id ,Request $request)
     {
-        return $request;
         
         try {
-            $family = $this->FamilyLevelService->update($userId, $request, $id);
+            $family = $this->FamilyLevelService->update( $request, $id);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

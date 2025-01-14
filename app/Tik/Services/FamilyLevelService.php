@@ -55,23 +55,27 @@ class FamilyLevelService
 
 
 
-    public function update($userId, $request, $FamilyLevelId)
+    public function update( $request, $FamilyLevelId)
     {
-        $FamilyLevel = $this->FamilyLevelRepository->findById($FamilyLevelId);
-        $is_admin = $this->FamilyLevelUserRepository->checkIsAdmin($FamilyLevelId, $userId);
-        if (($userId != $FamilyLevel->user_id) && !$is_admin) throw new \Exception('not allowed');
+        $FamilyLevel = $this->FamilyLevelRepository->find($FamilyLevelId);
         if (!$FamilyLevel) throw new \Exception('not found');
         if ($request->name) {
             $FamilyLevel->name = $request->name;
         }
-        if ($request->introduce) {
-            $FamilyLevel->introduce = $request->introduce;
+        if ($request->exp) {
+            $FamilyLevel->exp = $request->exp;
         }
-        if ($request->notice) {
-            $FamilyLevel->notice = $request->notice;
+        if ($request->type) {
+            $FamilyLevel->type = $request->type;
         }
-        if ($request->hasFile('image')) {
-            $FamilyLevel->image = Common::upload('families', $request->file('image'));
+        if ($request->members) {
+            $FamilyLevel->members = $request->members;
+        }
+        if ($request->admins) {
+            $FamilyLevel->admins = $request->admins;
+        }
+        if ($request->hasFile('img')) {
+            $FamilyLevel->img = Common::upload('families', $request->file('img'));
         }
         $FamilyLevel->save();
         return $FamilyLevel;

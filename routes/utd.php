@@ -226,7 +226,7 @@ Route::middleware([])->group(function () {
         Route::get('/all', [FamilyLevelController::class, 'index']);
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
-        Route::post('/update', [FamilyLevelController::class, 'update']);
+        Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
         Route::post('/delete', [FamilyLevelController::class, 'destroy']);
 
 
