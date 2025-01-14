@@ -22,6 +22,10 @@ use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\RewardLevelIntervalController;
+use Modules\Public\Http\Controllers\web\LevelIntervalController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -32,6 +36,34 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
+
+    Route::prefix('families')->group(function(){
+        Route::get('/', [FamilyController::class, 'index']);
+        Route::post('/', [FamilyController::class, 'store']);
+        Route::post('/update/{id}', [FamilyController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::get('/{id}', [FamilyController::class, 'show']);
+    });
+
+    Route::prefix('level-intervals')->group(function(){
+        Route::get('/', [LevelIntervalsController::class, 'index']);
+        Route::post('/', [LevelIntervalsController::class, 'store']);
+        Route::post('/update/{id}', [LevelIntervalsController::class, 'update']);
+        Route::post('/delete/{id}', [LevelIntervalsController::class, 'destroy']);
+        Route::get('/{id}', [LevelIntervalsController::class, 'show']);
+    });
+
+    Route::prefix('reward-level-interval/{reward_level_interval}')->group(function(){
+        Route::get('/', [RewardLevelIntervalController::class, 'index']);
+        Route::post('/', [RewardLevelIntervalController::class, 'store']);
+        Route::post('/update/{id}', [RewardLevelIntervalController::class, 'update']);
+        Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
+
+        Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
+
+    });
+
+
     //games
     Route::prefix('games')->group(function () {
         Route::get('/all', [AllGameController::class, 'utdGameIndex']);
@@ -40,7 +72,7 @@ Route::middleware([])->group(function () {
         Route::post('/show', [AllGameController::class, 'showGame']);
         Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
         Route::get('/game-charge-details', [AllGameController::class, 'gameChargeDetails']);
-        
+
     });
     // target
     Route::prefix('targets')->group(function () {
@@ -95,9 +127,9 @@ Route::middleware([])->group(function () {
         Route::post('/update', [WareController::class, 'update']);
         Route::post('/show', [WareController::class, 'show']);
         Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
-        Route::get('/type', [WareController::class, 'typeWare']); 
+        Route::get('/type', [WareController::class, 'typeWare']);
         Route::get('/get-type', [WareController::class, 'getTypeWare']);
-       
+
 
     });
     Route::post('/create-paymentMethod', [PaymentMethodController::class, 'store']);
@@ -107,7 +139,7 @@ Route::middleware([])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    
+
 
     // users
     Route::resource('utd-users', UtdUserController::class);
@@ -152,15 +184,15 @@ Route::middleware([])->group(function () {
         Route::post('/payment-gateway/create', [CoinController::class, 'createPaymentGateway']);
         Route::post('/payment-gateway/update', [CoinController::class, 'updatePaymentGateway']);
         Route::post('/payment-gateway/show', [CoinController::class, 'showPaymentCoin']);
-      
+
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
     Route::post('roles/preview',  [RoleController::class, 'preview']);
 
-    
-    // game report 
+
+    // game report
     Route::get('/all-players', [GameReportController::class, 'allPlayers']);
     Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
     Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
