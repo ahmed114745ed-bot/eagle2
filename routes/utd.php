@@ -187,9 +187,22 @@ Route::middleware([])->group(function () {
         Route::post('/create', [FamilyLevelController::class, 'store']);
         Route::post('/update', [FamilyLevelController::class, 'update']);
         Route::post('/delete', [FamilyLevelController::class, 'destroy']);
-        
-
     });
+    Route::get('user-target', [UserController::class, 'usersTarget']);
 
-    
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'allUsers']);
+        Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
+        Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
+        Route::post('change-agency', [UserController::class, 'changeAgency']);
+        Route::post('charge-status', [UserController::class, 'chargeStatus']);
+        Route::post('transfer-salary', [UserController::class, 'transferSalary']);
+        Route::post('can-play', [UserController::class, 'canPlay']);
+        Route::post('hide-chat', [UserController::class, 'hideChat']);
+        Route::post('show-invite-code', [UserController::class, 'showInviteCode']);
+        Route::post('create', [UserController::class, 'create']);
+        Route::get('show/{id}', [UserController::class, 'showDataUser']);
+        Route::get('pack-vip/{id}', [UserController::class, 'showDataUser']);
+        Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+    });
 });

@@ -25,8 +25,10 @@ use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
+use App\Http\Resources\Api\V1\AllUsersResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
@@ -629,11 +631,245 @@ class UserController extends Controller
     public function usersTarget(Request $request)
     {
         $data = $this->userService->usersTargets($request->perPage, $request->Page);
-        return Common::apiResponse(true, 'success', $data);
+        return Common::apiResponse(true, 'success', UserTargetResource::collection($data));
     }
+
     public function allUsers(Request $request)
     {
         $users = $this->userService->allUser($request->perPage, $request->Page, $request->familyId, $request->agencyId, $request->search, $request->host);
-        return Common::apiResponse(true, 'done',$users);
+        return Common::apiResponse(true, 'done', AllUsersResource::collection($users));
+    }
+
+    public function kickAgency($id)
+    {
+        try {
+            $this->userService->kickAgency($id);
+            return Common::apiResponse(true, 'removed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function kickFamily($id)
+    {
+        try {
+            $this->userService->kickFamily($id);
+            return Common::apiResponse(true, 'removed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function changeAgency(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'agency_id'         => 'required|integer|exists:agencies,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->changeAgency($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function chargeStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'charge_status'         => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->chargeStatus($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function transferSalary(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'transfer_salary'         => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->transferSalary($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function canPlay(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'can_play'         => 'required|integer|in:2,3',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->changeAgency($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function hideChat(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'hide_chat'         => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->hideChat($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+    public function showInviteCode(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id'         => 'required|integer|exists:users,id',
+            'show_invite_code'         => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->userService->showInviteCode($request);
+            return Common::apiResponse(true, 'changed');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function create(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uuid'         => 'required',
+            'name'         => 'required|string',
+            'charge_status'         => 'required|boolean',
+            'transfer_salary'         => 'required|boolean',
+            'can_play'         => 'required|integer|in:0,1',
+            'country_id'         => 'nullable|integer|exists:countries,id',
+            'di'    => 'nullable|integer',
+            'user_diamond' => 'nullable|integer',
+            'total_sender_level' => 'nullable|integer',
+            'total_received_level' => 'nullable|integer',
+            'salary' => 'nullable|integer',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'facebook_id' => 'nullable',
+            'google_id' => 'nullable',
+            'huawei_id' => 'nullable',
+            'status' => 'required|boolean',
+            'type_user' => 'required|integer',
+            'manger_type_id' => 'nullable',
+            'avatar' => 'nullable',
+            'image_id' => 'nullable',
+            'gender' => 'nullable',
+            'show_invite_code'         => 'required|boolean',
+            'hide_chat'         => 'required|boolean',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $this->userService->create($request);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function showDataUser($id)
+    {
+        try {
+            $user  = $this->userService->showDataUser($id);
+            $user['Level'] =  Common::level_center($user)['sender_level'];
+            $user['worth'] =  Common::level_center($user)['receiver_level'];
+            $user['diamonds'] =  $user->coins;
+            $user['balance'] =  $user->salary;
+
+            return Common::apiResponse(true, 'done', $user);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateDataUser($id, Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'uuid'         => [
+                'required',
+                'exists:users,id',
+                Rule::unique('users', 'uuid')->ignore($id),
+            ],
+            'name'         => 'required|string',
+            'charge_status'         => 'required|boolean',
+            'transfer_salary'         => 'required|boolean',
+            'can_play'         => 'required|integer|in:0,1',
+            'country_id'         => 'nullable|integer|exists:countries,id',
+            'di'    => 'nullable|integer',
+            'user_diamond' => 'nullable|integer',
+            'total_sender_level' => 'nullable|integer',
+            'total_received_level' => 'nullable|integer',
+            'salary' => 'nullable|integer',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'facebook_id' => 'nullable',
+            'google_id' => 'nullable',
+            'huawei_id' => 'nullable',
+            'status' => 'required|boolean',
+            'type_user' => 'required|integer',
+            'manger_type_id' => 'nullable',
+            'avatar' => 'nullable',
+            'image_id' => 'nullable',
+            'gender' => 'nullable',
+            'show_invite_code'         => 'required|boolean',
+            'hide_chat'         => 'required|boolean',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $this->userService->update($id, $request);
+            return Common::apiResponse(true, 'updated successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }

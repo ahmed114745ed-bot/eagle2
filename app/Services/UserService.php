@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use DB;
+use Exception;
 use Carbon\Carbon;
 use App\Models\Vip;
 use App\Models\User;
@@ -21,9 +22,12 @@ use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
+use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\GiftLogRepository;
+use App\Tik\Repositories\ProfileRepository;
+use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
 use App\Tik\Repositories\UserSettingRepository;
@@ -52,6 +56,9 @@ class UserService
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
         private readonly UserTargetRepository $userTargetRepository,
+        private readonly FamilyUserRepository $familyUserRepository,
+        private readonly AgencyRepository $agencyRepository,
+        private readonly ProfileRepository $profileRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -687,5 +694,183 @@ class UserService
     public function allUser($perPage, $Page, $familyId, $agencyId, $search, $host)
     {
         return $this->userRepository->all($perPage, $Page, $familyId, $agencyId, $search, $host);
+    }
+
+    public function kickAgency($userId)
+    {
+        if (UserHandling::checkIfUserOwnerOfAgency($userId)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
+
+
+        UserHandling::kickUserFromAgency($userId);
+        return true;
+    }
+
+    public function kickFamily($userId)
+    {
+        if (UserHandling::checkIfUserOwnerOfFamily($userId)) throw new Exception(__('This User is the host Of family can\'t delete it go to remove family first'));
+        $data = [
+            'family_id' => null,
+        ];
+        $user = $this->userRepository->update($data, $userId);
+        $this->familyUserRepository->deleteByUserId($userId);
+        return true;
+    }
+
+    public function changeAgency($request)
+    {
+        $agencyOwner = $this->agencyRepository->getAgencyByOwnerId($request->user_id);
+        if ($agencyOwner) throw new Exception(__('This User is the host Of agency can\'t delete it'));
+        $data = [
+            'agency_id' => $request->agency_id,
+        ];
+        $user = $this->userRepository->update($data, $request->user_id);
+        $userSalary = $this->userSalaryRepository->findByUser($request->user_id);
+        if ($userSalary) {
+            $userSalary->user_agency_id = $request->agency_id;
+            $userSalary->save();
+        }
+        return true;
+    }
+
+    public function chargeStatus($request)
+    {
+        $data = [
+            'charge_status' => $request->charge_status,
+        ];
+        $this->userRepository->update($data, $request->user_id);
+
+        return true;
+    }
+
+    public function transferSalary($request)
+    {
+        $data = [
+            'transfer_salary' => $request->transfer_salary,
+        ];
+        $this->userRepository->update($data, $request->user_id);
+
+        return true;
+    }
+
+    public function hideChat($request)
+    {
+        $user = $this->userRepository->findOrFail($request->user_id);
+        $data = [
+            'hide_chat' => $request->hide_chat,
+        ];
+        $user->userSetting->update($data);
+
+        return true;
+    }
+
+    public function showInviteCode($request)
+    {
+        $user = $this->userRepository->findOrFail($request->user_id);
+        $data = [
+            'show_invite_code' => $request->show_invite_code,
+        ];
+        $user->userSetting->update($data);
+
+        return true;
+    }
+
+    public function create($request)
+    {
+        $data = [
+            'uuid' => $request->uuid,
+            'name' => $request->name,
+            'charge_status' => $request->charge_status,
+            'transfer_salary' => $request->transfer_salary,
+            'can_play' => $request->can_play,
+            'country_id' => $request->country_id,
+            'di' => $request->di,
+            'user_diamond' => $request->user_diamond,
+            'total_sender_level' => $request->total_sender_level,
+            'total_received_level' => $request->total_received_level,
+            'salary' => $request->salary,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'facebook_id' => $request->facebook_id,
+            'google_id' => $request->google_id,
+            'huawei_id' => $request->huawei_id,
+            'status' => $request->status,
+            'type_user' => $request->type_user,
+            'manger_type_id' => $request->manger_type_id,
+
+        ];
+        $user =  $this->userRepository->create($data);
+
+        if ($request->hasFile('avatar')) {
+            $avatar = Common::upload('profile', $request->file('avatar'));
+        }
+        if ($request->hasFile('image_id')) {
+            $image_id = Common::upload('profile', $request->file('image_id'));
+        }
+        $profileData = [
+            'avatar' => $avatar ?? '',
+            'image_id' => $image_id ?? '',
+            'gender' => $request->gender,
+            'user_id' => $user->id,
+        ];
+        $this->profileRepository->create($profileData);
+        $dataUserSitting = [
+            'show_invite_code' => $request->show_invite_code,
+            'hide_chat' => $request->hide_chat,
+            'user_id' => $user->id,
+        ];
+        $this->userSettingRepository->create($dataUserSitting);
+
+        return true;
+    }
+
+    public function showDataUser($id)
+    {
+        return  $this->userRepository->findOrFail($id, ['userSetting', 'profile', 'packs', 'haveVip']);
+    }
+
+    public function update($userId, $request)
+    {
+        $data = [
+            'uuid' => $request->uuid,
+            'name' => $request->name,
+            'charge_status' => $request->charge_status,
+            'transfer_salary' => $request->transfer_salary,
+            'can_play' => $request->can_play,
+            'country_id' => $request->country_id,
+            'di' => $request->di,
+            'user_diamond' => $request->user_diamond,
+            'total_sender_level' => $request->total_sender_level,
+            'total_received_level' => $request->total_received_level,
+            'salary' => $request->salary,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'facebook_id' => $request->facebook_id,
+            'google_id' => $request->google_id,
+            'huawei_id' => $request->huawei_id,
+            'status' => $request->status,
+            'type_user' => $request->type_user,
+            'manger_type_id' => $request->manger_type_id,
+
+        ];
+        $user =  $this->userRepository->findOrFail($userId);
+        $this->userRepository->update($data, $user->id);
+
+        $profileData = [
+            'gender' => $request->gender,
+        ];
+        if ($request->hasFile('avatar')) {
+            $profileData['avatar'] = Common::upload('profile', $request->file('avatar'));
+        }
+        if ($request->hasFile('image_id')) {
+            $profileData['image_id'] = Common::upload('profile', $request->file('image_id'));
+        }
+        $user->profile->update($profileData);
+        $dataUserSitting = [
+            'show_invite_code' => $request->show_invite_code,
+            'hide_chat' => $request->hide_chat,
+        ];
+        $user->userSetting->update($dataUserSitting);
+
+        return true;
     }
 }

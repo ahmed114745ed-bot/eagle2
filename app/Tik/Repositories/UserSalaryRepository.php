@@ -26,6 +26,11 @@ class UserSalaryRepository extends AbstractRepository
         return $this->model->query()->where('user_id', $userId)->orderByDesc('id')->first();
     }
 
+    public function findByUser($userId)
+    {
+        return $this->model->where('user_id',$userId)->where('month',now()->month)->where('year',now()->year)->first();
+    }
+
     public function incrementCutAmount($userId, $usd)
     {
         $userSalary = $this->findByUserId($userId);
