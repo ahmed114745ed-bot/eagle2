@@ -25,6 +25,11 @@ use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\GroupChatController;
+use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\RewardLevelIntervalController;
+use Modules\Public\Http\Controllers\web\LevelIntervalController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -35,6 +40,42 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
+
+    Route::prefix('families')->group(function(){
+        Route::get('/', [FamilyController::class, 'index']);
+        Route::post('/', [FamilyController::class, 'store']);
+        Route::post('/update/{id}', [FamilyController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::get('/{id}', [FamilyController::class, 'show']);
+    });
+
+    Route::prefix('level-intervals')->group(function(){
+        Route::get('/', [LevelIntervalsController::class, 'index']);
+        Route::post('/', [LevelIntervalsController::class, 'store']);
+        Route::post('/update/{id}', [LevelIntervalsController::class, 'update']);
+        Route::post('/delete/{id}', [LevelIntervalsController::class, 'destroy']);
+        Route::get('/{id}', [LevelIntervalsController::class, 'show']);
+    });
+
+    Route::prefix('reward-level-interval/{reward_level_interval}')->group(function(){
+        Route::get('/', [RewardLevelIntervalController::class, 'index']);
+        Route::post('/', [RewardLevelIntervalController::class, 'store']);
+        Route::post('/update/{id}', [RewardLevelIntervalController::class, 'update']);
+        Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
+
+        Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
+
+    });
+
+    Route::prefix('group-chat')->group(function(){
+        Route::get('/', [GroupChatController::class, 'index']);
+        Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/update/{id}', [GroupChatController::class, 'update']);
+        Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
+        Route::get('/{id}', [GroupChatController::class, 'show']);
+
+    });
+
     //games
     Route::prefix('games')->group(function () {
         Route::get('/all', [AllGameController::class, 'utdGameIndex']);
@@ -156,7 +197,7 @@ Route::middleware([])->group(function () {
     Route::post('roles/preview',  [RoleController::class, 'preview']);
 
 
-    // game report 
+    // game report
     Route::get('/all-players', [GameReportController::class, 'allPlayers']);
     Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
     Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
@@ -185,8 +226,10 @@ Route::middleware([])->group(function () {
         Route::get('/all', [FamilyLevelController::class, 'index']);
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
-        Route::post('/update', [FamilyLevelController::class, 'update']);
-        Route::post('/delete', [FamilyLevelController::class, 'destroy']);
+        Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
+
+
     });
     Route::get('user-target', [UserController::class, 'usersTarget']);
 
