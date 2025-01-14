@@ -636,7 +636,7 @@ class UserController extends Controller
 
     public function allUsers(Request $request)
     {
-        $users = $this->userService->allUser($request->perPage, $request->Page, $request->familyId, $request->agencyId, $request->search, $request->host);
+        $users = $this->userService->allUser($request->perPage, $request->Page, $request->family_id, $request->agency_id, $request->search, $request->host);
         return Common::apiResponse(true, 'done', AllUsersResource::collection($users));
     }
 
