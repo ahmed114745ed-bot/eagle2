@@ -238,11 +238,8 @@ Route::middleware([])->group(function () {
         Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
         Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
         Route::post('change-agency', [UserController::class, 'changeAgency']);
-        Route::post('charge-status', [UserController::class, 'chargeStatus']);
-        Route::post('transfer-salary', [UserController::class, 'transferSalary']);
-        Route::post('can-play', [UserController::class, 'canPlay']);
-        Route::post('hide-chat', [UserController::class, 'hideChat']);
-        Route::post('show-invite-code', [UserController::class, 'showInviteCode']);
+        Route::post('update-switch', [UserController::class, 'updateSwitch']);
+        Route::post('update-user-Setting', [UserController::class, 'updateUserSetting']); 
         Route::post('create', [UserController::class, 'create']);
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);

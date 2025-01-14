@@ -732,10 +732,10 @@ class UserService
         return true;
     }
 
-    public function chargeStatus($request)
+    public function updateSwitch($request)
     {
         $data = [
-            'charge_status' => $request->charge_status,
+            $request->key => $request->value
         ];
         $this->userRepository->update($data, $request->user_id);
 
@@ -752,27 +752,18 @@ class UserService
         return true;
     }
 
-    public function hideChat($request)
+    public function updateUserSetting($request)
     {
         $user = $this->userRepository->findOrFail($request->user_id);
         $data = [
-            'hide_chat' => $request->hide_chat,
+            $request['key'] => $request['value'],
         ];
         $user->userSetting->update($data);
 
         return true;
     }
 
-    public function showInviteCode($request)
-    {
-        $user = $this->userRepository->findOrFail($request->user_id);
-        $data = [
-            'show_invite_code' => $request->show_invite_code,
-        ];
-        $user->userSetting->update($data);
 
-        return true;
-    }
 
     public function create($request)
     {

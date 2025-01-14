@@ -680,17 +680,29 @@ class UserController extends Controller
         }
     }
 
-    public function chargeStatus(Request $request)
+    public function updateSwitch(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
-            'charge_status'         => 'required|boolean',
+            'user_id' => 'required|integer|exists:users,id',
+            'key' => 'required|string|in:charge_status,transfer_salary,can_play',
+            'value'   => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    if (in_array($request->key, ['charge_status', 'transfer_salary']) && !in_array($value, [0, 1])) {
+                        $fail(__('The :attribute must be a boolean value for charge_status or transfer_salary.'));
+                    }
+
+                    if ($request->key === 'can_play' && !in_array($value, [2, 3])) {
+                        $fail(__('The :attribute must be either 2 or 3 when the setting is can_play.'));
+                    }
+                },
+            ],
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-            $this->userService->chargeStatus($request);
+            $this->userService->updateSwitch($request);
             return Common::apiResponse(true, 'changed');
         } catch (Exception $exception) {
 
@@ -698,17 +710,20 @@ class UserController extends Controller
         }
     }
 
-    public function transferSalary(Request $request)
+
+
+    public function updateUserSetting(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'user_id'         => 'required|integer|exists:users,id',
-            'transfer_salary'         => 'required|boolean',
+            'key' => 'required|string|in:hide_chat,show_invite_code',
+            'value' => 'required|boolean',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-            $this->userService->transferSalary($request);
+            $this->userService->updateUserSetting($request);
             return Common::apiResponse(true, 'changed');
         } catch (Exception $exception) {
 
@@ -716,58 +731,6 @@ class UserController extends Controller
         }
     }
 
-    public function canPlay(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
-            'can_play'         => 'required|integer|in:2,3',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        try {
-            $this->userService->changeAgency($request);
-            return Common::apiResponse(true, 'changed');
-        } catch (Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
-
-    public function hideChat(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
-            'hide_chat'         => 'required|boolean',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        try {
-            $this->userService->hideChat($request);
-            return Common::apiResponse(true, 'changed');
-        } catch (Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
-    public function showInviteCode(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_id'         => 'required|integer|exists:users,id',
-            'show_invite_code'         => 'required|boolean',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        try {
-            $this->userService->showInviteCode($request);
-            return Common::apiResponse(true, 'changed');
-        } catch (Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
 
     public function create(Request $request)
     {
