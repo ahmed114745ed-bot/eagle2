@@ -227,7 +227,7 @@ Route::middleware([])->group(function () {
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
         Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
-        Route::post('/delete', [FamilyLevelController::class, 'destroy']);
+        Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
 
 
     });
