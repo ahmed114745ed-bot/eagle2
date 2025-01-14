@@ -838,7 +838,7 @@ class UserController extends Controller
             'name'         => 'required|string',
             'charge_status'         => 'required|boolean',
             'transfer_salary'         => 'required|boolean',
-            'can_play'         => 'required|integer|in:0,1',
+            'can_play'         => 'required|integer|in:2,3',
             'country_id'         => 'nullable|integer|exists:countries,id',
             'di'    => 'nullable|integer',
             'user_diamond' => 'nullable|integer',
