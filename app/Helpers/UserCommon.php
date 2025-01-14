@@ -405,4 +405,15 @@ class UserCommon{
             DB::rollBack ();
         }
     }
+
+    public static function addChargeLevel($userId, $amount)
+    {
+        $user = User::where("id", $userId)->first();
+        $user->total_charge_coins += $amount;
+        $level = Vip::where("exp", "<=", $user->total_charge_coins)->where('type', 5)->latest()->first();
+        if ($level) {
+            $user->charge_level = $level->level;
+        }
+        $user->save();
+    }
 }
