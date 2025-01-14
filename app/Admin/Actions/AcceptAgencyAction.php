@@ -33,35 +33,34 @@ class AcceptAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
-       $agency= Agency::find( $request->id);
-       $user = User::find($agency->app_owner_id);
-       $agency->status = 1;
-       $agency->save();
-       $additionalInfo = AdditionalInfo::where('agency_id', $agency->id)->first();
+        $agency = Agency::find($request->id);
+        $user = User::find($agency->app_owner_id);
+        $agency->status = 1;
+        $agency->save();
+        $additionalInfo = AdditionalInfo::where('agency_id', $agency->id)->first();
         $additionalInfo->status = 1;
         $additionalInfo->save();
         $appOwnerId = $agency->app_owner_id;
-            $user = User::find($appOwnerId);
-            $user->type_user = 2;
-            $user->agency_id = $agency->id;
-            $user->save();
-        if($agency->additionalInfo->gmail)
-            {
-                Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
-            }
-            CustomNotification::acceptRequestAgency($user);
+        $user = User::find($appOwnerId);
+        $user->type_user = 2;
+        $user->agency_id = $agency->id;
+        $user->save();
+        if ($agency->additionalInfo->gmail) {
+            Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
+        }
+        Common::createUserAdmin($appOwnerId);
+        CustomNotification::acceptRequestAgency($user->id);
         return $this->response()->success('success')->refresh();
     }
 
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-
     }
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')"  ></a>
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')"  ></a>
 <script>
 function pu(val) {
 

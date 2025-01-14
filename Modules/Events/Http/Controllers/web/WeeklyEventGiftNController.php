@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainOldController;
 use App\Models\Vip;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -21,7 +22,7 @@ use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Events\Entities\WeeklyStar;
 
-class WeeklyEventGiftNController extends MainController
+class WeeklyEventGiftNController extends MainOldController
 {
     use HasResourceActions;
     public $permission_name = 'weekly_star_rewards';

@@ -7,10 +7,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Admin;
+//use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class GiftController extends MainController
 {
@@ -19,9 +20,9 @@ class GiftController extends MainController
     public $permission_name = 'gift';
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Gifts'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -33,9 +34,9 @@ class GiftController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('Gifts'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -47,9 +48,9 @@ class GiftController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('Gifts'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -60,9 +61,9 @@ class GiftController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Gifts'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 
@@ -81,7 +82,7 @@ class GiftController extends MainController
             $filter->disableIdFilter();
             // $filter->like('type', __('type'));
             $filter->in('type', __('type'))->multipleSelect(
-                translate(TYPE_GIFT) 
+                translate(TYPE_GIFT)
             );
 
             $filter->expand();
@@ -89,7 +90,12 @@ class GiftController extends MainController
         $grid->id(__('ID'));
         $grid->column('name', __('name'))->editable();
         $grid->column('e_name', __('e_name'))->editable();
-        $grid->column('price', __('price'))->editable();
+        if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
+            $grid->column('price', __('price'))->editable();
+            $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+        } else {
+            $grid->column('price', __('price'));
+        }
         $grid->column('img', trans('image'))->image('', '50', 50);
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
@@ -97,13 +103,13 @@ class GiftController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column("use_count", __('use count'));
-        $grid->column('type', __('type'))->select(translate(TYPE_GIFT) );
+        $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         $grid->vip_level(__('vip_level'));
         $grid->column('hot', trans('hot'));
         $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
-        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+       
         $grid->column('music_gift', trans('music_gift'))->switch(Common::getSwitchStatesGiftMucic());
         $grid->sort(__('sort'))->editable();
         $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
@@ -159,7 +165,7 @@ class GiftController extends MainController
         $form->text('name', __('name'));
         $form->text('e_name', __('e_name'));
         $form->select('type', __('type'))->options(
-            translate(TYPE_GIFT) 
+            translate(TYPE_GIFT)
         )->attribute(['id' => 'type'])->required();
 
         $form->number('luckyGift.win_probability', __('win probability'))
@@ -221,10 +227,22 @@ class GiftController extends MainController
              SCRIPT;
         Admin::script($script);
         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'));
-        $form->currency('price', __('price'))->symbol('💎');
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💎');
+                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💎');
+                $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+            }
+        }
+
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {
-             return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->required();
         $form->select('image_type', __('image_type'))->options(
             [
@@ -236,7 +254,7 @@ class GiftController extends MainController
         )->required();
         $form->file('show_img2', __('show_img2'));
         $form->number('sort', __('sort'));
-        $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+       
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         $form->saving(function (Form $form) {
             if ($form->model()->type != "6") {

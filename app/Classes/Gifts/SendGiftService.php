@@ -31,6 +31,7 @@ class SendGiftService
         GiftLog::query()->create($info);
 
 
+
     }
 
     public function sendGift2($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, $cpId = null)
@@ -309,7 +310,6 @@ class SendGiftService
      */
     public function getGiftLogData(Gift $gift, Room $room, $number, mixed $totalPrice, User $senderUser, User $receivedUser, mixed $isPlay, $isPk = false, $cpId = null): array
     {
-
         $appFeatureStatus = AppFeature::where('slug', 'room_gift_target')->value('status');
         $info['giftId']       = $gift->id;
         $info['roomowner_id'] = $room->uid;

@@ -62,7 +62,7 @@ class GiftController extends Controller
 
     public function storeList(Request $request)
     {
-        Log::info(json_encode($request->all()));
+        // Log::info(json_encode($request->all()));
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',

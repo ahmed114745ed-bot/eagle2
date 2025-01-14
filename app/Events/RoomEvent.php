@@ -18,7 +18,7 @@ class RoomEvent implements ShouldBroadcast
      */
     public function __construct(private $data)
     {
-        Log::info('Event broadcasted to my-channel: ' . json_encode($data));
+        // Log::info('Event broadcasted to my-channel: ' . json_encode($data));
 
     }
 

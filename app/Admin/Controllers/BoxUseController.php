@@ -22,10 +22,10 @@ class BoxUseController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -37,10 +37,10 @@ class BoxUseController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->header(trans('admin.detail'))
             ->description(trans('admin.description'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -52,10 +52,10 @@ class BoxUseController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**

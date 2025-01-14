@@ -70,13 +70,13 @@ class AllowPacks
     public function initialize()
     {
         $this->packs = $this->user->packs()->whereIn('type', $this->packIds)->get();
-        $this->wares = Ware::query()->selectRaw('type,MIN(level) as min_level,MAX(level) as max_level')
-            ->whereIn('type', $this->packIds)
-            ->where('is_active_for_vip', true)
-            ->groupBy('type')
-            ->get();
-
-        Log::info('this is wares : ' . json_encode($this->wares));
+        $this->wares = Ware::query()
+        ->selectRaw('type, MIN(level) as min_level, MAX(level) as max_level, MIN(id) as min_id, MAX(id) as max_id')
+        ->whereIn('type', $this->packIds)
+        ->where('is_active_for_vip', true)
+        ->groupBy('type')
+        ->get();
+        // Log::info('this is wares : ' . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
     }
@@ -103,7 +103,7 @@ class AllowPacks
         foreach ($this->data as $key => $value) {
             $ware      = $this->getWare($value);
             if ($value == 16) {
-                Log::info("ware before is:" . json_encode($ware ));
+                // Log::info("ware before is:" . json_encode($ware ));
             }
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;
@@ -140,7 +140,8 @@ class AllowPacks
         $userlevel = $this->userOVipLevel;
 
         $packs = $this->packs;
-        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->id)->isNotEmpty();
+        //return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level && $packs->where('target_id', $ware->max_id)->isNotEmpty();
+        return $userlevel >= $ware->min_level && $userlevel <= $ware->max_level;
     }
 
     private function getDescription(string $key, $isAllow, $minLevel, $maxLevel,$lang ='en')

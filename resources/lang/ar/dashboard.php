@@ -21,7 +21,7 @@ return [
     'list'                  => 'القائمة',
     'new'                   => 'جديد',
     'create'                => 'انشاء',
-    'delete'                => 'مسح',
+    'delete'                => 'حذف',
     'remove'                => 'حذف',
     'edit'                  => 'تعديل',
     'view'                  => 'عرض',
@@ -230,7 +230,6 @@ return [
     'raise' => 'رفع',
     'lower' => 'خفض',
     'giveSalary' => 'تسليم الراتب',
-    'delete' => 'حزف',
     'chickDelete' => 'هل متاكد من انك تريد حذف هذا العنصر ؟',
     'removeBlackList' => ' ألغاء المستجدم من القائمة السوداء',
     'userNotFound' => 'المستخدم غير موجود',
@@ -282,6 +281,6 @@ return [
     'kick_out_less_than_day'           => 'أول يوم مسموح به لطرد العميل من الوكالة',
     'kick_out_greater_than_day'        => 'آخر يوم مسموح به لطرد العميل من الوكالة',
     'system_default_manager'           => 'قيمة UUID لتعيين العميل كمدير للتطبيق',
-
+    'add_coins' => 'أضافة رصبد',
 
 ];

@@ -158,10 +158,10 @@ class AppSitiingCOnfigController extends MainController
         $form .= '</form>';
 
 
-        return $content
+        return parent::index($content
             ->header('Custom Page')
             ->description('This is a custom page')
-            ->body(new HtmlString($form));
+            ->body(new HtmlString($form)));
     }
 
 }

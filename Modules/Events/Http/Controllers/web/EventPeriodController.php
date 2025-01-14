@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainOldController;
 use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
@@ -23,7 +24,7 @@ use App\Admin\Controllers\MainController;
 use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class EventPeriodController extends MainController
+class EventPeriodController extends MainOldController
 {
     use HasResourceActions;
 

@@ -13,7 +13,6 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\UserVip;
-use App\Models\ImageColor;
 use App\Models\MangerType;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
@@ -30,7 +29,6 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Actions\DeletePackAction;
-use App\Classes\Charges\ChargesHistory;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\KickOfAgencyAction;
@@ -85,6 +83,20 @@ class UserController extends MainController
             ->body(Tab::forms($forms));
     }
 
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(__($this->title))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(__($this->title))
+            ->body($this->form()));
+    }
+
     public function index(Content $content)
     {
         if (!Admin::user()->can('*')) {
@@ -129,7 +141,7 @@ class UserController extends MainController
         } else if ($haveCoins) {
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
-            $grid->model()->orderByDesc('id')->ofAgency();
+            $grid->model()->orderByDesc('id');
         }
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {

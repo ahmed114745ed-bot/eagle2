@@ -19,6 +19,13 @@ class RoleController extends MainController
         return trans('admin.roles');
     }
 
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(__($this->title))
+            ->body($this->grid()));
+    }
+
     public function edit($id, Content $content)
     {
         return $content
@@ -132,7 +139,8 @@ class RoleController extends MainController
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
-
+        $form->text('desc_en', __('Description en'));
+        $form->text('desc_ar', __('Description ar'));
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
 

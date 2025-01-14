@@ -2,6 +2,7 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
+use App\Admin\Controllers\MainOldController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -11,7 +12,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class GeneralRoleController extends MainController
+class GeneralRoleController extends MainOldController
 {
     use HasResourceActions;
     public $permission_name = 'general-roles';

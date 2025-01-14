@@ -2,18 +2,24 @@
 
 namespace App\Tik\Services;
 
-use App\Exceptions\CValidationException;
 use Exception;
 use Carbon\Carbon;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Admin;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use Illuminate\Support\Str;
 use App\Facades\UserHandling;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
 use App\Notifications\RefuseAgency;
 use http\Exception\RuntimeException;
+use Illuminate\Support\Facades\Hash;
+use App\Notifications\AgencyOwnerRole;
 use Illuminate\Support\Facades\Storage;
+use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AdminRepository;
 use App\Tik\Repositories\AgencyRepository;
@@ -23,9 +29,9 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
+use Illuminate\Validation\ValidationException;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
@@ -235,6 +241,11 @@ class AgencyService
         if ($request->name != null) {
             $agency->name = $request->name;
         }
+
+        if ($request->contents != null) {
+            $agency->contents = $request->contents;
+        }
+
         if ($request->get('content') != null) {
             $agency->notice = $request->get('content');
         }
@@ -364,6 +375,7 @@ class AgencyService
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
+        Common::createUserAdmin($agency->app_owner_id);
         CustomNotification::acceptRequestAgency($user);
         return true;
     }
@@ -511,7 +523,7 @@ class AgencyService
 
         if ($isThisMonth) $endDay = today()->day;
 
-        \Log::info('this2 is error');
+        // \Log::info('this2 is error');
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
         $data = [

@@ -23,10 +23,8 @@ class OVipController extends MainController
     use HasResourceActions;
     public $permission_name = 'ovip';
 
-   
-    public $hiddenColumns = [
 
-    ];
+    public $hiddenColumns = [];
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("vips");
@@ -88,26 +86,26 @@ class OVipController extends MainController
 
     protected function grid()
     {
-//        $arr = [];
-//        $privs = VipPrivilege::all ();
-//        foreach ($privs as $priv){
-//            $arr[$priv->id]=$priv->name;
-//        }
+        //        $arr = [];
+        //        $privs = VipPrivilege::all ();
+        //        foreach ($privs as $priv){
+        //            $arr[$priv->id]=$priv->name;
+        //        }
         $grid = new Grid(new OVip);
 
         $grid->id('ID');
-        $grid->column('level',__ ('level'));
-        $grid->column('name',__ ('name'));
-        $grid->column('img',__ ('img'))->display(function ($path){
+        $grid->column('level', __('level'));
+        $grid->column('name', __('name'));
+        $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('price',__ ('price'));
-        $grid->column('expire',__ ('expire'));
-//        $grid->created_at(trans('admin.created_at'));
-//        $grid->updated_at(trans('admin.updated_at'));
-        $this->extendGrid ($grid);
+        $grid->column('price', __('price'));
+        $grid->column('expire', __('expire'));
+        //        $grid->created_at(trans('admin.created_at'));
+        //        $grid->updated_at(trans('admin.updated_at'));
+        $this->extendGrid($grid);
         $grid->disableExport();
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -127,15 +125,15 @@ class OVipController extends MainController
     {
         $show = new Show(OVip::findOrFail($id));
 
-//        $show->id('ID');
-//        $show->level('level');
-//        $show->name('name');
-//        $show->img('img');
-//        $show->price('price');
-//        $show->privileges('privileges');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
+        //        $show->id('ID');
+        //        $show->level('level');
+        //        $show->name('name');
+        //        $show->img('img');
+        //        $show->price('price');
+        //        $show->privileges('privileges');
+        //        $show->created_at(trans('admin.created_at'));
+        //        $show->updated_at(trans('admin.updated_at'));
+        $this->extendShow($show);
         return $show;
     }
 
@@ -146,11 +144,11 @@ class OVipController extends MainController
      */
     protected function form()
     {
-//        $arr = [];
-//        $privs = VipPrivilege::all ();
-//        foreach ($privs as $priv){
-//            $arr[$priv->id]=$priv->name;
-//        }
+        //        $arr = [];
+        //        $privs = VipPrivilege::all ();
+        //        foreach ($privs as $priv){
+        //            $arr[$priv->id]=$priv->name;
+        //        }
 
         $form = new Form(new OVip);
         if (Session::has('show_alert_vip')) {
@@ -159,48 +157,56 @@ class OVipController extends MainController
                  alert("___");
              });
          </script>');
-         }
-        $form->display(__ ('ID'));
+        }
+        $form->display(__('ID'));
         $form->hidden('level', __('level'));
         $form->text('name', __('name'));
         $form->file('img', __('img'));
         $form->number('exp', __('exp'));
-        $form->currency('price', __('price'));
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_vip_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💎');
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_vip_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💎');
+            }
+        }
         if (Admin::user()->can('*')) {
             $form->number('expire', __('expire'));
         } else {
             $form->number('expire', __('expire'))->max(30);
         }
-        $form->belongsToMany ('privilegs', Privileges::class, __ ('privileges'));
+        $form->belongsToMany('privilegs', Privileges::class, __('privileges'));
 
         $form->saving(function (Form $form) {
 
             $privilegs = request()->all();
             $privilegs = request('privilegs');
             $level = request('level');
-            $notActuveAll =Ware::where('level', $level)->update([
-                'is_active_for_vip'=>false
+            $notActuveAll = Ware::where('level', $level)->update([
+                'is_active_for_vip' => false
             ]);
 
             if ($notActuveAll) {
 
-                foreach ($privilegs as $privileg){
+                foreach ($privilegs as $privileg) {
                     $type_preveleg = VipPrivilege::find($privileg);
 
 
-                    if(isset($type_preveleg->type)){
+                    if (isset($type_preveleg->type)) {
 
-                    $updateActive = Ware::where('type', $type_preveleg->type)->where('level',$level)->update([
-                        'is_active_for_vip'=>true
-                    ]);
-                    // if (!$updateActive) {
-                    //     session()->flash('show_alert_vip', 'Your alert message');
-                    //     return redirect()->back();
-                    // }
+                        $updateActive = Ware::where('type', $type_preveleg->type)->where('level', $level)->update([
+                            'is_active_for_vip' => true
+                        ]);
+                        // if (!$updateActive) {
+                        //     session()->flash('show_alert_vip', 'Your alert message');
+                        //     return redirect()->back();
+                        // }
 
+                    }
                 }
-
-            }
 
 
                 // try {
@@ -222,13 +228,8 @@ class OVipController extends MainController
 
 
                 session()->forget('show_alert_vip');
-
-
             }
-
-
-
-         });
+        });
 
         return $form;
     }

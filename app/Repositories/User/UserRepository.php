@@ -242,4 +242,48 @@ class UserRepository extends Repository
         }
         return     $builder->paginate(10);
     }
+
+
+    public function trashedUserAccountList($perPage, $Page, $uuid)
+    {
+        return User::onlyTrashed()->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where('uuid', $uuid);
+        })->orderByDesc('deleted_at')->paginate($perPage, ['*'], 'page', $Page);
+    }
+
+    public function restoreAccount($id)
+    {
+        $user = User::query()->onlyTrashed()->find($id);
+        $user->restore();
+        return true;
+    }
+
+    public function softDelete($id)
+    {
+        $user = User::query()->onlyTrashed()->find($id);
+        DB::table('reports')->where('Reporter_id', $user->id)->delete();
+        $user->forceDelete();
+        return true;
+    }
+
+    public function userLevel($perPage, $Page, $uuid)
+    {
+        return User::when(isset($uuid), function ($query) use ($uuid) {
+            $query->where('uuid', $uuid);
+        })->paginate($perPage, ['*'], 'page', $Page);
+    }
+
+    public function all($perPage, $Page, $familyId, $agencyId, $search, $host)
+    {
+        return User::when(isset($familyId), function ($query) use ($familyId) {
+            $query->where('family_id', $familyId);
+        })->when(isset($agencyId), function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
+        })->when(isset($host), function ($query) use ($host) {
+            $query->where('is_host', $host);
+        })->when(isset($search), function ($query) use ($search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhere('uuid', 'like', "%$search%")->orWhere('special_id', 'like', "%$search%")->orWhere('phone', 'like', "%$search%")->orWhere('nickname', 'like', "%$search%")->orWhere('email', 'like', "%$search%");
+        })->orderByDesc('id')->with('agency', 'targets')->paginate($perPage, ['*'], 'page', $Page);
+    }
 }

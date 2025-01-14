@@ -18,10 +18,10 @@ class RoleController extends Controller
     {
         $roleModel = config('admin.database.roles_model');
 
-            $roles = $roleModel::with('permissions')
-            ->select('id', 'slug', 'name', 'created_at', 'updated_at')
+        $roles = $roleModel::with('permissions')
+            ->select('id', 'slug', 'name', 'desc_en', 'desc_ar', 'created_at', 'updated_at')
             ->get();
-    
+
         return Common::apiResponse(1, '', RoleResource::collection($roles));
     }
 
@@ -30,7 +30,7 @@ class RoleController extends Controller
         $roleModel = config('admin.database.roles_model');
 
         $roles = $roleModel::with('permissions:name')
-            ->select('id', 'slug', 'name', 'created_at', 'updated_at')
+            ->select('id', 'slug', 'name', 'desc_en', 'desc_ar', 'created_at', 'updated_at')
             ->where('id', $id)->first();
 
         return Common::apiResponse(1, '', $roles);
@@ -42,6 +42,8 @@ class RoleController extends Controller
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string|max:255',
             'name' => 'required|string|max:255|unique:admin_roles,name',
+            'desc_en' => 'nullable',
+            'desc_ar' => 'nullable',
             'permissions' => 'required',
         ]);
         if ($validator->fails()) {
@@ -55,6 +57,8 @@ class RoleController extends Controller
         $role = new $roleModel();
         $role->slug = $request->input('slug');
         $role->name = $request->input('name');
+        $role->desc_en = $request->input('desc_en');
+        $role->desc_ar = $request->input('desc_ar');
         $role->save();
 
         if (is_string($request->permissions)) {
@@ -84,12 +88,18 @@ class RoleController extends Controller
             $validated = $request->validate([
                 'slug' => 'required|string|max:255',
                 'name' => 'required|string|max:255|unique:admin_roles,name,' . $id,
+                'desc_en' => 'nullable',
+                'desc_ar' => 'nullable',
                 'permissions' => 'required',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
 
+            
+
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
+            $role->desc_en = $request->input('desc_en');
+            $role->desc_ar = $request->input('desc_ar');
             $role->save();
 
             if (is_string($request->permissions)) {
@@ -99,10 +109,10 @@ class RoleController extends Controller
 
             return Common::apiResponse(1, 'Role updated successfully', $role);
         } catch (ValidationException $e) {
-            Log::info('Validation Error:', $e->errors());
+            // Log::info('Validation Error:', $e->errors());
             return Common::apiResponse(0, 'Validation failed', $e->errors());
         } catch (\Throwable $th) {
-            Log::info('Unexpected Error: ' . $th->getMessage());
+            // Log::info('Unexpected Error: ' . $th->getMessage());
             return Common::apiResponse(0, 'An unexpected error occurred');
         }
     }
@@ -141,18 +151,18 @@ class RoleController extends Controller
         // Fetch all permissions first and then group by category
         $permissions = $permissionModel::all();
 
-    // Group the permissions by category
-    $permissionsGrouped = $permissions->groupBy(function ($item) {
-        return $item->category ?? 'other';
-    });
+        // Group the permissions by category
+        $permissionsGrouped = $permissions->groupBy(function ($item) {
+            return $item->category ?? 'other';
+        });
 
-    // Prepare the response to match your desired format
-    $formattedPermissions = [];
-    foreach ($permissionsGrouped as $category => $items) {
-        $formattedPermissions[__($category)] = PermissionResource::collection($items);
-    }
+        // Prepare the response to match your desired format
+        $formattedPermissions = [];
+        foreach ($permissionsGrouped as $category => $items) {
+            $formattedPermissions[__($category)] = PermissionResource::collection($items);
+        }
 
-    return Common::apiResponse(1, '', $formattedPermissions, 200);
+        return Common::apiResponse(1, '', $formattedPermissions, 200);
     }
 
     public function preview(Request $request)

@@ -107,6 +107,11 @@ class DedicateAction extends RowAction
                 return $this->response()->error(__('dashboard.addAchivement'))->refresh();
             }
             DB::beginTransaction();
+
+            
+            $enableVipAuto = Common::getConf('enable_vip_auto') ?? "false";
+            $is_used = $enableVipAuto === "true" ? 1 : 0;
+
             try {
                 $uniqueAttributes = [
                     'sender_id' => 0,
@@ -124,6 +129,7 @@ class DedicateAction extends RowAction
                             'qty'    => 1,
                             'price'  => 0,
                             'total'  => 0,
+                            'is_used'  => $is_used,
                             'dash_user_id'  => \auth()->user()->id,
                         ]
                     );
@@ -131,8 +137,11 @@ class DedicateAction extends RowAction
                     $userVip->qty++;
                     if($userVip->expire > now()->timestamp){
                         $userVip->expire += ($request->days * 86400);
+                        $userVip->is_used += $is_used;
                     }else{
                         $userVip->expire = now()->timestamp + ($request->days * 86400);
+                        $userVip->is_used += $is_used;
+
                     }
                     $userVip->save();
                 }

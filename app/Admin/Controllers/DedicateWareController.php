@@ -7,7 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Admin;
+//use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DedicateAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class DedicateWareController extends MainController
 {
@@ -140,7 +141,7 @@ class DedicateWareController extends MainController
 
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
-        if (\Encore\Admin\Facades\Admin::user()->can('*')) {
+        if (\Encore\Admin\Facades\Admin::user()->can('*') ||Admin::user()->can('edit_ware_price')) {
             $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         }
         $grid->sort(__('sort'), __('sort'));
@@ -226,7 +227,18 @@ class DedicateWareController extends MainController
         //        });
         $form->text('name', trans('name'));
         $form->text('title', trans('title'));
-        $form->currency('price', trans('price'))->symbol('💰');
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->currency('price', __('price'))->symbol('💰');
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+            }
+        }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
         $form->image('show_img', trans('img'))->default('1.png')->rules('required');
@@ -245,7 +257,7 @@ class DedicateWareController extends MainController
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+       
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 

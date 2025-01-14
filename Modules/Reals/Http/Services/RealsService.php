@@ -27,14 +27,14 @@ class RealsService extends BaseModelService
     {
         $userId = $user->id;
         return Real::query()->with([
-                                       'user' => function ($query) use ($currentUserId) {
-                                           $query->withoutAppends()->isFollow($currentUserId)->with('profile');
-                                       }
-                                   ])->withCount(['likes', 'comments'])->withExists([
-                                                                                        'likes' => function ($query) use ($currentUserId) {
-                                                                                            $query->where('user_id', $currentUserId);
-                                                                                        }
-                                                                                    ])->where('user_id', $userId)->orderByDesc('id')->paginate(PAGINATION);
+            'user' => function ($query) use ($currentUserId) {
+                $query->withoutAppends()->isFollow($currentUserId)->with('profile');
+            }
+        ])->withCount(['likes', 'comments'])->withExists([
+            'likes' => function ($query) use ($currentUserId) {
+                $query->where('user_id', $currentUserId);
+            }
+        ])->where('user_id', $userId)->orderByDesc('id')->paginate(PAGINATION);
     }
 
     public function getUserFollowersReals(User $user)
@@ -44,20 +44,20 @@ class RealsService extends BaseModelService
         $builder = Real::query()->whereHas('user', function ($query) use ($userId) {
             $query->withoutAppends()->getFollowers($userId);
         });
-        if (!request("page")  || request("page") == 1 ) {
+        if (!request("page")  || request("page") == 1) {
             $user->last_following_reel_id = $builder->latest()->select(['id'])->first()?->id;
         }
-        $reels   =  $builder->whereDoesntHave('likes' ,function ($query) use ($userId) {
+        $reels   =  $builder->whereDoesntHave('likes', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         })->with([
-                     'user' => function ($query) use ($userId) {
-                         $query->withoutAppends()->isFollow($userId)->with('profile');
-                     }
-                 ])->withCount(['likes', 'comments'])->withExists([
-                                                                      'likes' => function ($query) use ($userId) {
-                                                                          $query->where('user_id', $userId);
-                                                                      }
-                                                                  ])->where('reals.id', '<=', $user->last_following_reel_id ?? PHP_INT_MAX)->inRandomOrder($user->following_unique_value);
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->isFollow($userId)->with('profile');
+            }
+        ])->withCount(['likes', 'comments'])->withExists([
+            'likes' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }
+        ])->where('reals.id', '<=', $user->last_following_reel_id ?? PHP_INT_MAX)->inRandomOrder($user->following_unique_value);
 
         $countInterested   = $reels->count();
         $currentPage       = request()->page ?? 1;
@@ -69,7 +69,7 @@ class RealsService extends BaseModelService
 
 
         [$_, $allData] =
-            $this->getReels($countInterested, [], $userId, $allData, $user->following_unique_value, $user->last_following_reel_id,function($interestIds, $userId){
+            $this->getReels($countInterested, [], $userId, $allData, $user->following_unique_value, $user->last_following_reel_id, function ($interestIds, $userId) {
                 return $this->getLikedReels($interestIds, $userId, true);
             });
 
@@ -83,19 +83,19 @@ class RealsService extends BaseModelService
 
 
         $interestIds = $userInterests?->pluck('id')?->toArray() ?? [];
-        if (!request("page")  || request("page") == 1 ) {
+        if (!request("page")  || request("page") == 1) {
             $user->last_all_reel_id = Real::query()->select('id')->latest()->first()?->id;
         }
         $reals = Real::query()->whereHas('categories', function ($query) use ($interestIds) {
             return $query->whereIn('category_id', $interestIds);
         })->with([
-                     'user' => function ($query) use ($userId) {
-                         $query->withoutAppends()->isFollow($userId)->with('profile');
-                     }
-                 ])->withCount(['likes', 'comments'])
-                     ->whereDoesntHave('likes' ,function ($query) use ($userId) {
-                         $query->where('user_id', $userId);
-                     })->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))->inRandomOrder($user->real_type);
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->isFollow($userId)->with('profile');
+            }
+        ])->withCount(['likes', 'comments'])
+            ->whereDoesntHave('likes', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))->inRandomOrder($user->real_type);
 
         $countInterested   = $reals->count();
         $currentPage       = request()->page ?? 1;
@@ -108,19 +108,20 @@ class RealsService extends BaseModelService
         $maxRealId = $user->last_all_reel_id;
 
         [$countNotInterest, $allData] =
-            $this->getReels($countInterested, $interestIds, $userId, $allData, $user->real_type, $maxRealId,function($interestIds, $userId){
+            $this->getReels($countInterested, $interestIds, $userId, $allData, $user->real_type, $maxRealId, function ($interestIds, $userId) {
                 return $this->getNotInterestedReels($interestIds, $userId);
             });
 
 
         [$_, $allData] =
-            $this->getReels(($countInterested + ($countNotInterest)), $interestIds, $userId, $allData, $user->real_type, $maxRealId,function($interestIds, $userId){
+            $this->getReels(($countInterested + ($countNotInterest)), $interestIds, $userId, $allData, $user->real_type, $maxRealId, function ($interestIds, $userId) {
                 return $this->getLikedReels($interestIds, $userId);
             });
 
 
         $paginator = new LengthAwarePaginator($allData, 100, $pagination, $currentPage, [
-            'path' => request()->url(), 'query' => request()->query()
+            'path' => request()->url(),
+            'query' => request()->query()
         ]);
 
 
@@ -140,17 +141,17 @@ class RealsService extends BaseModelService
         $diffWithCurrentPage = $currentPage - $numOfAdminsPages;
 
         $limit = $perPage;
-        if ($diffWithCurrentPage == 1 ) {
+        if ($diffWithCurrentPage == 1) {
             $limit = $perPage - ($countInterested % $perPage);
             $limit = $limit == 0 ? $perPage : $limit;
         }
 
         if (($numOfAdminsPages == 0 && $diffWithCurrentPage == 1)) {
             $offset = 0;
-        } else if ($countInterested < $perPage && $diffWithCurrentPage == 2){
+        } else if ($countInterested < $perPage && $diffWithCurrentPage == 2) {
 
             $offset = $perPage - $countInterested;
-        } else if(($interestedPageCount - $numOfAdminsPages  )> 0.0){
+        } else if (($interestedPageCount - $numOfAdminsPages) > 0.0) {
             $offset = (($currentPage - 1) * $perPage) - (($countInterested) % $perPage) + ($perPage * $numOfAdminsPages);
         } else {
             if ($countInterested == 0) {
@@ -158,27 +159,37 @@ class RealsService extends BaseModelService
             }
             $offset = (($currentPage - 1) * $perPage) - (($countInterested) % $perPage) + ($perPage * $numOfAdminsPages);
 
-//            $offset = $countInterested % $perPage * (($diffWithCurrentPage - 1) * $perPage);
+            //            $offset = $countInterested % $perPage * (($diffWithCurrentPage - 1) * $perPage);
         }
 
         return [$limit, $offset];
     }
 
-    public function create(array $data, int $userId)
+    public function create($data, int $userId)
     {
         $video         = $data['video'];
         $categoriesIds = @$data['categories'];
+        $urlVideo = '';
         unset($data['video']);
         if ($categoriesIds) {
             unset($data['categories']);
         }
 
-        $url               = $this->upload($video);
+        if ($data->hasFile('video')) {
+            $urlVideo = $this->upload($video);
+        } elseif ($data->has('video')) {
+            if (!Storage::exists($video)) {
+                return ;
+            }
+            $urlVideo =    $video;
+        }
+
+        $url               = $urlVideo;
         $data['user_id']   = $userId;
         $data['url']       = $url;
         $data['sub_video'] = $this->makeSubVideo($url, null, 'gcs');
         $real              = Real::query()->create($data);
-        (new FfmpegService())->extract(getDriverUrl().'/'.$url,$real->id);
+        (new FfmpegService())->extract(getDriverUrl() . '/' . $url, $real->id);
         if ($categoriesIds) {
             $real->categories()->sync($categoriesIds);
         }
@@ -196,10 +207,9 @@ class RealsService extends BaseModelService
 
         Real::chunk(600, function ($reals) {
             foreach ($reals as $real) {
-                (new FfmpegService())->extract(getDriverUrl().'/'.$real->url, $real->id);
+                (new FfmpegService())->extract(getDriverUrl() . '/' . $real->url, $real->id);
             }
         });
-
     }
 
     public function makeSubVideo(string $videoPath, ?string $outPutPath, string $storage = 'local'): ?string
@@ -236,14 +246,14 @@ class RealsService extends BaseModelService
     public function showReal(int $realId, $userId)
     {
         return Real::query()->with([
-                                       'user' => function ($query) use ($userId) {
-                                           $query->withoutAppends()->with(['profile'])->isFollow($userId);
-                                       }
-                                   ])->withCount(['likes', 'comments'])->withExists([
-                                                                                        'likes' => function ($query) use ($userId) {
-                                                                                            $query->where('user_id', $userId);
-                                                                                        }
-                                                                                    ])->where('id', $realId)->first();
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->with(['profile'])->isFollow($userId);
+            }
+        ])->withCount(['likes', 'comments'])->withExists([
+            'likes' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }
+        ])->where('id', $realId)->first();
     }
 
 
@@ -295,21 +305,21 @@ class RealsService extends BaseModelService
         return Real::query()->whereDoesntHave('categories', function ($query) use ($interestIds) {
             return $query->whereIn('category_id', $interestIds);
         })->with([
-                     'user' => function ($query) use ($userId) {
-                         $query->withoutAppends()->isFollow($userId)->with([
-                                                                               'profile' => function ($query) {
-                                                                                   $query->select([
-                                                                                                      'id',
-                                                                                                      'avatar',
-                                                                                                      'user_id',
-                                                                                                  ]);
-                                                                               }
-                                                                           ]);
-                     }
-                 ])->withCount(['likes', 'comments'])
-                   ->whereDoesntHave('likes', function ($query) use ($userId) {
-                       $query->where('user_id', $userId);
-                   })->where('reals.id', '<=', $lastId);
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->isFollow($userId)->with([
+                    'profile' => function ($query) {
+                        $query->select([
+                            'id',
+                            'avatar',
+                            'user_id',
+                        ]);
+                    }
+                ]);
+            }
+        ])->withCount(['likes', 'comments'])
+            ->whereDoesntHave('likes', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->where('reals.id', '<=', $lastId);
     }
 
     /**
@@ -321,49 +331,49 @@ class RealsService extends BaseModelService
     {
 
         $builder = Real::query();
-        if ($isFollowing){
+        if ($isFollowing) {
             $builder->whereHas('user', function ($query) use ($userId) {
                 $query->withoutAppends()->getFollowers($userId);
             });
-        }else{
+        } else {
             $builder->whereHas('user', function ($query) use ($userId) {
                 $query->withoutAppends();
             });
         }
         return $builder->with([
-                                  'user' => function ($query) use ($userId) {
-                                      $query->withoutAppends()->isFollow($userId)->with([
-                                                                                            'profile' => function ($query) {
-                                                                                                $query->select([
-                                                                                                                   'id',
-                                                                                                                   'avatar',
-                                                                                                                   'user_id',
-                                                                                                               ]);
-                                                                                            }
-                                                                                        ]);
-                                  }
-                              ])->withCount(['likes', 'comments'])
-                       ->withExists([
-                                        'likes' => function ($query) use ($userId) {
-                                            $query->where('user_id', $userId);
-                                        }
-                                    ])
-                       ->whereHas('likes', function ($query) use ($userId) {
-                           $query->where('user_id', $userId);
-                       });
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->isFollow($userId)->with([
+                    'profile' => function ($query) {
+                        $query->select([
+                            'id',
+                            'avatar',
+                            'user_id',
+                        ]);
+                    }
+                ]);
+            }
+        ])->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }
+            ])
+            ->whereHas('likes', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
     }
 
     /**
- * @param int $countInterested
- * @param int $pagination
- * @param mixed $currentPage
- * @param array $interestIds
- * @param mixed $userId
- * @param User $user
- * @param Collection $allData
- * @return array
- */
-    public function getReels(int $countInterested, array $interestIds, mixed $userId, Collection $allData, string $seed ,$lastId , \Closure $closure): array
+     * @param int $countInterested
+     * @param int $pagination
+     * @param mixed $currentPage
+     * @param array $interestIds
+     * @param mixed $userId
+     * @param User $user
+     * @param Collection $allData
+     * @return array
+     */
+    public function getReels(int $countInterested, array $interestIds, mixed $userId, Collection $allData, string $seed, $lastId, \Closure $closure): array
     {
         if ($lastId === null) $lastId = PHP_INT_MAX;
         $currentPage       = request()->page ?? 1;
@@ -380,6 +390,6 @@ class RealsService extends BaseModelService
 
             $allData = $allData->merge($anotherData);
         }
-        return array( $countNotInterest ?? 0, $allData);
+        return array($countNotInterest ?? 0, $allData);
     }
 }

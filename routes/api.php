@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
@@ -39,6 +40,7 @@ use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\MallController as ControllersMallController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
@@ -88,6 +90,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
+
+            Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
+
             Route::get('/countries/users', [CountryController::class, 'countries']);
 
             Route::get('/stripe-pay', [StripeController::class, 'pay']);
@@ -133,6 +140,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('remove_admin', [RoomController::class, 'remove_admin']);
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
+                Route::post('add-block', [RoomController::class, 'addBlock']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
@@ -289,6 +297,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
 
+
+            Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
+            Route::get('parent-statistic', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitationStatistics']);
+            Route::get('parent-user', [\App\Http\Controllers\Api\V1\UserController::class, 'parentUser']);
+            Route::get('user-earn-from-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitation']);
+            Route::get('create-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'CreateCodeInvitation']);
+            Route::get('add-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'AddCodeInvitation']);
             // Todo Refact
             Route::get('my-store', [UserController::class, 'my_store_all']);
 

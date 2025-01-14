@@ -115,6 +115,7 @@ return [
     "to"=>" to ",
     "roomTarget" => "Congrats! you achieve new target in :room you got :coins",
     'kickRole' => "Cannot kick from the agency before :startDay day or after :endDay day.",
+    'agencyOwner' => "Your UserName: :userName and your password : :Password to can login in website "
 
 
 ];

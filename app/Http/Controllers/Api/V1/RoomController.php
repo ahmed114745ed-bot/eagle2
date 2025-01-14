@@ -123,7 +123,7 @@ class RoomController extends Controller
             $room = $this->roomService->create($request, $user->id);
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
         } catch (Exception $exception) {
-            Log::info($exception->getMessage());
+            // Log::info($exception->getMessage());
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
@@ -1357,14 +1357,15 @@ class RoomController extends Controller
     public function removeRoomPass(Request $request)
     {
         $room = $this->roomService->changePasswordRoom($request->owner_id);
+       
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",
-                "imgbackground" => $room->room_background ?: '',
-                "roomIntro" => $room->room_intro ?: "",
-                "roomImg" => $room->room_cover ?: "",
-                "room_type" => @$room->myType->name ?: "",
-                "room_name" => @$room->room_name ?: "",
+                "imgbackground" => $room->final_room_image ??  '',
+                "roomIntro" => $room->room_intro ?? "",
+                "roomImg" => $room->room_cover ?? "",
+                "room_type" => @$room->myType->name ?? "",
+                "room_name" => @$room->room_name ?? "",
                 "is_locked" => false
 
             ]
@@ -1656,6 +1657,54 @@ class RoomController extends Controller
         }
     }
 
+    protected function addBlock(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'room_id' => 'required|integer|exists:rooms,id',
+            'user_id' => 'required|integer|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $userId = $request->user()->id;
+            $room = Room::findOrFail($request->room_id);
+            $userToBlock = $request->user_id;
+                $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
+                if(!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0,'This user is not in this room',null,404);
+
+
+            // Check if the current user is the owner of the room
+            if ($room->uid != $userId) {
+                return Common::apiResponse(0, 'You do not have permission to perform this action', 400);
+            }
+
+
+            // Get the current blacklist
+            $blacklist = $room->room_black ? explode(',', $room->room_black) : [];
+
+            // Check if the user is already in the blacklist
+            foreach ($blacklist as $entry) {
+                $parts = explode('#', $entry);
+                $id = $parts[0] ?? null;
+
+                if ($id == $userToBlock) {
+                    return Common::apiResponse(0, 'This user is already in the blacklist', 400);
+                }
+            }
+
+            // Add the user to the blacklist
+            $blacklist[] = $userToBlock . '#' . time(); // Add a timestamp or additional info if needed
+            $room->room_black = implode(',', $blacklist);
+            $room->save();
+
+            return Common::apiResponse(true, 'User added to the blacklist', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+    }
     protected function removeBlock(Request $request)
     {
         $validator = Validator::make($request->all(), [
