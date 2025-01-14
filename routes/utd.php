@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
@@ -66,6 +67,14 @@ Route::middleware([])->group(function () {
 
     });
 
+    Route::prefix('group-chat')->group(function(){
+        Route::get('/', [GroupChatController::class, 'index']);
+        Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/update/{id}', [GroupChatController::class, 'update']);
+        Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
+        Route::get('/{id}', [GroupChatController::class, 'show']);
+
+    });
 
     //games
     Route::prefix('games')->group(function () {

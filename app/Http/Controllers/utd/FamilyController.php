@@ -26,10 +26,9 @@ class FamilyController extends Controller
         $family  = Family::create([
             'name' => $request->name,
             'introduce' => $request->introduce,
-            'num' => $request->num,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'img' => $request->img,
+            'image' => $request->image,
             'user_id'=> $request->user_id
         ]);
 
@@ -47,10 +46,9 @@ class FamilyController extends Controller
         Family::findOrFail($id)->update([
             'name' => $request->name,
             'introduce' => $request->introduce,
-            'num' => $request->num,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'img' => $request->img,
+            'image' => $request->img,
             'user_id'=> $request->user_id
         ]);
 
