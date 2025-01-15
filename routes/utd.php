@@ -3,6 +3,7 @@
 
 use App\Helpers\Common;
 use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\ReelsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -229,15 +230,13 @@ Route::middleware([])->group(function () {
     });
 
     Route::prefix('family-levels')->group(function () {
-
         Route::get('/all', [FamilyLevelController::class, 'index']);
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
         Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
         Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
-
-
     });
+
     Route::get('user-target', [UserController::class, 'usersTarget']);
 
     Route::prefix('users')->group(function () {
@@ -251,4 +250,16 @@ Route::middleware([])->group(function () {
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
     });
+
+
+
+
+    Route::prefix('reels')->group(function () {
+        Route::get('/all', [ReelsController::class, 'index']);
+        Route::post('/show/{id}', [ReelsController::class, 'show']);
+        Route::post('/search/{id}', [ReelsController::class, 'search']);
+        Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        
+    });
+
 });

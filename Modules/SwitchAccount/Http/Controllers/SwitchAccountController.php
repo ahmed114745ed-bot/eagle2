@@ -50,7 +50,10 @@ class SwitchAccountController extends Controller
     }
 
     public function getAccounts($userId, $otherUserId, $deviceToken)
-    {
+    {        
+
+        if (empty($deviceToken))  return  [];
+
         $users = UserAccount::
             //            where(function ($q) use ($userId,$otherUserId){
             //                $q->where("parent_user_id", $userId)
@@ -60,6 +63,7 @@ class SwitchAccountController extends Controller
             //            })
             where('device_token', $deviceToken)
             ->get();
+            
         $parentUserIds = $users->pluck('parent_user_id');
         $childUserIds = $users->pluck('child_user_id');
 
