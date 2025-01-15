@@ -47,7 +47,7 @@ class WeeklyStarController extends Controller
         $existsInArray       = $firstTenQueries->contains('sender_id', $authenticatedUserId->id);
         $data                = [
             'top'  => TopWeeklyStarUsersResource::collection($firstTenQueries),
-            'user' => $existsInArray == true ? null : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
+            'user' => $existsInArray == true ? new \stdClass() : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
         ];
         return Common::apiResponse(1, '', $data);
     }
