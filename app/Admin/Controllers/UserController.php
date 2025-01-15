@@ -218,7 +218,7 @@ class UserController extends MainController
         ]);
 
 
-        $grid->column('phone3', __('Phone'));
+        $grid->column('phone', __('Phone'));
         //        $grid->column('di', __('coins'));
         //        $grid->column('gold', __('silver coins'));
         //        $grid->column('coins', __('diamonds'));

@@ -233,11 +233,22 @@ Route::middleware([])->group(function () {
         Route::get('/all', [FamilyLevelController::class, 'index']);
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
-        Route::post('/update', [FamilyLevelController::class, 'update']);
-        Route::post('/delete', [FamilyLevelController::class, 'destroy']);
+        Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
 
 
     });
+    Route::get('user-target', [UserController::class, 'usersTarget']);
 
-
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'allUsers']);
+        Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
+        Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
+        Route::post('change-agency', [UserController::class, 'changeAgency']);
+        Route::post('update-switch', [UserController::class, 'updateSwitch']);
+        Route::post('update-user-Setting', [UserController::class, 'updateUserSetting']); 
+        Route::post('create', [UserController::class, 'create']);
+        Route::get('show/{id}', [UserController::class, 'showDataUser']);
+        Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+    });
 });

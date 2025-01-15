@@ -81,6 +81,8 @@ class GooglePaymentController extends Controller
         $url = config('app.payment_url') . '/api/google-pay';
 
         try {
+           
+
             $productId = $request->productId;
             $response  = $client->post($url, [
                 'json' => [
@@ -89,6 +91,7 @@ class GooglePaymentController extends Controller
                     'serverKey'     => config('app.node_server_name') // this required
                 ],
             ]);
+            dd($response);
             $body = $response->getBody()->getContents();
 
             $data = json_decode($body);

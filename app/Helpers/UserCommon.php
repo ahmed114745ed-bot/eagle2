@@ -44,6 +44,9 @@ use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Facades\Agency as FacadesAgency;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Models\CoinTarget;
+use App\Models\UserCoinTarget;
+use App\Models\UserTargetCoin;
 
 class UserCommon{
 
@@ -404,5 +407,66 @@ class UserCommon{
         }catch (\Exception $exception){
             DB::rollBack ();
         }
+    }
+
+    public static function addChargeLevel($userId, $amount)
+    {
+        $user = User::where("id", $userId)->first();
+        $user->total_charge_coins += $amount;
+        $level = Vip::where("exp", "<=", $user->total_charge_coins)->where('type', 5)->latest()->first();
+        if ($level) {
+            $user->charge_level = $level->level;
+        }
+        $user->save();
+    }
+
+    public static function updateUserTotalCoins($user_id, $total_coins)
+    {
+        $userTarget =  UserTargetCoin::updateOrCreate(
+            ['user_id' => $user_id],
+            ['total_coins' => \DB::raw("total_coins + {$total_coins}")]
+        )->first();
+
+        $coins = CoinTarget::with('gifts')
+            ->where('coins', '<=', $userTarget->total_coins)
+            ->orderBy('coins', 'desc')->first();
+
+        $user = User::find($user_id);
+
+        if ($coins) {
+           $user_coin_target = UserCoinTarget::where([
+                'user_id' => $user->id,
+                'coin_target_id' => $coins->id,
+            ])->first();
+
+            if ($user_coin_target) {
+                return true;
+            }
+
+            UserCoinTarget::create([
+                'user_id' => $user->id,
+                'coin_target_id' => $coins->id,
+            ]);
+
+            foreach ($coins->gifts as $reward) {
+                switch ($reward->type) {
+                    case 'coins':
+                        CoinsTarget::assignCoinsUser($reward->item_id, $user);
+                        break;
+                    case 'vip':
+                        CoinsTarget::assignVipUser($reward->item_id, $reward->expire, $user);
+                        break;
+                    case 'ware':
+                        $ware = Ware::find($reward->item_id);
+                        CoinsTarget::assignWareUser($ware, $reward, $user);
+                        break;
+                    case 'achievement':
+                        CoinsTarget::assignAchievementUser($reward->item_id, $reward->expire, $user);
+                        break;
+                }
+            }
+            
+        }
+           
     }
 }

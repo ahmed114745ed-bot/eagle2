@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FamilyLevel;
 use App\Tik\Services\FamilyLevelService;
 use Illuminate\Http\Request;
+use Exception;
 
 class FamilyLevelController extends Controller
 {
@@ -14,13 +15,24 @@ class FamilyLevelController extends Controller
     public function index(Request $request)
     {
         
-        $FamilyLevel = $this->FamilyLevelService->index();
-        return Common::apiResponse(true, '', $FamilyLevel, 200);
+        // $FamilyLevel = $this->FamilyLevelService->index();
+        $perPage = request('per_page')?? 10;
+        $FamilyLevel = FamilyLevel::paginate($perPage);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'FamilyLevels returned successfully',
+            'data' => $FamilyLevel
+        ]);
     }
     public function show( $id,Request $request)
     {
         $FamilyLevel = FamilyLevel::find($id);
-        return Common::apiResponse(true, '', $FamilyLevel, 200);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'FamilyLevel returned successfully',
+            'data' => $FamilyLevel
+        ]);
     }
 
 
@@ -31,42 +43,55 @@ class FamilyLevelController extends Controller
             $FamilyLevel =   $this->FamilyLevelService->create( $request);
         } catch (\Exception $e) {
     
-            return Common::apiResponse(0, $e != null ? $e->getMessage() : 'missing params', 422);
+            return response()->json([
+                'message' => 'failed',
+                'status' => 'failed',
+                'data' => null
+            ]);
+        
         }
 
-        return Common::apiResponse(true, '', $FamilyLevel, 200);
-
+        return response()->json([
+            'message' => 'FamilyLevel created successfully',
+            'status' => 'success',
+            'data' => $FamilyLevel
+        ]);
     }
 
 
     
 
-    public function update(Request $request)
+    public function update($id ,Request $request)
     {
-        return $request;
         
         try {
-            $family = $this->FamilyLevelService->update($userId, $request, $id);
+            $family = $this->FamilyLevelService->update( $request, $id);
         } catch (Exception $e) {
-            return Common::apiResponse(0, $e->getMessage(), 422);
-        }
 
-        return Common::apiResponse(1, '', new FamilyResource($family));
+            return response()->json([
+                'message' => 'failed',
+                'status' => 'failed',
+                'data' => null
+            ]);       
+         }
+
+        return response()->json([
+            'message' => 'FamilyLevel updated successfully',
+            'status' => 'success',
+        ]);
     }
 
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
         
 
-        try {
+        FamilyLevel::findOrFail($id)->delete();
 
-            $this->FamilyLevelService->delete($request->id);
-
-            return Common::apiResponse(1, 'success', null, 200);
-        } catch (\Exception $exception) {
-            return Common::apiResponse(0, $exception->getMessage() ?? 'failed', null, 400);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'FamilyLevel deleted successfully',
+        ]);
     }
     
 }
