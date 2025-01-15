@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\AdminTraits\HasPermissions;
+use Carbon\Carbon;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,20 @@ class Administrator extends Model implements AuthenticatableContract
 
     protected $fillable = ['username', 'password', 'name', 'avatar'];
 
+    public function getCreatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
+
+    // Convert updated_at to the user's local time zone
+    public function getUpdatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
     /**
      * Create a new Eloquent model instance.
      *

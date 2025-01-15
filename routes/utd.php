@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 
@@ -70,10 +71,16 @@ Route::middleware([])->group(function () {
     Route::prefix('group-chat')->group(function(){
         Route::get('/', [GroupChatController::class, 'index']);
         Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/add-experience-points', [GroupChatController::class, 'add_experience_points']);
         Route::post('/update/{id}', [GroupChatController::class, 'update']);
         Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
         Route::get('/{id}', [GroupChatController::class, 'show']);
 
+    });
+
+    Route::prefix('parent-users')->group(function(){
+        Route::get('/', [ParentUsersController::class, 'index']);
+        Route::get('/{id}', [ParentUsersController::class, 'users']);
     });
 
     //games

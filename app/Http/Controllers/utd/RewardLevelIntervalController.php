@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Public\Entities\RewardLevelInterval;
@@ -13,21 +14,18 @@ class RewardLevelIntervalController extends Controller
         $perPage = request('per_page') ?? 10;
         $rewards = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->paginate($perPage);
 
-        return response()->json([
-            'message' => 'Rewards returned successfully',
-            'status' => 'success',
-            'data' => $rewards
-        ]);
+
+        return Common::apiResponse(1, 'success', $rewards, 200);
+
     }
 
     public function show($reward_level_interval, $id){
         $reward = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id);
 
-        return response()->json([
-            'message' => 'Reward returned successfully',
-            'status' => 'success',
-            'data' => $reward
-        ]);
+
+
+        return Common::apiResponse(1, 'success', $reward, 200);
+
     }
 
     public function store($reward_level_interval, Request $request){
@@ -40,11 +38,9 @@ class RewardLevelIntervalController extends Controller
             'expire' => $request->expire,
         ]);
 
-        return response()->json([
-            'message' => 'Reward created successfully',
-            'status' => 'success',
-            'data' => $reward
-        ]);
+
+        return Common::apiResponse(1, 'success', $reward, 200);
+
     }
 
     public function update($reward_level_interval, Request $request, $id){
@@ -56,18 +52,16 @@ class RewardLevelIntervalController extends Controller
             'expire' => $request->expire,
         ]);
 
-        return response()->json([
-            'message' => 'Reward updated successfully',
-            'status' => 'success',
-        ]);
+
+        return Common::apiResponse(1, 'success', [], 200);
+
     }
 
     public function destroy($reward_level_interval, $id){
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->delete();
 
-        return response()->json([
-            'message' => 'Reward deleted successfully',
-            'status' => 'success',
-        ]);
+
+        return Common::apiResponse(1, 'success', [], 200);
+
     }
 }

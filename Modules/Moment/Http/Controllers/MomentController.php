@@ -23,6 +23,7 @@ class MomentController extends Controller
 
     public function index(Request $request)
     {
+
         $type = $request->type;
         $page = $request->get('page', 1);
         $userId = $request->user_id;

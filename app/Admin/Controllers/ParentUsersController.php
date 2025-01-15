@@ -42,7 +42,6 @@ class ParentUsersController extends MainController {
             $name= request("name");
         }
 
-
         $grid = $name;
         $grid = $this->{$grid}();
         $grid->disableexport();
@@ -64,21 +63,21 @@ class ParentUsersController extends MainController {
 
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->expand();
-              
-              
-                   
+
+
+
                     $filter->column('1/2', function ($filter) {
                         $filter->where(function ($query) {
                             $input = $this->input;
                             $query->where('uuid', $input);
                         }, __('User'))->placeholder(__('Search by  UUID '));
                     });
-            
+
             });
         $grid->column ('uuid',__ ('uuid'));
-        
+
         $grid->column ('name',__("name"));
-        
+
         $grid->column ('user_count',__("user_count"))->display (function (){
             return count($this->codeInvitations);
         });
