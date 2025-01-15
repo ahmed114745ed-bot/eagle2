@@ -28,6 +28,8 @@ class AllUsersResource extends JsonResource
             'nickname' => $this->nickname ?? '',
             'charge_status' => $this->charge_status,
             'hide_chat' => @$this->userSetting->hide_chat ?? 0,
+            'show_invite_code' => @$this->userSetting->show_invite_code,
+            'transfer_salary' => $this->transfer_salary,
             'reals_count' =>  count($this->reals),
             'moment_count' => count($this->moments),
             'total_days' => $this->total_days,
