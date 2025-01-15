@@ -13,7 +13,7 @@ class ExchangeCoinsReportResource extends JsonResource
     {
         return [
             'id'          => $this->user_id,
-            'diamonds'    => $this->diamonds,
+            'diamonds'    => numToStringNew($this->diamonds),
             'value'       => $this->value,
             'operation_no' => (int)$this->operation_no,
             'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),

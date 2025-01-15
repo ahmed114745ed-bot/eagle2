@@ -13,7 +13,7 @@ class RechargeCoinsReportResource extends JsonResource
     {
         return [
             'id'          => $this->user_id,
-            'diamonds'    => $this->obtained_coins,
+            'diamonds'    => numToStringNew($this->obtained_coins),
             'operation_no' => (int)$this->trx,
             'created_at'  => Carbon::parse(@$this->created_at)->format('Y-m-d h:i:s A'),
         ];
