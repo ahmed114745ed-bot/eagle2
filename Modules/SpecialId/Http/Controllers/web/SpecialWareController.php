@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 
 class SpecialWareController extends  MainController
 {
@@ -89,7 +90,9 @@ class SpecialWareController extends  MainController
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
+        if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
         $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+        }
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -172,10 +175,26 @@ class SpecialWareController extends  MainController
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        $form->number('price', trans('price'))->rules('required|max:9', [
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                
+                $form->number('price', trans('price'))->rules('required|max:9', [
 
-            'max' => __('The maximum price allowed is 9 hundred million'),
-        ])/*->symbol ('💰')*/;
+                    'max' => __('The maximum price allowed is 9 hundred million'),
+                ])/*->symbol ('💰')*/;
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->number('price', trans('price'))->rules('required|max:9', [
+
+                    'max' => __('The maximum price allowed is 9 hundred million'),
+                ])/*->symbol ('💰')*/;
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+            }
+        }
+       
         $form->number('level', trans('level'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
@@ -185,7 +204,7 @@ class SpecialWareController extends  MainController
         })->rules('required');
         $form->color('color', trans('color'));
 
-        $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+       
         $form->number('num', __('num'));
 
 

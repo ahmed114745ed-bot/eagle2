@@ -157,7 +157,7 @@ class SalaryTransactionController extends Controller
             ])->delete();
             TransactionCustomNotification::action_request($host->id, 5,$requestSalary->usd);
         }
-       
+
         try {
             $requestSalery = SalaryRequest::with("host")->findOrFail($request->request_id);
         } catch (\Exception $e) {
@@ -171,8 +171,8 @@ class SalaryTransactionController extends Controller
         if ($requestSalery->status != 0) {
             return Common::apiResponse(0, __('api_responses.correct_data'), null, 422);
         }
-       
-        
+
+
        $requestSalary->update([
             'status' => $request->answer == 0 ? 4 : 1
         ]);
@@ -205,7 +205,7 @@ class SalaryTransactionController extends Controller
                 "user_id" => $host->id,"month" => date("m"),"year" => date("Y") ,'cut_amount'=> -$coins
             ]);
         }
-        
+
     }
 
     public function transfer_salary(Request $request)
@@ -214,7 +214,7 @@ class SalaryTransactionController extends Controller
             return Common::apiResponse(0, __('salaryTransaction::api_responses.missing_params'), null, 422);
         }
         $user = $request->user();
-        
+
         try {
             $requestSalary = SalaryRequest::with("host")->findOrFail($request->request_id);
         } catch (\Exception $e) {
@@ -255,7 +255,7 @@ class SalaryTransactionController extends Controller
             return Common::apiResponse(0, __('salaryTransaction::api_responses.missing_params'), null, 422);
         }
         $user = $request->user();
-       
+
         try {
             $requestSalary = SalaryRequest::with("host")->findOrFail($request->request_id);
         } catch (\Exception $e) {
@@ -272,7 +272,7 @@ class SalaryTransactionController extends Controller
 
         $agency_owner = $requestSalary->agency?->owner;
         $agency = $requestSalary->agency;
-        if ($agency->Shipping_agency != 1 ) {
+        if (@$agency->Shipping_agency != 1 ) {
             return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
         }
         $host = $request->user();

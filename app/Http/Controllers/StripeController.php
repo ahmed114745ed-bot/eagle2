@@ -79,7 +79,7 @@ class StripeController extends Controller
         $sigHeader = $request->header('Stripe-Signature');
         // Your Stripe webhook secret, which you get from the Stripe dashboard
         $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
-        Log::info(json_encode(['stripe_webhook_secret' => $endpointSecret]));
+        // Log::info(json_encode(['stripe_webhook_secret' => $endpointSecret]));
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
@@ -96,7 +96,7 @@ class StripeController extends Controller
                     $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
-                    Log::info('completed');
+                    // Log::info('completed');
                     break;
 
                 case 'payment_intent.succeeded':
@@ -109,20 +109,20 @@ class StripeController extends Controller
                     $this->makePayment($orderId, $userId);
                     // Handle successful payment here (e.g., update database)
                     // You can access $session->id, $session->payment_status, etc.
-                    Log::info('succeeded');
-                    \Log::info("Payment successful for session: {$session->id}");
+                    // Log::info('succeeded');
+                    // \Log::info("Payment successful for session: {$session->id}");
 
                     break;
                 case 'payment_intent.failed':
                     // Payment failed
                     $paymentIntent = $event->data->object; // Contains payment intent details
                     // Handle failed payment here (e.g., notify user)
-                    \Log::info("Payment failed for payment intent: {$paymentIntent->id}");
+                    // \Log::info("Payment failed for payment intent: {$paymentIntent->id}");
                     break;
 
                 default:
                     // Handle other events if needed
-                    \Log::info("Unhandled event type: {$event->type}");
+                    // \Log::info("Unhandled event type: {$event->type}");
                     break;
             }
 

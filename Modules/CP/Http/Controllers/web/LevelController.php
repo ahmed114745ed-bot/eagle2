@@ -37,6 +37,42 @@ class LevelController extends MainController
             ->row($buttonHTML)
             ->row($this->grid());
     }
+
+    public function show($id, Content $content)
+    {
+        $relation_id = request()->route('relation_id'); 
+        return parent::show($id, $content
+            ->title(trans('cp-relations'))
+            ->body($this->detail($id,$relation_id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('cp-relations'))
+            ->body($this->form()->edit($id)));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('cp-relations'))
+            ->body($this->form()));
+    }
+
     protected function grid()
     {
         $relation_id = request("relation_id");

@@ -79,6 +79,13 @@ class PaymentCoinController extends MainController
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". __('coins') ."</a>";
             return $button1;
         });
+        $status = [
+            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
+            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
+        ];
+        
+        $grid->column('status', __("status"))->switch($status);
+
         return $grid;
     }
 
@@ -97,7 +104,7 @@ class PaymentCoinController extends MainController
         $show->field('photo', __('Photo'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
-
+        
         return $show;
     }
 
@@ -114,6 +121,11 @@ class PaymentCoinController extends MainController
          ->options(PaymentType::getTranslatedOptions())
          ->creationRules(['required', "unique:payment_coins,title,{{id}}"])->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
         $form->image('photo', __('Photo'));
+        $status = [
+            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
+            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
+        ];
+        $form->switch('status', __('status'))->states($status)->default(1);;
 
         return $form;
     }

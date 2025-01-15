@@ -35,7 +35,6 @@ class RealCommentsService
             'user' => function ($query) {
                 $query->withoutAppends()->with('profile')->select(['id', 'name']);
             }
-        ])
-            ->paginate(10);
+        ])->orderByDesc('id')->paginate(10);
     }
 }

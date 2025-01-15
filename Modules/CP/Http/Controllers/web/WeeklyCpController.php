@@ -38,6 +38,48 @@ class WeeklyCpController extends MainController
                 $row->column(12, $this->grid());
             });
     }
+
+    
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('weekly-cp'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id,$content
+            ->title(trans('weekly-cp'))
+            ->body($this->form()->edit($id)));
+    }
+
+    /**
+     * Create interface.
+     *
+     * @param Content $content
+     * @return Content
+     */
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('weekly-cp'))
+            ->body($this->form()));
+    }
     protected function grid2()
     {
         $form = new Box();

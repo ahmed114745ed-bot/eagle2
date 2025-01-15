@@ -6,13 +6,13 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Admin\Actions\RestoreUserAccount;
-use App\Admin\Actions\SoftDeleteUserAccount;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
+use App\Admin\Actions\RestoreUserAccount;
+use App\Admin\Controllers\MainController;
+use App\Admin\Actions\SoftDeleteUserAccount;
+use Encore\Admin\Controllers\HasResourceActions;
 
-class TrashedUserAccountController extends AdminController
+class TrashedUserAccountController extends  MainController
 {
     /**
      * Title for current resource.

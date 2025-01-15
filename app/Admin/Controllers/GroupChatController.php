@@ -151,8 +151,8 @@ class GroupChatController extends MainController
         $form = new Form(new GroupChat);
 
         $form->display('ID');
-        $form->text(__('text'), __('text'));
-        $form->text(__('user_id'), __('user_id'));
+        $form->text('text', __('text'));
+        $form->text('user_id', __('user_id'));
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 

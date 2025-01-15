@@ -2,7 +2,8 @@
 
 return [
 
-
+    'google_cloud_file' => env('GOOGLE_CLOUD_KEY_FILE'),
+    'google_cloud_storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
     'cache'=>env ('CACHE_ENABLE','disabled'),
 
     'payment_url' => env('PAYMENT_URL'),
@@ -105,7 +106,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

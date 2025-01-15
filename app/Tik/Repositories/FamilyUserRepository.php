@@ -57,6 +57,11 @@ class FamilyUserRepository extends AbstractRepository
         $this->model->where('family_id', $familyId)->delete();
         return true;
     }
+    public function deleteByUserId($userId)
+    {
+        $this->model->where('user_id', $userId)->delete();
+        return true;
+    }
 
     public function deleteUserFromFamily($userId, $familyId)
     {

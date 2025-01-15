@@ -14,7 +14,7 @@ use App\Models\Room;
 */
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    \Illuminate\Support\Facades\Log::info('test - '.$user->name .' : '. $user->id);
+    // \Illuminate\Support\Facades\Log::info('test - '.$user->name .' : '. $user->id);
 
     return (int) $user->id === (int) $id;
 });
@@ -23,7 +23,7 @@ Broadcast::channel('room-{roomId}', function ($user, $roomId) {
 });
 
 Broadcast::channel('room-{roomId}-{userId}', function ($user, $roomId, $userId) {
-    \Illuminate\Support\Facades\Log::info($user->name .' : '. $user->id);
+    // \Illuminate\Support\Facades\Log::info($user->name .' : '. $user->id);
     return  $userId == $user->id;
 });
 

@@ -99,6 +99,7 @@ class Kernel extends HttpKernel
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
+        'timezone' => \App\Http\Middleware\SetUserTimezone::class,
 
     ];
 }

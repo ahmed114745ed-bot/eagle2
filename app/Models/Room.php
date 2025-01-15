@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +27,20 @@ class Room extends Model
 
     protected $casts = [];
 
+    public function getCreatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
+
+    // Convert updated_at to the user's local time zone
+    public function getUpdatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
@@ -221,7 +235,7 @@ class Room extends Model
 
     public function getFinalRoomImageAttribute()
     {
-        if ($this->is_pk_custom) return PK_IMAGE;
+        if ($this->is_pk_custom && $this->mode == 3) return PK_IMAGE;
 
         $var = /*$this->mode == '3' ?
             'custom_image/back-black.png' :*/

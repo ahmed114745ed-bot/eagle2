@@ -241,6 +241,11 @@ class AgencyService
         if ($request->name != null) {
             $agency->name = $request->name;
         }
+
+        if ($request->contents != null) {
+            $agency->contents = $request->contents;
+        }
+
         if ($request->get('content') != null) {
             $agency->notice = $request->get('content');
         }
@@ -518,7 +523,7 @@ class AgencyService
 
         if ($isThisMonth) $endDay = today()->day;
 
-        \Log::info('this2 is error');
+        // \Log::info('this2 is error');
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
         $data = [

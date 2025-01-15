@@ -50,12 +50,12 @@ class UpdatePkAndSendToZigo implements ShouldQueue
     public function handle()
     {
           
-        Log::info(12345);
+        // Log::info(12345);
         /*$lastPk =
             Pk::query()->where('room_id', $this->roomId)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();*/
 
         $lastPk = Room::select(['id'])->where('id', $this->roomId)->first()?->lastPk;
-        Log::info(' this is job pk '. json_encode($lastPk));
+        // Log::info(' this is job pk '. json_encode($lastPk));
         (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->roomMics);
     }
 

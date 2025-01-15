@@ -1,6 +1,9 @@
 <?php
 
 
+use App\Helpers\Common;
+use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\ReelsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -20,8 +23,15 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\GroupChatController;
+use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\RewardLevelIntervalController;
+use Modules\Public\Http\Controllers\web\LevelIntervalController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -32,6 +42,48 @@ Route::middleware([])->group(function () {
         Route::post('/update', [ConfigController::class, 'updateConfig']);
         Route::get('/category', [ConfigController::class, "config"]);
     });
+
+    Route::prefix('families')->group(function(){
+        Route::get('/', [FamilyController::class, 'index']);
+        Route::post('/', [FamilyController::class, 'store']);
+        Route::post('/update/{id}', [FamilyController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::get('/{id}', [FamilyController::class, 'show']);
+    });
+
+    Route::prefix('level-intervals')->group(function(){
+        Route::get('/', [LevelIntervalsController::class, 'index']);
+        Route::post('/', [LevelIntervalsController::class, 'store']);
+        Route::post('/update/{id}', [LevelIntervalsController::class, 'update']);
+        Route::post('/delete/{id}', [LevelIntervalsController::class, 'destroy']);
+        Route::get('/{id}', [LevelIntervalsController::class, 'show']);
+    });
+
+    Route::prefix('reward-level-interval/{reward_level_interval}')->group(function(){
+        Route::get('/', [RewardLevelIntervalController::class, 'index']);
+        Route::post('/', [RewardLevelIntervalController::class, 'store']);
+        Route::post('/update/{id}', [RewardLevelIntervalController::class, 'update']);
+        Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
+
+        Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
+
+    });
+
+    Route::prefix('group-chat')->group(function(){
+        Route::get('/', [GroupChatController::class, 'index']);
+        Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/add-experience-points', [GroupChatController::class, 'add_experience_points']);
+        Route::post('/update/{id}', [GroupChatController::class, 'update']);
+        Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
+        Route::get('/{id}', [GroupChatController::class, 'show']);
+
+    });
+
+    Route::prefix('parent-users')->group(function(){
+        Route::get('/', [ParentUsersController::class, 'index']);
+        Route::get('/{id}', [ParentUsersController::class, 'users']);
+    });
+
     //games
     Route::prefix('games')->group(function () {
         Route::get('/all', [AllGameController::class, 'utdGameIndex']);
@@ -40,7 +92,6 @@ Route::middleware([])->group(function () {
         Route::post('/show', [AllGameController::class, 'showGame']);
         Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
         Route::get('/game-charge-details', [AllGameController::class, 'gameChargeDetails']);
-        
     });
     // target
     Route::prefix('targets')->group(function () {
@@ -59,8 +110,6 @@ Route::middleware([])->group(function () {
         Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
         Route::get('/ware-vips', [VipController::class, 'getWareVip']);
         Route::post('/delete-ware', [VipController::class, 'deleteWare']);
-
-
     });
     Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
@@ -84,7 +133,6 @@ Route::middleware([])->group(function () {
         Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
         Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
         Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
-
     });
 
     //ware
@@ -95,10 +143,8 @@ Route::middleware([])->group(function () {
         Route::post('/update', [WareController::class, 'update']);
         Route::post('/show', [WareController::class, 'show']);
         Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
-        Route::get('/type', [WareController::class, 'typeWare']); 
+        Route::get('/type', [WareController::class, 'typeWare']);
         Route::get('/get-type', [WareController::class, 'getTypeWare']);
-       
-
     });
     Route::post('/create-paymentMethod', [PaymentMethodController::class, 'store']);
 
@@ -107,11 +153,11 @@ Route::middleware([])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    
+
 
     // users
     Route::resource('utd-users', UtdUserController::class);
-    Route::get('utd-users/show/{id}', [UtdUserController::class,'show']);
+    Route::get('utd-users/show/{id}', [UtdUserController::class, 'show']);
 
 
 
@@ -152,15 +198,14 @@ Route::middleware([])->group(function () {
         Route::post('/payment-gateway/create', [CoinController::class, 'createPaymentGateway']);
         Route::post('/payment-gateway/update', [CoinController::class, 'updatePaymentGateway']);
         Route::post('/payment-gateway/show', [CoinController::class, 'showPaymentCoin']);
-      
     });
     Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
 
 
     Route::post('roles/preview',  [RoleController::class, 'preview']);
 
-    
-    // game report 
+
+    // game report
     Route::get('/all-players', [GameReportController::class, 'allPlayers']);
     Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
     Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
@@ -168,6 +213,53 @@ Route::middleware([])->group(function () {
     Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay']);
     // end game report
 
+    Route::prefix('trashed-account')->group(function () {
+        Route::get('/', [TrashedUserController::class, 'trashedAccount']);
+        Route::post('/restore/{id}', [TrashedUserController::class, 'restore']);
+        Route::post('/delete/{id}', [TrashedUserController::class, 'softDelete']);
+    });
+
+    Route::prefix('users-level')->group(function () {
+        Route::get('/', [UserController::class, 'userLevel']);
+        Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
+    });
+
+    Route::prefix('device-token')->group(function () {
+        Route::get('/', [UserController::class, 'usersDeviceToken']);
+        Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
+    });
+
+    Route::prefix('family-levels')->group(function () {
+        Route::get('/all', [FamilyLevelController::class, 'index']);
+        Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
+        Route::post('/create', [FamilyLevelController::class, 'store']);
+        Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
+    });
+
+    Route::get('user-target', [UserController::class, 'usersTarget']);
+
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'allUsers']);
+        Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
+        Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
+        Route::post('change-agency', [UserController::class, 'changeAgency']);
+        Route::post('update-switch', [UserController::class, 'updateSwitch']);
+        Route::post('update-user-Setting', [UserController::class, 'updateUserSetting']); 
+        Route::post('create', [UserController::class, 'create']);
+        Route::get('show/{id}', [UserController::class, 'showDataUser']);
+        Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+    });
+
+
+
+
+    Route::prefix('reels')->group(function () {
+        Route::get('/all', [ReelsController::class, 'index']);
+        Route::post('/show/{id}', [ReelsController::class, 'show']);
+        Route::post('/search/{id}', [ReelsController::class, 'search']);
+        Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        
+    });
+
 });
-
-

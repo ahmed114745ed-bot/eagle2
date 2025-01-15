@@ -33,7 +33,7 @@ class KickOfFamilyAction extends RowAction
         if (UserHandling::checkIfUserOwnerOfFamily($model->id)){
             throw ValidationException::withMessages(['error' => __('This User is the host Of family can\'t delete it go to remove family first')]);
         }
-        $model->family_id = 0;
+        $model->family_id = null;
         FamilyUser::query ()->where ('user_id',$model->id)->delete ();
         $model->save ();
         return $this->response()->success (__('dashboard.successful'));

@@ -182,7 +182,7 @@ class UserHandling
     }
 
 
-    public function checkIfUserOwnerOfAgency(User $user): bool
+    public static function checkIfUserOwnerOfAgency(User $user): bool
     {
         return \App\Models\Agency::query()->where('owner_id', $user->id)->orWhere('app_owner_id', $user->id)->exists();
     }
