@@ -87,7 +87,7 @@ class GooglePaymentController extends Controller
             $response  = $client->post($url, [
                 'json' => [
                     'purchaseToken' => $request->purchaseToken,
-                    'productId'     => 'coin_'.$productId,
+                    'productId'     => 'coin_2',
                     'serverKey'     => config('app.node_server_name') // this required
                 ],
             ]);
