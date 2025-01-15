@@ -32,7 +32,7 @@ class ReelsService
     public function search($id)
     {
 
-        return $this->reelRepository->find($id);
+        return $this->reelRepository->search($id);
     }
     
    
@@ -40,6 +40,8 @@ class ReelsService
     {
         $reel = $this->reelRepository->find($reelId);
         if (!$reel) throw new \Exception('not found');
+        // if (!$reel)  return Common::apiResponse(false, 'not found', null);
+
         $reel->delete();
         return true;
     }

@@ -57,9 +57,14 @@ class ReelsController extends Controller
 
     public function destroy($id)
     {
-        $reel = $this->reelService->delete($id);
-        if (!$reel) return Common::apiResponse(0, "not found'", null, 400);
-        return Common::apiResponse(true, 'success', null);
+        try {
+            $reel = $this->reelService->delete($id);
+            return Common::apiResponse(true, 'success', null);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+       
 
     }
     

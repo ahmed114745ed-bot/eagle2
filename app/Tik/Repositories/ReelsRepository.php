@@ -37,13 +37,13 @@ class ReelsRepository extends AbstractRepository
         $query = $this->model->query();
 
         $query->whereHas('user', function ($query) use ($input) {
-            $query->where('uuid', trim($input)) 
-                  ->orWhere('name', 'like', "%$input%"); 
+            $query->where('uuid', trim($input)) ;
+                 
         });
         
         $result = $query->get(); 
         
-        return $result;
+        return $result ;
      
     }
    
