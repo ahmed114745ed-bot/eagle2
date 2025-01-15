@@ -20,12 +20,7 @@ class FamilyLevelService
         return $this->FamilyLevelRepository->all();
     }
 
-    public function getWithSearch($search = null): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $data = $this->FamilyLevelRepository->getWithSearch($search);
-        // return FamilyLevelResource::collection($data);
-        return $data;
-    }
+   
 
     public function show($id)
     {
