@@ -15,7 +15,9 @@ class FamilyLevelController extends Controller
     public function index(Request $request)
     {
         
-        $FamilyLevel = $this->FamilyLevelService->index();
+        // $FamilyLevel = $this->FamilyLevelService->index();
+        $perPage = request('per_page')?? 10;
+        $FamilyLevel = FamilyLevel::paginate($perPage);
         return response()->json([
             'status' => 'success',
             'message' => 'FamilyLevels returned successfully',

@@ -20,12 +20,7 @@ class FamilyLevelService
         return $this->FamilyLevelRepository->all();
     }
 
-    public function getWithSearch($search = null): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $data = $this->FamilyLevelRepository->getWithSearch($search);
-        // return FamilyLevelResource::collection($data);
-        return $data;
-    }
+   
 
     public function show($id)
     {
@@ -35,13 +30,15 @@ class FamilyLevelService
 
     public function create( $request)
     {
-        
-        $img = null;
-        if ($request->hasFile('img'))  $img = Common::upload(' FamilyLevels', $request->file('img'));
 
+        if ($request->hasFile('img')) {
+            $image= Common::upload('FamilyLevels', $request->file('img'));
+        }
+
+   
         $FamilyLevelData = [
             'name' => $request->name,
-            'img' => $img,
+            'img' => $image ??'',
             'exp' => $request->exp,
             'type' => $request->type,
             'members' => $request->members,
