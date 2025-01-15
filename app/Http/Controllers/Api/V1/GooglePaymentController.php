@@ -91,7 +91,6 @@ class GooglePaymentController extends Controller
                     'serverKey'     => config('app.node_server_name') // this required
                 ],
             ]);
-            dd($response);
             $body = $response->getBody()->getContents();
 
             $data = json_decode($body);

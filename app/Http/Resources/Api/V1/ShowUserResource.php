@@ -19,6 +19,7 @@ class ShowUserResource extends JsonResource
      */
     public function toArray($request)
     {
+       
         return [
             'id' => $this->id,
             'coins' => number_format($this->di),
@@ -49,7 +50,9 @@ class ShowUserResource extends JsonResource
             'worth' =>  Common::level_center($this->resource)['receiver_level'],
             'diamonds' =>  $this->coins,
             'balance' =>  $this->salary,
-            
+            'pack' => PackUserResource::collection($this->packs),
+            'vip' => VipUserResource::collection($this->haveVip)
+
 
         ];
     }
