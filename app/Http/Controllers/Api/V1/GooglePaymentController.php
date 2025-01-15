@@ -77,6 +77,7 @@ class GooglePaymentController extends Controller
 
     public function purchasedFour(Request $request)
     {
+        dd("dsdsdds");
         $client = new \GuzzleHttp\Client();
         $url = config('app.payment_url') . '/api/google-pay';
 
