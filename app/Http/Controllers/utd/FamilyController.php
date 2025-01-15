@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\Family;
 use Illuminate\Http\Request;
@@ -13,11 +14,9 @@ class FamilyController extends Controller
         $perPage = request('per_page')?? 10;
         $families = Family::paginate($perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'families returned successfully',
-            'data' => $families
-        ]);
+
+        return Common::apiResponse(true, '', $families, 200);
+
     }
 
     public function store(Request $request){
@@ -32,12 +31,7 @@ class FamilyController extends Controller
             'user_id'=> $request->user_id
         ]);
 
-        return response()->json([
-            'message' => 'Family created successfully',
-            'status' => 'success',
-            'data' => $family
-        ]);
-
+        return Common::apiResponse(true, '',  $family, 200);
     }
 
     public function update(Request $request, $id){
@@ -52,30 +46,21 @@ class FamilyController extends Controller
             'user_id'=> $request->user_id
         ]);
 
-        return response()->json([
-            'message' => 'Family updated successfully',
-            'status' => 'success',
-        ]);
+        return Common::apiResponse(1, 'Family updated successfully');
+
 
     }
 
     public function show($id){
         $family = Family::findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Family returned successfully',
-            'data' => $family
-        ]);
+        return Common::apiResponse(true, '', $family, 200);
     }
 
     public function destroy($id){
 
         Family::findOrFail($id)->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Family deleted successfully',
-        ]);
+        return Common::apiResponse(1, 'success', null, 200);
     }
 }

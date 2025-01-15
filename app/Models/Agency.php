@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\PaymentGetWayTrait;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,7 +23,20 @@ class Agency extends Model
         'password',
     ];
 
+    public function getCreatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
 
+    // Convert updated_at to the user's local time zone
+    public function getUpdatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
     Public function chargeAgency()
     {
         return $this->hasMany(ChargeAgency::class ,'agency_id');
@@ -280,5 +294,5 @@ class Agency extends Model
     {
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
-    
+
 }

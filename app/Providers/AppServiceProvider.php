@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind (UserRepoInterface::class,UserRepo::class);
 
 
-    
+
 
 
         $this->app->bind ('RedisService',function($app){
