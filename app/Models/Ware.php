@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class Ware extends Model
 {
     protected $table = 'wares';
-    protected $guarded=['id'];
+    protected $guarded = ['id'];
+    protected $appends = ['image_type1', 'profile_frame_type'];
 
     public function getCreatedAtAttribute($value)
     {
@@ -33,6 +34,14 @@ class Ware extends Model
             if ($model->status) {
                 unset($model->status);
             }
+            unset($model->image_type1);
+            unset($model->profile_frame_type);
+        });
+
+        static::updating(function ($model) {
+
+            unset($model->image_type1);
+            unset($model->profile_frame_type);
         });
         // Listen for the 'deleting' event of the Agency model
         static::deleting(function ($id) {
@@ -49,23 +58,32 @@ class Ware extends Model
     public function scopeIsNotUsedInPacks(Builder $query)
     {
         return $query->whereDoesntHave("packs", function ($q) {
-            $q->where(fn($q)=>$q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time()));
+            $q->where(fn($q) => $q->where('packs.expire', 0)->orWhere('packs.expire', '>=', time()));
         });
     }
 
     public function scopeShowUserCustom(Builder $query, int $userId)
     {
-        return $query->where(fn($q) =>
+        return $query->where(
+            fn($q) =>
             $q->whereDoesntHave('ware_users')
-            ->orWhereHas('ware_users', fn($q) => $q->where('user_id', $userId))
+                ->orWhereHas('ware_users', fn($q) => $q->where('user_id', $userId))
         );
     }
 
 
     public function ware_users()
     {
-        return $this->belongsToMany(User::class, 'user_ware','ware_id','user_id')->withPivot('disable');
+        return $this->belongsToMany(User::class, 'user_ware', 'ware_id', 'user_id')->withPivot('disable');
     }
 
+    public function getImageType1Attribute()
+    {
+        return  $this->image_type;
+    }
 
+    public function getProfileFrameTypeAttribute()
+    {
+        return  $this->image_type;
+    }
 }

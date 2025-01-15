@@ -154,7 +154,7 @@ class WareController extends MainController
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
         $grid->column('is_active_for_vip', __("active vip"))->switch($states);
-       
+
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -251,7 +251,7 @@ class WareController extends MainController
         $form->file('img2', trans('svg'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-        $form->select('image_type', __('image_type'))->options(
+        $form->select('image_type1', __('image_type'))->options(
             [
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
@@ -259,9 +259,9 @@ class WareController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->attribute(['id' => 'image_type']);
+        )->attribute(['id' => 'image_type1']);
 
-        $form->select('image_type', __('image_type'))->options(
+        $form->select('profile_frame_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
                 'png' => __('png'),
@@ -275,10 +275,10 @@ class WareController extends MainController
                      var type = $('#type').val();
                      if(type == '28') {
                          $('#profile_frame').closest('.form-group').show();
-                          $('#image_type').closest('.form-group').hide();
+                          $('#image_type1').closest('.form-group').hide();
                      } else {
                          $('#profile_frame').closest('.form-group').hide();
-                         $('#image_type').closest('.form-group').show();
+                         $('#image_type1').closest('.form-group').show();
                          
                      }
                  }
@@ -301,16 +301,22 @@ class WareController extends MainController
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-       
+
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
-            if ($form->input('image_type') == null) {
+            $imageType1 = $form->input('image_type1');
+            $profileFrameType = $form->input('profile_frame_type');
+            $form->model()->image_type = $imageType1 ?? $profileFrameType;
+
+            if (is_null($imageType1) && is_null($profileFrameType)) {
 
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
+            
+
             (new UserCounterServices)->eventUsers('ware');
         });
 
