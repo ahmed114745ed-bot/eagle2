@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,9 +13,9 @@ class RecevingReportResource extends JsonResource
     {
         return [
             'id'          => $this->user_id, 
-            'diamonds'    => $this->amount,
+            'diamonds'    => numToStringNew($this->amount),
             'operation_no'=> (int)$this->id,
-            'created_at'  => $this->created_at->format('Y-m-d h:i:s A')
+            'created_at'  =>Carbon::parse( $this->created_at)->format('Y-m-d h:i:s A'),
         ];
     }
 }

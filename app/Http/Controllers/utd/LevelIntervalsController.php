@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Public\Entities\LevelInterval;
@@ -13,11 +14,9 @@ class LevelIntervalsController extends Controller
         $perPage = request('per_page') ?? 10;
         $levelIntervals = LevelInterval::paginate($perPage);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $levelIntervals,
-            'message' => 'level intervals returned successfully',
-        ]);
+
+        return Common::apiResponse(1, 'success', $levelIntervals, 200);
+
     }
 
     public function store(Request $request){
@@ -29,11 +28,7 @@ class LevelIntervalsController extends Controller
             'max' => $request->max
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'level interval returned successfully',
-            'data' => $level_interval
-        ]);
+        return Common::apiResponse(1, 'success', $level_interval, 200);
     }
 
     public function update($id, Request $request){
@@ -45,29 +40,22 @@ class LevelIntervalsController extends Controller
             'max' => $request->max
         ]);
 
-        return response()->json([
-            'message' => 'level interval updated successfully',
-            'status' => 'success',
-        ]);
+
+        return Common::apiResponse(1, 'success', [], 200);
+
     }
 
     public function show($id){
 
         $levelInterval = LevelInterval::findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $levelInterval,
-            'message' => 'level interval returned successfully',
-        ]);
+        return Common::apiResponse(1, 'success', $levelInterval, 200);
+
     }
 
     public function destroy($id){
         LevelInterval::findOrFail($id)->delete();
 
-        return response()->json([
-            'message' => 'level interval deleted successfully',
-            'status' => 'success',
-        ]);
+        return Common::apiResponse(1, 'success', [], 200);
     }
 }

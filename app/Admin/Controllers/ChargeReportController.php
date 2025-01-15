@@ -243,6 +243,7 @@ class TemporaryModel extends Model
     // Optionally, define fillable attributes if you want to use it like a regular model
     protected $fillable = ['name', 'age', 'email'];
 
+    
     public function getTestAttribute() : string
     {
         return 'this is test attribute';

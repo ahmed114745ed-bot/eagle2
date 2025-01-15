@@ -1364,7 +1364,8 @@ class RoomController extends Controller
                 "imgbackground" => $room->final_room_image ??  '',
                 "roomIntro" => $room->room_intro ?? "",
                 "roomImg" => $room->room_cover ?? "",
-                "room_type" => @$room->myType->name ?? "",
+                // "room_type" => @$room->myType->name ?? "", 
+                "room_type" => app()->getLocale() === 'ar' ? @$room->roomCategory?->name  ?? @$room->roomCategory?->name_en : @$room->roomCategory?->name_en ?? @$room->roomCategory?->name,
                 "room_name" => @$room->room_name ?? "",
                 "is_locked" => false
 

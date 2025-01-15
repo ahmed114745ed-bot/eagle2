@@ -398,9 +398,9 @@ class UserService
             }
         }
 
-        if ($user->device_token  != $request->header('device')) {
+        if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
-            $user->device_token = $request->header('device');
+            $user->device_token = $request->header('X-Device-Token');
             $user->save();
         }
 
@@ -698,10 +698,11 @@ class UserService
 
     public function kickAgency($userId)
     {
-        if (UserHandling::checkIfUserOwnerOfAgency($userId)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
+       $user = $this->userRepository->findOrFail($userId);
+        if (UserHandling::checkIfUserOwnerOfAgency($user)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
 
 
-        UserHandling::kickUserFromAgency($userId);
+        UserHandling::kickUserFromAgency($user);
         return true;
     }
 

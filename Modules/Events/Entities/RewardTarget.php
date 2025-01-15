@@ -5,6 +5,7 @@ namespace Modules\Events\Entities;
 use App\Models\OVip;
 use App\Models\Ware;
 use App\Helpers\Common;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Events\Database\factories\RewardTargetFactory;
@@ -22,6 +23,21 @@ class RewardTarget extends Model
     protected $guarded = ['id'];
     protected $appends = ['target1', 'target2', 'target3','target4'];
     protected $table='reward_charges';
+
+    public function getCreatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
+
+    // Convert updated_at to the user's local time zone
+    public function getUpdatedAtAttribute($value)
+    {
+        $timeZone = request()->header('tz') ?? 'UTC';
+        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+    }
     public function target()
     {
         return $this->belongsTo(ChargeTargetEvent::class,'charge_event_id');

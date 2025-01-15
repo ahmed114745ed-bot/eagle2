@@ -26,6 +26,7 @@ use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\AllUsersResource;
+use App\Http\Resources\Api\V1\ShowUserResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
 use App\Http\Resources\Api\V1\UserTargetResource;
@@ -778,12 +779,8 @@ class UserController extends Controller
     {
         try {
             $user  = $this->userService->showDataUser($id);
-            $user['Level'] =  Common::level_center($user)['sender_level'];
-            $user['worth'] =  Common::level_center($user)['receiver_level'];
-            $user['diamonds'] =  $user->coins;
-            $user['balance'] =  $user->salary;
 
-            return Common::apiResponse(true, 'done', $user);
+            return Common::apiResponse(true, 'done',new ShowUserResource($user) );
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

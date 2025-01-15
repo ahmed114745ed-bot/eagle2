@@ -3,6 +3,7 @@
 
 use App\Helpers\Common;
 use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\ReelsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 
@@ -70,10 +72,16 @@ Route::middleware([])->group(function () {
     Route::prefix('group-chat')->group(function(){
         Route::get('/', [GroupChatController::class, 'index']);
         Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/add-experience-points', [GroupChatController::class, 'add_experience_points']);
         Route::post('/update/{id}', [GroupChatController::class, 'update']);
         Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
         Route::get('/{id}', [GroupChatController::class, 'show']);
 
+    });
+
+    Route::prefix('parent-users')->group(function(){
+        Route::get('/', [ParentUsersController::class, 'index']);
+        Route::get('/{id}', [ParentUsersController::class, 'users']);
     });
 
     //games
@@ -222,15 +230,13 @@ Route::middleware([])->group(function () {
     });
 
     Route::prefix('family-levels')->group(function () {
-
         Route::get('/all', [FamilyLevelController::class, 'index']);
         Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
         Route::post('/create', [FamilyLevelController::class, 'store']);
         Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
         Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
-
-
     });
+
     Route::get('user-target', [UserController::class, 'usersTarget']);
 
     Route::prefix('users')->group(function () {
@@ -244,4 +250,16 @@ Route::middleware([])->group(function () {
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
     });
+
+
+
+
+    Route::prefix('reels')->group(function () {
+        Route::get('/all', [ReelsController::class, 'index']);
+        Route::post('/show/{id}', [ReelsController::class, 'show']);
+        Route::post('/search/{id}', [ReelsController::class, 'search']);
+        Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        
+    });
+
 });

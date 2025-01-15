@@ -15,6 +15,8 @@ class UserWare extends Model
     use HasFactory;
     protected $table = 'user_ware';
     public $timestamps = false;
+
+    
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\utd;
 
+use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Models\Config;
 use App\Models\GroupChat;
 use Illuminate\Http\Request;
 
@@ -19,11 +21,8 @@ class GroupChatController extends Controller
             });
         })->paginate($per_page);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'group chats returned successfully',
-            'data' => $groups
-        ]);
+        return Common::apiResponse(1, 'success', $groups, 200);
+
     }
 
     public function store(Request $request){
@@ -33,21 +32,14 @@ class GroupChatController extends Controller
             'user_id'=> $request->user_id
         ]);
 
-        return response()->json([
-            'message' => 'Group chat created successfully',
-            'data' => $chat,
-            'status' => 'success',
-        ]);
+        return Common::apiResponse(1, 'success', $chat, 200);
+
     }
 
     public function show($id){
         $group = GroupChat::findOrFail($id);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Group chat returned successfully',
-            'data' => $group
-        ]);
+        return Common::apiResponse(1, 'success', $group, 200);
     }
 
     public function update(Request $request, $id){
@@ -56,18 +48,32 @@ class GroupChatController extends Controller
             'user_id' => $request->user_id
         ]);
 
-        return response()->json([
-            'message' => 'Group chat updated successfully',
-            'status' => 'success',
-        ]);
+        return Common::apiResponse(1, 'success', [], 200);
+
+    }
+
+    public function add_experience_points(Request $request){
+
+        $conf = Config::where('name','send_world_chat')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'send_world_chat',
+                'value' => $request->number,
+            ]);
+        }else{
+            $conf->value = $request->number;
+            $conf->save();
+        }
+
+        return Common::apiResponse(1, 'success', [], 200);
+
     }
 
     public function destroy($id){
         GroupChat::findOrFail($id)->delete();
 
-        return response()->json([
-            'message' => 'Group chat deleted successfully',
-            'status' => 'success',
-        ]);
+        return Common::apiResponse(1, 'success', [], 200);
+
     }
 }
