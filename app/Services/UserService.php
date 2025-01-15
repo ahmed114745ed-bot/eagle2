@@ -698,10 +698,11 @@ class UserService
 
     public function kickAgency($userId)
     {
-        if (UserHandling::checkIfUserOwnerOfAgency($userId)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
+       $user = $this->userRepository->findOrFail($userId);
+        if (UserHandling::checkIfUserOwnerOfAgency($user)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
 
 
-        UserHandling::kickUserFromAgency($userId);
+        UserHandling::kickUserFromAgency($user);
         return true;
     }
 
