@@ -398,9 +398,9 @@ class UserService
             }
         }
 
-        if ($user->device_token  != $request->header('device')) {
+        if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
-            $user->device_token = $request->header('device');
+            $user->device_token = $request->header('X-Device-Token');
             $user->save();
         }
 
