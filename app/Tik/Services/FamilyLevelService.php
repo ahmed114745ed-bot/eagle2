@@ -30,13 +30,15 @@ class FamilyLevelService
 
     public function create( $request)
     {
-        
-        $img = null;
-        if ($request->hasFile('img'))  $img = Common::upload(' FamilyLevels', $request->file('img'));
 
+        if ($request->hasFile('img')) {
+            $image= Common::upload('FamilyLevels', $request->file('img'));
+        }
+
+   
         $FamilyLevelData = [
             'name' => $request->name,
-            'img' => $img,
+            'img' => $image ??'',
             'exp' => $request->exp,
             'type' => $request->type,
             'members' => $request->members,
