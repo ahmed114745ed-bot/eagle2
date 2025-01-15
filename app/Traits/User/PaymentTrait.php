@@ -42,6 +42,7 @@ trait PaymentTrait
                 'trx'            => $orderId,
             ]);
         }
+        dd($coins);
 
         UserCommon::updateUserTotalCoins($userId, $coins->coin);
 
