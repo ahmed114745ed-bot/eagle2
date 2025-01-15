@@ -42,13 +42,14 @@ class ShowUserResource extends JsonResource
             'facebook_id' => @$this->facebook_id,
             'google_id' => @$this->google_id,
             'huawei_id' => @$this->huawei_id,
-            ''
-
-
+            'status' => @$this->status,
+            'type_user' => $this->type_user,
+            'manger_type_id' => $this->manger_type_id?? 0,
             'Level' =>  Common::level_center($this->resource)['sender_level'],
             'worth' =>  Common::level_center($this->resource)['receiver_level'],
             'diamonds' =>  $this->coins,
-            'balance' =>  $this->salary
+            'balance' =>  $this->salary,
+            
 
         ];
     }
