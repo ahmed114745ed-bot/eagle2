@@ -127,8 +127,9 @@ class HomeService
     }
 
     public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
-    {dd( 123);
+    {
         if (key_exists($type, $privilegeArr)) {
+            dd(1);
             $privilegeId = $privilegeArr[$type];
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
@@ -153,6 +154,7 @@ class HomeService
                     break;
             }
         }
+        dd(12345+6);
         return true;
     }
 }
