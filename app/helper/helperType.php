@@ -39,6 +39,31 @@ const TYPE_WARE =
 
 ];
 
+const WARE_DEDICATE =
+[
+    1 => 'Gemstone',
+    3 => 'Card Scroll',
+    4 => 'Avatar Frame',
+    5 => 'Bubble Frame',
+    6 => 'Entering Special Effects',
+    7 => 'Microphone Aperture',
+    8 => 'Badge',
+    9 => 'NoKick',
+    10 => 'Icon',
+    11 => 'intro animation',
+    12 => 'wapel',
+    13 => 'hide country',
+    14 => 'vip gifts',
+    15 => 'no pan',
+    16 => 'hidden room',
+    17 => 'anonymous man',
+    18 => 'colored name',
+    19 => 'profile visitors hide in',
+    20 => 'hide last active',
+    21 => 'sound effect',
+    22 => 'upload GIF image',
+];
+
 const  GET_TYPE_WARE =
 [
     4 => 'purchase',
