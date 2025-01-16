@@ -4,6 +4,7 @@
 use App\Helpers\Common;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\ReelsController;
+use App\Http\Controllers\utd\RoomVipsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -259,6 +260,16 @@ Route::middleware([])->group(function () {
         Route::post('/show/{id}', [ReelsController::class, 'show']);
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        
+    });
+    Route::prefix('room-vips')->group(function () {
+        Route::get('/all', [RoomVipsController::class, 'index']);
+        Route::post('/show/{id}', [RoomVipsController::class, 'show']);
+        Route::post('/search/{key}', [RoomVipsController::class, 'search']);
+        Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
+        Route::post('create', [RoomVipsController::class, 'store']);
+        Route::post('update/{id}', [RoomVipsController::class, 'update']);
+
         
     });
 

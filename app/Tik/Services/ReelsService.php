@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\reelRepository;
 
 
-class ReelsService
+class ReelsService 
 {
 
     public function __construct(
