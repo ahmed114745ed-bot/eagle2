@@ -221,7 +221,7 @@ class CustomNotification
     {
         $user_id = $msg->user_id;
         if ($user_id == 0) {
-            $usersChunk = User::where('notification_id', '!=', NULL)->select(['id', 'notification_id'])->get()->unique('notification_id')->chunk(200);
+            $usersChunk = User::where('notification_id', '!=', NULL)->select(['id', 'notification_id'])->get()->unique('notification_id')->chunk(100);
             $body             = $msg->content;
             $title = $msg->title;
             $data['image'] = null;
