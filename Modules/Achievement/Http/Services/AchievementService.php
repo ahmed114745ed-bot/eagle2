@@ -4,9 +4,11 @@ namespace Modules\Achievement\Http\Services;
 
 use App\Models\User;
 use App\Helpers\Common;
+use App\Tik\Repositories\GiftRepository;
 use Modules\Achievement\Enums\TargetType;
 use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Http\Repositories\AchievementRepository;
+use Modules\Achievement\Http\Repositories\GiftAchievementRepository;
 use Modules\Achievement\Http\Repositories\AchievementLevelRepository;
 
 class AchievementService
@@ -14,6 +16,8 @@ class AchievementService
     public function __construct(
         private readonly AchievementRepository $achievementRepository,
         private readonly AchievementLevelRepository $achievementLevelRepository,
+        private readonly GiftAchievementRepository $giftAchievementRepository,
+        private readonly GiftRepository $giftRepository,
 
     ) {}
 
@@ -32,9 +36,9 @@ class AchievementService
         return $this->achievementRepository->all();
     }
 
-    public function allAchievementLevel($achievementId,$perPage, $Page)
+    public function allAchievementLevel($achievementId, $perPage, $Page)
     {
-        return $this->achievementLevelRepository->all($achievementId,$perPage, $Page);
+        return $this->achievementLevelRepository->all($achievementId, $perPage, $Page);
     }
 
     public function createAchievementLevel($request)
@@ -92,6 +96,22 @@ class AchievementService
 
     public function achievementTargetType()
     {
-        return TargetType::getTranslatedOptions(); 
+        return TargetType::getTranslatedOptions();
+    }
+
+    public function allAchievementGift($achievementId, $perPage, $Page)
+    {
+        return $this->giftAchievementRepository->all($achievementId, $perPage, $Page);
+    }
+
+    public function achievementGift($request)
+    {
+        $this->giftAchievementRepository->create([$request->all()]);
+        return true;
+    }
+
+    public function giftAchievement()
+    {
+        return $this->giftRepository->allAchievementGift();
     }
 }
