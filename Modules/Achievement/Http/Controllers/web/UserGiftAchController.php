@@ -32,17 +32,13 @@ class UserGiftAchController extends MainController
       */
 
 
-     //  public function index(Content $content)
-     //  {
-     //      return $content
-     //          ->header(trans('admin.index'))
-     //          ->description(trans('admin.description'))
-     //          ->row(function($row) {
-     //             // $row->column(12, view('admin.grid.users.UserGiftAchivement'));
-     //         })  ->row(function($row) {
-     //             $row->column(12, $this->grid());
-     //         });
-     //  }
+      public function index(Content $content)
+      {
+          return $content
+              ->header(trans('admin.index'))
+              ->description(trans('admin.description'))
+              ->body( $this->grid());
+      }
 
 
      public function create(Content $content)
