@@ -8,6 +8,8 @@ use Modules\Reals\Entities\Real;
 use App\Tik\Services\ReelsService;
 use Illuminate\Http\Request;
 use Exception;
+use App\Models\Config;
+
 
 class ReelsController extends Controller
 {
@@ -65,6 +67,24 @@ class ReelsController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
        
+
+    }
+
+    public function reelConfig($num ,Request $request)
+    {
+        $conf = Config::where('name','upload_reel')->first();
+        if(!$conf)
+        {
+            config::create([
+                'name'  => 'upload_reel',
+                'value' => $num,
+            ]);
+        }else{
+            $conf->value = $num;
+            $conf->save();
+        }
+        return Common::apiResponse(true, __('dashboard.update'), null);
+
 
     }
     

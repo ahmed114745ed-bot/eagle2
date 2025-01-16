@@ -259,6 +259,8 @@ Route::middleware([])->group(function () {
         Route::post('/show/{id}', [ReelsController::class, 'show']);
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
+        
     });
     Route::prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);

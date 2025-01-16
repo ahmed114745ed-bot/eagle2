@@ -19,9 +19,8 @@ class ReelsRepository extends AbstractRepository
 
     public function all($perPage, $Page)
     {
-        $reals = $this->model;
-     
-        return $reals->paginate($perPage, ['*'], 'page', $Page);;
+        $reals = $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
+        return $reals->paginate($perPage, ['*'], 'page', $Page);
     }
 
   
@@ -29,7 +28,7 @@ class ReelsRepository extends AbstractRepository
 
     public function find($id)
     {
-      return  $this->model->query()->find($id);
+      return  $this->model->query()->where('id',$id)->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->first();
     }
 
     public function search($input)
@@ -39,7 +38,7 @@ class ReelsRepository extends AbstractRepository
         $query->whereHas('user', function ($query) use ($input) {
             $query->where('uuid', trim($input)) ;
                  
-        });
+        })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
         
         $result = $query->get(); 
         
