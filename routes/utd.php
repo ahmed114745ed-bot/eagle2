@@ -32,6 +32,7 @@ use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
+use App\Http\Controllers\utd\RoomTargetController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -260,7 +261,7 @@ Route::middleware([])->group(function () {
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
         Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
-        
+
     });
     Route::prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);
@@ -270,7 +271,7 @@ Route::middleware([])->group(function () {
         Route::post('create', [RoomVipsController::class, 'store']);
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
 
-        
+
     });
 
     Route::prefix('achievements')->group(function () {
