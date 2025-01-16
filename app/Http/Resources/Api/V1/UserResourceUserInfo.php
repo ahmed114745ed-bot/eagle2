@@ -82,6 +82,7 @@ class UserResourceUserInfo extends JsonResource
         $data = [
             'id'=>@$this->id, // both
             'uuid'=>@$this->uuid, // both
+            'has_color_id'=>Common::hasInPack ($this->id,21, true), // both
             'chat_id'=>@$this->chat_id?:"", // both
             'notification_id'=>@$this->notification_id?:"", // both
             'is_gold'=>@$this->is_gold_id, // both

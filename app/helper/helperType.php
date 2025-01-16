@@ -35,6 +35,8 @@ const TYPE_WARE =
     19 => 'profile visitors hide in',
     20 => 'hide last active',
     28 => 'profile frame',
+    21 => 'colored ID',
+
 ];
 
 const  GET_TYPE_WARE =

@@ -1036,7 +1036,7 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->whereIn('type', [21,20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6])->where('is_used', 1)->with('ware')->get();
         }
         return $this->loadedPacks;
     }
