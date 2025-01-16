@@ -167,21 +167,19 @@ class RealsService extends BaseModelService
 
     public function create($data, int $userId)
     {
-        $video         = $data['video'];
         $categoriesIds = @$data['categories'];
-        $urlVideo = '';
+        $urlVideo = $data['video'];
         unset($data['video']);
         if ($categoriesIds) {
             unset($data['categories']);
         }
 
-        if ($data->hasFile('video')) {
-            $urlVideo = $this->upload($video);
-        } elseif ($data->has('video')) {
-            if (!Storage::exists($video)) {
-                return ;
+        if (isset($data['video']) && is_file($data['video'])) {
+            $urlVideo = $this->upload($data['video']);
+        } elseif (isset($data['video'])) {
+            if (!Storage::exists($data['video'])) {
+                return;
             }
-            $urlVideo =    $video;
         }
 
         $url               = $urlVideo;
@@ -189,7 +187,9 @@ class RealsService extends BaseModelService
         $data['url']       = $url;
         $data['sub_video'] = $this->makeSubVideo($url, null, 'gcs');
         $real              = Real::query()->create($data);
-        (new FfmpegService())->extract(getDriverUrl() . '/' . $url, $real->id);
+        // if(is_file($data['video'])) {
+            (new FfmpegService())->extract(getDriverUrl() . '/' . $url, $real->id);
+        // }
         if ($categoriesIds) {
             $real->categories()->sync($categoriesIds);
         }
