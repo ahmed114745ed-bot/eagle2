@@ -132,9 +132,10 @@ class HomeService
             $privilegeId = $privilegeArr[$type];
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
+                dd(12345);
                 return Common::apiResponse(0, 'not found', null, 404);
             } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
-
+ dd(654789);
                 return Common::apiResponse(0, 'not allowed', null, 403);
             }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->first();
