@@ -129,7 +129,6 @@ class HomeService
     public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
     {
         if (key_exists($type, $privilegeArr)) {
-            dd(1);
             $privilegeId = $privilegeArr[$type];
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
