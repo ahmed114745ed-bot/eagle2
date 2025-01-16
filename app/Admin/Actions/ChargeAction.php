@@ -124,7 +124,6 @@ class ChargeAction extends Action
         //dd($charge);
         $charge->save();
 
-        UserCommon::UserEarnedInvitation($user->id,$amount);
 
     }
 
