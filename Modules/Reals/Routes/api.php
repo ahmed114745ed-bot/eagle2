@@ -20,7 +20,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan'])-
         Route::prefix('/')->middleware("appFeatureEnable:reel")->group(function (){
             Route::get('reals/user/{user_id?}', 'RealsController@getUserReals');
             Route::get('reals/user-followers', 'RealsController@getUserFollowersReals');
-            Route::apiResource('/reals', 'RealsController');
+            // Route::apiResource('/reals', 'RealsController');
             Route::apiResource('reals/{real_id}/comment', 'RealsUserCommentController', [
                 'names' => [
                     'index' => 'reals.comment.index',
