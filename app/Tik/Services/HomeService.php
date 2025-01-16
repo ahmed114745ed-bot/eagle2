@@ -132,12 +132,12 @@ class HomeService
             $privilegeId = $privilegeArr[$type];
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
-                dd(12345);
-                throw new \Exception( 'not found');
+               
+                throw new \Exception( 'not allow');
             } 
             else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
 
-                throw new \Exception( 'not found');
+                throw new \Exception( 'not allow');
             }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
