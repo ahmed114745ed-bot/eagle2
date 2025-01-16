@@ -133,11 +133,12 @@ class HomeService
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
                 dd(12345);
-                return Common::apiResponse(0, 'not found', null, 404);
-            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
- dd(654789);
-                return Common::apiResponse(0, 'not allowed', null, 403);
-            }
+                throw new \Exception( 'not found');
+            } 
+            // else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
+
+            //     throw new \Exception( 'you have this pack');
+            // }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->first();
             dd( $pack);
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
