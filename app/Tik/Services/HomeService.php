@@ -137,7 +137,8 @@ class HomeService
 
                 return Common::apiResponse(0, 'not allowed', null, 403);
             }
-
+            $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->first();
+            dd( $pack);
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
 
             switch ($type) {
