@@ -135,12 +135,11 @@ class HomeService
                 dd(12345);
                 throw new \Exception( 'not found');
             } 
-            // else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
+            else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
 
-            //     throw new \Exception( 'you have this pack');
-            // }
+                throw new \Exception( 'not found');
+            }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
-            dd( $pack);
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
 
             switch ($type) {
