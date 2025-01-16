@@ -127,7 +127,7 @@ class HomeService
     }
 
     public function changePackMode($type, $privilegeArr, User $user, $isAvailable)
-    {
+    {dd( 123);
         if (key_exists($type, $privilegeArr)) {
             $privilegeId = $privilegeArr[$type];
 
