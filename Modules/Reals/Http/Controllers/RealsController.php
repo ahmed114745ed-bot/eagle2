@@ -89,7 +89,6 @@ class RealsController extends Controller
      */
     public function store(RealStore $request)
     {
-        dd($request->all());
         $user = $request->user();
         $this->realsService->create($request->all(), Auth::id());
         (new UpgradeLevelServices())->uploadReel($user);

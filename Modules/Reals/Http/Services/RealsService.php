@@ -167,9 +167,8 @@ class RealsService extends BaseModelService
 
     public function create($data, int $userId)
     {
-        $video         = $data['video'];
         $categoriesIds = @$data['categories'];
-        $urlVideo = '';
+        $urlVideo = $data['video'];
         unset($data['video']);
         if ($categoriesIds) {
             unset($data['categories']);
@@ -181,7 +180,6 @@ class RealsService extends BaseModelService
             if (!Storage::exists($data['video'])) {
                 return;
             }
-            $urlVideo = $data['video'];
         }
 
         $url               = $urlVideo;
