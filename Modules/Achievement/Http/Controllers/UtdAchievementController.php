@@ -156,4 +156,10 @@ class UtdAchievementController extends Controller
         $data = $this->achievementService->giftAchievement();
         return Common::apiResponse(true, 'done', $data);
     }
+
+    public function giftAchievement(Request $request)
+    {
+        $data = $this->achievementService->giftAchievement();
+        return Common::apiResponse(true, 'done', $data);
+    }
 }

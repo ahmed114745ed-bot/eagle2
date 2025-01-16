@@ -18,6 +18,7 @@ class AchievementService
         private readonly AchievementLevelRepository $achievementLevelRepository,
         private readonly GiftAchievementRepository $giftAchievementRepository,
         private readonly GiftRepository $giftRepository,
+        private readonly UserAchievementLevelRepository $userAchievementLevelRepository,
 
     ) {}
 
@@ -113,5 +114,10 @@ class AchievementService
     public function giftAchievement()
     {
         return $this->giftRepository->allAchievementGift();
+    }
+
+    public function userAchievementLevel($perPage, $Page, $uuid)
+    {
+        return $this->userAchievementLevelRepository->all($perPage, $Page, $uuid);
     }
 }
