@@ -189,9 +189,9 @@ class RealsService extends BaseModelService
         $data['url']       = $url;
         $data['sub_video'] = $this->makeSubVideo($url, null, 'gcs');
         $real              = Real::query()->create($data);
-        if(is_file($data['video'])) {
-            (new FfmpegService())->extract(getDriverUrl() . '/' . $url, $real->id);
-        }
+        // if(is_file($data['video'])) {
+        //     (new FfmpegService())->extract(getDriverUrl() . '/' . $url, $real->id);
+        // }
         if ($categoriesIds) {
             $real->categories()->sync($categoriesIds);
         }
