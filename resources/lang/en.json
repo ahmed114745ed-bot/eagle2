@@ -418,8 +418,7 @@
      "Main" : "Main",
      "commission": "The amount deducted from the commission",
      "date":"date",
-     "party" :"Party",
-     "colored ID": "colored ID"
+     "party" :"Party"
 
 
 

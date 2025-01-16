@@ -100,7 +100,6 @@ class WareController extends MainController
                     18 => trans('colored name'),
                     19 => trans('profile visitors hide in'),
                     20 => trans('hide last active'),
-                    21 => trans('colored Id'),
 
                 ]);
             });

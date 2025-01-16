@@ -99,7 +99,6 @@ class UserResource extends JsonResource
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
-            'has_color_id'=>Common::hasInPack ($this->id,21, true), // both
 
             // 'has_color_id'       => $this->getPackWithType(21),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
