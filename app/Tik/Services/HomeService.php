@@ -34,8 +34,7 @@ class HomeService
         private readonly PackRepository $packRepository,
         private readonly UserVipRepository $userVipRepository,
         private readonly TicketRepository $ticketRepository,
-    ) {
-    }
+    ) {}
 
     public function totalHours($request, $userId)
     {
@@ -103,7 +102,7 @@ class HomeService
             }
             $ware = $this->wareRepository->findById($wapel->target_id);
         }
-        return [$level, $expire, $ware, $room->id,$wapel];
+        return [$level, $expire, $ware, $room->id, $wapel];
     }
 
     public function openTicket($request)
@@ -132,12 +131,11 @@ class HomeService
             $privilegeId = $privilegeArr[$type];
 
             if ($isAvailable && !Ware::query()->where('type', $privilegeId)->exists()) {
-               
-                throw new \Exception( 'not allow');
-            } 
-            else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
 
-                throw new \Exception( 'not allow');
+                throw new \Exception('not found ');
+            } else if (!Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->where('is_used', !$isAvailable)->exists()) {
+
+                throw new \Exception(__('api.notWare'));
             }
             $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
@@ -154,7 +152,7 @@ class HomeService
                     break;
             }
         }
-        dd(12345+6);
+        dd(12345 + 6);
         return true;
     }
 }
