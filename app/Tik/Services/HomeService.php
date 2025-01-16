@@ -139,7 +139,7 @@ class HomeService
 
             //     throw new \Exception( 'you have this pack');
             // }
-            $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->first();
+            $pack = Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->get();
             dd( $pack);
             Pack::query()->where('user_id', $user->id)->where('type', $privilegeId)->update(['is_used' => $isAvailable]);
 
