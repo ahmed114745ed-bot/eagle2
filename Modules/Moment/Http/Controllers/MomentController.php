@@ -14,6 +14,7 @@ use Modules\Moment\Entities\MomentLikes;
 use Modules\Moment\Entities\ReportMoment;
 use Modules\Moment\Transformers\MomentResource;
 use DB;
+use Illuminate\Support\Facades\Log;
 use Modules\Moment\Http\Services\MomentService;
 
 class MomentController extends Controller
@@ -23,7 +24,7 @@ class MomentController extends Controller
 
     public function index(Request $request)
     {
-
+        Log::info('Request Headers:', $request->headers->all());
         $type = $request->type;
         $page = $request->get('page', 1);
         $userId = $request->user_id;
