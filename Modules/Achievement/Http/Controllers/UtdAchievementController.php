@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\Achievement\Http\Services\AchievementService;
+use Modules\Achievement\Transformers\GiftAchievementUser;
 
 
 class UtdAchievementController extends Controller
@@ -30,7 +31,7 @@ class UtdAchievementController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-        $data = $this->achievementService->allAchievementLevel($request->achievement_id,$request->perPage, $request->Page);
+        $data = $this->achievementService->allAchievementLevel($request->achievement_id, $request->perPage, $request->Page);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -115,5 +116,44 @@ class UtdAchievementController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function allUsersGiftAchievements(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'achievement_id'         => 'required|integer|exists:achievements,id',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        $data = $this->achievementService->allAchievementGift($request->achievement_id, $request->perPage, $request->Page);
+        return Common::apiResponse(true, 'done', GiftAchievementUser::collection($data));
+    }
+
+    public function createUserAchievementGift(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'achievement_id'         => 'required|integer|exists:achievements,id',
+            'user_id'         => 'required|integer|exists:users,id',
+            'gift_id'         => 'required|integer|exists:gifts,id',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        try {
+            $this->achievementService->achievementGift($request);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function giftAchievement(Request $request)
+    {
+        $data = $this->achievementService->giftAchievement();
+        return Common::apiResponse(true, 'done', $data);
     }
 }

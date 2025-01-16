@@ -22,12 +22,11 @@ class GiftRepository extends AbstractRepository
         return $gifts->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price')->get();
     }
 
-    public function allGifts($page,$perPage)
+    public function allGifts($page, $perPage)
     {
         $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
 
         return $gifts->orderBy('price')->paginate($perPage, ['*'], 'page', $page);
-
     }
 
     public function findById($giftId)
@@ -51,11 +50,14 @@ class GiftRepository extends AbstractRepository
         return $this->model->query()->with('lucky_gift')->find($giftId);
     }
 
-    public function giftUpdate($giftId,$type,$requestType)
+    public function giftUpdate($giftId, $type, $requestType)
     {
-        $this->model->where('id',$giftId)->update([$type=>$requestType]);
+        $this->model->where('id', $giftId)->update([$type => $requestType]);
         return true;
     }
 
-
+    public function allAchievementGift()
+    {
+        return $this->model->where('type', 5)->select('id', 'name')->where('enable', true)->get();
+    }
 }

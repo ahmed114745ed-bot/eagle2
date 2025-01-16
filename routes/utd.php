@@ -280,5 +280,8 @@ Route::middleware([])->group(function () {
         Route::post('/update-level/{id}', [UtdAchievementController::class, 'updateAchievementLevel']);
         Route::post('/show/{id}', [UtdAchievementController::class, 'showAchievementLevel']);
         Route::get('/target-level', [UtdAchievementController::class, 'achievementTargetType']);
+        Route::get('/all-users-gift-achievement', [UtdAchievementController::class, 'allUsersGiftAchievements']);
+        Route::post('/create-user-gift', [UtdAchievementController::class, 'createUserAchievementGift']);
+        Route::get('/gift-achievement', [UtdAchievementController::class, 'giftAchievement']);
     });
 });
