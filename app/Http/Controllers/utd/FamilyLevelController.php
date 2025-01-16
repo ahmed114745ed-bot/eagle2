@@ -14,7 +14,7 @@ class FamilyLevelController extends Controller
     public function __construct(private FamilyLevelService $FamilyLevelService) {}
     public function index(Request $request)
     {
-        
+
         // $FamilyLevel = $this->FamilyLevelService->index();
         $perPage = request('per_page')?? 10;
         $FamilyLevel = FamilyLevel::paginate($perPage);
@@ -38,17 +38,16 @@ class FamilyLevelController extends Controller
 
     public function store(Request $request)
     {
- 
         try {
             $FamilyLevel =   $this->FamilyLevelService->create( $request);
         } catch (\Exception $e) {
-    
+
             return response()->json([
                 'message' => 'failed',
                 'status' => 'failed',
                 'data' => null
             ]);
-        
+
         }
 
         return response()->json([
@@ -59,11 +58,11 @@ class FamilyLevelController extends Controller
     }
 
 
-    
+
 
     public function update($id ,Request $request)
     {
-        
+
         try {
             $family = $this->FamilyLevelService->update( $request, $id);
         } catch (Exception $e) {
@@ -72,7 +71,7 @@ class FamilyLevelController extends Controller
                 'message' => 'failed',
                 'status' => 'failed',
                 'data' => null
-            ]);       
+            ]);
          }
 
         return response()->json([
@@ -84,7 +83,7 @@ class FamilyLevelController extends Controller
 
     public function destroy($id)
     {
-        
+
 
         FamilyLevel::findOrFail($id)->delete();
 
@@ -93,5 +92,5 @@ class FamilyLevelController extends Controller
             'message' => 'FamilyLevel deleted successfully',
         ]);
     }
-    
+
 }

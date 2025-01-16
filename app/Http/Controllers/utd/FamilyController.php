@@ -5,10 +5,12 @@ namespace App\Http\Controllers\utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\Family;
+use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 
 class FamilyController extends Controller
 {
+    use DashBoardTrait;
     public function index(){
 
         $perPage = request('per_page')?? 10;
@@ -21,13 +23,18 @@ class FamilyController extends Controller
 
     public function store(Request $request){
 
+        $image = null;
+
+        if($request->has('image')){
+            $image = Common::upload('images', $request->image);
+        }
 
         $family  = Family::create([
             'name' => $request->name,
             'introduce' => $request->introduce,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'image' => $request->image,
+            'image' => $image,
             'user_id'=> $request->user_id
         ]);
 
@@ -37,12 +44,17 @@ class FamilyController extends Controller
     public function update(Request $request, $id){
 
 
+        if($request->has('image')){
+            $image = Common::upload('images', $request->image);
+            Family::findOrFail($id)->update([
+                'image' => $image
+            ]);
+        }
         Family::findOrFail($id)->update([
             'name' => $request->name,
             'introduce' => $request->introduce,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'image' => $request->img,
             'user_id'=> $request->user_id
         ]);
 
