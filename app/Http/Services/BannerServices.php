@@ -89,4 +89,21 @@ class BannerServices
                         ]);
         return true;
     }
+
+    public function index2($ids)
+    {
+        $query = Banner::query()
+            ->where('is_active', true)
+            ->whereNotNull('publish_at')
+            ->whereNotIn("id",$ids)
+            ->inRandomOrder()
+            ->take(1);
+
+        // if (Banner::query()->count() > 1) {
+        //     if ($ids != null && $query->count() > 1) $query->where('id', '!=', $ids->banner_id)->get();
+        // }
+
+        return $query->first();
+    }
+
 }

@@ -32,8 +32,8 @@ class OfficialMessageAdmin extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function(OfficialMessageAdmin $officialMessageAdmin){
-            CustomNotification::officialMsg($officialMessageAdmin);
+        static::creating(function ($model){
+            CustomNotification::officialMsg($model);
         });
     }
 

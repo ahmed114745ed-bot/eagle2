@@ -36,9 +36,9 @@ class FamilyLevelRepository extends AbstractRepository
       return  $this->model->query()->find($id);
     }
 
-    public function delete($family)
+    public function delete($FamilyLevel)
     {
-        $family->delete();
+        $FamilyLevel->delete();
         return true;
     }
 }
