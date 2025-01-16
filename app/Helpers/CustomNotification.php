@@ -235,7 +235,7 @@ class CustomNotification
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
                
-             $data =   Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+              Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
             // dd($data);
             }
             (new UserCounterServices)->eventUsers('system-messages');
