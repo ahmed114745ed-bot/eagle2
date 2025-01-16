@@ -217,7 +217,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function officialMsg(OfficialMessageAdmin $msg)
+    public  function officialMsg(OfficialMessageAdmin $msg)
     {
         $user_id = $msg->user_id;
         if ($user_id == 0) {
@@ -234,7 +234,9 @@ class CustomNotification
 
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
-                Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+               
+             $data =   Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+             dd($data);
             }
             (new UserCounterServices)->eventUsers('system-messages');
             // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {
