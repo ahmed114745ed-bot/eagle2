@@ -10,6 +10,7 @@ use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Http\Repositories\AchievementRepository;
 use Modules\Achievement\Http\Repositories\GiftAchievementRepository;
 use Modules\Achievement\Http\Repositories\AchievementLevelRepository;
+use Modules\Achievement\Http\Repositories\UserAchievementLevelRepository;
 
 class AchievementService
 {
