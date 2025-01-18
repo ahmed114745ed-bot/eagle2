@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use Exception;
 use App\Models\Vip;
 use App\Models\Room;
 use App\Helpers\Common;
@@ -62,19 +63,19 @@ class HomeController extends Controller
     public function openTicket(Request $request)
     {
 
-            $request->validate([
-                'contact' => 'required|string',
-                'txt' => 'required|string|min:10|max:500',
-            ], [
-                'contact.required' => 'حقل الاتصال مطلوب.',
-                'txt.required' => 'حقل النص مطلوب.',
-                'txt.min' => 'يجب أن يكون النص على الأقل 10 حروف.',
-                'txt.max' => 'لا يمكن أن يزيد النص عن 500 حرف.',
-            ]);
+        $request->validate([
+            'contact' => 'required|string',
+            'txt' => 'required|string|min:10|max:500',
+        ], [
+            'contact.required' => 'حقل الاتصال مطلوب.',
+            'txt.required' => 'حقل النص مطلوب.',
+            'txt.min' => 'يجب أن يكون النص على الأقل 10 حروف.',
+            'txt.max' => 'لا يمكن أن يزيد النص عن 500 حرف.',
+        ]);
 
-            if (!$request->contact || !$request->txt) {
-                return Common::apiResponse(0, 'missing params');
-            }
+        if (!$request->contact || !$request->txt) {
+            return Common::apiResponse(0, 'missing params');
+        }
         try {
             $tkt = $this->homeService->openTicket($request);
             $out = [
@@ -240,20 +241,24 @@ class HomeController extends Controller
 
     public function hide(Request $request)
     {
-        $user         = $request->user();
-        $privilegeArr = [
-            'has_color_name' => 18,
-            'anonymous'      => 17,
-            'country'        => 13,
-            'last_active'    => 20,
-            'visit'          => 19,
-            'room'           => 16,
-            'sound_effect'   => 21
-        ];
-        $type         = $request->type;
-        $this->homeService->changePackMode($type, $privilegeArr, $user, true);
+        try {
+            $user         = $request->user();
+            $privilegeArr = [
+                'has_color_name' => 18,
+                'anonymous'      => 17,
+                'country'        => 13,
+                'last_active'    => 20,
+                'visit'          => 19,
+                'room'           => 16,
+                'sound_effect'   => 21
+            ];
+            $type         = $request->type;
+            $this->homeService->changePackMode($type, $privilegeArr, $user, true);
 
-        return Common::apiResponse(1, 'ok', null, 200);
+            return Common::apiResponse(1, 'ok', null, 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(false, $e->getMessage(), null, 407);
+        }
     }
 
     public function un_hide(Request $request)

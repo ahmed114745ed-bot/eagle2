@@ -93,7 +93,7 @@ class CustomNotification
         $body_en              = __('api.target', ['salary' => $salary, 'agency' => $agencyName], 'en');
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $data['user_id'] = $user?->id;
-        Common::send_firebase_notification($tokens_notfacion,$this->appName($user->lan), $firebaseBody, data: $data,  messageType: 'achieve-target-monthly');
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, data: $data,  messageType: 'achieve-target-monthly');
         Common::sendOfficialMessage($user->id, $body_en, __('New target'), titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
     }
@@ -158,7 +158,7 @@ class CustomNotification
         $data['image'] = getDriverUrl() . '/' . $visitor->profile->avatar;
         $data['user_id'] = $user?->id;
         $icon = $data['image'];
-        Common::send_firebase_notification($tokens_notification,$this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'visit-profile');
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'visit-profile');
 
         Common::sendOfficialMessage($user->id, image: $visitor->profile->avatar, title: $body_en, content: $visitor->name, titleAr: $body_ar, fromUserId: $visitor->id);
         (new UserCounterServices)->eventUser($user, 'official-messages');
@@ -173,7 +173,7 @@ class CustomNotification
 
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
-        Common::send_firebase_notification($tokens_notfacion,$this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
+        Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
         Common::sendOfficialMessage($receiver->id, image: $user->profile->avatar, title: $body_en, content: $user->name, titleAr: $body_ar, fromUserId: $user->id);
         (new UserCounterServices)->eventUser($receiver, 'official-messages');
     }
@@ -200,7 +200,7 @@ class CustomNotification
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $icon = $family->img;
 
-        Common::send_firebase_notification($tokens_notification,$this->appName($user->lan), $firebaseBody, $icon);
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon);
         Common::sendOfficialMessage(user_id: $user->id, content: $body_en, title: $family->name, titleAr: $body_ar, image: $family->img);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
@@ -217,7 +217,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function officialMsg(OfficialMessageAdmin $msg)
+    public  function officialMsg(OfficialMessageAdmin $msg)
     {
         $user_id = $msg->user_id;
         if ($user_id == 0) {
@@ -234,7 +234,9 @@ class CustomNotification
 
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
-                Common::send_firebase_notification($user, $title, $body, icon: $icon, data: $data, messageType: 'system-msg');
+               
+              Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+            // dd($data);
             }
             (new UserCounterServices)->eventUsers('system-messages');
             // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {
@@ -319,7 +321,7 @@ class CustomNotification
         $data['image'] = getImagePath($bubbleImage);
         $icon = $data['image'];
 
-        Common::send_firebase_notification($tokens_notification,$this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'mall-send');
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'mall-send');
         Common::sendOfficialMessage($toUser->id, $body_en, '', titleAr: $body_ar, fromUserId: $user->id);
         (new UserCounterServices)->eventUser($toUser, 'official-messages');
         (new UserCounterServices)->eventUser($toUser, 'mall');
@@ -428,7 +430,7 @@ class CustomNotification
         $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['image'] = getImagePath($img);
         $icon = $data['image'];
-        Common::send_firebase_notification($tokens_notification,$this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'vips');
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'vips');
         Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
@@ -463,7 +465,7 @@ class CustomNotification
         $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['image'] = getImagePath($image);
         $icon = $data['image'];
-        Common::send_firebase_notification($tokens_notification,$this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'ware-vip');
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'ware-vip');
         Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }

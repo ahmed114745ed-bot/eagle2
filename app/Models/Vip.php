@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 class Vip extends Model
 {
     use HasFactory;
+        protected $fillable = [
+            'type',
+            'img',
+            'exp',
+            'level',
+            'di',
+            'co',
+            'name_en',
+            'name_ar',
+        ];
 
     public function getCreatedAtAttribute($value)
     {

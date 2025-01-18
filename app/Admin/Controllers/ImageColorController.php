@@ -35,7 +35,12 @@ class ImageColorController extends MainController
             });
     }
 
-
+    public function create(Content $content)
+    {
+        return $content
+            ->title(trans('image-color'))
+            ->body($this->form());
+    }
 
 
     /**
