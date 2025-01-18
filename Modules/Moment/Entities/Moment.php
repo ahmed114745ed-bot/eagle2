@@ -6,6 +6,7 @@ use App\Models\Gift;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Moment extends Model
 {

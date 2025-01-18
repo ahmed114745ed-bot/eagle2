@@ -15,7 +15,7 @@ class MomentResource extends JsonResource
      * @return array
      */
     public function toArray($request)
-    {      
+    {
         return [
             'id'                 => $this->id ?? 0,
             'user_id'            => $this->user_id ?? 0,
@@ -23,7 +23,7 @@ class MomentResource extends JsonResource
             'comment_num'        => (int) $this->comments_count ?? 0, // Assuming you have a relationship for comments
             'like_num'           => (int) $this->likes_count ?? 0, // Assuming you have a relationship for likes
             'gifts_count'        => (int)$this->gifts?->sum('gifts_count') ?? 0,
-            'created_at'         => Carbon::parse($this->created_at)->setTimezone($request->hasHeader('tz') ? $request->header()['tz'][0] : 'UTC')->format('Y-m-d H:i:s') ?? '',
+            'created_at'         => $this->created_at,
             'updated_at'         => $this->updated_at ?? '',
             'img'                => $this->img ?? '',
             'is_like'            => @$this->likes_exists ?? false,

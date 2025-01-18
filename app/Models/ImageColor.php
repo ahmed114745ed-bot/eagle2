@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class ImageColor extends Model
 {
     use HasFactory;
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';

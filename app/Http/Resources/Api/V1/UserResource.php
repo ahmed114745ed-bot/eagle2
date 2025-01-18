@@ -99,6 +99,8 @@ class UserResource extends JsonResource
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
+
+            // 'has_color_id'       => $this->getPackWithType(21),
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'chat_id' => @$this->chat_id ?: "", // both                     ///////
