@@ -623,6 +623,8 @@ class UserController extends MainController
                     }
                 ]);
         }
+        $form->color('color_id', __('Color'))->default('#000000'); 
+
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {

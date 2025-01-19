@@ -143,6 +143,7 @@ class MyDataResource extends JsonResource
             'vip' => Common::ovip_center($this),
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
+            'color'    => @$this->color_id ??'',
             'bio' => @$this->bio ?: '',
             'number_of_fans' => $this->followerss()->count(),
             'number_of_followings' => $this->following()->count(),
