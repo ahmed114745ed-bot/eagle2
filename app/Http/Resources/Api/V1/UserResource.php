@@ -161,7 +161,7 @@ class UserResource extends JsonResource
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level'=> Common::level_center($this->id),
-            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true)
+            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2')
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
