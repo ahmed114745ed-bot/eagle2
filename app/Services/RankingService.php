@@ -18,7 +18,7 @@ use Modules\CP\Transformers\RankingResource;
 
 class RankingService
 {
-    protected $rankingRepo ,$cpRepository ;
+    protected $rankingRepo, $cpRepository;
 
     public function __construct(
         RankingRepository $rankingRepo,
@@ -184,7 +184,7 @@ class RankingService
         $kong['vip_level']  =  0;
         $kong['sender_level'] = 0;
         $kong['reciver_level'] = 0;
-        
+
         $kong['vip_level_img'] = '';
         $kong['sender_level_img'] = '';
         $kong['reciver_level_img'] = '';
@@ -214,7 +214,7 @@ class RankingService
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
-        $arr['user']['exp'] = $userExp->exp ?? '0';
+        $arr['user']['exp'] = ($userExp != null) ? ($userExp->exp ?? '0') : ($arr['user']['exp'] ?? '0');
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level ?? 0;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
@@ -234,6 +234,8 @@ class RankingService
         $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);
         return $arr;
     }
+
+
 
     protected function getClassKeywordsAndRelation($class)
     {
@@ -283,13 +285,16 @@ class RankingService
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
         $cp_top_2 = $data->take(2);
 
-        return Common::apiResponse(1, '', 
-        [
-        'sender' => $img,
-         'receiver' => $receiverImage, 
-         'room' => $roomImage,
-         'top_cp' => RankingResource::collection($cp_top_2),
-        ]);
+        return Common::apiResponse(
+            1,
+            '',
+            [
+                'sender' => $img,
+                'receiver' => $receiverImage,
+                'room' => $roomImage,
+                'top_cp' => RankingResource::collection($cp_top_2),
+            ]
+        );
     }
 
     public function topUser2()
