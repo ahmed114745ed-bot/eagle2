@@ -300,7 +300,7 @@ Route::middleware([])->group(function () {
 
 
     });
-
+    Route::get('users', [UserController::class, 'search']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
         Route::get('/level', [UtdAchievementController::class, 'allAchievementsLevel']);
@@ -317,7 +317,7 @@ Route::middleware([])->group(function () {
         Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
         Route::get('/gift-user-level', [UtdAchievementController::class, 'UserAchievementLevelGiftIndex']);
         Route::get('/target-user-level', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
-        Route::get('users', [UserController::class, 'search']);
+       
 
 
 
