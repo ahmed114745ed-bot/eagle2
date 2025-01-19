@@ -718,7 +718,8 @@ trait CalcsTrait
             'img'     => $vipIcon->show_img ?? '',
             'image'     => $vip->image ?? '',
             'image_from_wares'     => $vipIcon->show_img ?? '',
-            'expire'    => $vip->expire ?? 0
+            'expire'    => $vip->expire ?? 0,
+            'color' => $vipIcon->color ?? '',
         ];
     }
 
