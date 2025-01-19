@@ -10,6 +10,7 @@ use Modules\Achievement\Entities\Achievement;
 use Modules\Achievement\Http\Repositories\AchievementRepository;
 use Modules\Achievement\Http\Repositories\GiftAchievementRepository;
 use Modules\Achievement\Http\Repositories\AchievementLevelRepository;
+use Modules\Achievement\Http\Repositories\UserAchievementLevelRepository;
 
 class AchievementService
 {
@@ -102,7 +103,7 @@ class AchievementService
 
     public function allAchievementGift($achievementId, $perPage, $Page)
     {
-        return $this->giftAchievementRepository->all($achievementId, $perPage, $Page);
+        return $this->giftAchievementRepository->getByAchievementId($achievementId, $perPage, $Page);
     }
 
     public function achievementGift($request)
@@ -119,5 +120,44 @@ class AchievementService
     public function userAchievementLevel($perPage, $Page, $uuid)
     {
         return $this->userAchievementLevelRepository->all($perPage, $Page, $uuid);
+    }
+
+    public function isEnable($id, $isEnable)
+    {
+        $this->userAchievementLevelRepository->update(['is_enable' => $isEnable], $id);
+        return true;
+    }
+
+    public function deleteUserAchievementLevel($id)
+    {
+        $data = $this->userAchievementLevelRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
+
+    public function giftAchievementIndex($perPage, $Page)
+    {
+        return $this->giftAchievementRepository->all($perPage, $Page);
+    }
+
+    public function getAchievementLevelsTarget($achievementId)
+    {
+        return $this->achievementLevelRepository->getTarget($achievementId);
+    }
+
+    public function createUserAchievementLevel($request)
+    {
+        if ($request->hasFile('custom_image')) {
+            $customImage = Common::upload('images', $request->file('custom_image'));
+        }
+        $data = [
+            'user_id' => $request->user_id,
+            'achievement_id' => $request->achievement_id,
+            'achievement_level_id' => $request->achievement_level_id,
+            'custom_image' => $customImage ?? null,
+            'gift_achievement_id' => $request->gift_achievement_id,
+        ];
+        $this->userAchievementLevelRepository->create($data);
+        return true;
     }
 }
