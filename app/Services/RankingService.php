@@ -214,7 +214,8 @@ class RankingService
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
-        $arr['user']['exp'] = ($userExp != null) ? ($userExp->exp ?? '0') : ($arr['user']['exp'] ?? '0');
+        $userData = $data->where($key, $user->id)->first();
+        $arr['user']['exp'] = ($userExp != null) ? ($userExp->exp ?? '0') : ($userData->exp ?? '0');
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level ?? 0;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
