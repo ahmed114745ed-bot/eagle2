@@ -125,7 +125,9 @@ class WareVipController extends MainController
                 19 => trans('profile visitors hide in'),
                 20 => trans('hide last active'),
                 21 => trans('sound effect'),
-                22 => trans('upload GIF image')
+                22 => trans('upload GIF image'),
+                28 => trans('profile frame')
+
 
             ]
         );
