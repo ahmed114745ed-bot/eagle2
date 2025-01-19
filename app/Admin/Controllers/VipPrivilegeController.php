@@ -137,8 +137,8 @@ class VipPrivilegeController extends MainController
                 19=>trans ('profile visitors hide in'),
                 20=>trans ('last login'),
                 21=>trans ('sound effect'),
-                22=>trans('upload GIF image')
-            ]
+                22=>trans('upload GIF image'),
+                28=> trans('profile frame')            ]
         );
         $form->image('img1', __('admin.img'));
         $form->file('img2', __('admin.img2'));
