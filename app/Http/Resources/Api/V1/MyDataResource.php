@@ -142,7 +142,7 @@ class MyDataResource extends JsonResource
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
-            'color' => common::wareUserVip($this->id, 18, 'color'),
+
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ??'',
