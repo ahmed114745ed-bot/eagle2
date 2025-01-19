@@ -176,7 +176,7 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, false),
+            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
