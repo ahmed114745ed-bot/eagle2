@@ -103,6 +103,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
+            'vip' => Common::ovip_center(@$owner->id),
         ];
     }
 
