@@ -142,7 +142,7 @@ class MyDataResource extends JsonResource
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
-            'color' => common::wareUserVip($this->id, 18, 'color'),
+
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ??'',
@@ -176,7 +176,7 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true),
+            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
