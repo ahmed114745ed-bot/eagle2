@@ -27,9 +27,11 @@ class EnterRoomCollection extends JsonResource
 
         $pks     = $this->getRoomTwoLastPk($this->id);
         $topUser = $this->getTopUser($this->uid);
-
+        
         request()->type = 1;
         $owner = $this->owner;
+        $vip_level_img = Common::ovip_center_rank_img($owner->id);
+
         /** @var User $owner*/
         return [
             "id"                  => $this->id,
@@ -103,7 +105,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
-            'vip' => Common::ovip_center(@$owner->id),
+            'vip_level_img'  => $vip_level_img == 0 ? "" : $vip_level_img,
         ];
     }
 
