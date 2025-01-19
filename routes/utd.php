@@ -317,6 +317,7 @@ Route::middleware([])->group(function () {
         Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
         Route::get('/gift-user-level', [UtdAchievementController::class, 'UserAchievementLevelGiftIndex']);
         Route::get('/target-user-level', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
+        Route::get('users', [UserController::class, 'search']);
 
 
 
