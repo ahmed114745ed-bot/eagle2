@@ -52,7 +52,7 @@ class UserResourceSerche extends JsonResource
         $data = [
             'id'=>@$this->id, // both
             'uuid'=>@$this->uuid, // both
-            'color'    => @$this->color_id ??'',
+            'special_color'    => @$this->color_id ??'',
             'is_gold_id'=>(bool) @$this->is_gold_id, // both
             'name'=>@$this->name?:'', // both
             'is_follow' => $this->is_follow,
