@@ -315,8 +315,8 @@ Route::middleware([])->group(function () {
         Route::post('/enable/{id}', [UtdAchievementController::class, 'isEnable']);
         Route::delete('/delete_user_level/{id}', [UtdAchievementController::class, 'deleteUserAchievementLevel']);
         Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
-        Route::get('/gift-user-level', [UtdAchievementController::class, 'UserAchievementLevelGiftIndex']);
-        Route::get('/target-user-level', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
+        Route::get('/gift-user-level', [UtdAchievementController::class, 'userAchievementLevelGiftIndex']);
+        Route::get('/target-user-level/{achievementId}', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
        
 
 

@@ -203,7 +203,7 @@ class UtdAchievementController extends Controller
         }
     }
 
-    public function UserAchievementLevelGiftIndex(Request $request)
+    public function userAchievementLevelGiftIndex(Request $request)
     {
         $data = $this->achievementService->giftAchievementIndex($request->perPage, $request->Page);
         return Common::apiResponse(true, 'done', UserAchievementLevelGiftResource::collection($data));
