@@ -31,6 +31,8 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RoomTargetController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
@@ -78,6 +80,31 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [GroupChatController::class, 'update']);
         Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
         Route::get('/{id}', [GroupChatController::class, 'show']);
+    });
+
+    Route::prefix('image-colors')->group(function () {
+        Route::get('/', [ImageColorController::class, 'index']);
+        Route::post('/', [ImageColorController::class, 'store']);
+        Route::post('/update/{id}', [ImageColorController::class, 'update']);
+        Route::post('/delete/{id}', [ImageColorController::class, 'destroy']);
+        Route::get('/{id}', [ImageColorController::class, 'show']);
+    });
+
+    Route::prefix('room-target')->group(function () {
+        Route::get('/', [RoomTargetController::class, 'index']);
+        Route::post('/', [RoomTargetController::class, 'store']);
+        Route::post('/update/{id}', [RoomTargetController::class, 'update']);
+        Route::post('/delete/{id}', [RoomTargetController::class, 'destroy']);
+        Route::get('/{id}', [RoomTargetController::class, 'show']);
+    });
+
+
+    Route::prefix('backgrounds')->group(function () {
+        Route::get('/', [BackgroundController::class, 'index']);
+        Route::post('/', [BackgroundController::class, 'store']);
+        Route::post('/update/{id}', [BackgroundController::class, 'update']);
+        Route::post('/delete/{id}', [BackgroundController::class, 'destroy']);
+        Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
     Route::prefix('parent-users')->group(function () {
