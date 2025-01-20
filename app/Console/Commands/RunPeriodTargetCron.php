@@ -29,17 +29,17 @@ class RunPeriodTargetCron extends Command
      */
     public function handle()
     {
-         $days = DB::table('configs')->where( 'name','period_target')->value('value') ?? 20; 
-         if ($days) {
-          
+         $days = DB::table('configs')->where( 'name','period_target')->value('value') ?? 20;
+//         if ($days) {
+
             $lastRun = DB::table('period_target')->orderBy('id', 'desc')->first();
 
             DB::table('period_target')->insert([
-                'start_at' => $lastRun ? $lastRun->end_at : now(), 
-                'end_at' => now()->addDays($days), 
+                'start_at' => Carbon::now()->startOfMonth()->addDays(20),
+                'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19),
             ]);
- 
+
              $this->info("Cron job executed. Next execution will be in {$days} days.");
-         }
+//         }
     }
 }
