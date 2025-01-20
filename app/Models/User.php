@@ -680,8 +680,8 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
     public function myroom()
-    {   
-        return $this->hasOne(Room::class, 'uid' ,'id');
+    {
+        return $this->hasOne(Room::class, 'uid', 'id');
     }
 
     public function color_image()
@@ -923,17 +923,12 @@ class User extends Authenticatable
 
 
 
-    public function getTotalSallary($month = null, $year = null)
+    public function getTotalSallary($period)
     {
-        if ($month == null) {
-            $month = now()->month;
-        }
-        if ($year == null) {
-            $year = now()->year;
-        }
         if ($this->agency_id) {
-            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            $userSallary = UserSallary::query()->where(function ($query) use ($period) {
+                //$query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                $query->where('period_id', $period);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -947,13 +942,11 @@ class User extends Authenticatable
         }
     }
 
-    public function getTotalDiamond($month = null, $year = null)
+    public function getTotalDiamond($period)
     {
         if ($this->agency_id) {
-            $userSallary = UserTarget::query()->when(isset($month), function ($query) use ($month) {
-                $query->where('add_month', '<=', $month);
-            })->when(isset($year), function ($query) use ($year) {
-                $query->where('add_year', '<=', $year);
+            $userSallary = UserTarget::query()->when(isset($period), function ($query) use ($period) {
+                $query->where('period_id', $period);
             })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
@@ -976,6 +969,7 @@ class User extends Authenticatable
             $year = now()->year;
         }
         if ($this->agency_id) {
+
             $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
                 $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
