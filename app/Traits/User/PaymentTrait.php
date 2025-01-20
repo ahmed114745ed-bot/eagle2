@@ -23,7 +23,6 @@ trait PaymentTrait
         if ($userId === null) return false;
         $item  = CoinLog::where("trx", $orderId)->first();
         $coins = Coin::find($productId);
-
         $data = false;
 
         if (!$item && $coins) {
