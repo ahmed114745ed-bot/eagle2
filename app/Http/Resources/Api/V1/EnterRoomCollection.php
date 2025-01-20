@@ -68,6 +68,7 @@ class EnterRoomCollection extends JsonResource
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => $vip_level_img == 0 ? "" : $vip_level_img,
+            'vip' => Common::ovip_center(@$owner->id),
             'owner_country'        =>        $owner && $owner->country
                 ? [
                     'id' => $owner->country->id,
