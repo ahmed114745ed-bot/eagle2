@@ -74,6 +74,7 @@ class UserResourceSerche extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'country'          =>  @$this->country ?? (object)[],
+            'image_color'          => @$this->color_image,
         ];
         return $data;
     }
