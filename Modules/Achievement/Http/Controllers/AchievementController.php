@@ -25,20 +25,18 @@ use Modules\Achievement\Transformers\AchievementOneLevelsResource;
 class AchievementController extends Controller
 {
 
-    public function __construct(private AchievementService $achievementService) {
-
-    }
+   // public function __construct(private AchievementService $achievementService) { }
 
     /**
      * Display a listing of the resource.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
-    {
-        $user = Auth::user();
-        $data = $this->achievementService->show($user);
-        return Common::apiResponse(1, 'successfully', $data);
-    }
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $data = $this->achievementService->show($user);
+    //     return Common::apiResponse(1, 'successfully', $data);
+    // }
 
     public function achivement_select(Request $request)
     {
