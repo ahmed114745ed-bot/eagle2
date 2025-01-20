@@ -21,6 +21,7 @@ use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
 use App\Admin\Controllers\AppFeatureController;

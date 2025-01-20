@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
@@ -20,6 +21,9 @@ use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
+use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\ParentUsersController;
@@ -31,10 +35,7 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
-use App\Http\Controllers\utd\BackgroundController;
-use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
-use App\Http\Controllers\utd\RoomTargetController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -317,9 +318,15 @@ Route::middleware([])->group(function () {
         Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
         Route::get('/gift-user-level', [UtdAchievementController::class, 'userAchievementLevelGiftIndex']);
         Route::get('/target-user-level/{achievementId}', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
-       
+    
+    });
 
-
+    Route::prefix('interests')->group(function () {
+        Route::get('/', [InterestController::class, 'all']);
+        Route::get('/show/{id}', [InterestController::class, 'show']);
+        Route::post('/create', [InterestController::class, 'create']);
+        Route::post('/update/{id}', [InterestController::class, 'update']);
+        Route::post('/delete/{id}', [InterestController::class, 'destroy']);
 
     });
 });
