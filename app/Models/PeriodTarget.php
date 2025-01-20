@@ -9,5 +9,5 @@ class PeriodTarget extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
-    protected $table =['period_target'];
+    protected $table ='period_target';
 }
