@@ -79,14 +79,11 @@ class FixedTargetService
                 $hours = $times->hnum;
                 $days  = $user->monthly_days;
             }
+            $period = UserCommon::getPeriodTarget();
 
-            $countMoments  = Moment::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
-            ])->count();
+            $countMoments  = Moment::query()->where('user_id', $user->id)->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at'])->count();
 
-            $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
-            ])->count();
+            $countReels         = Real::query()->where('user_id', $user->id)->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at'])->count();
 
 
             $userTarget = UserTarget::where('user_id', $user->id)->first();
