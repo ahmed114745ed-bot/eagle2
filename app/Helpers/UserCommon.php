@@ -83,12 +83,9 @@ class UserCommon{
 
     public static function UserStatistic($userId,$type, bool $reals = false)
     {
+        $type = 0;
         $user=User::withCount(["reals"=>function($reals) use ($type){
-            if ($type == 0) {
-                $reals->whereDate("reals.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $reals->whereMonth("reals.created_at",date("m"))->whereYear("reals.created_at",date("Y"));
-            }
+            $reals->whereDate("reals.created_at",date("Y-m-d"))->whereDate("reals.created_at",date("Y-m-d"));
         },'real_comments'=>function($real_comments) use ($type){
             if ($type == 0) {
                 $real_comments->whereDate("real_user_comments.created_at",date("Y-m-d"));

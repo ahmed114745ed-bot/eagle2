@@ -125,7 +125,7 @@ class FixedTargetService
     public function getUserLiveTime(User $user): null|Model
     {
         $period = UserCommon::getPeriodTarget();
-        return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        return LiveTime::query()->where('uid', $user->id)->whereDate('created_at', '>=', $period['start_at'])->whereDate('created_at', '<=', $period['end_at'])->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
     }
 
     private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null): void
