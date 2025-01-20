@@ -67,17 +67,16 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::withoutAppends()->searchByUuid($toId)->first();
 
-        if (!$to) Common::apiResponse(0, __('user not found'), 404);
-        $agenciesIdes = DB::table('agency_countries')->pluck('agency_id');
-
+        $agenciesIdes = DB::table('charge_agencies')->pluck('agency_id'); 
+        
         $owners = Agency::whereIn('id', $agenciesIdes)->with('owner')->get()->pluck('owner.id');
-
+        
         if (!$owners->contains($to->id)) {
             return Common::apiResponse(0, __('api_responses.returnToAdmin'), 404);
         }
 
         $period = UserCommon::getPeriodTarget();
-        $date = Carbon::parse($period['end_at']);
+        $date = Carbon::parse($period['end_at']); 
         $today = Carbon::now();
         $previousDate = $date->subDays(3);
         if (!$today->between($previousDate, Carbon::now())) {
