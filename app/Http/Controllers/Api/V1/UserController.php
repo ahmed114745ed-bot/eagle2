@@ -827,4 +827,10 @@ class UserController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function allCodes(Request $request)
+    {
+        $data = $this->userService->allCods($request->id, $request->perPage, $request->page);
+        return Common::apiResponse(true, 'done', $data);
+    }
 }

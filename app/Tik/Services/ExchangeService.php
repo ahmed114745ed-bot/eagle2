@@ -57,4 +57,38 @@ class ExchangeService
     {
         return $this->exchangeLogRepository->getExchanges($userId, $type);
     }
+
+    public function all($id, $perPage, $page)
+    {
+        return $this->exchangeRepository->all($id, $perPage, $page);
+    }
+
+    public function createDashboard($request)
+    {
+
+        $this->exchangeRepository->create($request->all());
+        return true;
+    }
+
+    public function update($id, $request)
+    {
+
+        $this->exchangeRepository->update($request->all(), $id);
+        return true;
+    }
+
+    public function delete($id)
+    {
+
+        $data = $this->exchangeRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
+
+    public function show($id)
+    {
+        return $this->exchangeRepository->findOrFail($id);
+    }
+
+    
 }

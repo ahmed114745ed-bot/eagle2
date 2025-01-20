@@ -2,7 +2,6 @@
 
 
 use App\Helpers\Common;
-use App\Http\Controllers\utd\MomentsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -15,6 +14,8 @@ use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
@@ -335,13 +336,20 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
     });
 
+    Route::prefix('exchanges')->group(function () {
+        Route::get('/', [ExchangeController::class, 'all']);
+        Route::get('/show/{id}', [ExchangeController::class, 'show']);
+        Route::post('/create', [ExchangeController::class, 'create']);
+        Route::post('/update/{id}', [ExchangeController::class, 'update']);
+        Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
+    });
+    Route::get('codes', [UserController::class, 'allCodes']);
+
     Route::prefix('moment')->group(function () {
         Route::get('/', [MomentsController::class, 'all']);
         Route::get('/show/{id}', [MomentsController::class, 'show']);
         Route::post('/search/{id}', [MomentsController::class, 'search']);
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config/{id}', [MomentsController::class, 'config']);
-
-
     });
 });
