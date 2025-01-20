@@ -45,6 +45,7 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Facades\Agency as FacadesAgency;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Models\CoinTarget;
+use App\Models\PeriodTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
 
@@ -468,5 +469,13 @@ class UserCommon{
             
         }
            
+    }
+
+    public static function getPeriodTarget()
+    {
+        $periodTarget =  PeriodTarget::latest()->first();
+        $data['start_at'] = $periodTarget?->start_at ?? "";
+        $data['end_at'] = $periodTarget?->end_at ?? "";
+        return $data;
     }
 }

@@ -124,6 +124,7 @@ class FixedTargetService
      */
     public function getUserLiveTime(User $user): null|Model
     {
+        $period = UserCommon::getPeriodTarget();
         return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
     }
 

@@ -29,8 +29,7 @@ class RunPeriodTargetCron extends Command
      */
     public function handle()
     {
-         $days = DB::table('configs')->where( 'name','period_target')->value('value'); 
-        //  dd($lastRun);
+         $days = DB::table('configs')->where( 'name','period_target')->value('value') ?? 20; 
          if ($days) {
           
             $lastRun = DB::table('period_target')->orderBy('id', 'desc')->first();
