@@ -145,5 +145,6 @@ return [
     'expireAccount' => 'your account expired',
     'reserved' => 'The phone is reserved',
     'notSend' => 'ypu can not send to yourself',
-    'notFound' => 'user not found'
+    'notFound' => 'user not found',
+    'returnToAdmin' => 'Stop user salary transactions return to admin',
 ];
