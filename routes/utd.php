@@ -326,7 +326,7 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [InterestController::class, 'show']);
         Route::post('/create', [InterestController::class, 'create']);
         Route::post('/update/{id}', [InterestController::class, 'update']);
-        Route::post('/delete/{id}', [InterestController::class, 'destroy']);
+        Route::delete('/delete/{id}', [InterestController::class, 'destroy']);
 
     });
 });
