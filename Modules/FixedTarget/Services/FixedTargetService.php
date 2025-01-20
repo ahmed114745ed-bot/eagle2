@@ -9,6 +9,7 @@ use App\Models\Target;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
+use App\Models\PeriodTarget;
 use App\Models\UserSallary;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
@@ -164,20 +165,21 @@ class FixedTargetService
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
         ];
         if (0 < $t) $values['sallary'] = $t;
-
-        $userSalary = UserSallary::query()->where([
+        $period = UserCommon::getPeriodTarget();
+        $userSalary = UserSallary::query()->whereHas('period_target',function($q) use ($period){
+            $q->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at']);
+        })->where([
                                                       'user_id' => $user->id,
-                                                      'month' => Carbon::now()->month,
-                                                      'year' => Carbon::now()->year,
                                                       'user_agency_id' => $user->agency_id,
                                                   ])->lock()->first();
         if ($userSalary){
             $userSalary->update($values);
         }else{
+            $period = PeriodTarget::latest()->first();
             $userSalary = UserSallary::query()->create([
                                                            'user_id' => $user->id,
-                                                           'month' => Carbon::now()->month,
-                                                           'year' => Carbon::now()->year,
+                                                           'month' => $period->id,
+                                                           'year' => 0,
                                                            'user_agency_id' => $user->agency_id,
                                                            ...$values
                                                        ])->lock();
