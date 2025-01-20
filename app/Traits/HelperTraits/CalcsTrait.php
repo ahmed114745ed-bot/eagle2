@@ -708,7 +708,7 @@ trait CalcsTrait
         $vip = OVip::query()->find($uvip->vip_id);
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
-
+        $hasColor = Common::hasInPack($user->id, 18, true);
         return [
             'id'        => 1,
             'level'     => $vip->level ?? '',
@@ -720,7 +720,7 @@ trait CalcsTrait
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon->id,
-            'colored_name' => common::wareUserVip($user->id, 18, 'color'),
+            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
         ];
     }
 
@@ -803,7 +803,7 @@ trait CalcsTrait
 
         if (!$vip) return new \stdClass();
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
-        return @$ware?->{$item} ?? '';
+        return @$ware?->{$item};
     }
 
 
