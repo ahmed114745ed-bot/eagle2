@@ -67,9 +67,10 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::withoutAppends()->searchByUuid($toId)->first();
 
-        if (!$to) return Common::apiResponse(0, __('user not found'), 402);
 
-        $agenciesIdes = DB::table('charge_agencies')->pluck('agency_id');
+        if (!$to) Common::apiResponse(0, __('user not found'), 404);
+        $agenciesIdes = DB::table('agency_countries')->pluck('agency_id');
+       
 
         $owners = Agency::whereIn('id', $agenciesIdes)->with('owner')->get()->pluck('owner.id');
 
