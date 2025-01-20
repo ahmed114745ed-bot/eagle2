@@ -44,12 +44,12 @@ class ResetUserMonthlyDiamond extends Command
     public function handle()
     {
 
-        if (now()->day == 1){
+        /*if (now()->day == 1){
             $carbon = now()->subDay();
             $this->updateUserSalary(month: $carbon->month, year: $carbon->year);
         }else{
             $this->updateUserSalary();
-        }
+        }*/
 
 
 

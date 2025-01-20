@@ -43,6 +43,6 @@ public bool $allowSaving = true;
     }
 
     public function period_target(){
-        return $this->belongsTo(PeriodTarget::class,'month','id');
+        return $this->belongsTo(PeriodTarget::class,'period_id','id');
     }
 }
