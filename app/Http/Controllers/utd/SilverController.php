@@ -4,37 +4,36 @@ namespace App\Http\Controllers\utd;
 
 use Exception;
 use App\Helpers\Common;
-use App\Models\ImageColor;
 use Illuminate\Http\Request;
+use App\Tik\Services\SilverService;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\InterestService;
 use Illuminate\Support\Facades\Validator;
 
-class InterestController extends Controller
+class SilverController extends Controller
 {
 
-    public function __construct(private InterestService $interestService) {}
+    public function __construct(private SilverService $silverService) {}
 
     public function all(Request $request)
     {
-        $data = $this->interestService->all($request->id, $request->perPage, $request->page);
+        $data = $this->silverService->all($request->id, $request->perPage, $request->page);
         return Common::apiResponse(true, 'done', $data);
     }
 
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
-
-            'name' => 'required|string',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+            'coin' => 'required|integer',
+            'silver' => 'required|integer',
+            'sort' => 'required|integer',
         ]);
+
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         try {
-            $this->interestService->create($request);
+            $this->silverService->create($request);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -45,17 +44,17 @@ class InterestController extends Controller
     public function update($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-
-            'name' => 'required|string',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+            'coin' => 'required|integer',
+            'silver' => 'required|integer',
+            'sort' => 'required|integer',
         ]);
+
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         try {
-            $this->interestService->update($id, $request);
+            $this->silverService->update($id, $request);
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -65,14 +64,14 @@ class InterestController extends Controller
 
     public function show($id)
     {
-        $data = $this->interestService->show($id);
+        $data = $this->silverService->show($id);
         return Common::apiResponse(true, 'done', $data);
     }
 
     public function destroy($id)
     {
         try {
-            $this->interestService->delete($id);
+            $this->silverService->delete($id);
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 

@@ -12,9 +12,9 @@ class InterestService
 {
     public function __construct(private readonly InterestRepository $interestRepository) {}
 
-    public function all($id)
+    public function all($id, $perPage, $page)
     {
-        return $this->interestRepository->all($id);
+        return $this->interestRepository->all($id, $perPage, $page);
     }
 
     public function create($request)

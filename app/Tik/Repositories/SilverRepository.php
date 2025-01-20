@@ -2,14 +2,14 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Interest;
+use App\Models\Silver;
 
-class InterestRepository extends AbstractRepository
+class SilverRepository extends AbstractRepository
 {
 
     public function __construct()
     {
-        parent::__construct(new Interest());
+        parent::__construct(new Silver());
     }
 
     public function all($id, $perPage, $page)

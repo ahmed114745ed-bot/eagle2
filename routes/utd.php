@@ -7,6 +7,7 @@ use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
@@ -289,7 +290,6 @@ Route::middleware([])->group(function () {
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
         Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
-
     });
     Route::prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);
@@ -298,8 +298,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
         Route::post('create', [RoomVipsController::class, 'store']);
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
-
-
     });
     Route::get('users-search', [UserController::class, 'search']);
     Route::prefix('achievements')->group(function () {
@@ -318,7 +316,6 @@ Route::middleware([])->group(function () {
         Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
         Route::get('/gift-user-level', [UtdAchievementController::class, 'userAchievementLevelGiftIndex']);
         Route::get('/target-user-level/{achievementId}', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
-    
     });
 
     Route::prefix('interests')->group(function () {
@@ -327,6 +324,13 @@ Route::middleware([])->group(function () {
         Route::post('/create', [InterestController::class, 'create']);
         Route::post('/update/{id}', [InterestController::class, 'update']);
         Route::delete('/delete/{id}', [InterestController::class, 'destroy']);
+    });
 
+    Route::prefix('silvers')->group(function () {
+        Route::get('/', [SilverController::class, 'all']);
+        Route::get('/show/{id}', [SilverController::class, 'show']);
+        Route::post('/create', [SilverController::class, 'create']);
+        Route::post('/update/{id}', [SilverController::class, 'update']);
+        Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
     });
 });
