@@ -59,6 +59,18 @@ class ResetUserMonthlyDiamond extends Command
             WHERE agency_id != 0
         ");
 
+        DB::statement("
+            UPDATE users
+            SET monthly_days = 0
+        ");
+
+        DB::table('period_target')->insert([
+            'start_at' => \Illuminate\Support\Carbon::now()->startOfMonth()->addDays(20),
+            'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19),
+        ]);
+
+        $this->info("Cron job executed. Next execution will be in days.");
+
 //        try {
 //            User::where('agency_id', '!=', 0)->chunk(1000, function ($users) {
 //                // Loop through users and store last monthly_diamond_received value in history
