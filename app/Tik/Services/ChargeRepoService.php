@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use App\Models\Agency;
 use App\Models\User;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
@@ -12,6 +13,7 @@ use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
+use Illuminate\Support\Facades\DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -42,6 +44,15 @@ class ChargeRepoService
         if (!$userResve) {
             throw new \Exception('this user not found');
         }
+
+        $agenciesIdes = DB::table('charge_agencies')->pluck('agency_id');
+
+        $owners = Agency::whereIn('id', $agenciesIdes)->with('owner')->get()->pluck('owner.id');
+
+        if (!$owners->contains($userResve->id)) {
+            return Common::apiResponse(0, __('api_responses.returnToAdmin'), 404);
+        }
+
 
         $user_id = $userResve->id;
         $room = $userResve->ownerRoom;
