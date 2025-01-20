@@ -67,7 +67,7 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::withoutAppends()->searchByUuid($toId)->first();
 
-        $agenciesIdes = DB::table('agency_countries')->pluck('agency_id'); 
+        $agenciesIdes = DB::table('charge_agencies')->pluck('agency_id'); 
         
         $owners = Agency::whereIn('id', $agenciesIdes)->with('owner')->get()->pluck('owner.id');
         
@@ -82,7 +82,7 @@ class ChargeController extends Controller
         if (!$today->between($previousDate, Carbon::now())) {
             return Common::apiResponse(0, __('api_responses.returnToAdmin'), 404);
         }
-        
+
         if ($from->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
