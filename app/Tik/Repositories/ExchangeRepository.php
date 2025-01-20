@@ -26,4 +26,11 @@ class ExchangeRepository extends AbstractRepository
     {
         return $this->model->find($id);
     }
+
+    public function all($id, $perPage, $page)
+    {
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);
+    }
 }

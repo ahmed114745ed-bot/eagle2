@@ -37,6 +37,7 @@ class UserSearchResource extends JsonResource
         $data = [
             'id'=>@$this->id,
             'uuid'=>@$this->uuid,
+            'special_color'    => @$this->color_id ??'',
             'name'=>@$this->name?:'',
             'visit_time' => '',
             'profile'=> [

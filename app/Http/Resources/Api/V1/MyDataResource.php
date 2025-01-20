@@ -41,6 +41,7 @@ class MyDataResource extends JsonResource
         //     ->where('is_used', 1);
 
         $time_log = $this->timeLog()->latest()->first();
+         
 
         $agency_joined = $this->agency;
         if ($agency_joined) {
@@ -141,8 +142,10 @@ class MyDataResource extends JsonResource
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
+
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
+            'special_color'    => @$this->color_id ??'',
             'bio' => @$this->bio ?: '',
             'number_of_fans' => $this->followerss()->count(),
             'number_of_followings' => $this->following()->count(),
@@ -158,7 +161,8 @@ class MyDataResource extends JsonResource
             'Last_seen' => @$time_log->time ?? 0,
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
-            'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
+          ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
+            'has_color_name'       => Common::hasInPack($this->id, 18, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
             'country' => $this->country ??(object) [] ,
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
@@ -169,10 +173,11 @@ class MyDataResource extends JsonResource
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
             "family_price" =>  Common::getConfig('family_price') ?? 0,
+            'image_color'          => @$this->color_image,
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>Common::hasProfileFramePack($this->id, 28, true),
+            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",

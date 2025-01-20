@@ -800,16 +800,11 @@ class UserController extends Controller
             'transfer_salary'         => 'required|boolean',
             'can_play'         => 'required|integer|in:2,3',
             'country_id'         => 'nullable|integer|exists:countries,id',
-            'di'    => 'nullable|integer',
             'user_diamond' => 'nullable|integer',
             'total_sender_level' => 'nullable|integer',
             'total_received_level' => 'nullable|integer',
-            'salary' => 'nullable|integer',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
-            'facebook_id' => 'nullable',
-            'google_id' => 'nullable',
-            'huawei_id' => 'nullable',
             'status' => 'required|boolean',
             'type_user' => 'required|integer',
             'manger_type_id' => 'nullable',
@@ -831,5 +826,11 @@ class UserController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function allCodes(Request $request)
+    {
+        $data = $this->userService->allCods($request->id, $request->perPage, $request->page);
+        return Common::apiResponse(true, 'done', $data);
     }
 }

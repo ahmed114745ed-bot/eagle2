@@ -52,6 +52,7 @@ class UserResourceSerche extends JsonResource
         $data = [
             'id'=>@$this->id, // both
             'uuid'=>@$this->uuid, // both
+            'special_color'    => @$this->color_id ??'',
             'is_gold_id'=>(bool) @$this->is_gold_id, // both
             'name'=>@$this->name?:'', // both
             'is_follow' => $this->is_follow,
@@ -73,6 +74,7 @@ class UserResourceSerche extends JsonResource
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'country'          =>  @$this->country ?? (object)[],
+            'image_color'          => @$this->color_image,
         ];
         return $data;
     }

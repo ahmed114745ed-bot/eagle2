@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\Achievement\Http\Services\AchievementService;
 use Modules\Achievement\Transformers\GiftAchievementUser;
+use Modules\Achievement\Transformers\UserAchievementLevelGiftResource;
 
 
 class UtdAchievementController extends Controller
@@ -23,15 +24,15 @@ class UtdAchievementController extends Controller
         return Common::apiResponse(true, 'done', $data);
     }
 
-    public function allAchievementsLevel(Request $request)
+    public function allAchievementsLevel($achievementId, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'achievement_id'         => 'required|integer|exists:achievements,id',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        $data = $this->achievementService->allAchievementLevel($request->achievement_id, $request->perPage, $request->Page);
+        // $validator = Validator::make($request->all(), [
+        //     'achievement_id'         => 'required|integer|exists:achievements,id',
+        // ]);
+        // if ($validator->fails()) {
+        //     return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        // }
+        $data = $this->achievementService->allAchievementLevel($achievementId, $request->perPage, $request->Page);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -118,15 +119,10 @@ class UtdAchievementController extends Controller
         }
     }
 
-    public function allUsersGiftAchievements(Request $request)
+    public function allUsersGiftAchievements($achievementId, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'achievement_id'         => 'required|integer|exists:achievements,id',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        $data = $this->achievementService->allAchievementGift($request->achievement_id, $request->perPage, $request->Page);
+
+        $data = $this->achievementService->allAchievementGift($achievementId, $request->perPage, $request->Page);
         return Common::apiResponse(true, 'done', GiftAchievementUser::collection($data));
     }
 
@@ -153,13 +149,69 @@ class UtdAchievementController extends Controller
 
     public function giftAchievement(Request $request)
     {
-        $data = $this->achievementService->giftAchievement();
+        try {
+            $data = $this->achievementService->giftAchievement();
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function allUserAchievementLevel(Request $request)
+    {
+        $data = $this->achievementService->userAchievementLevel($request->perPage, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'done', $data);
     }
 
-    public function giftAchievement(Request $request)
+    public function isEnable($id, Request $request)
     {
-        $data = $this->achievementService->giftAchievement();
+        $this->achievementService->isEnable($id, $request->is_enable);
+        return Common::apiResponse(true, 'changed');
+    }
+
+    public function deleteUserAchievementLevel($id)
+    {
+        try {
+            $this->achievementService->deleteUserAchievementLevel($id);
+            return Common::apiResponse(true, 'deleted successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function createUserAchievementLevel(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'achievement_id'         => 'required|integer|exists:achievements,id',
+            'achievement_level_id'         => 'nullable|integer|exists:achievements,id',
+            'user_id'         => 'required|integer|exists:users,id',
+            'gift_achievement_id'         => 'nullable|integer',
+            'custom_image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,mp4,svga',
+
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->achievementService->createUserAchievementLevel($request);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userAchievementLevelGiftIndex(Request $request)
+    {
+        $data = $this->achievementService->giftAchievementIndex($request->perPage, $request->Page);
+        return Common::apiResponse(true, 'done', UserAchievementLevelGiftResource::collection($data));
+    }
+
+    public function getAchievementLevelsTarget($achievementId)
+    {
+        $data = $this->achievementService->getAchievementLevelsTarget($achievementId);
         return Common::apiResponse(true, 'done', $data);
     }
 }

@@ -7,12 +7,16 @@ use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\utd\ExchangeController;
+use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
@@ -20,6 +24,9 @@ use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
+use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\ParentUsersController;
@@ -32,7 +39,6 @@ use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
-use App\Http\Controllers\utd\RoomTargetController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -78,6 +84,31 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [GroupChatController::class, 'update']);
         Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
         Route::get('/{id}', [GroupChatController::class, 'show']);
+    });
+
+    Route::prefix('image-colors')->group(function () {
+        Route::get('/', [ImageColorController::class, 'index']);
+        Route::post('/', [ImageColorController::class, 'store']);
+        Route::post('/update/{id}', [ImageColorController::class, 'update']);
+        Route::post('/delete/{id}', [ImageColorController::class, 'destroy']);
+        Route::get('/{id}', [ImageColorController::class, 'show']);
+    });
+
+    Route::prefix('room-target')->group(function () {
+        Route::get('/', [RoomTargetController::class, 'index']);
+        Route::post('/', [RoomTargetController::class, 'store']);
+        Route::post('/update/{id}', [RoomTargetController::class, 'update']);
+        Route::post('/delete/{id}', [RoomTargetController::class, 'destroy']);
+        Route::get('/{id}', [RoomTargetController::class, 'show']);
+    });
+
+
+    Route::prefix('backgrounds')->group(function () {
+        Route::get('/', [BackgroundController::class, 'index']);
+        Route::post('/', [BackgroundController::class, 'store']);
+        Route::post('/update/{id}', [BackgroundController::class, 'update']);
+        Route::post('/delete/{id}', [BackgroundController::class, 'destroy']);
+        Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
     Route::prefix('parent-users')->group(function () {
@@ -261,7 +292,6 @@ Route::middleware([])->group(function () {
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
         Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
-
     });
     Route::prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);
@@ -270,19 +300,56 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
         Route::post('create', [RoomVipsController::class, 'store']);
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
-
-
     });
-
+    Route::get('users-search', [UserController::class, 'search']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
-        Route::get('/level', [UtdAchievementController::class, 'allAchievementsLevel']);
+        Route::get('/{achievementId}/level', [UtdAchievementController::class, 'allAchievementsLevel']);
         Route::post('/create-level', [UtdAchievementController::class, 'createAchievementLevel']);
         Route::post('/update-level/{id}', [UtdAchievementController::class, 'updateAchievementLevel']);
-        Route::post('/show/{id}', [UtdAchievementController::class, 'showAchievementLevel']);
+        Route::get('/show/{id}', [UtdAchievementController::class, 'showAchievementLevel']);
         Route::get('/target-level', [UtdAchievementController::class, 'achievementTargetType']);
-        Route::get('/all-users-gift-achievement', [UtdAchievementController::class, 'allUsersGiftAchievements']);
+        Route::get('/{achievementId}/all-users-gift-achievement', [UtdAchievementController::class, 'allUsersGiftAchievements']);
         Route::post('/create-user-gift', [UtdAchievementController::class, 'createUserAchievementGift']);
         Route::get('/gift-achievement', [UtdAchievementController::class, 'giftAchievement']);
+        Route::get('/user-achievement-level', [UtdAchievementController::class, 'allUserAchievementLevel']);
+        Route::post('/enable/{id}', [UtdAchievementController::class, 'isEnable']);
+        Route::post('/delete_user_level/{id}', [UtdAchievementController::class, 'deleteUserAchievementLevel']);
+        Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
+        Route::get('/gift-user-level', [UtdAchievementController::class, 'userAchievementLevelGiftIndex']);
+        Route::get('/target-user-level/{achievementId}', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
+    });
+
+    Route::prefix('interests')->group(function () {
+        Route::get('/', [InterestController::class, 'all']);
+        Route::get('/show/{id}', [InterestController::class, 'show']);
+        Route::post('/create', [InterestController::class, 'create']);
+        Route::post('/update/{id}', [InterestController::class, 'update']);
+        Route::delete('/delete/{id}', [InterestController::class, 'destroy']);
+    });
+
+    Route::prefix('silvers')->group(function () {
+        Route::get('/', [SilverController::class, 'all']);
+        Route::get('/show/{id}', [SilverController::class, 'show']);
+        Route::post('/create', [SilverController::class, 'create']);
+        Route::post('/update/{id}', [SilverController::class, 'update']);
+        Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
+    });
+
+    Route::prefix('exchanges')->group(function () {
+        Route::get('/', [ExchangeController::class, 'all']);
+        Route::get('/show/{id}', [ExchangeController::class, 'show']);
+        Route::post('/create', [ExchangeController::class, 'create']);
+        Route::post('/update/{id}', [ExchangeController::class, 'update']);
+        Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
+    });
+    Route::get('codes', [UserController::class, 'allCodes']);
+
+    Route::prefix('moment')->group(function () {
+        Route::get('/', [MomentsController::class, 'all']);
+        Route::get('/show/{id}', [MomentsController::class, 'show']);
+        Route::post('/search/{id}', [MomentsController::class, 'search']);
+        Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
+        Route::post('/config/{id}', [MomentsController::class, 'config']);
     });
 });

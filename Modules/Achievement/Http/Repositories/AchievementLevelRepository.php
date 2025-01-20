@@ -17,4 +17,9 @@ class AchievementLevelRepository extends AbstractRepository
     {
         return $this->model->where('achievement_id', $achievementId)->paginate($perPage, ['*'], 'page', $Page);
     }
+
+    public function getTarget($achievementId)
+    {
+        return $this->model->where('achievement_id', $achievementId)->pluck('target', 'id');
+    }
 }

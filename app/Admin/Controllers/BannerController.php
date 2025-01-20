@@ -119,24 +119,24 @@ class BannerController extends MainController
         $form->image('image_url', __('Image url'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required()->dir('banners');
-        $form->switch('publish_at', __('Publish Now'));
+        $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
         return $form;
     }
 
-    public function store()
-    {
-         $data = request()->all();
-        (new BannerServices())->store($data);
-    }
+//     public function store()
+//     {
+//          $data = request()->all();
+//         (new BannerServices())->store($data);
+//     }
 
-    public function update($id)
-    {
-        $data = request()->all();
-//        dd($data);
-        (new BannerServices())->update($id, $data);
-    }
+//     public function update($id)
+//     {
+//         $data = request()->all();
+// //        dd($data);
+//         (new BannerServices())->update($id, $data);
+//     }
 
     public function create(Content $content)
     {
