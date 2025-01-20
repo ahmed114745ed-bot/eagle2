@@ -2,6 +2,7 @@
 
 
 use App\Helpers\Common;
+use App\Http\Controllers\utd\MomentsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -327,6 +328,16 @@ Route::middleware([])->group(function () {
         Route::post('/create', [InterestController::class, 'create']);
         Route::post('/update/{id}', [InterestController::class, 'update']);
         Route::delete('/delete/{id}', [InterestController::class, 'destroy']);
+
+    });
+
+    Route::prefix('moment')->group(function () {
+        Route::get('/', [MomentsController::class, 'all']);
+        Route::get('/show/{id}', [MomentsController::class, 'show']);
+        Route::post('/search/{id}', [MomentsController::class, 'search']);
+        Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
+        Route::post('/config/{id}', [MomentsController::class, 'config']);
+
 
     });
 });
