@@ -74,17 +74,20 @@ class UserSallaryObserver
      */
     public function updateOrCreateAgencySallary(UserSallary $userSalary, bool $isCreate = false): void
     {
+
         $agency = Agency::find($userSalary->user_agency_id);
         if ($userSalary->user_agency_id != 0 /*&& ($userSalary->isDirty('agency_sallary') || $isCreate)*/ && $agency && $agency->status == 1) {
             $agency_id    = $userSalary->user_agency_id;
-            $month        = now()->month;
-            $year         = now()->year;
+            $month        = 0;
+            $year         = 0;
+            $period_id         = $userSalary->period_id;
             $agencySalary =
-                AgencySallary::query()->where('month', $month)->where('year', $year)->where('agency_id', $agency_id)->first();
-
+                AgencySallary::query()->where('month', $month)->where('year', $year)->where('period_id', $period_id)->where('agency_id', $agency_id)->first();
+               
+         
 //            $diff = (double)$userSalary->agency_sallary - ((double)$userSalary->getOriginal('agency_sallary') ?? 0);
 
-            $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->sum('agency_sallary');
+            $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->where('period_id', $period_id)->sum('agency_sallary');
             /*if( $diff < 0 ){
                 $diff = $userSalary->agency_sallary;
             }*/
