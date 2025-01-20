@@ -41,7 +41,7 @@ class MyDataResource extends JsonResource
         //     ->where('is_used', 1);
 
         $time_log = $this->timeLog()->latest()->first();
-        $color_image = @$this->color_image;
+         
 
         $agency_joined = $this->agency;
         if ($agency_joined) {
@@ -173,7 +173,7 @@ class MyDataResource extends JsonResource
             'achievement_images' => $achievement_images,
             "multi_images" => $this->images?->select("img"),
             "family_price" =>  Common::getConfig('family_price') ?? 0,
-            'image_color'          => $color_image,
+            'image_color'          => @$this->color_image,
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),

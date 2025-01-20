@@ -99,7 +99,7 @@ class UserResource extends JsonResource
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
-            'special_color'    => @$this->color_id ??'', // both
+            'special_color'    => @$this->color_id ?? '', // both
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'chat_id' => @$this->chat_id ?: "", // both                     ///////
@@ -160,8 +160,9 @@ class UserResource extends JsonResource
             "chat_setting" => new ChatSettingResource($chat_setting),
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
-            'level'=> Common::level_center($this->id),
-            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2')
+            'level' => Common::level_center($this->id),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'image_color'          => @$this->color_image,
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
