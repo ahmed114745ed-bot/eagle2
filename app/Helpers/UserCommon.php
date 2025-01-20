@@ -83,39 +83,36 @@ class UserCommon{
 
     public static function UserStatistic($userId,$type, bool $reals = false)
     {
-        $type = 0;
-        $user=User::withCount(["reals"=>function($reals) use ($type){
-            $reals->whereDate("reals.created_at",date("Y-m-d"))->whereDate("reals.created_at",date("Y-m-d"));
-        },'real_comments'=>function($real_comments) use ($type){
-            if ($type == 0) {
-                $real_comments->whereDate("real_user_comments.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $real_comments->whereMonth("real_user_comments.created_at",date("m"))->whereYear("real_user_comments.created_at",date("Y"));
-            }
-        },'real_likes'=>function($real_likes) use ($type){
-            if ($type == 0) {
-                $real_likes->whereDate("real_user_likes.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $real_likes->whereMonth("real_user_likes.created_at",date("m"))->whereYear("real_user_likes.created_at",date("Y"));
-            }
-        },'moments'=>function($moments) use ($type){
-            if ($type == 0) {
-                $moments->whereDate("moment.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $moments->whereMonth("moment.created_at",date("m"))->whereYear("moment.created_at",date("Y"));
-            }
-        },'moment_comments'=>function($moment_comments) use ($type){
-            if ($type == 0) {
-                $moment_comments->whereDate("moment_user_comments.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $moment_comments->whereMonth("moment_user_comments.created_at",date("m"))->whereYear("moment_user_comments.created_at",date("Y"));
-            }
-        },'moment_likes'=>function($moment_likes) use ($type){
-            if ($type == 0) {
-                $moment_likes->whereDate("moment_user_likes.created_at",date("Y-m-d"));
-            }elseif ($type == 1) {
-                $moment_likes->whereMonth("moment_user_likes.created_at",date("m"))->whereYear("moment_user_likes.created_at",date("Y"));
-            }
+        $period = UserCommon::getPeriodTarget();
+        
+        // $type = 0;
+
+        $user = User::withCount(['reals' => function ($reals) use ($type, $period) {
+
+               $reals->whereDate('created_at', '>=', $period['start_at'])
+                     ->whereDate('created_at', '<=', $period['end_at']);
+        },'real_comments'=>function($real_comments) use ($period){
+                
+                $real_comments->whereDate('created_at', '>=', $period['start_at'])
+                              ->whereDate('created_at', '<=', $period['end_at']);
+            
+        },'real_likes'=>function($real_likes) use ($period){
+                $real_likes->whereDate('created_at', '>=', $period['start_at'])
+                            ->whereDate('created_at', '<=', $period['end_at']);
+            
+        },'moments'=>function($moments) use ($period){
+                $moments->whereDate('created_at', '>=', $period['start_at'])
+                        ->whereDate('created_at', '<=', $period['end_at']);
+        },'moment_comments'=>function($moment_comments) use ($period){
+            
+                $moment_comments->whereDate('created_at', '>=', $period['start_at'])
+                                ->whereDate('created_at', '<=', $period['end_at']);
+           
+        },'moment_likes'=>function($moment_likes) use ($period){
+           
+                $moment_likes->whereDate('created_at', '>=', $period['start_at'])
+                             ->whereDate('created_at', '<=', $period['end_at']);
+          
         }])->find($userId);
 
         $key = ($reals)? 'reals' : 'reel';
