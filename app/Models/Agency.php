@@ -200,17 +200,11 @@ class Agency extends Model
         return $this->hasMany(AgencySallary::class, 'agency_id')->orderByDesc('id');
     }
 
-    public function getTotalSallaryAgency($month = null, $year = null)
+    public function getTotalSallaryAgency($period)
     {
-        if ($month == null) {
-            $month = now()->month;
-        }
-
-        if ($year == null) {
-            $year = now()->year;
-        }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
+                //$query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+                $query->where('period_id', $period);
             })->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
@@ -220,17 +214,10 @@ class Agency extends Model
             return floor($agencySallary ?? 0);
     }
 
-    public function getTotalCutAmountAgency($month = null, $year = null)
+    public function getTotalCutAmountAgency($period)
     {
-        if ($month == null) {
-            $month = now()->month;
-        }
-
-        if ($year == null) {
-            $year = now()->year;
-        }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
+                $query->where('period_id', $period);
             }) ->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
@@ -252,17 +239,11 @@ class Agency extends Model
         return $old;
     }
 
-    public function getSalaryAgency($month = null, $year = null)
+    public function getSalaryAgency($period)
     {
-        if ($month == null) {
-            $month = now()->month;
-        }
-
-        if ($year == null) {
-            $year = now()->year;
-        }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+        
+            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
+                $query->where('period_id', $period);
             })->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
