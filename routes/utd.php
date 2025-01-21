@@ -159,7 +159,7 @@ Route::middleware([])->group(function () {
     Route::prefix('admin_users')->group(function () {
         Route::get('/all', [AdminUsersController::class, 'index']);
         Route::post('/create', [AdminUsersController::class, 'store']);
-        Route::get('/show/{id}', [AdminUsersController::class, 'show']);
+        Route::post('/show', [AdminUsersController::class, 'show']);
         Route::get('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
     });
     Route::prefix('gifts')->group(function () {
@@ -190,7 +190,6 @@ Route::middleware([])->group(function () {
 
     // roles
     Route::resource('roles', RoleController::class);
-    Route::post('roles/update/{id}', [RoleController::class, 'update']);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
     Route::resource('all-permissions', RoleController::class);
@@ -226,7 +225,7 @@ Route::middleware([])->group(function () {
         Route::get('/all', [CoreWalletsController::class, 'index']);
         Route::post('/create', [CoreWalletsController::class, 'store']);
         Route::post('/update', [CoreWalletsController::class, 'update']);
-        Route::get('/show/{id}', [CoreWalletsController::class, 'show']);
+        Route::post('/show/{id}', [CoreWalletsController::class, 'show']);
         Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
     });
 
