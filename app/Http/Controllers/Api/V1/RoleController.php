@@ -47,10 +47,7 @@ class RoleController extends Controller
             'permissions' => 'required',
         ]);
         if ($validator->fails()) {
-
-            return response()->json([
-                'errors' => $validator->errors()
-            ], 422);
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         $roleModel = config('admin.database.roles_model');
 
@@ -62,7 +59,7 @@ class RoleController extends Controller
         $role->save();
 
         if (is_string($request->permissions)) {
-            $permissions = json_decode($request->permissions, true);
+            $permissions = $request->permissions;
         }
 
         $role->permissions()->sync($permissions);
@@ -85,7 +82,7 @@ class RoleController extends Controller
             $roleModel = config('admin.database.roles_model');
             $role = $roleModel::findOrFail($id);
 
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'slug' => 'required|string|max:255',
                 'name' => 'required|string|max:255|unique:admin_roles,name,' . $id,
                 'desc_en' => 'nullable',
@@ -93,9 +90,11 @@ class RoleController extends Controller
                 'permissions' => 'required',
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
-
+            if ($validator->fails()) {
+                return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            }
             
-
+       
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
             $role->desc_en = $request->input('desc_en');
@@ -103,7 +102,7 @@ class RoleController extends Controller
             $role->save();
 
             if (is_string($request->permissions)) {
-                $permissions = json_decode($request->permissions, true);
+                $permissions = $request->permissions;
             }
             $role->permissions()->sync($permissions);
 

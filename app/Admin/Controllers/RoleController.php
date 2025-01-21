@@ -45,8 +45,13 @@ class RoleController extends MainController
     {
         return $this->form()->store();
     }
-
-    public function update ( $id )
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->detail($id)));
+    }
+    public function update($id)
     {
         return $this->form1()->update($id);
     }
@@ -78,7 +83,8 @@ class RoleController extends MainController
         $grid->column('updated_at', trans('admin.updated_at'));
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
-            if ($actions->row->slug == 'administrator' ||
+            if (
+                $actions->row->slug == 'administrator' ||
                 $actions->row->slug == 'admin' ||
                 $actions->row->slug == 'developer' ||
                 $actions->row->slug == 'agency' ||
