@@ -19,7 +19,7 @@ class ChargeController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'charge';
-    
+
 
     /**
      * Index interface.
@@ -56,11 +56,11 @@ class ChargeController extends MainController
         $grid->filter(function ($filter) {
             // إلغاء الفلاتر الافتراضية
             $filter->disableIdFilter();
-        
+
             // فلتر "من تاريخ إلى تاريخ" على عمود created_at
             $filter->between('created_at', __('Filter by date'))->date();
-            
-                
+
+
             $filter->column('1/2', function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input; // Retrieve the selected value
@@ -71,8 +71,8 @@ class ChargeController extends MainController
                 ]);
             });
 
-           
-    
+
+
             $filter->expand();
 
         });
@@ -92,25 +92,25 @@ class ChargeController extends MainController
             }
             return "<img src='$img' style='width: 50px; height: 50px; border-radius: 50%;' /> <br> uid: #{$id} <br> type: #{$type}";
         });
-        
+
         // $grid->column('user_type', __('User Type'))->using([
         //     'app' => __('app'),
         //     'dash' => __('office')
         // ]);
-        
+
         $grid->amount(__('coins'));
         $grid->column('created_at', trans('admin.created_at'));
-        
-        
-        
+
+
+
         $grid->disableActions();
         $grid->disableCreateButton();
         $grid->disableExport();
-        
+
         $this->extendGrid($grid);
-        
+
         return $grid;
-        
+
     }
 
     /**

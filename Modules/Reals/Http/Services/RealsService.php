@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 define('PAGINATION', 10);
-define('REEL_PAGINATION', 5);
+define('REEL_PAGINATION', 10);
 
 class RealsService extends BaseModelService
 {
