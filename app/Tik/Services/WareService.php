@@ -95,4 +95,9 @@ class WareService
         $this->wareRepository->update($data, $ware_id);
         return true;
     }
+
+    public function profile_frame_wares($page, $perPage)
+    {
+        return $this->wareRepository->profile_frame_wares($page, $perPage);
+    }
 }
