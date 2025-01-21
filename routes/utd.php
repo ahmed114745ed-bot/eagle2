@@ -40,6 +40,9 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\ChargesController;
+use App\Http\Controllers\utd\PagesController;
+use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -77,7 +80,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
 
         Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
-        
+
     });
     Route::prefix('/reward-level')->group(function () {
     Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
@@ -118,9 +121,27 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
+    Route::prefix('percentage-target')->group(function () {
+        Route::get('/', [PercentageTargetController::class, 'index']);
+        Route::post('/', [PercentageTargetController::class, 'store']);
+    });
+
     Route::prefix('parent-users')->group(function () {
         Route::get('/', [ParentUsersController::class, 'index']);
         Route::get('/{id}', [ParentUsersController::class, 'users']);
+    });
+
+    Route::prefix('pages')->group(function () {
+        Route::get('/', [PagesController::class, 'index']);
+        Route::get('/{id}', [PagesController::class, 'show']);
+        Route::post('/', [PagesController::class, 'store']);
+        Route::post('/update/{id}', [PagesController::class, 'update']);
+        Route::post('/delete/{id}', [PagesController::class, 'delete']);
+    });
+
+    Route::prefix('charges')->group(function () {
+        Route::get('/', [ChargesController::class, 'index']);
+        Route::post('/', [ChargesController::class, 'store']);
     });
 
     //games
