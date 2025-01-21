@@ -44,15 +44,10 @@ class AdminUsersController extends Controller
         }
     }
 
-    public function show(Request $request)
+    public function show($id,Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'admin_user_id'  => 'required|integer',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
-        }
-        $data = $this->adminUsersService->show($request->admin_user_id);
+        
+        $data = $this->adminUsersService->show($id);
         return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
 
