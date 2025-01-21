@@ -14,9 +14,11 @@ class CoreWalletsRepository extends AbstractRepository
         parent::__construct(new CoreWallets());
     }
 
-    public function all()
+    public function all($id, $perPage, $page)
     {
-        return $this->model->get();
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function findById($id)

@@ -219,7 +219,8 @@ Route::middleware([])->group(function () {
         Route::get('/all', [CoreWalletsController::class, 'index']);
         Route::post('/create', [CoreWalletsController::class, 'store']);
         Route::post('/update', [CoreWalletsController::class, 'update']);
-        Route::post('/show', [CoreWalletsController::class, 'show']);
+        Route::get('/show/{id}', [CoreWalletsController::class, 'show']);
+        Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
     });
 
     //coin

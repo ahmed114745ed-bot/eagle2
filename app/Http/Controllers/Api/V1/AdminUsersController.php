@@ -17,7 +17,7 @@ class AdminUsersController extends Controller
 
     public function index(Request $request)
     {
-        $data = $this->adminUsersService->index($request->perPage, $request->page);
+        $data = $this->adminUsersService->index($request->id, $request->per_page, $request->page);
         return Common::apiResponse(1, '', AdminUsersResource::collection($data));
     }
 
@@ -44,17 +44,17 @@ class AdminUsersController extends Controller
         }
     }
 
-    public function show($id,Request $request)
+    public function show($id, Request $request)
     {
-        
+
         $data = $this->adminUsersService->show($id);
         return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
 
-    public function showUserAgency($agencyId,Request $request)
+    public function showUserAgency($agencyId, Request $request)
     {
-       
-        $data = $this->adminUsersService->showUserAgency($agencyId, $request->perPage, $request->page);
+
+        $data = $this->adminUsersService->showUserAgency($agencyId, $request->per_page, $request->page);
         return Common::apiResponse(1, '', $data);
     }
 }
