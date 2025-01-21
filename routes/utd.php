@@ -193,7 +193,7 @@ Route::middleware([])->group(function () {
     Route::post('roles/update/{id}', [RoleController::class, 'update']);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    Route::resource('permissions', RoleController::class);
+    Route::resource('all-permissions', RoleController::class);
 
 
     // users
