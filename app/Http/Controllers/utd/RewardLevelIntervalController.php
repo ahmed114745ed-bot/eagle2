@@ -88,7 +88,7 @@ class RewardLevelIntervalController extends Controller
 
     public function vipInterval()
     {
-        $vips = OVip::query()->select('id', 'name')->get();
+        $vips = OVip::query()->get();
 
         return Common::apiResponse(1, 'success', IntervalOVipResource::collection($vips), 200);
     }
