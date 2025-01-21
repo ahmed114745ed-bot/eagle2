@@ -356,8 +356,8 @@ Route::middleware([])->group(function () {
     Route::prefix('manger-types')->group(function () {
         Route::get('/', [MangerTypesController::class, 'all']);
         Route::get('/show/{id}', [MangerTypesController::class, 'show']);
-        Route::post('/search/{id}', [MangerTypesController::class, 'search']);
+        Route::post('/create', [MangerTypesController::class, 'create']);
+        Route::post('/update/{id}', [MangerTypesController::class, 'update']);
         Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
-        Route::post('/config/{id}', [MangerTypesController::class, 'config']);
     });
 });

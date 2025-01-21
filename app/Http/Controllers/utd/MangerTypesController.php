@@ -26,10 +26,11 @@ class MangerTypesController extends Controller
     {
         $validator = Validator::make($request->all(), [
 
-            'description' => 'required|string',
-            'user_id' => 'required',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+            'name_ar' => 'required|string',
+            'name_en' => 'required|string',
+            'description_ar' => 'required|string',
+            'description_en' => 'required|string',
+            'files' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -49,9 +50,11 @@ class MangerTypesController extends Controller
     {
         $validator = Validator::make($request->all(), [
 
-            'name' => 'required|string',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-
+            'name_ar' => 'required|string',
+            'name_en' => 'required|string',
+            'description_ar' => 'required|string',
+            'description_en' => 'required|string',
+            'files' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());

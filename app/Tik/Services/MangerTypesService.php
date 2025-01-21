@@ -19,12 +19,15 @@ class MangerTypesService
 
     public function create($request)
     {
-        if ($request->hasFile('img')) {
-            $img = Common::upload('images', $request->file('img'));
+        if ($request->hasFile('files')) {
+            $img = Common::upload('images', $request->file('files'));
         }
         $data = [
-            'user_id' => $request->user_id,
-            'description' => $request->user_id,
+    
+            'name_ar' => $request->name_ar,
+            'name_en' => $request->name_en,
+            'description_ar' => $request->description_ar,
+            'description_en' => $request->description_en,
             'img' =>  $img ?? ''
         ];
         $this->MangerTypesRepository->create($data);
@@ -35,10 +38,15 @@ class MangerTypesService
     {
 
         $data = [
-            'name' => $request->name,
+    
+            'name_ar' => $request->name_ar,
+            'name_en' => $request->name_en,
+            'description_ar' => $request->description_ar,
+            'description_en' => $request->description_en,
+            'img' =>  $img ?? ''
         ];
-        if ($request->hasFile('img')) {
-            $data['img'] = Common::upload('images', $request->file('img'));
+        if ($request->hasFile('files')) {
+            $data['img'] = Common::upload('images', $request->file('files'));
         }
         $this->MangerTypesRepository->update($data, $id);
         return true;
