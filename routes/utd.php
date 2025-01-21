@@ -2,7 +2,6 @@
 
 
 use App\Helpers\Common;
-use App\Http\Controllers\utd\MangerTypesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -30,10 +29,12 @@ use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
+use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
@@ -192,7 +193,8 @@ Route::middleware([])->group(function () {
     Route::resource('roles', RoleController::class);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    Route::resource('all-permissions', RoleController::class);
+    Route::resource('all-permissions', PermissionController::class);
+    Route::get('methods', [PermissionController::class, "getHttpMethodsOptions"]);
 
 
     // users

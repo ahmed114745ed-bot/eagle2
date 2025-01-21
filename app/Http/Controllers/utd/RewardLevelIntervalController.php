@@ -27,7 +27,7 @@ class RewardLevelIntervalController extends Controller
 
     public function show($reward_level_interval, $id)
     {
-        $reward = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id);
+        $reward = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->with('ware', 'vip')->findOrFail($id);
 
 
 
@@ -37,11 +37,17 @@ class RewardLevelIntervalController extends Controller
     public function store($reward_level_interval, Request $request)
     {
 
+        if ($request->hasFile('target')) {
+            $$target = Common::upload('images', $request->file('target'));
+        } elseif ($request->has('target')) {
+            $target =    $request->target;
+        }
+
 
         $reward = RewardLevelInterval::create([
             'level_interval_id' => $reward_level_interval,
             'type' => $request->type,
-            'target' => $request->target,
+            'target' =>  $target,
             'expire' => $request->expire,
         ]);
 
@@ -52,10 +58,14 @@ class RewardLevelIntervalController extends Controller
     public function update($reward_level_interval, Request $request, $id)
     {
 
-
+        if ($request->hasFile('target')) {
+            $$target = Common::upload('images', $request->file('target'));
+        } elseif ($request->has('target')) {
+            $target =    $request->target;
+        }
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->update([
             'type' => $request->type,
-            'target' => $request->target,
+            'target' => $target,
             'expire' => $request->expire,
         ]);
 
