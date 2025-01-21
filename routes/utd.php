@@ -155,6 +155,7 @@ Route::middleware([])->group(function () {
         Route::get('/all', [AdminUsersController::class, 'index']);
         Route::post('/create', [AdminUsersController::class, 'store']);
         Route::post('/show', [AdminUsersController::class, 'show']);
+        Route::post('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
     });
     Route::prefix('gifts')->group(function () {
         Route::get('/all', [GiftController::class, 'allGifts']);
