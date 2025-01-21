@@ -12,8 +12,10 @@ use Modules\Public\Entities\RewardLevelInterval;
 
 class RewardLevelIntervalController extends Controller
 {
-    public function index($reward_level_interval)
-    {
+
+
+
+    public function index($reward_level_interval){
 
         $id = request('id');
         $perPage = request('per_page') ?? 10;
