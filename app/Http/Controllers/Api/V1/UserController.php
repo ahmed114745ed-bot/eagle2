@@ -594,7 +594,7 @@ class UserController extends Controller
 
     public function userLevel(Request $request)
     {
-        $trashed = $this->userService->userLevel($request->perPage, $request->Page, $request->uuid);
+        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
     }
 
@@ -613,7 +613,7 @@ class UserController extends Controller
 
     public function usersDeviceToken(Request $request)
     {
-        $data = $this->userService->userDeviceToken($request->perPage, $request->Page, $request->device_token);
+        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token);
         return Common::apiResponse(true, 'success', DeviceTokenResource::collection($data));
     }
 
@@ -631,13 +631,13 @@ class UserController extends Controller
 
     public function usersTarget(Request $request)
     {
-        $data = $this->userService->usersTargets($request->perPage, $request->Page);
+        $data = $this->userService->usersTargets($request->per_page, $request->Page);
         return Common::apiResponse(true, 'success', UserTargetResource::collection($data));
     }
 
     public function allUsers(Request $request)
     {
-        $users = $this->userService->allUser($request->perPage, $request->Page, $request->family_id, $request->agency_id, $request->search, $request->host);
+        $users = $this->userService->allUser($request->per_page, $request->Page, $request->family_id, $request->agency_id, $request->search, $request->host);
         return Common::apiResponse(true, 'done', AllUsersResource::collection($users));
     }
 
@@ -830,7 +830,7 @@ class UserController extends Controller
 
     public function allCodes(Request $request)
     {
-        $data = $this->userService->allCods($request->id, $request->perPage, $request->page);
+        $data = $this->userService->allCods($request->id, $request->per_page, $request->page);
         return Common::apiResponse(true, 'done', $data);
     }
 }
