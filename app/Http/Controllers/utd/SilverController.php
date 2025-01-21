@@ -16,7 +16,7 @@ class SilverController extends Controller
 
     public function all(Request $request)
     {
-        $data = $this->silverService->all($request->id, $request->perPage, $request->page);
+        $data = $this->silverService->all($request->id, $request->per_page, $request->page);
         return Common::apiResponse(true, 'done', $data);
     }
 

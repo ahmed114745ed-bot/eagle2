@@ -23,7 +23,7 @@ class TrashedUserController extends Controller
 
     public function trashedAccount(Request $request)
     {
-        $trashed = $this->userService->trashedAccount($request->perPage, $request->Page, $request->uuid);
+        $trashed = $this->userService->trashedAccount($request->per_page, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'success', TrashedUserResource::collection($trashed));
     }
 

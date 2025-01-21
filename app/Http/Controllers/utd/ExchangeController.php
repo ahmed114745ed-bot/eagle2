@@ -16,7 +16,7 @@ class ExchangeController extends Controller
 
     public function all(Request $request)
     {
-        $data = $this->exchangeService->all($request->id, $request->perPage, $request->page);
+        $data = $this->exchangeService->all($request->id, $request->per_page, $request->page);
         return Common::apiResponse(true, 'done', $data);
     }
 
