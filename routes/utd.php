@@ -76,7 +76,10 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
 
         Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
+        
     });
+
+    Route::get('/reward-level/types', [RewardLevelIntervalController::class, 'allType']);
 
     Route::prefix('group-chat')->group(function () {
         Route::get('/', [GroupChatController::class, 'index']);
@@ -185,8 +188,10 @@ Route::middleware([])->group(function () {
 
     // roles
     Route::resource('roles', RoleController::class);
+    Route::post('roles/update/{id}', [RoleController::class, 'update']);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
+    Route::resource('permissions', RoleController::class);
 
 
     // users
