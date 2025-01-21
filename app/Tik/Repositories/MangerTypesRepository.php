@@ -3,22 +3,23 @@
 namespace App\Tik\Repositories;
 
 use App\Models\Interest;
+use App\Models\MangerType;
 use Modules\Moment\Entities\Moment;
 
 
-class MomentsRepository extends AbstractRepository
+class MangerTypesRepository extends AbstractRepository
 {
 
     public function __construct()
     {
-        parent::__construct(new Moment());
+        parent::__construct(new MangerType());
     }
 
     public function all($id)
     {
        return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
-        })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->get();
+        })->get();
     }
 
 
