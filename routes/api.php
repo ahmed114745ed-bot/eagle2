@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\WareController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -356,6 +357,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::get('levels/badges', [VipController::class, 'badges']);
             Route::get('levels', [VipController::class, 'index']);
+            Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
             // end vips
 
 
