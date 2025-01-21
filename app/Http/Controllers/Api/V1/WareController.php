@@ -166,4 +166,10 @@ class WareController extends Controller
         return translate(GET_TYPE_WARE);
     }
 
+    public function profile_frame_wares(Request $request)
+    {
+        $wares = $this->wareService->profile_frame_wares($request->page, $request->per_page);
+        return Common::apiResponse(1, '',  $wares);
+    }
+    
 }
