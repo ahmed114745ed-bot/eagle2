@@ -2,6 +2,7 @@
 
 
 use App\Helpers\Common;
+use App\Http\Controllers\utd\MangerTypesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -351,5 +352,12 @@ Route::middleware([])->group(function () {
         Route::post('/search/{id}', [MomentsController::class, 'search']);
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config/{id}', [MomentsController::class, 'config']);
+    });
+    Route::prefix('manger-types')->group(function () {
+        Route::get('/', [MangerTypesController::class, 'all']);
+        Route::get('/show/{id}', [MangerTypesController::class, 'show']);
+        Route::post('/search/{id}', [MangerTypesController::class, 'search']);
+        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
+        Route::post('/config/{id}', [MangerTypesController::class, 'config']);
     });
 });
