@@ -45,7 +45,7 @@ class WareObserver
             }elseif ($ware->type == 1){
                 settings()->set('extra_updated_at', time());
             }elseif ($ware->type == 28){
-                settings()->set('is_profile_frame_updated', time());
+                settings()->set('profile_frame_updated', time());
             }
         }
     }

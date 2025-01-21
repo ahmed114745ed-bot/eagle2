@@ -13,9 +13,11 @@ class RewardLevelIntervalController extends Controller
     public function index($reward_level_interval)
     {
 
+        $id = request('id');
         $perPage = request('per_page') ?? 10;
-        $rewards = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->paginate($perPage);
-
+        $rewards = RewardLevelInterval::when($id, function ($query, $id) {
+            return $query->where('id', $id);
+        })->where('level_interval_id', $reward_level_interval)->paginate($perPage);
 
         return Common::apiResponse(1, 'success', $rewards, 200);
     }
