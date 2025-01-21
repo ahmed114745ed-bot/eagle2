@@ -23,7 +23,7 @@ class AdminUsersController extends Controller
 
     public function store(Request $request)
     {
-        
+
         $validator = Validator::make($request->all(), [
             'username'       => 'required|unique:admin_users,username',
             'name'           => 'required|string',
@@ -55,5 +55,16 @@ class AdminUsersController extends Controller
         $data = $this->adminUsersService->show($request->admin_user_id);
         return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
-        
+
+    public function showUserAgency(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'agency_id'  => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+        $data = $this->adminUsersService->showUserAgency($request->agencyId, $request->perPage, $request->page);
+        return Common::apiResponse(1, '', $data);
+    }
 }
