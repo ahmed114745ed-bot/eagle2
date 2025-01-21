@@ -217,7 +217,8 @@ class VipService
         if ($expire == 0) {
             $ex = 0;
         } else {
-            $ex = now()->addDays($expire * $qty)->timestamp;
+            // $ex = now()->addDays($expire * $qty)->timestamp;
+            $ex = now()->diffInDays(now()->addDays($expire * $qty));
         }
         if ($request->type == 1) {
             $type = 1;
