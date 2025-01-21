@@ -38,12 +38,14 @@ class WareObserver
         $svgOld = $ware->getOriginal('img2');
 
         if ((!$isEnableOld && $ware->enable) ||($isEnableOld && !$ware->enable) || $svgOld != $ware->img2){
-            if ($ware->type = 6 ){
+            if ($ware->type == 6 ){
                 settings()->set('intro_updated_at', time());
-            }elseif ($ware->type = 4){
+            }elseif ($ware->type == 4){
                 settings()->set('frame_updated_at', time());
-            }elseif ($ware->type = 1){
+            }elseif ($ware->type == 1){
                 settings()->set('extra_updated_at', time());
+            }elseif ($ware->type == 28){
+                settings()->set('is_profile_frame_updated', time());
             }
         }
     }
