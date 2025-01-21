@@ -15,9 +15,9 @@ class AdminUsersController extends Controller
 {
     public function __construct(private AdminUsersService $adminUsersService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->adminUsersService->index();
+        $data = $this->adminUsersService->index($request->perPage, $request->page);
         return Common::apiResponse(1, '', AdminUsersResource::collection($data));
     }
 

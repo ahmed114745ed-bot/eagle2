@@ -16,10 +16,10 @@ class AdminUsersRepository extends AbstractRepository
         parent::__construct(new AdminUser());
     }
 
-    public function all()
+    public function all($perPage,$page)
     {
         return $this->model->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
-        ->where('app_id','!=',0)->with(['user' => fn ($q) => $q->withCount('agencies')])->with([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')])->get();
+        ->where('app_id','!=',0)->with(['user' => fn ($q) => $q->withCount('agencies')])->with([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')])->paginate($perPage, ['*'], 'page', $page);
         
     }
 
