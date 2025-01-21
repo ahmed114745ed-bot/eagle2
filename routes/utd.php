@@ -154,8 +154,8 @@ Route::middleware([])->group(function () {
     Route::prefix('admin_users')->group(function () {
         Route::get('/all', [AdminUsersController::class, 'index']);
         Route::post('/create', [AdminUsersController::class, 'store']);
-        Route::post('/show', [AdminUsersController::class, 'show']);
-        Route::post('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
+        Route::get('/show/{id}', [AdminUsersController::class, 'show']);
+        Route::get('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
     });
     Route::prefix('gifts')->group(function () {
         Route::get('/all', [GiftController::class, 'allGifts']);
@@ -304,6 +304,7 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
     });
     Route::get('users-search', [UserController::class, 'search']);
+    Route::get('users-search2', [UserController::class, 'search2']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
         Route::get('/{achievementId}/level', [UtdAchievementController::class, 'allAchievementsLevel']);
