@@ -78,9 +78,11 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
         
     });
-
-    Route::get('/reward-level/types', [RewardLevelIntervalController::class, 'allType']);
-
+    Route::prefix('/reward-level')->group(function () {
+    Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
+    Route::get('/wares', [RewardLevelIntervalController::class, 'wareInterval']);
+    Route::get('/vip', [RewardLevelIntervalController::class, 'vipInterval']);
+});
     Route::prefix('group-chat')->group(function () {
         Route::get('/', [GroupChatController::class, 'index']);
         Route::post('/', [GroupChatController::class, 'store']);
