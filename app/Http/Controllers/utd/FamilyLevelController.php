@@ -40,13 +40,8 @@ class FamilyLevelController extends Controller
     {
         try {
             $FamilyLevel =   $this->FamilyLevelService->create( $request);
-<<<<<<< HEAD
-        } catch (\Exception $e) {
+        }catch (Exception $e) {
 
-=======
-        } catch (Exception $e) {
-    
->>>>>>> bd8db3ac148ac7ed8c2ed9088199a22c72456dde
             return response()->json([
                 'message' => 'failed',
                 'status' => 'failed',

@@ -32,7 +32,10 @@ use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\PagesController;
+use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RoomTargetController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
@@ -107,9 +110,27 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
+    Route::prefix('percentage-target')->group(function () {
+        Route::get('/', [PercentageTargetController::class, 'index']);
+        Route::post('/', [PercentageTargetController::class, 'store']);
+    });
+
     Route::prefix('parent-users')->group(function () {
         Route::get('/', [ParentUsersController::class, 'index']);
         Route::get('/{id}', [ParentUsersController::class, 'users']);
+    });
+
+    Route::prefix('pages')->group(function () {
+        Route::get('/', [PagesController::class, 'index']);
+        Route::get('/{id}', [PagesController::class, 'show']);
+        Route::post('/', [PagesController::class, 'store']);
+        Route::post('/update/{id}', [PagesController::class, 'update']);
+        Route::post('/delete/{id}', [PagesController::class, 'delete']);
+    });
+
+    Route::prefix('charges')->group(function () {
+        Route::get('/', [ChargesController::class, 'index']);
+        Route::post('/', [ChargesController::class, 'store']);
     });
 
     //games
