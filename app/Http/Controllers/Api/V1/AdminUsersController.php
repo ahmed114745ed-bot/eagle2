@@ -44,17 +44,23 @@ class AdminUsersController extends Controller
         }
     }
 
-    public function show($id, Request $request)
+    public function show(Request $request)
     {
 
-        $data = $this->adminUsersService->show($id);
+        $validator = Validator::make($request->all(), [
+            'admin_user_id'  => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        }
+        $data = $this->adminUsersService->show($request->admin_user_id);
         return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
 
     public function showUserAgency($agencyId, Request $request)
     {
 
-        $data = $this->adminUsersService->showUserAgency($agencyId, $request->per_page, $request->page);
+        $data = $this->adminUsersService->showUserAgency($agencyId, $request->per_pageyyy, $request->page);
         return Common::apiResponse(1, '', $data);
     }
 }
