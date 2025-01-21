@@ -38,11 +38,10 @@ class UserVisitorResource extends JsonResource
             }
         }
 
-        if(self::$userFollowers != null && count(self::$userFollowers) > 0){
+        if (self::$userFollowers != null && count(self::$userFollowers) > 0) {
             $isFollow = in_array($this->id, self::$userFollowers);
-        }else{
+        } else {
             $isFollow = @(bool)Common::IsFollow(@$request->user()->id, $this->id);
-
         }
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
             $imageReceiver = $this->getImageReceiverOrSender('receiver_id', 1);
@@ -64,7 +63,7 @@ class UserVisitorResource extends JsonResource
                 'image'  => @$this->profile->avatar,
                 'age'    => Carbon::parse(@$this->profile->birthday)->age,
                 'gender' => @$this->profile->gender ?? 1,
-                'country'=> @$this->profile->country?:''
+                'country' => @$this->profile->country ?: ''
             ],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'   => @$this->dress_1,
@@ -80,12 +79,13 @@ class UserVisitorResource extends JsonResource
             'level'      => [
                 'receiver_img' => $imageReceiver ? @$imageReceiver->img : '',
                 'sender_img'   => $imageSender ? @$imageSender->img : '',
-                'sender_level'  =>@$this->total_sender_level ?? 0,
-                'reciver_level' =>@$this->total_received_level ?? 0
+                'sender_level'  => @$this->total_sender_level ?? 0,
+                'reciver_level' => @$this->total_received_level ?? 0
             ],
             'is_follow'      => $isFollow,
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType),
-            'type_user' => @$this->type_user ?? 0
+            "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            'type_user' => @$this->type_user ?? 0,
+            'image_color'          => @$this->color_image,
 
         ];
 
@@ -104,9 +104,5 @@ class UserVisitorResource extends JsonResource
         self::$vipsSenderImages = null;
         self::$vipsReceivedImages = null;
         self::$userFollowers = null;
-
-
     }
-
-
 }

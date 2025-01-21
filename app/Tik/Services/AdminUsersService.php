@@ -19,9 +19,9 @@ class AdminUsersService
         private readonly UserRepository $userRepository,
     ) {}
 
-    public function index()
+    public function index($id, $perPage, $page)
     {
-        $adminUsers = $this->adminUsersRepository->all();
+        $adminUsers = $this->adminUsersRepository->all($id, $perPage, $page);
         $adminUsers->each(function ($admin) {
             $admin->salary = ManagerHelper::getTotalAgenciesSalary($admin->managerAgencies, $admin->app_id);
             $admin->agencyCount = $this->agencyRepository->countAgencyUserAdmin($admin->app_id);
@@ -56,5 +56,10 @@ class AdminUsersService
             $agency->userCount = $this->userRepository->countByAgencyId($agency->id);
         });
         return $agencies;
+    }
+
+    public function showUserAgency($agencyId, $perPage, $page)
+    {
+        return $this->userRepository->findUsersByAgencyId($agencyId, $perPage, $page);
     }
 }

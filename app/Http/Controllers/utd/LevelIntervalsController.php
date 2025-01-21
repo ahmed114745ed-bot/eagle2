@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LevelIntervalsResource;
 use Illuminate\Http\Request;
 use Modules\Public\Entities\LevelInterval;
 
@@ -11,11 +12,14 @@ class LevelIntervalsController extends Controller
 {
     public function index(){
 
+        
         $perPage = request('per_page') ?? 10;
-        $levelIntervals = LevelInterval::paginate($perPage);
+        $id = request('id');
+        $levelIntervals = LevelInterval::when($id, function ($query, $id) {
+            return $query->where('id', $id);
+        })->paginate($perPage);
 
-
-        return Common::apiResponse(1, 'success', $levelIntervals, 200);
+        return Common::apiResponse(1, 'success', LevelIntervalsResource::collection($levelIntervals), 200);
 
     }
 

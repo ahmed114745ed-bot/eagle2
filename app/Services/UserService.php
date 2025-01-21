@@ -5,9 +5,8 @@ namespace App\Services;
 use DB;
 use Exception;
 use Carbon\Carbon;
-use App\Models\Vip;
 use App\Models\User;
-use App\Models\Follow;
+use App\Models\Code;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Facades\UserHandling;
@@ -859,5 +858,12 @@ class UserService
         $user->userSetting->update($dataUserSitting);
 
         return true;
+    }
+
+    public function allCods($id, $perPage, $page)
+    {
+        return Code::when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);;
     }
 }

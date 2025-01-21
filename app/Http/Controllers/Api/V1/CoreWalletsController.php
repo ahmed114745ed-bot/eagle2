@@ -16,9 +16,9 @@ class CoreWalletsController extends Controller
 {
 
     public function __construct(private CoreWalletsService $coreWalletsService) {}
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->coreWalletsService->index();
+        $data = $this->coreWalletsService->index($request->id, $request->per_page, $request->page);
         return Common::apiResponse(1, '', $data);
     }
 
@@ -68,6 +68,17 @@ class CoreWalletsController extends Controller
         try {
             $this->coreWalletsService->update($request);
             return Common::apiResponse(1, 'updated successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function delete($id)
+    {
+        try {
+            $this->coreWalletsService->delete($id);
+            return Common::apiResponse(1, 'deleted successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

@@ -28,9 +28,9 @@ class CoreWallets extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
-    public function getUpdateForHumanAttribute() : string
+    public function getUpdateForHumanAttribute(): string
     {
 
-        return $this->updated_at->diffForHumans();
+        return carbon::parse(@$this?->updated_at)->diffForHumans() ?? '';
     }
 }

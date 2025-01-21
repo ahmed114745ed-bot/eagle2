@@ -13,9 +13,9 @@ class CoreWalletsService
         private readonly CoreWalletsRepository $coreWalletsRepository,
     ) {}
 
-    public function index()
+    public function index($id,$perPage,$page)
     {
-        return $this->coreWalletsRepository->all();
+        return $this->coreWalletsRepository->all($id,$perPage,$page);
     }
 
     public function create($request)
@@ -43,6 +43,13 @@ class CoreWalletsService
         ];
 
         $this->coreWalletsRepository->update($data, $request->core_wallet_id);
+        return true;
+    }
+
+    public function delete($id)
+    {
+        $data = $this->coreWalletsRepository->findOrFail($id);
+        $data->delete();
         return true;
     }
 }

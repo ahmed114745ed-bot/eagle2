@@ -15,15 +15,15 @@ class AdminUsersController extends Controller
 {
     public function __construct(private AdminUsersService $adminUsersService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $data = $this->adminUsersService->index();
+        $data = $this->adminUsersService->index($request->id, $request->per_page, $request->page);
         return Common::apiResponse(1, '', AdminUsersResource::collection($data));
     }
 
     public function store(Request $request)
     {
-        
+
         $validator = Validator::make($request->all(), [
             'username'       => 'required|unique:admin_users,username',
             'name'           => 'required|string',
@@ -46,6 +46,7 @@ class AdminUsersController extends Controller
 
     public function show(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'admin_user_id'  => 'required|integer',
         ]);
@@ -55,5 +56,11 @@ class AdminUsersController extends Controller
         $data = $this->adminUsersService->show($request->admin_user_id);
         return Common::apiResponse(1, '', AdminUserShowResource::collection($data));
     }
-        
+
+    public function showUserAgency($agencyId, Request $request)
+    {
+
+        $data = $this->adminUsersService->showUserAgency($agencyId, $request->per_pageyyy, $request->page);
+        return Common::apiResponse(1, '', $data);
+    }
 }

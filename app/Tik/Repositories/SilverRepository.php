@@ -2,16 +2,14 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\CoreWallets;
+use App\Models\Silver;
 
-class CoreWalletsRepository extends AbstractRepository
+class SilverRepository extends AbstractRepository
 {
-    /**
-     * @param Model $model
-     */
+
     public function __construct()
     {
-        parent::__construct(new CoreWallets());
+        parent::__construct(new Silver());
     }
 
     public function all($id, $perPage, $page)
@@ -19,10 +17,5 @@ class CoreWalletsRepository extends AbstractRepository
         return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    public function findById($id)
-    {
-        return $this->model->find($id);
     }
 }

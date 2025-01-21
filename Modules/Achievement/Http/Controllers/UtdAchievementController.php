@@ -24,15 +24,9 @@ class UtdAchievementController extends Controller
         return Common::apiResponse(true, 'done', $data);
     }
 
-    public function allAchievementsLevel(Request $request)
+    public function allAchievementsLevel($achievementId, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'achievement_id'         => 'required|integer|exists:achievements,id',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        $data = $this->achievementService->allAchievementLevel($request->achievement_id, $request->perPage, $request->Page);
+        $data = $this->achievementService->allAchievementLevel($achievementId, $request->per_page, $request->Page);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -119,15 +113,10 @@ class UtdAchievementController extends Controller
         }
     }
 
-    public function allUsersGiftAchievements(Request $request)
+    public function allUsersGiftAchievements($achievementId, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'achievement_id'         => 'required|integer|exists:achievements,id',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        $data = $this->achievementService->allAchievementGift($request->achievement_id, $request->perPage, $request->Page);
+
+        $data = $this->achievementService->allAchievementGift($achievementId, $request->per_page, $request->Page);
         return Common::apiResponse(true, 'done', GiftAchievementUser::collection($data));
     }
 
@@ -154,13 +143,18 @@ class UtdAchievementController extends Controller
 
     public function giftAchievement(Request $request)
     {
-        $data = $this->achievementService->giftAchievement();
-        return Common::apiResponse(true, 'done', $data);
+        try {
+            $data = $this->achievementService->giftAchievement();
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
     public function allUserAchievementLevel(Request $request)
     {
-        $data = $this->achievementService->userAchievementLevel($request->perPage, $request->Page, $request->uuid);
+        $data = $this->achievementService->userAchievementLevel($request->per_page, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -203,9 +197,9 @@ class UtdAchievementController extends Controller
         }
     }
 
-    public function UserAchievementLevelGiftIndex(Request $request)
+    public function userAchievementLevelGiftIndex(Request $request)
     {
-        $data = $this->achievementService->giftAchievementIndex($request->perPage, $request->Page);
+        $data = $this->achievementService->giftAchievementIndex($request->per_page, $request->Page);
         return Common::apiResponse(true, 'done', UserAchievementLevelGiftResource::collection($data));
     }
 
