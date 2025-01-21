@@ -57,4 +57,10 @@ class AdminUsersService
         });
         return $agencies;
     }
+
+    public function showUserAgency($agencyId, $perPage, $page)
+    {
+       return $this->userRepository->findUsersByAgencyId($agencyId, $perPage, $page);
+        
+    }
 }
