@@ -37,9 +37,9 @@ class RewardLevelIntervalController extends Controller
     public function store($reward_level_interval, Request $request)
     {
 
-        if ($request->hasFile('target')) {
-            $$target = Common::upload('images', $request->file('target'));
-        } elseif ($request->has('target')) {
+        if ($request->hasFile('target4')) {
+            $target = Common::upload('images', $request->file('target4'));
+        }else {
             $target =    $request->target;
         }
 
@@ -58,7 +58,7 @@ class RewardLevelIntervalController extends Controller
     public function update($reward_level_interval, Request $request, $id)
     {
 
-        if ($request->hasFile('target')) {
+        if ($request->hasFile('target4')) {
             $$target = Common::upload('images', $request->file('target'));
         } elseif ($request->has('target')) {
             $target =    $request->target;

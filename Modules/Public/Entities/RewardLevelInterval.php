@@ -40,7 +40,6 @@ class RewardLevelInterval extends Model
             }elseif ($model->type == "coins"){
                 $model->target = request('target3', $model->target);
             }elseif ($model->type == "achievement"){
-
                 $file       = request('target4', $model->target);
 
                 if ($file instanceof  UploadedFile){
