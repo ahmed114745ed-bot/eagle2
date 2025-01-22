@@ -39,15 +39,14 @@ class RewardLevelIntervalController extends Controller
 
         if ($request->hasFile('target4')) {
             $target = Common::upload('images', $request->file('target4'));
-        }else {
-            $target =    $request->target;
         }
+       
 
 
         $reward = RewardLevelInterval::create([
             'level_interval_id' => $reward_level_interval,
             'type' => $request->type,
-            'target' =>  $target,
+           // 'target' =>  $target,
             'expire' => $request->expire,
         ]);
 
@@ -60,12 +59,11 @@ class RewardLevelIntervalController extends Controller
 
         if ($request->hasFile('target4')) {
             $target = Common::upload('images', $request->file('target4'));
-        } elseif ($request->has('target')) {
-            $target =    $request->target;
-        }
+        } 
+        
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->update([
             'type' => $request->type,
-            'target' => $target,
+           // 'target' => $target,
             'expire' => $request->expire,
         ]);
 
