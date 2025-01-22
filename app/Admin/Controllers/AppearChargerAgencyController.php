@@ -13,12 +13,12 @@ use Encore\Admin\Layout\Content;
 class AppearChargerAgencyController extends MainController
 {
     /**
-     * 
+     *
      * Title for current resource.
      *
      * @var string
      */
-    
+
     public $permission_name = 'appear-charger-agency';
 
     public function index(Content $content)
