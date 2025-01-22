@@ -42,8 +42,9 @@ use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -142,6 +143,11 @@ Route::middleware([])->group(function () {
     Route::prefix('charges')->group(function () {
         Route::get('/', [ChargesController::class, 'index']);
         Route::post('/', [ChargesController::class, 'store']);
+    });
+
+    Route::prefix('appear-charger-agency')->group(function () {
+        Route::get('/', [AppearChargerAgencyController::class, 'index']);
+        Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
     });
 
     //games
