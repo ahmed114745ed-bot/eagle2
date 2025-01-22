@@ -1,5 +1,8 @@
 <?php
 
+use App\Admin\Controllers\WareController;
+use App\Enums\UserType;
+use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -46,7 +49,14 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
-  
+    Route::get('test-users', function (){
+        return response()->json([
+            'success' => true,
+            'message' => 'Success',
+            'data' => (object) UserType::list(),
+        ]);
+    });
+
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
