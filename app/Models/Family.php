@@ -118,13 +118,13 @@ class Family extends Model
         return null;
     }
 
-/*     public function getNumAttribute()
+    public function getNumAttribute()
     {
         if ($this->level_max_members_num) {
             return $this->level_max_members_num;
         }
         return $this->attributes['num'];
-    } */
+    }
 
     public function getNumAdminsAttribute()
     {

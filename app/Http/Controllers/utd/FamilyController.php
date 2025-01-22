@@ -39,7 +39,7 @@ class FamilyController extends Controller
             'num' => $request->num,
         ]);
 
-        return Common::apiResponse(true, '',  $family, 200);
+        return Common::apiResponse(true, '',  [], 200);
     }
 
     public function update(Request $request, $id){
