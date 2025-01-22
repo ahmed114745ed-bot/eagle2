@@ -837,7 +837,10 @@ class UserController extends Controller
 
     public function userType()
     {
-        $data = UserType::list();
-        return Common::apiResponse(true, 'done', $data);
+        return response()->json([
+            'success' => true,
+            'message' => 'Success',
+            'data' => (object) UserType::list(),
+        ]);
     }
 }
