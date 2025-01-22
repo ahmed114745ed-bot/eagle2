@@ -59,7 +59,7 @@ class RewardLevelIntervalController extends Controller
     {
 
         if ($request->hasFile('target4')) {
-            $$target = Common::upload('images', $request->file('target'));
+            $target = Common::upload('images', $request->file('target'));
         } elseif ($request->has('target')) {
             $target =    $request->target;
         }
