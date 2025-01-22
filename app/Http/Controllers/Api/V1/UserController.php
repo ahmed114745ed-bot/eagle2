@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Target;
+use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
@@ -780,7 +781,7 @@ class UserController extends Controller
         try {
             $user  = $this->userService->showDataUser($id);
 
-            return Common::apiResponse(true, 'done',new ShowUserResource($user) );
+            return Common::apiResponse(true, 'done', new ShowUserResource($user));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -831,6 +832,12 @@ class UserController extends Controller
     public function allCodes(Request $request)
     {
         $data = $this->userService->allCods($request->id, $request->per_page, $request->page);
+        return Common::apiResponse(true, 'done', $data);
+    }
+
+    public function userType()
+    {
+        $data = UserType::list();
         return Common::apiResponse(true, 'done', $data);
     }
 }

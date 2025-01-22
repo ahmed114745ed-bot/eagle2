@@ -314,6 +314,7 @@ Route::middleware([])->group(function () {
         Route::post('create', [UserController::class, 'create']);
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+        Route::get('user-type', [UserController::class, 'userType']);
     });
 
 
