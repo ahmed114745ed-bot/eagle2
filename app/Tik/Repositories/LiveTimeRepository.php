@@ -92,6 +92,16 @@ class LiveTimeRepository extends AbstractRepository
             ->get();
     }
 
+    public function getByDailyNew($userId, $start_at, $end_at)
+    {
+        return $this->model->query()
+            ->selectRaw('sum(hours) as hours, max(created_at) as date')
+            ->where('uid', $userId)
+            ->whereBetween('created_at', [$start_at, $end_at])
+            ->groupBy(\DB::raw('date(created_at)'))
+            ->limit(31)
+            ->get();
+    }
     public function sumUserHoursByDate($userId,$date)
     {
         return $this->model->query()->where('uid', $userId)->whereDate('created_at', $date) ->sum('hours');

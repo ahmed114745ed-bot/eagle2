@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\UserCommon;
 use DB;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
@@ -25,6 +26,8 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Carbon\Carbon;
+
 
 /**
  * @method static withoutAppends()
@@ -194,7 +197,32 @@ class User extends Authenticatable
             ->havingRaw('SUM(hours) > 1')
             ->get(); // Having condition
 
+        return $subQuery->count('entry_count');
+    }
 
+    public function getTotalDaysNew()
+    {
+        $defult = UserCommon::getPeriodTarget();
+        if (request('start_at') && request('end_at')) {
+           
+            $start_at = Carbon::parse(request()->start_at)->setTimezone('UTC')->startOfDay()->toDateTimeString();
+            $end_at = Carbon::parse(request()->end_at)->setTimezone('UTC')->endOfDay()->toDateTimeString() ;
+            $period=  UserCommon::getPeriodTargetIds($start_at,$end_at);
+            $start_at =$period['start_at'];
+            $end_at =$period['end_at'];
+        }else {
+            
+            $start_at =$defult['start_at'];
+            $end_at =$defult['end_at'];
+        }
+        
+        $subQuery = DB::table('live_times')
+            ->select('uid', DB::raw('COUNT(*) AS entry_count'))
+            ->whereBetween('created_at', [$start_at, $end_at])
+            ->where('uid', $this->id)
+            ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
+            ->havingRaw('SUM(hours) > 1')
+            ->get(); // Having condition
 
         return $subQuery->count('entry_count');
     }
@@ -216,7 +244,32 @@ class User extends Authenticatable
 
         return $userSallary?->toArray() ?? [];
     }
+    public function getSallaryInfoNew(): array
+    {
+        if (request('start_at') && request('end_at')) {
 
+            $start_at = Carbon::parse(request()->start_at)->setTimezone('UTC')->startOfDay()->toDateTimeString();
+            $end_at = Carbon::parse(request()->end_at)->setTimezone('UTC')->endOfDay()->toDateTimeString() ;
+            $period=  UserCommon::getPeriodTargetIds($start_at,$end_at);
+            $periodID=  $period->id;
+
+        }else {
+
+            $defult = UserCommon::getPeriodTarget();
+            $start_at =$defult['start_at'];
+            $end_at =$defult['end_at'];
+            $periodID=  $defult['id'];
+
+        }
+     
+      $userSallary = UserSallary::query()
+            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
+            ->where('period_id','<=', $periodID) 
+            ->where('user_id', $this->id)
+            ->first();
+
+        return $userSallary?->toArray() ?? [];
+    }
     public function additionalInfo()
     {
         return $this->hasMany(AdditionalInfo::class, 'user_id');

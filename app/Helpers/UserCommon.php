@@ -464,7 +464,25 @@ class UserCommon{
         $periodTarget =  PeriodTarget::latest()->first();
         $data['start_at'] = $periodTarget?->start_at ?? "";
         $data['end_at'] = $periodTarget?->end_at ?? "";
+        $data['id'] = $periodTarget?->id ?? 0;
         return $data;
+    }
+
+    public static function getPeriodTargetIds($start_at ,$end_at)
+    {
+        $startDate = Carbon::parse($start_at);
+        $endDate = Carbon::parse($end_at);
+    
+        $periodTarget = PeriodTarget::query()
+            ->whereBetween('start_at', [$startDate, $endDate])
+            ->orWhereBetween('end_at', [$startDate, $endDate])
+            ->orWhere(function ($query) use ($startDate, $endDate) {
+                $query->where('start_at', '<=', $startDate)
+                      ->where('end_at', '>=', $endDate);
+            })
+            ->first();    
+    
+        return $periodTarget;
     }
 
   
