@@ -3,6 +3,7 @@
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -14,7 +15,9 @@ use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\RoomVipsController;
@@ -41,8 +44,6 @@ use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\ChargesController;
-use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
@@ -81,13 +82,13 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
 
         Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
-        
+
     });
     Route::prefix('/reward-level')->group(function () {
-    Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
-    Route::get('/wares', [RewardLevelIntervalController::class, 'wareInterval']);
-    Route::get('/vip', [RewardLevelIntervalController::class, 'vipInterval']);
-});
+        Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
+        Route::get('/wares', [RewardLevelIntervalController::class, 'wareInterval']);
+        Route::get('/vip', [RewardLevelIntervalController::class, 'vipInterval']);
+    });
     Route::prefix('group-chat')->group(function () {
         Route::get('/', [GroupChatController::class, 'index']);
         Route::post('/', [GroupChatController::class, 'store']);
@@ -221,7 +222,7 @@ Route::middleware([])->group(function () {
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
     Route::resource('all-permissions', PermissionController::class);
-    Route::post('all-permissions/{id}', [PermissionController::class,'update']);
+    Route::post('all-permissions/{id}', [PermissionController::class, 'update']);
     Route::get('http-methods', [PermissionController::class, "getHttpMethodsOptions"]);
 
 
@@ -393,6 +394,15 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config', [MomentsController::class, 'config']);
     });
+
+    Route::prefix('offers')->group(function () {
+        Route::get('/', [OfferController::class, 'index']);
+        Route::get('/show/{id}', [OfferController::class, 'show']);
+        Route::post('/create', [OfferController::class, 'store']);
+        Route::delete('/delete/{id}', [OfferController::class, 'delete']);
+        Route::post('/update/{id}', [OfferController::class, 'update']);
+    });
+
     Route::prefix('manger-types')->group(function () {
         Route::get('/', [MangerTypesController::class, 'all']);
         Route::get('/show/{id}', [MangerTypesController::class, 'show']);
