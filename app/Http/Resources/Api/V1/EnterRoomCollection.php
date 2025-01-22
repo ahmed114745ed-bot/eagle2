@@ -67,7 +67,8 @@ class EnterRoomCollection extends JsonResource
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
-            'owner_vip_level'     => $vip_level_img == 0 ? "" : $vip_level_img,
+            'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
+            'owner_vip_img'     => $vip_level_img == 0 ? "" : $vip_level_img,
             'vip' => Common::ovip_center(@$owner->id),
             'owner_country'        =>        $owner && $owner->country
                 ? [
@@ -106,7 +107,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
-           
+
         ];
     }
 
