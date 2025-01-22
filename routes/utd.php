@@ -391,7 +391,7 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [MomentsController::class, 'show']);
         Route::post('/search/{id}', [MomentsController::class, 'search']);
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
-        Route::post('/config/{id}', [MomentsController::class, 'config']);
+        Route::post('/config', [MomentsController::class, 'config']);
     });
     Route::prefix('manger-types')->group(function () {
         Route::get('/', [MangerTypesController::class, 'all']);
