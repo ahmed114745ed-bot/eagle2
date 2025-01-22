@@ -215,7 +215,8 @@ Route::middleware([])->group(function () {
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
     Route::resource('all-permissions', PermissionController::class);
-    Route::get('methods', [PermissionController::class, "getHttpMethodsOptions"]);
+    Route::post('all-permissions/{id}', [PermissionController::class,'update']);
+    Route::get('http-methods', [PermissionController::class, "getHttpMethodsOptions"]);
 
 
     // users
