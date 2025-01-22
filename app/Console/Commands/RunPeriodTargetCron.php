@@ -35,8 +35,10 @@ class RunPeriodTargetCron extends Command
 //            $lastRun = DB::table('period_target')->orderBy('id', 'desc')->first();
 
             DB::table('period_target')->insert([
-                'start_at' => Carbon::now()->startOfMonth()->addDays(20),
-                'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19),
+                'start_at' => Carbon::now()->startOfMonth()->addDays(20)->subDay()->setHour(18)->setMinute(0)->setSecond(0),
+                'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19)->setHour(17)->setMinute(59)->setSecond(59),
+                'created_at' => Carbon::now(),
+
             ]);
 
              $this->info("Cron job executed. Next execution will be in days.");

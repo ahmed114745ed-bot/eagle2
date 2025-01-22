@@ -101,7 +101,7 @@ class UserTargetController extends MainController
             // توليد الروابط
            
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return Carbon::parse($period)->format('Y-m-d');
+            // return Carbon::parse($period)->format('Y-m-d');
         });
         $grid->column('target_usd', __('usd') . ' ' . __('deserved'));
         $grid->column('target_hours', __('target hours'));

@@ -66,6 +66,7 @@ class FixedTargetService
      */
     public function calculateFixedTarget($month_received, User $user): User
     {
+        $times = $this->getUserLiveTime($user);
 
         if ($user->agency_id != 0) {
             $fixedTarget = new FixedTargetClass();
@@ -81,10 +82,14 @@ class FixedTargetService
             }
             $period = UserCommon::getPeriodTarget();
 
-            $countMoments  = Moment::query()->where('user_id', $user->id)->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at'])->count();
-
-            $countReels         = Real::query()->where('user_id', $user->id)->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at'])->count();
-
+            $countMoments = Moment::query()
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$period['start_at'], $period['end_at']])
+            ->count();
+            $countReels = Real::query()
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$period['start_at'], $period['end_at']])
+            ->count();
 
             $userTarget = UserTarget::where('user_id', $user->id)->first();
             $target = Target::find($userTarget->target_id);
@@ -122,8 +127,19 @@ class FixedTargetService
      */
     public function getUserLiveTime(User $user): null|Model
     {
+        // return LiveTime::query()->where('uid', $user->id)->whereDate('created_at', '>=', $period['start_at'])->whereDate('created_at', '<=', $period['end_at'])->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        // $startAt = Carbon::parse($period['start_at']);
+        // $endAt = Carbon::parse($period['end_at']);
         $period = UserCommon::getPeriodTarget();
-        return LiveTime::query()->where('uid', $user->id)->whereDate('created_at', '>=', $period['start_at'])->whereDate('created_at', '<=', $period['end_at'])->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        return LiveTime::query()
+        ->where('uid', $user->id)
+        ->whereBetween('created_at', [
+            $period['start_at'],   
+            $period['end_at']    
+        ])
+        ->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')
+        ->groupBy('uid')
+        ->first();
     }
 
     private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null): void
@@ -164,7 +180,7 @@ class FixedTargetService
         if (0 < $t) $values['sallary'] = $t;
         $period = UserCommon::getPeriodTarget();
         $userSalary = UserSallary::query()->whereHas('period_target',function($q) use ($period){
-            $q->whereDate("created_at",">=",$period['start_at'])->whereDate("created_at","<=",$period['end_at']);
+            $q->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
         })->where([
                                                       'user_id' => $user->id,
                                                       'user_agency_id' => $user->agency_id,

@@ -89,29 +89,23 @@ class UserCommon{
 
         $user = User::withCount(['reals' => function ($reals) use ($type, $period) {
 
-               $reals->whereDate('created_at', '>=', $period['start_at'])
-                     ->whereDate('created_at', '<=', $period['end_at']);
+            $reals->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
         },'real_comments'=>function($real_comments) use ($period){
                 
-                $real_comments->whereDate('created_at', '>=', $period['start_at'])
-                              ->whereDate('created_at', '<=', $period['end_at']);
+            $real_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
             
         },'real_likes'=>function($real_likes) use ($period){
-                $real_likes->whereDate('created_at', '>=', $period['start_at'])
-                            ->whereDate('created_at', '<=', $period['end_at']);
+            $real_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
             
         },'moments'=>function($moments) use ($period){
-                $moments->whereDate('created_at', '>=', $period['start_at'])
-                        ->whereDate('created_at', '<=', $period['end_at']);
+            $moments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
         },'moment_comments'=>function($moment_comments) use ($period){
             
-                $moment_comments->whereDate('created_at', '>=', $period['start_at'])
-                                ->whereDate('created_at', '<=', $period['end_at']);
+            $moment_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
            
         },'moment_likes'=>function($moment_likes) use ($period){
            
-                $moment_likes->whereDate('created_at', '>=', $period['start_at'])
-                             ->whereDate('created_at', '<=', $period['end_at']);
+            $moment_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
           
         }])->find($userId);
 
@@ -472,4 +466,7 @@ class UserCommon{
         $data['end_at'] = $periodTarget?->end_at ?? "";
         return $data;
     }
+
+  
+
 }

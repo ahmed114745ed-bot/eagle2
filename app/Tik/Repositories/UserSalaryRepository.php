@@ -71,6 +71,7 @@ class UserSalaryRepository extends AbstractRepository
 
     public function TotalSalary($userId, $month, $year)
     {
+
         return $this->model->query()->where('user_id', $userId)
             ->where(function ($query) use ($year, $month) {
                 $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
