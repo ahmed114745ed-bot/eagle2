@@ -95,16 +95,16 @@ class MomentsController extends Controller
         }
     }
 
-    public function config($num, Request $request)
+    public function config(Request $request)
     {
         $conf = Config::where('name', 'upload_moment')->first();
         if (!$conf) {
             config::create([
                 'name'  => 'upload_moment',
-                'value' => $num,
+                'value' => $request->num,
             ]);
         } else {
-            $conf->value = $num;
+            $conf->value = $request->num;
             $conf->save();
         }
         return Common::apiResponse(true, __('dashboard.update'), null);

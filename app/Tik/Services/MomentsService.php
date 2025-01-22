@@ -54,7 +54,7 @@ class MomentsService
 
     public function show($id)
     {
-        return $this->MomentsRepository->all($id);
+        return $this->MomentsRepository->find($id);
     }
 
     public function search($id)

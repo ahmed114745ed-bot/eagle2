@@ -20,6 +20,11 @@ class MomentsRepository extends AbstractRepository
             $query->where('id', $id);
         })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->paginate($perPage, ['*'], 'page', $page);
     }
+ 
+    public function find($id)
+    {
+        return $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->find($id);
+    }
 
 
 
