@@ -20,7 +20,7 @@ class RewardLevelIntervalController extends Controller
         $perPage = request('per_page') ?? 10;
         $rewards = RewardLevelInterval::when($id, function ($query, $id) {
             return $query->where('id', $id);
-        })->where('level_interval_id', $reward_level_interval)->paginate($perPage);
+        })->where('level_interval_id', $reward_level_interval)->with('ware','vip')->paginate($perPage);
 
         return Common::apiResponse(1, 'success', $rewards, 200);
     }
@@ -39,15 +39,14 @@ class RewardLevelIntervalController extends Controller
 
         if ($request->hasFile('target4')) {
             $target = Common::upload('images', $request->file('target4'));
-        }else {
-            $target =    $request->target;
         }
+       
 
 
         $reward = RewardLevelInterval::create([
             'level_interval_id' => $reward_level_interval,
             'type' => $request->type,
-            'target' =>  $target,
+           // 'target' =>  $target,
             'expire' => $request->expire,
         ]);
 
@@ -59,13 +58,12 @@ class RewardLevelIntervalController extends Controller
     {
 
         if ($request->hasFile('target4')) {
-            $target = Common::upload('images', $request->file('target'));
-        } elseif ($request->has('target')) {
-            $target =    $request->target;
-        }
+            $target = Common::upload('images', $request->file('target4'));
+        } 
+        
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->update([
             'type' => $request->type,
-            'target' => $target,
+           // 'target' => $target,
             'expire' => $request->expire,
         ]);
 
