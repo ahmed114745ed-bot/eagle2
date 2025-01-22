@@ -6,6 +6,7 @@ use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ChargeResource;
 use App\Models\Agency;
 use App\Models\Charge;
 use App\Models\User;
@@ -23,7 +24,7 @@ class ChargesController extends Controller
 
         $user_type = request('user_type');
 
-        $charges = Charge::when($from && $to , function($q)use($from, $to){
+        $charges = Charge::with('user.profile')->when($from && $to , function($q)use($from, $to){
             $q->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to);
         })
@@ -32,7 +33,7 @@ class ChargesController extends Controller
         })
         ->paginate(10);
 
-        return Common::apiResponse(true, 'Success', $charges);
+        return Common::apiResponse(true, 'Success', ChargeResource::collection($charges));
     }
 
     public function store(Request $request){
@@ -130,7 +131,7 @@ class ChargesController extends Controller
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
     {
         $charge = new Charge();
-        $charge->charger_id = Auth::id();
+        $charge->charger_id = Auth::id() ?? $request->charger_id;
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
         $charge->user_id = $user->id;
         $charge->agency_id = $agency->id ?? null;
