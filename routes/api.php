@@ -1,6 +1,5 @@
 <?php
 
-use App\Admin\Controllers\WareController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -47,7 +46,7 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
-
+  
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);

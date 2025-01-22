@@ -19,10 +19,11 @@ enum UserType: int
 
     public static function list(): array
     {
-        return array_reduce(
-            self::cases(),
-            fn($carry, $case) => $carry + [$case->value => $case->label()],
-            []
-        );
+        $result = [];
+        foreach (self::cases() as $case) {
+            $result[$case->value] = $case->name;
+        }
+        return $result;
     }
+
 }
