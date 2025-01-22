@@ -43,9 +43,9 @@ class PermissionController extends Controller
 
         $validator = Validator::make($request->all(), [
             'slug' => 'required|string|max:255',
-            'name' => 'required|string|max:255|unique:admin_roles,name',
-            'http_method' => 'nullable',
-            'http_path' => 'nullable',
+            'name' => 'required|string|max:255|unique:admin_permissions,name',
+            'http_method' => 'required',
+            'http_path' => 'required',
 
         ]);
         if ($validator->fails()) {
@@ -57,7 +57,7 @@ class PermissionController extends Controller
         $permission = new $permissionModel();
         $permission->slug = $request->input('slug');
         $permission->name = $request->input('name');
-        $permission->http_path = $request->input('http_path');
+        $permission->http_method = $request->input('http_method');
         $permission->http_path = $request->input('http_path');
         $permission->save();
 
@@ -86,7 +86,7 @@ class PermissionController extends Controller
 
             $permission->slug = $request->input('slug');
             $permission->name = $request->input('name');
-            $permission->http_path = $request->input('http_path');
+            $permission->http_method = $request->input('http_method');
             $permission->http_path = $request->input('http_path');
             $permission->save();
 
