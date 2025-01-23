@@ -44,8 +44,11 @@ use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\PercentageTargetController;
+use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
+use App\Http\Controllers\utd\SpecialIdFramController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -149,6 +152,30 @@ Route::middleware([])->group(function () {
     Route::prefix('appear-charger-agency')->group(function () {
         Route::get('/', [AppearChargerAgencyController::class, 'index']);
         Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
+    });
+
+
+    Route::prefix('request-agencies')->group(function(){
+        Route::get('/', [RequestAgenciesController::class, 'index']);
+        Route::post('/process-request/{id}', [RequestAgenciesController::class, 'update']);
+    });
+
+    Route::prefix('special-id-fram')->group(function(){
+        Route::get('/', [SpecialIdFramController::class, 'index']);
+        Route::get('/{id}', [SpecialIdFramController::class, 'show']);
+        Route::post('/create', [SpecialIdFramController::class, 'store']);
+        Route::post('/update/{id}', [SpecialIdFramController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
+    });
+
+
+
+    Route::prefix('daily-gift-types')->group(function(){
+        Route::get('/', [DailyGiftTypesController::class, 'index']);
+        Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
+        Route::post('/create', [DailyGiftTypesController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
     });
 
     //games
