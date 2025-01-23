@@ -181,6 +181,18 @@ class AgencyController extends Controller
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
 
+    public function agenciesCharge()
+    {
+
+        try {
+            $agencies = $this->agencyService->allAgencyCharged();
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  AllDataAgencyResource::collection($agencies));
+    }
+
     // public function showAgencyRequest(Request $request)
     // {
     //     $user = $request->user();
