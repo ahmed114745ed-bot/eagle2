@@ -18,7 +18,7 @@ class MomentsController extends Controller
 
     public function all(Request $request)
     {
-        $data = $this->MomentsService->all($request->id);
+        $data = $this->MomentsService->all($request->id, $request->per_page, $request->page);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -34,7 +34,7 @@ class MomentsController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
-        
+
 
         try {
             $this->MomentsService->create($request);
@@ -83,7 +83,7 @@ class MomentsController extends Controller
         }
     }
 
-    public function search( $id,Request $request)
+    public function search($id, Request $request)
     {
 
         try {
@@ -93,24 +93,20 @@ class MomentsController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
     }
 
-    public function config($num ,Request $request)
+    public function config(Request $request)
     {
-        $conf = Config::where('name','upload_moment')->first();
-        if(!$conf)
-        {
+        $conf = Config::where('name', 'upload_moment')->first();
+        if (!$conf) {
             config::create([
                 'name'  => 'upload_moment',
-                'value' => $num,
+                'value' => $request->num,
             ]);
-        }else{
-            $conf->value = $num;
+        } else {
+            $conf->value = $request->num;
             $conf->save();
         }
         return Common::apiResponse(true, __('dashboard.update'), null);
-
-
     }
 }

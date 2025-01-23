@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Common;
 use App\Traits\PaymentGetWayTrait;
 use Carbon\Carbon;
 use DB;
@@ -275,5 +276,8 @@ class Agency extends Model
     {
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
+
+
+
 
 }

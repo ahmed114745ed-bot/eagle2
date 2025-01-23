@@ -18,7 +18,7 @@ class DailyPrizeTypeController extends MainController
      */
     protected $title = 'DailyGiftType';
     public $permission_name = 'daily-prize';
-    
+
 
     public function index(Content $content)
     {
@@ -91,7 +91,7 @@ class DailyPrizeTypeController extends MainController
 
         $show->field('id', __('Id'));
         $show->field('type', __('Type'));
-        
+
 
         return $show;
     }

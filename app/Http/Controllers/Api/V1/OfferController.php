@@ -3,37 +3,47 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Exception;
+use App\Models\Offer;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\CoreWalletsService;
 use Illuminate\Support\Facades\Validator;
 
 
 
-class CoreWalletsController extends Controller
+
+
+class OfferController extends Controller
 {
 
-    public function __construct(private CoreWalletsService $coreWalletsService) {}
     public function index(Request $request)
     {
-        $data = $this->coreWalletsService->index($request->id, $request->per_page, $request->page);
+        $id = $request->id;
+        $page = $request->page;
+        $perPage = $request->per_page;
+        $data = Offer::when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(1, '', $data);
     }
 
     public function store(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'name'         => 'required|string|max:255',
-            'coins'         => 'required|numeric',
+            'title'         => 'required|string|max:255',
+            'title_en'         => 'required|string|max:255',
+            'body'         => 'required|string|max:255',
+            'body_en'         => 'required|string|max:255',
         ]);
+
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
+
         try {
-            $this->coreWalletsService->create($request);
+
+            Offer::create($request->all());
             return Common::apiResponse(1, 'created successfully');
         } catch (Exception $exception) {
 
@@ -41,32 +51,34 @@ class CoreWalletsController extends Controller
         }
     }
 
-    public function show(Request $request)
+    public function show($id)
     {
-        $validator = Validator::make($request->all(), [
-            "core_wallet_id" => 'required|integer|exists:core_wallets,id',
-        ]);
-        if ($validator->fails()) {
-            return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
+        try {
+            $offer =   Offer::findOrFail($id);
+            return Common::apiResponse(1, 'done', $offer);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        $data = $this->coreWalletsService->show($request->core_wallet_id);
-        return Common::apiResponse(1, '', $data);
     }
 
-    public function update(Request $request)
+    public function update($id, Request $request)
     {
 
         $validator = Validator::make($request->all(), [
-            'name'         => 'required|string|max:255',
-            'coins'         => 'required|numeric',
-            "core_wallet_id" => 'required|integer|exists:core_wallets,id',
+            'title'         => 'required|string|max:255',
+            'title_en'         => 'required|string|max:255',
+            'body'         => 'required|string|max:255',
+            'body_en'         => 'required|string|max:255',
         ]);
+
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         try {
-            $this->coreWalletsService->update($request);
+
+            Offer::where('id', $id)->update($request->all());
             return Common::apiResponse(1, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -76,8 +88,10 @@ class CoreWalletsController extends Controller
 
     public function delete($id)
     {
+
         try {
-            $this->coreWalletsService->delete($id);
+            $offer =   Offer::findOrFail($id);
+            $offer->delete();
             return Common::apiResponse(1, 'deleted successfully');
         } catch (Exception $exception) {
 

@@ -2,8 +2,8 @@
 
 
 use App\Helpers\Common;
-use App\Http\Controllers\utd\MangerTypesController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -15,7 +15,9 @@ use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\RoomVipsController;
@@ -30,16 +32,26 @@ use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\ReportMomentController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
+use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\RequestAgencyController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\DailyGiftTypesController;
+use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
+use App\Http\Controllers\utd\SpecialIdFramController;
+use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -76,7 +88,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
 
         Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
-        
+
     });
     Route::prefix('/reward-level')->group(function () {
     Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
@@ -117,9 +129,56 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [BackgroundController::class, 'show']);
     });
 
+    Route::prefix('percentage-target')->group(function () {
+        Route::get('/', [PercentageTargetController::class, 'index']);
+        Route::post('/', [PercentageTargetController::class, 'store']);
+    });
+
     Route::prefix('parent-users')->group(function () {
         Route::get('/', [ParentUsersController::class, 'index']);
         Route::get('/{id}', [ParentUsersController::class, 'users']);
+    });
+
+    Route::prefix('pages')->group(function () {
+        Route::get('/', [PagesController::class, 'index']);
+        Route::get('/{id}', [PagesController::class, 'show']);
+        Route::post('/', [PagesController::class, 'store']);
+        Route::post('/update/{id}', [PagesController::class, 'update']);
+        Route::post('/delete/{id}', [PagesController::class, 'delete']);
+    });
+
+    Route::prefix('charges')->group(function () {
+        Route::get('/', [ChargesController::class, 'index']);
+        Route::post('/', [ChargesController::class, 'store']);
+    });
+
+    Route::prefix('appear-charger-agency')->group(function () {
+        Route::get('/', [AppearChargerAgencyController::class, 'index']);
+        Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
+    });
+
+
+    Route::prefix('request-agencies')->group(function(){
+        Route::get('/', [RequestAgenciesController::class, 'index']);
+        Route::post('/process-request/{id}', [RequestAgenciesController::class, 'update']);
+    });
+
+    Route::prefix('special-id-fram')->group(function(){
+        Route::get('/', [SpecialIdFramController::class, 'index']);
+        Route::get('/{id}', [SpecialIdFramController::class, 'show']);
+        Route::post('/create', [SpecialIdFramController::class, 'store']);
+        Route::post('/update/{id}', [SpecialIdFramController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
+    });
+
+
+
+    Route::prefix('daily-gift-types')->group(function(){
+        Route::get('/', [DailyGiftTypesController::class, 'index']);
+        Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
+        Route::post('/create', [DailyGiftTypesController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
     });
 
     //games
@@ -159,7 +218,7 @@ Route::middleware([])->group(function () {
     Route::prefix('admin_users')->group(function () {
         Route::get('/all', [AdminUsersController::class, 'index']);
         Route::post('/create', [AdminUsersController::class, 'store']);
-        Route::get('/show/{id}', [AdminUsersController::class, 'show']);
+        Route::post('/show', [AdminUsersController::class, 'show']);
         Route::get('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
     });
     Route::prefix('gifts')->group(function () {
@@ -190,10 +249,11 @@ Route::middleware([])->group(function () {
 
     // roles
     Route::resource('roles', RoleController::class);
-    Route::post('roles/update/{id}', [RoleController::class, 'update']);
     Route::get('permissions', [RoleController::class, "permissions"]);
     Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
-    Route::resource('permissions', RoleController::class);
+    Route::resource('all-permissions', PermissionController::class);
+    Route::post('all-permissions/{id}', [PermissionController::class, 'update']);
+    Route::get('http-methods', [PermissionController::class, "getHttpMethodsOptions"]);
 
 
     // users
@@ -210,6 +270,7 @@ Route::middleware([])->group(function () {
         Route::post('/create', [MangerTypeController::class, 'store']);
         Route::post('/update', [MangerTypeController::class, 'update']);
         Route::post('/show', [MangerTypeController::class, 'show']);
+        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
     });
     //target Percentage
     Route::prefix('target-Percentage')->group(function () {
@@ -226,7 +287,7 @@ Route::middleware([])->group(function () {
         Route::get('/all', [CoreWalletsController::class, 'index']);
         Route::post('/create', [CoreWalletsController::class, 'store']);
         Route::post('/update', [CoreWalletsController::class, 'update']);
-        Route::get('/show/{id}', [CoreWalletsController::class, 'show']);
+        Route::post('/show/{id}', [CoreWalletsController::class, 'show']);
         Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
     });
 
@@ -291,6 +352,7 @@ Route::middleware([])->group(function () {
         Route::post('create', [UserController::class, 'create']);
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+        Route::get('user-type', [UserController::class, 'userType']);
     });
 
 
@@ -361,13 +423,37 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [MomentsController::class, 'show']);
         Route::post('/search/{id}', [MomentsController::class, 'search']);
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
-        Route::post('/config/{id}', [MomentsController::class, 'config']);
+        Route::post('/config', [MomentsController::class, 'config']);
     });
-    Route::prefix('manger-types')->group(function () {
-        Route::get('/', [MangerTypesController::class, 'all']);
-        Route::get('/show/{id}', [MangerTypesController::class, 'show']);
-        Route::post('/create', [MangerTypesController::class, 'create']);
-        Route::post('/update/{id}', [MangerTypesController::class, 'update']);
-        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
+
+    Route::prefix('offers')->group(function () {
+        Route::get('/', [OfferController::class, 'index']);
+        Route::get('/show/{id}', [OfferController::class, 'show']);
+        Route::post('/create', [OfferController::class, 'store']);
+        Route::delete('/delete/{id}', [OfferController::class, 'delete']);
+        Route::post('/update/{id}', [OfferController::class, 'update']);
+    });
+
+    Route::prefix('request-background-image')->group(function () {
+        Route::get('/', [RequestBackgroundImageController::class, 'all']);
+        Route::get('/show/{id}', [RequestBackgroundImageController::class, 'show']);
+        Route::post('/create', [RequestBackgroundImageController::class, 'create']);
+        Route::delete('/delete/{id}', [RequestBackgroundImageController::class, 'destroy']);
+        Route::post('/update/{id}', [RequestBackgroundImageController::class, 'update']);
+    });
+
+    Route::prefix('report-moment')->group(function () {
+        Route::get('/', [ReportMomentController::class, 'all']);
+        Route::get('/show/{id}', [ReportMomentController::class, 'show']);
+        Route::post('/create', [ReportMomentController::class, 'create']);
+        Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
+        Route::post('/update/{id}', [ReportMomentController::class, 'update']);
+        Route::post('delete-moment/{moment_id}/{id}',[ReportMomentController::class, 'destroyDash']);
+    });
+
+    Route::prefix('request-agency')->group(function () {
+        Route::get('/', [RequestAgencyController::class, 'index']);
+        Route::post('/action', [RequestAgencyController::class, 'actionRequestAgency']);
+       
     });
 });

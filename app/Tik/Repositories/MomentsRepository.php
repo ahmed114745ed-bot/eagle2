@@ -14,11 +14,16 @@ class MomentsRepository extends AbstractRepository
         parent::__construct(new Moment());
     }
 
-    public function all($id)
+    public function all($id, $perPage, $page)
     {
-       return $this->model->when(isset($id), function ($query) use ($id) {
+        return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
-        })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->get();
+        })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->paginate($perPage, ['*'], 'page', $page);
+    }
+ 
+    public function find($id)
+    {
+        return $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->find($id);
     }
 
 
@@ -30,13 +35,11 @@ class MomentsRepository extends AbstractRepository
         $query = $this->model->query();
 
         $query->whereHas('user', function ($query) use ($input) {
-            $query->where('uuid', trim($input)) ;
-                 
+            $query->where('uuid', trim($input));
         })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
-        
-        $result = $query->get(); 
-        
-        return $result ;
-     
+
+        $result = $query->get();
+
+        return $result;
     }
 }

@@ -90,7 +90,7 @@ class DailyPrizeController extends AdminController
     {
         $id = request()->route('id');
         $model = DailyGift::findOrFail($id);
-        
+
         $form = $this->form()->edit($id);
 
         return $content
@@ -106,7 +106,7 @@ class DailyPrizeController extends AdminController
             ->description(trans('admin.description'))
             ->body($this->detail($id));
     }
-    
+
     protected function form()
     {
         $form = new Form(new DailyGift());

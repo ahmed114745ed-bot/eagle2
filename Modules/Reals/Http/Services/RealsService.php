@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 define('PAGINATION', 10);
-define('REEL_PAGINATION', 5);
+define('REEL_PAGINATION', 10);
 
 class RealsService extends BaseModelService
 {
@@ -76,6 +76,62 @@ class RealsService extends BaseModelService
         return $allData;
     }
 
+    public function showNew(User $user)
+    {
+        $userId        = $user->id;
+        $userInterests = $user->interests;
+
+        $interestIds = $userInterests?->pluck('id')?->toArray() ?? [];
+        if (!request("page")  || request("page") == 1) {
+            $user->last_all_reel_id = Real::select('id')->latest()->first()?->id;
+        }
+        $reals = Real::query()->whereHas('categories', function ($query) use ($interestIds) {
+            return $query->whereIn('category_id', $interestIds);
+        })->with([
+            'user' => function ($query) use ($userId) {
+                $query->withoutAppends()->isFollow($userId)->with('profile');
+            }
+        ])->withCount(['likes', 'comments'])
+            ->whereDoesntHave('likes', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
+            ->inRandomOrder($user->real_type);
+
+
+            $countInterested   = $reals->count();
+        $currentPage       = request()->page ?? 1;
+        $pagination        = 10;
+
+        $reals = $reals->paginate($pagination);
+
+
+        $allData = $reals->items();
+        $allData = collect($allData);
+
+        $maxRealId = $user->last_all_reel_id;
+
+        [$countNotInterest, $allData] =
+            $this->getReels($countInterested, $interestIds, $userId, $allData, $user->real_type, $maxRealId, function ($interestIds, $userId) {
+                return $this->getNotInterestedReels($interestIds, $userId);
+            });
+
+
+        [$_, $allData] =
+            $this->getReels(($countInterested + ($countNotInterest)), $interestIds, $userId, $allData, $user->real_type, $maxRealId, function ($interestIds, $userId) {
+                return $this->getLikedReels($interestIds, $userId);
+            });
+
+
+        $paginator = new LengthAwarePaginator($allData, 100, $pagination, $currentPage, [
+            'path' => request()->url(),
+            'query' => request()->query()
+        ]);
+
+
+
+        return $reals;
+    }
     public function show(User $user): array
     {
         $userId        = $user->id;

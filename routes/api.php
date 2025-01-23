@@ -1,6 +1,8 @@
 <?php
 
 use App\Admin\Controllers\WareController;
+use App\Enums\UserType;
+use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -47,6 +49,13 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
+    Route::get('test-users', function (){
+        return response()->json([
+            'success' => true,
+            'message' => 'Success',
+            'data' => (object) UserType::list(),
+        ]);
+    });
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
@@ -403,6 +412,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+                // Route::get('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
 

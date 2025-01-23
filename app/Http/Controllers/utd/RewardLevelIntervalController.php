@@ -9,24 +9,30 @@ use App\Enums\IntervalLevel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Modules\Public\Entities\RewardLevelInterval;
+use App\Http\Resources\Api\V1\IntervalOVipResource;
+use App\Http\Resources\Api\V1\IntervalWareResource;
 
 class RewardLevelIntervalController extends Controller
 {
     public function index($reward_level_interval)
     {
 
+
         $id = request('id');
         $perPage = request('per_page') ?? 10;
         $rewards = RewardLevelInterval::when($id, function ($query, $id) {
             return $query->where('id', $id);
-        })->where('level_interval_id', $reward_level_interval)->paginate($perPage);
+
+        })->where('level_interval_id', $reward_level_interval)->with('ware','vip')->paginate($perPage);
+
+
 
         return Common::apiResponse(1, 'success', $rewards, 200);
     }
 
     public function show($reward_level_interval, $id)
     {
-        $reward = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id);
+        $reward = RewardLevelInterval::where('level_interval_id', $reward_level_interval)->with('ware', 'vip')->findOrFail($id);
 
 
 
@@ -36,11 +42,16 @@ class RewardLevelIntervalController extends Controller
     public function store($reward_level_interval, Request $request)
     {
 
+        if ($request->hasFile('target4')) {
+            $target = Common::upload('images', $request->file('target4'));
+        }
+       
+
 
         $reward = RewardLevelInterval::create([
             'level_interval_id' => $reward_level_interval,
             'type' => $request->type,
-            'target' => $request->target,
+           // 'target' =>  $target,
             'expire' => $request->expire,
         ]);
 
@@ -51,10 +62,13 @@ class RewardLevelIntervalController extends Controller
     public function update($reward_level_interval, Request $request, $id)
     {
 
-
+        if ($request->hasFile('target4')) {
+            $target = Common::upload('images', $request->file('target4'));
+        } 
+        
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->update([
             'type' => $request->type,
-            'target' => $request->target,
+           // 'target' => $target,
             'expire' => $request->expire,
         ]);
 

@@ -12,9 +12,9 @@ class MomentsService
 {
     public function __construct(private readonly MomentsRepository $MomentsRepository) {}
 
-    public function all($id)
+    public function all($id, $perPage, $page)
     {
-        return $this->MomentsRepository->all($id);
+        return $this->MomentsRepository->all($id, $perPage, $page);
     }
 
     public function create($request)
@@ -54,7 +54,7 @@ class MomentsService
 
     public function show($id)
     {
-        return $this->MomentsRepository->all($id);
+        return $this->MomentsRepository->find($id);
     }
 
     public function search($id)
