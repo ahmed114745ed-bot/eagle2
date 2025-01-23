@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\utd;
 
 use Exception;
-use App\Models\Config;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Tik\Services\ReelsService;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
