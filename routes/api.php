@@ -404,6 +404,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
+                Route::get('charges', [AgencyController::class, 'agenciesCharge']);
 
             });
             Route::prefix('payment-gateway')->group(function () {
