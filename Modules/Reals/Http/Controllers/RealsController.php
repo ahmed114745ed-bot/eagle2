@@ -36,7 +36,21 @@ class RealsController extends Controller
             $user->real_type = $user->id . random_int(1000,9999);
 
         }
-        $reals = $this->realsService->show($user);
+        $reals = $this->realsService->showNew($user);
+        //return $reals;
+
+        return response()->json([
+            'status' => true,
+            'message' => 'success',
+            'data' => RealsResource::collection($reals)->resolve(),
+            'pagination' => [
+                'current_page' => $reals->currentPage(),
+                'per_page' => $reals->perPage(),
+                'total' => $reals->total(),
+                'last_page' => $reals->lastPage(),
+            ]
+            ],200);
+
         return Common::apiResponse(1, 'success',RealsResource::collection($reals));
     }
 
