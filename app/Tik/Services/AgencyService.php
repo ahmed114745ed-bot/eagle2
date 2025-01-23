@@ -817,4 +817,10 @@ class AgencyService
         return $data;
     }
 
+    public function allAgencyCharged()
+    {
+        $agencyIds = $this->chargeAgencyRepository->all();
+        return $this->agencyRepository->getByIds($agencyIds);
+    }
+
 }
