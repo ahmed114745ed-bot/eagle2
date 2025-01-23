@@ -825,4 +825,8 @@ class AgencyService
         return $this->agencyRepository->getByIds($agencyIds);
     }
 
+    public function allRequests($id, $uuid, $perPage, $page, $status, $action)
+    {
+        return $this->agencyRepository->getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status, $action);
+    }
 }
