@@ -85,9 +85,7 @@ class RealsService extends BaseModelService
         if (!request("page")  || request("page") == 1) {
             $user->last_all_reel_id = Real::select('id')->latest()->first()?->id;
         }
-        $reals = Real::query()->whereHas('categories', function ($query) use ($interestIds) {
-            return $query->whereIn('category_id', $interestIds);
-        })->with([
+        $reals = Real::query()->with([
             'user' => function ($query) use ($userId) {
                 $query->withoutAppends()->isFollow($userId)->with('profile');
             }
