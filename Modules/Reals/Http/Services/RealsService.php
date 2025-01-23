@@ -85,7 +85,10 @@ class RealsService extends BaseModelService
         if (!request("page")  || request("page") == 1) {
             $user->last_all_reel_id = Real::select('id')->latest()->first()?->id;
         }
-        $reals = Real::query()->with([
+        $reals = Real::query()
+        /* ->whereHas('categories', function ($query) use ($interestIds) {
+            return $query->whereIn('category_id', $interestIds);
+        }) */->with([
             'user' => function ($query) use ($userId) {
                 $query->withoutAppends()->isFollow($userId)->with('profile');
             }
@@ -93,7 +96,7 @@ class RealsService extends BaseModelService
             ->whereDoesntHave('likes', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
+            //->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
             ->inRandomOrder($user->real_type);
 
 
