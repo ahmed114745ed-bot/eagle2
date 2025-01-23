@@ -2,10 +2,21 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Background;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 
-
-
-class BackgroundRepository extends AbstractRepository
+class ChargeAgencyRepository extends AbstractRepository
 {
+
+    /**
+     * @param Model $model
+     */
+    public function __construct()
+    {
+        parent::__construct(new ChargeAgency());
+    }
+
+    public function all()
+    {
+        return $this->model->Select('agency_id')->groupBy('agency_id')->get();
+    }
 }
