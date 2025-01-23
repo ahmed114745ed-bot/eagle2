@@ -26,6 +26,13 @@ class RequestBackgroundImageRepository extends AbstractRepository
 
     public function findByUserId($userId)
     {
-        return $this->model->query()->where('owner_room_id',$userId)->whereIn('status',[1,3])->select('id','img')->get();
+        return $this->model->query()->where('owner_room_id', $userId)->whereIn('status', [1, 3])->select('id', 'img')->get();
+    }
+
+    public function all($id, $perPage, $page)
+    {
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);
     }
 }

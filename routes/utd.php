@@ -34,6 +34,7 @@ use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\ReportMomentController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
@@ -42,13 +43,14 @@ use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
-use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\SpecialIdFramController;
+use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
@@ -267,6 +269,7 @@ Route::middleware([])->group(function () {
         Route::post('/create', [MangerTypeController::class, 'store']);
         Route::post('/update', [MangerTypeController::class, 'update']);
         Route::post('/show', [MangerTypeController::class, 'show']);
+        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
     });
     //target Percentage
     Route::prefix('target-Percentage')->group(function () {
@@ -430,11 +433,20 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [OfferController::class, 'update']);
     });
 
-    Route::prefix('manger-types')->group(function () {
-        Route::get('/', [MangerTypesController::class, 'all']);
-        Route::get('/show/{id}', [MangerTypesController::class, 'show']);
-        Route::post('/create', [MangerTypesController::class, 'create']);
-        Route::post('/update/{id}', [MangerTypesController::class, 'update']);
-        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
+    Route::prefix('request-background-image')->group(function () {
+        Route::get('/', [RequestBackgroundImageController::class, 'all']);
+        Route::get('/show/{id}', [RequestBackgroundImageController::class, 'show']);
+        Route::post('/create', [RequestBackgroundImageController::class, 'create']);
+        Route::delete('/delete/{id}', [RequestBackgroundImageController::class, 'destroy']);
+        Route::post('/update/{id}', [RequestBackgroundImageController::class, 'update']);
+    });
+
+    Route::prefix('report-moment')->group(function () {
+        Route::get('/', [ReportMomentController::class, 'all']);
+        Route::get('/show/{id}', [ReportMomentController::class, 'show']);
+        Route::post('/create', [ReportMomentController::class, 'create']);
+        Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
+        Route::post('/update/{id}', [ReportMomentController::class, 'update']);
+        Route::post('delete-moment/{moment_id}/{id}',[ReportMomentController::class, 'destroyDash']);
     });
 });
