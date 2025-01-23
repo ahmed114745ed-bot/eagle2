@@ -40,7 +40,7 @@ class FamilyLevelService
             'name' => $request->name,
             'img' => $image ??'',
             'exp' => $request->exp,
-            'type' => $request->type,
+            // 'type' => $request->type,
             'members' => $request->members,
             'admins' => $request->admins,
         ];
@@ -62,9 +62,9 @@ class FamilyLevelService
         if ($request->exp) {
             $FamilyLevel->exp = $request->exp;
         }
-        if ($request->type) {
-            $FamilyLevel->type = $request->type;
-        }
+        // if ($request->type) {
+        //     $FamilyLevel->type = $request->type;
+        // }
         if ($request->members) {
             $FamilyLevel->members = $request->members;
         }
