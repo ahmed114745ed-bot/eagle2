@@ -40,7 +40,7 @@ class FamilyLevelService
             'name' => $request->name,
             'img' => $image ??'',
             'exp' => $request->exp,
-            'type' => $request->type,
+            // 'type' => $request->type,
             'members' => $request->members,
             'admins' => $request->admins,
         ];
