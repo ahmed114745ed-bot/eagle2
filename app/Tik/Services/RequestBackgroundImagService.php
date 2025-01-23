@@ -12,31 +12,69 @@ class RequestBackgroundImagService
         private readonly RequestBackgroundImageRepository $requestBackgroundImageRepository,
         private readonly UserRepository $userRepository,
 
-    ) {
-    }
+    ) {}
 
     public function create($request, $userId, $price)
     {
-  
-            if ($request->hasFile('image')) {
-                $img                                   = $request->file('image');
-                $image                                 = Common::upload('images', $img);
 
-                $data = [
-                    'owner_room_id' => $userId,
-                    'img' => $image,
-                    'price' => $price,
-                    'status' => 1,
-                ];
-                $this->requestBackgroundImageRepository->create($data);
-                $this->userRepository->decrementCoins($userId, $price);
-                return true;
-            }
-        
+        if ($request->hasFile('image')) {
+            $img                                   = $request->file('image');
+            $image                                 = Common::upload('images', $img);
+
+            $data = [
+                'owner_room_id' => $userId,
+                'img' => $image,
+                'price' => $price,
+                'status' => 1,
+            ];
+            $this->requestBackgroundImageRepository->create($data);
+            $this->userRepository->decrementCoins($userId, $price);
+            return true;
+        }
     }
 
     public function findByUserId($id)
     {
         return $this->requestBackgroundImageRepository->findByUserId($id);
+    }
+
+    public function show($id)
+    {
+        return $this->requestBackgroundImageRepository->findOrFail($id);
+    }
+
+    public function index($id, $perPage, $page)
+    {
+        return $this->requestBackgroundImageRepository->all($id, $perPage, $page);
+    }
+
+    public function createDash($request)
+    {
+        if ($request->hasFile('img')) {
+            $img = Common::upload('images', $request->file('img'));
+            $request->merge(['img' => $img]);
+        }
+        $request->merge(['type' => 'admin']);
+
+        $this->requestBackgroundImageRepository->create($request->all());
+        return true;
+    }
+
+    public function update($id, $request)
+    {
+        if ($request->hasFile('img')) {
+            $img = Common::upload('images', $request->file('img'));
+            $request->merge(['img' => $img]);
+        }
+        $request->merge(['type' => 'admin']);
+        $this->requestBackgroundImageRepository->update($request->all(), $id);
+        return true;
+    }
+
+    public function delete($id)
+    {
+        $data = $this->requestBackgroundImageRepository->findByUserId($id);
+        $data->delete();
+        return true;
     }
 }
