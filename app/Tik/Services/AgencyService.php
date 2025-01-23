@@ -746,4 +746,9 @@ class AgencyService
 
         return [];
     }
+
+    public function allRequests($id, $uuid, $perPage, $page, $status, $action)
+    {
+        return $this->agencyRepository->getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status, $action);
+    }
 }
