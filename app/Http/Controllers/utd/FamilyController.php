@@ -35,10 +35,11 @@ class FamilyController extends Controller
             'notice' => $request->notice,
             'is_success' => $request->is_success,
             'image' => $image,
-            'user_id'=> $request->user_id
+            'user_id'=> $request->user_id,
+            'num' => $request->num,
         ]);
 
-        return Common::apiResponse(true, '',  $family, 200);
+        return Common::apiResponse(true, '',  [], 200);
     }
 
     public function update(Request $request, $id){
@@ -55,7 +56,8 @@ class FamilyController extends Controller
             'introduce' => $request->introduce,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'user_id'=> $request->user_id
+            'user_id'=> $request->user_id,
+            'num' => $request->num
         ]);
 
         return Common::apiResponse(1, 'Family updated successfully');
