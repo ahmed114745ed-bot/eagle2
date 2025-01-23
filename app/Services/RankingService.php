@@ -89,7 +89,7 @@ class RankingService
             $this->achievementService->getUserAchievement($user)
         );
     }
-    public function getRanking($class, $type, $user, $limit, $room_uid, $sent_to_owner, $agencyId)
+    public function getRanking($class, $type, $user, $limit, $room_uid, $sent_to_owner)
     {
         if ($class == 4) {
             $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
@@ -100,7 +100,7 @@ class RankingService
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
       
 
-        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords, $agencyId);
+        $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
       
     if($class = 5 )
     {

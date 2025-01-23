@@ -749,79 +749,79 @@ class AgencyService
         return [];
     }
 
-    public function dailyReportNew($user, $start_at, $end_at)
+    // public function dailyReportNew($user, $start_at, $end_at)
+    // {
+
+    //     $dailyDiamonds = $this->giftLogRepository->getByDailyNew($user->id, $user->agency_id, $start_at, $end_at);
+
+    //     $dailyTimes = $this->liveTimeRepository->getByDailyNew($user->id, $start_at, $end_at);
+        
+    //     $dailyDiamonds = $dailyDiamonds->map(function ($data) {
+    //         $data->day = Carbon::parse($data->date)->day;
+    //         return $data;
+    //     });
+    //     $dailyTimes = $dailyTimes->map(function ($data) {
+    //         $data->day = Carbon::parse($data->date)->day;
+    //         return $data;
+    //     });
+    //     /** @var User $user */
+
+    //     $totalDays = $user->getTotalDaysNew();
+
+    //     $userInfoArray = $user->getSallaryInfoNew();
+
+    //     $totalSalary = @$userInfoArray['total_salary'] ?? 0;
+    //     $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
+
+    //     $isThisMonth = $start_at == now()->month && $end_at == now()->year;
+    //     $startDay = 1;
+    //     $endDay = Carbon::parse(request()->end_at)->endOfMonth()->day;
+
+    //     if ($isThisMonth) $endDay = today()->day;
+
+    //     // \Log::info('this2 is error');
+    //     $hours = $dailyTimes->sum('hours');
+    //     $minutes = $hours * 60;
+    //     $data = [
+    //         'user_salary' => [
+    //             'cut_amount' => (int)$totalCutAmount,
+    //             'salary' => intval($totalSalary),
+    //         ],
+    //         'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
+    //         'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
+    //         'live_minutes' => (string)$minutes,
+    //         'active_days' => (string)$totalDays,
+    //         'daly_reports' => []
+    //     ];
+        
+    //     $startDate = Carbon::parse($start_at);
+    //     $endDate = Carbon::parse($end_at);
+        
+    //     for ($date = $startDate; $date <= $endDate; $date->addDay()) {
+    //         $day = $date->day;
+    //         $month = $date->month;
+    //         $year = $date->year;
+        
+    //         $hours = $dailyTimes->where('day', $day)->first()?->hours ?? 0;
+    //         $minutes = $hours * 60;
+    //         $diamonds = $dailyDiamonds->where('day', $day)->first()?->diamonds ?? 0;
+        
+    //         $data['daly_reports'][] = [
+    //             'day' => (int)$day,
+    //             'month' => (int)$month,  
+    //             'year' => (int)$year,    
+    //             'live_minutes' => (int)$minutes,
+    //             'diamonds' => numToString((int)$diamonds),
+    //             'is_active_day' => $hours >= 1,
+    //         ];
+    //     }
+        
+    //     return $data;
+    // }
+
+    public function allAgencyCharged($agencyId)
     {
-
-        $dailyDiamonds = $this->giftLogRepository->getByDailyNew($user->id, $user->agency_id, $start_at, $end_at);
-
-        $dailyTimes = $this->liveTimeRepository->getByDailyNew($user->id, $start_at, $end_at);
-        
-        $dailyDiamonds = $dailyDiamonds->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
-            return $data;
-        });
-        $dailyTimes = $dailyTimes->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
-            return $data;
-        });
-        /** @var User $user */
-
-        $totalDays = $user->getTotalDaysNew();
-
-        $userInfoArray = $user->getSallaryInfoNew();
-
-        $totalSalary = @$userInfoArray['total_salary'] ?? 0;
-        $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
-
-        $isThisMonth = $start_at == now()->month && $end_at == now()->year;
-        $startDay = 1;
-        $endDay = Carbon::parse(request()->end_at)->endOfMonth()->day;
-
-        if ($isThisMonth) $endDay = today()->day;
-
-        // \Log::info('this2 is error');
-        $hours = $dailyTimes->sum('hours');
-        $minutes = $hours * 60;
-        $data = [
-            'user_salary' => [
-                'cut_amount' => (int)$totalCutAmount,
-                'salary' => intval($totalSalary),
-            ],
-            'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
-            'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$minutes,
-            'active_days' => (string)$totalDays,
-            'daly_reports' => []
-        ];
-        
-        $startDate = Carbon::parse($start_at);
-        $endDate = Carbon::parse($end_at);
-        
-        for ($date = $startDate; $date <= $endDate; $date->addDay()) {
-            $day = $date->day;
-            $month = $date->month;
-            $year = $date->year;
-        
-            $hours = $dailyTimes->where('day', $day)->first()?->hours ?? 0;
-            $minutes = $hours * 60;
-            $diamonds = $dailyDiamonds->where('day', $day)->first()?->diamonds ?? 0;
-        
-            $data['daly_reports'][] = [
-                'day' => (int)$day,
-                'month' => (int)$month,  
-                'year' => (int)$year,    
-                'live_minutes' => (int)$minutes,
-                'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $hours >= 1,
-            ];
-        }
-        
-        return $data;
-    }
-
-    public function allAgencyCharged()
-    {
-        $agencyIds = $this->chargeAgencyRepository->all();
+        $agencyIds = $this->chargeAgencyRepository->all($agencyId);
         return $this->agencyRepository->getByIds($agencyIds);
     }
 

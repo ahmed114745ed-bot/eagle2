@@ -24,7 +24,7 @@ class RankingRepository
             });
     }
 
-    public function getGiftLogs($class, $rel, $type, $limit, $keywords, $agencyId)
+    public function getGiftLogs($class, $rel, $type, $limit, $keywords)
     {
         $query = GiftLog::query();
         if ($class != 5) {
@@ -32,9 +32,7 @@ class RankingRepository
                 ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
                 ->when($class != 3, fn($q) => $q->with($rel));
         } else {
-            $query = $query->with($rel)->when(isset($agencyId), function ($query) use ($agencyId,$keywords) {
-                $query->where($keywords, $agencyId);
-            });
+            $query = $query->with($rel);
         }
         $this->applyDateFilters($query, $type);
 

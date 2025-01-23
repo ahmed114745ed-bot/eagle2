@@ -15,8 +15,10 @@ class ChargeAgencyRepository extends AbstractRepository
         parent::__construct(new ChargeAgency());
     }
 
-    public function all()
+    public function all($agencyId)
     {
-        return $this->model->Select('agency_id')->groupBy('agency_id')->get();
+        return $this->model->Select('agency_id')->groupBy('agency_id')->when(isset($agencyId), function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
+        })->get();
     }
 }
