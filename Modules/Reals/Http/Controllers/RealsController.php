@@ -39,7 +39,7 @@ class RealsController extends Controller
         $reals = $this->realsService->showNew($user);
         //return $reals;
 
-        return response()->json([
+/*         return response()->json([
             'status' => true,
             'message' => 'success',
             'data' => RealsResource::collection($reals)->resolve(),
@@ -49,7 +49,7 @@ class RealsController extends Controller
                 'total' => $reals->total(),
                 'last_page' => $reals->lastPage(),
             ]
-            ],200);
+            ],200); */
 
         return Common::apiResponse(1, 'success',RealsResource::collection($reals));
     }

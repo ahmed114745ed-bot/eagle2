@@ -130,7 +130,7 @@ class RealsService extends BaseModelService
 
 
 
-        return $paginator;
+        return $reals;
     }
     public function show(User $user): array
     {
