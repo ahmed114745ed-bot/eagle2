@@ -93,9 +93,9 @@ class RealsService extends BaseModelService
                 $query->withoutAppends()->isFollow($userId)->with('profile');
             }
         ])->withCount(['likes', 'comments'])
-            ->whereDoesntHave('likes', function ($query) use ($userId) {
+            /* ->whereDoesntHave('likes', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
-            })
+            }) */
             //->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
             ->inRandomOrder($user->real_type);
 
