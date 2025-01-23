@@ -26,10 +26,15 @@ class RankingRepository
 
     public function getGiftLogs($class, $rel, $type, $limit,$keywords)
     {
-        $query = GiftLog::query()->whereHas($rel)
+        $query = GiftLog::query();
+          if($class != 5)
+          {
+            $query = $query->whereHas($rel)
             ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
             ->when($class != 3, fn($q) => $q->with($rel));
-
+          }else{
+            $query = $query->with($rel);
+          }
         $this->applyDateFilters($query, $type);
 
         return $query->selectRaw("sum(giftPrice) as exp, $keywords")

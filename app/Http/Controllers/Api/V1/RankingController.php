@@ -23,7 +23,7 @@ class RankingController extends Controller
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
 
-        if (!in_array($class, [1, 2, 3, 4]) || !in_array($type, [0, 1, 2, 3, 4])) {
+        if (!in_array($class, [1, 2, 3, 4, 5]) || !in_array($type, [0, 1, 2, 3, 4, 5])) {
             return Common::apiResponse(0, 'Parameter error', null, 422);
         }
 

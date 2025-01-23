@@ -98,8 +98,14 @@ class RankingService
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
+      
 
         $data = $this->rankingRepo->getGiftLogs($class, $rel, $type, $limit, $keywords);
+      
+    if($class = 5 )
+    {
+        return $data;
+    }
         $this->transformData($data, $class, $keywords, $rel);
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
@@ -246,7 +252,7 @@ class RankingService
             return ['sender_id', 'sender'];
         } elseif ($class == 3) {
             return ['roomowner_id', 'roomOwner'];
-        } elseif ($class == 4) {
+        } elseif ($class == 5) {
             return ['agency_id', 'agency'];
         } 
         else {
