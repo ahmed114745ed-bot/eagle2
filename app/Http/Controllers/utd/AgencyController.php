@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\AgencyRequestsResource;
 
 
-class RequestAgencyController extends Controller
+class AgencyController extends Controller
 {
     public function __construct(private AgencyService $agencyService) {}
 

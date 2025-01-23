@@ -33,6 +33,7 @@ use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
 use App\Tik\Repositories\AgencySalaryRepository;
+use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
@@ -63,6 +64,7 @@ class AgencyService
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
+        private readonly ChargeAgencyRepository $chargeAgencyRepository,
 
     ) {}
 
@@ -750,5 +752,11 @@ class AgencyService
     public function allRequests($id, $uuid, $perPage, $page, $status, $action)
     {
         return $this->agencyRepository->getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status, $action);
+    }
+
+    public function allAgencyCharged()
+    {
+        $agencyIds = $this->chargeAgencyRepository->all();
+        return $this->agencyRepository->getByIds($agencyIds);
     }
 }

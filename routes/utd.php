@@ -7,6 +7,7 @@ use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
+use App\Http\Controllers\utd\AgencyController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
@@ -39,7 +40,6 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use App\Http\Controllers\utd\RequestAgencyController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
@@ -52,7 +52,6 @@ use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
-use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -451,8 +450,8 @@ Route::middleware([])->group(function () {
     });
 
     Route::prefix('request-agency')->group(function () {
-        Route::get('/', [RequestAgencyController::class, 'index']);
-        Route::post('/action', [RequestAgencyController::class, 'actionRequestAgency']);
-
+        Route::get('/', [AgencyController::class, 'index']);
+        Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
+       
     });
 });

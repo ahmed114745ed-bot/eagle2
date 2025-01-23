@@ -136,9 +136,9 @@ class AgencyController extends Controller
         $agency = $user->ownAgency;
         if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
 
-//        try {
-            $this->agencyService->userHandlingRequest($request->user_id, $agency->id);
-      /*  } catch (ValidationException $exception){
+        //        try {
+        $this->agencyService->userHandlingRequest($request->user_id, $agency->id);
+        /*  } catch (ValidationException $exception){
             return Common::apiResponse(0, $exception->getMessage(), null, 422);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), null, 500);
@@ -171,14 +171,26 @@ class AgencyController extends Controller
             $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
         } elseif ($type == "record") {
-            $list_req1 = $list_req->where('status', '!=', 0)->with('user','admin')->paginate(10);
+            $list_req1 = $list_req->where('status', '!=', 0)->with('user', 'admin')->paginate(10);
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'record');
         }
 
         if ($list_req) {
-            return Common::apiResponse(1, '', $list_req,200);
+            return Common::apiResponse(1, '', $list_req, 200);
         }
         return Common::apiResponse(0, 'لا يوجد بيانات', []);
+    }
+
+    public function agenciesCharge()
+    {
+
+        try {
+            $agencies = $this->agencyService->allAgencyCharged();
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  AllDataAgencyResource::collection($agencies));
     }
 
     // public function showAgencyRequest(Request $request)
