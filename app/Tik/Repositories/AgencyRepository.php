@@ -111,4 +111,9 @@ class AgencyRepository extends AbstractRepository
     {
         return AgencyJoinRequest::where('agency_id', $agencyId);
     }
+
+    public function getByIds($ids)
+    {
+        return $this->model->whereIn('id', $ids)->get();
+    }
 }
