@@ -24,45 +24,51 @@ class RankingRepository
             });
     }
 
-    public function getGiftLogs($class, $rel, $type, $limit,$keywords)
+    public function getGiftLogs($class, $rel, $type, $limit, $keywords, $agencyId)
     {
-        $query = GiftLog::query()->whereHas($rel)
-            ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
+        $query = GiftLog::query();
+        if ($class != 5) {
+            $query = $query->whereHas($rel)
+                ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
+                ->when($class != 3, fn($q) => $q->with($rel));
+        } else {
+            $query = $query->with($rel)->when(isset($agencyId), function ($query) use ($agencyId,$keywords) {
+                $query->where($keywords, $agencyId);
+            });
+        }
+        $this->applyDateFilters($query, $type);
+
+        return $query->selectRaw("sum(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->limit($limit)->get()->reject(function ($q) {
+                return $q->exp == 0;
+            });
+    }
+
+    public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit, $room_id, $keywords)
+    {
+        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
+
             ->when($class != 3, fn($q) => $q->with($rel));
 
         $this->applyDateFilters($query, $type);
 
         return $query->selectRaw("sum(giftPrice) as exp, $keywords")
-                    ->groupBy($keywords)->orderByRaw("exp desc")
-                    ->limit($limit)->get()->reject(function ($q) {
-                        return $q->exp == 0;
-                    });
+            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->limit($limit)->get()->reject(function ($q) {
+                return $q->exp == 0;
+            });
     }
 
-    public function getGiftLogsForRoomOwnerId($class, $rel, $type, $limit,$room_id,$keywords)
+    public function getGiftLogsUserForRoomOwnerId($class, $rel, $type, $userId, $room_id, $keywords)
     {
         $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
-           
+
             ->when($class != 3, fn($q) => $q->with($rel));
 
         $this->applyDateFilters($query, $type);
 
-        return $query->selectRaw("sum(giftPrice) as exp, $keywords")
-                    ->groupBy($keywords)->orderByRaw("exp desc")
-                    ->limit($limit)->get()->reject(function ($q) {
-                        return $q->exp == 0;
-                    });
-    }
-
-    public function getGiftLogsUserForRoomOwnerId($class, $rel, $type, $userId,$room_id,$keywords)
-    {
-        $query = GiftLog::query()->where('roomowner_id', $room_id)->whereHas($rel)
-           
-            ->when($class != 3, fn($q) => $q->with($rel));
-
-        $this->applyDateFilters($query, $type);
-
-        return $query->selectRaw("sum(giftPrice) as exp, $keywords")->where($keywords,$userId)->groupBy($keywords)->first();
+        return $query->selectRaw("sum(giftPrice) as exp, $keywords")->where($keywords, $userId)->groupBy($keywords)->first();
     }
 
     protected function applyDateFilters(&$query, $type)
