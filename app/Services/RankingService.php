@@ -246,7 +246,10 @@ class RankingService
             return ['sender_id', 'sender'];
         } elseif ($class == 3) {
             return ['roomowner_id', 'roomOwner'];
-        } else {
+        } elseif ($class == 4) {
+            return ['agency_id', 'agency'];
+        } 
+        else {
             return ['sender_id', 'sender'];
         }
     }
