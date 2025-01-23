@@ -62,9 +62,9 @@ class FamilyLevelService
         if ($request->exp) {
             $FamilyLevel->exp = $request->exp;
         }
-        if ($request->type) {
-            $FamilyLevel->type = $request->type;
-        }
+        // if ($request->type) {
+        //     $FamilyLevel->type = $request->type;
+        // }
         if ($request->members) {
             $FamilyLevel->members = $request->members;
         }
