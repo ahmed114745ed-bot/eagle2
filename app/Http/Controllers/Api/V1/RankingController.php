@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Services\RankingService;
 use App\Services\VipService;
 use Illuminate\Http\Request;
+use App\Services\RankingService;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 
 class RankingController extends Controller
 {
@@ -30,6 +31,9 @@ class RankingController extends Controller
         $limit = $request->is_home ? 3 : 20;
 
         $data = $this->rankingService->getRanking($class, $type, $request->user(), $limit, $request->room_uid, $request->sent_to_owner);
+        if ($class = 5) {
+            $data =   AgencyRankingRecourse::collection($data);
+        }
 
         return Common::apiResponse(1, '', $data);
     }
