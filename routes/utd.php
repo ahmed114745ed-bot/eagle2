@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\RequestAgencyController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\LevelIntervalsController;
@@ -420,5 +421,11 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
         Route::post('/update/{id}', [ReportMomentController::class, 'update']);
         Route::post('delete-moment/{moment_id}/{id}',[ReportMomentController::class, 'destroyDash']);
+    });
+
+    Route::prefix('request-agency')->group(function () {
+        Route::get('/', [RequestAgencyController::class, 'index']);
+        Route::post('/action', [RequestAgencyController::class, 'actionRequestAgency']);
+       
     });
 });
