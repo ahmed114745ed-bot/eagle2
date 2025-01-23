@@ -12,10 +12,50 @@ class DailyGiftTypesController extends Controller
     public function index(){
         $search = request('search');
 
-        $dailyPrices = DailyGiftType::when($search,function($q)use($search){
+        $dailyGiftTypes = DailyGiftType::when($search,function($q)use($search){
             $q->where('id', $search);
         })->paginate(10);
 
-        return Common::apiResponse(true, 'Success', $dailyPrices);
+        return Common::apiResponse(true, 'Success', $dailyGiftTypes);
+    }
+
+    public function show($id){
+
+        $result = DailyGiftType::findOrFail($id);
+
+        return Common::apiResponse(true, 'Success', $result);
+    }
+
+    public function store(Request $request){
+        $request->validate([
+            'type' => 'required|in:1,2,3,4'
+        ]);
+
+        $result = DailyGiftType::create([
+            'type' => $request->type
+        ]);
+
+        return Common::apiResponse(true, 'Success', $result);
+    }
+
+    public function update(Request $request, $id){
+        $request->validate([
+            'type' => 'required|in:1,2,3,4'
+        ]);
+
+        $result = DailyGiftType::findOrFail($id);
+
+        $result->update([
+            'type' => $request->type
+        ]);
+
+        return Common::apiResponse(true, 'Success');
+    }
+
+    public function delete($id){
+        $result = DailyGiftType::findOrFail($id);
+        $result->delete();
+
+        return Common::apiResponse(true, 'Success');
     }
 }
