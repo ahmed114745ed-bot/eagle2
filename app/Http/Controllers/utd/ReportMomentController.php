@@ -67,8 +67,8 @@ class ReportMomentController extends Controller
             'moment_id' => 'required|integer',
             'Reporter_id' => 'required|integer',
             'Reported_id' => 'required|integer',
-            'description' => 'required|',
-            'type' => 'required|integer',
+            'description' => 'required',
+            'type' => 'required',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
