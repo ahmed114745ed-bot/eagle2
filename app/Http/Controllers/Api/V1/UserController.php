@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Target;
+use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
@@ -594,7 +595,7 @@ class UserController extends Controller
 
     public function userLevel(Request $request)
     {
-        $trashed = $this->userService->userLevel($request->perPage, $request->Page, $request->uuid);
+        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
     }
 
@@ -613,7 +614,7 @@ class UserController extends Controller
 
     public function usersDeviceToken(Request $request)
     {
-        $data = $this->userService->userDeviceToken($request->perPage, $request->Page, $request->device_token);
+        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token);
         return Common::apiResponse(true, 'success', DeviceTokenResource::collection($data));
     }
 
@@ -631,13 +632,13 @@ class UserController extends Controller
 
     public function usersTarget(Request $request)
     {
-        $data = $this->userService->usersTargets($request->perPage, $request->Page);
+        $data = $this->userService->usersTargets($request->per_page, $request->Page);
         return Common::apiResponse(true, 'success', UserTargetResource::collection($data));
     }
 
     public function allUsers(Request $request)
     {
-        $users = $this->userService->allUser($request->perPage, $request->Page, $request->family_id, $request->agency_id, $request->search, $request->host);
+        $users = $this->userService->allUser($request->per_page, $request->Page, $request->family_id, $request->agency_id, $request->search, $request->host);
         return Common::apiResponse(true, 'done', AllUsersResource::collection($users));
     }
 
@@ -740,7 +741,7 @@ class UserController extends Controller
             'name'         => 'required|string',
             'charge_status'         => 'required|boolean',
             'transfer_salary'         => 'required|boolean',
-            'can_play'         => 'required|integer|in:0,1',
+            'can_play'         => 'required|integer|in:0,2,3',
             'country_id'         => 'nullable|integer|exists:countries,id',
             'di'    => 'nullable|integer',
             'user_diamond' => 'nullable|integer',
@@ -780,7 +781,7 @@ class UserController extends Controller
         try {
             $user  = $this->userService->showDataUser($id);
 
-            return Common::apiResponse(true, 'done',new ShowUserResource($user) );
+            return Common::apiResponse(true, 'done', new ShowUserResource($user));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -798,18 +799,13 @@ class UserController extends Controller
             'name'         => 'required|string',
             'charge_status'         => 'required|boolean',
             'transfer_salary'         => 'required|boolean',
-            'can_play'         => 'required|integer|in:2,3',
+            'can_play'         => 'required|integer|in:0,2,3',
             'country_id'         => 'nullable|integer|exists:countries,id',
-            'di'    => 'nullable|integer',
             'user_diamond' => 'nullable|integer',
             'total_sender_level' => 'nullable|integer',
             'total_received_level' => 'nullable|integer',
-            'salary' => 'nullable|integer',
             'email' => 'nullable|email',
             'phone' => 'nullable|string',
-            'facebook_id' => 'nullable',
-            'google_id' => 'nullable',
-            'huawei_id' => 'nullable',
             'status' => 'required|boolean',
             'type_user' => 'required|integer',
             'manger_type_id' => 'nullable',
@@ -831,5 +827,20 @@ class UserController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function allCodes(Request $request)
+    {
+        $data = $this->userService->allCods($request->id, $request->per_page, $request->page);
+        return Common::apiResponse(true, 'done', $data);
+    }
+
+    public function userType()
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'Success',
+            'data' => (object) UserType::list(),
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';

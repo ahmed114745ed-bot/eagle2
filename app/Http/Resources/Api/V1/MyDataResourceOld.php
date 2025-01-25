@@ -169,6 +169,7 @@ class MyDataResourceOld extends JsonResource
             'vip'                  => @Common::ovip_center($this), // both
             'family_id'            => @$this->family_id, // both
             'uuid'                 => @$this->uuid, // both
+            'color'    => @$this->color_id ??'',
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
 

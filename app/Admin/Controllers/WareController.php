@@ -100,6 +100,8 @@ class WareController extends MainController
                     18 => trans('colored name'),
                     19 => trans('profile visitors hide in'),
                     20 => trans('hide last active'),
+                    28 => trans('profile frame')
+
 
                 ]);
             });
@@ -139,6 +141,7 @@ class WareController extends MainController
                 4 => trans('Avatar Frame'),
                 5 => trans('Bubble Frame'),
                 6 => trans('Entering Special Effects'),
+                28 => trans('profile frame')
 
 
             ]

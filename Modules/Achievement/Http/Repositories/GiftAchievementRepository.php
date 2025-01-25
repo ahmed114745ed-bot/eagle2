@@ -13,8 +13,13 @@ class GiftAchievementRepository extends AbstractRepository
         parent::__construct(new GiftAchievement());
     }
 
-    public function all($achievementId, $perPage, $Page)
+    public function getByAchievementId($achievementId, $perPage, $Page)
     {
         return $this->model->where('achievement_id', $achievementId)->with('user', 'gift', 'Achievement')->paginate($perPage, ['*'], 'page', $Page);
+    }
+
+    public function all( $perPage, $Page)
+    {
+        return $this->model->with( 'gift')->paginate($perPage, ['*'], 'page', $Page);
     }
 }

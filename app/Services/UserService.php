@@ -5,9 +5,8 @@ namespace App\Services;
 use DB;
 use Exception;
 use Carbon\Carbon;
-use App\Models\Vip;
 use App\Models\User;
-use App\Models\Follow;
+use App\Models\Code;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Facades\UserHandling;
@@ -829,16 +828,11 @@ class UserService
             'transfer_salary' => $request->transfer_salary,
             'can_play' => $request->can_play,
             'country_id' => $request->country_id,
-            'di' => $request->di,
             'user_diamond' => $request->user_diamond,
             'total_sender_level' => $request->total_sender_level,
             'total_received_level' => $request->total_received_level,
-            'salary' => $request->salary,
             'email' => $request->email,
             'phone' => $request->phone,
-            'facebook_id' => $request->facebook_id,
-            'google_id' => $request->google_id,
-            'huawei_id' => $request->huawei_id,
             'status' => $request->status,
             'type_user' => $request->type_user,
             'manger_type_id' => $request->manger_type_id,
@@ -864,5 +858,12 @@ class UserService
         $user->userSetting->update($dataUserSitting);
 
         return true;
+    }
+
+    public function allCods($id, $perPage, $page)
+    {
+        return Code::when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);;
     }
 }

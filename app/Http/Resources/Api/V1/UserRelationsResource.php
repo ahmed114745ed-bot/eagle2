@@ -96,7 +96,8 @@ class UserRelationsResource extends JsonResource
                 "licked" => count($this->likes),
                 "followers" => count($this->followers),
                 "bio" => $this->bio,
-            ]
+            ],
+            'image_color'          => @$this->color_image,
         ];
 
         return $data;

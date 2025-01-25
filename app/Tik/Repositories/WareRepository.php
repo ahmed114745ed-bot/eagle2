@@ -111,4 +111,9 @@ class WareRepository extends AbstractRepository
     {
         return $this->model->whereNot('get_type', 1)->paginate($perPage, ['*'], 'page', $page);
     }
+    public function profile_frame_wares($page,$perPage )
+    {
+        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id','img2','type','level','get_type','image_type') ->paginate($perPage, ['*'], 'page', $page);
+    }
+    
 }

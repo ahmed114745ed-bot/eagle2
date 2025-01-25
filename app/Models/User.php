@@ -679,6 +679,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
+    public function myroom()
+    {   
+        return $this->hasOne(Room::class, 'uid' ,'id');
+    }
 
     public function color_image()
     {

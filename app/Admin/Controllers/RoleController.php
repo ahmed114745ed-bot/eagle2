@@ -46,7 +46,12 @@ class RoleController extends MainController
     {
         return $this->form()->store();
     }
-
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans(__($this->title)))
+            ->body($this->detail($id)));
+    }
     public function update($id)
     {
         return $this->form1()->update($id);
@@ -80,10 +85,7 @@ class RoleController extends MainController
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $admin = Auth::user();
-            if (
                 $actions->row->slug == 'administrator' ||
-                $actions->row->slug == 'admin' ||
-                $actions->row->slug == 'developer' ||
                 $actions->row->slug == 'agency' ||
                 $actions->row->slug == 'charger'
             ) {

@@ -12,6 +12,7 @@ class Banner extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    protected $appends = ['publish'];
     protected $casts = [
         'is_active' => 'boolean',
     ];
@@ -33,6 +34,33 @@ class Banner extends Model
     public function scopeWhereIsNotSeen(Builder $query, $utcTimestamp): Builder
     {
         return $query->whereDate('publish_at', '>', Carbon::createFromTimestamp($utcTimestamp, 'utc'));
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (request('publish') == 'on') {
+                $model->publish_at = now();
+            } else {
+                $model->publish_at = null;
+            }
+            unset($model->publish);
+        });
+
+        static::updating(function ($model) {
+            if (request('publish') == 'on') {
+
+                $model->publish_at = now();
+            } else {
+                $model->publish_at = null;
+            }
+            unset($model->publish);
+        });
+    }
+    public function getPublishAttribute()
+    {
+        return $this->publish_at == null ? 0 : 1;
     }
 
 

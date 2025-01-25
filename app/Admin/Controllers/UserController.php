@@ -29,6 +29,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Selectable\ImageColors;
 use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\ChangeAgencyAction;
@@ -125,7 +126,7 @@ class UserController extends MainController
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code' , 'transfer_salary', ])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary',])),
         ))->collapsable()->class('box collapsed-box');
     }
     protected function grid()
@@ -181,8 +182,8 @@ class UserController extends MainController
 
 
         //        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
-        $grid->column('name', __('Name'));//->display(function ($value){//attribute
-         //   return $value??'undefined name';
+        $grid->column('name', __('Name')); //->display(function ($value){//attribute
+        //   return $value??'undefined name';
         //});
 
 
@@ -460,7 +461,7 @@ class UserController extends MainController
         );
         $grid->column('target_id', __('img'))->display(function () {
             $ware = Ware::query()->where('id', $this->target_id)->value('show_img');
-            $src  = getDriverUrl().'/'.$ware;
+            $src  = getDriverUrl() . '/' . $ware;
             return "<img width='30' src='$src'>";
         });
         $grid->column('expire', __('expire'))->display(function ($row) {
@@ -611,7 +612,8 @@ class UserController extends MainController
         if (!$form->isEditing()) {
             // Add a hidden field for 'uuid' in the edit form
             $form->text('uuid', __('uuid'))->creationRules([
-                'required', Rule::unique('users', 'uuid'),
+                'required',
+                Rule::unique('users', 'uuid'),
                 function ($attribute, $value, $fail) {
                     if (DB::table('wares')->where('value', $value)->exists()) {
                         return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
@@ -619,7 +621,8 @@ class UserController extends MainController
                 }
             ])
                 ->updateRules([
-                    'required', Rule::unique('users', 'uuid')->ignore(request()->route('id')),
+                    'required',
+                    Rule::unique('users', 'uuid')->ignore(request()->route('id')),
                     // نفس الشيء هنا مع التحقق من عدم وجود القيمة في جدول wares
                     function ($attribute, $value, $fail) {
                         if (DB::table('wares')->where('value', $value)->exists()) {
@@ -628,6 +631,9 @@ class UserController extends MainController
                     }
                 ]);
         }
+
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
+
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
@@ -672,15 +678,15 @@ class UserController extends MainController
                 return $can_play ? 'on' : 'off';
             })->states($states);
         }
-//        $form->select('image_color_id', trans('image_color'))->options(function () {
-//            $ops   = [null => __('no image_color')];
-//            $datas = ImageColor::all();
-//            foreach ($datas as $data) {
-//                // $imageTag = "<img src='{$data->image}' alt='Image' style='width: 50px; height: 50px;' />";
-//                $ops[$data->id] = "{$data->id}";
-//            }
-//            return $ops;
-//        });
+        //        $form->select('image_color_id', trans('image_color'))->options(function () {
+        //            $ops   = [null => __('no image_color')];
+        //            $datas = ImageColor::all();
+        //            foreach ($datas as $data) {
+        //                // $imageTag = "<img src='{$data->image}' alt='Image' style='width: 50px; height: 50px;' />";
+        //                $ops[$data->id] = "{$data->id}";
+        //            }
+        //            return $ops;
+        //        });
 
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {

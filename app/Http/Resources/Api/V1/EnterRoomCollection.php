@@ -30,6 +30,8 @@ class EnterRoomCollection extends JsonResource
 
         request()->type = 1;
         $owner = $this->owner;
+        $vip_level_img = Common::ovip_center_rank_img($owner->id);
+
         /** @var User $owner*/
         return [
             "id"                  => $this->id,
@@ -65,7 +67,9 @@ class EnterRoomCollection extends JsonResource
             'ban_users'           => $this->getBans($this->room_speak ?? ''),
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
-            'owner_vip_level'     => @$owner->UserVip?->level ?? null,
+            'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
+            'owner_vip_img'     => $vip_level_img == 0 ? "" : $vip_level_img,
+            'vip' => Common::ovip_center(@$owner->id),
             'owner_country'        =>        $owner && $owner->country
                 ? [
                     'id' => $owner->country->id,
@@ -103,6 +107,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
+
         ];
     }
 
@@ -141,8 +146,8 @@ class EnterRoomCollection extends JsonResource
     public function getRoomBackground()
     {
         return $this->mode == '3' ? 'custom_image/back-black.png' : ((@RequestBackgroundImage::where('status', 1)->where('owner_room_id', $this->uid)->orderByDesc('id')->first())->img ??
-                $this->room_background ??
-                @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img);
+            $this->room_background ??
+            @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img);
     }
 
     public function getOwnerSound($ownerId, $roomSound)
