@@ -20,7 +20,7 @@ class ChargeResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'uuid' => $this->user->uuid,
+            'uuid' => @$this->user?->uuid ?? 0,
             'coins' => $this->amount,
             'type' => $this->user_type == 'dash' ? 'agency' : 'user',
             'created_at' => $this->created_at,
