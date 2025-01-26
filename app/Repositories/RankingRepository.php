@@ -32,7 +32,7 @@ class RankingRepository
                 ->when($class == 3, fn($q) => $q->with('roomOwner.ownerRoom:id,uid,room_name,room_cover'))
                 ->when($class != 3, fn($q) => $q->with($rel));
         } else {
-            $query = $query->with($rel);
+            $query = $query->with($rel)->whereHas('agency');
         }
         $this->applyDateFilters($query, $type);
 
