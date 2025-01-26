@@ -28,4 +28,11 @@ class AdminUsersRepository extends AbstractRepository
     {
         return $this->model->find($id);
     }
+
+    public function report($id, $perPage, $page)
+    {
+        return $this->model->where('app_id','!=',0)->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->paginate($perPage, ['*'], 'page', $page);
+    }
 }

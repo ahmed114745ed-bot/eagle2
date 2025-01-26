@@ -154,9 +154,9 @@ class AgencyRepository extends AbstractRepository
         return $this->model->whereIn('id', $ids)->get();
     }
 
-    public function agencies($id,$perPage,$page)
+    public function agencies($id, $perPage, $page)
     {
-        return $this->model->where('id','!=',$id)->where(function ($query) {
+        return $this->model->where('id', '!=', $id)->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
@@ -164,5 +164,26 @@ class AgencyRepository extends AbstractRepository
                 }
             );
         })->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function report($id, $month, $year, $perPage, $page)
+    {
+        $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->whereHas('agencySalaries', function ($q) use ($month, $year) {
+            $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
+                $query->where('month', $month)->where('year', $year);
+            });
+        })->with(['agencySalaries' => function ($query) use ($month, $year) {
+            $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
+                $query->where('month', $month)->where('year', $year);
+            });
+        }])->paginate($perPage, ['*'], 'page', $page)
+            ->through(function ($agency) use ($month, $year) {
+                $agency->target = $agency->getTotalSallaryAgency($month, $year);
+                $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
+                $agency->salary = $agency->getSalaryAgency($month, $year);
+                return $agency;
+            });;
     }
 }
