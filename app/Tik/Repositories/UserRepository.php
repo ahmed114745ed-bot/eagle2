@@ -144,15 +144,14 @@ class UserRepository extends AbstractRepository
         return true;
     }
 
-    public function updateIsLogout($user, $isLogout, $is_new= false)
+    public function updateIsLogout($user, $isLogout, $is_new = false)
     {
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
-        if($is_new){
+        if ($is_new) {
             $user->is_points_first = true;
         } else {
             $user->is_points_first = false;
-
         }
         $notification_id = @request()->notification_id;
         if ($notification_id) {
@@ -340,6 +339,12 @@ class UserRepository extends AbstractRepository
     public function updateAgencyId($user, $agencyId)
     {
         $user->update(['agency_id' => $agencyId]);
+        return true;
+    }
+
+    public function changeAgencyForHost($oldAgencyId, $newAgencyId)
+    {
+        $this->model->where('agency_id', $oldAgencyId)->where('type_user', 1)->update(['agency_id', $newAgencyId]);
         return true;
     }
 }

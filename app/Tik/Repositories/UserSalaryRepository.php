@@ -28,7 +28,7 @@ class UserSalaryRepository extends AbstractRepository
 
     public function findByUser($userId)
     {
-        return $this->model->where('user_id',$userId)->where('month',now()->month)->where('year',now()->year)->first();
+        return $this->model->where('user_id', $userId)->where('month', now()->month)->where('year', now()->year)->first();
     }
 
     public function incrementCutAmount($userId, $usd)
@@ -76,5 +76,11 @@ class UserSalaryRepository extends AbstractRepository
                 $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })
             ->sum(DB::raw('sallary - cut_amount'));
+    }
+
+    public function changeAgencyId($oldAgencyId, $newAgencyId)
+    {
+        $this->model->where('user_agency_id', $oldAgencyId)->where('month', now()->month)->where('year', now()->year)->update(['user_agency_id' => $newAgencyId]);
+        return true;
     }
 }

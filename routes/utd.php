@@ -47,6 +47,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
@@ -156,12 +157,12 @@ Route::middleware([])->group(function () {
     });
 
 
-    Route::prefix('request-agencies')->group(function(){
+    Route::prefix('request-agencies')->group(function () {
         Route::get('/', [RequestAgenciesController::class, 'index']);
         Route::post('/process-request/{id}', [RequestAgenciesController::class, 'update']);
     });
 
-    Route::prefix('special-id-fram')->group(function(){
+    Route::prefix('special-id-fram')->group(function () {
         Route::get('/', [SpecialIdFramController::class, 'index']);
         Route::get('/{id}', [SpecialIdFramController::class, 'show']);
         Route::post('/create', [SpecialIdFramController::class, 'store']);
@@ -171,12 +172,20 @@ Route::middleware([])->group(function () {
 
 
 
-    Route::prefix('daily-gift-types')->group(function(){
+    Route::prefix('daily-gift-types')->group(function () {
         Route::get('/', [DailyGiftTypesController::class, 'index']);
         Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
         Route::post('/create', [DailyGiftTypesController::class, 'store']);
         Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
         Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
+    });
+
+    Route::prefix('daily-gifts/{type}')->group(function(){
+        Route::get('/', [DailyGiftsController::class, 'index']);
+        Route::get('/{id}', [DailyGiftsController::class, 'show']);
+        Route::post('/create', [DailyGiftsController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftsController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftsController::class, 'delete']);
     });
 
     //games
@@ -446,12 +455,20 @@ Route::middleware([])->group(function () {
         Route::post('/create', [ReportMomentController::class, 'create']);
         Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
         Route::post('/update/{id}', [ReportMomentController::class, 'update']);
-        Route::post('delete-moment/{moment_id}/{id}',[ReportMomentController::class, 'destroyDash']);
+        Route::post('delete-moment/{moment_id}/{id}', [ReportMomentController::class, 'destroyDash']);
     });
 
     Route::prefix('request-agency')->group(function () {
         Route::get('/', [AgencyController::class, 'index']);
         Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
-       
+    });
+
+    Route::prefix('agencies')->group(function () {
+        Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::post('/create', [AgencyController::class, 'create']);
+        Route::post('/update/{id}', [AgencyController::class, 'update']);
+        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
+        Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
 });
