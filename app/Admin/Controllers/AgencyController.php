@@ -319,18 +319,7 @@ class AgencyController extends MainController
 
         $form->display('ID');
         if (!$form->isEditing()) {
-//            $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
-//                $ops2 = [];
-//                foreach (User::Where('id', $value)->get() as $user) {
-//                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
-//                }
-//                return $ops2;
-//            })->attribute(['id' => 'app_owner_id'])->ajax('/api/search/users3', 'id', 'name');
-//
-//            $form->switch('Host_agency', trans('Host agency'))->default(true)->rules(function ($form) {});
-//            if (!Auth::user()->isRole('Agencies Managers')) {
-//                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)->rules(function ($form) {});
-//            }
+            
             $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
                 $ops2 = [];
                 foreach (User::Where('id', $value)->get() as $user) {
@@ -338,11 +327,6 @@ class AgencyController extends MainController
                 }
                 return $ops2;
             })->ajax('/api/search/users3', 'id', 'name');
-            if (!$form->isEditing()) {
-                //$form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
-                // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
-            }
-
             if ($form->isEditing()) {
                 //            $form->hidden('app_owner_id', __('app owner id'));
                 $form->hidden('agency_manger_id', __('app manger id'));
@@ -357,13 +341,6 @@ class AgencyController extends MainController
             $form->url('url', __('url'));
             $form->image('img', __('img'))->rules('required');
             $form->textarea('contents', __('contents'));
-
-
-            // $form->switch('Shipping_agency', trans('Shipping agency'))->default(true);
-            // $form->switch('Host_agency', trans('Host agency'))->default(false);
-
-            // $form->switch('at_least_one_selected', __('At least one selected'))->default(false)->readonly();
-
             $form->switch('Host_agency', trans('Host agency'))->default(true)->rules(function ($form) {
                 // $shippingAgency = $form->input('Shipping_agency');
                 // return [

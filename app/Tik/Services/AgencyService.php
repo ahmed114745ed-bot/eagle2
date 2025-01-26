@@ -829,73 +829,100 @@ class AgencyService
         return $this->agencyRepository->getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status, $action);
     }
 
-    public function dailyReportNew($user, $start_at, $end_at)
+    public function activeAgencies($id, $perPage, $page)
     {
+        return $this->agencyRepository->getActiveAgency($id, $perPage, $page);
+    }
 
-        $dailyDiamonds = $this->giftLogRepository->getByDailyNew($user->id, $user->agency_id, $start_at, $end_at);
-
-        $dailyTimes = $this->liveTimeRepository->getByDailyNew($user->id, $start_at, $end_at);
-
-        $dailyDiamonds = $dailyDiamonds->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
-            return $data;
-        });
-        $dailyTimes = $dailyTimes->map(function ($data) {
-            $data->day = Carbon::parse($data->date)->day;
-            return $data;
-        });
-        /** @var User $user */
-
-        $totalDays = $user->getTotalDaysNew();
-
-        $userInfoArray = $user->getSallaryInfoNew();
-
-        $totalSalary = @$userInfoArray['total_salary'] ?? 0;
-        $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
-
-        $isThisMonth = $start_at == now()->month && $end_at == now()->year;
-        $startDay = 1;
-        $endDay = Carbon::parse(request()->end_at)->endOfMonth()->day;
-
-        if ($isThisMonth) $endDay = today()->day;
-
-        // \Log::info('this2 is error');
-        $hours = $dailyTimes->sum('hours');
-        $minutes = $hours * 60;
+    public function deleteAgency($id)
+    {
+        $agency = $this->agencyRepository->findOrFail($id);
         $data = [
-            'user_salary' => [
-                'cut_amount' => (int)$totalCutAmount,
-                'salary' => intval($totalSalary),
-            ],
-            'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
-            'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$minutes,
-            'active_days' => (string)$totalDays,
-            'daly_reports' => []
+            'agency_id' => 0,
+            'type_user' => 0,
         ];
+        $this->userRepository->update($data, $agency->app_owner_id);
+        $agency->delete();
+        return true;
+    }
 
-        $startDate = Carbon::parse($start_at);
-        $endDate = Carbon::parse($end_at);
+    public function changeAgencyMembers($oldAgencyId, $newAgencyId)
+    {
+        $this->userRepository->changeAgencyForHost($oldAgencyId, $newAgencyId);
+        $this->userSalaryRepository->changeAgencyId($oldAgencyId, $newAgencyId);
+        return true;
+    }
 
-        for ($date = $startDate; $date <= $endDate; $date->addDay()) {
-            $day = $date->day;
-            $month = $date->month;
-            $year = $date->year;
+    public function AllAgencyExceptOld($oldAgencyId, $perPage, $page)
+    {
+        return $this->agencyRepository->agencies($oldAgencyId, $perPage, $page);
+    }
 
-            $hours = $dailyTimes->where('day', $day)->first()?->hours ?? 0;
-            $minutes = $hours * 60;
-            $diamonds = $dailyDiamonds->where('day', $day)->first()?->diamonds ?? 0;
+    public function createAgencyUtd($request)
+    {
+        if ($request->hasFile('img')) {
 
-            $data['daly_reports'][] = [
-                'day' => (int)$day,
-                'month' => (int)$month,
-                'year' => (int)$year,
-                'live_minutes' => (int)$minutes,
-                'diamonds' => numToString((int)$diamonds),
-                'is_active_day' => $hours >= 1,
-            ];
+            $image = Common::upload('agency', $request->file('img'));
+            $request->merge(['img' => $image]);
         }
 
-        return $data;
+        $agency =  $this->agencyRepository->create($request->all());
+        Common::createUserAdmin($request->app_owner_id);
+
+        if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
+
+            $userType = 2;
+        } elseif ($request->Host_agency == 1 && $request->Shipping_agency == 1) {
+            $userType = 4;
+        } elseif ($request->Host_agency == 0 && $request->Shipping_agency == 1) {
+            $userType = 3;
+        }
+
+        $data = [
+            'agency_id' =>  $agency->id,
+            'type_user' => $userType,
+        ];
+        $this->userRepository->update($data, $request->app_owner_id);
+        return true;
+    }
+
+    public function updateAgencyUtd($id, $request)
+    {
+        if ($request->hasFile('img')) {
+
+            $image = Common::upload('agency', $request->file('img'));
+            $request->merge(['img' => $image]);
+        }
+        $agency = $this->agencyRepository->findOrFail($id);
+
+        if ($agency->app_owner_id != $request->app_owner_id) {
+            $data = [
+                'agency_id' => 0,
+                'type_user' => 0,
+            ];
+            $this->userRepository->update($data, $agency->app_owner_id);
+        }
+
+        if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
+
+            $userType = 2;
+        } elseif ($request->Host_agency == 1 && $request->Shipping_agency == 1) {
+            $userType = 4;
+        } elseif ($request->Host_agency == 0 && $request->Shipping_agency == 1) {
+            $userType = 3;
+        }
+
+        $data = [
+            'agency_id' =>  $agency->id,
+            'type_user' => $userType,
+        ];
+        $this->userRepository->update($data, $request->app_owner_id);
+        $this->agencyRepository->update($request, $id);
+        return true;
+    }
+
+    public function show($id)
+    {
+        return $this->agencyRepository->findOrFail($id);
     }
 }

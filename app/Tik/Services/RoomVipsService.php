@@ -43,8 +43,6 @@ class RoomVipsService
             'img' => $image ??'',
             'exp' => $request->exp,
             'level' => $request->level,
-            // 'di' => $request->di,
-            // 'co' => $request->co,
             'name_en' => $request->name_en,
             'name_ar' => $request->name_ar,
         ];
