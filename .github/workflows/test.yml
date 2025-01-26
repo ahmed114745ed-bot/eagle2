@@ -9,7 +9,7 @@ jobs:
     - name: print out Eagle test
       uses: cross-the-world/ssh-scp-ssh-pipelines@latest
       with:
-        host: "34.18.53.132"
+        host: "34.18.18.32"
         user: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
