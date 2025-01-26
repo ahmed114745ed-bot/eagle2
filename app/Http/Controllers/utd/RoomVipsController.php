@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\RoomVipResource;
 use App\Tik\Services\RoomVipsService;
 use Modules\Reals\Entities\Real;
 use App\Tik\Services\ReelsService;
@@ -18,7 +19,7 @@ class RoomVipsController extends Controller
 
         try {
             $roomVips = $this->roomVipsService->index($request->per_page, $request->Page);
-            return Common::apiResponse(true, 'success', $roomVips);
+            return Common::apiResponse(true, 'success',RoomVipResource::collection($roomVips));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
