@@ -46,8 +46,21 @@ class AgencyJoinRequestRepository extends AbstractRepository
         return $this->model->where('agency_id', $agencyId)->where('status', 0)->where('user_id', $userId)->first();
     }
 
-    public function findByUsersAndAgency($userId,$agencyId)
+    public function findByUsersAndAgency($userId, $agencyId)
     {
         return $this->model->where(['user_id' => $userId, 'agency_id' => $agencyId])->first();
+    }
+
+    public function allRequests($status, $agencyId, $id, $perPage, $page)
+    {
+        return $this->model->when(isset($status), function ($query) use ($status) {
+            $query->where('status', $status);
+        })->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->whereHas('agency', function ($q) use ($agencyId) {
+            $q->when(isset($agencyId), function ($query) use ($agencyId) {
+                $query->where('id', $agencyId);
+            });
+        })->with('user', 'agency', 'admin')->paginate($perPage, ['*'], 'page', $page);
     }
 }
