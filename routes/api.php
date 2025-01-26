@@ -369,6 +369,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/v2/top_user_ranking', [Ranking2Controller::class, 'topUserRanking']);
                 Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
 
+                
             });
             // end ranking
 
