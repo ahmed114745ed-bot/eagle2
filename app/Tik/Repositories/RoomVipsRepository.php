@@ -22,7 +22,7 @@ class RoomVipsRepository extends AbstractRepository
     {
         $Vips = $this->model->where('type',4)->orderBy('exp');
      
-        return $Vips->paginate($perPage, ['*'], 'page', $Page);;
+        return $Vips->paginate($perPage, ['*'], 'page', $Page);
     }
 
   
