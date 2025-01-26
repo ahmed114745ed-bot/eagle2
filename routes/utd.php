@@ -53,6 +53,7 @@ use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
+use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -170,6 +171,13 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
     });
 
+    Route::prefix('special-wares')->group(function () {
+        Route::get('/', [SpecialWareController::class, 'index']);
+        Route::get('/{id}', [SpecialWareController::class, 'show']);
+        Route::post('/create', [SpecialWareController::class, 'store']);
+        Route::post('/update/{id}', [SpecialWareController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
+    });
 
 
     Route::prefix('daily-gift-types')->group(function () {

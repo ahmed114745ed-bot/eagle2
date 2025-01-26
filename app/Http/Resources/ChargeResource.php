@@ -16,7 +16,7 @@ class ChargeResource extends JsonResource
     public function toArray(Request $request): array
     {
 
-        $img = ($this->user_type == 'dash') ? Agency::find($this->agency_id)->img : $this->user->profile->avatar;
+        $img = ($this->user_type == 'dash') ? Agency::find($this->agency_id)?->img : $this->user?->profile?->avatar;
 
         return [
             'id' => $this->id,
