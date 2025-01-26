@@ -68,6 +68,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 "gImage"  => @$user->nowGame?->image
             ]
         ];
+        Log::info( 'game image '.' '.@$user->nowGame?->image);
         $json = json_encode($d);
         dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         return "gooooooooooooooooooooooooooooood";
