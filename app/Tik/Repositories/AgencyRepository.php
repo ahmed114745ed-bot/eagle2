@@ -140,6 +140,13 @@ class AgencyRepository extends AbstractRepository
     {
         return $this->model->whereIn('id', $ids)->get();
     }
+
+    public function getChargeAgency($id)
+    {
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->whereHas('chargeAgency' )->get();
+    }
     public function incrementAgencyCoins($Agency, $coins)
     {
         $Agency->increment('coins', $coins);

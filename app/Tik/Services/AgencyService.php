@@ -64,7 +64,6 @@ class AgencyService
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
-        private readonly ChargeAgencyRepository $chargeAgencyRepository,
 
     ) {}
 
@@ -755,7 +754,7 @@ class AgencyService
     //     $dailyDiamonds = $this->giftLogRepository->getByDailyNew($user->id, $user->agency_id, $start_at, $end_at);
 
     //     $dailyTimes = $this->liveTimeRepository->getByDailyNew($user->id, $start_at, $end_at);
-        
+
     //     $dailyDiamonds = $dailyDiamonds->map(function ($data) {
     //         $data->day = Carbon::parse($data->date)->day;
     //         return $data;
@@ -793,19 +792,19 @@ class AgencyService
     //         'active_days' => (string)$totalDays,
     //         'daly_reports' => []
     //     ];
-        
+
     //     $startDate = Carbon::parse($start_at);
     //     $endDate = Carbon::parse($end_at);
-        
+
     //     for ($date = $startDate; $date <= $endDate; $date->addDay()) {
     //         $day = $date->day;
     //         $month = $date->month;
     //         $year = $date->year;
-        
+
     //         $hours = $dailyTimes->where('day', $day)->first()?->hours ?? 0;
     //         $minutes = $hours * 60;
     //         $diamonds = $dailyDiamonds->where('day', $day)->first()?->diamonds ?? 0;
-        
+
     //         $data['daly_reports'][] = [
     //             'day' => (int)$day,
     //             'month' => (int)$month,  
@@ -815,14 +814,13 @@ class AgencyService
     //             'is_active_day' => $hours >= 1,
     //         ];
     //     }
-        
+
     //     return $data;
     // }
 
-    public function allAgencyCharged($agencyId)
+    public function allAgencyCharged($id)
     {
-        $agencyIds = $this->chargeAgencyRepository->all($agencyId);
-        return $this->agencyRepository->getByIds($agencyIds);
+        return $this->agencyRepository->getChargeAgency($id);
     }
 
     public function allRequests($id, $uuid, $perPage, $page, $status, $action)
@@ -836,7 +834,7 @@ class AgencyService
         $dailyDiamonds = $this->giftLogRepository->getByDailyNew($user->id, $user->agency_id, $start_at, $end_at);
 
         $dailyTimes = $this->liveTimeRepository->getByDailyNew($user->id, $start_at, $end_at);
-        
+
         $dailyDiamonds = $dailyDiamonds->map(function ($data) {
             $data->day = Carbon::parse($data->date)->day;
             return $data;
@@ -874,29 +872,29 @@ class AgencyService
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
-        
+
         $startDate = Carbon::parse($start_at);
         $endDate = Carbon::parse($end_at);
-        
+
         for ($date = $startDate; $date <= $endDate; $date->addDay()) {
             $day = $date->day;
             $month = $date->month;
             $year = $date->year;
-        
+
             $hours = $dailyTimes->where('day', $day)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $day)->first()?->diamonds ?? 0;
-        
+
             $data['daly_reports'][] = [
                 'day' => (int)$day,
-                'month' => (int)$month,  
-                'year' => (int)$year,    
+                'month' => (int)$month,
+                'year' => (int)$year,
                 'live_minutes' => (int)$minutes,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
             ];
         }
-        
+
         return $data;
     }
 }
