@@ -11,6 +11,7 @@ use App\Models\RequestBackgroundImage;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
+use Modules\CP\Entities\CpRoomHistory;
 
 class EnterRoomCollection extends JsonResource
 {
@@ -31,6 +32,12 @@ class EnterRoomCollection extends JsonResource
         request()->type = 1;
         $owner = $this->owner;
         $vip_level_img = Common::ovip_center_rank_img($owner->id);
+
+        $cpRoomHistories = CpRoomHistory::where('room_id',$this->id)->get(['index1', 'index2']);
+
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
 
         /** @var User $owner*/
         return [
@@ -92,6 +99,7 @@ class EnterRoomCollection extends JsonResource
             'boxes'               => [],
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",
+            'cp_indexs'         => $indices,
             'room_keys' => [
                 "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
             ],

@@ -144,15 +144,14 @@ class UserRepository extends AbstractRepository
         return true;
     }
 
-    public function updateIsLogout($user, $isLogout, $is_new= false)
+    public function updateIsLogout($user, $isLogout, $is_new = false)
     {
         $user->lan = app()->getLocale() ?? 'en';
         $user->is_logout = $isLogout;
-        if($is_new){
+        if ($is_new) {
             $user->is_points_first = true;
         } else {
             $user->is_points_first = false;
-
         }
         $notification_id = @request()->notification_id;
         if ($notification_id) {
@@ -342,4 +341,36 @@ class UserRepository extends AbstractRepository
         $user->update(['agency_id' => $agencyId]);
         return true;
     }
+
+    public function changeAgencyForHost($oldAgencyId, $newAgencyId)
+    {
+        $this->model->where('agency_id', $oldAgencyId)->where('type_user', 1)->update(['agency_id', $newAgencyId]);
+        return true;
+    }
+
+    public function report($uuid, $agencyId, $month, $year, $perPage, $page)
+    {
+        return $this->model->where('agency_id', '!=', 0)->where('agency_id', '!=', '')->where('agency_id', '!=', null)->when(isset($uuid), function ($query) use ($uuid) {
+            $query->where('uuid', $uuid);
+        })->when(isset($agencyId), function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
+        })->whereHas('userSallary', function ($q) use ($month,$year) {
+            $q->when(isset($month ) && isset($year ), function ($query) use ($month,$year) {
+                $query->where('month', $month)->where('year', $year);
+            });
+        })->with(['userSallary' => function ($query) use ($month, $year) {
+            $query->when(isset($month ) && isset($year ), function ($query) use ($month,$year) {
+                $query->where('month', $month)->where('year', $year);
+            });
+        }])->with('agency')
+        ->paginate($perPage, ['*'], 'page', $page)
+        ->through(function ($user) use ($month, $year) {
+            $user->total_diamonds = $user->getTotalDiamond($month, $year);
+            $user->total_salary = $user->getTotalSallary($month, $year);
+            $user->total_cut_amount = $user->getTotalCutAmount($month, $year);
+            $user->final_salary = $user->getSalary($month, $year); // Based on the computed salary attribute
+            return $user;
+        });
+    }
+
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\utd\AgencyController;
 use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -40,18 +42,19 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
+use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\DailyGiftTypesController;
-use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
-use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
+use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -156,12 +159,12 @@ Route::middleware([])->group(function () {
     });
 
 
-    Route::prefix('request-agencies')->group(function(){
+    Route::prefix('request-agencies')->group(function () {
         Route::get('/', [RequestAgenciesController::class, 'index']);
         Route::post('/process-request/{id}', [RequestAgenciesController::class, 'update']);
     });
 
-    Route::prefix('special-id-fram')->group(function(){
+    Route::prefix('special-id-fram')->group(function () {
         Route::get('/', [SpecialIdFramController::class, 'index']);
         Route::get('/{id}', [SpecialIdFramController::class, 'show']);
         Route::post('/create', [SpecialIdFramController::class, 'store']);
@@ -169,14 +172,29 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
     });
 
+    Route::prefix('special-wares')->group(function () {
+        Route::get('/', [SpecialWareController::class, 'index']);
+        Route::get('/{id}', [SpecialWareController::class, 'show']);
+        Route::post('/create', [SpecialWareController::class, 'store']);
+        Route::post('/update/{id}', [SpecialWareController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
+    });
 
 
-    Route::prefix('daily-gift-types')->group(function(){
+    Route::prefix('daily-gift-types')->group(function () {
         Route::get('/', [DailyGiftTypesController::class, 'index']);
         Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
         Route::post('/create', [DailyGiftTypesController::class, 'store']);
         Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
         Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
+    });
+
+    Route::prefix('daily-gifts/{type}')->group(function(){
+        Route::get('/', [DailyGiftsController::class, 'index']);
+        Route::get('/{id}', [DailyGiftsController::class, 'show']);
+        Route::post('/create', [DailyGiftsController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftsController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftsController::class, 'delete']);
     });
 
     //games
@@ -373,6 +391,7 @@ Route::middleware([])->group(function () {
     });
     Route::get('users-search', [UserController::class, 'search']);
     Route::get('users-search2', [UserController::class, 'search2']);
+    Route::get('users-search3', [UserController::class, 'userAgency']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
         Route::get('/{achievementId}/level', [UtdAchievementController::class, 'allAchievementsLevel']);
@@ -446,12 +465,21 @@ Route::middleware([])->group(function () {
         Route::post('/create', [ReportMomentController::class, 'create']);
         Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
         Route::post('/update/{id}', [ReportMomentController::class, 'update']);
-        Route::post('delete-moment/{moment_id}/{id}',[ReportMomentController::class, 'destroyDash']);
+        Route::post('delete-moment/{moment_id}/{id}', [ReportMomentController::class, 'destroyDash']);
     });
 
     Route::prefix('request-agency')->group(function () {
         Route::get('/', [AgencyController::class, 'index']);
         Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
-       
     });
+
+    Route::prefix('agencies')->group(function () {
+        Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::post('/create', [AgencyController::class, 'create']);
+        Route::post('/update/{id}', [AgencyController::class, 'update']);
+        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
+        Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
+    });
+    Route::get('/reports', [ReportController::class, 'reports']);
 });

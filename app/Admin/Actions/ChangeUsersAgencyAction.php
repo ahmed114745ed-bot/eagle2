@@ -51,7 +51,14 @@ class ChangeUsersAgencyAction extends RowAction
         $this->hidden('old_agency_id', __('id'))->value($this->id);
         $this->select('new_agency_id', __('agency id'))->options(function ($value){
             $ops2 = [];
-            foreach (Agency::where('id','!=',$this->id)->get() as $agency){
+            foreach (Agency::where('id','!=',$this->id)->where(function ($query) {
+            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                'additionalInfo',
+                function ($query) {
+                    $query->where('status', 1);
+                }
+            );
+        })->get() as $agency){
                 $ops2[$agency->id] = $agency->id. '_' .$agency->name;
             }
             return $ops2;

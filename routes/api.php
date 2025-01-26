@@ -3,6 +3,7 @@
 use App\Admin\Controllers\WareController;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -47,14 +48,30 @@ use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\MallController as ControllersMallController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Models\Room;
+use App\Models\User;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-users', function (){
-        return response()->json([
-            'success' => true,
-            'message' => 'Success',
-            'data' => (object) UserType::list(),
-        ]);
+    Route::get('test-game-rtm', function (){
+
+        $user = User::find(524);
+        $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
+
+        $d    = [
+            "messageContent" => [
+                "message" => "SBG",
+                'uImage'  => $user->profile?->avatar ?? 0,
+                'uName'   => $user->name ?? '',
+                'uId'     => $user->id ?? 0,
+                'coins'   => 50000,
+                "gImage"  => @$user->nowGame?->image
+            ]
+        ];
+        Log::info( 'game image '.' '.@$user->nowGame?->image);
+        $json = json_encode($d);
+        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
+        return "gooooooooooooooooooooooooooooood";
     });
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
@@ -449,7 +466,16 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
 
+            // Music Store 
+            Route::prefix ('music')->group (function (){
+                Route::get('/', [MusicStoreController::class, 'index']);
+                Route::post('/', [MusicStoreController::class, 'store']);
+
+            });
+
         }
     );
+
+
 
 });

@@ -142,7 +142,7 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(1, __('api_responses.your_recharge_was_successful'), [
                 'transfer_amount' => $charge->amount,
                 'operation_number' => $charge->id,
-                'date' => $charge->created_at->toDateTimeString()
+                'date' => Carbon::parse($charge->created_at)->toDateTimeString()
             ]);
         } catch (Exception $e) {
             // If an error occurs during the update process
@@ -239,4 +239,20 @@ class AgentSalaryTransactionController extends Controller
 
         return Common::apiResponse(1, '', ChargeCountryResource::collection($resulty));
     }
+
+    public function shipping_agencies(Request $request)
+    {
+        $countryId = $request->country_id;
+        $paymentId = $request->payment_id;
+
+        $agencies = Agency::with("Countries","AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function($query) {
+            $query->where('status', 3);
+        }])->whereHas('owner')
+        ->where('Shipping_agency',true)
+        ->when($countryId,fn($q)=>$q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
+        ->when($paymentId,fn($q)=>$q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
+        ->paginate(15);
+        return Common::apiResponse(true, 'agencies',TransformersChargeAgentResource::collection($agencies));
+    }
+    
 }

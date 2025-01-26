@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Pk;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
@@ -19,6 +20,7 @@ class MyDataResource extends JsonResource
 {
     public function toArray($request)
     {
+
         $family = $this->family;
         $f = null;
 
@@ -41,7 +43,7 @@ class MyDataResource extends JsonResource
         //     ->where('is_used', 1);
 
         $time_log = $this->timeLog()->latest()->first();
-         
+
 
         $agency_joined = $this->agency;
         if ($agency_joined) {
@@ -112,6 +114,7 @@ class MyDataResource extends JsonResource
 
 
         $ownerRoom = $this->ownerRoom;
+        $pks     = $this->getRoomTwoLastPk($ownerRoom->id);
         /**@var User $this
          * @var Room $ownerRoom*/
         $data = [
@@ -138,6 +141,9 @@ class MyDataResource extends JsonResource
                 "room_background" => @$ownerRoom->final_room_image,
                 "mode" => @$ownerRoom->mode,
                 'giftPrice' => @$ownerRoom->session_string,
+                "is_pk"               => (@$pks[0]) && $pks[0]->end_at >= now() ? $pks[0]->status : 0,
+                "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
+                'password_status'     => !(@$ownerRoom->room_pass == ""),
 
             ],
             'phone_bind' => (bool)@$this->phone,
@@ -145,7 +151,7 @@ class MyDataResource extends JsonResource
 
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
-            'special_color'    => @$this->color_id ??'',
+            'special_color'    => @$this->color_id ?? '',
             'bio' => @$this->bio ?: '',
             'number_of_fans' => $this->followerss()->count(),
             'number_of_followings' => $this->following()->count(),
@@ -161,10 +167,10 @@ class MyDataResource extends JsonResource
             'Last_seen' => @$time_log->time ?? 0,
             'type_user' => intval(@$this->type_user) ?: 0,
             'user_jobs' => $this->jobs,
-          ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
+            ///  'has_color_name' => $this->packs->where('type', 18)->count() >= 1,
             'has_color_name'       => Common::hasInPack($this->id, 18, true),
             'anonymous' => $this->packs->where('type', 17)->count() >= 1,
-            'country' => $this->country ??(object) [] ,
+            'country' => $this->country ?? (object) [],
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
@@ -177,10 +183,11 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
+
         ];
 
         $data['auth_token'] = $this->auth_token;
@@ -195,6 +202,14 @@ class MyDataResource extends JsonResource
         }
 
         return $data;
+    }
+    private function getRoomTwoLastPk(int $roomId)
+    {
+        return Pk::query()
+            ->where('room_id', $roomId)
+            ->orderByDesc('created_at')
+            ->limit(2)
+            ->get();
     }
 
     public function getUserDress($type, $dress, $item = 'img1')
