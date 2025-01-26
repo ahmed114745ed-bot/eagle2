@@ -451,8 +451,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
 
             // Music Store 
-            Route::post('/music', [MusicStoreController::class, 'store']);
+            Route::prefix ('music')->group (function (){
+                Route::get('/', [MusicStoreController::class, 'index']);
+                Route::post('/', [MusicStoreController::class, 'store']);
 
+            });
 
         }
     );

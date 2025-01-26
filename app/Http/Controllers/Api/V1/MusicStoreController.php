@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Resources\MusicResource;
 use App\Models\MusicStore;
 use Exception;
 use App\Helpers\Common;
@@ -13,7 +14,12 @@ use App\Traits\Dashboard\DashBoardTrait;
 class MusicStoreController extends Controller
 {
     use DashBoardTrait;
-
+    public function index()
+    {
+        $data = MusicStore::paginate(10);
+    //   return $data;
+        return Common::apiResponse(1, 'successfully',MusicResource::collection($data));
+    }
     public function store(Request $request)
     {
         
