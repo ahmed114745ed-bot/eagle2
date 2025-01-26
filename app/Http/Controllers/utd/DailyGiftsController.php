@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Http\Controllers\utd;
+
+use App\Helpers\Common;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Modules\DailyPrize\Entities\DailyGift;
+
+class DailyGiftsController extends Controller
+{
+    public function index($type){
+
+        $search = request('search');
+        $results = DailyGift::where('type', $type)->when($search, function($q) use($search){
+            $q->where('id', $search);
+        })
+        ->paginate(10);
+
+        return Common::apiResponse(true, 'Success', $results);
+    }
+
+    public function show($type, $id){
+
+        $result = DailyGift::where('type', $type)->findOrFail($id);
+
+        return Common::apiResponse(true, 'Success', $result);
+    }
+
+    public function store($type, Request $request){
+
+        $request->validate([
+            'order' => 'required|in:1,2,3,4,5,6,7',
+            'gift_type' => 'required',
+            'target' => 'required',
+            'expir' => 'required|numeric'
+        ]);
+
+
+        $result = DailyGift::create([
+            'order' => $request->order,
+            'gift_type' => $request->gift_type,
+            'target' => $request->target,
+            'expir' => $request->expir,
+            'type' => $type
+        ]);
+
+        return Common::apiResponse(true, 'Success', $result);
+    }
+
+    public function update($type, $id, Request $request){
+        $request->validate([
+            'order' => 'required|in:1,2,3,4,5,6,7',
+            'gift_type' => 'required',
+            'target' => 'required',
+            'expir' => 'required|numeric'
+        ]);
+        $result = DailyGift::where('type', $type)->findOrFail($id);
+
+        $result->update([
+            'order' => $request->order,
+            'gift_type' => $request->gift_type,
+            'target' => $request->target,
+            'expir' => $request->expir
+        ]);
+
+        return Common::apiResponse(true, 'Success');
+
+    }
+    public function delete($type, $id){
+
+        $result = DailyGift::where('type', $type)->findOrFail($id);
+        $result->delete();
+        return Common::apiResponse(true, 'Success');
+    }
+}
