@@ -23,12 +23,12 @@ class ReelsRepository extends AbstractRepository
         return $reals->paginate($perPage, ['*'], 'page', $Page);
     }
 
-  
+
 
 
     public function find($id)
     {
-      return  $this->model->query()->where('id',$id)->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->first();
+        return  $this->model->query()->where('id', $id)->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->first();
     }
 
     public function search($input)
@@ -36,16 +36,14 @@ class ReelsRepository extends AbstractRepository
         $query = $this->model->query();
 
         $query->whereHas('user', function ($query) use ($input) {
-            $query->where('uuid', trim($input)) ;
-                 
+            $query->fitterByUuid(trim($input));
         })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
-        
-        $result = $query->get(); 
-        
-        return $result ;
-     
+
+        $result = $query->get();
+
+        return $result;
     }
-   
+
     public function delete($reel)
     {
         $reel->delete();

@@ -113,5 +113,14 @@ trait DashBoardTrait {
         return $types[$type] ?? null;
     }
 
+    protected function store_music($file, $folder)
+    {
+        
+        $name =  Str::random(25);
 
+        return $file->storeAs(
+            $folder,
+            $name . "." . $file->getClientOriginalExtension()
+        );
+    }
 }

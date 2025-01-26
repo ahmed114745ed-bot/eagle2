@@ -64,6 +64,7 @@ class AgencyService
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
+        private readonly ChargeAgencyRepository $chargeAgencyRepository,
 
     ) {}
 

@@ -4,9 +4,6 @@ namespace App\Tik\Services;
 
 use App\Tik\Repositories\BackgroundRepository;
 
-
-
-
 class BackgroundService
 {
     public function __construct(

@@ -1134,4 +1134,9 @@ class User extends Authenticatable
         /** @var \Illuminate\Database\Eloquent\Collection $packs */
         return $packs->where('type', $type)->isNotEmpty();
     }
+
+    public function nowGame()
+    {
+        return $this->belongsTo(AllGame::class,'game_id');
+    }
 }
