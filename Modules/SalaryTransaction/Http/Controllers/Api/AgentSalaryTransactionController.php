@@ -142,7 +142,7 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(1, __('api_responses.your_recharge_was_successful'), [
                 'transfer_amount' => $charge->amount,
                 'operation_number' => $charge->id,
-                'date' => $charge->created_at->toDateTimeString()
+                'date' => Carbon::parse($charge->created_at)->toDateTimeString()
             ]);
         } catch (Exception $e) {
             // If an error occurs during the update process
