@@ -3,9 +3,10 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use App\Facades\ManagerHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserReportResource extends JsonResource
+class AdminUserReportResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,14 +16,11 @@ class UserReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'uuid' => $this->uuid,
+            'id' => $this->user->id,
+            'uuid' => $this->uuid->uuid,
             'name' => @$this->name ?: '',
-            'diamond' => $this->total_diamonds,
-            'target' => $this->total_salary,
-            'expenses' => $this->total_cut_amount,
-            'salary'   => $this->final_salary,
-            'agency_name' => $this->agency->name ?? '',
+            'target' => $this->target,
+            'due' => ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id),
         ];
     }
 }

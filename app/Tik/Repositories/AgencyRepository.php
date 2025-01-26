@@ -178,7 +178,7 @@ class AgencyRepository extends AbstractRepository
             $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
                 $query->where('month', $month)->where('year', $year);
             });
-        }])->paginate($perPage, ['*'], 'page', $page)
+        }], 'owner', 'dashOwner', 'users')->paginate($perPage, ['*'], 'page', $page)
             ->through(function ($agency) use ($month, $year) {
                 $agency->target = $agency->getTotalSallaryAgency($month, $year);
                 $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
