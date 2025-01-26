@@ -758,7 +758,7 @@ class UserService
         $data = [
             $request['key'] => $request['value'],
         ];
-        $user->userSetting->update($data);
+        $user->userSetting()->update($data);
 
         return true;
     }
