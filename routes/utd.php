@@ -47,6 +47,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
@@ -177,6 +178,14 @@ Route::middleware([])->group(function () {
         Route::post('/create', [DailyGiftTypesController::class, 'store']);
         Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
         Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
+    });
+
+    Route::prefix('daily-gifts/{type}')->group(function(){
+        Route::get('/', [DailyGiftsController::class, 'index']);
+        Route::get('/{id}', [DailyGiftsController::class, 'show']);
+        Route::post('/create', [DailyGiftsController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftsController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftsController::class, 'delete']);
     });
 
     //games
@@ -452,6 +461,6 @@ Route::middleware([])->group(function () {
     Route::prefix('request-agency')->group(function () {
         Route::get('/', [AgencyController::class, 'index']);
         Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
-       
+
     });
 });
