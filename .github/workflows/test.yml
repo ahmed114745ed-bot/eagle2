@@ -16,7 +16,6 @@ jobs:
         command_timeout: 3m
         first_ssh: |
           echo "$USER"
-          pwd
           cd /var/www/Eagle
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
