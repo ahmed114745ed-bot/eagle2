@@ -31,7 +31,9 @@ class RankingController extends Controller
         $limit = $request->is_home ? 3 : 20;
 
         $data = $this->rankingService->getRanking($class, $type, $request->user(), $limit, $request->room_uid, $request->sent_to_owner);
-        if ($class = 5) {
+       
+    //    return $data;
+        if ($class == 5) {
             $data =   AgencyRankingRecourse::collection($data);
         }
 
