@@ -362,7 +362,7 @@ class UserRepository extends AbstractRepository
             $query->when(isset($month ) && isset($year ), function ($query) use ($month,$year) {
                 $query->where('month', $month)->where('year', $year);
             });
-        }])
+        }])->with('agency')
         ->paginate($perPage, ['*'], 'page', $page)
         ->through(function ($user) use ($month, $year) {
             $user->total_diamonds = $user->getTotalDiamond($month, $year);
@@ -372,4 +372,5 @@ class UserRepository extends AbstractRepository
             return $user;
         });
     }
+
 }

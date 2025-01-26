@@ -9,6 +9,7 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\utd\AgencyController;
 use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -41,20 +43,20 @@ use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\utd\RequestAgencyController;
+use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
+use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\DailyGiftsController;
-use App\Http\Controllers\utd\DailyGiftTypesController;
-use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
-use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
+use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -172,6 +174,13 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
     });
 
+    Route::prefix('special-wares')->group(function () {
+        Route::get('/', [SpecialWareController::class, 'index']);
+        Route::get('/{id}', [SpecialWareController::class, 'show']);
+        Route::post('/create', [SpecialWareController::class, 'store']);
+        Route::post('/update/{id}', [SpecialWareController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
+    });
 
 
     Route::prefix('daily-gift-types')->group(function () {
@@ -384,6 +393,7 @@ Route::middleware([])->group(function () {
     });
     Route::get('users-search', [UserController::class, 'search']);
     Route::get('users-search2', [UserController::class, 'search2']);
+    Route::get('users-search3', [UserController::class, 'userAgency']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
         Route::get('/{achievementId}/level', [UtdAchievementController::class, 'allAchievementsLevel']);
@@ -473,4 +483,5 @@ Route::middleware([])->group(function () {
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
+    Route::get('/reports', [ReportController::class, 'reports']);
 });
