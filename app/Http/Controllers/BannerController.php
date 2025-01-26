@@ -83,7 +83,6 @@ class BannerController extends Controller
         $banners = $this->bannerServices->index2($ids);
         if (empty($banners)) {
             UserBannerShow::where("user_id", $user->id)->delete();
-            dd(1);
            return Common::apiResponse(true, 'successful', null);
         }
         // UserBannerShow::where("user_id", $user->id)->delete();
