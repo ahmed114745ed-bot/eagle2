@@ -2,6 +2,7 @@
 
 namespace App\Tik\Repositories;
 
+use App\Helpers\UserCommon;
 use App\Models\AgencyJoinRequest;
 
 class AgencyJoinRequestRepository extends AbstractRepository
@@ -17,7 +18,11 @@ class AgencyJoinRequestRepository extends AbstractRepository
 
     public function countByMonth($userId)
     {
-        return $this->model->query()->where('user_id', $userId)->where('status', '!=', 2)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
+        $period = UserCommon::getPeriodTarget();
+        $start_at =$period['start_at'];
+        $end_at =$period['end_at'];
+        return $this->model->query()->where('user_id', $userId)->where('status', '!=', 2)->whereBetween('created_at', [$start_at, $end_at])->count();
+        // return $this->model->query()->where('user_id', $userId)->where('status', '!=', 2)->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->count();
     }
 
     public function countByAgency($userId, $agencyId)

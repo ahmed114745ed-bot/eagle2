@@ -447,12 +447,13 @@ class UserService
         $query = GiftLog::query()->where('roomowner_id', $room_uid);
 
         if ($type == 1) {
+            $startOfDay = Carbon::now()->subDay()->setTime(18, 0, 0); 
+            $endOfDay = Carbon::now()->setTime(17, 59, 59); 
             $query = $query->whereBetween('created_at', [
-                Carbon::now()->startOfDay(),
-                Carbon::now()->endOfDay()
+                $startOfDay,
+                $endOfDay
             ]);
         }
-
         $data = $query->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')
             ->orderByRaw("exp desc")
