@@ -53,7 +53,7 @@ use App\Models\Room;
 use App\Models\User;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-users', function (){
+    Route::get('test-game-rtm', function (){
 
         $user = User::find(524);
         $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
