@@ -83,15 +83,9 @@ class UserSallaryObserver
             $period_id         = $userSalary->period_id;
             $agencySalary =
                 AgencySallary::query()->where('month', $month)->where('year', $year)->where('period_id', $period_id)->where('agency_id', $agency_id)->first();
-               
-         
-//            $diff = (double)$userSalary->agency_sallary - ((double)$userSalary->getOriginal('agency_sallary') ?? 0);
 
-            // $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->where('period_id', $period_id)->sum('agency_sallary');
+
             $salary = UserSallary::where('user_agency_id', $agency_id)->where('period_id', $period_id)->sum('agency_sallary');
-            /*if( $diff < 0 ){
-                $diff = $userSalary->agency_sallary;
-            }*/
 
             if ($agencySalary) {
                 $agencySalary->update([
@@ -99,8 +93,8 @@ class UserSallaryObserver
                                       ]);
             } else {
                 AgencySallary::query()->create([
-                                                   'sallary' => $salary, 'agency_id' => $agency_id, 'month' => $month,
-                                                   'year'    => $year
+                                                   'sallary' => $salary, 'agency_id' => $agency_id, 'month' => '0',
+                                                   'year'    => '0', 'period_id' => $period_id
                                                ]);
             }
         }

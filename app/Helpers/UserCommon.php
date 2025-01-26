@@ -84,29 +84,29 @@ class UserCommon{
     public static function UserStatistic($userId,$type, bool $reals = false)
     {
         $period = UserCommon::getPeriodTarget();
-        
+
         // $type = 0;
 
         $user = User::withCount(['reals' => function ($reals) use ($type, $period) {
 
             $reals->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
         },'real_comments'=>function($real_comments) use ($period){
-                
+
             $real_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-            
+
         },'real_likes'=>function($real_likes) use ($period){
             $real_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-            
+
         },'moments'=>function($moments) use ($period){
             $moments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
         },'moment_comments'=>function($moment_comments) use ($period){
-            
+
             $moment_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-           
+
         },'moment_likes'=>function($moment_likes) use ($period){
-           
+
             $moment_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-          
+
         }])->find($userId);
 
         $key = ($reals)? 'reals' : 'reel';
@@ -454,16 +454,23 @@ class UserCommon{
                         break;
                 }
             }
-            
+
         }
-           
+
     }
 
     public static function getPeriodTarget()
     {
         $periodTarget =  PeriodTarget::latest()->first();
-        $data['start_at'] = $periodTarget?->start_at ?? "";
-        $data['end_at'] = $periodTarget?->end_at ?? "";
+        if (!$periodTarget) {
+            DB::table('period_target')->updateOrInsert([
+                'start_at' => Carbon::now()->startOfMonth()->addDays(20)->subDay()->setHour(18)->setMinute(0)->setSecond(0),
+                'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19)->setHour(17)->setMinute(59)->setSecond(59)
+                ], ['created_at' => Carbon::now(),]);
+            $periodTarget =  PeriodTarget::latest()->first();
+        }
+        $data['start_at'] = $periodTarget?->start_at ?? now()->toString();
+        $data['end_at'] = $periodTarget?->end_at ?? now()->toString();
         $data['id'] = $periodTarget?->id ?? 0;
         return $data;
     }
@@ -472,7 +479,7 @@ class UserCommon{
     {
         $startDate = Carbon::parse($start_at);
         $endDate = Carbon::parse($end_at);
-    
+
         $periodTarget = PeriodTarget::query()
             ->whereBetween('start_at', [$startDate, $endDate])
             ->orWhereBetween('end_at', [$startDate, $endDate])
@@ -480,11 +487,11 @@ class UserCommon{
                 $query->where('start_at', '<=', $startDate)
                       ->where('end_at', '>=', $endDate);
             })
-            ->first();    
-    
+            ->first();
+
         return $periodTarget;
     }
 
-  
+
 
 }
