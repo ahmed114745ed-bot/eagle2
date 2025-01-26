@@ -3,6 +3,7 @@
 use App\Admin\Controllers\WareController;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
@@ -448,6 +449,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // });
 
             Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
+
+            // Music Store 
+            Route::post('/music', [MusicStoreController::class, 'store']);
+
 
         }
     );
