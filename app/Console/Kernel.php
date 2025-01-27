@@ -4,7 +4,6 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,10 +31,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=heavy1')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy2')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy3')->withoutOverlapping()->runInBackground();
-        $days = DB::table('configs')->where( 'name','period_target')->value('value'); 
-        if ($days) {
-            $schedule->command('schedule:cron')->withoutOverlapping()->runInBackground()->cron("0 0 */{$days} * *");
-        }
     }
 
     /**

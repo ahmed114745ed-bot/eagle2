@@ -14,8 +14,6 @@ class UserAchievementService
     public function insertCharging(User $user, $totalCoins): void
     {
         $userId      = $user->id;
-
-
         $achievement = Achievement::query()->where('type', AchievementType::RECHARGE_TARGET)->first();
         if (!$achievement) return;
 

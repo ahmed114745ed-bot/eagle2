@@ -41,8 +41,4 @@ public bool $allowSaving = true;
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
-
-    public function period_target(){
-        return $this->belongsTo(PeriodTarget::class,'period_id','id');
-    }
 }

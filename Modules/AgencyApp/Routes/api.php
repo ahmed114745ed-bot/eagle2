@@ -32,7 +32,6 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','appFeatureE
         Route::post('kick-of-agency', [AgencyAppController::class, 'kick_of_agency']);
         Route::post('/filter', [AgencyAppController::class, 'agency_filter']);
         Route::post('host-reports', [AgencyAppController::class, 'dailyReport']);
-        Route::post('host-reports-new', [AgencyAppController::class, 'dailyReportNew']);
     });
 
     //dashboard

@@ -86,147 +86,147 @@ class AgencyMangerTaregetController extends MainController {
 //         return $grid;
 //     }
 
-    // protected function agencies_grid(){
-    //     $grid = new Grid(new Agency());
+    protected function agencies_grid(){
+        $grid = new Grid(new Agency());
 
-    //     $grid->model ()->where ('target_usd','>',0);
+        $grid->model ()->where ('target_usd','>',0);
 
-    //     $grid->column ('id',__ ('id'));
-    //     $grid->column ('name',__ ('name'));
-    //     $grid->column ('phone',__ ('phone'));
-    //     $grid->column ('old_usd',__ ('old usd'));
-    //     $grid->column ('target_usd',__ ('target usd'));
-    //     $grid->column ('target_token_usd',__ ('target token usd'));
-    //     $grid->column ('due',__ ('due'))->display (function (){
-    //         return $this->old_usd + $this->target_usd - $this->target_token_usd;
-    //     });
-    //     $grid->column ('users',__ ('users'))->display (function (){
-    //         return '<a href="?name=users&desc='.$this->name.'&aid='.$this->id.'">'.$this->users()->count().'</a>';
-    //     });
-    //     // $grid->column ('cashing',__ ('cashing'))->display (function (){
-    //     //     return (new \App\Admin\Actions\SalaryAction($this->id,'agency'))->render () ;
-    //     // });
+        $grid->column ('id',__ ('id'));
+        $grid->column ('name',__ ('name'));
+        $grid->column ('phone',__ ('phone'));
+        $grid->column ('old_usd',__ ('old usd'));
+        $grid->column ('target_usd',__ ('target usd'));
+        $grid->column ('target_token_usd',__ ('target token usd'));
+        $grid->column ('due',__ ('due'))->display (function (){
+            return $this->old_usd + $this->target_usd - $this->target_token_usd;
+        });
+        $grid->column ('users',__ ('users'))->display (function (){
+            return '<a href="?name=users&desc='.$this->name.'&aid='.$this->id.'">'.$this->users()->count().'</a>';
+        });
+        // $grid->column ('cashing',__ ('cashing'))->display (function (){
+        //     return (new \App\Admin\Actions\SalaryAction($this->id,'agency'))->render () ;
+        // });
 
-    //     return $grid;
-    // }
+        return $grid;
+    }
 
-    // public function cashing000(){
-    //     $amount = \request ('amount');
-    //     try {
-    //         DB::beginTransaction ();
-    //         if (\request ('id') && \request ('type') == 'agency'){
-    //             $agency = Agency::query ()->find (\request ('id'));
-    //             if ($agency){
-    //                 $prev = $agency->old_usd;
-    //                 if ($amount){
-    //                     $agency->old_usd -= $amount;
-    //                 }else{
-    //                     $agency->old_usd = 0;
-    //                 }
-    //                 $agency->save ();
-    //                 $m = $amount?:$agency->old_usd ;
-    //                 if ($m > 0){
-    //                     SalaryTrx::query ()->create (
-    //                         [
-    //                             'type'=>1,
-    //                             'oid'=>$agency->id,
-    //                             'amount'=>$amount?:$agency->old_usd,
-    //                             't_no'=>rand (11111111,99999999),
-    //                             'note'=>'paid via admin',
-    //                             'before_pay'=>$prev,
-    //                             'after_pay'=>$prev - $m,
-    //                             'payer_id'=>auth ()->id (),
-    //                             'payer_type'=>0
-    //                         ]
-    //                     );
-    //                 }
-    //             }
-    //         }
-    //         elseif (\request ('id') && \request ('type') == 'user'){
-    //             $user = User::query ()->find (\request ('id'));
-    //             if ($user){
-    //                 $prev = $user->old_usd;
-    //                 $m = $amount?:$user->old_usd ;
-    //                 if ($amount){
-    //                     $user->old_usd -= $amount;
-    //                 }else{
-    //                     $user->old_usd = 0;
-    //                     $user->coins = 0;
-    //                 }
-    //                 $user->save ();
-    //                 if ($m > 0){
-    //                     SalaryTrx::query ()->create (
-    //                         [
-    //                             'type'=>0,
-    //                             'oid'=>$user->id,
-    //                             'amount'=>$amount?:$user->old_usd,
-    //                             't_no'=>rand (11111111,99999999),
-    //                             'note'=>'paid via admin',
-    //                             'before_pay'=>$prev,
-    //                             'after_pay'=>$prev - $m,
-    //                             'payer_id'=>auth ()->id (),
-    //                             'payer_type'=>0
-    //                         ]
-    //                     );
-    //                 }
-    //             }
-    //         }
-    //         elseif (\request ('id') && \request ('type') == 'agency_users'){
-    //             $agency = Agency::query ()->find (\request ('id'));
-    //             if ($agency){
-    //                 $prev = $agency->old_usd;
-    //                 $m = $agency->old_usd ;
-    //                 $agency->old_usd = 0;
-    //                 if ($m > 0){
-    //                     SalaryTrx::query ()->create (
-    //                         [
-    //                             'type'=>0,
-    //                             'oid'=>$agency->id,
-    //                             'amount'=>$agency->old_usd,
-    //                             't_no'=>rand (11111111,99999999),
-    //                             'note'=>'paid via admin',
-    //                             'before_pay'=>$prev,
-    //                             'after_pay'=>$prev - $m,
-    //                             'payer_id'=>auth ()->id (),
-    //                             'payer_type'=>0
-    //                         ]
-    //                     );
-    //                 }
-    //                 $users = $agency->users;
-    //                 foreach ($users as $user){
-    //                     $m = $user->old_usd ;
-    //                     $user->old_usd = 0;
-    //                     $user->coins = 0;
-    //                     if ($m > 0){
-    //                         SalaryTrx::query ()->create (
-    //                             [
-    //                                 'type'=>0,
-    //                                 'oid'=>$user->id,
-    //                                 'amount'=>$user->old_usd,
-    //                                 't_no'=>rand (11111111,99999999),
-    //                                 'note'=>'paid via admin for agency , contact your agent for your salary',
-    //                                 'before_pay'=>$prev,
-    //                                 'after_pay'=>$prev - $m,
-    //                                 'payer_id'=>auth ()->id (),
-    //                                 'payer_type'=>0
-    //                             ]
-    //                         );
-    //                     }
-    //                     $user->save();
-    //                 }
-    //                 $agency->save ();
-    //             }
-    //         }
-    //         DB::commit ();
-    //     }
-    //     catch (\Exception $exception){
-    //         DB::rollBack ();
-    //         return $this->response()->error(__ ('un known error'))->refresh();
-    //     }
+    public function cashing000(){
+        $amount = \request ('amount');
+        try {
+            DB::beginTransaction ();
+            if (\request ('id') && \request ('type') == 'agency'){
+                $agency = Agency::query ()->find (\request ('id'));
+                if ($agency){
+                    $prev = $agency->old_usd;
+                    if ($amount){
+                        $agency->old_usd -= $amount;
+                    }else{
+                        $agency->old_usd = 0;
+                    }
+                    $agency->save ();
+                    $m = $amount?:$agency->old_usd ;
+                    if ($m > 0){
+                        SalaryTrx::query ()->create (
+                            [
+                                'type'=>1,
+                                'oid'=>$agency->id,
+                                'amount'=>$amount?:$agency->old_usd,
+                                't_no'=>rand (11111111,99999999),
+                                'note'=>'paid via admin',
+                                'before_pay'=>$prev,
+                                'after_pay'=>$prev - $m,
+                                'payer_id'=>auth ()->id (),
+                                'payer_type'=>0
+                            ]
+                        );
+                    }
+                }
+            }
+            elseif (\request ('id') && \request ('type') == 'user'){
+                $user = User::query ()->find (\request ('id'));
+                if ($user){
+                    $prev = $user->old_usd;
+                    $m = $amount?:$user->old_usd ;
+                    if ($amount){
+                        $user->old_usd -= $amount;
+                    }else{
+                        $user->old_usd = 0;
+                        $user->coins = 0;
+                    }
+                    $user->save ();
+                    if ($m > 0){
+                        SalaryTrx::query ()->create (
+                            [
+                                'type'=>0,
+                                'oid'=>$user->id,
+                                'amount'=>$amount?:$user->old_usd,
+                                't_no'=>rand (11111111,99999999),
+                                'note'=>'paid via admin',
+                                'before_pay'=>$prev,
+                                'after_pay'=>$prev - $m,
+                                'payer_id'=>auth ()->id (),
+                                'payer_type'=>0
+                            ]
+                        );
+                    }
+                }
+            }
+            elseif (\request ('id') && \request ('type') == 'agency_users'){
+                $agency = Agency::query ()->find (\request ('id'));
+                if ($agency){
+                    $prev = $agency->old_usd;
+                    $m = $agency->old_usd ;
+                    $agency->old_usd = 0;
+                    if ($m > 0){
+                        SalaryTrx::query ()->create (
+                            [
+                                'type'=>0,
+                                'oid'=>$agency->id,
+                                'amount'=>$agency->old_usd,
+                                't_no'=>rand (11111111,99999999),
+                                'note'=>'paid via admin',
+                                'before_pay'=>$prev,
+                                'after_pay'=>$prev - $m,
+                                'payer_id'=>auth ()->id (),
+                                'payer_type'=>0
+                            ]
+                        );
+                    }
+                    $users = $agency->users;
+                    foreach ($users as $user){
+                        $m = $user->old_usd ;
+                        $user->old_usd = 0;
+                        $user->coins = 0;
+                        if ($m > 0){
+                            SalaryTrx::query ()->create (
+                                [
+                                    'type'=>0,
+                                    'oid'=>$user->id,
+                                    'amount'=>$user->old_usd,
+                                    't_no'=>rand (11111111,99999999),
+                                    'note'=>'paid via admin for agency , contact your agent for your salary',
+                                    'before_pay'=>$prev,
+                                    'after_pay'=>$prev - $m,
+                                    'payer_id'=>auth ()->id (),
+                                    'payer_type'=>0
+                                ]
+                            );
+                        }
+                        $user->save();
+                    }
+                    $agency->save ();
+                }
+            }
+            DB::commit ();
+        }
+        catch (\Exception $exception){
+            DB::rollBack ();
+            return $this->response()->error(__ ('un known error'))->refresh();
+        }
 
-    //     return $this->response()->success('success')->refresh();
+        return $this->response()->success('success')->refresh();
 
-    // }
+    }
 
 //     protected function users(){
 // //        if (request ('update_salary') == 'yes'){
@@ -308,30 +308,27 @@ class AgencyMangerTaregetController extends MainController {
                 $grid->filter (function (Grid\Filter $filter){
                     $filter->expand ();
                     $filter->column(1/2, function ($filter) {
-                        $filter->column(1 / 2, function ($filter) {
-                            $filter->equal('salaries.period_id', __('period'))->select(Common::by_period_filter());
-                        });
                         // $filter->equal('salaries.year', __('Year'));
                         // $filter->equal('salaries.month', __('Month'));
-                        // $filter->where(function ($query) {
-                        //     $year = Request::input('year');
-                        //     if (!empty($year)) {
-                        //         $query->whereHas('salaries', function ($q) use ($year) {
-                        //             $q->where('year', $year);
-                        //         });
-                        //     }
-                        // }, __('Year'), 'year')->integer();
+                        $filter->where(function ($query) {
+                            $year = Request::input('year');
+                            if (!empty($year)) {
+                                $query->whereHas('salaries', function ($q) use ($year) {
+                                    $q->where('year', $year);
+                                });
+                            }
+                        }, __('Year'), 'year')->integer();
                     });
 
 
-                        // $filter->where(function ($query) {
-                        //     $month = Request::input('month');
-                        //     if (!empty($month)) {
-                        //         $query->whereHas('salaries', function ($q) use ($month) {
-                        //             $q->where('month', $month);
-                        //         });
-                        //     }
-                        // }, __('Month'), 'month')->integer();
+                        $filter->where(function ($query) {
+                            $month = Request::input('month');
+                            if (!empty($month)) {
+                                $query->whereHas('salaries', function ($q) use ($month) {
+                                    $q->where('month', $month);
+                                });
+                            }
+                        }, __('Month'), 'month')->integer();
 
 
                 });

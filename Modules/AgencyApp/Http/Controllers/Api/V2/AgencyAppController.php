@@ -2,7 +2,6 @@
 
 namespace Modules\AgencyApp\Http\Controllers\Api\V2;
 
-use App\Helpers\UserCommon;
 use Exception;
 use Carbon\Carbon;
 use App\Models\User;
@@ -188,39 +187,6 @@ class AgencyAppController extends Controller
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year);
-
-        return Common::apiResponse(true, 'success', $data);
-    }
-
-    public function dailyReportNew()
-    {
-        $user  = \Auth::user();
-
-        
-
-        if (request('start_at') && request('end_at')) {
-
-            $start_at = Carbon::parse(request()->start_at)->setTimezone('UTC')->startOfDay()->toDateTimeString();
-            $end_at = Carbon::parse(request()->end_at)->setTimezone('UTC')->endOfDay()->toDateTimeString() ;
-            $period=  UserCommon::getPeriodTargetIds($start_at,$end_at);
-            $start_at =$period['start_at'];
-            $end_at =$period['end_at'];
-
-        }else {
-            $defult = UserCommon::getPeriodTarget();
-            $start_at =$defult['start_at'];
-            $end_at =$defult['end_at'];
-        }
-
-       
-        if (!$user instanceof User) return;
-        $userId        = $user->id;
-        $cacheKey = 'cache-data-my-store-' . $user->id;
-        if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-            $targetService = new TargetService($user);
-            ($targetService)->calculateTarget();
-        }
-        $data = $this->agencyService->dailyReportNew($user, $start_at, $end_at);
 
         return Common::apiResponse(true, 'success', $data);
     }

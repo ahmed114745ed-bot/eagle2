@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\Common;
 use App\Traits\PaymentGetWayTrait;
 use Carbon\Carbon;
 use DB;
@@ -201,11 +200,17 @@ class Agency extends Model
         return $this->hasMany(AgencySallary::class, 'agency_id')->orderByDesc('id');
     }
 
-    public function getTotalSallaryAgency($period)
+    public function getTotalSallaryAgency($month = null, $year = null)
     {
-            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
-                //$query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
-                $query->where('period_id', $period);
+        if ($month == null) {
+            $month = now()->month;
+        }
+
+        if ($year == null) {
+            $year = now()->year;
+        }
+            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
             })->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
@@ -215,10 +220,17 @@ class Agency extends Model
             return floor($agencySallary ?? 0);
     }
 
-    public function getTotalCutAmountAgency($period)
+    public function getTotalCutAmountAgency($month = null, $year = null)
     {
-            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
-                $query->where('period_id', $period);
+        if ($month == null) {
+            $month = now()->month;
+        }
+
+        if ($year == null) {
+            $year = now()->year;
+        }
+            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
             }) ->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
@@ -240,11 +252,17 @@ class Agency extends Model
         return $old;
     }
 
-    public function getSalaryAgency($period)
+    public function getSalaryAgency($month = null, $year = null)
     {
-        
-            $agencySallary = AgencySallary::query()->when(isset($period), function ($query) use ($period) {
-                $query->where('period_id', $period);
+        if ($month == null) {
+            $month = now()->month;
+        }
+
+        if ($year == null) {
+            $year = now()->year;
+        }
+            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
             })->where('is_paid', 0)
                 ->where('agency_id', $this->id)
                 ->orderByDesc('id')
@@ -276,8 +294,5 @@ class Agency extends Model
     {
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
-
-
-
 
 }

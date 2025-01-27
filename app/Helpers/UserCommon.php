@@ -45,7 +45,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Facades\Agency as FacadesAgency;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Models\CoinTarget;
-use App\Models\PeriodTarget;
 use App\Models\UserCoinTarget;
 use App\Models\UserTargetCoin;
 
@@ -83,30 +82,42 @@ class UserCommon{
 
     public static function UserStatistic($userId,$type, bool $reals = false)
     {
-        $period = UserCommon::getPeriodTarget();
-
-        // $type = 0;
-
-        $user = User::withCount(['reals' => function ($reals) use ($type, $period) {
-
-            $reals->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-        },'real_comments'=>function($real_comments) use ($period){
-
-            $real_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-
-        },'real_likes'=>function($real_likes) use ($period){
-            $real_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-
-        },'moments'=>function($moments) use ($period){
-            $moments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-        },'moment_comments'=>function($moment_comments) use ($period){
-
-            $moment_comments->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-
-        },'moment_likes'=>function($moment_likes) use ($period){
-
-            $moment_likes->whereBetween('created_at', [$period['start_at'], $period['end_at']]);
-
+        $user=User::withCount(["reals"=>function($reals) use ($type){
+            if ($type == 0) {
+                $reals->whereDate("reals.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $reals->whereMonth("reals.created_at",date("m"))->whereYear("reals.created_at",date("Y"));
+            }
+        },'real_comments'=>function($real_comments) use ($type){
+            if ($type == 0) {
+                $real_comments->whereDate("real_user_comments.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $real_comments->whereMonth("real_user_comments.created_at",date("m"))->whereYear("real_user_comments.created_at",date("Y"));
+            }
+        },'real_likes'=>function($real_likes) use ($type){
+            if ($type == 0) {
+                $real_likes->whereDate("real_user_likes.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $real_likes->whereMonth("real_user_likes.created_at",date("m"))->whereYear("real_user_likes.created_at",date("Y"));
+            }
+        },'moments'=>function($moments) use ($type){
+            if ($type == 0) {
+                $moments->whereDate("moment.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $moments->whereMonth("moment.created_at",date("m"))->whereYear("moment.created_at",date("Y"));
+            }
+        },'moment_comments'=>function($moment_comments) use ($type){
+            if ($type == 0) {
+                $moment_comments->whereDate("moment_user_comments.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $moment_comments->whereMonth("moment_user_comments.created_at",date("m"))->whereYear("moment_user_comments.created_at",date("Y"));
+            }
+        },'moment_likes'=>function($moment_likes) use ($type){
+            if ($type == 0) {
+                $moment_likes->whereDate("moment_user_likes.created_at",date("Y-m-d"));
+            }elseif ($type == 1) {
+                $moment_likes->whereMonth("moment_user_likes.created_at",date("m"))->whereYear("moment_user_likes.created_at",date("Y"));
+            }
         }])->find($userId);
 
         $key = ($reals)? 'reals' : 'reel';
@@ -454,44 +465,8 @@ class UserCommon{
                         break;
                 }
             }
-
+            
         }
-
+           
     }
-
-    public static function getPeriodTarget()
-    {
-        $periodTarget =  PeriodTarget::latest()->first();
-        if (!$periodTarget) {
-            DB::table('period_target')->updateOrInsert([
-                'start_at' => Carbon::now()->startOfMonth()->addDays(20)->subDay()->setHour(18)->setMinute(0)->setSecond(0),
-                'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19)->setHour(17)->setMinute(59)->setSecond(59)
-                ], ['created_at' => Carbon::now(),]);
-            $periodTarget =  PeriodTarget::latest()->first();
-        }
-        $data['start_at'] = $periodTarget?->start_at ?? now()->toString();
-        $data['end_at'] = $periodTarget?->end_at ?? now()->toString();
-        $data['id'] = $periodTarget?->id ?? 0;
-        return $data;
-    }
-
-    public static function getPeriodTargetIds($start_at ,$end_at)
-    {
-        $startDate = Carbon::parse($start_at);
-        $endDate = Carbon::parse($end_at);
-
-        $periodTarget = PeriodTarget::query()
-            ->whereBetween('start_at', [$startDate, $endDate])
-            ->orWhereBetween('end_at', [$startDate, $endDate])
-            ->orWhere(function ($query) use ($startDate, $endDate) {
-                $query->where('start_at', '<=', $startDate)
-                      ->where('end_at', '>=', $endDate);
-            })
-            ->first();
-
-        return $periodTarget;
-    }
-
-
-
 }

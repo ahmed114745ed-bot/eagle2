@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Helpers\UserCommon;
 use DB;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
@@ -26,8 +25,6 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
-use Carbon\Carbon;
-
 
 /**
  * @method static withoutAppends()
@@ -197,32 +194,7 @@ class User extends Authenticatable
             ->havingRaw('SUM(hours) > 1')
             ->get(); // Having condition
 
-        return $subQuery->count('entry_count');
-    }
 
-    public function getTotalDaysNew()
-    {
-        $defult = UserCommon::getPeriodTarget();
-        if (request('start_at') && request('end_at')) {
-           
-            $start_at = Carbon::parse(request()->start_at)->setTimezone('UTC')->startOfDay()->toDateTimeString();
-            $end_at = Carbon::parse(request()->end_at)->setTimezone('UTC')->endOfDay()->toDateTimeString() ;
-            $period=  UserCommon::getPeriodTargetIds($start_at,$end_at);
-            $start_at =$period['start_at'];
-            $end_at =$period['end_at'];
-        }else {
-            
-            $start_at =$defult['start_at'];
-            $end_at =$defult['end_at'];
-        }
-        
-        $subQuery = DB::table('live_times')
-            ->select('uid', DB::raw('COUNT(*) AS entry_count'))
-            ->whereBetween('created_at', [$start_at, $end_at])
-            ->where('uid', $this->id)
-            ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-            ->havingRaw('SUM(hours) > 1')
-            ->get(); // Having condition
 
         return $subQuery->count('entry_count');
     }
@@ -244,32 +216,7 @@ class User extends Authenticatable
 
         return $userSallary?->toArray() ?? [];
     }
-    public function getSallaryInfoNew(): array
-    {
-        if (request('start_at') && request('end_at')) {
 
-            $start_at = Carbon::parse(request()->start_at)->setTimezone('UTC')->startOfDay()->toDateTimeString();
-            $end_at = Carbon::parse(request()->end_at)->setTimezone('UTC')->endOfDay()->toDateTimeString() ;
-            $period=  UserCommon::getPeriodTargetIds($start_at,$end_at);
-            $periodID=  $period->id;
-
-        }else {
-
-            $defult = UserCommon::getPeriodTarget();
-            $start_at =$defult['start_at'];
-            $end_at =$defult['end_at'];
-            $periodID=  $defult['id'];
-
-        }
-     
-      $userSallary = UserSallary::query()
-            ->selectRaw('sum(sallary) as total_salary, sum(cut_amount) as total_cut_amount')
-            ->where('period_id','<=', $periodID) 
-            ->where('user_id', $this->id)
-            ->first();
-
-        return $userSallary?->toArray() ?? [];
-    }
     public function additionalInfo()
     {
         return $this->hasMany(AdditionalInfo::class, 'user_id');
@@ -733,8 +680,8 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
     public function myroom()
-    {
-        return $this->hasOne(Room::class, 'uid', 'id');
+    {   
+        return $this->hasOne(Room::class, 'uid' ,'id');
     }
 
     public function color_image()
@@ -976,12 +923,17 @@ class User extends Authenticatable
 
 
 
-    public function getTotalSallary($period)
+    public function getTotalSallary($month = null, $year = null)
     {
+        if ($month == null) {
+            $month = now()->month;
+        }
+        if ($year == null) {
+            $year = now()->year;
+        }
         if ($this->agency_id) {
-            $userSallary = UserSallary::query()->when(isset($period), function ($query) use ($period) {
-                //$query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
-                $query->where('period_id', $period);
+            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -995,11 +947,13 @@ class User extends Authenticatable
         }
     }
 
-    public function getTotalDiamond($period)
+    public function getTotalDiamond($month = null, $year = null)
     {
         if ($this->agency_id) {
-            $userSallary = UserTarget::query()->when(isset($period), function ($query) use ($period) {
-                $query->where('period_target_id', $period);
+            $userSallary = UserTarget::query()->when(isset($month), function ($query) use ($month) {
+                $query->where('add_month', '<=', $month);
+            })->when(isset($year), function ($query) use ($year) {
+                $query->where('add_year', '<=', $year);
             })->where('user_id', $this->id)
                 ->where('agency_id', $this->agency_id)
                 ->orderByDesc('id')
@@ -1013,12 +967,17 @@ class User extends Authenticatable
     }
 
 
-    public function getTotalCutAmount($period)
+    public function getTotalCutAmount($month = null, $year = null)
     {
+        if ($month == null) {
+            $month = now()->month;
+        }
+        if ($year == null) {
+            $year = now()->year;
+        }
         if ($this->agency_id) {
-
-            $userSallary = UserSallary::query()->when(isset($period),function ($query) use ($period) {
-                $query->where('period_id', $period);
+            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })->where('user_id', $this->id)
                 ->where('is_paid', 0)
                 ->where('user_agency_id', $this->agency_id)
@@ -1045,12 +1004,17 @@ class User extends Authenticatable
         return $old;
     }
 
-    public function getSalary($period)
+    public function getSalary($month = null, $year = null)
     {
-       
+        if ($month == null) {
+            $month = now()->month;
+        }
+        if ($year == null) {
+            $year = now()->year;
+        }
         if ($this->agency_id) {
-            $userSallary = UserSallary::query()->when(isset($period),function ($query) use ($period) {
-                $query->where('period_id', $period);
+            $userSallary = UserSallary::query()->where(function ($query) use ($year, $month) {
+                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
             })
                 ->where('user_id', $this->id)
                 ->where('is_paid', 0)
