@@ -13,6 +13,7 @@ use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\TimeLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
+use Illuminate\Support\Facades\Log;
 use Modules\CP\Entities\CpRoomHistory;
 use Modules\CP\Enums\CpStatus;
 
