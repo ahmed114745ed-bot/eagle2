@@ -16,10 +16,10 @@ class AdminUserReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->user->id,
-            'uuid' => $this->uuid->uuid,
+            'id' => $this->user->id ?? 0,
+            'uuid' => $this->user->uuid ?? 0,
             'name' => @$this->name ?: '',
-            'target' => $this->target,
+            'target' => $this->target ?? 0,
             'due' => ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id),
         ];
     }

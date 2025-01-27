@@ -114,7 +114,7 @@ class MyDataResource extends JsonResource
 
 
         $ownerRoom = $this->ownerRoom;
-        $pks     = $this->getRoomTwoLastPk($ownerRoom->id);
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
         $data = [
@@ -134,14 +134,14 @@ class MyDataResource extends JsonResource
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
             'room' => [
-                "id" => @$ownerRoom->id,
+                "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
-                "room_name" => @$ownerRoom->room_name,
-                "room_cover" => @$ownerRoom->room_cover,
-                "room_background" => @$ownerRoom->final_room_image,
-                "mode" => @$ownerRoom->mode,
-                'giftPrice' => @$ownerRoom->session_string,
-                "is_pk"               => (@$pks[0]) && $pks[0]->end_at >= now() ? $pks[0]->status : 0,
+                "room_name" => @$ownerRoom->room_name ?? '',
+                "room_cover" => @$ownerRoom->room_cover ?? '',
+                "room_background" => @$ownerRoom->final_room_image ?? '',
+                "mode" => @$ownerRoom->mode ?? 0,
+                'giftPrice' => @$ownerRoom->session_string ?? 0,
+                "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
 

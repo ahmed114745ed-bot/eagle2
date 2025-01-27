@@ -19,7 +19,12 @@ class ReportController extends Controller
 
     public function reports(Request $request)
     {
-        $data = $this->reportService->report($request);
-        return Common::apiResponse(true, 'done', $data);
+        try {
+            $data = $this->reportService->report($request);
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }

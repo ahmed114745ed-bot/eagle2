@@ -21,7 +21,7 @@ class ChargesController extends Controller
 
         $from = request('from');
         $to = request('to');
-
+        $sort = request('sort');
         $user_type = request('user_type');
 
         $charges = Charge::with('user.profile')->when($from && $to , function($q)use($from, $to){
@@ -30,6 +30,9 @@ class ChargesController extends Controller
         })
         ->when($user_type,function($q)use($user_type){
             $q->where('user_type', $user_type);
+        })
+        ->when($sort,function($q)use($sort){
+            $q->orderBy('id', $sort);
         })
         ->paginate(10);
 
