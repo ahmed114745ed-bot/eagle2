@@ -9,6 +9,7 @@ use App\Models\Target;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
+use App\Models\PeriodTarget;
 use App\Models\UserSallary;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
@@ -65,6 +66,7 @@ class FixedTargetService
      */
     public function calculateFixedTarget($month_received, User $user): User
     {
+        $times = $this->getUserLiveTime($user);
 
         if ($user->agency_id != 0) {
             $fixedTarget = new FixedTargetClass();
@@ -78,15 +80,16 @@ class FixedTargetService
                 $hours = $times->hnum;
                 $days  = $user->monthly_days;
             }
+            $period = UserCommon::getPeriodTarget();
 
-            $countMoments  = Moment::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
-            ])->count();
-
-            $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
-            ])->count();
-
+            $countMoments = Moment::query()
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$period['start_at'], $period['end_at']])
+            ->count();
+            $countReels = Real::query()
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$period['start_at'], $period['end_at']])
+            ->count();
 
             $userTarget = UserTarget::where('user_id', $user->id)->first();
             $target = Target::find($userTarget->target_id);
@@ -124,7 +127,19 @@ class FixedTargetService
      */
     public function getUserLiveTime(User $user): null|Model
     {
-        return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        // return LiveTime::query()->where('uid', $user->id)->whereDate('created_at', '>=', $period['start_at'])->whereDate('created_at', '<=', $period['end_at'])->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        // $startAt = Carbon::parse($period['start_at']);
+        // $endAt = Carbon::parse($period['end_at']);
+        $period = UserCommon::getPeriodTarget();
+        return LiveTime::query()
+        ->where('uid', $user->id)
+        ->whereBetween('created_at', [
+            $period['start_at'],
+            $period['end_at']
+        ])
+        ->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')
+        ->groupBy('uid')
+        ->first();
     }
 
     private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null): void
@@ -163,20 +178,22 @@ class FixedTargetService
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
         ];
         if (0 < $t) $values['sallary'] = $t;
+        $period = UserCommon::getPeriodTarget();
 
+        if (!$period) return;
         $userSalary = UserSallary::query()->where([
                                                       'user_id' => $user->id,
-                                                      'month' => Carbon::now()->month,
-                                                      'year' => Carbon::now()->year,
                                                       'user_agency_id' => $user->agency_id,
+                                                       'period_id' => $period['id'],
                                                   ])->lock()->first();
         if ($userSalary){
             $userSalary->update($values);
         }else{
             $userSalary = UserSallary::query()->create([
                                                            'user_id' => $user->id,
-                                                           'month' => Carbon::now()->month,
-                                                           'year' => Carbon::now()->year,
+                                                           'month' => '0',
+                                                           'period_id' => $period['id'],
+                                                           'year' => 0,
                                                            'user_agency_id' => $user->agency_id,
                                                            ...$values
                                                        ])->lock();

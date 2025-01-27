@@ -12,11 +12,12 @@ trait AttributesTrait
 
     public static function checkPack($userId, $type, $dress = null)
     {
+        
         $pack = Pack::query()->with('ware')
             ->where('user_id', $userId)
             ->where('type', $type)
             ->where(function ($q) {
-                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->subHours(6)->timestamp);
             });
         if ($dress != null) $pack->where('target_id', $dress);
         return $pack;

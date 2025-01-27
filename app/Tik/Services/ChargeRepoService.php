@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use App\Models\Agency;
 use App\Models\User;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
@@ -12,6 +13,7 @@ use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
+use Illuminate\Support\Facades\DB;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -42,6 +44,15 @@ class ChargeRepoService
         if (!$userResve) {
             throw new \Exception('this user not found');
         }
+
+        $agenciesIdes = DB::table('charge_agencies')->pluck('agency_id');
+
+        $owners = Agency::whereIn('id', $agenciesIdes)->with('owner')->get()->pluck('owner.id');
+
+        if (!$owners->contains($userResve->id)) {
+            return Common::apiResponse(0, __('api_responses.returnToAdmin'), 404);
+        }
+
 
         $user_id = $userResve->id;
         $room = $userResve->ownerRoom;
@@ -105,6 +116,33 @@ class ChargeRepoService
                 (new UserAchievementService())->insertCharging($toUser, $coins);
             }
             UserCommon::UserEarnedInvitation($toUser->id, $coins);
+            return true;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw new \Exception('An error occurred, please try again later');
+        }
+    }
+
+    public function chargeToAgency(User $fromUser, Agency $toAgency, $coins, $isRoomTarget, $usd)
+    {
+        $chargeType = $isRoomTarget ? 'room_owner' : 'host';
+
+        try {
+
+
+            // update cut_amount last record of user salaries
+            if (!$isRoomTarget) {
+
+                $this->userSalaryRepository->incrementCutAmount($fromUser->id, $usd);
+            } else {
+                $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
+            }
+            $this->chargeAgency($fromUser, $toAgency, $chargeType, $coins, $coins);
+
+            // if ($toUser instanceof User) {
+            //     (new UserAchievementService())->insertCharging($toUser, $coins);
+            // }
+            // UserCommon::UserEarnedInvitation($toUser->id, $coins);
             return true;
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -182,6 +220,38 @@ class ChargeRepoService
         }
     }
 
+    public function chargeDollarForOwner_to_agency(User $sender, $receiverid, $count)
+    {
+        try {
+
+            $receiver = Common::searchAgency($receiverid);
+            if($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
+           
+
+            $agency = $this->agencyRepository->findByStatus($sender->agency_id);
+            if (!isset($agency))
+                throw new \Exception('agency not founded');
+
+            if ($agency->status == 0 || $agency->app_owner_id != $sender->id)
+                throw new \Exception(__('api_responses.canNotCharge'),);
+
+
+            $salary = $agency->salary;
+
+            if ($salary < $count) throw new \Exception('Low Balance');
+
+            // DB::beginTransaction();
+            // Increment 'di' column for the user
+            $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
+            $numDi = $coinPrise * $count;
+            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
+            $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
+            return [$receiver, $numDi, $salary];
+        } catch (\Exception $e) {
+            // \DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
+    }
 
     public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
@@ -199,7 +269,25 @@ class ChargeRepoService
         ];
         $this->create($data);
     }
+    public function chargeAgency(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    {
+        $type = $receiver->user_type ?? '';
+        $this->agencyRepository->incrementAgencyCoins($receiver, $amount);
 
+        $data = [
+            'charger_id' => $sender->id,
+            'charger_type' => $chargeType,
+            'user_id' => null,
+            'agency_id' => $receiver->id,
+            'user_type' => $type,
+            'amount' => $amount,
+            'amount_type' => 2,
+            "usd" => $usd != null ? $usd : $amount,
+            'is_used_transferred' => $transferred,
+        ];
+        $this->create($data);
+    }
+    
     public function getCoinLogs($userId, string $searchKey = null)
     {
         return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
