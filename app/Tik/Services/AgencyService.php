@@ -926,5 +926,40 @@ class AgencyService
         return $this->agencyRepository->findOrFail($id);
     }
 
-    
+    public function destroy($id)
+    {
+        $data = $this->agencyRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
+
+    public function getAllRequestUtd($status, $agencyId, $id, $perPage, $page)
+    {
+        return  $this->agencyJoinRequestRepository->allRequests($status, $agencyId, $id, $perPage, $page);
+    }
+
+    public function showAgencyJoinRequest($id)
+    {
+        return $this->agencyJoinRequestRepository->findOrFail($id);
+    }
+
+    public function updateAgencyJoinRequest($id, $request)
+    {
+        $user = $this->userRepository->findOrFail($request->user_id);
+        if (!$user) throw new \Exception(' user not found');
+        if (($user->agency_id != 0) || ($user->agency_id != null)) throw new \Exception('user already in agency');
+        $agency = $this->agencyRepository->findById($request->agency_id);
+        if (!$agency) throw new \Exception(' agency not found');
+        $data = [
+            'user_id' => $request->user_id,
+            'agency_id' => $request->agency_id,
+            'status' => $request->status,
+        ];
+        $this->agencyJoinRequestRepository->update($data, $id);
+        if ($request->status == 1) {
+            UserCommon::userVip($user);
+            $this->userRepository->update(['type_user' => 1], $user->id);
+        }
+        return true;
+    }
 }

@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RequestJoinAgency;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ActiveAgencyResource;
 use App\Http\Resources\AgencyRequestsResource;
@@ -161,6 +162,54 @@ class AgencyController extends Controller
         try {
             $data = $this->agencyService->show($id);
             return Common::apiResponse(true, 'success', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $this->agencyService->destroy($id);
+            return Common::apiResponse(true, ' deleted successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function allAgencyJoinRequest(Request $request)
+    {
+        $data = $this->agencyService->getAllRequestUtd($request->status, $request->agency_id, $request->id, $request->per_page, $request->page);
+        return Common::apiResponse(true, 'success', RequestJoinAgency::collection($data));
+    }
+
+    public function showAgencyJoinRequest($id)
+    {
+        try {
+            $data = $this->agencyService->showAgencyJoinRequest($id);
+            return Common::apiResponse(true, 'success', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function updateAgencyJoinRequest($id, Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id',
+            'agency_id' => 'required|integer|exists:agencies,id',
+            'status' => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->agencyService->updateAgencyJoinRequest($id, $request);
+            return Common::apiResponse(true, ' update successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

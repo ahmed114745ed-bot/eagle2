@@ -167,9 +167,9 @@ class AgencyRepository extends AbstractRepository
         })->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function report($id, $month, $year, $perPage, $page)
+    public function report($id, $month = null, $year = null, $perPage, $page)
     {
-        $this->model->when(isset($id), function ($query) use ($id) {
+       return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->whereHas('agencySalaries', function ($q) use ($month, $year) {
             $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
@@ -185,6 +185,6 @@ class AgencyRepository extends AbstractRepository
                 $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
                 $agency->salary = $agency->getSalaryAgency($month, $year);
                 return $agency;
-            });;
+            });
     }
 }
