@@ -259,8 +259,9 @@ class VipService
                 'is_used' => 1,
             ];
 
-            $this->userVipRepository->create($data);
-            Common::handelVip($vip, $user);
+            $data = $this->userVipRepository->create($data);
+            Log::info(json_encode($data));
+            //Common::handelVip($vip, $user);
             DB::commit();
             CustomNotification::vips($user, $ex, $vip->img);
 
