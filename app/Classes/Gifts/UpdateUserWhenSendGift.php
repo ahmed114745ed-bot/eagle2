@@ -35,6 +35,9 @@ class UpdateUserWhenSendGift
         $receivedUser->monthly_diamond_received += $totalCoins;
         $receivedUser->total_diamond_received   += $totalCoins;
         // update levels
+        if ($receivedUser->user_type == 0 && $receivedUser->agency_id == 0) {
+            $receivedUser->exchange_diamonds += $totalCoins;
+        }
 
         $lastReceivedLevel = $receivedUser->total_received_level;
 
@@ -54,6 +57,7 @@ class UpdateUserWhenSendGift
         DB::table('users')->whereIn('id', $userIds)->update([
                                                                 'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
                                                                 'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
+                                                                'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
                                                             ]);
 
 
