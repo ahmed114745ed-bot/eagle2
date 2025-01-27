@@ -962,4 +962,9 @@ class AgencyService
         }
         return true;
     }
+    
+    public function allAgencyCharged($id)
+    {
+        return $this->agencyRepository->getChargeAgency($id);
+    }
 }
