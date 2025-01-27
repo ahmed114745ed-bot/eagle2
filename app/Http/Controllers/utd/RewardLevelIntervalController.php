@@ -40,8 +40,6 @@ class RewardLevelIntervalController extends Controller
         if ($request->hasFile('target4')) {
             $target = Common::upload('images', $request->file('target4'));
         }
-       
-
 
         $reward = RewardLevelInterval::create([
             'level_interval_id' => $reward_level_interval,

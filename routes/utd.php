@@ -37,6 +37,8 @@ use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\SpecialWareController;
+use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\ReportMomentController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
@@ -54,7 +56,6 @@ use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
-use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -189,7 +190,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
     });
 
-    Route::prefix('daily-gifts/{type}')->group(function(){
+    Route::prefix('daily-gifts/{type}')->group(function () {
         Route::get('/', [DailyGiftsController::class, 'index']);
         Route::get('/{id}', [DailyGiftsController::class, 'show']);
         Route::post('/create', [DailyGiftsController::class, 'store']);
@@ -490,4 +491,19 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
     });
 
+    Route::prefix('target-events')->group(function () {
+        Route::get('/', [TargetEventController::class, 'index']);
+        Route::get('/show/{id}', [TargetEventController::class, 'show']);
+        Route::post('/create', [TargetEventController::class, 'store']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
+        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('target-events-gift')->group(function () {
+        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
+        Route::post('/create', [TargetEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
 });
