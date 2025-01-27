@@ -3,6 +3,7 @@
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
+use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\MomentsController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
@@ -490,6 +492,38 @@ Route::middleware([])->group(function () {
         Route::get('/', [AgencyController::class, 'allAgencyJoinRequest']);
         Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
         Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
+    });
+
+
+    Route::prefix('target-events')->group(function () {
+        Route::get('/', [TargetEventController::class, 'index']);
+        Route::get('/show/{id}', [TargetEventController::class, 'show']);
+        Route::post('/create', [TargetEventController::class, 'store']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
+        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('target-events-gift')->group(function () {
+        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
+        Route::post('/create', [TargetEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('countries')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+       
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+       
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [ColorController::class, 'index']);
+       
     });
 
 });
