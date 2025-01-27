@@ -14,7 +14,7 @@ use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
 use App\Tik\Repositories\VipPrivilegeRepository;
-
+use Illuminate\Support\Facades\Log;
 
 class VipService
 {
@@ -259,7 +259,8 @@ class VipService
                 'is_used' => 1,
             ];
 
-            $this->userVipRepository->create($data);
+            $data = $this->userVipRepository->create($data);
+            Log::info(json_decode($data));
             Common::handelVip($vip, $user);
             DB::commit();
             CustomNotification::vips($user, $ex, $vip->img);
