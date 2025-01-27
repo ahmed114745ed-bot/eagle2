@@ -46,7 +46,7 @@ class Cp extends Model
     public function scopeRelation($query)
     {
         return $query->whereHas('relation', function ($query) {
-            $query->where('title', 'lover');
+            $query->where('title', 'lovely');
         });
     }
 }
