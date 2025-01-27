@@ -41,6 +41,10 @@ class Family extends Model
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/*->where ('user_type',0)*/->count();
         return $fu;
     }
+    public function currentLevel()
+    {
+        return $this->belongsTo(FamilyLevel::class, 'current_level_id');
+    }
 
     public function getMembersCountAttribute()
     {

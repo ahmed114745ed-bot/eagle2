@@ -25,8 +25,8 @@ class ExchangeService
         $ex = $this->exchangeRepository->findById($exchangeId);
 
         if (!$ex) throw new \Exception('not found');
-        if ($user->type_user == 1 ) throw new \Exception('not allowed');
-        if ($user->total_diamond_received < $ex->diamonds) throw new \Exception('balance low');
+        if ($user->type_user != 0 ) throw new \Exception('not allowed');
+        if ($user->exchange_diamonds < $ex->diamonds) throw new \Exception('balance low');
 
 
         $data = [
@@ -38,11 +38,10 @@ class ExchangeService
         ];
 
         $this->exchangeLogRepository->create($data);
-        $user->monthly_diamond_received -= $ex->diamonds;
-        $user->total_diamond_received -= $ex->diamonds;
-        $user->sub_receiver_num += $ex->diamonds;
-        if ($user->monthly_diamond_received <= 0) {
-            $user->monthly_diamond_received = 0;
+        $user->exchange_diamonds -= $ex->diamonds;
+
+        if ($user->exchange_diamonds <= 0) {
+            $user->exchange_diamonds = 0;
         }
         if ($ex->type == 0) {
             $user->di += $ex->value;
@@ -90,5 +89,5 @@ class ExchangeService
         return $this->exchangeRepository->findOrFail($id);
     }
 
-    
+
 }
