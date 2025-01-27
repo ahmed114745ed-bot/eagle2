@@ -189,7 +189,7 @@ class AgencyJoinRequestController extends MainController
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
             $user = User::query()->where('id', $form->model()->user_id)->first();
-            if (($user->agency_id != 0) || ($user->agency_id != null)) {
+            if (($user->agency_id)) {
                 $error = new MessageBag(
                     [
                         'title'   => 'forbidden',

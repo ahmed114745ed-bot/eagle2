@@ -23,7 +23,8 @@ class AllUsersResource extends JsonResource
         return [
             'id' => $this->id,
             'coins' => number_format($this->di),
-            'uuid' => $this->uuid . ' ' . $this->original_uuid,
+            'uuid' => $this->uuid ?? 0,
+            'original_uuid' => $this->original_uuid ?? 0,
             'name' => $this->name ?? '',
             'nickname' => $this->nickname ?? '',
             'charge_status' => $this->charge_status == true ? 1 : 0,
