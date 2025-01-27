@@ -80,8 +80,8 @@ class UserVipRepository extends AbstractRepository
         return true;
     }
 
-    public function findByUserLevel($userId, $level,$vipId)
+    public function findByUserLevel($userId, $level, $vipId)
     {
-        return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id',$vipId)->first();
+        return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id', $vipId)->where('expire', '!=', 0)->where('expire', '<', Carbon::now()->timestamp)->first();
     }
 }
