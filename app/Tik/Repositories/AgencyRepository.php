@@ -186,4 +186,11 @@ class AgencyRepository extends AbstractRepository
                 return $agency;
             });
     }
+
+    public function getChargeAgency($id)
+    {
+        return $this->model->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->get();
+    }
 }
