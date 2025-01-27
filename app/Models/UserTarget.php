@@ -31,14 +31,12 @@ class UserTarget extends Model
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
-    public function scopeOfAgency($q){
-        $user = Auth::user ();
-        if (Auth::user ()->isRole('agency')){
+    public function scopeOfAgency($q)
+    {
+        $user = Auth::user();
+        if (Auth::user()->isRole('agency')) {
             $q->whereNotNull('agency_id')->where('agency_id', '=', @$user->agency_id);
         }
-
-
-
     }
 
 
@@ -52,4 +50,8 @@ class UserTarget extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function periodTarget()
+    {
+        return $this->belongsTo(PeriodTarget::class, 'period_target_id');
+    }
 }

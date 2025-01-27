@@ -41,9 +41,9 @@ class CalculateUserSalaries extends Command
      */
     public function handle()
     {
-        if (now() < now()->startOfMonth()->addMinutes(15) || now() >= now()->endOfMonth()->subMinutes(15)) return;
-
-        $this->updateUserSalary();
+//        if (now() < now()->startOfMonth()->addMinutes(15) || now() >= now()->endOfMonth()->subMinutes(15)) return;
+//
+//        $this->updateUserSalary();
     }
 
 

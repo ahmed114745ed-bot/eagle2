@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Actions\DeleteAgencyAction;
+use App\Helpers\UserCommon;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
@@ -181,11 +182,17 @@ class AgencyController extends MainController
             return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>" : "";
         });
+   
         $grid->column('members', __('members'))->expand(function ($model) {
             $mempers = $model->mempers()
                 ->orderBy('monthly_diamond_received', 'desc')
                 ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
+
+                    $period = UserCommon::getPeriodTarget();
+                    $start_at =$period['start_at'];
+                    $end_at =$period['end_at'];
+                    $query->select('id', 'user_id', 'sallary')->whereBetween('created_at', [$start_at, $end_at]);
+
                 }, 'profile' => function ($query) {
                     $query->select('id', 'user_id', 'avatar'); // assuming 'avatar' is the column name for the image in 'profile'
                 }])

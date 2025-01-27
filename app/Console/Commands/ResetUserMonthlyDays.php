@@ -38,9 +38,9 @@ class ResetUserMonthlyDays extends Command
      */
     public function handle()
     {
-        DB::statement("
-            UPDATE users
-            SET monthly_days = 0
-        ");
+//        DB::statement("
+//            UPDATE users
+//            SET monthly_days = 0
+//        ");
     }
 }

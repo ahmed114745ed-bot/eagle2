@@ -44,12 +44,12 @@ class ResetUserMonthlyDiamond extends Command
     public function handle()
     {
 
-        if (now()->day == 1){
+        /*if (now()->day == 1){
             $carbon = now()->subDay();
             $this->updateUserSalary(month: $carbon->month, year: $carbon->year);
         }else{
             $this->updateUserSalary();
-        }
+        }*/
 
 
 
@@ -58,6 +58,18 @@ class ResetUserMonthlyDiamond extends Command
             SET monthly_diamond_received = 0
             WHERE agency_id != 0
         ");
+
+        DB::statement("
+            UPDATE users
+            SET monthly_days = 0
+        ");
+
+        DB::table('period_target')->insert([
+            'start_at' => \Illuminate\Support\Carbon::now()->startOfMonth()->addDays(20),
+            'end_at' => Carbon::now()->addMonth()->startOfMonth()->addDays(19),
+        ]);
+
+        $this->info("Cron job executed. Next execution will be in days.");
 
 //        try {
 //            User::where('agency_id', '!=', 0)->chunk(1000, function ($users) {

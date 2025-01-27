@@ -257,38 +257,42 @@ class ReportController extends MainController
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
                 // $filter->equal('salaries.year', __('Year'));
                 // $filter->equal('salaries.month', __('Month'));
-                $filter->where(function ($query) {
-                    $year = Request::input('year');
-                    if (!empty($year)) {
-                        $query->whereHas('userSallary', function ($q) use ($year) {
-                            $q->where('year', $year);
-                        });
-                    }
-                }, __('Year'), 'year')->integer();
+                // $filter->where(function ($query) {
+                //     $year = Request::input('year');
+                //     if (!empty($year)) {
+                //         $query->whereHas('userSallary', function ($q) use ($year) {
+                //             $q->where('year', $year);
+                //         });
+                //     }
+                // }, __('Year'), 'year')->integer();
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->equal('userSallary.period_id', __('period'))->select(Common::by_period_filter());
+                });
             });
 
+            // $filter->where(function ($query) {
+            //     $month = Request::input('month');
+            //     if (!empty($month)) {
 
-            $filter->where(function ($query) {
-                $month = Request::input('month');
-                if (!empty($month)) {
-
-                    $query->whereHas('userSallary', function ($q) use ($month) {
-                        $q->where('month', $month);
-                    });
-                }
-            }, __('Month'), 'month')->integer();
+            //         $query->whereHas('userSallary', function ($q) use ($month) {
+            //             $q->where('month', $month);
+            //         });
+            //     }
+            // }, __('Month'), 'month')->integer();
         });
         $grid->column('id', __('Id'));
         $grid->column('uuid', __('uuid'));
         $grid->column('name', __('name'));
          $grid->column('monthly_diamond_received',__('diamond'))->display(function () {
-            return @$this->getTotalDiamond(request()->month, request()->year)?? 0;
+            
+            return @$this->getTotalDiamond(request()->input('userSallary.period_id'))?? 0;
         });
         $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallary(request()->month, request()->year) ?? 0;
+            return @$this->getTotalSallary(request()->input('userSallary.period_id')) ?? 0;
         });
         $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmount(request()->month, request()->year) ?? 0;
+            return @$this->getTotalCutAmount(request()->input('userSallary.period_id')) ?? 0;
         });
         // $grid->column('old', __('old'))->display(function () {
         //     return $this->getOld(request()->month, request()->year) ?: 0;
@@ -296,7 +300,7 @@ class ReportController extends MainController
         $grid->column('total', __('salary'))->display(function () {
 
 
-            return $this->getSalary(request()->month, request()->year) ?? 0;
+            return $this->getSalary(request()->input('period')) ?? 0;
         });
 
         $grid->column('agency', __('agency'))->display(function () {
@@ -323,43 +327,47 @@ class ReportController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
+
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->equal('agencySalaries.period_id', __('period'))->select(Common::by_period_filter());
+                });
                 // $filter->equal('salaries.year', __('Year'));
                 // $filter->equal('salaries.month', __('Month'));
-                $filter->where(function ($query) {
-                    $year = Request::input('year');
-                    if (!empty($year)) {
-                        $query->whereHas('agencySalaries', function ($q) use ($year) {
-                            $q->where('year', $year);
-                        });
-                    }
-                }, __('Year'), 'year')->integer();
+                // $filter->where(function ($query) {
+                //     $year = Request::input('year');
+                //     if (!empty($year)) {
+                //         $query->whereHas('agencySalaries', function ($q) use ($year) {
+                //             $q->where('year', $year);
+                //         });
+                //     }
+                // }, __('Year'), 'year')->integer();
             });
 
 
-            $filter->where(function ($query) {
-                $month = Request::input('month');
-                if (!empty($month)) {
-                    $query->whereHas('agencySalaries', function ($q) use ($month) {
-                        $q->where('month', $month);
-                    });
-                }
-            }, __('Month'), 'month')->integer();
+            // $filter->where(function ($query) {
+            //     $month = Request::input('month');
+            //     if (!empty($month)) {
+            //         $query->whereHas('agencySalaries', function ($q) use ($month) {
+            //             $q->where('month', $month);
+            //         });
+            //     }
+            // }, __('Month'), 'month')->integer();
         });
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('name'));
       //  $grid->column('monthly_diamond_received',_('diamond'));
         $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalSallaryAgency(request()->month, request()->year)?? 0;
+            return @$this->getTotalSallaryAgency(request()->input('agencySalaries.period_id'))?? 0;
         });
         $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmountAgency(request()->month, request()->year)?? 0;
+            return @$this->getTotalCutAmountAgency(request()->input('agencySalaries.period_id'))?? 0;
         });
         // $grid->column('old', __('old'))->display(function () {
         //     return $this->getOldAgency(request()->month, request()->year)?? 0;
         // });
         $grid->column('total', __('salary'))->display(function () {
-            return $this->getSalaryAgency(request()->month, request()->year)?? 0;
+            return $this->getSalaryAgency(request()->input('agencySalaries.period_id'))?? 0;
         });
         $grid->column('agent', __('agent'))->display(function () {
             return @$this->owner->name ?: @$this->dashOwner->name;

@@ -41,6 +41,11 @@ class GiftLog extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
+
     public function roomOwner()
     {
         return $this->belongsTo(User::class, 'roomowner_id');

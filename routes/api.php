@@ -369,6 +369,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/v2/top_user_ranking', [Ranking2Controller::class, 'topUserRanking']);
                 Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
 
+                
             });
             // end ranking
 
@@ -429,6 +430,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
                 Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
+                // Route::get('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
 

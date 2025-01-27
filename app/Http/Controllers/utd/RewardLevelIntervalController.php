@@ -86,7 +86,6 @@ class RewardLevelIntervalController extends Controller
 
     public function wareInterval()
     {
-
         $wares = Ware::query()->whereIn('type', [4, 5, 6])->get();
 
         return Common::apiResponse(1, 'success', IntervalWareResource::collection($wares), 200);
