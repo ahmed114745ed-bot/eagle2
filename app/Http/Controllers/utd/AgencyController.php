@@ -181,7 +181,7 @@ class AgencyController extends Controller
 
     public function allAgencyJoinRequest(Request $request)
     {
-        $data = $this->agencyService->getAllRequestUtd($request->status, $request->agencyId, $request->id, $request->per_page, $request->page);
+        $data = $this->agencyService->getAllRequestUtd($request->status, $request->agency_id, $request->id, $request->per_page, $request->page);
         return Common::apiResponse(true, 'success', RequestJoinAgency::collection($data));
     }
 
@@ -198,6 +198,15 @@ class AgencyController extends Controller
 
     public function updateAgencyJoinRequest($id, Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id',
+            'agency_id' => 'required|integer|exists:agencies,id',
+            'status' => 'required|boolean',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         try {
             $this->agencyService->updateAgencyJoinRequest($id, $request);
             return Common::apiResponse(true, ' update successfully');

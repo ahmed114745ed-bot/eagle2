@@ -27,6 +27,7 @@ class RequestJoinAgency extends JsonResource
         }
 
         return [
+            'id' => $this ->id,
             'user' => [
                 'id' => $this->user->id ?? 0,
                 'avatar' => $this->user->profile->avatar ?? '',
