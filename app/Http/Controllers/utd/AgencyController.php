@@ -168,6 +168,17 @@ class AgencyController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $this->agencyService->destroy($id);
+            return Common::apiResponse(true, ' deleted successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function allAgencyJoinRequest(Request $request)
     {
         $data = $this->agencyService->getAllRequestUtd($request->status, $request->agencyId, $request->id, $request->per_page, $request->page);

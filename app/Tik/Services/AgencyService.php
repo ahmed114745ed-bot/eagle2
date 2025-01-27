@@ -851,6 +851,13 @@ class AgencyService
         return $this->agencyRepository->findOrFail($id);
     }
 
+    public function destroy($id)
+    {
+        $data = $this->agencyRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
+
     public function getAllRequestUtd($status, $agencyId, $id, $perPage, $page)
     {
         return  $this->agencyJoinRequestRepository->allRequests($status, $agencyId, $id, $perPage, $page);

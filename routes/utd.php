@@ -480,6 +480,7 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [AgencyController::class, 'show']);
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
+        Route::delete('/delete/{id}', [AgencyController::class, 'destroy']);
     });
     Route::get('/reports', [ReportController::class, 'reports']);
 
