@@ -189,7 +189,7 @@ class AgencyJoinRequestController extends MainController
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
             $user = User::query()->where('id', $form->model()->user_id)->first();
-            if (@$user->agency_id) {
+            if (($user->agency_id != 0) || ($user->agency_id != null)) {
                 $error = new MessageBag(
                     [
                         'title'   => 'forbidden',
@@ -201,23 +201,19 @@ class AgencyJoinRequestController extends MainController
 
             if ($form->status == 1) {
                 UserCommon::userVip($user);
-            }
 
-            $user_id = $form->model()->user_id;
+                $user_id = $form->model()->user_id;
 
-            $update = DB::table('users')
-                ->where('id', $user_id)
-                ->update(['type_user' => 1]);
+                $update = DB::table('users')
+                    ->where('id', $user_id)
+                    ->update(['type_user' => 1]);
 
-            if (!$update) {
-                $error = new MessageBag([
-                    'title' => 'Error',
-                    'message' => 'Failed to update user',
-                ]);
-
-                // Use a flash message to display the error on the redirected page
-
-                // Redirect back to the form with the error message
+                if (!$update) {
+                    $error = new MessageBag([
+                        'title' => 'Error',
+                        'message' => 'Failed to update user',
+                    ]);
+                }
             }
         });
 

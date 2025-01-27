@@ -477,9 +477,16 @@ Route::middleware([])->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
-        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::get('/show/{id}', [AgencyController::class, 'show']);
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
     Route::get('/reports', [ReportController::class, 'reports']);
+
+    Route::prefix('agency-join-request')->group(function () {
+        Route::get('/', [AgencyController::class, 'allAgencyJoinRequest']);
+        Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
+        Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
+    });
+
 });
