@@ -77,5 +77,11 @@ class UserVipRepository extends AbstractRepository
     public function deleteByLevel($userId, $level)
     {
         $this->model->where('user_id', $userId)->where('level', '<=', $level)->delete();
+        return true;
+    }
+
+    public function findByUserLevel($userId, $level,$vipId)
+    {
+        return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id',$vipId)->first();
     }
 }
