@@ -132,7 +132,6 @@ class MicService
             $userOtherId = $newMic[$antherUserPosition];
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
-            Log::info('cp id '.$existingCp?->id);
             if ($existingCp) {
                 $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
 //                $this->sendCpLovelyMessage($room, $user);
