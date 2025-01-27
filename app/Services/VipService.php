@@ -217,8 +217,7 @@ class VipService
         if ($expire == 0) {
             $ex = 0;
         } else {
-            // $ex = now()->addDays($expire * $qty)->timestamp;
-            $ex = now()->diffInDays(now()->addDays($expire * $qty));
+            $ex = now()->addDays($expire * $qty)->timestamp;
         }
         if ($request->type == 1) {
             $type = 1;
@@ -243,29 +242,39 @@ class VipService
         DB::beginTransaction();
         try {
             $from->decrement('di', $total);
-            $this->userVipRepository->deleteByLevel($user_id, $vip->level);
+            //  $this->userVipRepository->deleteByLevel($user_id, $vip->level);
             $this->packRepository->deleteExpirePack();
 
-            $data = [
-                'type' => $type,
-                'sender_id' => $sender_id,
-                'user_id' => $user_id,
-                'vip_id' => $vip->id,
-                'level' => $vip->level,
-                'expire' => $ex,
-                'qty' => $qty,
-                'price' => $vip->price,
-                'total' => $total,
-                'is_used' => 1,
-            ];
+            $userVip = $this->userVipRepository->findByUserLevel($user_id, $vip->level, $vip->id);
+            if ($userVip) {
+                if ($userVip->expire == 0) {
+                    $ex = 0;
+                } else {
+                    $ex =  $userVip->expire + $ex;
+                }
+                $data = [
+                    'expire'   => $ex,
+                ];
+                $this->userVipRepository->update($data, $userVip->id);
+            } else {
+                $data = [
+                    'type' => $type,
+                    'sender_id' => $sender_id,
+                    'user_id' => $user_id,
+                    'vip_id' => $vip->id,
+                    'level' => $vip->level,
+                    'expire' => $ex,
+                    'qty' => $qty,
+                    'price' => $vip->price,
+                    'total' => $total,
+                    'is_used' => 1,
+                ];
 
-            $data = $this->userVipRepository->create($data);
-            Log::info(json_encode($data));
-            //Common::handelVip($vip, $user);
+                $data = $this->userVipRepository->create($data);
+            }
+            Common::handelVip($vip, $user);
             DB::commit();
             CustomNotification::vips($user, $ex, $vip->img);
-
-
             return Common::apiResponse(1, 'done', null, 201);
         } catch (\Exception $exception) {
             DB::rollBack();
