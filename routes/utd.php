@@ -517,11 +517,6 @@ Route::middleware([])->group(function () {
     });
 
     Route::prefix('colors')->group(function () {
-        Route::get('/', [CountryController::class, 'index']);
-       
-    });
-
-    Route::prefix('colors')->group(function () {
         Route::get('/', [ColorController::class, 'index']);
        
     });
