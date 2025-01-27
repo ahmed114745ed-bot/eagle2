@@ -485,7 +485,6 @@ class UserController extends MainController
 
     protected function vipList($id)
     {
-
         // UserVip::query ()->where ('expire','!=',0)->where ('expire','<',time ())->delete ();
 
         $grid = new Grid(new UserVip());
