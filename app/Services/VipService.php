@@ -242,16 +242,18 @@ class VipService
         DB::beginTransaction();
         try {
             $from->decrement('di', $total);
-            //  $this->userVipRepository->deleteByLevel($user_id, $vip->level);
+            
             $this->packRepository->deleteExpirePack();
 
             $userVip = $this->userVipRepository->findByUserLevel($user_id, $vip->level, $vip->id);
             if ($userVip) {
+
                 if ($userVip->expire == 0) {
                     $ex = 0;
                 } else {
-                    $ex =  $userVip->expire + $ex;
+                    $ex =  $userVip->expire + ($expire * 86400);
                 }
+
                 $data = [
                     'expire'   => $ex,
                 ];
