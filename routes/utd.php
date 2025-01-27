@@ -3,6 +3,7 @@
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
+use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\MomentsController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
@@ -505,5 +507,20 @@ Route::middleware([])->group(function () {
         Route::post('/create', [TargetEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
         Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('countries')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+       
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+       
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [ColorController::class, 'index']);
+       
     });
 });
