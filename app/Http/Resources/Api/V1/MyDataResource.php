@@ -178,9 +178,11 @@ class MyDataResource extends JsonResource
                 'unread_counter'       =>  $counters,
             ]),
             'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
+
         ];
 
         $data['auth_token'] = $this->auth_token;
