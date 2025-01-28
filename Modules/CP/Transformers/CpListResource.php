@@ -45,6 +45,7 @@ class CpListResource extends JsonResource
                 "name"      => $user?->name,
                 "image"     => $user?->avatar,
                 "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
+                'frame'=>Common::getUserDress($user?->id,$user?->dress_1,4,'img2', true)?:Common::getUserDress($user?->id,$user?->dress_1,4,'img1', true),
             ],
             "relation" => $this->relation,
             'frame'=>Common::getUserDress($user?->id,$user?->dress_1,4,'img2', true)?:Common::getUserDress($user?->id,$user?->dress_1,4,'img1', true),
