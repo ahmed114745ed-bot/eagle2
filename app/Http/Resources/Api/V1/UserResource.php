@@ -191,7 +191,7 @@ class UserResource extends JsonResource
         ->where('target_id', $dress)
         ->first();
 
-        dd($pack);
+        dd($this->packs,1);
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
