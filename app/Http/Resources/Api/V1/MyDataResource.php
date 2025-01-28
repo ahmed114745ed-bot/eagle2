@@ -70,7 +70,6 @@ class MyDataResource extends JsonResource
         $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
         $frame = $dress_1_data ?: $dress_1_fallback;
-        dd($frame);
 
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         // Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
