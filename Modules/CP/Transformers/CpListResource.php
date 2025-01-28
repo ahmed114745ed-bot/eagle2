@@ -18,9 +18,9 @@ class CpListResource extends JsonResource
     {
         $loginUserId = request('user_id') ?? Auth::id();
         if ($this->user_one_id == $loginUserId) {
-            $user = $this->fromUser;
-        } else {
             $user = $this->toUser;
+        } else {
+            $user = $this->fromUser;
         }
 
         $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
