@@ -66,6 +66,7 @@ class UserResource extends JsonResource
         } else {
             $timeDifferenceFormatted = "In the future";
         }
+dd($this->dress_1);
 
         $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?? $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
@@ -95,7 +96,6 @@ class UserResource extends JsonResource
                 'show_banner' => 1,
             ]);
         }
-dd($frame);
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
