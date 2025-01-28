@@ -95,7 +95,6 @@ class UserResource extends JsonResource
                 'show_banner' => 1,
             ]);
         }
-dd($frame);
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
@@ -178,14 +177,20 @@ dd($frame);
     public function getUserDress($type, $dress, $item = 'img1')
     {
 
-        $packs = $this->packs;
-        /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
-        if ($pack) {
-            if ($pack->ware) {
-                return $pack->ware->{$item};
-            }
-        }
-        return '';
+        // $packs = $this->packs;
+        // /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        // $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        // if ($pack) {
+        //     if ($pack->ware) {
+        //         return $pack->ware->{$item};
+        //     }
+        // }
+        // return '';
+        $pack = $this->packs
+        ->where('type', $type)
+        ->where('target_id', $dress)
+        ->first();
+
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
