@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\PkReward;
 use Illuminate\Support\Facades\Validator;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\ChargeTargetEvent;
@@ -28,19 +29,34 @@ class PkEventController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'value' => 'required|numeric',
+            'start_date' => 'required|date|date_format:Y-m-d',
+
         ]);
 
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-           PkEvent::create($request->all());
+            $lastStartDate = PkEvent::max('start_date');
+            $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
+            if ($minStartDate == $request->start_date) {
+                return Common::apiResponse(0, __('date must be after ' . $minStartDate),);
+            }
+
+            PkEvent::create($request->all());
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function defaultDate()
+    {
+        $lastStartDate = PkEvent::max('start_date');
+
+        $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
+        return Common::apiResponse(true, 'done', $minStartDate);
     }
 
     public function show($id)
@@ -57,8 +73,8 @@ class PkEventController extends Controller
     public function update($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'start_date' => 'required|date|date_format:Y-m-d',
 
-            'value' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -87,12 +103,12 @@ class PkEventController extends Controller
         }
     }
 
-    public function allGifts($targetId, Request $request)
+    public function allGifts($pkId, Request $request)
     {
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = RewardTarget::where('charge_event_id', $targetId)->when(isset($id), function ($query) use ($id) {
+        $data = PkReward::where('pk_event_id', $pkId)->where("pk_type", $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(true, 'done', $data);
@@ -101,7 +117,9 @@ class PkEventController extends Controller
     public function storeGift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'charge_event_id' => 'required',
+            'pk_event_id' => 'required',
+            'pk_type' => 'required|string',
+            'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -118,11 +136,13 @@ class PkEventController extends Controller
             }
 
             $data = [
-                'charge_event_id' => $request->charge_event_id,
+                'pk_event_id' => $request->pk_event_id,
+                'pk_type' => $request->pk_type,
+                'level' => $request->level,
                 'type' => $request->type,
                 'expire'  => $request->expire,
             ];
-            RewardTarget::create($data);
+            PkReward::create($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -133,7 +153,9 @@ class PkEventController extends Controller
     public function updateGift($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'charge_event_id' => 'required',
+            'pk_event_id' => 'required',
+            'pk_type' => 'required|string',
+            'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -150,11 +172,13 @@ class PkEventController extends Controller
             }
 
             $data = [
-                'charge_event_id' => $request->charge_event_id,
+                'pk_event_id' => $request->pk_event_id,
+                'pk_type' => $request->pk_type,
+                'level' => $request->level,
                 'type' => $request->type,
                 'expire'  => $request->expire,
             ];
-            $reward =  RewardTarget::findOrFail($id);
+            $reward =  PkReward::findOrFail($id);
             $reward->update($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -166,7 +190,7 @@ class PkEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  RewardTarget::findOrFail($id);
+            $data =  PkReward::findOrFail($id);
             $data->delete();
             return Common::apiResponse(true, 'deleted successfully',  $data);
         } catch (Exception $exception) {
@@ -178,7 +202,7 @@ class PkEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  RewardTarget::with('ware', 'vip')->findOrFail($id);
+            $data =  PkReward::with('ware', 'vip')->findOrFail($id);
             return Common::apiResponse(true, 'done',  $data);
         } catch (Exception $exception) {
 

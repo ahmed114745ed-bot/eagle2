@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
 use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\utd\PkEventController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
@@ -528,12 +529,10 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
-       
     });
 
     Route::prefix('colors')->group(function () {
         Route::get('/', [ColorController::class, 'index']);
-       
     });
 
     Route::prefix('target-events')->group(function () {
@@ -550,5 +549,38 @@ Route::middleware([])->group(function () {
         Route::post('/create', [TargetEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
         Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('target-events')->group(function () {
+        Route::get('/', [TargetEventController::class, 'index']);
+        Route::get('/show/{id}', [TargetEventController::class, 'show']);
+        Route::post('/create', [TargetEventController::class, 'store']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
+        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('target-events-gift')->group(function () {
+        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
+        Route::post('/create', [TargetEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('pk-events')->group(function () {
+        Route::get('/', [PkEventController::class, 'index']);
+        Route::get('/show/{id}', [PkEventController::class, 'show']);
+        Route::post('/create', [PkEventController::class, 'store']);
+        Route::delete('/delete/{id}', [PkEventController::class, 'destroy']);
+        Route::post('/update/{id}', [PkEventController::class, 'update']);
+        Route::get('/default-date', [PkEventController::class, 'defaultDate']);
+    });
+
+    Route::prefix('pk-events-gift')->group(function () {
+        Route::get('/{targetId}', [PkEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [PkEventController::class, 'showGift']);
+        Route::post('/create', [PkEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [PkEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [PkEventController::class, 'updateGift']);
     });
 });
