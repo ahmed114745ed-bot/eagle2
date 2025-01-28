@@ -3,11 +3,13 @@
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\utd\AgencyController;
+use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\SilverController;
@@ -18,6 +20,7 @@ use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
+use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\MomentsController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
@@ -34,9 +37,13 @@ use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
+use App\Http\Controllers\utd\DedicateVipController;
 use App\Http\Controllers\utd\FamilyLevelController;
 use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\SpecialWareController;
+use App\Http\Controllers\utd\TargetEventController;
+use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\ReportMomentController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
@@ -47,18 +54,14 @@ use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\SpecialHistoryController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\BannerController;
-use App\Http\Controllers\utd\DedicateVipController;
-use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
-use App\Http\Controllers\utd\SpecialHistoryController;
-use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -522,4 +525,30 @@ Route::middleware([])->group(function () {
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
     Route::get('/reports', [ReportController::class, 'reports']);
+
+    Route::prefix('countries')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+       
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [ColorController::class, 'index']);
+       
+    });
+
+    Route::prefix('target-events')->group(function () {
+        Route::get('/', [TargetEventController::class, 'index']);
+        Route::get('/show/{id}', [TargetEventController::class, 'show']);
+        Route::post('/create', [TargetEventController::class, 'store']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
+        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('target-events-gift')->group(function () {
+        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
+        Route::post('/create', [TargetEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
 });
