@@ -1,481 +1,523 @@
 <?php
 
-use App\Admin\Controllers\WareController;
-use App\Enums\UserType;
+
 use App\Helpers\Common;
-use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\VersionController;
-use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\utd\ColorController;
+use App\Http\Controllers\utd\PagesController;
+use App\Http\Controllers\utd\ReelsController;
+use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V1\VipController;
-use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\utd\AgencyController;
+use App\Http\Controllers\utd\FamilyController;
+use App\Http\Controllers\utd\ReportController;
+use App\Http\Controllers\utd\SilverController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
-use App\Http\Controllers\Api\V1\HomeController;
-use App\Http\Controllers\Api\V1\PackController;
-use App\Http\Controllers\Api\V1\RoomController;
+use App\Http\Controllers\Api\V1\OvipController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
-use App\Http\Controllers\Api\V2\MallController;
-use App\Http\Controllers\Api\V1\ColorController;
-use App\Http\Controllers\Api\V1\EmojiController;
-use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\FamilyController;
-use App\Http\Controllers\Api\V2\AgencyController;
+use App\Http\Controllers\Api\V1\WareController;
+use App\Http\Controllers\utd\ChargesController;
+use App\Http\Controllers\utd\CountryController;
+use App\Http\Controllers\utd\MomentsController;
+use App\Http\Controllers\Api\V1\OfferController;
+use App\Http\Controllers\utd\ExchangeController;
+use App\Http\Controllers\utd\InterestController;
+use App\Http\Controllers\utd\RoomVipsController;
+use App\Admin\Controllers\AllStatisticController;
+use App\Http\Controllers\Api\V1\ConfigController;
+use App\Http\Controllers\Api\V1\TargetController;
+use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\Api\V1\AllGameController;
-use App\Http\Controllers\Api\V1\CountryController;
-use App\Http\Controllers\Api\V1\GiftLogController;
-use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\RankingController;
-use App\Http\Controllers\Api\V1\ExchangeController;
-use App\Http\Controllers\Api\V1\QuestionController;
-use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\GroupChatController;
-use App\Http\Controllers\Api\V1\BackgroundController;
-use App\Http\Controllers\Api\V1\CoinReportController;
-use App\Http\Controllers\Api\V1\ReportUserController;
-use App\Http\Controllers\Api\V1\HomeCarouselController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
-use App\Http\Controllers\Api\v1\Auth\RegisterController;
-use App\Http\Controllers\Api\V1\GooglePaymentController;
-use App\Http\Controllers\Api\V1\PaymentGetWayController;
+use App\Http\Controllers\Api\V1\UtdUserController;
+use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\DailyGiftsController;
+use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\RoomTargetController;
+use App\Http\Controllers\AddTargetToJsonController;
+use App\Http\Controllers\utd\FamilyLevelController;
+use App\Http\Controllers\utd\MangerTypesController;
+use App\Http\Controllers\utd\ParentUsersController;
+use App\Http\Controllers\utd\ReportMomentController;
+use App\Http\Controllers\Api\V1\AdminUsersController;
+use App\Http\Controllers\Api\V1\GameReportController;
+use App\Http\Controllers\Api\V1\MangerTypeController;
+use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\RequestAgencyController;
+use App\Http\Controllers\utd\SpecialIdFramController;
+use App\Http\Controllers\Api\V1\CoreWalletsController;
+use App\Http\Controllers\Api\V1\TrashedUserController;
+use App\Http\Controllers\utd\DailyGiftTypesController;
+use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\Api\V1\Ranking2Controller;
-use App\Http\Controllers\Api\V1\Room\EnteranceController;
-use App\Http\Controllers\Api\V1\Room\MicrophoneController;
-use Modules\Public\Http\Controllers\web\UpgradeLevelController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\UploadLinkController;
-use App\Http\Controllers\MallController as ControllersMallController;
-use App\Http\Controllers\PaySkyController;
-use App\Http\Controllers\StripeController;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Models\Room;
-use App\Models\User;
+use App\Http\Controllers\utd\PercentageTargetController;
+use App\Http\Controllers\Api\V1\AgencyStatisticController;
+use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\RewardLevelIntervalController;
+use App\Http\Controllers\utd\RequestBackgroundImageController;
+use Modules\Public\Http\Controllers\web\LevelIntervalController;
+use App\Http\Controllers\utd\SpecialWareController;
+use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
-Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-game-rtm', function (){
-
-        $user = User::find(524);
-        $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
-
-        $d    = [
-            "messageContent" => [
-                "message" => "SBG",
-                'uImage'  => $user->profile?->avatar ?? 0,
-                'uName'   => $user->name ?? '',
-                'uId'     => $user->id ?? 0,
-                'coins'   => 50000,
-                "gImage"  => @$user->nowGame?->image
-            ]
-        ];
-        Log::info( 'game image '.' '.@$user->nowGame?->image);
-        $json = json_encode($d);
-        dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
-        return "gooooooooooooooooooooooooooooood";
+// 'utd.decreptHeader'
+// utd apis
+Route::middleware([])->group(function () {
+    //configs
+    Route::prefix('configs')->group(function () {
+        Route::get('/all', [ConfigController::class, 'index']);
+        Route::post('/update', [ConfigController::class, 'updateConfig']);
+        Route::get('/category', [ConfigController::class, "config"]);
     });
 
-    Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
-
-    Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
-    Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
-
-    Route::prefix('config')->group(function () {
-        Route::post('app-check', [VersionController::class, 'versionAndCache']);
+    Route::prefix('families')->group(function () {
+        Route::get('/', [FamilyController::class, 'index']);
+        Route::post('/', [FamilyController::class, 'store']);
+        Route::post('/update/{id}', [FamilyController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::get('/{id}', [FamilyController::class, 'show']);
     });
 
-    Route::get('colors', [ColorController::class, 'index']);
-    Route::get('all-servers', [RegisterController::class, 'all_servers']);
-
-    // v2
-    Route::prefix('search')->name('search.')->group(function () {
-        Route::get('users', [UserController::class, 'search'])->name('users');
-        Route::get('users2', [UserController::class, 'search2'])->name('users2');
-        Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
-        Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
-        Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
+    Route::prefix('level-intervals')->group(function () {
+        Route::get('/', [LevelIntervalsController::class, 'index']);
+        Route::post('/', [LevelIntervalsController::class, 'store']);
+        Route::post('/update/{id}', [LevelIntervalsController::class, 'update']);
+        Route::post('/delete/{id}', [LevelIntervalsController::class, 'destroy']);
+        Route::get('/{id}', [LevelIntervalsController::class, 'show']);
     });
 
-    // authorization
-    Route::prefix('auth')->group(function () {
-        Route::get('all-countries', [CountryController::class, 'index']);
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('recall-account', [AuthController::class, 'recallAccount']);
-        Route::post('forget_password', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'reset']);
-        Route::post('verify-code', [\App\Http\Controllers\Api\V2\Auth\ForgotPasswordController::class, 'verifyCode']);
+    Route::prefix('reward-level-interval/{reward_level_interval}')->group(function () {
+        Route::get('/', [RewardLevelIntervalController::class, 'index']);
+        Route::post('/', [RewardLevelIntervalController::class, 'store']);
+        Route::post('/update/{id}', [RewardLevelIntervalController::class, 'update']);
+        Route::post('/delete/{id}', [RewardLevelIntervalController::class, 'destroy']);
+
+        Route::get('/{id}', [RewardLevelIntervalController::class, 'show']);
+    });
+    Route::prefix('/reward-level')->group(function () {
+        Route::get('/types', [RewardLevelIntervalController::class, 'allType']);
+        Route::get('/wares', [RewardLevelIntervalController::class, 'wareInterval']);
+        Route::get('/vip', [RewardLevelIntervalController::class, 'vipInterval']);
+    });
+    Route::prefix('group-chat')->group(function () {
+        Route::get('/', [GroupChatController::class, 'index']);
+        Route::post('/', [GroupChatController::class, 'store']);
+        Route::post('/add-experience-points', [GroupChatController::class, 'add_experience_points']);
+        Route::post('/update/{id}', [GroupChatController::class, 'update']);
+        Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
+        Route::get('/{id}', [GroupChatController::class, 'show']);
+    });
+
+    Route::prefix('image-colors')->group(function () {
+        Route::get('/', [ImageColorController::class, 'index']);
+        Route::post('/', [ImageColorController::class, 'store']);
+        Route::post('/update/{id}', [ImageColorController::class, 'update']);
+        Route::post('/delete/{id}', [ImageColorController::class, 'destroy']);
+        Route::get('/{id}', [ImageColorController::class, 'show']);
+    });
+
+    Route::prefix('room-target')->group(function () {
+        Route::get('/', [RoomTargetController::class, 'index']);
+        Route::post('/', [RoomTargetController::class, 'store']);
+        Route::post('/update/{id}', [RoomTargetController::class, 'update']);
+        Route::post('/delete/{id}', [RoomTargetController::class, 'destroy']);
+        Route::get('/{id}', [RoomTargetController::class, 'show']);
     });
 
 
-    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan','throttle:4,1'])
-    ->group(function () {
-        Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
+    Route::prefix('backgrounds')->group(function () {
+        Route::get('/', [BackgroundController::class, 'index']);
+        Route::post('/', [BackgroundController::class, 'store']);
+        Route::post('/update/{id}', [BackgroundController::class, 'update']);
+        Route::post('/delete/{id}', [BackgroundController::class, 'destroy']);
+        Route::get('/{id}', [BackgroundController::class, 'show']);
+    });
+
+    Route::prefix('percentage-target')->group(function () {
+        Route::get('/', [PercentageTargetController::class, 'index']);
+        Route::post('/', [PercentageTargetController::class, 'store']);
+    });
+
+    Route::prefix('parent-users')->group(function () {
+        Route::get('/', [ParentUsersController::class, 'index']);
+        Route::get('/{id}', [ParentUsersController::class, 'users']);
+    });
+
+    Route::prefix('pages')->group(function () {
+        Route::get('/', [PagesController::class, 'index']);
+        Route::get('/{id}', [PagesController::class, 'show']);
+        Route::post('/', [PagesController::class, 'store']);
+        Route::post('/update/{id}', [PagesController::class, 'update']);
+        Route::post('/delete/{id}', [PagesController::class, 'delete']);
+    });
+
+    Route::prefix('charges')->group(function () {
+        Route::get('/', [ChargesController::class, 'index']);
+        Route::post('/', [ChargesController::class, 'store']);
+    });
+
+    Route::prefix('appear-charger-agency')->group(function () {
+        Route::get('/', [AppearChargerAgencyController::class, 'index']);
+        Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
     });
 
 
-    Route::post('/stripe-callback', [StripeController::class, 'handleWebhook']);
-
-    // all route with auth
-    Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
-        function () {
-
-            Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
-
-            Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
-
-            Route::get('/countries/users', [CountryController::class, 'countries']);
-
-            Route::get('/stripe-pay', [StripeController::class, 'pay']);
-            Route::get('/paysky-pay', [PaySkyController::class, 'pay']);
-
-            Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
-
-
-            Route::prefix('config')->group(function() {
-                Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
-                //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
-            });
-            Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
-
-            Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
-            Route::post('/change-room-effect',[UserController::class, 'showSetting']);
-            Route::get('get-users-support', [UserController::class, 'get_users_support']);
-            Route::post('hide', [HomeController::class, 'hide']);
-            Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-
-            // rooms api
-            Route::prefix('rooms')->group(function () {
-                Route::get('/room-user', [RoomController::class, 'userRooms']);
-                Route::get('/', [RoomController::class, 'index']);
-                Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
-                Route::post('/create', [RoomController::class, 'store']);
-                Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
-                Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
-                Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
-                Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-                Route::get('/{id}', [RoomController::class, 'show']);
-                Route::post('/{id}/edit', [EnteranceController::class, 'update']);
-                Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
-                Route::post('admins', [RoomController::class, 'getAdmins']);
-                Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
-                Route::post('remove_pass', [RoomController::class, 'removeRoomPass']);
-                Route::post('room_background_list', [BackgroundController::class, 'roomBackground']);
-                Route::post('quit_room', [RoomController::class, 'quit_room']);
-                Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
-                Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
-                Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
-                Route::post('remove_admin', [RoomController::class, 'remove_admin']);
-                Route::post('black-list', [RoomController::class, 'blackList']);
-                Route::post('remove-block', [RoomController::class, 'removeBlock']);
-                Route::post('add-block', [RoomController::class, 'addBlock']);
-
-                //Pk
-                Route::middleware(['appFeatureEnable:pk'])->group(function () {
-                    Route::post('create-pk', [PkController::class, 'createPK']);
-                    Route::post('close-pk', [PkController::class, 'closePK']);
-                    Route::post('show-pk', [PkController::class, 'showPK']);
-                    Route::post('hide-pk', [PkController::class, 'hidePk']);
-                });
-                // Microphone
-
-                Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
-                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone']);
-                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone']);
-                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone']);
-                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone']);
-                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
-                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
-                Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-            });
-            Route::post('change_room_mode', [RoomController::class, 'changeMode']);
-            Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
-
-            Route::prefix('coins')->group(function () {
-                Route::get('/list', [CoinController::class, 'coinList']);
-                Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
-                Route::get('/payment', [CoinController::class, 'paymentCoin']);
-
-            });
-
-            Route::prefix('users')->group(function () {
-                Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
-                Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
-
-            });
-
-            Route::get('/room-countries', [RoomController::class, 'room_countries']);
-            // end rooms api
-
-
-            Route::prefix('account')->group(function () {
-                Route::post('bind', [UserController::class, 'joinAccount']);
-                Route::get('delete', [UserController::class, 'delete']);
-                Route::post('change_phone', [\App\Http\Controllers\Api\V1\UserController::class, 'changePhone']);
-                Route::post('change-phone-whatsapp', [UserController::class, 'changePhoneWhatsapp']);
-                Route::post('reset-password-whatsapp', [UserController::class, 'resetWhatsapp']);
-                Route::post('reset_password', [\App\Http\Controllers\Api\V2\Auth\ResetPasswordController::class, 'reset']);
-            });
-
-            Route::prefix('search')->group(function () {
-                Route::get('/', [CommunityController::class, 'merge_search']);
-                Route::get('user-friends', [CommunityController::class, 'user_friends']);
-                Route::get('/history', [CommunityController::class, 'searchList']);
-                Route::get('/clean_search_history', [CommunityController::class, 'cleanSearchList']);
-            });
-
-            Route::prefix('merge_search')->group(function () {
-                Route::post('/', [CommunityController::class, 'merge_search']);
-            });
-
-            Route::prefix('community')->group(function () {
-                Route::get('official_messages', [CommunityController::class, 'officialMessages']);
-            });
-
-            Route::prefix ('home_carousels')->group (function (){
-                Route::get ('/',[HomeCarouselController::class,'index']);
-            });
-
-
-            Route::prefix('families')->middleware(['appFeatureEnable:families'])->group(function () {
-                Route::get('all', [FamilyController::class, 'index']);
-                Route::get('show/{id}', [FamilyController::class, 'show']);
-                Route::post('create', [FamilyController::class, 'store']);
-                Route::post('ranking', [FamilyController::class, 'ranking']);
-                Route::post('top-ranking', [FamilyController::class, 'topUserRanking']);
-                Route::post('edit/{id}', [FamilyController::class, 'update']);
-                Route::post('join', [FamilyController::class, 'join']);
-                Route::get('delete/{id}', [FamilyController::class, 'destroy']);
-                Route::post('remove_user', [FamilyController::class, 'removeUser']);
-                Route::post('req_list', [FamilyController::class, 'req_list']);
-                Route::post('take_action', [FamilyController::class, 'RequestFamilyAction']);
-                Route::post('change_user_type', [FamilyController::class, 'changeFamilyUserType']);
-                Route::post('getMembersList', [FamilyController::class, 'getMembersList']);
-                Route::post('getFamilyRooms', [FamilyController::class, 'getFamilyRooms']);
-                Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
-            });
-
-
-
-            Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
-            Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
-            Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
-
-            Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
-                Route::get('/', [GiftController::class, 'index']);
-                // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
-
-                //todo
-                Route::post('/send', [GiftLogController::class, 'gift_queue_cp']);
-                Route::post('/send2', [GiftLogController::class, 'gift_queue_cp']);
-                // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
-                Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
-            });
-
-            Route::get ('my_gifts',[\App\Http\Controllers\Api\V1\GiftLogController::class,'giftLogsList']);
-
-
-            Route::prefix('group-chat')->group(function () {
-                Route::get('/', [GroupChatController::class, 'index']);
-                Route::post('/send', [GroupChatController::class, 'store']);
-            });
-
-            Route::prefix('countries')->group(function () {
-                Route::get('/', [CountryController::class, 'allCountries']);
-                Route::get('/{id}', [CountryController::class, 'getCountry']);
-            });
-            // user controller
-            Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
-
-
-            Route::prefix('room_category')->group(function () {
-                Route::get('classes', [RoomCategoryController::class, 'allClasses']);
-                Route::get('types', [RoomCategoryController::class, 'getTypes']);
-                Route::get('types_by_class/{id}', [RoomCategoryController::class, 'getClassChildren']);
-            });
-
-            Route::prefix('backgrounds')->group(function () {
-                Route::get('/', [BackgroundController::class, 'allBackgrounds']);
-                Route::get('/me', [BackgroundController::class, 'allMyBackgrounds']);
-            });
-
-            Route::prefix('user_info')->group(function () {
-
-                Route::get('my_pack', [PackController::class, 'my_pack']);
-                Route::post('use_pack_item', [PackController::class, 'usePackItem']);
-                Route::post('takeOff', [PackController::class, 'takeOff']);
-                //                Route::get('my_store', [UserController::class, 'my_store']);
-                //                Route::get('my_income', [UserController::class, 'my_income']);
-                Route::post('getTimes', [HomeController::class, 'getTimes']);
-            });
-
-            Route::prefix('exchange')->group(function () {
-                Route::get('/list', [ExchangeController::class, 'exchangeList']);
-                Route::post('/make', [ExchangeController::class, 'exchangeSave']);
-                Route::get('/logs', [ExchangeController::class, 'exchangeLogs']);
-            });
-
-            Route::get('trxs', [ChargeController::class, 'trxLog']);
-            Route::get('images', [HomeController::class, 'getImages']);
-
-            Route::post('check_wapel', [HomeController::class, 'check_wapel']);
-
-            Route::get('getUserHides', [HomeController::class, 'getUserHides']);
-
-            // user api
-            Route::get('my-data', [UserController::class, 'my_data']);
-
-
-            Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
-            Route::get('parent-statistic', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitationStatistics']);
-            Route::get('parent-user', [\App\Http\Controllers\Api\V1\UserController::class, 'parentUser']);
-            Route::get('user-earn-from-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'UserEarnFromInvitation']);
-            Route::get('create-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'CreateCodeInvitation']);
-            Route::get('add-code-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'AddCodeInvitation']);
-            // Todo Refact
-            Route::get('my-store', [UserController::class, 'my_store_all']);
-
-            Route::prefix('profile')->group(function () {
-                Route::get('get/{id}', [ProfileController::class, 'show']);
-                Route::post('update', [ProfileController::class, 'update']);
-                Route::get('visitors', [ProfileController::class, 'myProfileVisitorsList']);
-                Route::post('liked', [ProfileController::class, 'liked']);
-                Route::post('ignored', [ProfileController::class, 'ignored']);
-                Route::get('users', [ProfileController::class, 'getNearbyUsers']);
-                Route::get('related', [ProfileController::class, 'related']);
-                Route::get('following', [ProfileController::class, 'getFollowingUsers']);
-            });
-
-            // TODO refact @eriny
-            Route::prefix('relations')->group(function () {
-                Route::get('/', [UserController::class, 'userFriend']);
-                Route::post('follow', [UserController::class, 'follow']);
-                Route::post('un-follow', [UserController::class, 'unFollow']);
-                Route::post('is_user_friend', [HomeController::class, 'check_if_friend']);
-                Route::post('report_user', [ReportUserController::class, 'ReportUser']);
-            });
-            // end user api
-
-            //start rankin
-            Route::prefix('ranking')->group(function () {
-                Route::post('/', [RankingController::class, 'ranking']);
-                Route::post('/room', [UserController::class, 'ranking_room']);
-                Route::get('/top_user_ranking', [RankingController::class, 'topUserRanking']);
-                Route::post('/one-room', [RankingController::class, 'oneRoomRanking']);
-
-
-                //v2
-                Route::post('/v2', [Ranking2Controller::class, 'ranking']);
-                Route::post('/v2/room', [Ranking2Controller::class, 'ranking_room']);
-                Route::get('/v2/top_user_ranking', [Ranking2Controller::class, 'topUserRanking']);
-                Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
-
-            });
-            // end ranking
-
-            // start vips
-            Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-                Route::get('/list', [VipController::class, 'vipList']);
-                Route::post('/buyVip', [VipController::class, 'buyVip']);
-                Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
-                Route::post('/use', [VipController::class, 'vip_use']);
-                Route::post('/send-to-user', [VipController::class, 'vip_send']);
-
-            });
-            Route::get('levels/badges', [VipController::class, 'badges']);
-            Route::get('levels', [VipController::class, 'index']);
-            Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
-            // end vips
-
-
-
-            Route::prefix('emojis')->group(function () {
-                Route::get('/', [EmojiController::class, 'index']);
-                Route::get('/{id}', [EmojiController::class, 'show']);
-            });
-            // start levels
-            Route::get('levels-ranges', [UpgradeLevelController::class, 'getLevelsRange']);
-            // end levels
-            Route::prefix('mall')->middleware(['appFeatureEnable:mall'])->group(function () {
-                Route::get('wares', [MallController::class, 'index']);
-                Route::post('buy', [MallController::class, 'buyWare']);
-                Route::post('send', [MallController::class, 'sendWare']);
-                Route::get('best-sale', [MallController::class, 'bestWareSale']);
-
-            });
-            //start games
-            Route::prefix('all-games1')->group(function () {
-                Route::get('/', [AllGameController::class, 'index']);
-                Route::post('update-game', [AllGameController::class, 'updateGame']);
-            });
-            // end games
-
-            // questions
-            Route::get('questions', [QuestionController::class, 'questions']);
-            Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
-            // end questions
-
-            Route::prefix('agencies')->middleware(['appFeatureEnable:agencies'])->group(function () {
-                Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
-                Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
-                Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
-                Route::post('join_request', [AgencyController::class, 'joinRequest']);
-                Route::get('show', [AgencyController::class, 'view']);
-                Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
-                Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
-                Route::get('show_request', [AgencyController::class, 'show_request']);
-                Route::post('actions_request', [AgencyController::class, 'Accept_request']);
-                Route::get('list_options_his', [AgencyController::class, 'list_options_his']);
-                Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
-                Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
-                Route::post('charge_to', [ChargeController::class, 'chargeTo']);
-                Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
-                Route::get('charges', [AgencyController::class, 'agenciesCharge']);
-
-            });
-            Route::prefix('payment-gateway')->group(function () {
-                Route::get('/', [PaymentGetWayController::class, 'index']);
-                Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
-            });
-
-            // coins reports
-            Route::get('/coin-reports', [CoinReportController::class, 'index']);
-            Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
-            // end coin report
-            Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
-
-
-            Route::prefix('banners')->group(function() {
-                Route::get('/', [\App\Http\Controllers\BannerController::class, 'index2']);
-                // Route::get('/', [\App\Http\Controllers\BannerController::class, 'index']);
-                // Route::get('/banner', [\App\Http\Controllers\BannerController::class, 'index2']);
-            });
-
-            Route::prefix ('black_list')->group (function (){
-                Route::get ('/',[\App\Http\Controllers\Api\V1\BlackListController::class,'index']);
-                Route::post ('/add',[\App\Http\Controllers\Api\V1\BlackListController::class,'add']);
-                Route::post ('/remove',[\App\Http\Controllers\Api\V1\BlackListController::class,'remove']);
-                Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
-            });
-
-            // Route::get('/data-data', function(){
-            //     $id = \App\Models\User::first()?->id;
-            //     $data = Common::level_center(@$id);
-            //     return $data;
-            // });
-
-            Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
-
-            // Music Store 
-            Route::prefix ('music')->group (function (){
-                Route::get('/', [MusicStoreController::class, 'index']);
-                Route::post('/', [MusicStoreController::class, 'store']);
-
-            });
-
-        }
-    );
-
-
-
+    Route::prefix('request-agencies')->group(function () {
+        Route::get('/', [RequestAgenciesController::class, 'index']);
+        Route::post('/process-request/{id}', [RequestAgenciesController::class, 'update']);
+    });
+
+    Route::prefix('special-id-fram')->group(function () {
+        Route::get('/', [SpecialIdFramController::class, 'index']);
+        Route::get('/{id}', [SpecialIdFramController::class, 'show']);
+        Route::post('/create', [SpecialIdFramController::class, 'store']);
+        Route::post('/update/{id}', [SpecialIdFramController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
+    });
+
+    Route::prefix('special-wares')->group(function () {
+        Route::get('/', [SpecialWareController::class, 'index']);
+        Route::get('/{id}', [SpecialWareController::class, 'show']);
+        Route::post('/create', [SpecialWareController::class, 'store']);
+        Route::post('/update/{id}', [SpecialWareController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
+    });
+
+
+    Route::prefix('daily-gift-types')->group(function () {
+        Route::get('/', [DailyGiftTypesController::class, 'index']);
+        Route::get('/{id}', [DailyGiftTypesController::class, 'show']);
+        Route::post('/create', [DailyGiftTypesController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftTypesController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
+    });
+
+    Route::prefix('daily-gifts/{type}')->group(function(){
+        Route::get('/', [DailyGiftsController::class, 'index']);
+        Route::get('/{id}', [DailyGiftsController::class, 'show']);
+        Route::post('/create', [DailyGiftsController::class, 'store']);
+        Route::post('/update/{id}', [DailyGiftsController::class, 'update']);
+        Route::post('/delete/{id}', [DailyGiftsController::class, 'delete']);
+    });
+
+    //games
+    Route::prefix('games')->group(function () {
+        Route::get('/all', [AllGameController::class, 'utdGameIndex']);
+        Route::post('/create', [AllGameController::class, 'utdGameCreate']);
+        Route::post('/update', [AllGameController::class, 'utdGameUpdate']);
+        Route::post('/show', [AllGameController::class, 'showGame']);
+        Route::post('/update-switch', [AllGameController::class, 'utdGameSwitchUpdate']);
+        Route::get('/game-charge-details', [AllGameController::class, 'gameChargeDetails']);
+    });
+    // target
+    Route::prefix('targets')->group(function () {
+        Route::get('/all', [TargetController::class, 'index']);
+        Route::post('/create', [TargetController::class, 'store']);
+        Route::post('/update', [TargetController::class, 'update']);
+        Route::post('/show', [TargetController::class, 'show']);
+    });
+    //ovip
+    Route::prefix('ovips')->group(function () {
+        Route::get('/all', [OvipController::class, 'index']);
+        Route::post('/create', [OvipController::class, 'store']);
+        Route::post('/update', [OvipController::class, 'update']);
+        Route::post('/show', [OvipController::class, 'show']);
+        Route::post('/ware-vip', [VipController::class, 'createWareVip']);
+        Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
+        Route::get('/ware-vips', [VipController::class, 'getWareVip']);
+        Route::post('/delete-ware', [VipController::class, 'deleteWare']);
+    });
+    Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
+
+    // agency statistic
+    Route::get('agency-statistic', [AgencyStatisticController::class, 'statistic']);
+
+
+    //admin users
+    Route::prefix('admin_users')->group(function () {
+        Route::get('/all', [AdminUsersController::class, 'index']);
+        Route::post('/create', [AdminUsersController::class, 'store']);
+        Route::post('/show', [AdminUsersController::class, 'show']);
+        Route::get('/agency-user/{agencyId}', [AdminUsersController::class, 'showUserAgency']);
+    });
+    Route::prefix('gifts')->group(function () {
+        Route::get('/all', [GiftController::class, 'allGifts']);
+        Route::get('/type', [GiftController::class, 'typeGift']);
+        Route::post('/create', [GiftController::class, 'store']);
+        Route::post('/create-list', [GiftController::class, 'storeList']);
+        Route::post('/update', [GiftController::class, 'update']);
+        Route::post('/show', [GiftController::class, 'show']);
+        Route::post('/update-music-switch', [GiftController::class, 'musicSwitchUpdate']);
+        Route::post('/update-enable-switch', [GiftController::class, 'enableSwitchUpdate']);
+        Route::post('/update-play-switch', [GiftController::class, 'isPlaySwitchUpdate']);
+    });
+
+    //ware
+    Route::prefix('wares')->group(function () {
+        Route::get('/all', [WareController::class, 'index']);
+        Route::post('/create', [WareController::class, 'store']);
+        Route::post('/create-list', [WareController::class, 'storeList']);
+        Route::post('/update', [WareController::class, 'update']);
+        Route::post('/show', [WareController::class, 'show']);
+        Route::post('/update-enable-switch', [WareController::class, 'enableSwitchUpdate']);
+        Route::get('/type', [WareController::class, 'typeWare']);
+        Route::get('/get-type', [WareController::class, 'getTypeWare']);
+    });
+    Route::post('/create-paymentMethod', [PaymentMethodController::class, 'store']);
+
+
+    // roles
+    Route::resource('roles', RoleController::class);
+    Route::get('permissions', [RoleController::class, "permissions"]);
+    Route::get('permissions-category', [RoleController::class, "permissionsCategory"]);
+    Route::resource('all-permissions', PermissionController::class);
+    Route::post('all-permissions/{id}', [PermissionController::class, 'update']);
+    Route::get('http-methods', [PermissionController::class, "getHttpMethodsOptions"]);
+
+
+    // users
+    Route::resource('utd-users', UtdUserController::class);
+    Route::get('utd-users/show/{id}', [UtdUserController::class, 'show']);
+
+
+
+    Route::get('all-users', [UserController::class, 'userWithSearch']);
+
+    //mangerType
+    Route::prefix('manger-types')->group(function () {
+        Route::get('/all', [MangerTypeController::class, 'index']);
+        Route::post('/create', [MangerTypeController::class, 'store']);
+        Route::post('/update', [MangerTypeController::class, 'update']);
+        Route::post('/show', [MangerTypeController::class, 'show']);
+        Route::delete('/delete/{id}', [MangerTypesController::class, 'destroy']);
+    });
+    //target Percentage
+    Route::prefix('target-Percentage')->group(function () {
+        Route::post('/create', [AddTargetToJsonController::class, 'create']);
+        Route::get('/show', [AddTargetToJsonController::class, 'show']);
+    });
+    //setting config
+    Route::prefix('setting-config')->group(function () {
+        Route::post('/create', [addTOjesonController::class, 'create']);
+        Route::get('/show', [addTOjesonController::class, 'show']);
+    });
+    //CoreWallets
+    Route::prefix('core-wallets')->group(function () {
+        Route::get('/all', [CoreWalletsController::class, 'index']);
+        Route::post('/create', [CoreWalletsController::class, 'store']);
+        Route::post('/update', [CoreWalletsController::class, 'update']);
+        Route::post('/show/{id}', [CoreWalletsController::class, 'show']);
+        Route::delete('delete/{id}', [CoreWalletsController::class, 'delete']);
+    });
+
+    //coin
+    Route::prefix('coins')->group(function () {
+        Route::get('/all/{payment_id}', [CoinController::class, 'index']);
+        Route::post('/create/{payment_id}', [CoinController::class, 'store']);
+        Route::post('/update', [CoinController::class, 'update']);
+        Route::get('/show', [CoinController::class, 'show']);
+        Route::get('/payment-gateway', [CoinController::class, 'paymentCoin']);
+        Route::post('/payment-gateway/create', [CoinController::class, 'createPaymentGateway']);
+        Route::post('/payment-gateway/update', [CoinController::class, 'updatePaymentGateway']);
+        Route::post('/payment-gateway/show', [CoinController::class, 'showPaymentCoin']);
+    });
+    Route::get('/app-information', [AllStatisticController::class, 'appInformation']);
+
+
+    Route::post('roles/preview',  [RoleController::class, 'preview']);
+
+
+    // game report
+    Route::get('/all-players', [GameReportController::class, 'allPlayers']);
+    Route::get('/player-details/{id}', [GameReportController::class, 'playerDetails']);
+    Route::post('/game-ranking/{id}', [GameReportController::class, 'gameRanking']);
+    Route::get('/games-info/{id}', [GameReportController::class, 'gameInfo']);
+    Route::get('/user-game-play/{id}', [GameReportController::class, 'gamePlay']);
+    // end game report
+
+    Route::prefix('trashed-account')->group(function () {
+        Route::get('/', [TrashedUserController::class, 'trashedAccount']);
+        Route::post('/restore/{id}', [TrashedUserController::class, 'restore']);
+        Route::post('/delete/{id}', [TrashedUserController::class, 'softDelete']);
+    });
+
+    Route::prefix('users-level')->group(function () {
+        Route::get('/', [UserController::class, 'userLevel']);
+        Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
+    });
+
+    Route::prefix('device-token')->group(function () {
+        Route::get('/', [UserController::class, 'usersDeviceToken']);
+        Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
+    });
+
+    Route::prefix('family-levels')->group(function () {
+        Route::get('/all', [FamilyLevelController::class, 'index']);
+        Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
+        Route::post('/create', [FamilyLevelController::class, 'store']);
+        Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
+        Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
+    });
+
+    Route::get('user-target', [UserController::class, 'usersTarget']);
+
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'allUsers']);
+        Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
+        Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
+        Route::post('change-agency', [UserController::class, 'changeAgency']);
+        Route::post('update-switch', [UserController::class, 'updateSwitch']);
+        Route::post('update-user-Setting', [UserController::class, 'updateUserSetting']);
+        Route::post('create', [UserController::class, 'create']);
+        Route::get('show/{id}', [UserController::class, 'showDataUser']);
+        Route::post('update/{id}', [UserController::class, 'updateDataUser']);
+        Route::get('user-type', [UserController::class, 'userType']);
+    });
+
+
+
+
+    Route::prefix('reels')->group(function () {
+        Route::get('/all', [ReelsController::class, 'index']);
+        Route::post('/show/{id}', [ReelsController::class, 'show']);
+        Route::post('/search/{id}', [ReelsController::class, 'search']);
+        Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
+        Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
+    });
+    Route::prefix('room-vips')->group(function () {
+        Route::get('/all', [RoomVipsController::class, 'index']);
+        Route::post('/show/{id}', [RoomVipsController::class, 'show']);
+        Route::post('/search/{key}', [RoomVipsController::class, 'search']);
+        Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
+        Route::post('create', [RoomVipsController::class, 'store']);
+        Route::post('update/{id}', [RoomVipsController::class, 'update']);
+    });
+    Route::get('users-search', [UserController::class, 'search']);
+    Route::get('users-search2', [UserController::class, 'search2']);
+    Route::get('users-search3', [UserController::class, 'userAgency']);
+    Route::prefix('achievements')->group(function () {
+        Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
+        Route::get('/{achievementId}/level', [UtdAchievementController::class, 'allAchievementsLevel']);
+        Route::post('/create-level', [UtdAchievementController::class, 'createAchievementLevel']);
+        Route::post('/update-level/{id}', [UtdAchievementController::class, 'updateAchievementLevel']);
+        Route::get('/show/{id}', [UtdAchievementController::class, 'showAchievementLevel']);
+        Route::get('/target-level', [UtdAchievementController::class, 'achievementTargetType']);
+        Route::get('/{achievementId}/all-users-gift-achievement', [UtdAchievementController::class, 'allUsersGiftAchievements']);
+        Route::post('/create-user-gift', [UtdAchievementController::class, 'createUserAchievementGift']);
+        Route::get('/gift-achievement', [UtdAchievementController::class, 'giftAchievement']);
+        Route::get('/user-achievement-level', [UtdAchievementController::class, 'allUserAchievementLevel']);
+        Route::post('/enable/{id}', [UtdAchievementController::class, 'isEnable']);
+        Route::post('/delete_user_level/{id}', [UtdAchievementController::class, 'deleteUserAchievementLevel']);
+        Route::post('/create/user-level', [UtdAchievementController::class, 'createUserAchievementLevel']);
+        Route::get('/gift-user-level', [UtdAchievementController::class, 'userAchievementLevelGiftIndex']);
+        Route::get('/target-user-level/{achievementId}', [UtdAchievementController::class, 'getAchievementLevelsTarget']);
+    });
+
+    Route::prefix('interests')->group(function () {
+        Route::get('/', [InterestController::class, 'all']);
+        Route::get('/show/{id}', [InterestController::class, 'show']);
+        Route::post('/create', [InterestController::class, 'create']);
+        Route::post('/update/{id}', [InterestController::class, 'update']);
+        Route::delete('/delete/{id}', [InterestController::class, 'destroy']);
+    });
+
+    Route::prefix('silvers')->group(function () {
+        Route::get('/', [SilverController::class, 'all']);
+        Route::get('/show/{id}', [SilverController::class, 'show']);
+        Route::post('/create', [SilverController::class, 'create']);
+        Route::post('/update/{id}', [SilverController::class, 'update']);
+        Route::delete('/delete/{id}', [SilverController::class, 'destroy']);
+    });
+
+    Route::prefix('exchanges')->group(function () {
+        Route::get('/', [ExchangeController::class, 'all']);
+        Route::get('/show/{id}', [ExchangeController::class, 'show']);
+        Route::post('/create', [ExchangeController::class, 'create']);
+        Route::post('/update/{id}', [ExchangeController::class, 'update']);
+        Route::delete('/delete/{id}', [ExchangeController::class, 'destroy']);
+    });
+    Route::get('codes', [UserController::class, 'allCodes']);
+
+    Route::prefix('moment')->group(function () {
+        Route::get('/', [MomentsController::class, 'all']);
+        Route::get('/show/{id}', [MomentsController::class, 'show']);
+        Route::post('/search/{id}', [MomentsController::class, 'search']);
+        Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
+        Route::post('/config', [MomentsController::class, 'config']);
+    });
+
+    Route::prefix('offers')->group(function () {
+        Route::get('/', [OfferController::class, 'index']);
+        Route::get('/show/{id}', [OfferController::class, 'show']);
+        Route::post('/create', [OfferController::class, 'store']);
+        Route::delete('/delete/{id}', [OfferController::class, 'delete']);
+        Route::post('/update/{id}', [OfferController::class, 'update']);
+    });
+
+    Route::prefix('request-background-image')->group(function () {
+        Route::get('/', [RequestBackgroundImageController::class, 'all']);
+        Route::get('/show/{id}', [RequestBackgroundImageController::class, 'show']);
+        Route::post('/create', [RequestBackgroundImageController::class, 'create']);
+        Route::delete('/delete/{id}', [RequestBackgroundImageController::class, 'destroy']);
+        Route::post('/update/{id}', [RequestBackgroundImageController::class, 'update']);
+    });
+
+    Route::prefix('report-moment')->group(function () {
+        Route::get('/', [ReportMomentController::class, 'all']);
+        Route::get('/show/{id}', [ReportMomentController::class, 'show']);
+        Route::post('/create', [ReportMomentController::class, 'create']);
+        Route::delete('/delete/{id}', [ReportMomentController::class, 'destroy']);
+        Route::post('/update/{id}', [ReportMomentController::class, 'update']);
+        Route::post('delete-moment/{moment_id}/{id}', [ReportMomentController::class, 'destroyDash']);
+    });
+
+    Route::prefix('request-agency')->group(function () {
+        Route::get('/', [AgencyController::class, 'index']);
+        Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
+    });
+
+    Route::prefix('agencies')->group(function () {
+        Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::post('/create', [AgencyController::class, 'create']);
+        Route::post('/update/{id}', [AgencyController::class, 'update']);
+        Route::get('/show/{id}', [AgencyController::class, 'show']);
+        Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
+        Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
+        Route::delete('/delete/{id}', [AgencyController::class, 'destroy']);
+    });
+    Route::get('/reports', [ReportController::class, 'reports']);
+
+    Route::prefix('agency-join-request')->group(function () {
+        Route::get('/', [AgencyController::class, 'allAgencyJoinRequest']);
+        Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
+        Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
+    });
+
+
+    Route::prefix('target-events')->group(function () {
+        Route::get('/', [TargetEventController::class, 'index']);
+        Route::get('/show/{id}', [TargetEventController::class, 'show']);
+        Route::post('/create', [TargetEventController::class, 'store']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
+        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('target-events-gift')->group(function () {
+        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
+        Route::post('/create', [TargetEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('countries')->group(function () {
+        Route::get('/', [CountryController::class, 'index']);
+
+    });
+
+    Route::prefix('colors')->group(function () {
+        Route::get('/', [ColorController::class, 'index']);
+
+    });
 });
