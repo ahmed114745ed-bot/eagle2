@@ -32,46 +32,62 @@ class PkEvent extends Model
     }
     public function admin()
     {
-        return $this->belongsTo(User::class,'admin_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function editor()
     {
-        return $this->belongsTo(User::class,'editor_id');
+        return $this->belongsTo(User::class, 'editor_id');
     }
 
-    public function rewards(){
-        return $this->hasMany(PkReward::class,'pk_event_id');
+    public function rewards()
+    {
+        return $this->hasMany(PkReward::class, 'pk_event_id');
     }
 
     public function  WinnersPK()
     {
-        return $this->hasMany(PkWinner::class,'pk_event_id');
+        return $this->hasMany(PkWinner::class, 'pk_event_id');
     }
 
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
 
         static::creating(function ($model) {
-            $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
+            $dataLang = self::checkDateLanguage($model->attributes['start_date']);
+            if ($dataLang == 'arabic') {
+
+                $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
+            } else {
+                $model->start_date = $model->attributes['start_date'];
+            }
+          //  $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
             $model->end_date = Carbon::createFromFormat('Y-m-d', $model->attributes['start_date'])->addWeek();
             $model->admin_id = Auth::id();
         });
 
         static::saving(function ($model) {
             if ($model->isDirty('start_date')) {
-                $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
+                $dataLang = self::checkDateLanguage($model->attributes['start_date']);
+                if ($dataLang == 'arabic') {
+                   
+                    $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
+                } else {
+                    $model->start_date = $model->attributes['start_date'];
+                }
+              //  $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
                 $model->end_date = Carbon::createFromFormat('Y-m-d', $model->attributes['start_date'])->addWeek();
                 $model->editor_id = Auth::id();
-               // $model->admin_id = Auth::id();
+                // $model->admin_id = Auth::id();
             }
         });
     }
 
 
 
-   /* protected static function convertArabicNumbers($string) {
+    /* protected static function convertArabicNumbers($string) {
         $newNumbers = range(0, 9);
         $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         return str_replace($arabicNumbers, $newNumbers, $string);
@@ -96,7 +112,4 @@ class PkEvent extends Model
     {
         return Carbon::parse($this->attributes['end_date'])->subDay()->toDateString();
     }*/
-
-
-
 }

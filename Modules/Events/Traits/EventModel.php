@@ -11,7 +11,6 @@ trait EventModel
     {
         $date = self::convertArabicNumbers($value);
         return Carbon::parse($date)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
-
     }
     public function getEndDateAttribute($value)
     {
@@ -28,10 +27,27 @@ trait EventModel
     }
 
 
-    public static function convertArabicNumbers($string) {
+    public static function convertArabicNumbers($string)
+    {
         $newNumbers = range(0, 9);
         $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
         return str_replace($arabicNumbers, $newNumbers, $string);
+    }
+
+    public static function checkDateLanguage($date)
+    {
+        $arabicNumbersPattern = '/[٠-٩]/u'; // Arabic numerals
+        $englishNumbersPattern = '/[0-9]/'; // English numerals
+
+        if (preg_match($arabicNumbersPattern, $date)) {
+            return 'arabic';
+        }
+
+        if (preg_match($englishNumbersPattern, $date)) {
+            return 'english';
+        }
+
+        return 'unknown'; 
     }
 
 
@@ -39,8 +55,8 @@ trait EventModel
     {
         $timezone = config('app.owner_timezone') ?? '-03:00';
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
-        return $query->whereRaw("start_date <= ?", [date($nowDate)] ) // 27
-                     ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate] ); // 27
+        return $query->whereRaw("start_date <= ?", [date($nowDate)]) // 27
+            ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) >= ?", [$timezone, $nowDate]); // 27
     }
 
 
@@ -49,8 +65,8 @@ trait EventModel
         $timezone = config('app.owner_timezone') ?? '-03:00';
         $nowDate     = Carbon::now()->copy()->timezone($timezone)->toDateTimeString();
 
-        return $query->whereRaw("start_date < ?", [ date($nowDate)] ) // 27
-                     ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate] ); // 27
+        return $query->whereRaw("start_date < ?", [date($nowDate)]) // 27
+            ->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) < ?", [$timezone, $nowDate]); // 27
     }
 
 
@@ -58,6 +74,6 @@ trait EventModel
     {
         $timezone = config('app.owner_timezone');
         $nowDate     = Carbon::now()->copy()->toDateString();
-        return $query ->whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate] );
+        return $query->whereRaw("date(CONVERT_TZ(end_date, '+00:00', ?)) = ?", [$timezone, $nowDate]);
     }
 }
