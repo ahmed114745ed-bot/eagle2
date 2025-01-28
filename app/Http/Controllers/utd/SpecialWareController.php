@@ -25,6 +25,16 @@ class SpecialWareController extends Controller
             ->orderBy('id', $sort)
             ->paginate(10);
 
+            $getTypeTranslations = [
+                4 => trans('purchase'),
+                6 => trans('limited time purchase'),
+            ];
+
+            $result->getCollection()->transform(function ($item) use ( $getTypeTranslations) {
+                $item->get_type = $getTypeTranslations[$item->get_type] ?? trans('Unknown Get Type');
+                return $item;
+            });
+
         return Common::apiResponse(true, 'Success', $result);
     }
 
@@ -125,6 +135,21 @@ class SpecialWareController extends Controller
             'level' =>  $request->level,
             'color' =>  $request->color,
             'num' =>  $request->num,
+        ]);
+
+        return Common::apiResponse(true, 'Success', $ware);
+    }
+
+
+    public function update_enable(Request $request, $id){
+        $request->validate([
+            'enable' => 'required',
+        ]);
+        $ware = Ware::where('type',25)->findOrFail($id);
+
+
+        $ware->update([
+            'enable' =>  $request->enable,
         ]);
 
         return Common::apiResponse(true, 'Success', $ware);

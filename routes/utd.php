@@ -55,8 +55,10 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
+use App\Http\Controllers\utd\SpecialHistoryController;
 use Modules\Public\Http\Controllers\web\LevelIntervalController;
 use App\Http\Controllers\utd\SpecialWareController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -184,6 +186,23 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
     });
 
+
+    Route::prefix('special-histories')->group(function () {
+        Route::get('/', [SpecialHistoryController::class, 'index']);
+        Route::post('/delete-all', [SpecialHistoryController::class, 'delete_all']);
+        Route::post('/delete/{id}', [SpecialHistoryController::class, 'delete']);
+    });
+
+
+
+    Route::prefix('dedicate-wares')->group(function () {
+        Route::get('/', [DedicateWareController::class, 'index']);
+        Route::post('/create', [DedicateWareController::class, 'store']);
+        Route::post('/update/{id}', [DedicateWareController::class, 'update']);
+        Route::post('/update-enable/{id}', [DedicateWareController::class, 'update_enable']);
+        Route::post('/delete-all', [DedicateWareController::class, 'delete_all']);
+        Route::post('dedicate/{id}', [DedicateWareController::class, 'dedicate']);
+    });
 
     Route::prefix('daily-gift-types')->group(function () {
         Route::get('/', [DailyGiftTypesController::class, 'index']);
