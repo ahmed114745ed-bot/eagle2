@@ -140,7 +140,7 @@ class VipPrivilegeController extends MainController
                 22=>trans('upload GIF image'),
                 28=> trans('profile frame')            ]
         );
-        $form->image('img1', __('admin.img'));
+        $form->file('img1', __('admin.img'));
         $form->file('img2', __('admin.img2'));
 //        $form->display(trans('admin.created_at'));
 //        $form->display(trans('admin.updated_at'));
