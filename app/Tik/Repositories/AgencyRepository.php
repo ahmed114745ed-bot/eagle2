@@ -154,7 +154,7 @@ class AgencyRepository extends AbstractRepository
         return $this->model->whereIn('id', $ids)->get();
     }
 
-    public function agencies($id, $perPage, $page)
+    public function agencies($id, $search, $perPage, $page)
     {
         return $this->model->where('id', '!=', $id)->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
@@ -163,7 +163,12 @@ class AgencyRepository extends AbstractRepository
                     $query->where('status', 1);
                 }
             );
-        })->paginate($perPage, ['*'], 'page', $page);
+        })->when(isset($search), function ($query) use ($search) {
+            $query->whereHas('owner', function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('uuid', 'like', "%$search%");
+            });
+        })->with('owner')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function report($id, $month = null, $year = null, $perPage, $page)
