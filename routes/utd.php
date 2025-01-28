@@ -590,7 +590,7 @@ Route::middleware([])->group(function () {
     });
 
     Route::prefix('pk-events-gift')->group(function () {
-        Route::get('/{targetId}', [PkEventController::class, 'allGifts']);
+        Route::get('/{pkId}', [PkEventController::class, 'allGifts']);
         Route::get('/show/{id}', [PkEventController::class, 'showGift']);
         Route::post('/create', [PkEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [PkEventController::class, 'destroyGift']);
