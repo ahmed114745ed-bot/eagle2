@@ -67,12 +67,7 @@ class UserResource extends JsonResource
             $timeDifferenceFormatted = "In the future";
         }
 
-        $dress_1_data = $this->getUserDress(4, $this->dress_1, 'img2');
-        // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
-        $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
-        // Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
-        $frame = $dress_1_data ?: $dress_1_fallback;
-
+        $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?? $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
@@ -196,6 +191,7 @@ class UserResource extends JsonResource
         ->where('target_id', $dress)
         ->first();
 
+        dd($pack);
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
