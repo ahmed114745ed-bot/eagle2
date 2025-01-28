@@ -219,7 +219,6 @@ class MyDataResource extends JsonResource
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
-
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
