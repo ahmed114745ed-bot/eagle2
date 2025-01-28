@@ -52,6 +52,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\DedicateVipController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
@@ -202,10 +203,21 @@ Route::middleware([])->group(function () {
         Route::post('dedicate/{id}', [DedicateWareController::class, 'dedicate']);
     });
 
-	    Route::prefix('vips-dedicate')->group(function () {
+    Route::prefix('vips-dedicate')->group(function () {
         Route::get('/', [DedicateVipController::class, 'index']);
         Route::post('/delete-all', [DedicateVipController::class, 'delete_all']);
         Route::post('dedicate/{id}', [DedicateVipController::class, 'dedicate']);
+    });
+
+
+    Route::prefix('banners')->group(function () {
+        Route::get('/', [BannerController::class, 'index']);
+        Route::post('/create', [BannerController::class, 'store']);
+        Route::post('/delete-all', [BannerController::class, 'delete_all']);
+        Route::post('update/{id}', [BannerController::class, 'update']);
+        Route::post('delete/{id}', [BannerController::class, 'delete']);
+        Route::post('update-is-active/{id}', [BannerController::class, 'update_is_active']);
+        Route::get('/{id}', [BannerController::class, 'show']);
     });
 
 
@@ -217,7 +229,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [DailyGiftTypesController::class, 'delete']);
     });
 
-    Route::prefix('daily-gifts/{type}')->group(function(){
+    Route::prefix('daily-gifts/{type}')->group(function () {
         Route::get('/', [DailyGiftsController::class, 'index']);
         Route::get('/{id}', [DailyGiftsController::class, 'show']);
         Route::post('/create', [DailyGiftsController::class, 'store']);
