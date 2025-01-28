@@ -95,7 +95,7 @@ class UserResource extends JsonResource
                 'show_banner' => 1,
             ]);
         }
-
+dd($frame);
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
