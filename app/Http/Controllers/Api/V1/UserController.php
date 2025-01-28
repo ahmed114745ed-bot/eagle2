@@ -191,7 +191,6 @@ class UserController extends Controller
         }
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->first()?->img;
-
         $data = new MyDataResource($userWithMedals);
 
         return Common::apiResponse(true, '', $data, 200);
