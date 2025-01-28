@@ -66,7 +66,7 @@ class UserResource extends JsonResource
         } else {
             $timeDifferenceFormatted = "In the future";
         }
-
+        dd($this->dress_1, $this->dress_2);
         $frame  = !empty($this->getUserDress(4, $this->dress_1, 'img1')) ?  $this->getUserDress(4, $this->dress_1, 'img1') : $this->getUserDress(4, $this->dress_1, 'img2');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
