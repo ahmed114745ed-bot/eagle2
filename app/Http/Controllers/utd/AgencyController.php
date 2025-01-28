@@ -101,7 +101,7 @@ class AgencyController extends Controller
         }
 
         try {
-            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id, $request->per_page, $request->page);
+            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id,$request->search, $request->per_page, $request->page);
             return Common::apiResponse(true, 'success', AgencyRequestsResource::collection($data));
         } catch (Exception $exception) {
 
