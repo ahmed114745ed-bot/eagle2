@@ -205,7 +205,7 @@ class CpRepository
             ->orderByDesc('total_gifts')
             ->take(20)
             ->get();
-           
+
     }
 
     public function getCpRankingWithOutRelation($type)
@@ -215,11 +215,11 @@ class CpRepository
             ->with(['cp' => function ($query) {
                 $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id','cp_relation_id')
                 ->with(['relation' => function ($query) {
-                    $query->select('id', 'type');  
+                    $query->select('id', 'type');
                 }]);
             }])
             ->whereHas("cp.relation", function ($q) {
-                $q->whereNotNull('type');    
+                $q->whereNotNull('type');
             })
             ->when($type, function ($query) use ($type) {
                 /// todo update this filter
@@ -237,13 +237,13 @@ class CpRepository
             // ->take(1)
             ->get()
             ->groupBy(function ($item) {
-                return $item->cp->relation->type;  
+                return $item->cp->relation->type;
             })
             ->map(function ($groupedLogs) {
-                return $groupedLogs->sortByDesc('total_gifts')->first();     
+                return $groupedLogs->sortByDesc('total_gifts')->first();
             });
 
-            
+
     }
 
     public function getCpList($userId, $activeOnly = false)
@@ -267,7 +267,7 @@ class CpRepository
 
     public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
-        return Cp::with('relation:id,title,type')
+        return Cp::with('relation:id,title,type', 'toUser', 'fromUser')
             ->whereHas("cpRelation",function ($q){
                 $q->where('type',"!=",'solution');
             })
