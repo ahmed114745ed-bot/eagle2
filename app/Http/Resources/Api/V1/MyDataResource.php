@@ -65,6 +65,7 @@ class MyDataResource extends JsonResource
         $admin = $this->agencyUserJob;
         $owner = $this->ownAgency;
 
+        dd($this->dress_1, $this->dress_2);
         $dress_1_data = $this->getUserDress(4, $this->dress_1, 'img2');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
         $dress_1_fallback = $this->getUserDress(4, $this->dress_1, 'img1');
@@ -219,7 +220,6 @@ class MyDataResource extends JsonResource
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
-
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
