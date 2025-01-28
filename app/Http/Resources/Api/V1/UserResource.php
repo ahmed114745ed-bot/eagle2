@@ -163,6 +163,7 @@ class UserResource extends JsonResource
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
             'image_color'          => @$this->color_image,
+            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {

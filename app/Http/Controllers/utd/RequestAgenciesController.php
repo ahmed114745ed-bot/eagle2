@@ -87,7 +87,7 @@ class RequestAgenciesController extends Controller
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
         Common::createUserAdmin($appOwnerId);
-        CustomNotification::acceptRequestAgency($user->id);
+        CustomNotification::acceptRequestAgency($user);
         return Common::apiResponse(true, 'Succcess');
     }
 }

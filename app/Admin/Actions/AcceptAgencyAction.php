@@ -49,7 +49,7 @@ class AcceptAgencyAction extends RowAction
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
         Common::createUserAdmin($appOwnerId);
-        CustomNotification::acceptRequestAgency($user->id);
+        CustomNotification::acceptRequestAgency($user);
         return $this->response()->success('success')->refresh();
     }
 
