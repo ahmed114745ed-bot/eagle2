@@ -778,9 +778,9 @@ class AgencyService
         return true;
     }
 
-    public function AllAgencyExceptOld($oldAgencyId, $perPage, $page)
+    public function AllAgencyExceptOld($oldAgencyId,$search, $perPage, $page)
     {
-        return $this->agencyRepository->agencies($oldAgencyId, $perPage, $page);
+        return $this->agencyRepository->agencies($oldAgencyId,$search, $perPage, $page);
     }
 
     public function createAgencyUtd($request)

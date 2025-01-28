@@ -245,7 +245,7 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = Agency::with("Countries","AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function($query) {
+        $agencies = Agency::with("Countries","AgencypaymentGateways")->withCount(['salaryRequests' => function($query) {
             $query->where('status', 3);
         }])->whereHas('owner')
         ->where('Shipping_agency',true)
