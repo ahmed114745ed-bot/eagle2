@@ -66,7 +66,6 @@ class UserResource extends JsonResource
         } else {
             $timeDifferenceFormatted = "In the future";
         }
-dd($this->dress_1);
 
         $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?? $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
@@ -178,14 +177,20 @@ dd($this->dress_1);
     public function getUserDress($type, $dress, $item = 'img1')
     {
 
-        $packs = $this->packs;
-        /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
-        if ($pack) {
-            if ($pack->ware) {
-                return $pack->ware->{$item};
-            }
-        }
-        return '';
+        // $packs = $this->packs;
+        // /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        // $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        // if ($pack) {
+        //     if ($pack->ware) {
+        //         return $pack->ware->{$item};
+        //     }
+        // }
+        // return '';
+        $pack = $this->packs
+        ->where('type', $type)
+        ->where('target_id', $dress)
+        ->first();
+
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
