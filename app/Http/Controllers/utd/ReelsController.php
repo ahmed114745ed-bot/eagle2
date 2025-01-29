@@ -25,7 +25,17 @@ class ReelsController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-    
+
+    }
+
+    public function user($id,Request $request){
+        try {
+            $reel = $this->reelService->showByUser($id);
+            return Common::apiResponse(true, 'success', $reel);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
     public function show( $id,Request $request)
     {
@@ -37,7 +47,7 @@ class ReelsController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
+
     }
 
     public function search( $id,Request $request)
@@ -50,11 +60,11 @@ class ReelsController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
+
     }
 
 
-    
+
 
 
     public function destroy($id)
@@ -66,7 +76,7 @@ class ReelsController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-       
+
 
     }
 
@@ -87,5 +97,5 @@ class ReelsController extends Controller
 
 
     }
-    
+
 }
