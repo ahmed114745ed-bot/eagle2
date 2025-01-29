@@ -463,7 +463,7 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
     });
     Route::get('users-search', [UserController::class, 'search']);
-    Route::get('users-search2', [UserController::class, 'search2']);
+    Route::get('users-search2', [UserController::class, 'search2_new']);
     Route::get('users-search3', [UserController::class, 'userAgency']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
