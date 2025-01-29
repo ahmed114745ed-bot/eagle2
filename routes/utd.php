@@ -68,6 +68,8 @@ use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
+use App\Http\Controllers\utd\SallariesController;
+use App\Http\Controllers\utd\SallariesHistoryController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -252,6 +254,20 @@ Route::middleware([])->group(function () {
         Route::get('/', [ChargeReportController::class, 'index']);
         Route::get('/details', [ChargeReportController::class, 'details']);
         Route::post('/return/{id}', [ChargeReportController::class, 'return']);
+    });
+
+    Route::prefix('sallaries')->group(function(){
+        Route::get('/', [SallariesController::class, 'index']);
+        Route::get('/details', [SallariesController::class, 'details']);
+        Route::post('/cashing', [SallariesController::class, 'cashing']);
+        Route::post('/pay', [SallariesController::class, 'pay']);
+    });
+
+
+    Route::prefix('sallaries_history')->group(function(){
+        Route::get('/', [SallariesHistoryController::class, 'index']);
+        Route::post('delete/{id}', [SallariesHistoryController::class, 'delete']);
+        Route::post('/delete-all', [SallariesHistoryController::class, 'delete_all']);
     });
 
     Route::prefix('daily-gift-types')->group(function () {
@@ -449,11 +465,14 @@ Route::middleware([])->group(function () {
 
     Route::prefix('reels')->group(function () {
         Route::get('/all', [ReelsController::class, 'index']);
+        Route::get('/user/{id}', [ReelsController::class, 'user']);
         Route::post('/show/{id}', [ReelsController::class, 'show']);
         Route::post('/search/{id}', [ReelsController::class, 'search']);
         Route::post('/delete/{id}', [ReelsController::class, 'destroy']);
         Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
     });
+
+
     Route::prefix('room-vips')->group(function () {
         Route::get('/all', [RoomVipsController::class, 'index']);
         Route::post('/show/{id}', [RoomVipsController::class, 'show']);
@@ -463,7 +482,7 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [RoomVipsController::class, 'update']);
     });
     Route::get('users-search', [UserController::class, 'search']);
-    Route::get('users-search2', [UserController::class, 'search2']);
+    Route::get('users-search2', [UserController::class, 'search2_new']);
     Route::get('users-search3', [UserController::class, 'userAgency']);
     Route::prefix('achievements')->group(function () {
         Route::get('/all', [UtdAchievementController::class, 'allAchievements']);
