@@ -31,6 +31,7 @@ use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\utd\GroupChatController;
+use App\Http\Controllers\utd\RoleEventController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\BackgroundController;
@@ -45,6 +46,7 @@ use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\DedicateWareController;
+use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
@@ -56,14 +58,13 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\utd\SpecialHistoryController;
+use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\ChargeReportController;
-use App\Http\Controllers\utd\HomeCarouselController;
-use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -235,7 +236,6 @@ Route::middleware([])->group(function () {
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
-
     });
 
     Route::prefix('official-msgs')->group(function () {
@@ -245,7 +245,6 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [OfficialMessageController::class, 'update']);
         Route::post('delete/{id}', [OfficialMessageController::class, 'delete']);
         Route::get('/{id}', [OfficialMessageController::class, 'show']);
-
     });
 
     Route::prefix('charges-reports')->group(function(){
@@ -558,12 +557,10 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
-
     });
 
     Route::prefix('colors')->group(function () {
         Route::get('/', [ColorController::class, 'index']);
-
     });
 
     Route::prefix('target-events')->group(function () {
@@ -613,5 +610,20 @@ Route::middleware([])->group(function () {
         Route::post('/create', [PkEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [PkEventController::class, 'destroyGift']);
         Route::post('/update/{id}', [PkEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('event-reports')->group(function () {
+        Route::get('/', [ReportController::class, 'eventReports']);
+        Route::post('/return-reward', [ReportController::class, 'returnReward']);
+    });
+
+    Route::prefix('general-roles')->group(function () {
+        Route::get('/', [RoleEventController::class, 'all']);
+        Route::get('/show/{id}', [RoleEventController::class, 'show']);
+        Route::post('/create', [RoleEventController::class, 'create']);
+        Route::post('/update/{id}', [RoleEventController::class, 'update']);
+        Route::delete('/delete/{id}', [RoleEventController::class, 'destroy']);
+        Route::get('/details', [RoleEventController::class, 'details']);
+        Route::get('/types', [RoleEventController::class, 'types']);
     });
 });
