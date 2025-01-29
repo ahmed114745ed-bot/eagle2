@@ -57,7 +57,8 @@ class RequestBackgroundImageController extends Controller
         $validator = Validator::make($request->all(), [
 
             'owner_room_id' => 'required|integer|exists:users,id',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img' => 'required',
             'status' => 'required|integer',
             'expair' => 'required|integer',
         ]);
