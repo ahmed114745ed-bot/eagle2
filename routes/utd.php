@@ -65,6 +65,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -245,6 +246,12 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [OfficialMessageController::class, 'update']);
         Route::post('delete/{id}', [OfficialMessageController::class, 'delete']);
         Route::get('/{id}', [OfficialMessageController::class, 'show']);
+    });
+
+    Route::prefix('charges-reports')->group(function(){
+        Route::get('/', [ChargeReportController::class, 'index']);
+        Route::get('/details', [ChargeReportController::class, 'details']);
+        Route::post('/return/{id}', [ChargeReportController::class, 'return']);
     });
 
     Route::prefix('daily-gift-types')->group(function () {
