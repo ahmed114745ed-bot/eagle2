@@ -28,7 +28,7 @@ class ReportMoment extends Model
     }
     public function moment()
     {
-        return $this->hasOne(Moment::class, 'id', 'moment_id');
+        return $this->belongsTo(Moment::class);
     }
 }
 
