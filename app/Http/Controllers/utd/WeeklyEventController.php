@@ -5,8 +5,8 @@ namespace App\Http\Controllers\utd;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use Modules\Events\Entities\Reward;
 use App\Http\Controllers\Controller;
-use Modules\Events\Entities\PkReward;
 use Modules\Events\Entities\WeeklyStar;
 use Illuminate\Support\Facades\Validator;
 
@@ -112,12 +112,12 @@ class WeeklyEventController extends Controller
         }
     }
 
-    public function allGifts($pkId, Request $request)
+    public function allGifts($weeklyId, Request $request)
     {
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = PkReward::where('pk_event_id', $pkId)->where("pk_type", $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
+        $data = Reward::where('weekly_star_id', $weeklyId)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(true, 'done', $data);
@@ -126,8 +126,7 @@ class WeeklyEventController extends Controller
     public function storeGift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pk_event_id' => 'required',
-            'pk_type' => 'required|string',
+            'weekly_star_id' => 'required',
             'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
             'target1' => 'nullable',
@@ -145,13 +144,12 @@ class WeeklyEventController extends Controller
             }
 
             $data = [
-                'pk_event_id' => $request->pk_event_id,
-                'pk_type' => $request->pk_type,
+                'weekly_star_id' => $request->weekly_star_id,
                 'level' => $request->level,
                 'type' => $request->type,
                 'expire'  => $request->expire,
             ];
-            PkReward::create($data);
+            Reward::create($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -162,8 +160,7 @@ class WeeklyEventController extends Controller
     public function updateGift($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pk_event_id' => 'required',
-            'pk_type' => 'required|string',
+            'weekly_star_id' => 'required',
             'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
             'target1' => 'nullable',
@@ -181,13 +178,13 @@ class WeeklyEventController extends Controller
             }
 
             $data = [
-                'pk_event_id' => $request->pk_event_id,
+                'weekly_star_id' => $request->weekly_star_id,
                 'pk_type' => $request->pk_type,
                 'level' => $request->level,
                 'type' => $request->type,
                 'expire'  => $request->expire,
             ];
-            $reward =  PkReward::findOrFail($id);
+            $reward =  Reward::findOrFail($id);
             $reward->update($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -199,7 +196,7 @@ class WeeklyEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  PkReward::findOrFail($id);
+            $data =  Reward::findOrFail($id);
             $data->delete();
             return Common::apiResponse(true, 'deleted successfully',  $data);
         } catch (Exception $exception) {
@@ -211,7 +208,7 @@ class WeeklyEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  PkReward::with('ware', 'vip')->findOrFail($id);
+            $data =  Reward::with('ware', 'vip')->findOrFail($id);
             return Common::apiResponse(true, 'done',  $data);
         } catch (Exception $exception) {
 
