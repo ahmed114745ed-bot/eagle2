@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\MomentsService;
 use Illuminate\Support\Facades\Validator;
+use Modules\Moment\Transformers\MomentDashboardResource;
 
 class MomentsController extends Controller
 {
@@ -83,17 +84,31 @@ class MomentsController extends Controller
         }
     }
 
-    public function search($id, Request $request)
+    public function search($uuid, Request $request)
     {
 
         try {
-            $reel = $this->MomentsService->search($id);
+            $reel = $this->MomentsService->search($uuid);
             return Common::apiResponse(true, 'success', $reel);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function get_user_moments($user_id, Request $request)
+    {
+
+        try {
+            $reels = $this->MomentsService->get_user_moments($user_id);
+            // return $reels;
+            return Common::apiResponse(true, 'success', MomentDashboardResource::collection($reels));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+    
 
     public function config(Request $request)
     {

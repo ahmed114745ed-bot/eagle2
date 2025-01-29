@@ -3,6 +3,7 @@
 namespace App\Tik\Repositories;
 
 use App\Models\Interest;
+use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
 
 
@@ -42,4 +43,24 @@ class MomentsRepository extends AbstractRepository
 
         return $result;
     }
+
+    public function get_user_moments($user_id)
+    {
+        $query = $this->model->query();
+
+        $query->whereHas('user', function ($query) use ($user_id) {
+            $query->where('id', trim($user_id));
+        })->with(['comments', 'likes'])
+        ->with(['gifts' => function ($query) {
+            $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                  ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+        }]);
+
+        $result = $query->paginate(10);
+
+        return $result;
+    }
+
+
+    
 }
