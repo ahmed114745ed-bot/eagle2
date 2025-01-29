@@ -511,9 +511,11 @@ Route::middleware([])->group(function () {
     Route::prefix('moment')->group(function () {
         Route::get('/', [MomentsController::class, 'all']);
         Route::get('/show/{id}', [MomentsController::class, 'show']);
-        Route::post('/search/{id}', [MomentsController::class, 'search']);
+        Route::post('/search/{uuid}', [MomentsController::class, 'search']);
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config', [MomentsController::class, 'config']);
+        Route::get('/get-user-moments/{id}', [MomentsController::class, 'get_user_moments']);
+
     });
 
     Route::prefix('offers')->group(function () {

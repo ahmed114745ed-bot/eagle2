@@ -57,9 +57,14 @@ class MomentsService
         return $this->MomentsRepository->find($id);
     }
 
-    public function search($id)
+    public function search($uuid)
     {
 
-        return $this->MomentsRepository->search($id);
+        return $this->MomentsRepository->search($uuid);
+    }
+    public function get_user_moments($user_id)
+    {
+
+        return $this->MomentsRepository->get_user_moments($user_id);
     }
 }
