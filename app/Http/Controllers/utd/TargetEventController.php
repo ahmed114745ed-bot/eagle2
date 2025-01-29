@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Modules\Events\Entities\RewardTarget;
+use App\Http\Resources\TargetEventResource;
 use Modules\Events\Entities\ChargeTargetEvent;
 
 class TargetEventController extends Controller
@@ -20,7 +21,7 @@ class TargetEventController extends Controller
         $page = $request->page;
         $data = ChargeTargetEvent::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
-        })->paginate($perPage, ['*'], 'page', $page);
+        })->select('id', 'value')->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -45,7 +46,7 @@ class TargetEventController extends Controller
     public function show($id)
     {
         try {
-            $data =  ChargeTargetEvent::findOrFail($id);
+            $data =  ChargeTargetEvent::select('id', 'value')->findOrFail($id);
             return Common::apiResponse(true, ' successfully',  $data);
         } catch (Exception $exception) {
 
@@ -56,7 +57,6 @@ class TargetEventController extends Controller
     public function update($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-
             'value' => 'required|numeric',
         ]);
 
@@ -94,13 +94,13 @@ class TargetEventController extends Controller
         $data = RewardTarget::where('charge_event_id', $targetId)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', TargetEventResource::collection($data));
     }
 
     public function storeGift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'charge_event_id' => 'required',
+            'charge_event_id' => 'required|integer|exists:reward_charges,id',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -132,7 +132,7 @@ class TargetEventController extends Controller
     public function updateGift($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'charge_event_id' => 'required',
+            'charge_event_id' => 'required|integer|exists:reward_charges,id',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -178,7 +178,7 @@ class TargetEventController extends Controller
     {
         try {
             $data =  RewardTarget::with('ware', 'vip')->findOrFail($id);
-            return Common::apiResponse(true, 'done',  $data);
+            return Common::apiResponse(true, 'done', new TargetEventResource($data));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
