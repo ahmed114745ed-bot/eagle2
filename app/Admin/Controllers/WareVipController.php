@@ -275,6 +275,7 @@ class WareVipController extends MainController
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
+                'image' => __('image'),
             ]
         )->rules(function ($form) {
             // Add a conditional validation rule for 'image_type'

@@ -83,7 +83,7 @@ class EventReportController extends MainOldController
                 $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
              //   $vips = OVip::find($this->reward->target);
-                $path = $this->reward->target->vip->img;
+                $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
@@ -136,7 +136,7 @@ class EventReportController extends MainOldController
                 $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
                 //   $vips = OVip::find($this->reward->target);
-                $path = $this->reward->target->vip->img;
+                $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
@@ -190,7 +190,7 @@ class EventReportController extends MainOldController
                 $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
               //  $vips = OVip::find($this->reward->target);
-                $path =$this->reward->target->vip->img;
+                $path =$this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {

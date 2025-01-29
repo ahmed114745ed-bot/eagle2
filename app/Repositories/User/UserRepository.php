@@ -22,12 +22,23 @@ class UserRepository extends Repository
     public function searchWithPage($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
-            ->where('name', 'like', '%' . $key . '%')
+             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('uuid', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function searchWithPageNew($key, $page, $perPage)
+    {
+       
+        return User::select('id','uuid','name')
+             ->where('name', 'like', '%' . $key . '%')
+            ->orWhere('uuid', 'like', '%' . $key . '%')
+            ->orWhere('id', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    
     public function searchUserAgency($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
