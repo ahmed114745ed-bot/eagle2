@@ -27,7 +27,7 @@ class ReportEventResource extends JsonResource
         if ($this->reward->type == 'ware') {
             $path  = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
         } elseif ($this->reward->type == 'vip') {
-            $path = $this->reward->target->vip->img;
+            $path = $this->reward->vip->img;
         } elseif ($this->reward->type == 'achievement') {
             $path = $this->reward->target;
         } else {
