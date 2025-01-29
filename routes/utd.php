@@ -233,7 +233,6 @@ Route::middleware([])->group(function () {
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
-
     });
 
     Route::prefix('daily-gift-types')->group(function () {
@@ -540,12 +539,10 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
-
     });
 
     Route::prefix('colors')->group(function () {
         Route::get('/', [ColorController::class, 'index']);
-
     });
 
     Route::prefix('target-events')->group(function () {
@@ -595,5 +592,10 @@ Route::middleware([])->group(function () {
         Route::post('/create', [PkEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [PkEventController::class, 'destroyGift']);
         Route::post('/update/{id}', [PkEventController::class, 'updateGift']);
+    });
+
+    Route::prefix('event-reports')->group(function () {
+        Route::get('/', [ReportController::class, 'eventReports']);
+        Route::post('/return-reward', [ReportController::class, 'returnReward']);
     });
 });
