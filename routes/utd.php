@@ -45,6 +45,7 @@ use App\Http\Controllers\utd\MangerTypesController;
 use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
+use App\Http\Controllers\utd\WeeklyEventController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
@@ -572,20 +573,20 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
     });
 
-    Route::prefix('target-events')->group(function () {
-        Route::get('/', [TargetEventController::class, 'index']);
-        Route::get('/show/{id}', [TargetEventController::class, 'show']);
-        Route::post('/create', [TargetEventController::class, 'store']);
-        Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
-        Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    Route::prefix('weekly-events')->group(function () {
+        Route::get('/', [WeeklyEventController::class, 'index']);
+        Route::get('/show/{id}', [WeeklyEventController::class, 'show']);
+        Route::post('/create', [WeeklyEventController::class, 'store']);
+        Route::delete('/delete/{id}', [WeeklyEventController::class, 'destroy']);
+        Route::post('/update/{id}', [WeeklyEventController::class, 'update']);
     });
 
-    Route::prefix('target-events-gift')->group(function () {
-        Route::get('/{targetId}', [TargetEventController::class, 'allGifts']);
-        Route::get('/show/{id}', [TargetEventController::class, 'showGift']);
-        Route::post('/create', [TargetEventController::class, 'storeGift']);
-        Route::delete('/delete/{id}', [TargetEventController::class, 'destroyGift']);
-        Route::post('/update/{id}', [TargetEventController::class, 'updateGift']);
+    Route::prefix('weekly-events-gift')->group(function () {
+        Route::get('/{targetId}', [WeeklyEventController::class, 'allGifts']);
+        Route::get('/show/{id}', [WeeklyEventController::class, 'showGift']);
+        Route::post('/create', [WeeklyEventController::class, 'storeGift']);
+        Route::delete('/delete/{id}', [WeeklyEventController::class, 'destroyGift']);
+        Route::post('/update/{id}', [WeeklyEventController::class, 'updateGift']);
     });
 
     Route::prefix('pk-events')->group(function () {
@@ -619,4 +620,6 @@ Route::middleware([])->group(function () {
         Route::get('/details', [RoleEventController::class, 'details']);
         Route::get('/types', [RoleEventController::class, 'types']);
     });
+    Route::get('/wares-event', [RewardLevelIntervalController::class, 'wareInterval']);
+    Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
 });
