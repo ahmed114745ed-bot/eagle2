@@ -248,7 +248,7 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [OfficialMessageController::class, 'show']);
     });
 
-    Route::prefix('charges-reports')->group(function(){
+    Route::prefix('charges-reports')->group(function () {
         Route::get('/', [ChargeReportController::class, 'index']);
         Route::get('/details', [ChargeReportController::class, 'details']);
         Route::post('/return/{id}', [ChargeReportController::class, 'return']);
@@ -586,10 +586,11 @@ Route::middleware([])->group(function () {
         Route::post('/create', [WeeklyEventController::class, 'store']);
         Route::delete('/delete/{id}', [WeeklyEventController::class, 'destroy']);
         Route::post('/update/{id}', [WeeklyEventController::class, 'update']);
+        Route::get('/default-date', [WeeklyEventController::class, 'defaultDate']);
     });
 
     Route::prefix('weekly-events-gift')->group(function () {
-        Route::get('/{targetId}', [WeeklyEventController::class, 'allGifts']);
+        Route::get('/', [WeeklyEventController::class, 'allGifts']);
         Route::get('/show/{id}', [WeeklyEventController::class, 'showGift']);
         Route::post('/create', [WeeklyEventController::class, 'storeGift']);
         Route::delete('/delete/{id}', [WeeklyEventController::class, 'destroyGift']);
@@ -629,4 +630,5 @@ Route::middleware([])->group(function () {
     });
     Route::get('/wares-event', [RewardLevelIntervalController::class, 'wareInterval']);
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
+    Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
 });
