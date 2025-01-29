@@ -62,6 +62,7 @@ use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\HomeCarouselController;
+use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
@@ -233,6 +234,16 @@ Route::middleware([])->group(function () {
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
+    });
+
+    Route::prefix('official-msgs')->group(function () {
+        Route::get('/', [OfficialMessageController::class, 'index']);
+        Route::post('/create', [OfficialMessageController::class, 'store']);
+        Route::post('/delete-all', [OfficialMessageController::class, 'delete_all']);
+        Route::post('update/{id}', [OfficialMessageController::class, 'update']);
+        Route::post('delete/{id}', [OfficialMessageController::class, 'delete']);
+        Route::get('/{id}', [OfficialMessageController::class, 'show']);
+
     });
 
     Route::prefix('daily-gift-types')->group(function () {
