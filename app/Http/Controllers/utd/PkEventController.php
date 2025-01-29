@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Modules\Events\Entities\PkEvent;
 use Modules\Events\Entities\PkReward;
+use App\Http\Resources\PkEventResource;
 use Illuminate\Support\Facades\Validator;
 
 class PkEventController extends Controller
@@ -101,21 +102,30 @@ class PkEventController extends Controller
         }
     }
 
-    public function allGifts($pkId, Request $request)
+    public function allGifts(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'level' => 'required|integer|in:1,2,3',
+            'pk_event_id' => 'required|integer|exists:pk_events,id',
+            'pk_type' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = PkReward::where('pk_event_id', $pkId)->where("pk_type", $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
+        $data = PkReward::where('pk_event_id', $request->pk_event_id)->where("pk_type", $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', PkEventResource::collection($data));
     }
 
     public function storeGift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pk_event_id' => 'required',
+            'pk_event_id' => 'required|integer|exists:pk_events,id',
             'pk_type' => 'required|string',
             'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
@@ -151,7 +161,7 @@ class PkEventController extends Controller
     public function updateGift($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'pk_event_id' => 'required',
+            'pk_event_id' => 'required|integer|exists:pk_events,id',
             'pk_type' => 'required|string',
             'level' => 'required|numeric|in:1,2,3',
             'type' => 'required',
@@ -201,7 +211,7 @@ class PkEventController extends Controller
     {
         try {
             $data =  PkReward::with('ware', 'vip')->findOrFail($id);
-            return Common::apiResponse(true, 'done',  $data);
+            return Common::apiResponse(true, 'done', new PkEventResource($data));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
