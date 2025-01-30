@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Http;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
+use Illuminate\Support\Facades\Redis;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
