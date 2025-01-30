@@ -90,6 +90,15 @@ class RoleEventController extends Controller
 
     public function details(Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string',
+
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         try {
             $data = GeneralRole::where('type', $request->type)->first();
             return Common::apiResponse(true, 'done', $data);
