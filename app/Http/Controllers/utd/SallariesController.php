@@ -291,8 +291,7 @@ class SallariesController extends Controller
     private function getUsersGrid()
     {
         $search = request('search');
-        return User::select('id', 'name', 'old_usd', 'target_usd', 'target_token_usd')
-            ->with('agency:id,name')
+        return User::with('agency:id,name')
             ->when($search, function($q) use($search){
                 $q->where('id', $search);
             })
@@ -301,7 +300,7 @@ class SallariesController extends Controller
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'agency' => optional($user->agency)->name,
+                    'agency' => $user->agency?->name,
                     'old_usd' => $user->old_usd,
                     'target_usd' => $user->target_usd,
                     'target_token_usd' => $user->target_token_usd,
