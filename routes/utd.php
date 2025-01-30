@@ -2,6 +2,7 @@
 
 
 use App\Helpers\Common;
+use App\Http\Controllers\utd\BlackListController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
@@ -653,3 +654,17 @@ Route::middleware([])->group(function () {
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
     Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
 });
+
+
+
+
+    Route::prefix('blacks')->group(function () {
+        Route::get('/', [BlackListController::class, 'list']);
+        Route::post('/', [BlackListController::class, 'store']);
+        Route::post('/search/{key}', [BlackListController::class, 'search']);
+        Route::post('blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+        Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
+        Route::post('delete/{id}', [BlackListController::class, 'delete']);
+    });
+
+

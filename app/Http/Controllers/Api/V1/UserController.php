@@ -785,6 +785,7 @@ class UserController extends Controller
 
     public function showDataUser($id)
     {
+        
         try {
             $user  = $this->userService->showDataUser($id);
 
