@@ -47,7 +47,7 @@ class PackUserResource extends JsonResource
           'id' => $this->id,
             'get_type' => $getTypeLabels[$this->get_type] ?? null,
             'type' => $typeLabels[$this->type] ?? null,
-            'image' => $this->ware->show_img,
+            'image' => optional($this->ware)->show_img ?? '',
             'expire' => $this->expire,
         ];
     }
