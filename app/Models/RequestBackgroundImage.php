@@ -46,7 +46,7 @@ class RequestBackgroundImage extends Model
                     ]
                 ];
                 $json = json_encode ($data);
-                $res = Common::sendToZego ('SendCustomCommand',$room->id,$model->owner_room_id,$json);
+                $res = Common::sendToZego ('SendCustomCommand',$room?->id,$model->owner_room_id,$json);
             }
         });
     }
