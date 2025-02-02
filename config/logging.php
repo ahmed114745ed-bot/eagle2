@@ -94,6 +94,12 @@ return [
                 'stream' => 'php://stderr',
             ],
         ],
+        'lucky_gift' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/lucky_gift.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+
+        ],
 
         'syslog' => [
             'driver' => 'syslog',
