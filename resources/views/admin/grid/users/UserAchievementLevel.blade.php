@@ -85,7 +85,7 @@
         </div>
         
         <div class="form-group" id="file_image" style="display: none;">
-            <label for="file-image">{{__('admin.achievementLevel')}}</label>
+            <label for="file-image">{{__('admin.type_file')}}</label>
             <select name="file_image_select" id="file_image_select" class="form-control" required>
                
                 <option value="">{{__('admin.type_file')}}</option>
