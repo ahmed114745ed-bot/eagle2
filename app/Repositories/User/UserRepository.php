@@ -30,7 +30,7 @@ class UserRepository extends Repository
 
     public function searchWithPageNew($key, $page, $perPage)
     {
-       
+
         return User::select('id','uuid','name')
              ->where('name', 'like', '%' . $key . '%')
             ->orWhere('uuid', 'like', '%' . $key . '%')
@@ -38,7 +38,7 @@ class UserRepository extends Repository
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
-    
+
     public function searchUserAgency($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
@@ -213,7 +213,11 @@ class UserRepository extends Repository
     {
         return $this->model->query()
             ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")->orWhere('id', $search)->orWhere('uuid', $search);
+                $query->where(function($q) use($search){
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('id', $search)
+                    ->orWhere('uuid', $search);
+                });
             })->select('id', 'name', 'uuid')->get();
     }
 
