@@ -16,11 +16,7 @@ class ActiveAgencyResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'owner' => [
-                'name' => $this->owner->name  ?? '',
-                'uuid' => $this->owner->uuid ?? 0,
-            ],
-
+            'owner' => new OwnerAgencyResource($this->owner),
             'name' => $this->name ?? '',
             'phone' => $this->phone ?? '',
             'targe' => $this->targe ?? 0,
