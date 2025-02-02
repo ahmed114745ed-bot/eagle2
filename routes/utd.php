@@ -66,11 +66,14 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
+use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\ChargeReportController;
+use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\utd\SallariesHistoryController;
+use App\Http\Controllers\utd\TicketController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -264,6 +267,29 @@ Route::middleware([])->group(function () {
         Route::post('/pay', [SallariesController::class, 'pay']);
     });
 
+    Route::prefix('report-user')->group(function(){
+        Route::get('/', [ReportUserController::class, 'index']);
+        Route::post('/create', [ReportUserController::class, 'store']);
+        Route::post('/delete-all', [ReportUserController::class, 'delete_all']);
+    });
+
+    Route::prefix('tickets')->group(function(){
+        Route::get('/', [TicketController::class, 'index']);
+        Route::get('/show/{id}', [TicketController::class, 'show']);
+        Route::post('/create', [TicketController::class, 'store']);
+        Route::post('/delete-all', [TicketController::class, 'delete_all']);
+        Route::post('update/{id}', [TicketController::class, 'update']);
+        Route::post('update-status/{id}', [TicketController::class, 'status']);
+        Route::post('delete/{id}', [TicketController::class, 'delete']);
+        Route::get('/{id}', [TicketController::class, 'show']);
+    });
+
+    Route::prefix('bans')->group(function(){
+        Route::get('/', [BanController::class, 'index']);
+        Route::post('/delete', [BanController::class, 'delete']);
+        Route::post('/ban-user', [BanController::class, 'banUser']);
+        Route::post('/remove-ban', [BanController::class, 'removeBan']);
+    });
 
     Route::prefix('sallaries_history')->group(function(){
         Route::get('/', [SallariesHistoryController::class, 'index']);
