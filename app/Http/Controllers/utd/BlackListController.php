@@ -43,10 +43,10 @@ class BlackListController extends Controller
         }
     }
 
-    public function blocked_search($key)
+    public function blocked_search($user_id,$key)
     {
         try {
-            $data = $this->service->blocked_search($key);
+            $data = $this->service->blocked_search($user_id,$key);
             return Common::apiResponse(true, 'done', BlockedPersonsListResource::collection($data));
         } catch (Exception $exception) {
 
