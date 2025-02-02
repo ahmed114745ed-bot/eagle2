@@ -99,8 +99,8 @@ class GiftLogRepository extends AbstractRepository
     {
         return $this->model->with('sender', 'receiver', 'gift')
             ->selectRaw('giftId, sender_id, receiver_id, SUM(giftNum * giftPrice) AS total')
-            ->when($type == 'sender', fn($q) => $q->where('sender_id', $id))
-            ->when($type == 'receiver', fn($q) => $q->where('receiver_id', $id))
+            ->when($type == 'sender', fn($q) => $q->where('sender_id', $id)->where('receiver_id', '!=', $id))
+            ->when($type == 'receiver', fn($q) => $q->where('receiver_id', $id)->where('sender_id', '!=', $id))
             ->when($type == 'yourself', fn($q) => $q->where('receiver_id', $id)->where('sender_id', $id))
             ->when(is_null($type), function ($q) use ($id) {
                 $q->where(function ($query) use ($id) {
