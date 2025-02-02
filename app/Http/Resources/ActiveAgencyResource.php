@@ -16,12 +16,15 @@ class ActiveAgencyResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'owner_name' => $this->owner->name,
-            'owner_uuid' => $this->owner->uuid,
-            'name' => $this->name,
-            'phone' => $this->phone,
-            'targe' => $this->targe,
-            'img' => $this->img,
+            'owner' => [
+                'name' => $this->owner->name  ?? '',
+                'uuid' => $this->owner->uuid,
+            ],
+
+            'name' => $this->name ?? '',
+            'phone' => $this->phone ?? '',
+            'targe' => $this->targe ?? 0,
+            'img' => $this->img ?? '',
             'members' => $this->mempers()
                 ->orderBy('monthly_diamond_received', 'desc')
                 ->with(['userSallary' => function ($query) {
