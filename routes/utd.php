@@ -198,6 +198,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [SpecialWareController::class, 'update']);
         Route::post('/update-enable/{id}', [SpecialWareController::class, 'update_enable']);
         Route::post('/delete/{id}', [SpecialWareController::class, 'delete']);
+        Route::post('/delete-all', [SpecialWareController::class, 'delete_all']);
     });
 
 
