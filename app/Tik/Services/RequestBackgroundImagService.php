@@ -63,7 +63,7 @@ class RequestBackgroundImagService
         ];
 
 
-        $this->requestBackgroundImageRepository->create($data);
+        $this->requestBackgroundImageRepository->store($data);
         return true;
     }
 

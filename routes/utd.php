@@ -624,6 +624,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [ColorController::class, 'update']);
         Route::post('/delete/{id}', [ColorController::class, 'delete']);
         Route::post('/delete-all', [ColorController::class, 'delete_all']);
+        Route::post('/app-setting', [ColorController::class, 'app_setting']);
     });
 
     Route::prefix('target-events')->group(function () {
