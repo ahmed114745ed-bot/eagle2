@@ -261,20 +261,20 @@ Route::middleware([])->group(function () {
         Route::post('/return/{id}', [ChargeReportController::class, 'return']);
     });
 
-    Route::prefix('sallaries')->group(function(){
+    Route::prefix('sallaries')->group(function () {
         Route::get('/', [SallariesController::class, 'index']);
         Route::get('/details', [SallariesController::class, 'details']);
         Route::post('/cashing', [SallariesController::class, 'cashing']);
         Route::post('/pay', [SallariesController::class, 'pay']);
     });
 
-    Route::prefix('report-user')->group(function(){
+    Route::prefix('report-user')->group(function () {
         Route::get('/', [ReportUserController::class, 'index']);
         Route::post('/create', [ReportUserController::class, 'store']);
         Route::post('/delete-all', [ReportUserController::class, 'delete_all']);
     });
 
-    Route::prefix('tickets')->group(function(){
+    Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index']);
         Route::get('/show/{id}', [TicketController::class, 'show']);
         Route::post('/create', [TicketController::class, 'store']);
@@ -285,14 +285,14 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [TicketController::class, 'show']);
     });
 
-    Route::prefix('bans')->group(function(){
+    Route::prefix('bans')->group(function () {
         Route::get('/', [BanController::class, 'index']);
         Route::post('/delete', [BanController::class, 'delete']);
         Route::post('/ban-user', [BanController::class, 'banUser']);
         Route::post('/remove-ban', [BanController::class, 'removeBan']);
     });
 
-    Route::prefix('sallaries_history')->group(function(){
+    Route::prefix('sallaries_history')->group(function () {
         Route::get('/', [SallariesHistoryController::class, 'index']);
         Route::post('delete/{id}', [SallariesHistoryController::class, 'delete']);
         Route::post('/delete-all', [SallariesHistoryController::class, 'delete_all']);
@@ -486,6 +486,7 @@ Route::middleware([])->group(function () {
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
         Route::get('user-type', [UserController::class, 'userType']);
+        Route::get('my-data/{id}', [UserController::class, 'myData']);
     });
 
 
@@ -562,7 +563,6 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config', [MomentsController::class, 'config']);
         Route::get('/get-user-moments/{id}', [MomentsController::class, 'get_user_moments']);
-
     });
 
     Route::prefix('offers')->group(function () {
@@ -697,15 +697,11 @@ Route::middleware([])->group(function () {
 });
 
 
-
-
-    Route::prefix('blacks')->group(function () {
-        Route::get('/', [BlackListController::class, 'list']);
-        Route::post('/', [BlackListController::class, 'store']);
-        // Route::post('/search/{key}', [BlackListController::class, 'search']);
-        // Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
-        Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
-        Route::post('delete/{id}', [BlackListController::class, 'delete']);
-    });
-
-
+Route::prefix('blacks')->group(function () {
+    Route::get('/', [BlackListController::class, 'list']);
+    Route::post('/', [BlackListController::class, 'store']);
+    // Route::post('/search/{key}', [BlackListController::class, 'search']);
+    // Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+    Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
+    Route::post('delete/{id}', [BlackListController::class, 'delete']);
+});

@@ -21,6 +21,7 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\Api\V1\MyDataResource;
@@ -785,7 +786,7 @@ class UserController extends Controller
 
     public function showDataUser($id)
     {
-        
+
         try {
             $user  = $this->userService->showDataUser($id);
 
@@ -850,5 +851,17 @@ class UserController extends Controller
             'message' => 'Success',
             'data' => (object) UserType::list(),
         ]);
+    }
+
+    public function myData($id)
+    {
+        try {
+            $user  = $this->userService->showDataUser($id);
+
+            return Common::apiResponse(true, 'done', new MyDataUtdResource($user));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }
