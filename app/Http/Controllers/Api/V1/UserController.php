@@ -603,7 +603,7 @@ class UserController extends Controller
 
     public function userLevel(Request $request)
     {
-        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->uuid);
+        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->search);
         return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
     }
 
@@ -622,7 +622,7 @@ class UserController extends Controller
 
     public function usersDeviceToken(Request $request)
     {
-        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token);
+        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token, $request);
         return Common::apiResponse(true, 'success', DeviceTokenResource::collection($data));
     }
 

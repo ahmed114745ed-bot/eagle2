@@ -89,7 +89,7 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchWithPageNew($key, $page, $perPage);
     }
-    
+
     public function searchUsersInAgency($key, $page)
     {
         $perPage = 10;
@@ -650,9 +650,9 @@ class UserService
         return $updateType;
     }
 
-    public function trashedAccount($perPage, $Page, $uuid)
+    public function trashedAccount($perPage, $Page, $search)
     {
-        return $this->userRepository->trashedUserAccountList($perPage, $Page, $uuid);
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search);
     }
 
     public function restoreAccount($id)
@@ -665,9 +665,9 @@ class UserService
         return $this->userRepository->softDelete($id);
     }
 
-    public function userLevel($perPage, $Page, $uuid)
+    public function userLevel($perPage, $Page, $search)
     {
-        return $this->userRepository->userLevel($perPage, $Page, $uuid);
+        return $this->userRepository->userLevel($perPage, $Page, $search);
     }
 
     public function updateUserLevel($id, $request)
@@ -679,9 +679,9 @@ class UserService
         return true;
     }
 
-    public function userDeviceToken($perPage, $Page, $deviceToken)
+    public function userDeviceToken($perPage, $Page, $deviceToken, $request)
     {
-        return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken);
+        return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken, $request);
     }
 
     public function deleteDeviceToken($id)
