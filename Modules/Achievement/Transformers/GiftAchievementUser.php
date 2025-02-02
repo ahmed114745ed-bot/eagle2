@@ -21,9 +21,9 @@ class GiftAchievementUser extends JsonResource
 
         return [
             'id' => $this->id,
-            'achievement_name' => $this->Achievement->type,
-            'gift_name' => $this->gift->name,
-            'user_name' => $this->user->name,
+            'achievement_name' => $this->Achievement?->type,
+            'gift_name' => $this->gift?->name,
+            'user_name' => $this->user?->name,
         ];
     }
 }

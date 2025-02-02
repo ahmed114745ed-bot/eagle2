@@ -99,8 +99,8 @@ class MainController extends AdminController
         $permission_name = $this->permission_name;
 
         if (!Admin::user()->can('*')) {
-            if ( ! Admin ::user () -> can ( 'edit-' . $permission_name ) ) {
-                $grid -> hiddenColumns = $this -> hiddenColumns;
+            if (!Admin::user()->can('edit-' . $permission_name) && !Admin::user()->can('update-' . $permission_name)) {
+                $grid->hiddenColumns = is_array($this->hiddenColumns) ? $this->hiddenColumns : [];
             }
             if ( ! Admin ::user () -> can ( 'delete-' . $permission_name ) ) {
                 $grid -> disableRowSelector ();

@@ -2,6 +2,7 @@
 
 
 use App\Helpers\Common;
+use App\Http\Controllers\utd\BlackListController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
@@ -601,6 +602,13 @@ Route::middleware([])->group(function () {
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
+
+    Route::prefix('agency-join-request')->group(function () {
+        Route::get('/', [AgencyController::class, 'allAgencyJoinRequest']);
+        Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
+        Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
+    });
+    
     Route::get('/reports', [ReportController::class, 'reports']);
 
     Route::prefix('countries')->group(function () {
@@ -679,3 +687,17 @@ Route::middleware([])->group(function () {
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
     Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
 });
+
+
+
+
+    Route::prefix('blacks')->group(function () {
+        Route::get('/', [BlackListController::class, 'list']);
+        Route::post('/', [BlackListController::class, 'store']);
+        Route::post('/search/{key}', [BlackListController::class, 'search']);
+        Route::post('blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+        Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
+        Route::post('delete/{id}', [BlackListController::class, 'delete']);
+    });
+
+

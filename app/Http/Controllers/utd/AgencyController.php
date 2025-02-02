@@ -202,7 +202,7 @@ class AgencyController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,id',
             'agency_id' => 'required|integer|exists:agencies,id',
-            'status' => 'required|boolean',
+            'status' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
