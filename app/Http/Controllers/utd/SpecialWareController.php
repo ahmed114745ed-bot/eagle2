@@ -162,4 +162,17 @@ class SpecialWareController extends Controller
 
         return Common::apiResponse(true, 'Success');
     }
+
+    public function delete_all(Request $request){
+        $request->validate([
+            'ids' => 'required',
+        ]);
+
+        $ids = explode(',', $request->ids);
+
+        Ware::where('type',25)->whereIn('id', $ids)->delete();
+
+        return Common::apiResponse(true, 'Success');
+
+    }
 }

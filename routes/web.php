@@ -19,9 +19,6 @@ use App\Http\Controllers\addTOjesonController;
 */
 
 
-Route::get('/need', function(){
-    dd(sendMessageToChannel());
-});
 Route::prefix('payment')->group(function () {
     Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
     Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
