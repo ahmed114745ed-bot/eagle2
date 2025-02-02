@@ -24,7 +24,10 @@ class BlackListController extends Controller
     public function list()
     {
         try {
-            $data = $this->service->list();
+            $key =request('key') ?? null;
+            $perPage =request('per_page');
+            $page = request('page');
+            $data = $this->service->list($key ,$perPage,$page);
             return Common::apiResponse(true, 'done', UserBlacksListResource::collection($data));
         } catch (Exception $exception) {
 
@@ -32,27 +35,27 @@ class BlackListController extends Controller
         }
     }
 
-    public function search($key)
-    {
-        try {
-            $data = $this->service->search($key);
-            return Common::apiResponse(true, 'done', UserBlacksListResource::collection($data));
-        } catch (Exception $exception) {
+    // public function search($key)
+    // {
+    //     try {
+    //         $data = $this->service->search($key);
+    //         return Common::apiResponse(true, 'done', UserBlacksListResource::collection($data));
+    //     } catch (Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
+    //         return Common::apiResponse(0, $exception->getMessage(), null, 400);
+    //     }
+    // }
 
-    public function blocked_search($user_id,$key)
-    {
-        try {
-            $data = $this->service->blocked_search($user_id,$key);
-            return Common::apiResponse(true, 'done', BlockedPersonsListResource::collection($data));
-        } catch (Exception $exception) {
+    // public function blocked_search($user_id,$key)
+    // {
+    //     try {
+    //         $data = $this->service->blocked_search($user_id,$key);
+    //         return Common::apiResponse(true, 'done', BlockedPersonsListResource::collection($data));
+    //     } catch (Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
+    //         return Common::apiResponse(0, $exception->getMessage(), null, 400);
+    //     }
+    // }
 
     public function store(Request $request)
     {
@@ -78,7 +81,10 @@ class BlackListController extends Controller
     public function black_lists($user_id)
     {
         try {
-            $data = $this->service->black_lists($user_id);
+            $key =request('key') ?? null;
+            $perPage =request('per_page');
+            $page = request('page');
+            $data = $this->service->black_lists($user_id,$key,$perPage,$page);
             return Common::apiResponse(true, 'done', BlockedPersonsListResource::collection($data));
         } catch (Exception $exception) {
 

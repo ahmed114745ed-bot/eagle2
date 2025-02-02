@@ -22,23 +22,23 @@ class BlackListService
     ) {}
 
 
-    public function list(){
-        return $this->Repository->list();
+    public function list($key,$perPage,$page){
+        return $this->Repository->list($key,$perPage,$page);
     }
 
-    public function search($key){
-        return $this->Repository->search($key);
-    }
-    public function blocked_search($user_id,$key){
-        return $this->Repository->blocked_search($user_id,$key);
-    }
+    // public function search($key){
+    //     return $this->Repository->search($key);
+    // }
+    // public function blocked_search($user_id,$key){
+    //     return $this->Repository->blocked_search($user_id,$key);
+    // }
     
     public function store(array  $data){
         return $this->Repository->store($data);
     }
 
-    public function black_lists($userid){
-        return $this->Repository->black_lists($userid);
+    public function black_lists($userid,$key,$perPage,$page){
+        return $this->Repository->black_lists($userid,$key,$perPage,$page);
     }
 
     public function delete($id){

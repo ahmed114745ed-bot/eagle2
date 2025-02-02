@@ -17,36 +17,54 @@ class BlackLisRepository extends AbstractRepository
     }
 
 
-    public function list(){
-        return $this->model->select('id','user_id')->with('user:id,name,uuid')->paginate(10);
+    public function list($key,$perPage,$page){
+
+        return $this->model
+                            ->when(!empty($key), function ($query) use ($key) {
+                                $query->whereHas('user', function ($subQuery) use ($key) {
+                                    $subQuery->where('uuid', 'like', "%{$key}%")
+                                            ->orWhere('name', 'like', "%{$key}%");
+                                });
+                            })
+                          ->select('id','user_id')
+                          ->with('user:id,name,uuid')
+                          
+                          ->paginate($perPage, ['*'], 'page', $page);
    
     }
    
 
-    public function search($key){
-        return $this->model->with('user')->whereHas('user', function ($query) use ($key) {
-            $query->where('uuid', 'like', "%$key%")
-            ->orWhere('name', 'like', "%$key%");
-        })->get()->unique('user_id')->values();
+    // public function search($key){
+    //     return $this->model->with('user')->whereHas('user', function ($query) use ($key) {
+    //         $query->where('uuid', 'like', "%$key%")
+    //         ->orWhere('name', 'like', "%$key%");
+    //     })->get()->unique('user_id')->values();
         
-    }
+    // }
 
-    public function blocked_search($user_id,$key){
-        return $this->model->where('user_id',$user_id)
-        ->with('blockedPerson')->whereHas('blockedPerson', function ($query) use ($key) {
-            $query->where('uuid', 'like', "%$key%")
-            ->orWhere('name', 'like', "%$key%");
-        })->get()->unique('user_id')->values();
+    // public function blocked_search($user_id,$key){
+    //     return $this->model->where('user_id',$user_id)
+    //     ->with('blockedPerson')->whereHas('blockedPerson', function ($query) use ($key) {
+    //         $query->where('uuid', 'like', "%$key%")
+    //         ->orWhere('name', 'like', "%$key%");
+    //     })->get()->unique('user_id')->values();
         
-    }
+    // }
     
     public function store( array $data){
            return $this->create($data);   
     }
-    public function black_lists($userid){
-        return $this->model->with('blockedPerson')->whereHas('user', function ($query) use ($userid) {
+    public function black_lists($userid,$key,$perPage,$page){
+        return $this->model
+        ->when(!empty($key), function ($query) use ($key) {
+            $query->whereHas('blockedPerson', function ($subQuery) use ($key) {
+                $subQuery->where('uuid', 'like', "%{$key}%")
+                        ->orWhere('name', 'like', "%{$key}%");
+            });
+        })
+        ->with('blockedPerson')->whereHas('user', function ($query) use ($userid) {
             $query->where('id', 'like', "%$userid%");
-        })->get();   
+        })->paginate($perPage, ['*'], 'page', $page);   
     }
 
     public function delete($id){

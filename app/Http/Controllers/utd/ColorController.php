@@ -8,6 +8,7 @@ use App\Models\ImageColor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Color;
+use App\Models\WebSetting;
 
 class ColorController extends Controller
 {
@@ -95,5 +96,27 @@ class ColorController extends Controller
         Color::whereIn('id', $ids)->delete();
 
         return Common::apiResponse(true, 'Success');
+    }
+
+    public function app_setting(Request $request){
+
+        $request->validate([
+            'logo' => 'required|file|image',
+            'desc' => 'required'
+        ]);
+
+        $data = WebSetting::find(1);
+        if (!$data) {
+            $data = new WebSetting();
+        }
+        if ($request->hasFile('logo')) {
+            $imagePath = Common::upload('images', $request->file('logo'));
+            $data->logo = $imagePath;
+        }
+
+        $data->footer_description = $request->input('desc');
+        $data->save();
+
+        return Common::apiResponse(true,'success');
     }
 }

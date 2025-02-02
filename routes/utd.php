@@ -624,6 +624,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [ColorController::class, 'update']);
         Route::post('/delete/{id}', [ColorController::class, 'delete']);
         Route::post('/delete-all', [ColorController::class, 'delete_all']);
+        Route::post('/app-setting', [ColorController::class, 'app_setting']);
     });
 
     Route::prefix('target-events')->group(function () {
@@ -696,13 +697,11 @@ Route::middleware([])->group(function () {
 });
 
 
-
-
 Route::prefix('blacks')->group(function () {
     Route::get('/', [BlackListController::class, 'list']);
     Route::post('/', [BlackListController::class, 'store']);
-    Route::post('/search/{key}', [BlackListController::class, 'search']);
-    Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+    // Route::post('/search/{key}', [BlackListController::class, 'search']);
+    // Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
     Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
     Route::post('delete/{id}', [BlackListController::class, 'delete']);
 });
