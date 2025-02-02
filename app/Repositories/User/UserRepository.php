@@ -259,10 +259,15 @@ class UserRepository extends Repository
     }
 
 
-    public function trashedUserAccountList($perPage, $Page, $uuid)
+    public function trashedUserAccountList($perPage, $Page, $search)
     {
-        return User::onlyTrashed()->when(isset($uuid), function ($query) use ($uuid) {
-            $query->where('uuid', $uuid);
+        return User::onlyTrashed()->when($search, function ($query) use ($search) {
+            $query->where(function($q)use($search){
+                $q->where('name', 'LIKE', "%$search%")
+                ->orWhere('phone', 'LIKE' , "%$search%")
+                ->orWhere('uuid', 'LIKE' , "%$search%");
+            });
+
         })->orderByDesc('deleted_at')->paginate($perPage, ['*'], 'page', $Page);
     }
 
@@ -281,10 +286,14 @@ class UserRepository extends Repository
         return true;
     }
 
-    public function userLevel($perPage, $Page, $uuid)
+    public function userLevel($perPage, $Page, $search)
     {
-        return User::when(isset($uuid), function ($query) use ($uuid) {
-            $query->where('uuid', $uuid);
+        return User::when($search, function ($query) use ($search) {
+            $query->where(function($q)use($search){
+                $q->where('uuid', $search)
+                ->orWhere('phone', 'LIKE', "%$search%")
+                ->orWhere('name', 'LIKE', "%$search%");
+            });
         })->paginate($perPage, ['*'], 'page', $Page);
     }
 

@@ -58,7 +58,7 @@ class RequestBackgroundImageController extends Controller
 
             'owner_room_id' => 'required|integer|exists:users,id',
             // 'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'img' => 'required',
+            'img' => 'nullable',
             'status' => 'required|integer',
             'expair' => 'required|integer',
         ]);
