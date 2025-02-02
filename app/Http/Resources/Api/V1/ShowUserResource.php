@@ -19,16 +19,17 @@ class ShowUserResource extends JsonResource
      */
     public function toArray($request)
     {
-       
+
         return [
             'id' => $this->id,
             'coins' => number_format($this->di),
-            'uuid' => $this->uuid . ' ' . $this->original_uuid,
+            'uuid' => $this->uuid,
+            'original_uuid' =>  $this->original_uuid,
             'name' => $this->name ?? '',
             'nickname' => $this->nickname ?? '',
             'charge_status' => $this->charge_status,
             'transfer_salary' => $this->transfer_salary,
-            'hide_chat' => @$this->userSetting->hide_chat ,
+            'hide_chat' => @$this->userSetting->hide_chat,
             'show_invite_code' => @$this->userSetting->show_invite_code,
             'country_id' => @$this->country_id ?? 0,
             'user_diamond' => $this->user_diamond,
@@ -45,7 +46,7 @@ class ShowUserResource extends JsonResource
             'huawei_id' => @$this->huawei_id,
             'status' => @$this->status,
             'type_user' => $this->type_user,
-            'manger_type_id' => $this->manger_type_id?? 0,
+            'manger_type_id' => $this->manger_type_id ?? 0,
             'Level' =>  Common::level_center($this->resource)['sender_level'],
             'worth' =>  Common::level_center($this->resource)['receiver_level'],
             'diamonds' =>  $this->coins,

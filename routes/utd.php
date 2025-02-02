@@ -598,7 +598,7 @@ Route::middleware([])->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
-        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::get('/show/{id}', [AgencyController::class, 'show']);
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
@@ -701,7 +701,7 @@ Route::middleware([])->group(function () {
         Route::get('/', [BlackListController::class, 'list']);
         Route::post('/', [BlackListController::class, 'store']);
         Route::post('/search/{key}', [BlackListController::class, 'search']);
-        Route::post('blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+        Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
         Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
         Route::post('delete/{id}', [BlackListController::class, 'delete']);
     });

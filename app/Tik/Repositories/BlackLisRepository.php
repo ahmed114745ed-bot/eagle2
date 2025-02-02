@@ -31,8 +31,9 @@ class BlackLisRepository extends AbstractRepository
         
     }
 
-    public function blocked_search($key){
-        return $this->model->with('blockedPerson')->whereHas('blockedPerson', function ($query) use ($key) {
+    public function blocked_search($user_id,$key){
+        return $this->model->where('user_id',$user_id)
+        ->with('blockedPerson')->whereHas('blockedPerson', function ($query) use ($key) {
             $query->where('uuid', 'like', "%$key%")
             ->orWhere('name', 'like', "%$key%");
         })->get()->unique('user_id')->values();

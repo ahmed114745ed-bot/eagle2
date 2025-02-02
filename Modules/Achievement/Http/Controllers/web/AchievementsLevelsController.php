@@ -2,6 +2,8 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
+use App\Helpers\Common;
+use App\Models\AchievementValidImage;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -136,6 +138,28 @@ class AchievementsLevelsController extends MainController
         })->rules('required');
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
+        $form->saving(function (Form $form) {
+            if (request()->hasFile('valid_image')) {
+                $file = request()->file('valid_image'); 
+                $validImagePath = Common::upload('achievementValidImages', $file); 
+                $form->model()->valid_image = $validImagePath; 
+            }
+        
+            // if ($form->model()->valid_image) {
+            //     AchievementValidImage::create([
+            //         'image' => $form->model()->valid_image, //  
+            //     ]);
+            // }
+            if ($form->model()->valid_image) {
+                $existingImage = AchievementValidImage::where('image', $form->model()->valid_image)->first();
+                
+                if (!$existingImage) {
+                    AchievementValidImage::create([
+                        'image' => $form->model()->valid_image,
+                    ]);
+                }
+            }
+        });
         return $form;
     }
 }

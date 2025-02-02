@@ -3,6 +3,8 @@
 namespace Modules\Achievement\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Http\Resources\AchievementValidImagesResource;
+use App\Models\AchievementValidImage;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -253,4 +255,14 @@ class AchievementController extends Controller
     {
         //
     }
+
+    public function achievement_valid_images()
+    {
+        $data=AchievementValidImage::all();
+        return Common::apiResponse(1, 'successfully',AchievementValidImagesResource::collection($data));
+
+        
+    }
+    
+
 }

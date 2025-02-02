@@ -29,8 +29,8 @@ class BlackListService
     public function search($key){
         return $this->Repository->search($key);
     }
-    public function blocked_search($key){
-        return $this->Repository->blocked_search($key);
+    public function blocked_search($user_id,$key){
+        return $this->Repository->blocked_search($user_id,$key);
     }
     
     public function store(array  $data){
