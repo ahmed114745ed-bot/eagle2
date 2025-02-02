@@ -179,7 +179,7 @@ class UtdAchievementController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'achievement_id'         => 'required|integer|exists:achievements,id',
-            'achievement_level_id'         => 'nullable|integer|exists:achievements,id',
+            'achievement_level_id'         => 'nullable|integer|exists:achievement_levels,id',
             'user_id'         => 'required|integer|exists:users,id',
             'gift_achievement_id'         => 'nullable|integer',
             'custom_image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,mp4,svga',
