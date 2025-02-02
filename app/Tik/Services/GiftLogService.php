@@ -3,40 +3,42 @@
 namespace App\Tik\Services;
 
 
-use App\Helpers\Common;
+use App\Models\Cp;
 use App\Models\User;
-use GuzzleHttp\Exception\BadResponseException;
+use App\Helpers\Common;
 use GuzzleHttp\Promise\Utils;
+use App\Events\GiftBannerEvent;
 use App\Jobs\UpdatePkAndSendToZigo;
+use Illuminate\Support\Facades\Log;
 use App\Classes\Gifts\SendGiftService;
+use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Tik\Repositories\GiftRepository;
 use App\Tik\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use Modules\CP\Http\Services\CpServices;
+use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Events\GiftBannerEvent;
+use GuzzleHttp\Exception\BadResponseException;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Modules\Achievement\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
-use App\Models\Cp;
-use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
-use Modules\CP\Http\Services\CpService;
 
 class GiftLogService
 {
 
     public function __construct(
         private readonly GiftRepository $giftRepository,
-       private readonly RoomTopUsersRepository $roomTopUsersRepository,
-       private readonly RoomRepository $repository,
-       private readonly UserRepository $UserRepository,
+        private readonly RoomTopUsersRepository $roomTopUsersRepository,
+        private readonly RoomRepository $repository,
+        private readonly UserRepository $UserRepository,
+        private readonly GiftLogRepository $giftLogRepository,
     ) {}
 
 
-    public function sendGift($request ,UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendGift($request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $data    = $request;
         $user    = $request->user();
@@ -168,7 +170,7 @@ class GiftLogService
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
             }
         }
-            (new RoomAchievementTargetService)->roomTarget($room);
+        (new RoomAchievementTargetService)->roomTarget($room);
 
         CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
@@ -179,7 +181,7 @@ class GiftLogService
         } catch (BadResponseException $e) {
         }
 
-        if($totalPrice > 2000){
+        if ($totalPrice > 2000) {
             $this->gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUsers->first(), $receiversIds, $room, $ownerId, $number);
         }
 
@@ -188,7 +190,8 @@ class GiftLogService
         return Common::apiResponse(1, $message);
     }
 
-    private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number){
+    private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number)
+    {
 
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
@@ -346,5 +349,10 @@ class GiftLogService
         $topUser         = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
         $topUser->coins  += $totalPrice;
         $topUser->save();
+    }
+
+    public function userGiftIfo($id, $type, $startDate, $endDate)
+    {
+        return $this->giftLogRepository->userGiftInfo($id, $type, $startDate, $endDate);
     }
 }
