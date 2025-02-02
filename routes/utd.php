@@ -598,7 +598,7 @@ Route::middleware([])->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
-        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::get('/show/{id}', [AgencyController::class, 'show']);
         Route::post('/change-agency-members', [AgencyController::class, 'changeAgencyMembers']);
         Route::get('/all-old', [AgencyController::class, 'allAgenciesExceptOld']);
     });
