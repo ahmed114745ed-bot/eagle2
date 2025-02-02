@@ -2,6 +2,7 @@
 
 namespace Modules\Achievement\Http\Controllers\web;
 
+use App\Models\AchievementValidImage;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -11,6 +12,7 @@ use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 
 use App\Admin\Controllers\MainController;
+use Illuminate\Support\Facades\Auth;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 
@@ -155,10 +157,10 @@ class UserAchievementLevelController extends MainController
 
     public function create(Content $content)
     {
-
+        $achievementValidImage=AchievementValidImage::where('user_id',Auth::user()->id)->get();
         return parent::create($content
              ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevel')));
+            ->body(view('admin.grid.users.UserAchievementLevel',compact('achievementValidImage'))));
     }
 
 }

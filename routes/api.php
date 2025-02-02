@@ -42,6 +42,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
+use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
@@ -456,7 +457,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post ('/remove',[\App\Http\Controllers\Api\V1\BlackListController::class,'remove']);
                 Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
             });
-
+            
             // Route::get('/data-data', function(){
             //     $id = \App\Models\User::first()?->id;
             //     $data = Common::level_center(@$id);
@@ -471,10 +472,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/', [MusicStoreController::class, 'store']);
 
             });
+            Route::get('achievement-valid-images',[AchievementController::class,'achievement_valid_images']);
 
         }
     );
-
 
 
 });

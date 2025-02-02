@@ -16,7 +16,7 @@ class UserAchievementLevel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["id","achievement_level_id","user_id","gift_achievement_id","unique_value","end_at","is_enable","achievement_id","custom_image","picked"];
+    protected $fillable = ["id","achievement_level_id","user_id","gift_achievement_id","unique_value","end_at","is_enable","achievement_id","custom_image","picked","file"];
 
     protected $guarded = [];
 

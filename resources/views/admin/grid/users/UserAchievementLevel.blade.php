@@ -84,10 +84,41 @@
             </select>
         </div>
         
-        <div class="form-group" id="imageDiv" style="display: none;">
-            <label for="custom_image">{{__('admin.selectImage')}}</label>
-            <input type="file" id="custom_image" name="custom_image" >
+        <div class="form-group" id="file_image" style="display: none;">
+            <label for="file-image">{{__('admin.achievementLevel')}}</label>
+            <select name="file_image_select" id="file_image_select" class="form-control" required>
+               
+                <option value="">{{__('admin.type_file')}}</option>
+                <option value="file">{{__('admin.file')}}</option>
+                <option value="image">{{__('admin.Image')}}</option>
+                
+            </select>
         </div>
+
+        <div class="form-group" id="file_input" style="display: none;">
+            <label for="file-image">{{__('admin.select_file')}}</label>
+            <input type="file" id="custom_file" name="custom_file">
+
+        </div>
+
+
+        <div class="form-group" id="imageDiv" style="display: none;">
+            <label for="custom_image">{{ __('admin.selectImage') }}</label>
+            
+            <div class="d-flex flex-wrap">
+                @foreach ($achievementValidImage as $data)
+              
+                    <label class="image-option">
+                        <input type="radio" name="custom_image" value="{{ $data->image }}" class="d-none">
+                        <img src="{{ getImagePath($data->image) }}" class="img-thumbnail" width="100" height="100">
+                    </label>
+                @endforeach
+            </div>
+
+            <hr>
+            <input type="file" id="custom_image" name="custom_image">
+        </div>
+
         
         <div class="form-group" id="gift_achievement_div">
             <label for="gift_achievement_id">{{__('admin.giftAchievement')}}</label>
@@ -145,14 +176,15 @@
         // When the achievement select changes
         $('#achievement_id').change(function() {
             var achievementId = $(this).val();
-            $('#achievementLevelDiv, #imageDiv,#gift_achievement_div').hide();
+            $('#achievementLevelDiv, #imageDiv,#gift_achievement_div,#file_image').hide();
             let selected = $(this).find(':selected').data('type');
            
 
           if(selected == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}'){
                    $('#gift_achievement_div').fadeIn()
-        }else if (achievementId === ''){
-            $('#imageDiv').show();
+            }else if (achievementId === ''){
+            $('#file_image').show();
+            // $('#imageDiv').show();
 
                     $('#gift_achievement_div').hide()
                     $('#achievementLevelDiv').hide();
@@ -179,7 +211,21 @@
             });
         });
 
+        $('#file_image_select').change(function() {
+            var achievementId = $(this).val();
+    
+            console.log(achievementId);
+          if(achievementId == 'file'){
+           
+              $('#file_input').fadeIn()
 
+            }else if (achievementId === 'image'){
+           
+            $('#imageDiv').show();
+            $('#file_input').hide()
+             
+            }
+        });
         // $('#achievement_id').change(function() {
         //     // Hide all divs initially
         //     $('#achievementLevelDiv, #imageDiv,#gift_achievement_div').hide();
