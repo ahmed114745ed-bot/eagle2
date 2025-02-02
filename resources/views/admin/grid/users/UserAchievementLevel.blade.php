@@ -2,7 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <div class="box box-solid">
-    <div style="height: 417px;     height: 417px;
+    <div style="height: 417px;     height: 517px;
     margin: auto;
     width: 46%;
     top:50px;
