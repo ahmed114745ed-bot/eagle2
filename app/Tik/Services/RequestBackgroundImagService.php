@@ -52,11 +52,18 @@ class RequestBackgroundImagService
     {
         if ($request->hasFile('img')) {
             $img = Common::upload('images', $request->file('img'));
-            $request->merge(['img' => $img]);
         }
-        $request->merge(['type' => 'admin']);
 
-        $this->requestBackgroundImageRepository->create($request->all());
+        $data = [
+            'type' => 'admin',
+            'img' => $img ?? null,
+            'owner_room_id' => $request->owner_room_id,
+            'status' => $request->status,
+            'expair' => $request->expair,
+        ];
+
+
+        $this->requestBackgroundImageRepository->store($data);
         return true;
     }
 

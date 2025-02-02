@@ -13,7 +13,6 @@ class GiftAchievement extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
-    protected $fillable = [];
 
 
     public function getCreatedAtAttribute($value)
