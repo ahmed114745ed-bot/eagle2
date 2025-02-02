@@ -608,7 +608,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
         Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
     });
-    
+
     Route::get('/reports', [ReportController::class, 'reports']);
 
     Route::prefix('countries')->group(function () {
@@ -617,6 +617,12 @@ Route::middleware([])->group(function () {
 
     Route::prefix('colors')->group(function () {
         Route::get('/', [ColorController::class, 'index']);
+        Route::get('/all', [ColorController::class, 'all']);
+        Route::get('/show/{id}', [ColorController::class, 'show']);
+        Route::post('/create', [ColorController::class, 'store']);
+        Route::post('/update/{id}', [ColorController::class, 'update']);
+        Route::post('/delete/{id}', [ColorController::class, 'delete']);
+        Route::post('/delete-all', [ColorController::class, 'delete_all']);
     });
 
     Route::prefix('target-events')->group(function () {
