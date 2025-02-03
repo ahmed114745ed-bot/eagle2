@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\AllUsersResource;
@@ -881,10 +882,16 @@ class UserController extends Controller
     {
         try {
             $data = $this->userService->userPacksAndVip($id);
-            return Common::apiResponse(true, 'done',new UserPackVipResource($data));
+            return Common::apiResponse(true, 'done', new UserPackVipResource($data));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function userVisitRooms($id)
+    {
+        $data = $this->userService->VisitRoom($id);
+        return Common::apiResponse(true, 'done', UserVisitRoomResource::collection($data));
     }
 }
