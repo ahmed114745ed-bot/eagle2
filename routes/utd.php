@@ -76,6 +76,7 @@ use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
+use App\Http\Controllers\Api\V2\Report_userController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -491,6 +492,7 @@ Route::middleware([])->group(function () {
         Route::get('my-gifts/{id}', [GiftLogController::class, 'myGiftInfo']);
         Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
         Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
+        Route::get('report/{id}', [Report_userController::class, 'userReport']);
     });
 
 
