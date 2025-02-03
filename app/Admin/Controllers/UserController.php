@@ -499,6 +499,8 @@ class UserController extends MainController
             return __('no time');
         });
         $grid->column('qty', __('qty'));
+        $grid->column('total', __('totalPrice'));
+        $grid->column('price', __('price'));
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
