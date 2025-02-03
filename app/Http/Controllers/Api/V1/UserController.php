@@ -894,4 +894,10 @@ class UserController extends Controller
         $data = $this->userService->VisitRoom($id);
         return Common::apiResponse(true, 'done', UserVisitRoomResource::collection($data));
     }
+
+    public function allCpUser($id)
+    {
+        $data = $this->userService->allUserCp($id);
+        return Common::apiResponse(true, 'done', $data);
+    }
 }

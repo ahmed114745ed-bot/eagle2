@@ -22,6 +22,7 @@ use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
+use Modules\CP\Repositories\CpRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -63,6 +64,7 @@ class UserService
         private readonly ProfileRepository $profileRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
+        private readonly CpRepository $cpRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -893,5 +895,10 @@ class UserService
     public function VisitRoom($id)
     {
         return $this->roomVisitorRepository->getByUser($id);
+    }
+
+    public function allUserCp($userId)
+    {
+        return $this->cpRepository->getByUser($userId);
     }
 }

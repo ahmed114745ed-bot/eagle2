@@ -828,6 +828,15 @@ class GiftLogController extends Controller
 
     public function myGiftInfo($id, Request $request)
     {
+
+        $validator = Validator::make($request->all(), [
+            'end_date' => 'nullable|date_format:Y-m-d',
+            'start_date' => 'nullable|date_format:Y-m-d',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
         try {
             $data = $this->giftLogService->userGiftIfo($id, $request->type, $request->start_date, $request->end_date);
             return Common::apiResponse(1, __('api_responses.success'), GiftLogUtdResource::collection($data));
