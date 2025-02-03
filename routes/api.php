@@ -3,6 +3,7 @@
 use App\Admin\Controllers\WareController;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VersionController;
@@ -118,6 +119,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::get('/agora-rtc-token', [AgoraController::class, 'RtcToken']);
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
