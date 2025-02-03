@@ -55,7 +55,7 @@ use App\Models\Room;
 use App\Models\User;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
-    Route::get('test-game-rtm', function (){
+    Route::get('test-game-rtm', function () {
 
         $user = User::find(524);
         $room      = Room::withoutAppends()->select(['id'])->where("uid", $user->now_room_uid)->first();
@@ -70,7 +70,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 "gImage"  => @$user->nowGame?->image
             ]
         ];
-        Log::info( 'game image '.' '.@$user->nowGame?->image);
+        Log::info('game image ' . ' ' . @$user->nowGame?->image);
         $json = json_encode($d);
         dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         return "gooooooooooooooooooooooooooooood";
@@ -108,10 +108,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
 
-    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan','userBan','throttle:4,1'])
-    ->group(function () {
-        Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
-    });
+    Route::prefix('tickets')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'throttle:4,1'])
+        ->group(function () {
+            Route::post('open', [\App\Http\Controllers\Api\V1\HomeController::class, 'openTicket']);
+        });
 
 
     Route::post('/stripe-callback', [StripeController::class, 'handleWebhook']);
@@ -133,14 +133,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('zego-credential', [\App\Http\Controllers\Api\V1\UserController::class, 'zegoCredential']);
 
 
-            Route::prefix('config')->group(function() {
+            Route::prefix('config')->group(function () {
                 Route::post('keys-values', [\App\Http\Controllers\Api\V1\ConfigController::class, 'getConfigValues']);
                 //                Route::post('app-check', [\App\Http\Controllers\VersionController::class, 'versionAndCache']);
             });
             Route::get('user-app-setting', [\App\Http\Controllers\Api\V1\UserController::class, 'app_setting']);
 
             Route::post('auth/logout', [\App\Http\Controllers\Api\V1\UserController::class, 'logout']);
-            Route::post('/change-room-effect',[UserController::class, 'showSetting']);
+            Route::post('/change-room-effect', [UserController::class, 'showSetting']);
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
@@ -179,6 +179,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     Route::post('show-pk', [PkController::class, 'showPK']);
                     Route::post('hide-pk', [PkController::class, 'hidePk']);
                 });
+
+                Route::middleware(['appFeatureEnable:pk'])->prefix('pk')->group(function () {
+                    Route::post('create', [PkController::class, 'createPKWithoutZego']);
+                    Route::post('close', [PkController::class, 'closePKWithoutZego']);
+                    Route::post('show', [PkController::class, 'showPKWithoutZego']);
+                    Route::post('hide', [PkController::class, 'hidePkWithoutZego']);
+                });
                 // Microphone
 
                 Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
@@ -197,13 +204,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
                 Route::get('/payment', [CoinController::class, 'paymentCoin']);
-
             });
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
-
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -234,8 +239,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('official_messages', [CommunityController::class, 'officialMessages']);
             });
 
-            Route::prefix ('home_carousels')->group (function (){
-                Route::get ('/',[HomeCarouselController::class,'index']);
+            Route::prefix('home_carousels')->group(function () {
+                Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
 
@@ -274,7 +279,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/send-lucky-gift-combo', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
 
-            Route::get ('my_gifts',[\App\Http\Controllers\Api\V1\GiftLogController::class,'giftLogsList']);
+            Route::get('my_gifts', [\App\Http\Controllers\Api\V1\GiftLogController::class, 'giftLogsList']);
 
 
             Route::prefix('group-chat')->group(function () {
@@ -371,7 +376,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/v2/room', [Ranking2Controller::class, 'ranking_room']);
                 Route::get('/v2/top_user_ranking', [Ranking2Controller::class, 'topUserRanking']);
                 Route::post('/v2/one-room', [Ranking2Controller::class, 'oneRoomRanking']);
-
             });
             // end ranking
 
@@ -382,7 +386,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
                 Route::post('/send-to-user', [VipController::class, 'vip_send']);
-
             });
             Route::get('levels/badges', [VipController::class, 'badges']);
             Route::get('levels', [VipController::class, 'index']);
@@ -403,7 +406,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('buy', [MallController::class, 'buyWare']);
                 Route::post('send', [MallController::class, 'sendWare']);
                 Route::get('best-sale', [MallController::class, 'bestWareSale']);
-
             });
             //start games
             Route::prefix('all-games1')->group(function () {
@@ -434,7 +436,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
-
             });
             Route::prefix('payment-gateway')->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
@@ -445,19 +446,19 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
             Route::get('/event-coin-reports', [CoinReportController::class, 'eventCoins']);
             // end coin report
-            Route::post ('un_hide',[\App\Http\Controllers\Api\V1\HomeController::class,'un_hide']);
+            Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
 
-            Route::prefix('banners')->group(function() {
+            Route::prefix('banners')->group(function () {
                 Route::get('/', [\App\Http\Controllers\BannerController::class, 'index2']);
                 // Route::get('/', [\App\Http\Controllers\BannerController::class, 'index']);
                 // Route::get('/banner', [\App\Http\Controllers\BannerController::class, 'index2']);
             });
 
-            Route::prefix ('black_list')->group (function (){
-                Route::get ('/',[\App\Http\Controllers\Api\V1\BlackListController::class,'index']);
-                Route::post ('/add',[\App\Http\Controllers\Api\V1\BlackListController::class,'add']);
-                Route::post ('/remove',[\App\Http\Controllers\Api\V1\BlackListController::class,'remove']);
+            Route::prefix('black_list')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Api\V1\BlackListController::class, 'index']);
+                Route::post('/add', [\App\Http\Controllers\Api\V1\BlackListController::class, 'add']);
+                Route::post('/remove', [\App\Http\Controllers\Api\V1\BlackListController::class, 'remove']);
                 Route::get('/check/{userId}', [\App\Http\Controllers\Api\V1\BlackListController::class, 'checkBlockStatus']);
             });
 
@@ -467,18 +468,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //     return $data;
             // });
 
-            Route::post('test-google-id',[AuthController::class,'verifyGoogleToken']);
+            Route::post('test-google-id', [AuthController::class, 'verifyGoogleToken']);
 
             // Music Store
-            Route::prefix ('music')->group (function (){
+            Route::prefix('music')->group(function () {
                 Route::get('/', [MusicStoreController::class, 'index']);
                 Route::post('/', [MusicStoreController::class, 'store']);
-
             });
-            Route::get('achievement-valid-images',[AchievementController::class,'achievement_valid_images']);
-
+            Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
         }
     );
-
-
 });
