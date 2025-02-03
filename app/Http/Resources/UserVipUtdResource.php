@@ -20,6 +20,7 @@ class UserVipUtdResource extends JsonResource
             'level' => @$this?->level ?? 0,
             'expire' => @$this?->expire,
             'qty' => $this?->qty ?? 0,
+            'total_price' => $this->total,
 
         ];
     }
