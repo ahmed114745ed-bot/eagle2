@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Http;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
+use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Illuminate\Support\Facades\Redis;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
@@ -11,6 +12,18 @@ const CINEMA_IMAGE = 'custom_image/back-black.png';
 const GAME_COINS_PLAY = 'game_coins_play_#';
 
 
+
+
+function generateRtcToken($channelName, $uid, $expiresInSeconds = 1000000)
+{
+    $appID = config('app.agora_app_id');
+    $appCertificate = config('app.agora_certificate');
+    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
+
+    $token = RtcTokenBuilder2::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $expiresInSeconds);
+
+    return $token;
+}
 
 function translate($typeArray)
 {
@@ -149,7 +162,7 @@ if (!function_exists('get_file_details')) {
             return $path == null ? null : getDriverUrl() . '/' . $path;
         }
     }
-    
+
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {
