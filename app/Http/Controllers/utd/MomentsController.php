@@ -93,8 +93,8 @@ class MomentsController extends Controller
     {
 
         try {
-            $reel = $this->MomentsService->search($uuid);
-            return Common::apiResponse(true, 'success', $reel);
+            $moment = $this->MomentsService->search($uuid);
+            return Common::apiResponse(true, 'success', MomentResource::collection($moment) );
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
