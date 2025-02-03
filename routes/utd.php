@@ -78,6 +78,7 @@ use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\utd\QuestionController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -178,6 +179,16 @@ Route::middleware([])->group(function () {
     Route::prefix('appear-charger-agency')->group(function () {
         Route::get('/', [AppearChargerAgencyController::class, 'index']);
         Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
+    });
+
+    Route::prefix('questions')->group(function(){
+        Route::get('/', [QuestionController::class, 'index']);
+        Route::post('/create', [QuestionController::class, 'store']);
+        Route::post('/update/{id}', [QuestionController::class, 'update']);
+        Route::post('/update-status/{id}', [QuestionController::class, 'update_status']);
+        Route::post('/delete/{id}', [QuestionController::class, 'delete']);
+        Route::post('/delete-all', [QuestionController::class, 'delete_all']);
+        Route::get('/{id}', [QuestionController::class, 'show']);
     });
 
 
