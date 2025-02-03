@@ -15,7 +15,7 @@ class ActiveAgencyMembersResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'members' => $this->mempers()
+            $this->mempers()
                 ->orderBy('monthly_diamond_received', 'desc')
                 ->with(['userSallary' => function ($query) {
                     $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);

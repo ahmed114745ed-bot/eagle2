@@ -86,6 +86,9 @@ class AppearChargerAgencyController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('uuid', __('Uuid'));
         $grid->column('name', __('Name'));
+        $grid->column('agency.name', __('agency_name'));
+        $grid->column('agency.coins', __('agency_coins'));
+        $grid->column('agency.img', __('agency_image'));
         $grid->column('profile.avatar', __('image'))->image('', 50);
         $grid->column('phone', __('Phone'));
         $grid->column('agency_id', __('agency_id'));

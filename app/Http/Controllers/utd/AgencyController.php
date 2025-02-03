@@ -63,8 +63,18 @@ class AgencyController extends Controller
 
     public function activeAgenciesMembers(Request $request){
         try {
-            $data = $this->agencyService->activeAgencies($request->id,  $request->per_page,  $request->page);
-            return Common::apiResponse(true, 'success', ActiveAgencyMembersResource::collection($data));
+            $data = $this->agencyService->agencyById($request->id);
+
+            $memebrs =             $data->mempers()
+            ->orderBy('monthly_diamond_received', 'desc')
+            ->with(['userSallary' => function ($query) {
+                $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
+            }, 'profile' => function ($query) {
+                $query->select('id', 'user_id', 'avatar');
+            }])
+            ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']);
+
+            return Common::apiResponse(true, 'success', $memebrs);
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
