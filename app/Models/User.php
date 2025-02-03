@@ -592,6 +592,13 @@ class User extends Authenticatable
         })->with('OVip')->orderByDesc('level');
     }
 
+    public function userHaveVip()
+    {
+        return $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
+            $q->where("is_used", 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
+        })->with('OVip')->orderByDesc('level');
+    }
+
     public function haveVip()
     {
         return $this->hasMany(UserVip::class, 'user_id');
@@ -680,8 +687,8 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
     public function myroom()
-    {   
-        return $this->hasOne(Room::class, 'uid' ,'id');
+    {
+        return $this->hasOne(Room::class, 'uid', 'id');
     }
 
     public function color_image()
@@ -794,6 +801,13 @@ class User extends Authenticatable
     public function packs()
     {
         return $this->hasMany(Pack::class,)->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        });
+    }
+
+    public function packsUser()
+    {
+        return $this->hasMany(Pack::class, 'user_id')->whereIn('type', [4, 5, 6, 25])->where('get_type', '!=', 1)->where('is_used', 1)->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
     }
@@ -1101,6 +1115,6 @@ class User extends Authenticatable
 
     public function nowGame()
     {
-        return $this->belongsTo(AllGame::class,'game_id');
+        return $this->belongsTo(AllGame::class, 'game_id');
     }
 }

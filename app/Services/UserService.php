@@ -882,4 +882,9 @@ class UserService
 
         return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
     }
+
+    public function userPacksAndVip($id)
+    {
+        return $this->userRepository->findOrFail($id,['packsUser','userHaveVip']);
+    }
 }
