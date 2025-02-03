@@ -15,7 +15,6 @@ class AgencySalaryRepository extends AbstractRepository
     public function __construct()
     {
         parent::__construct(new AgencySallary());
-
     }
 
     public function findByAgencyId($agencyId)
@@ -33,5 +32,12 @@ class AgencySalaryRepository extends AbstractRepository
     {
         return $this->model->query()->where('agency_id', $agencyId)->where('month', $month)
             ->where('year', $year)->first();
+    }
+
+    public function agencySalary($agencyId, $month, $year)
+    {
+        return $this->model->where("agency_id", $agencyId)->when(isset($month) && $year, function ($query) use ($month, $year) {
+            $query->where('month',  $month)->where('year',  $year);
+        })->get();
     }
 }

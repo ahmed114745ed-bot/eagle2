@@ -864,4 +864,15 @@ class UserController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function userSalaryWithHisAgency($id, Request $request)
+    {
+        try {
+            $data = $this->userService->userSalary($id, $request->month, $request->year);
+            return Common::apiResponse(true, 'done',  $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }

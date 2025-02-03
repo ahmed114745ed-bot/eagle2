@@ -490,6 +490,7 @@ Route::middleware([])->group(function () {
         Route::get('my-data/{id}', [UserController::class, 'myData']);
         Route::get('my-gifts/{id}', [GiftLogController::class, 'myGiftInfo']);
         Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
+        Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
     });
 
 
