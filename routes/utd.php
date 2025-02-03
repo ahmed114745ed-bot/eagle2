@@ -2,8 +2,8 @@
 
 
 use App\Helpers\Common;
-use App\Http\Controllers\utd\BlackListController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
@@ -14,6 +14,7 @@ use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\SilverController;
+use App\Http\Controllers\utd\TicketController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
@@ -31,13 +32,17 @@ use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
+use App\Http\Controllers\utd\BlackListController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\RoleEventController;
+use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\BackgroundController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\DedicateVipController;
@@ -47,6 +52,7 @@ use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\WeeklyEventController;
+use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
@@ -64,16 +70,11 @@ use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
+use App\Http\Controllers\utd\SallariesHistoryController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\BanController;
-use App\Http\Controllers\utd\ChargeReportController;
-use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
-use App\Http\Controllers\utd\SallariesController;
-use App\Http\Controllers\utd\SallariesHistoryController;
-use App\Http\Controllers\utd\TicketController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
 // 'utd.decreptHeader'
@@ -487,6 +488,9 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
         Route::get('user-type', [UserController::class, 'userType']);
         Route::get('my-data/{id}', [UserController::class, 'myData']);
+        Route::get('my-gifts/{id}', [GiftLogController::class, 'myGiftInfo']);
+        Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
+        Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
     });
 
 
@@ -696,6 +700,7 @@ Route::middleware([])->group(function () {
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
     Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
 });
+
 
 
 Route::prefix('blacks')->group(function () {

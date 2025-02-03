@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\Cp;
 use App\Models\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
@@ -14,49 +15,49 @@ use App\Models\AppFeature;
 use App\Models\CoreWallet;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
+use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
 use App\Services\LuckyGiftService;
+use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdatePkAndSendToZigo;
+use App\Services\Gifts\GiftService;
 use App\Services\RoomLevelServices;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\GiftLogService;
+use Illuminate\Support\Facades\Redis;
 use App\Classes\Gifts\SendGiftService;
+use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\UpdateUserDataWhenSendGift;
 use Modules\CP\Http\Services\CpServices;
 use Illuminate\Support\Facades\Validator;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Facades\UserHandling;
-use App\Http\Resources\Api\V1\GiftLogResource;
-use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
-use Modules\Public\Http\Services\UpgradeRoomLevelServices;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
-use App\Traits\Gifts\WinLuckyGift;
-
-use App\Services\Gifts\GiftService;
-
-use Illuminate\Support\Facades\Redis;
-use Modules\CP\Http\Services\CpService;
-
+use App\Http\Resources\GiftLogUtdResource;
 use App\Traits\Gifts\LuckyGiftProbability;
 use Illuminate\Database\Eloquent\Collection;
 
-use App\Models\Cp;
+use App\Classes\Gifts\UpdateUserWhenSendGift;
+
+use App\Http\Resources\Api\V1\GiftLogResource;
+use App\Repositories\Room\RoomTopUsersRepository;
+
+use Modules\Achievement\Jobs\CalculateAchievement;
+use App\Http\Services\RoomAchievementTargetService;
+
+use Modules\Public\Http\Services\UpgradeRoomLevelServices;
+use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 
 class GiftLogController extends Controller
 {
 
     private $roomTopUsersRepository;
-    public function __construct(RoomTopUsersRepository $roomTopUsersRepository,
-    private GiftLogService $giftLogService,
-    )
-    {
+    public function __construct(
+        RoomTopUsersRepository $roomTopUsersRepository,
+        private GiftLogService $giftLogService,
+    ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
     }
@@ -252,7 +253,7 @@ class GiftLogController extends Controller
         $this->addRoomCoins($ownerId, $totalCoins);
         $this->addHostCoins($receiverIds, $coinsPerUser);
     }
-    public function addHostCoins( array $receiverIds, int  $totalCoins)
+    public function addHostCoins(array $receiverIds, int  $totalCoins)
     {
         $receiverIds = UserHandling::checkIfUserHostByIds($receiverIds);
 
@@ -261,7 +262,7 @@ class GiftLogController extends Controller
         $coins = floor($totalCoins * 0.03);
         DB::table('users')->whereIn('id', $receiverIds)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
         $data = [];
-        foreach ($receiverIds as $receiverId ) {
+        foreach ($receiverIds as $receiverId) {
             $data[] = [
                 'user_id'    => $receiverId,
                 'coins'      => $coins,
@@ -308,7 +309,7 @@ class GiftLogController extends Controller
         DB::table('users')->whereIn('id', $ownerIda)->update(values: ['di' => DB::raw(sprintf("di + %s", $coins))]);
 
         $data = [];
-        foreach ($ownerIda as $ownerId ) {
+        foreach ($ownerIda as $ownerId) {
             $data[] = [
                 'user_id' => $ownerId,
                 'coins' => $coins,
@@ -327,9 +328,9 @@ class GiftLogController extends Controller
                 $isTwoDiminutionsArray = true;
                 $value['created_at'] = now();
                 $value['updated_at'] = now();
-            }else break;
+            } else break;
         }
-        if( ! $isTwoDiminutionsArray){
+        if (! $isTwoDiminutionsArray) {
             $data['created_at'] = now();
             $data['updated_at'] = now();
         }
@@ -463,7 +464,7 @@ class GiftLogController extends Controller
         }
 
 
-      return  $this->giftLogService->sendGift($request , $updateUserWhenSendGift);
+        return  $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
     }
 
 
@@ -823,5 +824,15 @@ class GiftLogController extends Controller
     public function ofLucky()
     {
         return Common::apiResponse(0, __('api_responses.update_your_version'));
+    }
+
+    public function myGiftInfo($id, Request $request)
+    {
+        try {
+            $data = $this->giftLogService->userGiftIfo($id, $request->type, $request->start_date, $request->end_date);
+            return Common::apiResponse(1, __('api_responses.success'), GiftLogUtdResource::collection($data));
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
     }
 }

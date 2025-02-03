@@ -83,4 +83,11 @@ class UserSalaryRepository extends AbstractRepository
         $this->model->where('user_agency_id', $oldAgencyId)->where('month', now()->month)->where('year', now()->year)->update(['user_agency_id' => $newAgencyId]);
         return true;
     }
+
+    public function userSalary($userId, $month, $year)
+    {
+        return $this->model->where("user_id", $userId)->when(isset($month) && $year, function ($query) use ($month, $year) {
+            $query->where('month',  $month)->where('year',  $year);
+        })->get();
+    }
 }

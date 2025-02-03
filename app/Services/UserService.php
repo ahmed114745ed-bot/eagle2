@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use DB;
+use Cache;
 use Exception;
 use Carbon\Carbon;
-use App\Models\User;
 use App\Models\Code;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Facades\UserHandling;
@@ -30,13 +31,13 @@ use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
 use App\Tik\Repositories\UserSettingRepository;
+use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
-use Cache;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -59,6 +60,7 @@ class UserService
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
         private readonly ProfileRepository $profileRepository,
+        private readonly AgencySalaryRepository $agencySalaryRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -702,7 +704,7 @@ class UserService
 
     public function kickAgency($userId)
     {
-       $user = $this->userRepository->findOrFail($userId);
+        $user = $this->userRepository->findOrFail($userId);
         if (UserHandling::checkIfUserOwnerOfAgency($user)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
 
 
@@ -870,5 +872,14 @@ class UserService
         return Code::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);;
+    }
+
+    public function userSalary($userId, $month, $year,)
+    {
+        $salary = $this->userSalaryRepository->userSalary($userId, $month, $year);
+        $agency = $this->agencyRepository->findAgencyByOwnerId($userId);
+        $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
+
+        return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
     }
 }

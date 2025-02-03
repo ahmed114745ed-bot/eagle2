@@ -8,6 +8,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataUtdResource extends JsonResource
 {
+
+
     /**
      * Transform the resource into an array.
      *
@@ -15,6 +17,19 @@ class MyDataUtdResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $achievement_images = [];
+        if ($this->medals) {
+            foreach ($this->medals as $medal) {
+                if ($medal->achievementLevel) {
+                    $data = [
+                        'image' => @$medal->achievementLevel->valid_image,
+                        'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                        'created_at' => @$medal->created_at,
+                    ];
+                    $achievement_images[] = $data;
+                }
+            }
+        }
         return [
             'id' => $this->id ?? 0,
             'name' => $this->name  ?? '',
@@ -33,6 +48,7 @@ class MyDataUtdResource extends JsonResource
                 'image' => @$this?->agency?->img ?? '',
                 'owner' => new OwnerAgencyResource(@$this?->agency?->owner)
             ],
+            'achievement_images' => $achievement_images,
 
 
 
