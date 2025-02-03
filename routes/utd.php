@@ -508,6 +508,7 @@ Route::middleware([])->group(function () {
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
     });
 
 

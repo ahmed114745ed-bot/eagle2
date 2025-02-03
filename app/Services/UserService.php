@@ -30,6 +30,7 @@ use App\Tik\Repositories\ProfileRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
+use App\Tik\Repositories\RoomVisitorRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -61,6 +62,7 @@ class UserService
         private readonly AgencyRepository $agencyRepository,
         private readonly ProfileRepository $profileRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
+        private readonly RoomVisitorRepository $roomVisitorRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -885,6 +887,11 @@ class UserService
 
     public function userPacksAndVip($id)
     {
-        return $this->userRepository->findOrFail($id,['packsUser','userHaveVip']);
+        return $this->userRepository->findOrFail($id, ['packsUser', 'userHaveVip']);
+    }
+
+    public function VisitRoom($id)
+    {
+        return $this->roomVisitorRepository->getByUser($id);
     }
 }
