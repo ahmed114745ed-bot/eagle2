@@ -14,7 +14,7 @@ const GAME_COINS_PLAY = 'game_coins_play_#';
 
 
 
-function generateRtcToken($channelName, $uid, $expiresInSeconds = 1000000)
+function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
 {
     $appID = config('app.agora_app_id');
     $appCertificate = config('app.agora_certificate');
