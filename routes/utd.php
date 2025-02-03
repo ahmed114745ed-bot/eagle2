@@ -603,6 +603,7 @@ Route::middleware([])->group(function () {
 
     Route::prefix('agencies')->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::get('/members', [AgencyController::class, 'activeAgenciesMembers']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
         Route::get('/show/{id}', [AgencyController::class, 'show']);

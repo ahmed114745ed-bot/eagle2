@@ -20,8 +20,8 @@ class MomentDashboardResource extends JsonResource
             'id'           => $this->id,
             'user_id'      => $this->user_id,
             'description'  => $this->description,
-            'comment_num'  => $this->comment_num,
-            'like_num'     => $this->like_num,
+            'comment_num'  => $this->comments->count(),
+            'like_num'     => $this->likes->count(),
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
             'img'          => $this->img,
@@ -40,9 +40,9 @@ class MomentDashboardResource extends JsonResource
                 'created_at'  => $like->created_at,
                 'updated_at'  => $like->updated_at,
             ]),
-            
+
             'gifts' => $this->gifts->map(fn ($gift) => [
-                'gifts_count'  => $gift->gifts_count,      
+                'gifts_count'  => $gift->gifts_count,
             ]),
             // 'gifts'        => $this->gifts->map(fn ($gift) => [
             //     'id'                 => $gift->id,
@@ -72,5 +72,5 @@ class MomentDashboardResource extends JsonResource
         ];
     }
 
-  
+
 }

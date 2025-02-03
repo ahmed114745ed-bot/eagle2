@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ActiveAgencyMembersResource;
 use App\Http\Resources\RequestJoinAgency;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ActiveAgencyResource;
@@ -56,6 +57,15 @@ class AgencyController extends Controller
             return Common::apiResponse(true, 'success', ActiveAgencyResource::collection($data));
         } catch (Exception $exception) {
 
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function activeAgenciesMembers(Request $request){
+        try {
+            $data = $this->agencyService->activeAgencies($request->id,  $request->per_page,  $request->page);
+            return Common::apiResponse(true, 'success', ActiveAgencyMembersResource::collection($data));
+        } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }

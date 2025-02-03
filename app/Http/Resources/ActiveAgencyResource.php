@@ -21,15 +21,6 @@ class ActiveAgencyResource extends JsonResource
             'phone' => $this->phone ?? '',
             'targe' => $this->targe ?? 0,
             'img' => $this->img ?? '',
-            'members' => $this->mempers()
-                ->orderBy('monthly_diamond_received', 'desc')
-                ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-                }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar');
-                }])
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']),
-
         ];
     }
 }
