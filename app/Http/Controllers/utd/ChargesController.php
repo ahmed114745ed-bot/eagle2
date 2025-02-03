@@ -162,4 +162,18 @@ class ChargesController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function userMonthCharge($id, Request $request)
+    {
+        try {
+            $year = $request->year ?? date('y');
+            $data = Charge::where('user_id', $id)->whereYear('created_at', $year)
+                ->selectRaw('MONTH(created_at) as month, SUM(amount) as total_amount')
+                ->groupBy('month')->orderBy('month')->get();
+            return Common::apiResponse(true, 'done',  $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }

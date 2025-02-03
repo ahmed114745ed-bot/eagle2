@@ -495,6 +495,7 @@ Route::middleware([])->group(function () {
         Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
         Route::get('report/{id}', [Report_userController::class, 'userReport']);
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
+        Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
     });
 
 
