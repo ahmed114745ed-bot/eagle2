@@ -17,9 +17,11 @@ class UserPackUtdResource extends JsonResource
         return [
            
                 'id' => $this->id ?? 0,
-                'price' => @$this->price ?? 0,
+                'total_price' => @$this->price ?? 0,
                 'image' => @$this->ware?->img2 ?? '',
                 'show_image' => @$this->ware?->show_img ?? '',
+                'qty' => $this->num,
+                'price' => $this->price_item,
         ];
     }
 }
