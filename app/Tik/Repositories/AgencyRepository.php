@@ -84,6 +84,17 @@ class AgencyRepository extends AbstractRepository
         })->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function agencyById($id){
+        return $this->model->where(function ($query) {
+            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                'additionalInfo',
+                function ($query) {
+                    $query->where('status', 1);
+                }
+            );
+        })->findOrFail($id);
+    }
+
     public function getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status = null, $action = null)
     {
         if ($action == null) {

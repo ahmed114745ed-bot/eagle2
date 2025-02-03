@@ -18,6 +18,7 @@ class AppearChargerAgencyResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'image' => $this->profile?->avatar,
+            'coins' => $this->coins,
             'name' => $this->name,
             'phone' => $this->phone,
             'agency_id' => $this->agency_id,
