@@ -23,7 +23,6 @@ class RoomDetailsResource extends JsonResource
                 'name'  => $this->topUserGift->name ?? '',
                 'uuid'  => $this->topUserGift->uuid ?? 0,
                 'image' => @$this->topUserGift?->profile?->avatar ?? '',
-
             ],
             'pk' => $this->lastPk,
         ];

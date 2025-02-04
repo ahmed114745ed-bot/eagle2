@@ -4,7 +4,7 @@ namespace App\Repositories\Room;
 use App\Models\Room;
 use App\Tik\Repositories\AbstractRepository;
 
-class RoomRepository extends AbstractRepository
+class RoomRepository 
 {
 
     public $model;
