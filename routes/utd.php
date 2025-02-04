@@ -65,6 +65,7 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\ChargeCountryController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
@@ -659,6 +660,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [CountryController::class, 'delete']);
         Route::post('/delete-all', [CountryController::class, 'delete_all']);
         Route::get('/{id}', [CountryController::class, 'show']);
+        Route::get('/charge', [ChargeCountryController::class, 'country']);
     });
 
     Route::prefix('colors')->group(function () {
@@ -678,6 +680,14 @@ Route::middleware([])->group(function () {
         Route::post('/create', [TargetEventController::class, 'store']);
         Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
         Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('charge-country')->group(function () {
+        Route::get('/', [ChargeCountryController::class, 'all']);
+        Route::get('/show/{id}', [ChargeCountryController::class, 'show']);
+        Route::post('/create', [ChargeCountryController::class, 'store']);
+        Route::delete('/delete/{id}', [ChargeCountryController::class, 'destroy']);
+        Route::post('/update/{id}', [ChargeCountryController::class, 'update']);
     });
 
     Route::prefix('target-events-gift')->group(function () {
