@@ -20,7 +20,7 @@ class MyDataResource extends JsonResource
 {
     public function toArray($request)
     {
-        dd($this->id);
+
         $family = $this->family;
         $f = null;
 
@@ -44,7 +44,7 @@ class MyDataResource extends JsonResource
 
         $time_log = $this->timeLog()->latest()->first();
 
-
+dd($this->agency);
         $agency_joined = $this->agency;
         if ($agency_joined) {
             $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
