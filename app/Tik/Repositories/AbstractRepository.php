@@ -121,10 +121,12 @@ abstract class AbstractRepository
     {
         return $this->model->where($column, 'like','%'. $search . '%')->select(['name as text', 'id'])->take(10)->get();
     }
-    public function delete(int $id,int $user_id=0)
+
+    public function delete( $id,$user_id = 0): bool
     {
-        $data= $this->model->find($id);
+        $data = $this->model->find($id);
         if (!$data) return false;
+        
         $data->delete();
         return true;
     }
