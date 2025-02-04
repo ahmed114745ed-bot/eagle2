@@ -27,7 +27,7 @@ class AchievementLevelsServiceTest extends TestCase
         $orderArray = [ 2, 3, 1];
 
         $sortedCollection = array_search(0, $orderArray);
-        dd($sortedCollection );
+        //dd($sortedCollection );
         $sortedCollection = $collection->sortBy(function ($item) use ($orderArray) {
             return array_search($item['id'], $orderArray);
         })->last();

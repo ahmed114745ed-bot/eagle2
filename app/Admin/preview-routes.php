@@ -282,9 +282,9 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
                 $background->use_count = $background_count;
                 $background->save();
             }
-            dd("done");
+            //dd("done");
         }
-        dd("note found data");
+        //dd("note found data");
     });
 
 
