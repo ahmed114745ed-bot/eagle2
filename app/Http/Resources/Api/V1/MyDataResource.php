@@ -36,7 +36,7 @@ class MyDataResource extends JsonResource
             ];
         }
 
-        $user_id = $this->id;
+        // $user_id = $this->id;
 
         // $pack = $this->packs
         //     ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
@@ -103,7 +103,7 @@ class MyDataResource extends JsonResource
         $counters = [];
         if ($request->show_counter == true) {
             $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-            $user = User::find($this->id);
+            $user = User::find(@$this->id);
             $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
             $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
