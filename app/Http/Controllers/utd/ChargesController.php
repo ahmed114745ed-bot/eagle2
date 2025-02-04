@@ -2,59 +2,63 @@
 
 namespace App\Http\Controllers\utd;
 
-use App\Facades\CustomNotification;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ChargeResource;
+use Exception;
+use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
-use App\Models\User;
+use App\Helpers\Common;
+use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ChargeResource;
+use App\Http\Resources\UserChargeResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 class ChargesController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
         $from = request('from');
         $to = request('to');
         $sort = request('sort');
         $user_type = request('user_type');
 
-        $charges = Charge::with('user.profile')->when($from && $to , function($q)use($from, $to){
+        $charges = Charge::with('user.profile')->when($from && $to, function ($q) use ($from, $to) {
             $q->whereDate('created_at', '>=', $from)
-            ->whereDate('created_at', '<=', $to);
+                ->whereDate('created_at', '<=', $to);
         })
-        ->when($user_type,function($q)use($user_type){
-            $q->where('user_type', $user_type);
-        })
-        ->when($sort,function($q)use($sort){
-            $q->orderBy('id', $sort);
-        })
-        ->paginate(10);
+            ->when($user_type, function ($q) use ($user_type) {
+                $q->where('user_type', $user_type);
+            })
+            ->when($sort, function ($q) use ($sort) {
+                $q->orderBy('id', $sort);
+            })
+            ->paginate(10);
 
         return Common::apiResponse(true, 'Success', ChargeResource::collection($charges));
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         if ($request->user_type != 'dash') {
             $user = $this->getUser($request);
             if (!$user) {
-                return Common::apiResponse(false,'user not found');
+                return Common::apiResponse(false, 'user not found');
             }
 
             if ($this->isInvalidAmount($request->amount)) {
-                return Common::apiResponse(false,'amount must be more than 10');
+                return Common::apiResponse(false, 'amount must be more than 10');
             }
         }
 
         if ($request->user_type == 'dash') {
             $agency = $this->getAgency($request->user_id);
             if (!$agency) {
-                return Common::apiResponse(false,__('api_responses.agency'));
+                return Common::apiResponse(false, __('api_responses.agency'));
             }
             $user = $agency->owner;
             return $this->handleAgencyCharge($request, $agency, $user);
@@ -92,7 +96,7 @@ class ChargesController extends Controller
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
         if ($amount < 0 && $agency->coins < abs($amount)) {
-            return Common::apiResponse(false,__('Insufficient agency balance'));
+            return Common::apiResponse(false, __('Insufficient agency balance'));
         }
 
         DB::transaction(function () use ($request, $agency, $user, $amount) {
@@ -118,7 +122,7 @@ class ChargesController extends Controller
         DB::transaction(function () use ($request, $user, $usdAmount) {
             $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
             if ($amount < 0 && $user->di < abs($amount)) {
-                return Common::apiResponse(false,__('Insufficient user balance'));
+                return Common::apiResponse(false, __('Insufficient user balance'));
             }
 
             $user->di += $amount;
@@ -145,7 +149,31 @@ class ChargesController extends Controller
         //dd($charge);
         $charge->save();
 
-        UserCommon::UserEarnedInvitation($user->id,$amount);
+        UserCommon::UserEarnedInvitation($user->id, $amount);
+    }
 
+    public function userCharge($id, Request $request)
+    {
+        try {
+            $data =   Charge::where('user_id', $id)->with('sender')->paginate($request->perPage, ['*'], 'page', $request->page);
+            return Common::apiResponse(true, 'done',  UserChargeResource::collection($data));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userMonthCharge($id, Request $request)
+    {
+        try {
+            $year = $request->year ?? date('y');
+            $data = Charge::where('user_id', $id)->whereYear('created_at', $year)
+                ->selectRaw('MONTH(created_at) as month, SUM(amount) as total_amount')
+                ->groupBy('month')->orderBy('month')->get();
+            return Common::apiResponse(true, 'done',  $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 }

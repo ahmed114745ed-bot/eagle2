@@ -6,6 +6,8 @@ return [
     'google_cloud_storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
     'cache'=>env ('CACHE_ENABLE','disabled'),
 
+    'agora_app_id' => env('AGORA_APP_ID'),
+    'agora_certificate' => env('AGORA_APP_CERTIFICATE'),
     'payment_url' => env('PAYMENT_URL'),
     'node_server_name' => env('NODE_SERVER_NAME'),
 

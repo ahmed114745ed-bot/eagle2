@@ -35,18 +35,20 @@ class RequestBackgroundImage extends Model
         {
             if($model->status == 1){
                 $room = Room::where('uid',$model->owner_room_id)->first();
-                $data = [
-                    "messageContent"=>[
-                        "message"=>"changeBackground",
-                        "imgbackground"=>$model->img?:"",
-                        "roomIntro"=>$room->room_intro?:"",
-                        "roomImg"=>$room->room_cover?:"",
-                        "room_type"=>@$room->myType->name?:"",
-                        "room_name"=>@$room->room_name?:""
-                    ]
-                ];
-                $json = json_encode ($data);
-                $res = Common::sendToZego ('SendCustomCommand',$room->id,$model->owner_room_id,$json);
+                if(!empty($room)){
+                    $data = [
+                        "messageContent"=>[
+                            "message"=>"changeBackground",
+                            "imgbackground"=>$model->img?:"",
+                            "roomIntro"=>$room?->room_intro?:"",
+                            "roomImg"=>$room?->room_cover?:"",
+                            "room_type"=>@$room?->myType->name?:"",
+                            "room_name"=>@$room?->room_name?:""
+                        ]
+                    ];
+                    $json = json_encode ($data);
+                    $res = Common::sendToZego ('SendCustomCommand',$room?->id,$model->owner_room_id,$json);
+                }
             }
         });
     }

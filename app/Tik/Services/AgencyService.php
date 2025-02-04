@@ -759,6 +759,10 @@ class AgencyService
         return $this->agencyRepository->getActiveAgency($id, $perPage, $page);
     }
 
+    public function agencyById($id){
+        return $this->agencyRepository->agencyById($id);
+    }
+
     public function deleteAgency($id)
     {
         $agency = $this->agencyRepository->findOrFail($id);
@@ -887,7 +891,7 @@ class AgencyService
         }
         return true;
     }
-    
+
     public function allAgencyCharged($id)
     {
         return $this->agencyRepository->getChargeAgency($id);

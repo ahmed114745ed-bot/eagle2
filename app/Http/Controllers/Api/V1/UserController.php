@@ -21,9 +21,12 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\AllUsersResource;
@@ -602,7 +605,7 @@ class UserController extends Controller
 
     public function userLevel(Request $request)
     {
-        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->uuid);
+        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->search);
         return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
     }
 
@@ -621,7 +624,7 @@ class UserController extends Controller
 
     public function usersDeviceToken(Request $request)
     {
-        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token);
+        $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token, $request);
         return Common::apiResponse(true, 'success', DeviceTokenResource::collection($data));
     }
 
@@ -785,7 +788,7 @@ class UserController extends Controller
 
     public function showDataUser($id)
     {
-        
+
         try {
             $user  = $this->userService->showDataUser($id);
 
@@ -850,5 +853,51 @@ class UserController extends Controller
             'message' => 'Success',
             'data' => (object) UserType::list(),
         ]);
+    }
+
+    public function myData($id)
+    {
+        try {
+            $user  = $this->userService->showDataUser($id);
+
+            return Common::apiResponse(true, 'done', new MyDataUtdResource($user));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userSalaryWithHisAgency($id, Request $request)
+    {
+        try {
+            $data = $this->userService->userSalary($id, $request->month, $request->year);
+            return Common::apiResponse(true, 'done',  $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userPacksAndVip($id)
+    {
+        try {
+            $data = $this->userService->userPacksAndVip($id);
+            return Common::apiResponse(true, 'done', new UserPackVipResource($data));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userVisitRooms($id)
+    {
+        $data = $this->userService->VisitRoom($id);
+        return Common::apiResponse(true, 'done', UserVisitRoomResource::collection($data));
+    }
+
+    public function allCpUser($id)
+    {
+        $data = $this->userService->allUserCp($id);
+        return Common::apiResponse(true, 'done', $data);
     }
 }

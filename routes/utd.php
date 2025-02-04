@@ -2,8 +2,8 @@
 
 
 use App\Helpers\Common;
-use App\Http\Controllers\utd\BlackListController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
@@ -14,6 +14,7 @@ use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\ReportController;
 use App\Http\Controllers\utd\SilverController;
+use App\Http\Controllers\utd\TicketController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
@@ -31,13 +32,17 @@ use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
+use App\Http\Controllers\utd\BlackListController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\RoleEventController;
+use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
+use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\BackgroundController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
+use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RoomTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\utd\DedicateVipController;
@@ -47,6 +52,7 @@ use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\WeeklyEventController;
+use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
@@ -64,17 +70,15 @@ use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
+use App\Http\Controllers\utd\SallariesHistoryController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\BanController;
-use App\Http\Controllers\utd\ChargeReportController;
-use App\Http\Controllers\utd\ReportUserController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
-use App\Http\Controllers\utd\SallariesController;
-use App\Http\Controllers\utd\SallariesHistoryController;
-use App\Http\Controllers\utd\TicketController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
+use App\Http\Controllers\Api\V2\Report_userController;
+use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\utd\QuestionController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -177,6 +181,16 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
     });
 
+    Route::prefix('questions')->group(function () {
+        Route::get('/', [QuestionController::class, 'index']);
+        Route::post('/create', [QuestionController::class, 'store']);
+        Route::post('/update/{id}', [QuestionController::class, 'update']);
+        Route::post('/update-status/{id}', [QuestionController::class, 'update_status']);
+        Route::post('/delete/{id}', [QuestionController::class, 'delete']);
+        Route::post('/delete-all', [QuestionController::class, 'delete_all']);
+        Route::get('/{id}', [QuestionController::class, 'show']);
+    });
+
 
     Route::prefix('request-agencies')->group(function () {
         Route::get('/', [RequestAgenciesController::class, 'index']);
@@ -261,20 +275,20 @@ Route::middleware([])->group(function () {
         Route::post('/return/{id}', [ChargeReportController::class, 'return']);
     });
 
-    Route::prefix('sallaries')->group(function(){
+    Route::prefix('sallaries')->group(function () {
         Route::get('/', [SallariesController::class, 'index']);
         Route::get('/details', [SallariesController::class, 'details']);
         Route::post('/cashing', [SallariesController::class, 'cashing']);
         Route::post('/pay', [SallariesController::class, 'pay']);
     });
 
-    Route::prefix('report-user')->group(function(){
+    Route::prefix('report-user')->group(function () {
         Route::get('/', [ReportUserController::class, 'index']);
         Route::post('/create', [ReportUserController::class, 'store']);
         Route::post('/delete-all', [ReportUserController::class, 'delete_all']);
     });
 
-    Route::prefix('tickets')->group(function(){
+    Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index']);
         Route::get('/show/{id}', [TicketController::class, 'show']);
         Route::post('/create', [TicketController::class, 'store']);
@@ -285,14 +299,14 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [TicketController::class, 'show']);
     });
 
-    Route::prefix('bans')->group(function(){
+    Route::prefix('bans')->group(function () {
         Route::get('/', [BanController::class, 'index']);
         Route::post('/delete', [BanController::class, 'delete']);
         Route::post('/ban-user', [BanController::class, 'banUser']);
         Route::post('/remove-ban', [BanController::class, 'removeBan']);
     });
 
-    Route::prefix('sallaries_history')->group(function(){
+    Route::prefix('sallaries_history')->group(function () {
         Route::get('/', [SallariesHistoryController::class, 'index']);
         Route::post('delete/{id}', [SallariesHistoryController::class, 'delete']);
         Route::post('/delete-all', [SallariesHistoryController::class, 'delete_all']);
@@ -486,6 +500,16 @@ Route::middleware([])->group(function () {
         Route::get('show/{id}', [UserController::class, 'showDataUser']);
         Route::post('update/{id}', [UserController::class, 'updateDataUser']);
         Route::get('user-type', [UserController::class, 'userType']);
+        Route::get('my-data/{id}', [UserController::class, 'myData']);
+        Route::get('my-gifts/{id}', [GiftLogController::class, 'myGiftInfo']);
+        Route::get('coins/{id}', [ChargesController::class, 'userCharge']);
+        Route::get('salary/{id}', [UserController::class, 'userSalaryWithHisAgency']);
+        Route::get('report/{id}', [Report_userController::class, 'userReport']);
+        Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
+        Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
+        Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
+        Route::get('cp/{id}', [UserController::class, 'allCpUser']);
     });
 
 
@@ -562,7 +586,6 @@ Route::middleware([])->group(function () {
         Route::delete('/delete/{id}', [MomentsController::class, 'destroy']);
         Route::post('/config', [MomentsController::class, 'config']);
         Route::get('/get-user-moments/{id}', [MomentsController::class, 'get_user_moments']);
-
     });
 
     Route::prefix('offers')->group(function () {
@@ -597,6 +620,7 @@ Route::middleware([])->group(function () {
 
     Route::prefix('agencies')->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::get('/members', [AgencyController::class, 'activeAgenciesMembers']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
         Route::get('/show/{id}', [AgencyController::class, 'show']);
@@ -698,14 +722,11 @@ Route::middleware([])->group(function () {
 
 
 
-
-    Route::prefix('blacks')->group(function () {
-        Route::get('/', [BlackListController::class, 'list']);
-        Route::post('/', [BlackListController::class, 'store']);
-        // Route::post('/search/{key}', [BlackListController::class, 'search']);
-        // Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
-        Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
-        Route::post('delete/{id}', [BlackListController::class, 'delete']);
-    });
-
-
+Route::prefix('blacks')->group(function () {
+    Route::get('/', [BlackListController::class, 'list']);
+    Route::post('/', [BlackListController::class, 'store']);
+    // Route::post('/search/{key}', [BlackListController::class, 'search']);
+    // Route::post('{user_id}/blocked-search/{key}', [BlackListController::class, 'blocked_search']);
+    Route::get('/black-lists/{user_id}', [BlackListController::class, 'black_lists']);
+    Route::post('delete/{id}', [BlackListController::class, 'delete']);
+});

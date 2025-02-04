@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use DB;
+use Cache;
 use Exception;
 use Carbon\Carbon;
-use App\Models\User;
 use App\Models\Code;
+use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Facades\UserHandling;
@@ -21,6 +22,7 @@ use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
+use Modules\CP\Repositories\CpRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -29,14 +31,15 @@ use App\Tik\Repositories\ProfileRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
+use App\Tik\Repositories\RoomVisitorRepository;
 use App\Tik\Repositories\UserSettingRepository;
+use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
-use Cache;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -59,6 +62,9 @@ class UserService
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
         private readonly ProfileRepository $profileRepository,
+        private readonly AgencySalaryRepository $agencySalaryRepository,
+        private readonly RoomVisitorRepository $roomVisitorRepository,
+        private readonly CpRepository $cpRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -89,7 +95,7 @@ class UserService
         $perPage = 10;
         return $this->userRepository->searchWithPageNew($key, $page, $perPage);
     }
-    
+
     public function searchUsersInAgency($key, $page)
     {
         $perPage = 10;
@@ -650,9 +656,9 @@ class UserService
         return $updateType;
     }
 
-    public function trashedAccount($perPage, $Page, $uuid)
+    public function trashedAccount($perPage, $Page, $search)
     {
-        return $this->userRepository->trashedUserAccountList($perPage, $Page, $uuid);
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search);
     }
 
     public function restoreAccount($id)
@@ -665,9 +671,9 @@ class UserService
         return $this->userRepository->softDelete($id);
     }
 
-    public function userLevel($perPage, $Page, $uuid)
+    public function userLevel($perPage, $Page, $search)
     {
-        return $this->userRepository->userLevel($perPage, $Page, $uuid);
+        return $this->userRepository->userLevel($perPage, $Page, $search);
     }
 
     public function updateUserLevel($id, $request)
@@ -679,9 +685,9 @@ class UserService
         return true;
     }
 
-    public function userDeviceToken($perPage, $Page, $deviceToken)
+    public function userDeviceToken($perPage, $Page, $deviceToken, $request)
     {
-        return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken);
+        return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken, $request);
     }
 
     public function deleteDeviceToken($id)
@@ -702,7 +708,7 @@ class UserService
 
     public function kickAgency($userId)
     {
-       $user = $this->userRepository->findOrFail($userId);
+        $user = $this->userRepository->findOrFail($userId);
         if (UserHandling::checkIfUserOwnerOfAgency($user)) throw new Exception(__('This User is the host Of agency can\'t delete it'));
 
 
@@ -870,5 +876,29 @@ class UserService
         return Code::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);;
+    }
+
+    public function userSalary($userId, $month, $year,)
+    {
+        $salary = $this->userSalaryRepository->userSalary($userId, $month, $year);
+        $agency = $this->agencyRepository->findAgencyByOwnerId($userId);
+        $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
+
+        return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
+    }
+
+    public function userPacksAndVip($id)
+    {
+        return $this->userRepository->findOrFail($id, ['packsUser', 'userHaveVip']);
+    }
+
+    public function VisitRoom($id)
+    {
+        return $this->roomVisitorRepository->getByUser($id);
+    }
+
+    public function allUserCp($userId)
+    {
+        return $this->cpRepository->getByUser($userId);
     }
 }

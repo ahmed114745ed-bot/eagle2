@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ActiveAgencyResource extends JsonResource
+class UserVipUtdResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +15,13 @@ class ActiveAgencyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'owner' => new OwnerAgencyResource($this->owner),
-            'name' => $this->name ?? '',
-            'phone' => $this->phone ?? '',
-            'targe' => $this->targe ?? 0,
-            'img' => $this->img ?? '',
+            'id' => $this->id ?? 0,
+            'price' => @$this->price ?? 0,
+            'level' => @$this?->level ?? 0,
+            'expire' => @$this?->expire,
+            'qty' => $this?->qty ?? 0,
+            'total_price' => $this->total,
+
         ];
     }
 }

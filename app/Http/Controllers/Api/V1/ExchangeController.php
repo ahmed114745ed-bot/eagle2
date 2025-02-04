@@ -45,4 +45,12 @@ class ExchangeController extends Controller
         $data = $this->exchangeService->getExchangeLog($user->id, $type);
         return Common::apiResponse(1, 'ok', $data, 200);
     }
+
+    public function UserExchangeLogs($id,Request $request)
+    {
+        
+        $type = $request->type ?: 0;
+        $data = $this->exchangeService->getExchangeLog($id, $type);
+        return Common::apiResponse(1, 'ok', $data, 200);
+    }
 }

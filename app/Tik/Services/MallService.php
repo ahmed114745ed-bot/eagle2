@@ -46,11 +46,12 @@ class MallService
                 'type'      => $ware->type,
                 'get_type'  => $ware->get_type,
                 'target_id' => $ware->id,
-                'num'       => 1, //$qty,
+                'num'       => $quantity, //$qty,
                 'expire'    => $ware->expire ? time() + ($quantity * $ware->expire * 86400) : 0,
                 'is_read'   => 1,
                 'use_num'   => $ware->num,
                 'price'     => $totalPrice,
+                'price_item' => $ware->price
             ];
             $this->packRepository->create($data);
 
@@ -112,7 +113,12 @@ class MallService
                 try {
 
                     $expire = ($quantity * $ware->expire * 86400);
-                    $this->packRepository->updatePriceWithExpire($pack, $expire, $totalPrice);
+                    $updateData = [
+                        'num'       => $pack->num + $quantity, //$qty,
+                        'expire'    => $expire,
+                        'price'     => $pack->price + $totalPrice,
+                    ];
+                    $this->packRepository->update($updateData, $pack->id);
                     $this->service($user, $ware->exp, $totalPrice, $type);
                     return Common::apiResponse(1, 'success process');
                 } catch (Exception $exception) {
