@@ -34,7 +34,7 @@ class PkEventSeed extends Seeder
             $winner =    PkWinner::create($data);
             DB::table('reward_winner_pks')->insert([
                 'pk_winner_id' => $winner->user_id,
-                'pk_reward_id' => $previousEvent->rewards->where('level', 1)->where('type', 'pk-star')->first()->id,
+                'pk_reward_id' => $previousEvent->rewards->where('level', 1)->where('pk_type', 'pk-star')->first()->id,
 
             ]);
         }
