@@ -80,8 +80,8 @@ class RequestBackgroundImagService
 
     public function delete($id)
     {
-        $data = $this->requestBackgroundImageRepository->findByUserId($id);
-        $data->delete();
-        return true;
+        return  $this->requestBackgroundImageRepository->delete($id);
+  
+        
     }
 }
