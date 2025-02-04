@@ -44,18 +44,32 @@ class MyDataResource extends JsonResource
 
         $time_log = $this->timeLog()->latest()->first();
 
-dd($this->agency);
+
         $agency_joined = $this->agency;
+        // if ($agency_joined) {
+        //     $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+        //     $agency_joined = [
+        //         'id' => $agency_joined->id,
+        //         'name' => $agency_joined->name,
+        //         'status' => $agency_joined->status,
+        //         'owner' => $owner,
+        //     ];
+        // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+            $owner = $agency_joined->app_owner_id == $this->id 
+                ? new \stdClass() 
+                : new MiniUserResource($agency_joined->owner);
+        
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
                 'owner' => $owner,
             ];
+        } else {
+            $agency_joined = (object)[]; 
         }
-
+        
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
