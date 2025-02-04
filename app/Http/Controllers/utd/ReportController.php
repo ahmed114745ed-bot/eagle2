@@ -30,6 +30,14 @@ class ReportController extends Controller
 
     public function eventReports(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required',
+
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
         try {
             $data = $this->reportService->eventReports($request);
             return Common::apiResponse(true, 'done', $data);
