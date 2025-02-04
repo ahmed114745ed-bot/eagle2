@@ -59,7 +59,7 @@ class MyDataResource extends JsonResource
             $owner = $agency_joined->app_owner_id == $this->id 
                 ? new \stdClass() 
                 : new MiniUserResource($agency_joined->owner);
-        
+        dd($agency_joined->id);
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
