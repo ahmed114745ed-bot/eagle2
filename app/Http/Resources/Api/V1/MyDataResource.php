@@ -171,7 +171,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
+            
             'profile' => new ProfileResource(@$this->profile),
+            dd($show_user_setting),
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
@@ -187,7 +189,6 @@ class MyDataResource extends JsonResource
             'country' => $this->country ?? (object) [],
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
-            dd($show_user_setting),
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
