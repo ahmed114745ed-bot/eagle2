@@ -131,6 +131,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
+        dd($this->profile);
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -171,7 +172,7 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-            dd($this->profile),
+           
             'profile' => new ProfileResource(@$this->profile),
             
             'level' => Common::level_center(@$this),
