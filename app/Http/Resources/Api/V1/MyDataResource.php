@@ -128,7 +128,7 @@ class MyDataResource extends JsonResource
 
 
         $ownerRoom = $this->ownerRoom;
-        dd($ownerRoom->id);
+  
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
@@ -163,7 +163,7 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-            'vip' => Common::ovip_center($this),
+            'vip' => Common::ovip_center($this->id),
 
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
