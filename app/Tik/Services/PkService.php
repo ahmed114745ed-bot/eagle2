@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use Exception;
 use Carbon\Carbon;
 use App\Tik\Repositories\PkRepository;
 use App\Tik\Repositories\RoomRepository;
@@ -12,8 +13,7 @@ class PkService
     public function __construct(
         private readonly PkRepository $pkRepository,
         private readonly RoomRepository $roomRepository,
-    ) {
-    }
+    ) {}
 
 
     public function create($request, $userId)
@@ -59,5 +59,12 @@ class PkService
         $room->enableSaving = false;
         $status == 1 ? $room->update(['is_show_pk' => 1, 'is_pk_custom' => $isPkCustom]) : $room->update(['is_show_pk' => 0, 'is_pk_custom' => 0]);
         return $room;
+    }
+
+    public function roomPk($userId, $perPage, $page)
+    {
+        $pks = $this->pkRepository->roomPks($userId, $perPage, $page);
+        if (!$pks) throw new Exception('This user don\'t have room');
+        return $pks;
     }
 }

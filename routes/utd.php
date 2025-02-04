@@ -4,6 +4,7 @@
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
+use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
@@ -58,6 +59,7 @@ use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
+use App\Http\Controllers\utd\RoomCategoryController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
@@ -80,7 +82,6 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-use App\Http\Controllers\utd\RoomCategoryController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -523,6 +524,7 @@ Route::middleware([])->group(function () {
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
         Route::get('room/{id}', [RoomController::class, 'roomUserDetails']);
+        Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
 
