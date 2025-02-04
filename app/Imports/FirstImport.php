@@ -28,7 +28,7 @@ class FirstImport implements ToCollection ,WithHeadingRow //, WithChunkReading, 
             try {
                 $user=User::where("uuid",$row['uuid'])->first();
                 if (!$user) {
-                    dd($row['uuid']);
+                    //dd($row['uuid']);
                 }
                     $check=UserSallary::where(["user_id"=>$user->id,"month"=>11])->first();
 
@@ -61,7 +61,7 @@ class FirstImport implements ToCollection ,WithHeadingRow //, WithChunkReading, 
                             $newSallaryAgency->save();
                     }
                 } catch (\Throwable $th) {
-                    dd($th->getMessage());
+                    //dd($th->getMessage());
                 }
             }
     }

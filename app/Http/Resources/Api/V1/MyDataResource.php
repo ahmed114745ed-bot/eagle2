@@ -46,16 +46,30 @@ class MyDataResource extends JsonResource
 
 
         $agency_joined = $this->agency;
+        // if ($agency_joined) {
+        //     $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+        //     $agency_joined = [
+        //         'id' => $agency_joined->id,
+        //         'name' => $agency_joined->name,
+        //         'status' => $agency_joined->status,
+        //         'owner' => $owner,
+        //     ];
+        // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+            $owner = $agency_joined->app_owner_id == $this->id 
+                ? new \stdClass() 
+                : new MiniUserResource($agency_joined->owner);
+       
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
                 'owner' => $owner,
             ];
+        } else {
+            $agency_joined = (object)[]; 
         }
-
+        
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
@@ -157,7 +171,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
+            dd($this->profile),
             'profile' => new ProfileResource(@$this->profile),
+            
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),

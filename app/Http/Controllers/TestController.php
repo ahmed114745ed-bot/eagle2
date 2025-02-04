@@ -46,14 +46,14 @@ class TestController extends Controller
                 "userName" => 'Ahmed Ramadan'
             ]
         ]);
-        dd($response, $response->json());
+        //dd($response, $response->json());
     }
 
     public function payment_verify(Request $request) {
 
         $payment = new OpayPayment();
         $test = $payment->verify($request);
-        dd($test);
+        //dd($test);
         if ($test['status']) {
 
         } else {

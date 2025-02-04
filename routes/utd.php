@@ -80,6 +80,7 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\utd\RoomCategoryController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -192,6 +193,16 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [QuestionController::class, 'show']);
     });
 
+    Route::prefix('categories')->group(function(){
+        Route::get('/', [RoomCategoryController::class, 'index']);
+        Route::post('/create', [RoomCategoryController::class, 'store']);
+        Route::post('/update/{id}', [RoomCategoryController::class, 'update']);
+        Route::post('/update-status/{id}', [RoomCategoryController::class, 'update_status']);
+        Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
+        Route::post('/delete-all', [RoomCategoryController::class, 'delete_all']);
+        Route::get('/{id}', [RoomCategoryController::class, 'show']);
+
+    });
 
     Route::prefix('request-agencies')->group(function () {
         Route::get('/', [RequestAgenciesController::class, 'index']);
@@ -640,6 +651,12 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
+        Route::post('/create', [CountryController::class, 'store']);
+        Route::post('/update/{id}', [CountryController::class, 'update']);
+        Route::post('/update-status/{id}', [CountryController::class, 'update_status']);
+        Route::post('/delete/{id}', [CountryController::class, 'delete']);
+        Route::post('/delete-all', [CountryController::class, 'delete_all']);
+        Route::get('/{id}', [CountryController::class, 'show']);
     });
 
     Route::prefix('colors')->group(function () {
