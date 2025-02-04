@@ -36,7 +36,7 @@ class MyDataResource extends JsonResource
             ];
         }
 
-        $user_id = $this->id;
+        // $user_id = $this->id;
 
         // $pack = $this->packs
         //     ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
@@ -46,16 +46,30 @@ class MyDataResource extends JsonResource
 
 
         $agency_joined = $this->agency;
+        // if ($agency_joined) {
+        //     $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+        //     $agency_joined = [
+        //         'id' => $agency_joined->id,
+        //         'name' => $agency_joined->name,
+        //         'status' => $agency_joined->status,
+        //         'owner' => $owner,
+        //     ];
+        // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+            $owner = $agency_joined->app_owner_id == $this->id 
+                ? new \stdClass() 
+                : new MiniUserResource($agency_joined->owner);
+       
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
                 'owner' => $owner,
             ];
+        } else {
+            $agency_joined = (object)[]; 
         }
-
+        
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
@@ -103,7 +117,7 @@ class MyDataResource extends JsonResource
         $counters = [];
         if ($request->show_counter == true) {
             $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-            $user = User::find($this->id);
+            $user = User::find(@$this->id);
             $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
             $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {

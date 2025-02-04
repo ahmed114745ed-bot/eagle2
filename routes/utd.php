@@ -182,7 +182,7 @@ Route::middleware([])->group(function () {
         Route::post('update/{id}', [AppearChargerAgencyController::class, 'update']);
     });
 
-    Route::prefix('questions')->group(function(){
+    Route::prefix('questions')->group(function () {
         Route::get('/', [QuestionController::class, 'index']);
         Route::post('/create', [QuestionController::class, 'store']);
         Route::post('/update/{id}', [QuestionController::class, 'update']);
@@ -518,6 +518,9 @@ Route::middleware([])->group(function () {
         Route::get('report/{id}', [Report_userController::class, 'userReport']);
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
+        Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
+        Route::get('cp/{id}', [UserController::class, 'allCpUser']);
     });
 
 

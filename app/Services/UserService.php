@@ -22,6 +22,7 @@ use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
+use Modules\CP\Repositories\CpRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -30,6 +31,7 @@ use App\Tik\Repositories\ProfileRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
+use App\Tik\Repositories\RoomVisitorRepository;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -61,6 +63,8 @@ class UserService
         private readonly AgencyRepository $agencyRepository,
         private readonly ProfileRepository $profileRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
+        private readonly RoomVisitorRepository $roomVisitorRepository,
+        private readonly CpRepository $cpRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -881,5 +885,20 @@ class UserService
         $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
 
         return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
+    }
+
+    public function userPacksAndVip($id)
+    {
+        return $this->userRepository->findOrFail($id, ['packsUser', 'userHaveVip']);
+    }
+
+    public function VisitRoom($id)
+    {
+        return $this->roomVisitorRepository->getByUser($id);
+    }
+
+    public function allUserCp($userId)
+    {
+        return $this->cpRepository->getByUser($userId);
     }
 }

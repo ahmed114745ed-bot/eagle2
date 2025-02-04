@@ -277,7 +277,7 @@ class CpserviceCo
         $result = [
             "firstThree" => RankingResource::collection($first),
             "remain" => RankingResource::collection($second),
-            'user' => new CpsUserResource($user,$relationType),
+            'user' => new CpsUserResource($user, $relationType),
         ];
 
         return Common::apiResponse(1, '', $result);
