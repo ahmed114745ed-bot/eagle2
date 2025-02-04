@@ -719,7 +719,7 @@ trait CalcsTrait
             'image'     => $vip->image ?? '',
             'image_from_wares'     => $vipIcon->show_img ?? '',
             'expire'    => $vip->expire ?? 0,
-            'ware_id' => $vipIcon->id,
+            'ware_id' => $vipIcon?->id ?? 0,
             'color' => '',
             'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
         ];
