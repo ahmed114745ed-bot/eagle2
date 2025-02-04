@@ -199,11 +199,10 @@ class UserController extends Controller
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-        
+        }      
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->first()?->img;
-        dd($userWithMedals);
+
         $data = new MyDataResource($userWithMedals);
 
         return Common::apiResponse(true, '', $data, 200);
