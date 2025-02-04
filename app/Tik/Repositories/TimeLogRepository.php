@@ -18,7 +18,7 @@ class TimeLogRepository extends AbstractRepository
         return $this->model->where(['uid' => $ownerRoomId, 'user_id' => $userId])->orderByRaw('id desc')->limit(1)->first();
     }
 
-    public function delete($ownerRoomId, $userId = 0)
+    public function deleteAth($ownerRoomId, $userId = 0)
     {
         return $this->model->where(array('uid' => $ownerRoomId, 'user_id' => $userId))->delete();
     }
