@@ -187,6 +187,7 @@ class MyDataResource extends JsonResource
             'country' => $this->country ?? (object) [],
             'country_name' => $this->country ? (app()->getLocale() == 'en' ? $this->country->e_name : $this->country->name) : '',
             'country_hidden' => $isHideCountry,
+            dd($show_user_setting),
             'gender' => @$this->gender == 1 ? "custom_image/male.png" : "custom_image/female.png",
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
