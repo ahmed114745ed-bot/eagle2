@@ -20,7 +20,7 @@ class MyDataResource extends JsonResource
 {
     public function toArray($request)
     {
-
+        dd($this->id);
         $family = $this->family;
         $f = null;
 
@@ -117,7 +117,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
-      dd('k');
+      
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
