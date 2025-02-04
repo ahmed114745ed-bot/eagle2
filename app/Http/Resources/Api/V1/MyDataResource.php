@@ -131,6 +131,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
+       
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -147,6 +148,7 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
+          
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
@@ -161,8 +163,7 @@ class MyDataResource extends JsonResource
 
             ],
             'phone_bind' => (bool)@$this->phone,
-            'vip' => Common::ovip_center($this),
-
+            'vip' => Common::ovip_center($this->id),
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ?? '',
@@ -171,7 +172,7 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-            dd($this->profile),
+           
             'profile' => new ProfileResource(@$this->profile),
             
             'level' => Common::level_center(@$this),
