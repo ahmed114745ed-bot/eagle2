@@ -131,7 +131,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
-      
+      dd($this->resource);
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
