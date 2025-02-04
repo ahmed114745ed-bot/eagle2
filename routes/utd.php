@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\utd\PkEventController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
+use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
@@ -63,6 +65,7 @@ use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
+use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\utd\SpecialHistoryController;
@@ -76,9 +79,7 @@ use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
-use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\RoomCategoryController;
 
 // 'utd.decreptHeader'
@@ -521,6 +522,7 @@ Route::middleware([])->group(function () {
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
+        Route::get('room/{id}', [RoomController::class, 'roomUserDetails']);
     });
 
 

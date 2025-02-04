@@ -2,8 +2,9 @@
 namespace App\Repositories\Room;
 
 use App\Models\Room;
+use App\Tik\Repositories\AbstractRepository;
 
-class RoomRepository 
+class RoomRepository extends AbstractRepository
 {
 
     public $model;
@@ -20,5 +21,10 @@ class RoomRepository
                         $query->where('game_id', $gameId);
                     })
                     ->get();
+    }
+
+    public function FindByUserId($userId)
+    {
+        return $this->model->where('uid',$userId)->with('lastPk','gifts','topUserGift')->first();
     }
 }

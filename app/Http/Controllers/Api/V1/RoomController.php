@@ -1357,7 +1357,7 @@ class RoomController extends Controller
     public function removeRoomPass(Request $request)
     {
         $room = $this->roomService->changePasswordRoom($request->owner_id);
-       
+
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",
@@ -1673,8 +1673,8 @@ class RoomController extends Controller
             $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
             $userToBlock = $request->user_id;
-                $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
-                if(!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0,'This user is not in this room',null,404);
+            $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
+            if (!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
 
             // Check if the current user is the owner of the room
@@ -1734,6 +1734,16 @@ class RoomController extends Controller
             $room->room_black = implode(',', $updatedIds);
             $room->save();
             return   Common::apiResponse(true, 'block removed', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+    }
+
+    public function roomUserDetails($id)
+    {
+        try {
+            $room = $this->roomServiceMain->roomDetails($id);
+            return   Common::apiResponse(true, 'done', $room);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

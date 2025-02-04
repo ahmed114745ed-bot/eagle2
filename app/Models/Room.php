@@ -119,6 +119,15 @@ class Room extends Model
         return $this->hasMany(GiftLog::class, 'roomowner_id', 'uid');
     }
 
+    public function topUserGift()
+    {
+        return $this->hasOne(GiftLog::class, 'roomowner_id', 'id')
+            ->selectRaw("SUM(giftPrice) as exp, sender_id, roomowner_id")
+            ->whereHas('sender') // Ensures only valid senders are included
+            ->groupBy('sender_id', 'roomowner_id')
+            ->orderByDesc('exp');
+    }
+
 
     public function roomCategory()
     {
