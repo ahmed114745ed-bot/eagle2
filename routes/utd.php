@@ -42,6 +42,7 @@ use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
+use App\Http\Controllers\utd\AdminCheckController;
 use App\Http\Controllers\utd\BackgroundController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
@@ -194,7 +195,7 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [QuestionController::class, 'show']);
     });
 
-    Route::prefix('categories')->group(function(){
+    Route::prefix('categories')->group(function () {
         Route::get('/', [RoomCategoryController::class, 'index']);
         Route::post('/create', [RoomCategoryController::class, 'store']);
         Route::post('/update/{id}', [RoomCategoryController::class, 'update']);
@@ -202,7 +203,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
         Route::post('/delete-all', [RoomCategoryController::class, 'delete_all']);
         Route::get('/{id}', [RoomCategoryController::class, 'show']);
-
     });
 
     Route::prefix('request-agencies')->group(function () {
@@ -739,6 +739,12 @@ Route::middleware([])->group(function () {
     Route::get('/wares-event', [RewardLevelIntervalController::class, 'wareInterval']);
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
     Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
+});
+
+Route::prefix('transaction-request-problem')->group(function () {
+    Route::get('/', [AdminCheckController::class, 'all']);
+    Route::post('accept/{id}', [AdminCheckController::class, 'accept']);
+    Route::post('refuse/{id}', [AdminCheckController::class, 'cancel']);
 });
 
 

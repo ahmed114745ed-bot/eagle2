@@ -259,7 +259,7 @@ class MicService
         $microphone = implode(',', $baseMic);
         $this->updateMicAndPK($room, $microphone);
         //clear timer
-        $this->timeLogRepository->delete($room->uid, $user->id);
+        $this->timeLogRepository->deleteAth($room->uid, $user->id);
 
         $this->handleLeaveCp($user, $room);
 

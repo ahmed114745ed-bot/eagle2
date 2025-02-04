@@ -156,7 +156,7 @@ class MyDataResource extends JsonResource
                 "room_cover" => @$ownerRoom->room_cover ?? '',
                 "room_background" => @$ownerRoom->final_room_image ?? '',
                 "mode" => @$ownerRoom->mode ?? 0,
-                'giftPrice' => @$ownerRoom->session_string ?? 0,
+                'giftPrice' => @$ownerRoom->session_string ?? "0",
                 "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
