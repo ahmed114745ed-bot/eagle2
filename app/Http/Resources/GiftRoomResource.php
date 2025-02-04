@@ -17,7 +17,7 @@ class GiftRoomResource extends JsonResource
     {
         return [
             'id' => $this->gift->id,
-            'name' => app()->gift->getLocale() == 'ar' ? $this->gift->name : $this->gift->e_name,
+            'name' => app()->getLocale() == 'ar' ? $this->gift->name : $this->gift->e_name,
             'img' => $this->gift->img ?: '',
             'show_img' => $this->gift->show_img ?: '',
             'show_img2' => $this->gift->show_img2 ?: '',
