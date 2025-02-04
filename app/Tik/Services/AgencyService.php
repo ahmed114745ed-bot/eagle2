@@ -846,7 +846,7 @@ class AgencyService
             'type_user' => $userType,
         ];
         $this->userRepository->update($data, $request->app_owner_id);
-        $this->agencyRepository->update($request, $id);
+        $this->agencyRepository->update($request->all(), $id);
         return true;
     }
 
