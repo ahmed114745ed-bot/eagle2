@@ -20,7 +20,7 @@ class ReportUserController extends Controller
 
 
         $result = User::with('liveTime', 'reals', 'moments')->when($search,function($q)use($search){
-            $q->where('uuid', $search);
+            $q->where('uuid', 'like', "%{$search}%");
         })
         ->when($year, function($q) use($year){
             $q->whereYear('created_at', $year);
