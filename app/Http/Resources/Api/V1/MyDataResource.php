@@ -202,7 +202,6 @@ class MyDataResource extends JsonResource
         if ($pass_status) {
             $data['pass_status'] = $pass_status;
         }
-        dd($data);
         return $data;
     }
     private function getRoomTwoLastPk(int $roomId)
