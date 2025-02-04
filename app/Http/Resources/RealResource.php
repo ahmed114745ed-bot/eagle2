@@ -27,6 +27,10 @@ class RealResource extends JsonResource
             'updated_at' => $this->updated_at,
             'sub_video' => $this->sub_video,
             'intro_image' => $this->intro_image,
+            'user' => $this->user ? [
+                'uuid' => $this->user->uuid,
+                'name' => $this->user->name,
+            ] : (object)[],
 
         ];
     }
