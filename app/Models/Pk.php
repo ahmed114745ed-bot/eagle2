@@ -25,21 +25,28 @@ class Pk extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
-    public function getT1PerAttribute(){
-        if (($this->t1_score + $this->t2_score) > 0){
-            $res = $this->t1_score/($this->t1_score + $this->t2_score);
-        }else{
+    public function getT1PerAttribute()
+    {
+        if (($this->t1_score + $this->t2_score) > 0) {
+            $res = $this->t1_score / ($this->t1_score + $this->t2_score);
+        } else {
             $res = 0.5;
         }
-        return number_format ($res,2);
+        return number_format($res, 2);
     }
 
-    public function getT2PerAttribute(){
-        if (($this->t1_score + $this->t2_score) > 0){
-            $res = $this->t2_score/($this->t1_score + $this->t2_score);
-        }else{
+    public function getT2PerAttribute()
+    {
+        if (($this->t1_score + $this->t2_score) > 0) {
+            $res = $this->t2_score / ($this->t1_score + $this->t2_score);
+        } else {
             $res = 0.5;
         }
-        return number_format ($res,2);
+        return number_format($res, 2);
+    }
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id');
     }
 }

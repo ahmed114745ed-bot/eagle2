@@ -27,4 +27,35 @@ class ReportController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function eventReports(Request $request)
+    {
+        try {
+            $data = $this->reportService->eventReports($request);
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function returnReward(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'reward_id' => 'required|integer',
+            'type' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $data = $this->reportService->returnReward($request);
+            return Common::apiResponse(true, 'done');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
 }

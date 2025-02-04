@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Facades\UserHandling;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -18,12 +19,14 @@ class AllUsersResource extends JsonResource
      */
     public function toArray($request)
     {
+        $usersSameDeviceToken =  User::select("name", 'uuid', 'phone')->where('device_token', $this->device_token)->where('id', '!=', $this->id)->where('device_token', '!=', null)->get();
         $achievement      = new UserAchievementService();
         $data_achivement = $achievement->getUserAchievement($this->resource);
         return [
             'id' => $this->id,
             'coins' => number_format($this->di),
-            'uuid' => $this->uuid . ' ' . $this->original_uuid,
+            'uuid' => $this->uuid ?? 0,
+            'original_uuid' => $this->original_uuid ?? 0,
             'name' => $this->name ?? '',
             'nickname' => $this->nickname ?? '',
             'charge_status' => $this->charge_status == true ? 1 : 0,
@@ -63,12 +66,12 @@ class AllUsersResource extends JsonResource
                     'user_days'           => $target->user_days,
                     'user_obtain'         => $target->user_obtain,
                     'agency_obtain'       => $target->agency_obtain,
-                    'updated_at'          => $target->updated_at->toDateTimeString(), // Format date
+                    'updated_at'          => Carbon::parse($target->updated_at)->toDateTimeString(), // Format date
                 ];
             }),
             'device-token' => [
-                'count' => User::where('device_token', $this->device_token)->count(),
-                'users' => User::select("name", 'uuid', 'phone')->where('device_token', $this->device_token)->where('device_token', '!=', null)->get()->map(function ($user) {
+               'count' => User::where('device_token', $this->device_token)->count(),
+                'users' => $usersSameDeviceToken->map(function ($user) {
                     return [
                         'name'     => $user['name'] ?? '',
                         'uuid' => $user['uuid'] ?? 0,

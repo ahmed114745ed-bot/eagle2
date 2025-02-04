@@ -169,6 +169,12 @@ class WareController extends Controller
     public function profile_frame_wares(Request $request)
     {
         $wares = $this->wareService->profile_frame_wares($request->page, $request->per_page);
+
+   
+
+        $wares->each(function ($ware) {
+            $ware->makeHidden(['image_type1', 'profile_frame_type']);
+        });
         return Common::apiResponse(1, '',  $wares);
     }
     

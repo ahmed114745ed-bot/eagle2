@@ -25,7 +25,10 @@ class ReelsRepository extends AbstractRepository
 
 
 
-
+    public function showByUser($id){
+        $reals = $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->where('user_id', $id);
+        return $reals->paginate(10);
+    }
     public function find($id)
     {
         return  $this->model->query()->where('id', $id)->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->first();

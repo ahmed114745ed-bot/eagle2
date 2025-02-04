@@ -36,7 +36,7 @@ class MyDataResource extends JsonResource
             ];
         }
 
-        $user_id = $this->id;
+        // $user_id = $this->id;
 
         // $pack = $this->packs
         //     ->whereIn('type', [18, 21, 17, 20, 19, 13, 16, 9, 11, 14, 15])
@@ -46,16 +46,30 @@ class MyDataResource extends JsonResource
 
 
         $agency_joined = $this->agency;
+        // if ($agency_joined) {
+        //     $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+        //     $agency_joined = [
+        //         'id' => $agency_joined->id,
+        //         'name' => $agency_joined->name,
+        //         'status' => $agency_joined->status,
+        //         'owner' => $owner,
+        //     ];
+        // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+            $owner = $agency_joined->app_owner_id == $this->id 
+                ? new \stdClass() 
+                : new MiniUserResource($agency_joined->owner);
+       
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
                 'owner' => $owner,
             ];
+        } else {
+            $agency_joined = (object)[]; 
         }
-
+        
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
@@ -103,7 +117,7 @@ class MyDataResource extends JsonResource
         $counters = [];
         if ($request->show_counter == true) {
             $userCounterServices = new \Modules\Public\Http\Services\UserCounterServices();
-            $user = User::find($this->id);
+            $user = User::find(@$this->id);
             $types = ['system_message', 'official_message', 'followers', 'followeds', 'friend', 'visitor', 'mybag', 'mall'];
 
             $counters = collect($types)->mapWithKeys(function ($item) use ($userCounterServices, $user) {
@@ -117,6 +131,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
+       
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -133,6 +148,7 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
+          
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
@@ -148,7 +164,6 @@ class MyDataResource extends JsonResource
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
-
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ?? '',
@@ -157,7 +172,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
+           
             'profile' => new ProfileResource(@$this->profile),
+            
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
@@ -183,7 +200,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
@@ -218,7 +236,6 @@ class MyDataResource extends JsonResource
             ->where('type', $type)
             ->where('target_id', $dress)
             ->first();
-
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }

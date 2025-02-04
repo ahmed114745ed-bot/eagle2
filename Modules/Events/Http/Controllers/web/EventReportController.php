@@ -79,11 +79,11 @@ class EventReportController extends MainOldController
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
-                $ware = Ware::find($this->reward->target);
-                $path = $ware->img2 ?? $ware->show_img;
+               // $ware = Ware::find($this->reward->target);
+                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
-                $vips = OVip::find($this->reward->target);
-                $path = $vips->img;
+             //   $vips = OVip::find($this->reward->target);
+                $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
@@ -132,11 +132,11 @@ class EventReportController extends MainOldController
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
-                $ware = Ware::find($this->reward->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                //  $ware = Ware::find($this->reward->target);
+                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
-                $vips = OVip::find($this->reward->target);
-                $path = $vips->img;
+                //   $vips = OVip::find($this->reward->target);
+                $path = $this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
@@ -186,11 +186,11 @@ class EventReportController extends MainOldController
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->reward->type == 'ware') {
-                $ware = Ware::find($this->reward->target);
-                $path = $ware->img2 ?? $ware->show_img;
+               // $ware = Ware::find($this->reward->target);
+                $path = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
             } elseif ($this->reward->type == 'vip') {
-                $vips = OVip::find($this->reward->target);
-                $path = $vips->img;
+              //  $vips = OVip::find($this->reward->target);
+                $path =$this->reward->vip->img;
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {

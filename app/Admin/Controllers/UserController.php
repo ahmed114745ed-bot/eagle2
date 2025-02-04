@@ -490,7 +490,6 @@ class UserController extends MainController
 
     protected function vipList($id)
     {
-
         // UserVip::query ()->where ('expire','!=',0)->where ('expire','<',time ())->delete ();
 
         $grid = new Grid(new UserVip());
@@ -505,6 +504,8 @@ class UserController extends MainController
             return __('no time');
         });
         $grid->column('qty', __('qty'));
+        $grid->column('total', __('totalPrice'));
+        $grid->column('price', __('price'));
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();

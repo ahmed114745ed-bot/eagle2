@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ActiveAgencyMembersResource;
 use App\Http\Resources\RequestJoinAgency;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ActiveAgencyResource;
@@ -60,6 +61,25 @@ class AgencyController extends Controller
         }
     }
 
+    public function activeAgenciesMembers(Request $request){
+        try {
+            $data = $this->agencyService->agencyById($request->id);
+
+            $memebrs =             $data->mempers()
+            ->orderBy('monthly_diamond_received', 'desc')
+            ->with(['userSallary' => function ($query) {
+                $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
+            }, 'profile' => function ($query) {
+                $query->select('id', 'user_id', 'avatar');
+            }])
+            ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']);
+
+            return Common::apiResponse(true, 'success', $memebrs);
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function delete(Request $request)
     {
         try {
@@ -101,7 +121,7 @@ class AgencyController extends Controller
         }
 
         try {
-            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id, $request->per_page, $request->page);
+            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id,$request->search, $request->per_page, $request->page);
             return Common::apiResponse(true, 'success', AgencyRequestsResource::collection($data));
         } catch (Exception $exception) {
 
@@ -202,7 +222,7 @@ class AgencyController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,id',
             'agency_id' => 'required|integer|exists:agencies,id',
-            'status' => 'required|boolean',
+            'status' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());

@@ -19,36 +19,38 @@ class CpRepository
         return CpRelation::find($id);
     }
 
-    public function findStoppedRelationBetweenTwoUsers($userOne, $userTwo, $type){
-        return Cp::where(function($q) use($userOne, $userTwo){
-            $q->where(function($q) use($userOne, $userTwo){
+    public function findStoppedRelationBetweenTwoUsers($userOne, $userTwo, $type)
+    {
+        return Cp::where(function ($q) use ($userOne, $userTwo) {
+            $q->where(function ($q) use ($userOne, $userTwo) {
                 $q->where('user_one_id', $userOne)->where('user_two_id', $userTwo);
             })
-            ->orWhere(function($q)use($userOne, $userTwo){
-                $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
-            });
+                ->orWhere(function ($q) use ($userOne, $userTwo) {
+                    $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
+                });
         })
-        ->whereHas('cpRelation', function($q)use($type){
-            $q->where('type', $type);
-        })
-        ->where("status", CpStatus::STOPED)
-        ->first();
+            ->whereHas('cpRelation', function ($q) use ($type) {
+                $q->where('type', $type);
+            })
+            ->where("status", CpStatus::STOPED)
+            ->first();
     }
 
-    public function findCpBetweenUsers($userOne, $userTwo, $type=null){
-        return Cp::where(function($q) use($userOne, $userTwo){
-            $q->where(function($q) use($userOne, $userTwo){
+    public function findCpBetweenUsers($userOne, $userTwo, $type = null)
+    {
+        return Cp::where(function ($q) use ($userOne, $userTwo) {
+            $q->where(function ($q) use ($userOne, $userTwo) {
                 $q->where('user_one_id', $userOne)->where('user_two_id', $userTwo);
             })
-            ->orWhere(function($q)use($userOne, $userTwo){
-                $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
-            });
+                ->orWhere(function ($q) use ($userOne, $userTwo) {
+                    $q->where('user_one_id', $userTwo)->where('user_two_id', $userOne);
+                });
         })
-        ->whereHas("cpRelation", function ($q) {
-            $q->where('type','!=', 'solution');
-        })
-        ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
-        ->first();
+            ->whereHas("cpRelation", function ($q) {
+                $q->where('type', '!=', 'solution');
+            })
+            ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->first();
     }
 
     public function getCpCount($userId)
@@ -57,9 +59,9 @@ class CpRepository
             $query->where("user_one_id", $userId)
                 ->orWhere("user_two_id", $userId);
         })
-        ->whereHas("cpRelation", function ($q) {
-            $q->where('type','!=', 'solution');
-        })
+            ->whereHas("cpRelation", function ($q) {
+                $q->where('type', '!=', 'solution');
+            })
             ->whereIn("status", [0, 1, 4])
             ->count();
     }
@@ -75,7 +77,7 @@ class CpRepository
                 });
         })
             ->whereHas("cpRelation", function ($q) {
-                $q->where('type','!=', 'solution');
+                $q->where('type', '!=', 'solution');
             })
             ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
@@ -205,7 +207,6 @@ class CpRepository
             ->orderByDesc('total_gifts')
             ->take(20)
             ->get();
-           
     }
 
     public function getCpRankingWithOutRelation($type)
@@ -213,13 +214,13 @@ class CpRepository
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
             ->whereNotNull("cp_id")
             ->with(['cp' => function ($query) {
-                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id','cp_relation_id')
-                ->with(['relation' => function ($query) {
-                    $query->select('id', 'type');  
-                }]);
+                $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id')
+                    ->with(['relation' => function ($query) {
+                        $query->select('id', 'type');
+                    }]);
             }])
             ->whereHas("cp.relation", function ($q) {
-                $q->whereNotNull('type');    
+                $q->whereNotNull('type');
             })
             ->when($type, function ($query) use ($type) {
                 /// todo update this filter
@@ -237,13 +238,11 @@ class CpRepository
             // ->take(1)
             ->get()
             ->groupBy(function ($item) {
-                return $item->cp->relation->type;  
+                return $item->cp->relation->type;
             })
             ->map(function ($groupedLogs) {
-                return $groupedLogs->sortByDesc('total_gifts')->first();     
+                return $groupedLogs->sortByDesc('total_gifts')->first();
             });
-
-            
     }
 
     public function getCpList($userId, $activeOnly = false)
@@ -267,9 +266,9 @@ class CpRepository
 
     public function getUserCpProfiles($userId, $statuses, $count = 9)
     {
-        return Cp::with('relation:id,title,type')
-            ->whereHas("cpRelation",function ($q){
-                $q->where('type',"!=",'solution');
+        return Cp::with('relation:id,title,type', 'toUser', 'fromUser')
+            ->whereHas("cpRelation", function ($q) {
+                $q->where('type', "!=", 'solution');
             })
             ->where(function ($query) use ($userId) {
                 $query->where('user_one_id', $userId)
@@ -279,5 +278,13 @@ class CpRepository
             ->orderByDesc('di')
             ->take($count)
             ->get();
+    }
+
+    public function getByUser($userId)
+    {
+        return Cp::where(function ($query) use ($userId) {
+            $query->where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId);
+        })->with('relation:id,title,type', 'toUser', 'fromUser')->get();
     }
 }

@@ -67,11 +67,11 @@ class UserResource extends JsonResource
             $timeDifferenceFormatted = "In the future";
         }
 
-        $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?: $this->getUserDress(4, $this->dress_1, 'img1');
+        $frame  = $this->getUserDress(4, $this->dress_1, 'img2') ?? $this->getUserDress(4, $this->dress_1, 'img1');
         // Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
-        $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?: $this->getUserDress(6, $this->dress_3, 'img1');
+        $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?? $this->getUserDress(6, $this->dress_3, 'img1');
         //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
@@ -95,7 +95,6 @@ class UserResource extends JsonResource
                 'show_banner' => 1,
             ]);
         }
-
         $data      = [
             'id'      => @$this->id, // both
             'uuid'    => @$this->uuid, // both
@@ -163,6 +162,7 @@ class UserResource extends JsonResource
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
             'image_color'          => @$this->color_image,
+            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
@@ -177,14 +177,20 @@ class UserResource extends JsonResource
     public function getUserDress($type, $dress, $item = 'img1')
     {
 
-        $packs = $this->packs;
-        /** @var \Illuminate\Database\Eloquent\Collection $packs */
-        $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
-        if ($pack) {
-            if ($pack->ware) {
-                return $pack->ware->{$item};
-            }
-        }
-        return '';
+        // $packs = $this->packs;
+        // /** @var \Illuminate\Database\Eloquent\Collection $packs */
+        // $pack = $packs->where('type', $type)->where('target_id', $dress)->first();
+        // if ($pack) {
+        //     if ($pack->ware) {
+        //         return $pack->ware->{$item};
+        //     }
+        // }
+        // return '';
+        $pack = $this->packs
+        ->where('type', $type)
+        ->where('target_id', $dress)
+        ->first();
+
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }

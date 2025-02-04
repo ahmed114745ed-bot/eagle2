@@ -22,11 +22,22 @@ class UserRepository extends Repository
     public function searchWithPage($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
-            ->where('name', 'like', '%' . $key . '%')
+             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('uuid', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function searchWithPageNew($key, $page, $perPage)
+    {
+
+        return User::select('id','uuid','name')
+             ->where('name', 'like', '%' . $key . '%')
+            ->orWhere('uuid', 'like', '%' . $key . '%')
+            ->orWhere('id', 'like', '%' . $key . '%')
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
 
     public function searchUserAgency($key, $page, $perPage)
     {
@@ -202,7 +213,11 @@ class UserRepository extends Repository
     {
         return $this->model->query()
             ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")->orWhere('id', $search)->orWhere('uuid', $search);
+                $query->where(function($q) use($search){
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('id', $search)
+                    ->orWhere('uuid', $search);
+                });
             })->select('id', 'name', 'uuid')->get();
     }
 
@@ -244,10 +259,15 @@ class UserRepository extends Repository
     }
 
 
-    public function trashedUserAccountList($perPage, $Page, $uuid)
+    public function trashedUserAccountList($perPage, $Page, $search)
     {
-        return User::onlyTrashed()->when(isset($uuid), function ($query) use ($uuid) {
-            $query->where('uuid', $uuid);
+        return User::onlyTrashed()->when($search, function ($query) use ($search) {
+            $query->where(function($q)use($search){
+                $q->where('name', 'LIKE', "%$search%")
+                ->orWhere('phone', 'LIKE' , "%$search%")
+                ->orWhere('uuid', 'LIKE' , "%$search%");
+            });
+
         })->orderByDesc('deleted_at')->paginate($perPage, ['*'], 'page', $Page);
     }
 
@@ -266,10 +286,14 @@ class UserRepository extends Repository
         return true;
     }
 
-    public function userLevel($perPage, $Page, $uuid)
+    public function userLevel($perPage, $Page, $search)
     {
-        return User::when(isset($uuid), function ($query) use ($uuid) {
-            $query->where('uuid', $uuid);
+        return User::when($search, function ($query) use ($search) {
+            $query->where(function($q)use($search){
+                $q->where('uuid', $search)
+                ->orWhere('phone', 'LIKE', "%$search%")
+                ->orWhere('name', 'LIKE', "%$search%");
+            });
         })->paginate($perPage, ['*'], 'page', $Page);
     }
 

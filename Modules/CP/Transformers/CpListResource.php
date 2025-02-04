@@ -23,6 +23,10 @@ class CpListResource extends JsonResource
             $user = $this->fromUser;
         }
 
+        $dress_1_data = $this->getUserDress($user, 4, $user->dress_1, 'img2');
+        $dress_1_fallback = $this->getUserDress($user, 4, $user->dress_1, 'img1');
+        $frame = $dress_1_data ?: $dress_1_fallback;
+
         $nextLevel = CpLevel::where("level", ">", $this->level_id)->first();
         $ratio = 0;
         if ($nextLevel) {
@@ -45,10 +49,20 @@ class CpListResource extends JsonResource
                 "name"      => $user?->name,
                 "image"     => $user?->avatar,
                 "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
+                'frame' => $frame,
             ],
             "relation" => $this->relation,
-            'frame'=>Common::getUserDress($user?->id,$user?->dress_1,4,'img2', true)?:Common::getUserDress($user?->id,$user?->dress_1,4,'img1', true),
+            'frame' => $frame,
 
         ];
+    }
+    public function getUserDress($user, $type, $dress, $item = 'img1')
+    {
+        $pack = $user->packs
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
+
+        return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }

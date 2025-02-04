@@ -70,7 +70,7 @@ class LuckyStrategyService
         }
         return $cat;
     }
-    
+
     public function getUpdateGiftCountForCategory(Gift $gift)
     {
         $cat = $this->getGiftCategory($gift);
@@ -88,7 +88,7 @@ class LuckyStrategyService
 
         return $value;
     }
-    
+
     public function getUpdateUserStatistic(User $user,$bit,$win)
     {
         $key = 'user '.$user->id;
@@ -128,19 +128,19 @@ class LuckyStrategyService
         $input = implode(' ', $numbers);
         $pythonScript = base_path('app/Tik/Python/categorize_numbers.py');
         $command = escapeshellcmd("python3 {$pythonScript} {$input}");
-    
+
         $output = [];
         $returnVar = 0;
         exec($command, $output, $returnVar);
-    
+
         if ($returnVar !== 0) {
-            dd($output);
+            //dd($output);
            return throw new \RuntimeException("Python script returned an error. Command: {$command}");
         }
-    
+
         $outputString = implode('', $output);
         $decodedOutput = json_decode($outputString, true);
-    
+
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException("JSON decoding error: " . json_last_error_msg());
         }

@@ -322,7 +322,7 @@ Route::group(
         $router->resource('room-target', RoomTargetController::class);
 
         // $router->resource('agencyMangLink', AgencyMangerLinkController::class);
-        
+
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
@@ -380,9 +380,9 @@ Route::group(
                     $background->use_count = $background_count;
                     $background->save();
                 }
-                dd("done");
+                //dd("done");
             }
-            dd("note found data");
+            //dd("note found data");
         });
 
 

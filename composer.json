@@ -9,6 +9,7 @@
         "ext-curl": "*",
         "ext-openssl": "*",
         "beyondcode/laravel-websockets": "^1.14",
+        "boogiefromzk/agora-token": "^1.0",
         "cmdotcom/text-sdk-php": "^2.2",
         "dflydev/apache-mime-types": "^1.0",
         "encore/laravel-admin": "^1.8",

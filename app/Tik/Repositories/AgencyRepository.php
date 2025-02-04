@@ -84,6 +84,17 @@ class AgencyRepository extends AbstractRepository
         })->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function agencyById($id){
+        return $this->model->where(function ($query) {
+            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                'additionalInfo',
+                function ($query) {
+                    $query->where('status', 1);
+                }
+            );
+        })->findOrFail($id);
+    }
+
     public function getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status = null, $action = null)
     {
         if ($action == null) {
@@ -154,7 +165,7 @@ class AgencyRepository extends AbstractRepository
         return $this->model->whereIn('id', $ids)->get();
     }
 
-    public function agencies($id, $perPage, $page)
+    public function agencies($id, $search, $perPage, $page)
     {
         return $this->model->where('id', '!=', $id)->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
@@ -163,7 +174,12 @@ class AgencyRepository extends AbstractRepository
                     $query->where('status', 1);
                 }
             );
-        })->paginate($perPage, ['*'], 'page', $page);
+        })->when(isset($search), function ($query) use ($search) {
+            $query->whereHas('owner', function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('uuid', 'like', "%$search%");
+            });
+        })->with('owner')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function report($id, $month = null, $year = null, $perPage, $page)
@@ -185,5 +201,12 @@ class AgencyRepository extends AbstractRepository
                 $agency->salary = $agency->getSalaryAgency($month, $year);
                 return $agency;
             });
+    }
+
+    public function getChargeAgency($id)
+    {
+        return $this->model->whereHas('chargeAgency')->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->get();
     }
 }

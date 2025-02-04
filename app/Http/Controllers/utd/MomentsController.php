@@ -8,8 +8,12 @@ use App\Helpers\Common;
 use App\Models\ImageColor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MomentResource;
 use App\Tik\Services\MomentsService;
 use Illuminate\Support\Facades\Validator;
+use Modules\Moment\Entities\MomentCommint;
+use Modules\Moment\Entities\MomentLikes;
+use Modules\Moment\Transformers\MomentDashboardResource;
 
 class MomentsController extends Controller
 {
@@ -19,7 +23,8 @@ class MomentsController extends Controller
     public function all(Request $request)
     {
         $data = $this->MomentsService->all($request->id, $request->per_page, $request->page);
-        return Common::apiResponse(true, 'done', $data);
+
+        return Common::apiResponse(true, 'done', MomentResource::collection($data) );
     }
 
     public function create(Request $request)
@@ -69,7 +74,8 @@ class MomentsController extends Controller
     public function show($id)
     {
         $data = $this->MomentsService->show($id);
-        return Common::apiResponse(true, 'done', $data);
+
+        return Common::apiResponse(true, 'done', new MomentResource($data) );
     }
 
     public function destroy($id)
@@ -83,17 +89,31 @@ class MomentsController extends Controller
         }
     }
 
-    public function search($id, Request $request)
+    public function search($uuid, Request $request)
     {
 
         try {
-            $reel = $this->MomentsService->search($id);
-            return Common::apiResponse(true, 'success', $reel);
+            $moment = $this->MomentsService->search($uuid);
+            return Common::apiResponse(true, 'success', MomentResource::collection($moment) );
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function get_user_moments($user_id, Request $request)
+    {
+
+        try {
+            $reels = $this->MomentsService->get_user_moments($user_id);
+            // return $reels;
+            return Common::apiResponse(true, 'success', MomentDashboardResource::collection($reels));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
 
     public function config(Request $request)
     {

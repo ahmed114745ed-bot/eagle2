@@ -35,4 +35,8 @@ class RequestBackgroundImageRepository extends AbstractRepository
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function store($data){
+        $this->model->create($data);
+    }
 }

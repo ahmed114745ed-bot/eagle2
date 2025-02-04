@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RealResource;
 use Modules\Reals\Entities\Real;
 use App\Tik\Services\ReelsService;
 use Illuminate\Http\Request;
@@ -19,25 +20,36 @@ class ReelsController extends Controller
 
         try {
             $reels = $this->reelService->index($request->per_page, $request->Page);
-            return Common::apiResponse(true, 'success', $reels);
+
+            return Common::apiResponse(true, 'success', RealResource::collection($reels) );
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-    
+
+    }
+
+    public function user($id,Request $request){
+        try {
+            $reels = $this->reelService->showByUser($id);
+            return Common::apiResponse(true, 'success', RealResource::collection($reels));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
     public function show( $id,Request $request)
     {
 
         try {
             $reel = $this->reelService->show($id);
-            return Common::apiResponse(true, 'success', $reel);
+            return Common::apiResponse(true, 'success', new RealResource($reel));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
+
     }
 
     public function search( $id,Request $request)
@@ -45,16 +57,16 @@ class ReelsController extends Controller
 
         try {
             $reel = $this->reelService->search($id);
-            return Common::apiResponse(true, 'success', $reel);
+            return Common::apiResponse(true, 'success', new RealResource($reel));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
+
     }
 
 
-    
+
 
 
     public function destroy($id)
@@ -66,7 +78,7 @@ class ReelsController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-       
+
 
     }
 
@@ -87,5 +99,5 @@ class ReelsController extends Controller
 
 
     }
-    
+
 }

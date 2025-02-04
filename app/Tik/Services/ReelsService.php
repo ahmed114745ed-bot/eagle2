@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\reelRepository;
 
 
-class ReelsService 
+class ReelsService
 {
 
     public function __construct(
@@ -21,8 +21,10 @@ class ReelsService
         return $this->reelRepository->all($perPage, $Page);
     }
 
-   
 
+    public function showByUser($id){
+        return $this->reelRepository->showByUser($id);
+    }
     public function show($id)
     {
 
@@ -34,8 +36,8 @@ class ReelsService
 
         return $this->reelRepository->search($id);
     }
-    
-   
+
+
     public function delete( $reelId)
     {
         $reel = $this->reelRepository->find($reelId);
@@ -46,8 +48,8 @@ class ReelsService
         return true;
     }
 
-   
 
-   
-   
+
+
+
 }

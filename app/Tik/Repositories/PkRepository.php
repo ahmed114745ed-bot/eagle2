@@ -35,4 +35,11 @@ class PkRepository extends AbstractRepository
     {
         return $this->model->query()->where('id', $id)->where('status', 1)->orderByDesc('id')->first();
     }
+
+    public function roomPks($userId, $perPage, $page)
+    {
+        return $this->model->whereHas('room', function ($q) use ($userId) {
+            $q->where('uid', $userId);
+        })->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+    }
 }

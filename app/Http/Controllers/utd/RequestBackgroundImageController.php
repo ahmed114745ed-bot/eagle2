@@ -57,7 +57,8 @@ class RequestBackgroundImageController extends Controller
         $validator = Validator::make($request->all(), [
 
             'owner_room_id' => 'required|integer|exists:users,id',
-            'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'img' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img' => 'nullable',
             'status' => 'required|integer',
             'expair' => 'required|integer',
         ]);
@@ -76,7 +77,8 @@ class RequestBackgroundImageController extends Controller
     public function destroy($id)
     {
         try {
-            $this->requestBackgroundImagService->delete($id);
+            $result =$this->requestBackgroundImagService->delete($id);
+            if(!$result)return Common::apiResponse(false, 'Item Not found');
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 

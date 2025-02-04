@@ -43,9 +43,9 @@ class InAppPurchase extends Controller
          $product = new Product();
          try {
              $response = $product->googlePlay($client)->packageName('com.tikkchat.app')->token($token)->id($productId)->get();
-             dd($response, 'this');
+             //dd($response, 'this');
          } catch (GuzzleException $e) {
-             dd($e->getMessage(), 'this');
+             //dd($e->getMessage(), 'this');
          }
 
                  $subscription->verifyReceipt($client);

@@ -3,8 +3,10 @@
 namespace Modules\Achievement\Http\Controllers\web;
 
 use App\Helpers\Common;
+use App\Models\AchievementValidImage;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\Achievement\Entities\AchievementLevel;
@@ -26,8 +28,11 @@ class AchievementLevelsModuleController extends Controller
         $achievementLevel_id = request('achievement_level_id');
         $userId = request('user_id');
         $gift = request('gift_achievement_id');
+          
+          
+
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
-        if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
+        if ($achievementLevel_id == null && $request->hasFile('custom_image') ) {
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
                 'user_id'       => $userId,
@@ -36,7 +41,36 @@ class AchievementLevelsModuleController extends Controller
             ];
 
             UserAchievementLevel::create($attributes);
-        } elseif ($achievementLevel != null) {
+            AchievementValidImage::create([
+                'image' => $customImage,
+                'user_id' => Auth::user()->id,
+                'type' => 'user',
+            ]);
+        }elseif ($achievementLevel_id == null && $request->hasFile('custom_file') ) {
+            
+            $custom_file = Common::upload('custom_file', $request->file('custom_file'));
+            $attributes = [
+                'user_id'       => $userId,
+                'file' => $custom_file,
+                'achievement_id' => $request->input('achievement_id'),
+            ];
+
+            UserAchievementLevel::create($attributes);
+            AchievementValidImage::create([
+                'file' => $custom_file,
+                'user_id' => Auth::user()->id,
+                'type' => 'user',
+            ]);
+        }elseif ($achievementLevel_id == null && request('custom_image') ) {
+            $customImagepath = request('custom_image');
+            $attributes = [
+                'user_id'       => $userId,
+                'custom_image' => $customImagepath,
+                'achievement_id' => $request->input('achievement_id'),
+            ];
+
+            UserAchievementLevel::create($attributes);
+        }elseif ($achievementLevel != null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
                 $error = new MessageBag([

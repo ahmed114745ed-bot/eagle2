@@ -104,7 +104,7 @@ class ImportExcelReportController extends MainController {
             Excel::import(new FirstImport, request()->file('file'));
             return back();
         } catch (\Throwable $th) {
-           dd($th->getMessage());
+           //dd($th->getMessage());
         }
 
     }

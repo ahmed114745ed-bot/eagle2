@@ -157,4 +157,9 @@ return [
     'admin'=>'admin',
     "receiver" => "Total sent to",
 
+    'type_file'=>'Type upload',
+    'file'=>'File',
+    'Image'=>'Image',
+    'select_file'=>'Select File'
+
 ];

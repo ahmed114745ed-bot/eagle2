@@ -2,14 +2,15 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainOldController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Enums\TypeGeneralRole;
+use Encore\Admin\Layout\Content;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\GeneralRole;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainOldController;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class GeneralRoleController extends MainOldController
@@ -99,13 +100,9 @@ class GeneralRoleController extends MainOldController
         $form = new Form(new GeneralRole);
 
         $form->display('ID');
-        $form->select('type', __('type'))->options([
-            'weekly_star' => 'weekly_star',
-            'pk_event' => 'pk_event',
-            'charge_event' => 'charge_event',
-            'event_period' => 'period_event',
-            'weekly_cp' => 'weekly_cp',
-        ])->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
+        $form->select('type', __('type'))->options(
+            TypeGeneralRole::getTranslatedOptions()
+        )->creationRules(['required', "unique:general_roles"], ['unique' => __('This type is used before; please modify it')])
             ->updateRules(['required', "unique:general_roles,type,{{id}}"]);
         $form->url('url', trans('url'))->required();
         $form->text('sub_type', 'sub_type');

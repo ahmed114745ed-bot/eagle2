@@ -11,6 +11,7 @@ use Modules\Achievement\Http\Repositories\AchievementRepository;
 use Modules\Achievement\Http\Repositories\GiftAchievementRepository;
 use Modules\Achievement\Http\Repositories\AchievementLevelRepository;
 use Modules\Achievement\Http\Repositories\UserAchievementLevelRepository;
+use Request;
 
 class AchievementService
 {
@@ -108,7 +109,7 @@ class AchievementService
 
     public function achievementGift($request)
     {
-        $this->giftAchievementRepository->create([$request->all()]);
+        $this->giftAchievementRepository->store($request);
         return true;
     }
 
