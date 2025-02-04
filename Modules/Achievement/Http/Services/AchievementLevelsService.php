@@ -113,7 +113,7 @@ class AchievementLevelsService
                     $this->assignAchievement($userId, $achievementLevel, $levelIds, $defaultIds,@$userAchievement?->gift_achievement_id);
 
                 } catch (\Exception $e) {
-                    dd($e->getMessage());
+                    //dd($e->getMessage());
                     return null;
                 }
                 return $achievementLevel->target_type;

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class RoomCategory extends Model
 {
     protected $table = 'room_categories';
-
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';

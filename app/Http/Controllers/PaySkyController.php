@@ -50,7 +50,7 @@ class PaySkyController extends Controller
 
         $result = json_decode($response->getBody(), true);
 
-        dd($result,$this->apiUrl, $data);
+        //dd($result,$this->apiUrl, $data);
 
     }
 

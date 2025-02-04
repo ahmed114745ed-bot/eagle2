@@ -15,7 +15,7 @@ class RoomCategoryController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'categories';
-   
+
 
     public function index(Content $content)
     {
@@ -123,7 +123,7 @@ class RoomCategoryController extends MainController
         $form->text('name', trans('name'))->rules ('required');
         $form->text('name_en', trans('name_en'))->rules ('required');
         $form->select('type', trans('type'))->options([
-            'party' => trans('party') 
+            'party' => trans('party')
         ]);
         $form->image('img', trans('img'));
         $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ());
