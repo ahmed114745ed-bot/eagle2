@@ -187,6 +187,16 @@ class PkEventController extends Controller
                 'expire'  => $request->expire,
             ];
             $reward =  PkReward::findOrFail($id);
+            if ($request->type == 'ware') {
+                $reward->target = $request->target1;
+            } elseif ($request->type == 'vip') {
+                $reward->target = $request->target2;
+            } elseif ($request->type == 'coins') {
+                $reward->target = $request->target3;
+            } elseif ($request->type == 'achievement' && $request->hasFile('target4')) {
+                $file = $request->file('target4');
+                $reward->target = Common::upload('images', $file);
+            }
             $reward->update($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {

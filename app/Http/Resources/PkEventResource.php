@@ -38,6 +38,7 @@ class PkEventResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type ?: '',
             'target' => $target ?? '',
+            'id_target' => $this->target ?? '',
             'image' => $path ?? '',
             'expire' => $this->expire ?? 0,
             'pk_event_id' => $this->pk_event_id,

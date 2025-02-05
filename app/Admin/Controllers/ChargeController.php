@@ -86,8 +86,8 @@ class ChargeController extends MainController
                 $type = "agency";
             }else{
                 $user = \App\Models\User::find($userId);
-                $img = getDriverUrl().'/'. $user->profile?->avatar;
-                $id = $user->uuid;
+                $img = getDriverUrl().'/'. @$user->profile?->avatar ?? '';
+                $id = @$user->uuid ?? 0;
                 $type = "user";
             }
             return "<img src='$img' style='width: 50px; height: 50px; border-radius: 50%;' /> <br> uid: #{$id} <br> type: #{$type}";
