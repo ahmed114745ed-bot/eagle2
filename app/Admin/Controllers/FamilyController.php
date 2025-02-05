@@ -134,12 +134,11 @@ class FamilyController extends MainController
         })->ajax('/api/search/users4', 'id', 'name')->rules('required');
         $form->hidden('is_success', 'is_success')->default(1)->rules('required');
 
-        $form->saved(function (Form $form) {
-
-            $originalOwnerId = $form->model()->getOriginal('user_id');
-            $newOwnerId = $form->model()->user_id;
-            if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
-                User::where('id', $form->model()->user_id)->update(['family_id' => null]);
+        $form->saving(function (Form $form) {
+            $oldOwnerFamily = $form->model()->user_id;
+            $newOwnerFamily = request()->user_id;
+            if ($form->model()->exists && ($oldOwnerFamily != $newOwnerFamily)) {
+                User::where('id', $form->model()->user_id)->update(['family_id' => 0]);
                 FamilyUser::where([
                     'user_id' => $form->model()->user_id,
                     'family_id' => $form->model()->id,
@@ -147,7 +146,15 @@ class FamilyController extends MainController
                     'status' => 1,
                 ])->delete();
             }
-            if (!$form->model()->exists || $newOwnerId != $originalOwnerId) {
+        });
+        $form->saved(function (Form $form) {
+            $checkFamilyUser = FamilyUser::where([
+                'user_id' => $form->model()->user_id,
+                'family_id' => $form->model()->id,
+                'user_type' => 2,
+                'status' => 1,
+            ])->exists();
+            if (!$checkFamilyUser) {
                 User::where('id', $form->model()->user_id)->update(['family_id' => $form->model()->id]);
                 FamilyUser::create([
                     'user_id' => $form->model()->user_id,
