@@ -38,6 +38,7 @@ class WeeklyEventResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type ?: '',
             'target' => $target ?? '',
+            'id_target' => $this->target,
             'image' => $path ?? '',
             'expire' => $this->expire ?? 0,
             'weekly_star_id' => $this->weekly_star_id,
