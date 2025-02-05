@@ -6,11 +6,11 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 
-class SalaryRequestController extends AdminController
+class SalaryRequestController extends MainController
 {
     /**
      * Title for current resource.
