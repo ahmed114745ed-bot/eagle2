@@ -77,19 +77,20 @@ use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\PaymentGateWayController;
 use App\Http\Controllers\utd\SpecialHistoryController;
 use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\SallariesHistoryController;
+use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-use App\Http\Controllers\utd\PaymentGateWayController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -711,6 +712,13 @@ Route::middleware([])->group(function () {
         Route::get('/', [AgencyController::class, 'allAgencyJoinRequest']);
         Route::post('/update/{id}', [AgencyController::class, 'updateAgencyJoinRequest']);
         Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
+    });
+
+    Route::prefix('requests-for-get-salary')->group(function () {
+        Route::get('/', [RequestTakeSalaryController::class, 'all']);
+        Route::post('/update/{id}', [RequestTakeSalaryController::class, 'update']);
+        Route::get('/show/{id}', [RequestTakeSalaryController::class, 'show']);
+        Route::get('/history', [RequestTakeSalaryController::class, 'history']);
     });
 
     Route::get('/reports', [ReportController::class, 'reports']);

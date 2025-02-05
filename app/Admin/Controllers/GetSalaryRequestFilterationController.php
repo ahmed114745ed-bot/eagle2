@@ -35,19 +35,12 @@ class GetSalaryRequestFilterationController extends MainController
 
     ];
 
-
-    // public function update ( $id )
-    // {
-
-    //     if (request ('_edit_inline') == "true"){
-    //         if (request ('status')){
-    //             request ()->request->add(['change_status_admin_id'=>Auth::id ()]);
-    //         }
-    //     }
-    //     return $this->form()->update($id);
-    // }
-
-
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('requests-for-get-salary'))
+            ->body($this->grid()));
+    }
 
     /**
      * Make a grid builder.
