@@ -42,6 +42,11 @@ class BanController extends Controller
         return Common::apiResponse(true, 'Success', BanResource::collection($bans));
     }
 
+    public function banTypes(){
+        $result = BanType::all();
+
+        return Common::apiResponse(true, 'Success', $result);
+    }
     public function removeBan(Request $request)
     {
         $user = User::query ()->where ('uuid',$request->uid)->first();

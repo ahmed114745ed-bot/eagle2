@@ -89,7 +89,7 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-
+use App\Http\Controllers\utd\PaymentGateWayController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -212,6 +212,15 @@ Route::middleware([])->group(function () {
         Route::get('/{id}', [RoomCategoryController::class, 'show']);
     });
 
+
+    Route::prefix('payment-gateways')->group(function () {
+        Route::get('/', [PaymentGateWayController::class, 'index']);
+        Route::post('/create', [PaymentGateWayController::class, 'store']);
+        Route::post('/update/{id}', [PaymentGateWayController::class, 'update']);
+        Route::post('/delete/{id}', [PaymentGateWayController::class, 'delete']);
+        Route::post('/delete-all', [PaymentGateWayController::class, 'delete_all']);
+        Route::get('/{id}', [PaymentGateWayController::class, 'show']);
+    });
 
     Route::prefix('agency-country')->group(function () {
         Route::get('/', [ChargeAgencyController::class, 'index']);
@@ -361,6 +370,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete', [BanController::class, 'delete']);
         Route::post('/ban-user', [BanController::class, 'banUser']);
         Route::post('/remove-ban', [BanController::class, 'removeBan']);
+        Route::get('/ban-types', [BanController::class, 'banTypes']);
     });
 
     Route::prefix('sallaries_history')->group(function () {

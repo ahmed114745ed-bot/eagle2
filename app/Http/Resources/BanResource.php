@@ -25,6 +25,7 @@ class BanResource extends JsonResource
             'type' => $this->type,
             'reason' => $this->description_ar,
             'ban_type' => [
+                'ban_type_id' => $this->ban_type_id,
                 'name_ar' => $name_ar,
                 'name_en' => $name_en,
             ],
