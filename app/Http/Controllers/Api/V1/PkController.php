@@ -9,6 +9,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Utils;
 use App\Tik\Services\PkService;
+use App\Http\Resources\PkResource;
 use App\Http\Services\RoomService;
 use App\Http\Controllers\Controller;
 use App\Traits\Rooms\ChangeRoomMode;
@@ -257,5 +258,15 @@ class PkController extends Controller
                 "room_name"     => @$room->room_name ?: ""
             ]
         ];
+    }
+
+    public function roomPk($id, Request $request)
+    {
+        try {
+            $data = $this->pkService->roomPk($id, $request->per_page, $request->page);
+            return   Common::apiResponse(true, 'done', PkResource::collection($data) );
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
     }
 }

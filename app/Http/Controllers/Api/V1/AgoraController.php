@@ -14,15 +14,16 @@ class AgoraController extends Controller
             'channel' => 'required',
             'expir' => 'nullable'
         ]);
+        $user =$request->user();
 
         if($request->has('expir')){
 
-            $token = generateRtcToken($request->channel,auth()->user()->uuid, $request->expir);
+            $token = generateRtcToken($request->channel,$user->id, $request->expir);
 
             return Common::apiResponse(true,'Success',$token);
         }
 
-        $token = generateRtcToken($request->channel,auth()->user()->uuid);
+        $token = generateRtcToken($request->channel,$user->id);
 
         return Common::apiResponse(true,'Success',$token);
     }

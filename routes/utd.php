@@ -4,6 +4,7 @@
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
+use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
+use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\utd\PkEventController;
 use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
+use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
@@ -39,6 +42,7 @@ use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
+use App\Http\Controllers\utd\AdminCheckController;
 use App\Http\Controllers\utd\BackgroundController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
@@ -56,13 +60,16 @@ use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ReportMomentController;
+use App\Http\Controllers\utd\RoomCategoryController;
 use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\ChargeCountryController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
+use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
 use App\Http\Controllers\utd\SpecialHistoryController;
@@ -76,14 +83,12 @@ use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
-use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
 use App\Http\Controllers\utd\ChargeAgencyController;
 use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\LevelController;
 use App\Http\Controllers\utd\LevelGiftController;
-use App\Http\Controllers\utd\QuestionController;
-use App\Http\Controllers\utd\RoomCategoryController;
+
 
 // 'utd.decreptHeader'
 // utd apis
@@ -561,6 +566,8 @@ Route::middleware([])->group(function () {
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
+        Route::get('room/{id}', [RoomController::class, 'roomUserDetails']);
+        Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
 
@@ -695,6 +702,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [CountryController::class, 'delete']);
         Route::post('/delete-all', [CountryController::class, 'delete_all']);
         Route::get('/{id}', [CountryController::class, 'show']);
+        Route::get('/charge', [ChargeCountryController::class, 'country']);
     });
 
     Route::prefix('colors')->group(function () {
@@ -714,6 +722,14 @@ Route::middleware([])->group(function () {
         Route::post('/create', [TargetEventController::class, 'store']);
         Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
         Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('charge-country')->group(function () {
+        Route::get('/', [ChargeCountryController::class, 'all']);
+        Route::get('/show/{id}', [ChargeCountryController::class, 'show']);
+        Route::post('/create', [ChargeCountryController::class, 'store']);
+        Route::delete('/delete/{id}', [ChargeCountryController::class, 'destroy']);
+        Route::post('/update/{id}', [ChargeCountryController::class, 'update']);
     });
 
     Route::prefix('target-events-gift')->group(function () {
@@ -775,6 +791,12 @@ Route::middleware([])->group(function () {
     Route::get('/wares-event', [RewardLevelIntervalController::class, 'wareInterval']);
     Route::get('/vip-event', [RewardLevelIntervalController::class, 'vipInterval']);
     Route::get('/gift-event', [WeeklyEventController::class, 'gifts']);
+});
+
+Route::prefix('transaction-request-problem')->group(function () {
+    Route::get('/', [AdminCheckController::class, 'all']);
+    Route::post('accept/{id}', [AdminCheckController::class, 'accept']);
+    Route::post('refuse/{id}', [AdminCheckController::class, 'cancel']);
 });
 
 

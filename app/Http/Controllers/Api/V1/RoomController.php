@@ -15,20 +15,23 @@ use App\Models\KickRecord;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
+use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
-use App\Services\RoomService;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
 use App\Tik\Services\RoomRepoService;
 use App\Http\Requests\EditRoomRequest;
 use App\Models\RequestBackgroundImage;
+use Modules\CP\Entities\CpRoomHistory;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\RoomDetailsResource;
 use App\Repositories\Room\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Resources\RoomCountriesResource;
@@ -37,10 +40,8 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
-use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\CP\Entities\CpRoomHistory;
 
 class RoomController extends Controller
 {
@@ -1357,7 +1358,7 @@ class RoomController extends Controller
     public function removeRoomPass(Request $request)
     {
         $room = $this->roomService->changePasswordRoom($request->owner_id);
-       
+
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",
@@ -1673,8 +1674,8 @@ class RoomController extends Controller
             $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
             $userToBlock = $request->user_id;
-                $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
-                if(!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0,'This user is not in this room',null,404);
+            $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
+            if (!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
 
             // Check if the current user is the owner of the room
@@ -1734,6 +1735,16 @@ class RoomController extends Controller
             $room->room_black = implode(',', $updatedIds);
             $room->save();
             return   Common::apiResponse(true, 'block removed', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
+    }
+
+    public function roomUserDetails($id)
+    {
+        try {
+            $room = $this->roomServiceMain->roomDetails($id);
+            return   Common::apiResponse(true, 'done', new RoomDetailsResource($room));
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

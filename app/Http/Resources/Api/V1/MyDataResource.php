@@ -131,6 +131,7 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
+       
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -147,6 +148,7 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
+          
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
@@ -154,7 +156,7 @@ class MyDataResource extends JsonResource
                 "room_cover" => @$ownerRoom->room_cover ?? '',
                 "room_background" => @$ownerRoom->final_room_image ?? '',
                 "mode" => @$ownerRoom->mode ?? 0,
-                'giftPrice' => @$ownerRoom->session_string ?? 0,
+                'giftPrice' => @$ownerRoom->session_string ?? "0",
                 "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
@@ -162,7 +164,6 @@ class MyDataResource extends JsonResource
             ],
             'phone_bind' => (bool)@$this->phone,
             'vip' => Common::ovip_center($this),
-
             'family_id' => @$this->family_id,
             'uuid' => @$this->uuid,
             'special_color'    => @$this->color_id ?? '',
@@ -171,7 +172,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
+           
             'profile' => new ProfileResource(@$this->profile),
+            
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),

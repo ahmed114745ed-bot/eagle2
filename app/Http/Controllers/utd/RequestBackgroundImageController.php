@@ -77,7 +77,8 @@ class RequestBackgroundImageController extends Controller
     public function destroy($id)
     {
         try {
-            $this->requestBackgroundImagService->delete($id);
+            $result =$this->requestBackgroundImagService->delete($id);
+            if(!$result)return Common::apiResponse(false, 'Item Not found');
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 
