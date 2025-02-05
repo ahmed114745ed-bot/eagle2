@@ -5,6 +5,8 @@ namespace App\Http\Controllers\utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\Family;
+use App\Models\FamilyUser;
+use App\Models\User;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 
@@ -37,6 +39,17 @@ class FamilyController extends Controller
             'image' => $image,
             'user_id'=> $request->user_id,
             'num' => $request->num,
+        ]);
+
+        // Update the user's family_id
+        User::where('id', $family->user_id)->update(['family_id' => $family->id]);
+
+        // Create FamilyUser entry
+        FamilyUser::create([
+            'user_id'   => $family->user_id,
+            'family_id' => $family->id,
+            'user_type' => 2,
+            'status'    => 1,
         ]);
 
         return Common::apiResponse(true, '',  [], 200);
@@ -76,5 +89,17 @@ class FamilyController extends Controller
         Family::findOrFail($id)->delete();
 
         return Common::apiResponse(1, 'success', null, 200);
+    }
+
+    public function delete_all(Request $request){
+        $request->validate([
+            'ids' => 'required'
+        ]);
+
+        $ids = explode(',', $request->ids);
+
+        Family::whereIn('id', $ids)->delete();
+
+        return Common::apiResponse(1, 'success');
     }
 }

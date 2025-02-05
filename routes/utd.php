@@ -108,6 +108,7 @@ Route::middleware([])->group(function () {
         Route::post('/', [FamilyController::class, 'store']);
         Route::post('/update/{id}', [FamilyController::class, 'update']);
         Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::post('/delete-all', [FamilyController::class, 'delete_all']);
         Route::get('/{id}', [FamilyController::class, 'show']);
     });
 
