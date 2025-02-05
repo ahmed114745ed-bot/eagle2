@@ -837,6 +837,9 @@ class AgencyService
                 'type_user' => 0,
             ];
             $this->userRepository->update($data, $agency->app_owner_id);
+            $user = User::find($agency->app_owner_id);
+            Admin::where('username', $user->uuid)->delete();
+            Common::createUserAdmin($request->app_owner_id);
         }
 
         if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {

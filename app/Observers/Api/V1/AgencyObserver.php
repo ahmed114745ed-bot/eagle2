@@ -17,7 +17,7 @@ class AgencyObserver
      */
     public function created(Agency $agency)
     {
-        User::query ()->where ('id',$agency->app_owner_id)->update (['agency_id'=>$agency->id]);
+        User::query()->where('id', $agency->app_owner_id)->update(['agency_id' => $agency->id]);
     }
 
 
@@ -29,7 +29,7 @@ class AgencyObserver
      */
     public function updated(Agency $agency)
     {
-        User::query ()->where ('id',$agency->app_owner_id)->update (['agency_id'=>$agency->id]);
+        User::query()->where('id', $agency->app_owner_id)->update(['agency_id' => $agency->id]);
     }
 
 
@@ -41,12 +41,11 @@ class AgencyObserver
      */
     public function deleted(Agency $agency)
     {
-
-        // User::query ()->where ('agency_id',$agency->id)->update (['agency_id'=>0]);
-        AgencyJoinRequest::query ()->where ('agency_id',$agency->id)->delete ();
+        User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);
+        AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
         \App\Facades\UserHandling::kickOfAllUsersFromAgency($agency);
         $user = User::find($agency->app_owner_id);
-         Admin::where('username', $user->uuid)->delete();
+        Admin::where('username', $user->uuid)->delete();
     }
 
     /**
