@@ -27,6 +27,7 @@ class BlackLisRepository extends AbstractRepository
                                 });
                             })
                           ->select('id','user_id')
+                          ->has('user')
                           ->with('user:id,name,uuid')
                           
                           ->paginate($perPage, ['*'], 'page', $page);

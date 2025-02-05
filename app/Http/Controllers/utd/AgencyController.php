@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\utd;
 
 use Exception;
+use App\Models\Agency;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ActiveAgencyMembersResource;
 use App\Http\Resources\RequestJoinAgency;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\ActiveAgencyResource;
 use App\Http\Resources\AgencyRequestsResource;
+use App\Http\Resources\ActiveAgencyMembersResource;
 
 
 class AgencyController extends Controller
@@ -61,18 +62,19 @@ class AgencyController extends Controller
         }
     }
 
-    public function activeAgenciesMembers(Request $request){
+    public function activeAgenciesMembers(Request $request)
+    {
         try {
             $data = $this->agencyService->agencyById($request->id);
 
             $memebrs =             $data->mempers()
-            ->orderBy('monthly_diamond_received', 'desc')
-            ->with(['userSallary' => function ($query) {
-                $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-            }, 'profile' => function ($query) {
-                $query->select('id', 'user_id', 'avatar');
-            }])
-            ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']);
+                ->orderBy('monthly_diamond_received', 'desc')
+                ->with(['userSallary' => function ($query) {
+                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
+                }, 'profile' => function ($query) {
+                    $query->select('id', 'user_id', 'avatar');
+                }])
+                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received']);
 
             return Common::apiResponse(true, 'success', $memebrs);
         } catch (Exception $exception) {
@@ -121,7 +123,7 @@ class AgencyController extends Controller
         }
 
         try {
-            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id,$request->search, $request->per_page, $request->page);
+            $data = $this->agencyService->AllAgencyExceptOld($request->old_agency_id, $request->search, $request->per_page, $request->page);
             return Common::apiResponse(true, 'success', AgencyRequestsResource::collection($data));
         } catch (Exception $exception) {
 
@@ -234,5 +236,15 @@ class AgencyController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public static function by_agency_filter()
+    {
+        $ops = [0 => 'no agency'];
+        $agencies = Agency::query()->where('status', 1)->get();
+        foreach ($agencies as $agency) {
+            $ops[$agency->id] = $agency->name;
+        }
+        return $ops;
     }
 }
