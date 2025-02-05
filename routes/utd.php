@@ -89,6 +89,7 @@ use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\LevelController;
 use App\Http\Controllers\utd\LevelGiftController;
 use App\Http\Controllers\utd\PaymentGateWayController;
+use App\Http\Controllers\utd\WithdrawController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -219,6 +220,16 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [PaymentGateWayController::class, 'delete']);
         Route::post('/delete-all', [PaymentGateWayController::class, 'delete_all']);
         Route::get('/{id}', [PaymentGateWayController::class, 'show']);
+    });
+
+
+    Route::prefix('withdraw-types')->group(function () {
+        Route::get('/', [WithdrawController::class, 'index']);
+        Route::post('/create', [WithdrawController::class, 'store']);
+        Route::post('/update/{id}', [WithdrawController::class, 'update']);
+        Route::post('/delete/{id}', [WithdrawController::class, 'delete']);
+        Route::post('/delete-all', [WithdrawController::class, 'delete_all']);
+        Route::get('/{id}', [WithdrawController::class, 'show']);
     });
 
     Route::prefix('agency-country')->group(function () {
