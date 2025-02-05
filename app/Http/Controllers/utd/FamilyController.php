@@ -13,21 +13,22 @@ use Illuminate\Http\Request;
 class FamilyController extends Controller
 {
     use DashBoardTrait;
-    public function index(){
+    public function index()
+    {
 
-        $perPage = request('per_page')?? 10;
+        $perPage = request('per_page') ?? 10;
         $families = Family::paginate($perPage);
 
 
         return Common::apiResponse(true, '', $families, 200);
-
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $image = null;
 
-        if($request->has('image')){
+        if ($request->has('image')) {
             $image = Common::upload('images', $request->image);
         }
 
@@ -37,7 +38,7 @@ class FamilyController extends Controller
             'notice' => $request->notice,
             'is_success' => $request->is_success,
             'image' => $image,
-            'user_id'=> $request->user_id,
+            'user_id' => $request->user_id,
             'num' => $request->num,
         ]);
 
@@ -55,43 +56,64 @@ class FamilyController extends Controller
         return Common::apiResponse(true, '',  [], 200);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
 
 
-        if($request->has('image')){
+        if ($request->has('image')) {
             $image = Common::upload('images', $request->image);
             Family::findOrFail($id)->update([
                 'image' => $image
             ]);
         }
-        Family::findOrFail($id)->update([
+        $family =  Family::findOrFail($id);
+
+        if ($family->user_id != $request->user_id) {
+            User::where('id', $request->user_id)->update(['family_id' => null]);
+            FamilyUser::where([
+                'user_id' => $request->user_id,
+                'family_id' => $family->id,
+                'user_type' => 2,
+                'status' => 1,
+            ])->delete();
+
+            User::where('id', $request->user_id)->update(['family_id' => $family->id]);
+            FamilyUser::create([
+                'user_id' => $request->user_id,
+                'family_id' => $family->id,
+                'user_type' => 2,
+                'status' => 1,
+            ]);
+        }
+        $family->update([
             'name' => $request->name,
             'introduce' => $request->introduce,
             'notice' => $request->notice,
             'is_success' => $request->is_success,
-            'user_id'=> $request->user_id,
+            'user_id' => $request->user_id,
             'num' => $request->num
         ]);
 
         return Common::apiResponse(1, 'Family updated successfully');
-
-
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $family = Family::findOrFail($id);
 
         return Common::apiResponse(true, '', $family, 200);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
 
         Family::findOrFail($id)->delete();
 
         return Common::apiResponse(1, 'success', null, 200);
     }
 
-    public function delete_all(Request $request){
+    public function delete_all(Request $request)
+    {
         $request->validate([
             'ids' => 'required'
         ]);
