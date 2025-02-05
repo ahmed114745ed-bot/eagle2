@@ -199,7 +199,7 @@ class UserController extends Controller
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }      
+        }
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->first()?->img;
 
@@ -900,5 +900,16 @@ class UserController extends Controller
     {
         $data = $this->userService->allUserCp($id);
         return Common::apiResponse(true, 'done', $data);
+    }
+
+    public static function by_user_filter()
+    {
+        $ops = [0 => 'no agency'];
+        $app_owner_id = Agency::query()->where('status', 1)->pluck('app_owner_id');
+        $users = User::whereIn('id', $app_owner_id)->get();
+        foreach ($users as $user) {
+            $ops[$user->id] = $user->name;
+        }
+        return $ops;
     }
 }

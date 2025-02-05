@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
+use App\Http\Controllers\utd\LevelController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\utd\BlackListController;
 use App\Http\Controllers\utd\GroupChatController;
+use App\Http\Controllers\utd\LevelGiftController;
 use App\Http\Controllers\utd\RoleEventController;
 use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
@@ -44,6 +46,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\AdminCheckController;
 use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ReportUserController;
@@ -56,6 +59,7 @@ use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\WeeklyEventController;
+use App\Http\Controllers\utd\ChargeAgencyController;
 use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
@@ -66,6 +70,7 @@ use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\utd\ChargeCountryController;
+use App\Http\Controllers\utd\SalaryRequestController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
@@ -84,10 +89,6 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
-use App\Http\Controllers\utd\ChargeAgencyController;
-use App\Http\Controllers\utd\CpRelationController;
-use App\Http\Controllers\utd\LevelController;
-use App\Http\Controllers\utd\LevelGiftController;
 
 
 // 'utd.decreptHeader'
@@ -528,6 +529,16 @@ Route::middleware([])->group(function () {
     Route::prefix('users-level')->group(function () {
         Route::get('/', [UserController::class, 'userLevel']);
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
+    });
+
+    Route::prefix('salary-requests')->group(function () {
+        Route::get('/', [SalaryRequestController::class, 'all']);
+        Route::post('/create', [SalaryRequestController::class, 'create']);
+    });
+
+    Route::prefix('filter')->group(function () {
+        Route::get('/agency', [AgencyController::class, 'by_agency_filter']);
+        Route::post('/agency-owner', [UserController::class, 'by_user_filter']);
     });
 
     Route::prefix('device-token')->group(function () {
