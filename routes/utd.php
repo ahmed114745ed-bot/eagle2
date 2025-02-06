@@ -92,6 +92,9 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\utd\BoxController;
+use App\Http\Controllers\utd\BoxUserController;
+use App\Http\Controllers\utd\EmojiController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -111,6 +114,8 @@ Route::middleware([])->group(function () {
         Route::post('/delete-all', [FamilyController::class, 'delete_all']);
         Route::get('/{id}', [FamilyController::class, 'show']);
     });
+
+
 
     Route::prefix('level-intervals')->group(function () {
         Route::get('/', [LevelIntervalsController::class, 'index']);
@@ -213,6 +218,36 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
         Route::post('/delete-all', [RoomCategoryController::class, 'delete_all']);
         Route::get('/{id}', [RoomCategoryController::class, 'show']);
+    });
+
+
+    Route::prefix('emojis')->group(function () {
+        Route::get('/', [EmojiController::class, 'index']);
+        Route::post('/create', [EmojiController::class, 'store']);
+        Route::post('/update/{id}', [EmojiController::class, 'update']);
+        Route::post('/update-status/{id}', [EmojiController::class, 'update_status']);
+        Route::post('/delete/{id}', [EmojiController::class, 'delete']);
+        Route::post('/delete-all', [EmojiController::class, 'delete_all']);
+        Route::get('/{id}', [EmojiController::class, 'show']);
+    });
+
+
+    Route::prefix('boxes')->group(function () {
+        Route::get('/', [BoxController::class, 'index']);
+        Route::post('/create', [BoxController::class, 'store']);
+        Route::post('/update/{id}', [BoxController::class, 'update']);
+        Route::post('/delete/{id}', [BoxController::class, 'delete']);
+        Route::post('/delete-all', [BoxController::class, 'delete_all']);
+        Route::get('/{id}', [BoxController::class, 'show']);
+    });
+
+
+    Route::prefix('thrown-boxes')->group(function () {
+        Route::get('/', [BoxUserController::class, 'index']);
+        Route::post('/update/{id}', [BoxUserController::class, 'update']);
+        Route::post('/delete/{id}', [BoxUserController::class, 'delete']);
+        Route::post('/delete-all', [BoxUserController::class, 'delete_all']);
+        Route::get('/{id}', [BoxUserController::class, 'show']);
     });
 
 
