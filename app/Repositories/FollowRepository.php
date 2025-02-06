@@ -53,7 +53,7 @@ class FollowRepository
         })->orderByDesc('id')->paginate(15);
     }
 
-    public function getFollowing(User $user, array $with = [],$keyword)
+    public function getFollowing(User $user, array $with = [], $keyword)
     {
 
         if (empty($with)) {
@@ -72,13 +72,13 @@ class FollowRepository
     }
 
     // Get paginated list of users that are following the current user
-    public function getFollowers(User $user, array $with = [],$keyword)
+    public function getFollowers(User $user, array $with = [], $keyword)
     {
         return $user->followerss()->with($with)->fitterByUuid($keyword)->paginate(10);
     }
 
     // Get paginated list of mutual followers (friends)
-    public function getFriends(User $user, array $with = [],$keyword)
+    public function getFriends(User $user, array $with = [], $keyword)
     {
         return $user->friends()->with($with)->fitterByUuid($keyword)->paginate(10);
     }
@@ -130,5 +130,15 @@ class FollowRepository
     public function getFollowedIds($userId)
     {
         return Follow::query()->where('user_id', $userId)->pluck('followed_user_id')->toArray();
+    }
+
+    public function checkFollowing($authId, $followId)
+    {
+        return Follow::query()->where('user_id', $authId)->where('followed_user_id', $followId)->exists();
+    }
+
+    public function checkFollower($authId, $followId)
+    {
+        return Follow::query()->where('user_id', $followId)->where('followed_user_id', $authId)->exists();
     }
 }
