@@ -4,6 +4,7 @@
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
+use App\Http\Controllers\utd\RoomController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
 use App\Http\Controllers\utd\LevelController;
@@ -21,7 +22,6 @@ use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
-use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
@@ -33,6 +33,7 @@ use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\RoomVipsController;
+use App\Http\Controllers\utd\WithdrawController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
@@ -94,7 +95,6 @@ use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
 use App\Http\Controllers\utd\BoxController;
 use App\Http\Controllers\utd\BoxUserController;
 use App\Http\Controllers\utd\EmojiController;
-use App\Http\Controllers\utd\WithdrawController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -639,7 +639,14 @@ Route::middleware([])->group(function () {
         Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
-
+    Route::prefix('rooms')->group(function () {
+        Route::get('/', [RoomController::class, 'all']);
+        Route::post('/create', [RoomController::class, 'store']);
+        Route::post('/update/{id}', [RoomController::class, 'update']);
+        Route::post('/show/{id}', [RoomController::class, 'show']);
+        Route::post('/update-switches', [RoomController::class, 'updateSwitches']);
+        Route::delete('delete/{id}', [RoomController::class, 'delete']);
+    });
 
 
     Route::prefix('reels')->group(function () {
