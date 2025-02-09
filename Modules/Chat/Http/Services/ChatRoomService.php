@@ -39,7 +39,7 @@ class ChatRoomService
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
 
-        $this->countReel($data, $type, $userId, $userIds);
+        $this->countReel($data, $type ?? '', $userId, $userIds);
     }
 
     public function countReel($data, $type = '', $userId, $userIds)
