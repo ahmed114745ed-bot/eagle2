@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 
 use App\Helpers\Common;
+use Modules\Reals\Entities\Real;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GroupChatRepository;
 
@@ -14,8 +15,7 @@ class GroupChatService
         private readonly GroupChatRepository $groupChatRepository,
         private readonly UserRepository $userRepository
 
-    ) {
-    }
+    ) {}
 
     public function index($user)
     {
@@ -35,13 +35,25 @@ class GroupChatService
         if ($request->image_url) {
             $image = $request->image_url;
         }
+
         $data = [
             'text' => $request->text,
             'user_id' => $user->id,
             'image' => $image ?? '',
         ];
         $groupChatMessage = $this->groupChatRepository->create($data);
+        if ($request->message_type != null && $request->message_type == 'reel')  $this->countReel($request->text);
         $this->userRepository->incrementUnreadMessage($user);
         return $groupChatMessage;
+    }
+
+    public function countReel($data)
+    {
+        $parts = explode(':', str_replace("\n", ':', $data));
+        $reelId = $parts[4] ?? null;
+        $reel = Real::find($reelId);
+        if (!$reel) return true;
+        $reel->share_num += 1;
+        $reel->save();
     }
 }

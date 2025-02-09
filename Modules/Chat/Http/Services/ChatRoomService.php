@@ -44,8 +44,11 @@ class ChatRoomService
         Log::info('reel id : ' . $reelId);
         $reel = Real::find($reelId);
         if (!$reel) return true;
-        if ($type == 'all') {
-            $reel->share_num += 1;
+        $user = User::find($userId);
+        if ($type == 'all' && $userIds == null) {
+            $reel->share_num += $user->friend;
+        } elseif ($type == 'all' && $userIds != null) {
+            $reel->share_num += ($user->friend - count($userIds));
         } else {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
