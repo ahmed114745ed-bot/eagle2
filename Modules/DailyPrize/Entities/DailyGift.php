@@ -7,6 +7,7 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use App\Services\RedisService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\UploadedFile;
@@ -73,9 +74,8 @@ class DailyGift extends Model
                 $file       = request('target4', $model->target);
                 if ($file instanceof  UploadedFile){
                     $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
-                    if(Storage::exists($model->target)){
-                        Storage::delete($model->target);
-                    }
+                    $file = str_replace('\\', '/', $model->target);
+                    Storage::delete($file);
                 }
                 $model->target = $url ?? '';
 //                $model->target = request('target4', $model->target);

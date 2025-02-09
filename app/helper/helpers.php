@@ -164,14 +164,6 @@ if (!function_exists('get_file_details')) {
     }
 
 
-    if (!function_exists('getImagePathWithoutSlash')) {
-
-        function getImagePathWithoutSlash(?string $path = null): ?string
-        {
-            return $path == null ? null : getDriverUrl() . $path;
-        }
-    }
-
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {
