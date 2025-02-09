@@ -283,21 +283,66 @@ class UserService
 
     public function unFollowUser($request)
     {
-        $this->followRepository->deleteFollow($request->user()->id, $request->user_id);
+        $auth = $request->user();
+        $unFollower = $this->userRepository->findOrFail($request->user_id);
+        $checkFollowing = $this->followRepository->checkFollowing($auth->id, $unFollower->id);
+        $checkFollower = $this->followRepository->checkFollower($auth->id, $unFollower->id);
+        if ($checkFollowing && $checkFollower) { // friend
+            $unFollowStatus = [
+                'friend' => $unFollower->friend - 1,
+                'follower' => $unFollower->follower - 1,
+                'following' => $unFollower->following - 1,
+            ];
+            $userStatus = [
+                'friend' => $auth->friend - 1,
+                'following' => $auth->following - 1,
+                'follower' => $auth->follower - 1,
+            ];
+        } else {
+            $unFollowStatus = [
+                'follower' => $unFollower->follower - 1,
+            ];
+
+            $userStatus = [
+                'following' => $auth->following - 1,
+            ];
+        }
+        $this->userRepository->update($unFollowStatus, $unFollower->id);
+        $this->userRepository->update($userStatus, $auth->id);
+
+
+        $this->followRepository->deleteFollow($auth->id, $unFollower->id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
     }
 
     protected function handleFollowBack($user, $receiver)
     {
         if ($user->followBack($receiver)) {
+            $receiverStatus = [
+                'friend' => $receiver->friend + 1,
+                'follower' => $receiver->follower + 1,
+            ];
+            $userStatus = [
+                'friend' => $receiver->friend + 1,
+                'following' => $receiver->following + 1,
+            ];
             CustomNotification::followBack($receiver, $user);
             (new UserCounterServices)->UpgradeDateForType($receiver, 'friend');
             (new UserCounterServices)->eventUser($receiver, 'friend', 1);
         } else {
+
+            $receiverStatus = [
+                'follower' => $receiver->follower + 1,
+            ];
+            $userStatus = [
+                'following' => $receiver->following + 1,
+            ];
             CustomNotification::follow($receiver, $user);
             (new UserCounterServices)->UpgradeDateForType($receiver, 'followeds');
             (new UserCounterServices)->eventUser($receiver, 'follow', 1);
         }
+        $this->userRepository->update($receiverStatus, $receiver->id);
+        $this->userRepository->update($userStatus, $user->id);
         (new UserCounterServices)->eventUser($receiver, 'follower', 1);
     }
 

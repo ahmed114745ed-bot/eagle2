@@ -38,6 +38,7 @@ class TargetEventResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type ?: '',
             'target' => $target ?? '',
+            'id_target' => $this->target ?? '',
             'image' => $path ?? '',
             'expire' => $this->expire ?? 0,
             'charge_event_id' => $this->charge_event_id,
