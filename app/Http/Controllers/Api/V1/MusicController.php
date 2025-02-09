@@ -18,7 +18,6 @@ class MusicController extends Controller
     public function index()
     {
         $data = $this->musicService->all();
-        dd($data);
         return Common::apiResponse(1, '', MusicResource::collect($data));
     }
 
