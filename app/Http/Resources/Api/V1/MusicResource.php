@@ -10,7 +10,8 @@ class MusicResource extends JsonResource
     public function toArray($request)
     {
         $url = $this->url;
-        $lastPart = basename($url);
+        $parts = explode('/', $url);
+        $lastPart = end($parts);
         return [
             'id' => $this->id,
             'name' => $lastPart,
