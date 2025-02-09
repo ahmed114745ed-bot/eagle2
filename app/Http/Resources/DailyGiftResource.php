@@ -32,7 +32,7 @@ class DailyGiftResource extends JsonResource
             'id'        => $this->id,
             'order'     => $this->order,
             'gift_type' => $this->gift_type,
-            'image'     => getImagePath($imagePath), // Convert to full URL
+            'image'     => getImagePathWithoutSlash($imagePath), // Convert to full URL
             'target' => $this->target,
             'expir'     => $this->expir,
         ];

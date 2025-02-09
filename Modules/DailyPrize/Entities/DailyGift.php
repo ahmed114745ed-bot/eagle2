@@ -20,7 +20,7 @@ class DailyGift extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $appends = ['target1', 'target2', 'target3', 'target4'];
+    protected $appends = ['target1', 'target2', 'target3','target4'];
 
     public function getCreatedAtAttribute($value)
     {
@@ -36,23 +36,21 @@ class DailyGift extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
-    protected static function boot()
-    {
+    protected static function boot() {
         parent::boot();
         static::creating(function ($model) {
-            if ($model->gift_type == "ware") {
+            if ($model->gift_type == "ware"){
                 $model->target = request('target1', $model->target);
-            } elseif ($model->gift_type == "vip") {
+            }elseif ($model->gift_type == "vip"){
                 $model->target = request('target2', $model->target);
-            } elseif ($model->gift_type == "coins") {
+            }elseif ($model->gift_type == "coins"){
                 $model->target = request('target3', $model->target);
-            } elseif ($model->gift_type == "achievement") {
+            }elseif ($model->gift_type == "achievement"){
 
                 $file       = request('target4', $model->target);
 
-                if ($file instanceof  UploadedFile) {
-                    //$url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
-                    $url = Common::upload('events', $file);
+                if ($file instanceof  UploadedFile){
+                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
                 }
                 $model->target = $url ?? '';
             }
@@ -60,30 +58,25 @@ class DailyGift extends Model
             unset($model->target2);
             unset($model->target3);
             unset($model->target4);
+
+
         });
 
         static::updating(function ($model) {
-            if ($model->gift_type == "ware") {
+            if ($model->gift_type == "ware"){
                 $model->target = request('target1', $model->target);
-            } elseif ($model->gift_type == "vip") {
+            }elseif ($model->gift_type == "vip"){
                 $model->target = request('target2', $model->target);
-            } elseif ($model->gift_type == "coins") {
+            }elseif ($model->gift_type == "coins"){
                 $model->target = request('target3', $model->target);
-            } elseif ($model->gift_type == "achievement") {
+            }elseif ($model->gift_type == "achievement"){
                 $file       = request('target4', $model->target);
-                if ($file instanceof  UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    if (Storage::exists($model->target)) {
-                        Storage::delete($model->target);
-                    } else {
-                        $new = DIRECTORY_SEPARATOR . $model->target;
-                        if (Storage::exists($new)) {
-                            Storage::delete($new);
-                        }
-                    }
+                if ($file instanceof  UploadedFile){
+                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
+                    Storage::delete($model->target);
                 }
                 $model->target = $url ?? '';
-                //                $model->target = request('target4', $model->target);
+//                $model->target = request('target4', $model->target);
 
             }
             unset($model->target1);
@@ -102,12 +95,12 @@ class DailyGift extends Model
 
     public function ware()
     {
-        return $this->hasOne(Ware::class, 'id', 'target');
+        return $this->hasOne(Ware::class,'id','target');
     }
 
     public function vip()
     {
-        return $this->hasOne(OVip::class, 'id', 'target');
+        return $this->hasOne(OVip::class,'id','target');
     }
 
     public function getTarget1Attribute()
@@ -126,4 +119,7 @@ class DailyGift extends Model
     {
         return $this->gift_type == 'achievement' ? $this->target : null;
     }
+
+
+
 }
