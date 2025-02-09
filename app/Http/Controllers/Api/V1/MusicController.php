@@ -29,7 +29,7 @@ class MusicController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'url'         => 'required|url',
+            'url'         => 'required',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
