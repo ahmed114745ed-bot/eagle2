@@ -25,7 +25,7 @@ class BannerController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('banners'))
+            ->title(trans('Splash'))
             ->body($this->grid()));
     }
 

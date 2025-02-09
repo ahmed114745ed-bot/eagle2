@@ -25,7 +25,7 @@ class DedicateWareController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('wares'))
+            ->title(trans('Gift Products'))
             ->body($this->grid());
     }
 

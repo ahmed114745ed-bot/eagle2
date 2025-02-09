@@ -18,7 +18,7 @@ class HomeCarouselController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('HomeCarousel'))
+            ->title(trans('Banner'))
             ->body($this->grid());
     }
 

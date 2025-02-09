@@ -29,7 +29,7 @@ class SpecialWareController extends  MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(__($this->title))
+            ->title(__('Featured ids'))
             ->body($this->grid()));
     }
     public function show($id, Content $content)

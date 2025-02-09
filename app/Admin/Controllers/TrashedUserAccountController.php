@@ -26,7 +26,7 @@ class TrashedUserAccountController extends  MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('User'))
+            ->title(trans('Deleted Accounts'))
             ->body($this->grid()));
     }
     /**
