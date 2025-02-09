@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DailyGiftResource;
 use Illuminate\Http\Request;
 use Modules\DailyPrize\Entities\DailyGift;
 
@@ -17,14 +18,16 @@ class DailyGiftsController extends Controller
         })
         ->paginate(10);
 
-        return Common::apiResponse(true, 'Success', $results);
+
+
+        return Common::apiResponse(true, 'Success', DailyGiftResource::collection($results));
     }
 
     public function show($type, $id){
 
         $result = DailyGift::where('type', $type)->findOrFail($id);
 
-        return Common::apiResponse(true, 'Success', $result);
+        return Common::apiResponse(true, 'Success', new DailyGiftResource($result) );
     }
 
     public function store($type, Request $request){
