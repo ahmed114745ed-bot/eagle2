@@ -54,7 +54,7 @@ class ChatRoomService
             $reel->share_num += $user->friend;
         } elseif ($type == 'one' && $userIds != null) {
             $reel->share_num += ($user->friend - count($userIds));
-        } elseif ($type == 'one') {
+        } else {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
         }
