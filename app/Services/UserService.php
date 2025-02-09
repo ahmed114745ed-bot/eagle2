@@ -927,9 +927,9 @@ class UserService
     {
         $salary = $this->userSalaryRepository->userSalary($userId, $month, $year);
         $agency = $this->agencyRepository->findAgencyByOwnerId($userId);
-        $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
+        if ($agency) $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
 
-        return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
+        return  ['user_salary' => $salary ?? [], 'agency_Salary' => $agencySalary ?? []];
     }
 
     public function userPacksAndVip($id)

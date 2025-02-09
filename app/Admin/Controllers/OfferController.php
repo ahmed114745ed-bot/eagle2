@@ -22,7 +22,7 @@ class OfferController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('offers'))
+            ->title(trans('Advertising Space'))
             ->body($this->grid());
     }
 

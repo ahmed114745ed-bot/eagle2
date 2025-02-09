@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Tik\Services\MusicService;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\MusicResource;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -17,19 +18,19 @@ class MusicController extends Controller
     public function index()
     {
         $data = $this->musicService->all();
-        return Common::apiResponse(1, '', $data);
+        return Common::apiResponse(1, '', MusicResource::collect($data));
     }
 
     public function userMusic(Request $request)
     {
         $data = $this->musicService->userMusic($request->user()->id);
-        return Common::apiResponse(1, '', $data);
+        return Common::apiResponse(1, '',new MusicResource($data));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'url'         => 'required|url',
+            'url'         => 'required',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());

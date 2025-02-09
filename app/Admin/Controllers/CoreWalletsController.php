@@ -22,7 +22,7 @@ class CoreWalletsController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('level-intervals'))
+            ->title(trans('Application wallet'))
             ->body($this->grid()));
     }
 
