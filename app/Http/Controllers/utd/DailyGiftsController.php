@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DailyGiftResource;
 use Illuminate\Http\Request;
 use Modules\DailyPrize\Entities\DailyGift;
 
@@ -17,14 +18,16 @@ class DailyGiftsController extends Controller
         })
         ->paginate(10);
 
-        return Common::apiResponse(true, 'Success', $results);
+
+
+        return Common::apiResponse(true, 'Success', DailyGiftResource::collection($results));
     }
 
     public function show($type, $id){
 
         $result = DailyGift::where('type', $type)->findOrFail($id);
 
-        return Common::apiResponse(true, 'Success', $result);
+        return Common::apiResponse(true, 'Success', new DailyGiftResource($result) );
     }
 
     public function store($type, Request $request){
@@ -35,7 +38,7 @@ class DailyGiftsController extends Controller
             'target1'    => 'nullable|exists:wares,id',
             'target2'    => 'nullable|exists:o_vips,id',
             'target3'    => 'nullable|integer',
-            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
 
@@ -58,7 +61,7 @@ class DailyGiftsController extends Controller
             'target1'    => 'nullable|exists:wares,id',
             'target2'    => 'nullable|exists:o_vips,id',
             'target3'    => 'nullable|integer',
-            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
         $result = DailyGift::where('type', $type)->findOrFail($id);

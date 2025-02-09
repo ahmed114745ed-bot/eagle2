@@ -163,6 +163,7 @@ if (!function_exists('get_file_details')) {
         }
     }
 
+
     if (!function_exists('httpImage')) {
         function httpImage($image)
         {

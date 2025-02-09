@@ -41,7 +41,7 @@ Route::group(
         $router->post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
         $router->get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class,'getAchievementLevels'])->name('get-achievement-levels');
         $router->get('/get-view-page', [AchievementLevelsModuleController::class,'viewPage'])->name('get-view-page');
-       $router->resource('user-achievement-levels', UserAchievementLevelController::class);
+        $router->resource('user-achievement-levels', UserAchievementLevelController::class);
       // $router->post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
      //  $router->get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->where('id', '[0-9]+')->name('achievement-levels.create');
         $router->resource('gift-achievements','UserGiftAchController');
