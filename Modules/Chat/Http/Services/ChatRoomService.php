@@ -52,9 +52,9 @@ class ChatRoomService
         $user = User::find($userId);
         if ($type == 'all' && $userIds == null) {
             $reel->share_num += $user->friend;
-        } elseif ($type == 'one' && $userIds != null) {
+        } elseif ($type == 'not' && $userIds != null) {
             $reel->share_num += ($user->friend - count($userIds));
-        } else {
+        } elseif ($type == 'one') {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
         }
