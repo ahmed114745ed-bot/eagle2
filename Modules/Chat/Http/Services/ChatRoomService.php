@@ -39,10 +39,10 @@ class ChatRoomService
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
 
-        $this->countReel($data, $type ?? '', $userId, $userIds);
+        $this->countReel($data, $type , $userId, $userIds);
     }
 
-    public function countReel($data, string $type = null, $userId, $userIds)
+    public function countReel($data,  $type , $userId, $userIds)
     {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
@@ -52,9 +52,9 @@ class ChatRoomService
         $user = User::find($userId);
         if ($type == 'all' && $userIds == null) {
             $reel->share_num += $user->friend;
-        } elseif ($type == '' && $userIds != null) {
+        } elseif ($type == 'one' && $userIds != null) {
             $reel->share_num += ($user->friend - count($userIds));
-        } elseif ($type == '') {
+        } elseif ($type == 'one') {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
         }
