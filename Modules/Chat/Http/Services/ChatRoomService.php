@@ -42,7 +42,7 @@ class ChatRoomService
         $this->countReel($data, $type, $userId, $userIds);
     }
 
-    public function countReel($data, $type = null, $userId, $userIds)
+    public function countReel($data, $type = '', $userId, $userIds)
     {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
@@ -52,9 +52,9 @@ class ChatRoomService
         $user = User::find($userId);
         if ($type == 'all' && $userIds == null) {
             $reel->share_num += $user->friend;
-        } elseif ($type == null && $userIds != null) {
+        } elseif ($type == '' && $userIds != null) {
             $reel->share_num += ($user->friend - count($userIds));
-        } elseif ($type == null) {
+        } elseif ($type == '') {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
         }
