@@ -39,6 +39,11 @@ class ChatRoomService
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
 
+        $this->countReel($data, $type, $userId, $userIds);
+    }
+
+    public function countReel($data, $type, $userId, $userIds)
+    {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
         Log::info('reel id : ' . $reelId);
