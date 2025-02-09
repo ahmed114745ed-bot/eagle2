@@ -73,7 +73,9 @@ class DailyGift extends Model
                 $file       = request('target4', $model->target);
                 if ($file instanceof  UploadedFile){
                     $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
-                    Storage::delete($model->target);
+                    if(Storage::exists($model->target)){
+                        Storage::delete($model->target);
+                    }
                 }
                 $model->target = $url ?? '';
 //                $model->target = request('target4', $model->target);
