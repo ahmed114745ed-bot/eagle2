@@ -38,7 +38,7 @@ class DailyGiftsController extends Controller
             'target1'    => 'nullable|exists:wares,id',
             'target2'    => 'nullable|exists:o_vips,id',
             'target3'    => 'nullable|integer',
-            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
 
@@ -61,7 +61,7 @@ class DailyGiftsController extends Controller
             'target1'    => 'nullable|exists:wares,id',
             'target2'    => 'nullable|exists:o_vips,id',
             'target3'    => 'nullable|integer',
-            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
         $result = DailyGift::where('type', $type)->findOrFail($id);
