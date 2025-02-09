@@ -50,7 +50,8 @@ class DailyGift extends Model
                 $file       = request('target4', $model->target);
 
                 if ($file instanceof  UploadedFile){
-                    $url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
+                    //$url = Common::upload(DIRECTORY_SEPARATOR.'events', $file);
+                    $url = Common::upload('events', $file);
                 }
                 $model->target = $url ?? '';
             }
