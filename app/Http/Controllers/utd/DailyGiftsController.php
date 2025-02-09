@@ -32,7 +32,10 @@ class DailyGiftsController extends Controller
         $request->validate([
             'order' => 'required|in:1,2,3,4,5,6,7',
             'gift_type' => 'required',
-            'target' => 'required',
+            'target1'    => 'nullable|exists:wares,id',
+            'target2'    => 'nullable|exists:o_vips,id',
+            'target3'    => 'nullable|integer',
+            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'expir' => 'required|numeric'
         ]);
 
@@ -52,7 +55,10 @@ class DailyGiftsController extends Controller
         $request->validate([
             'order' => 'required|in:1,2,3,4,5,6,7',
             'gift_type' => 'required',
-            'target' => 'required',
+            'target1'    => 'nullable|exists:wares,id',
+            'target2'    => 'nullable|exists:o_vips,id',
+            'target3'    => 'nullable|integer',
+            'target4'    => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'expir' => 'required|numeric'
         ]);
         $result = DailyGift::where('type', $type)->findOrFail($id);

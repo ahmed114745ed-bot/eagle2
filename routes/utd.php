@@ -95,6 +95,9 @@ use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
 use App\Http\Controllers\utd\BoxController;
 use App\Http\Controllers\utd\BoxUserController;
 use App\Http\Controllers\utd\EmojiController;
+use App\Http\Controllers\utd\EventPeriodController;
+use App\Http\Controllers\utd\ImageController;
+use App\Http\Controllers\utd\SpecialIdRequestController;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -221,6 +224,28 @@ Route::middleware([])->group(function () {
     });
 
 
+
+    Route::prefix('event-period')->group(function () {
+        Route::get('/', [EventPeriodController::class, 'index']);
+        Route::post('/create', [EventPeriodController::class, 'store']);
+        Route::post('/update/{id}', [EventPeriodController::class, 'update']);
+        Route::post('/delete/{id}', [EventPeriodController::class, 'delete']);
+        Route::post('/delete-all', [EventPeriodController::class, 'delete_all']);
+        Route::get('/{id}', [EventPeriodController::class, 'show']);
+    });
+
+
+    Route::prefix('images')->group(function () {
+        Route::get('/', [ImageController::class, 'index']);
+        Route::post('/create', [ImageController::class, 'store']);
+        Route::post('/update/{id}', [ImageController::class, 'update']);
+        Route::post('/update-status/{id}', [ImageController::class, 'update_status']);
+        Route::post('/delete/{id}', [ImageController::class, 'delete']);
+        Route::post('/delete-all', [ImageController::class, 'delete_all']);
+        Route::get('/{id}', [ImageController::class, 'show']);
+    });
+
+
     Route::prefix('emojis')->group(function () {
         Route::get('/', [EmojiController::class, 'index']);
         Route::post('/create', [EmojiController::class, 'store']);
@@ -317,6 +342,15 @@ Route::middleware([])->group(function () {
         Route::post('/create', [SpecialIdFramController::class, 'store']);
         Route::post('/update/{id}', [SpecialIdFramController::class, 'update']);
         Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
+    });
+
+
+    Route::prefix('special-id-requests')->group(function () {
+        Route::get('/', [SpecialIdRequestController::class, 'index']);
+        Route::get('/{id}', [SpecialIdRequestController::class, 'show']);
+        Route::post('/update/{id}', [SpecialIdRequestController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialIdRequestController::class, 'delete']);
+        Route::post('/delete-all', [SpecialIdRequestController::class, 'delete_all']);
     });
 
     Route::prefix('special-wares')->group(function () {
@@ -861,6 +895,8 @@ Route::middleware([])->group(function () {
         Route::get('/', [ReportController::class, 'eventReports']);
         Route::post('/return-reward', [ReportController::class, 'returnReward']);
     });
+
+
 
     Route::prefix('general-roles')->group(function () {
         Route::get('/', [RoleEventController::class, 'all']);
