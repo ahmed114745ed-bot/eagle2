@@ -42,7 +42,7 @@ class ChatRoomService
         $this->countReel($data, $type ?? '', $userId, $userIds);
     }
 
-    public function countReel($data, $type = '', $userId, $userIds)
+    public function countReel($data, string $type = null, $userId, $userIds)
     {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
