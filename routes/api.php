@@ -472,14 +472,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('test-google-id', [AuthController::class, 'verifyGoogleToken']);
 
             // Music Store
-            Route::prefix('music')->group(function () {
-                Route::get('/', [MusicStoreController::class, 'index']);
-                Route::post('/', [MusicStoreController::class, 'store']);
-            });
+            // Route::prefix('music')->group(function () {
+            //     Route::get('/', [MusicStoreController::class, 'index']);
+            //     Route::post('/', [MusicStoreController::class, 'store']);
+            // });
             Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
 
             Route::prefix('music')->group(function () {
-                Route::get('/', [MusicController::class, 'index']);
+                Route::get('/all', [MusicController::class, 'index']);
                 Route::get('/user', [MusicController::class, 'userMusic']);
                 Route::post('/create', [MusicController::class, 'store']);
             });
