@@ -17,6 +17,7 @@ use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Reals\Entities\Real;
 
 class ChatRoomService
 {
@@ -37,6 +38,20 @@ class ChatRoomService
         } else {
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
+
+        $parts = explode(':', str_replace("\n", ':', $data['message']));
+        $reelId = $parts[4] ?? null;
+        Log::info('reel id : ' . $reelId);
+        $reel = Real::find($reelId);
+        if (!$reel) return true;
+        if ($type === 'all') {
+            $reel->share_num += 1;
+        } else {
+            $countUsers = count($userIds);
+            $reel->share_num += $countUsers;
+        }
+        $reel->save();
+        return true;
     }
 
     /**
@@ -161,7 +176,7 @@ class ChatRoomService
         // Get unread messages
         $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
             $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
-        })->where('type', 'friends') ->pluck('id')->toArray();
+        })->where('type', 'friends')->pluck('id')->toArray();
 
         $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
             ->where('user_id', '!=', $user->id)
@@ -230,14 +245,14 @@ class ChatRoomService
     {
         // Find existing chat room or create a new one
         $chatRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
-            $query->where(function($q) use($user, $userId2){
+            $query->where(function ($q) use ($user, $userId2) {
                 $q->where('user_id', $user->id)
-                ->where('user_id2', $userId2);
+                    ->where('user_id2', $userId2);
             })
-            ->orWhere(function($q)use($user, $userId2){
-                $q->where('user_id', $userId2)
-                ->where('user_id2', $user->id);
-            });
+                ->orWhere(function ($q) use ($user, $userId2) {
+                    $q->where('user_id', $userId2)
+                        ->where('user_id2', $user->id);
+                });
         })->first();
 
         if (!$chatRoom) {
