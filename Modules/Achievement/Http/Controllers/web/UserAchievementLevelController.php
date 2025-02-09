@@ -29,7 +29,7 @@ class UserAchievementLevelController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('user-achievement-levels'))
+            ->title(trans('Achievement Reports'))
             ->body($this->grid()));
     }
 

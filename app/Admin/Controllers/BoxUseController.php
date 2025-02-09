@@ -23,7 +23,7 @@ class BoxUseController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->header(trans('admin.index'))
+            ->header(trans('Dumped boxes'))
             ->description(trans('admin.description'))
             ->body($this->grid()));
     }
