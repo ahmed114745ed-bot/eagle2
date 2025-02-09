@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use Exception;
+use App\Helpers\Common;
+use Illuminate\Http\Request;
+use App\Tik\Services\MusicService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+
+
+class MusicController extends Controller
+{
+    public function __construct(private MusicService $musicService) {}
+
+    public function index()
+    {
+        $data = $this->musicService->all();
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function userMusic(Request $request)
+    {
+        $data = $this->musicService->userMusic($request->user()->id);
+        return Common::apiResponse(1, '', $data);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'url'         => 'required|url',
+        ]);
+        if ($validator->fails()) {
+            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+        try {
+            $this->musicService->create($request->user()->id, $request->url);
+            return Common::apiResponse(1, 'created successfully');
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+}

@@ -1,11 +1,14 @@
 <?php
 
-use App\Admin\Controllers\WareController;
+use App\Models\Room;
+use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
-use App\Http\Controllers\Api\V1\AgoraController;
-use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Admin\Controllers\WareController;
+use App\Http\Controllers\PaySkyController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -17,8 +20,10 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
+use App\Http\Controllers\Api\V1\MusicController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
@@ -29,30 +34,26 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
+use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
+use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\MallController as ControllersMallController;
-use App\Http\Controllers\PaySkyController;
-use App\Http\Controllers\StripeController;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Models\Room;
-use App\Models\User;
 
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
@@ -476,6 +477,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/', [MusicStoreController::class, 'store']);
             });
             Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
+
+            Route::prefix('music')->group(function () {
+                Route::get('/', [MusicController::class, 'index']);
+                Route::get('/user', [MusicController::class, 'userMusic']);
+                Route::post('/create', [MusicController::class, 'store']);
+            });
         }
     );
 });
