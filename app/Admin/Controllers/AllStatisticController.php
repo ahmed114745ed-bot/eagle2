@@ -102,7 +102,7 @@ class AllStatisticController extends MainController
                 });
         } else {
             return parent::index($content
-                ->title(trans('statistics')));
+                ->title(trans('Dashboard')));
         }
     }
 

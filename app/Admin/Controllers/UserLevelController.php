@@ -23,7 +23,7 @@ class UserLevelController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans(__($this->title)))
+            ->title(trans(__('Edit Level')))
             ->body($this->grid()));
     }
 

@@ -716,7 +716,7 @@
     "Agency": "ajans",
     "hosts": "sunucular",
     "Reports": "raporlar",
-    "Fast orders": "hızlı siparişler",
+
     "Applications to join agencies": "ajanslara katılma başvuruları",
     "Request to change the background image": "arka plan resmini değiştirme talebi",
     "Shipping reports": "gönderim raporları",
@@ -1640,7 +1640,16 @@
     "Sensitive Settings": "Hassas Ayarlar",
     "System Settings": "Sistem Ayarları",
     "Login Reward": "Giriş Ödülü",
-    "Gift Special ID":"Özel Hediye Kimliği"
+    "Gift Special ID":"Özel Hediye Kimliği",
+    "Fast orders":"Hızlı siparişler"
+
+
+
+
+
+
+
+
 
     
 
