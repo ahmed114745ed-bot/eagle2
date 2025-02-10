@@ -55,9 +55,6 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
-Route::get('/need',function(){
-    dd(User::findOrFail(5)->manager->roles()->first()?->image);
-});
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
 
@@ -89,6 +86,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
     });
 
+    Route::get('/image-intro/{id}',[ UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
 

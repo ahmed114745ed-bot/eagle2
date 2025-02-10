@@ -40,6 +40,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
+use App\Http\Resources\UserIntroResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -62,6 +63,15 @@ class UserController extends Controller
         return Common::apiResponse(1, '', $usersType);
     }
 
+    public function image_intro($id){
+
+        $user = User::find($id);
+
+        if($user->intro == ''){
+            return Common::apiResponse(true, 'Success', []);
+        }
+        return Common::apiResponse(true, 'Success', new UserIntroResource($user->intro));
+    }
     public function showSetting(Request $request)
     {
         $user = $request->user();
