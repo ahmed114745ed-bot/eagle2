@@ -26,6 +26,7 @@ class ChargesController extends Controller
         $to = request('to');
         $sort = request('sort');
         $user_type = request('user_type');
+        $perPage = request('per_page') ?? 10;
 
         $charges = Charge::with('user.profile')->when($from && $to, function ($q) use ($from, $to) {
             $q->whereDate('created_at', '>=', $from)
@@ -37,7 +38,7 @@ class ChargesController extends Controller
             ->when($sort, function ($q) use ($sort) {
                 $q->orderBy('id', $sort);
             })
-            ->paginate(10);
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', ChargeResource::collection($charges));
     }

@@ -122,6 +122,7 @@ class ChargeReportController extends Controller
     protected function resultReport(Request $request)
     {
         $charger_type = $request->query('name') == 'app' ? 'app' : 'dash';
+        $perPage = request('per_page') ?? 10;
 
         $query = Charge::orderByDesc('created_at')
             ->with(['sender', 'receiver']);
@@ -149,7 +150,7 @@ class ChargeReportController extends Controller
             $query->where('id', request('search'));
         }
 
-        $charges = $query->paginate(10);
+        $charges = $query->paginate($perPage);
 
         return $charges;
     }
@@ -159,6 +160,7 @@ class ChargeReportController extends Controller
         $query = CoinLog::orderByDesc('created_at')
             ->whereNotIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
             ->with('user');
+            $perPage = request('per_page') ?? 10;
 
         if ($request->has('charger_uuid')) {
             $query->whereHas('user', function ($q) use ($request) {
@@ -170,7 +172,7 @@ class ChargeReportController extends Controller
             $query->where('id', request('search'));
         }
 
-        $logs = $query->paginate(10);
+        $logs = $query->paginate($perPage);
 
         return $logs;
     }
@@ -180,6 +182,7 @@ class ChargeReportController extends Controller
         $query = CoinLog::orderByDesc('created_at')
             ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
             ->with('user');
+            $perPage = request('per_page') ?? 10;
 
         if ($request->has('charger_uuid')) {
             $query->whereHas('user', function ($q) use ($request) {
@@ -195,7 +198,7 @@ class ChargeReportController extends Controller
             $query->where('id', request('search'));
         }
 
-        $logs = $query->paginate(10);
+        $logs = $query->paginate($perPage);
 
         return $logs;
     }

@@ -12,13 +12,15 @@ class HomeCarouselController extends Controller
     public function index(){
         $search = request('search');
         $sort = request('sort') ?? 'asc';
+        $perPage = request('per_page') ?? 10;
+
         $results = HomeCarousel::when($search, function($q)use($search){
             $q->where('id', $search);
         })
         ->when($sort,function($q)use($sort){
             $q->orderBy('id', $sort);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
         return Common::apiResponse(true,'Success', $results);
     }

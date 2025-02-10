@@ -291,11 +291,13 @@ class SallariesController extends Controller
     private function getUsersGrid()
     {
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         return User::with('agency:id,name')
             ->when($search, function($q) use($search){
                 $q->where('id', $search);
             })
-            ->paginate(10) // Paginate by 10 items per page
+            ->paginate($perPage) // Paginate by 10 items per page
             ->through(function ($user) {
                 return [
                     'id' => $user->id,
@@ -312,12 +314,14 @@ class SallariesController extends Controller
     private function getAgenciesGrid()
     {
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         return Agency::select('id', 'name', 'phone', 'old_usd', 'target_usd', 'target_token_usd')
             ->withCount('users')
             ->when($search, function($q) use($search){
                 $q->where('id', $search);
             })
-            ->paginate(10) // Paginate by 10 items per page
+            ->paginate($perPage) // Paginate by 10 items per page
             ->through(function ($agency) {
                 return [
                     'id' => $agency->id,

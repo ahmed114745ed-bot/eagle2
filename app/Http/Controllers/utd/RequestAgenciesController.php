@@ -21,6 +21,7 @@ class RequestAgenciesController extends Controller
     {
         $id = request('id');
         $owner_uuid = request('owner_uuid');
+        $perPage = request('per_page') ?? 10;
 
         $requests = Agency::with('additionalInfo', 'owner')->where('status', 0)
             ->when($id, function ($q) use ($id) {
@@ -35,7 +36,7 @@ class RequestAgenciesController extends Controller
                 $q->where('status', 0);
             })
             ->orderByDesc("id")
-            ->paginate(10);
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', AgenciesRequestsResource::collection($requests));
     }

@@ -13,10 +13,12 @@ class DailyGiftsController extends Controller
     public function index($type){
 
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         $results = DailyGift::where('type', $type)->when($search, function($q) use($search){
             $q->where('id', $search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
 
 
