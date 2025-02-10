@@ -16,10 +16,10 @@ class DeviceTokenResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'uuid' => (int)$this->user->uuid,
-            'name' => $this->user->name,
-            'device_token' => $this->device_token,
+            'id' => @$this->id ?? 0,
+            'uuid' => (int)$this->user->uuid ?? 0,
+            'name' => $this->user->name ?? '',
+            'device_token' => @$this->device_token ?? '',
 
         ];
     }
