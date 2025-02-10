@@ -182,6 +182,7 @@ return [
     'data_distribution' => 'توزيع البيانات',
     'game_recharge_rate' => 'نسبه شحن الالعاب',
     'delete_video' => 'حذف فيديو',
+    'price' => 'السعر',
 
 
 
