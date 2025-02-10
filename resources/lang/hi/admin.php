@@ -172,4 +172,5 @@ return [
     'game_recharge_rate' => 'खेल रिचार्ज दर',
     'create_new' =>  'नया जोड़ें', 
     'delete_video' => 'वीडियो हटाएं',
+    'price' => 'मूल्य',
 ];

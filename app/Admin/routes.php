@@ -45,6 +45,7 @@ use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
+use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -346,6 +347,7 @@ Route::group(
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+        $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
         $router->resource('core-wallets', CoreWalletsController::class);
