@@ -17,8 +17,8 @@ class DeviceTokenResource extends JsonResource
     {
         return [
             'id' => @$this->id ?? 0,
-            'uuid' => (int)$this->user->uuid ?? 0,
-            'name' => $this->user->name ?? '',
+            'uuid' => @$this?->user?->uuid ?? "",
+            'name' => @$this?->user?->name ?? '',
             'device_token' => @$this->device_token ?? '',
 
         ];
