@@ -627,7 +627,7 @@ class UserController extends MainController
                     }
                 ]);
         }
-        
+
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
 
@@ -783,11 +783,11 @@ class UserController extends MainController
 
         ])->default(0);
 
-        $ops2 = [];
+/*         $ops2 = [];
         foreach (MangerType::get() as $manger_type) {
             $ops2[$manger_type->id] = $manger_type->name_en . '_' . $manger_type->description_en;
         }
-        $form->select('manger_type_id', __('manger type id'))->options($ops2);
+        $form->select('manger_type_id', __('manger type id'))->options($ops2); */
 
 
         // $form->html('<script>

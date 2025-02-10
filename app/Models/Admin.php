@@ -17,6 +17,7 @@ class Admin extends \App\Models\Administrator
         return $this->hasOne (Agency::class,'owner_id');
     }
 
+
     public function getAgencyIdAttribute(){
         return @$this->agency->id;
     }
