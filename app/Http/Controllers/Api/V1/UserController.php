@@ -41,6 +41,8 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
 use App\Http\Resources\UserIntroResource;
+use App\Models\Pack;
+use App\Models\Ware;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -63,14 +65,45 @@ class UserController extends Controller
         return Common::apiResponse(1, '', $usersType);
     }
 
+    public static function checkPack($userId, $type, $dress = null)
+    {
+        $pack = Pack::query()->with('ware')
+            ->where('user_id', $userId)
+            ->where('type', $type)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
+        if ($dress != null) $pack->where('target_id', $dress);
+        return $pack;
+    }
     public function image_intro($id){
 
         $user = User::find($id);
 
-        if($user->intro == ''){
+        $dr = '';
+        $pack = self::checkPack($user->id, 6,$user->dress_3);
+        $pack->where('is_used', 1);
+        $pack = $pack->exists();
+        if ($pack) {
+            $ware = Ware::query()
+                ->where('id', $user->dress_3)
+                ->where('type', 6)
+                ->get();
+
+            if (!$ware->isEmpty()) {
+                $dr = $ware->map(function($w){
+                    return [
+                        'image' => $w->show_img,
+                        'id' => $w->id,
+                    ];
+                });
+            }
+        }
+
+        if($dr == ''){
             return Common::apiResponse(true, 'Success', []);
         }
-        return Common::apiResponse(true, 'Success', $user->intro);
+        return Common::apiResponse(true, 'Success', $dr);
     }
     public function showSetting(Request $request)
     {
