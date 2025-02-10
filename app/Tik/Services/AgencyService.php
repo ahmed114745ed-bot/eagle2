@@ -759,6 +759,11 @@ class AgencyService
         return $this->agencyRepository->getActiveAgency($id, $perPage, $page);
     }
 
+    public function allActiveAgencies($id)
+    {
+        return $this->agencyRepository->getAllActiveAgency($id);
+    }
+
     public function agencyById($id)
     {
         return $this->agencyRepository->agencyById($id);

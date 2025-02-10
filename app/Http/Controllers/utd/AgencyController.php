@@ -62,6 +62,23 @@ class AgencyController extends Controller
         }
     }
 
+    public function allAgencies(Request $request)
+    {
+        try {
+            $data = $this->agencyService->allActiveAgencies($request->id);
+            $data = $data->map(function($agency){
+                return [
+                    'id' => $agency->id,
+                    'name' => $agency->name,
+                ];
+            });
+            return Common::apiResponse(true, 'success', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function activeAgenciesMembers(Request $request)
     {
         try {
