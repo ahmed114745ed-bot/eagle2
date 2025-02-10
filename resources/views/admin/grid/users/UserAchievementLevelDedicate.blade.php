@@ -82,6 +82,7 @@
             <div class="d-flex flex-wrap">
                 @foreach ($achievementValidImage as $data)
                 @php
+                 dump($data);
                 dump(getImagePath($data->image));
             @endphp
                     <label class="image-option">
