@@ -170,4 +170,5 @@ return [
     'availableBalance' => 'उपलब्ध शेष राशि',
     'data_distribution' => 'डेटा वितरण',
     'game_recharge_rate' => 'खेल रिचार्ज दर',
+    'create_new' =>  'नया जोड़ें', / 
 ];
