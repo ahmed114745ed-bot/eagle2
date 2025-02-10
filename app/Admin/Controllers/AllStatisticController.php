@@ -65,9 +65,7 @@ class AllStatisticController extends MainController
             $user = Auth::user();
             $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return $content
-                ->title(trans('statistics'))
-                ->description(__(request('desc') ?: 'الرئيسيه'))
-
+                ->title(trans('Dashboard'))
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
                     if ($user->isRole('admin') || $user->isRole('developer')) {
                         $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
