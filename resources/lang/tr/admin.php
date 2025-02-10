@@ -178,4 +178,5 @@ return [
     'game_recharge_rate' => 'Oyun Şarj Oranı',
     'delete_video' => 'Videoyu Sil',
     'price' => 'fiyat',
+    'value' => 'değer',
 ];

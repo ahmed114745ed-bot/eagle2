@@ -173,4 +173,5 @@ return [
     'create_new' =>  'नया जोड़ें', 
     'delete_video' => 'वीडियो हटाएं',
     'price' => 'मूल्य',
+    'value' => 'मूल्य',
 ];

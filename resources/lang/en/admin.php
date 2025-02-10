@@ -180,6 +180,7 @@ return [
     "user_exp" => "User EXP",
     'delete_video' => 'Delete Video',
     'price' => 'price',
+    'value' => 'value',
     
 
 

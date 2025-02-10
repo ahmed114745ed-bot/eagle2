@@ -183,6 +183,7 @@ return [
     'game_recharge_rate' => 'نسبه شحن الالعاب',
     'delete_video' => 'حذف فيديو',
     'price' => 'السعر',
+    'value' => 'القيمة',
 
 
 
