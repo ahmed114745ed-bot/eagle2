@@ -32,7 +32,7 @@ class AchievementDedicateController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('achievement-dedicate'))
+            ->title(trans('Gift Badges'))
             ->body($this->grid()));
     }
 

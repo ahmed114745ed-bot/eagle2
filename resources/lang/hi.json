@@ -557,7 +557,7 @@
     "user_charge": "उपयोगकर्ता शुल्क",
     "user_count": "उपयोगकर्ता की संख्या",
     "percentage-target": "लक्षित प्रतिशत",
-    "charges-reports": "शुल्क रिपोर्टें",
+    "charges reports": "शुल्क रिपोर्टें",
     "dash_repo": "डैशबोर्ड शुल्क",
     "app_repo": "ऐप शुल्क",
     "coins_repo": "कॉइन द्वार",
@@ -745,7 +745,42 @@
     "Coins": "सिक्के",
     "Sensitive Settings": "संवेदनशील सेटिंग्स",
     "System Settings": "सिस्टम सेटिंग्स",
-    "Login Reward": "लॉगिन इनाम"
+    "Login Reward": "लॉगिन इनाम",
+    "Gift Special ID":"उपहार विशेष आईडी",
+    "Fast orders":"तेज़ आदेश",
+    "Complaints":"शिकायतें",
+    "charge system":"चार्ज सिस्टम",
+    "Application wallet":"एप्लिकेशन वॉलेट",
+    "Edit Level": "स्तर संपादित करें",
+    "Distinguished identifier": "विशिष्ट पहचानकर्ता",
+    "room vips" : "कमरे के वीआईपी स्तर",
+    "transaction request problem": "लेनदेन अनुरोध समस्या"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     
