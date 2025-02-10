@@ -161,4 +161,5 @@ return [
     'huawei' => 'Huawei',
     'ios' => 'iOS',
     'submit' => 'Gönder',
+    "receiver"=> "Toplam gönderilen",
 ];
