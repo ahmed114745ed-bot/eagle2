@@ -70,7 +70,7 @@ class UserController extends Controller
         if($user->intro == ''){
             return Common::apiResponse(true, 'Success', []);
         }
-        return Common::apiResponse(true, 'Success', new UserIntroResource($user->intro));
+        return Common::apiResponse(true, 'Success', $user->intro);
     }
     public function showSetting(Request $request)
     {
