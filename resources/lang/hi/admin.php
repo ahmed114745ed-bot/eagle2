@@ -156,4 +156,9 @@ return [
     'ios' => 'आईओएस',
     'submit' => 'जमा करें',
     "receiver"=> "कुल भेजा गया",
+    "actions"=> "कार्रवाई",
+    "save"=> "सहेजें",
+    "moment_value_settings"=> "क्षण मान सेटिंग्स",
+    "fields"=> "क्षेत्र",
+    "user_exp"=> "उपयोगकर्ता EXP",
 ];

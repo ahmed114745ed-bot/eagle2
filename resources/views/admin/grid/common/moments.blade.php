@@ -84,9 +84,9 @@
             @csrf
             <div class="row">
                 <div class="col-md-3">
-                <label for="number">اعدادات قيمه اللحظات:</label>
-                <input type="number" id="number" name="number" min="1"  value="{{$vip->value ?? ''}}"/>
-                <button type="submit" >حفظ</button>
+                    <label for="number">{{ __('admin.moment_value_settings') }}</label>
+                    <input type="number" id="number" name="number" min="1"  value="{{$vip->value ?? ''}}"/>
+                <button type="submit">{{ __('admin.save') }}</button>
                 </div>
             </div>
             </form>

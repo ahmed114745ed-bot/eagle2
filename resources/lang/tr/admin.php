@@ -162,4 +162,9 @@ return [
     'ios' => 'iOS',
     'submit' => 'Gönder',
     "receiver"=> "Toplam gönderilen",
+     "actions"=> "Eylemler",
+     "save"=> "Kaydet",
+     "moment_value_settings"=> "Anlık Değer Ayarları",
+     "fields"=> "Alanlar",
+      "user_exp"=> "Kullanıcı EXP",
 ];
