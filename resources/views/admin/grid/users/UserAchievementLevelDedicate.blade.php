@@ -81,7 +81,7 @@
 
             <div class="d-flex flex-wrap">
                 @php
-                dump($achievementValidImage->image);
+                dump($achievementValidImage);
                
            @endphp
                 @foreach ($achievementValidImage as $data)
