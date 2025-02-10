@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\ChatSettingResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Models\Follow;
+use App\Models\User;
 
 class UserResource extends JsonResource
 {
@@ -85,7 +86,6 @@ class UserResource extends JsonResource
                 'chat_with_all'         =>  0,
             ]);
         }
-
         $show_user_setting = \App\Models\UserSetting::where("user_id", $this->id)->first();
         if ($show_user_setting == null) {
             $show_user_setting = \App\Models\UserSetting::create([
@@ -157,7 +157,7 @@ class UserResource extends JsonResource
             ], // my
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
-            "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            "manger_type"          => new MangerTypeResource(@$this->manager),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
