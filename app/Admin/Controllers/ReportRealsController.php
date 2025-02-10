@@ -7,12 +7,10 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\Reals\Entities\ReportReals;
-use App\Models\Ban;
-use App\Http\Controllers\Controller;
-use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
-
+use Modules\Reals\Entities\Real;
 
 class ReportRealsController extends AdminController
 {
@@ -34,27 +32,60 @@ class ReportRealsController extends AdminController
      public function index(Content $content)
      {
         return $content
-        ->header(trans('admin.index'))
-        ->description(trans('admin.description'))
+        ->title(trans('Report Reel'))
         ->body($this->grid());
      }
     protected function grid()
     {
         $grid = new Grid(new ReportReals());
+        $grid->model()->whereHas('reel')->orderByDesc('id');
 
         $grid->column('id', __('Id'));
-        $grid->column('real_id', __('Real id'));
         $grid->column('Reporter_id', __('Reporter id'));
         $grid->column('Reported_id', __('Reported id'));
         $grid->column('description', __('Description'));
-        // $grid->column('created_at', __('Created at'));
-        // $grid->column('updated_at', __('Updated at'));
+        $grid->column(__('redirect_button'))->display(function ($_) {
+            $redirectRoute = 'delete-reel';
+            $button = '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-primary">'.__('admin.delete_video').'</a>';
+            return $button;
+        });
+
+        $grid->column('real_id', __('View Reel'))->modal('test', function ($model){
+            return self::getRoomsShow($model->reel);
+        });
+        
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->actions(function ($actions) {
             $actions->disableEdit();
         });
                 return $grid;
+    }
+
+    public static function getRoomsShow(Real $reel){
+
+        $show = new Show($reel);
+        $show->field('id', 'ID');
+        $show->field('url', __('Video'))->display(function ($path) {
+            /** @var Ware $this */
+            $url = getImagePath($path);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $show->field('description', __('description'));
+       
+
+        $show->panel()
+             ->tools(function ($tools) {
+                 $tools->disableEdit();
+                 $tools->disableList();
+                 $tools->disableDelete();
+             });
+             Admin::script("
+             if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+                 $('.table-responsive').removeClass('table-responsive');
+                 }
+             ");
+        return $show;
     }
 
     /**

@@ -3,14 +3,15 @@
 namespace Modules\Reals\Http\Services;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
-
 use Illuminate\Support\Str;
 use Modules\Reals\Entities\Real;
+
+use Illuminate\Support\Collection;
 use Nwidart\Modules\Facades\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Modules\Reals\Entities\ReportReals;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 define('PAGINATION', 10);
@@ -448,5 +449,31 @@ class RealsService extends BaseModelService
             $allData = $allData->merge($anotherData);
         }
         return array($countNotInterest ?? 0, $allData);
+    }
+
+    public function deleteReeltAndReport($reelId, $reportId)
+    {
+        // Find the moment by ID
+        $reel = Real::find($reelId);
+        if (!$reel) {
+            return [
+                'success' => false,
+                'message' => 'Reel not found',
+                'status' => 404,
+            ];
+        }
+
+        // Find the report moment by ID and delete it
+        $reportReel = ReportReals::find($reportId);
+        if ($reportReel) $reportReel->delete();
+
+        // Delete the moment
+        $reel->delete();
+
+        return [
+            'success' => true,
+            'message' => 'Reel and report successfully deleted',
+            'status' => 200,
+        ];
     }
 }
