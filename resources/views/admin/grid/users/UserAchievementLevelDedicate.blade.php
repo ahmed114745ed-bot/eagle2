@@ -80,15 +80,15 @@
             <label for="custom_image">{{ __('admin.selectImage') }}</label>
 
             <div class="d-flex flex-wrap">
-                @php
+                {{-- @php
                 dump($achievementValidImage);
                
-           @endphp
+           @endphp --}}
                 @foreach ($achievementValidImage as $data)
                
                     <label class="image-option">
-                        <input type="radio" name="custom_image" value="{{ $data->image }}" class="d-none">
-                        <img src="<?= getImagePath($data->image) ?>" class="img-thumbnail" width="300" height="300">
+                        <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
+                        <img src="<?= getImagePath($data->file) ?>" class="img-thumbnail" width="300" height="300">
                     </label>
                 @endforeach
             </div>
