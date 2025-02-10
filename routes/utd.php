@@ -781,10 +781,10 @@ Route::middleware([])->group(function () {
         Route::post('delete-moment/{moment_id}/{id}', [ReportMomentController::class, 'destroyDash']);
     });
 
-    Route::prefix('request-agency')->group(function () {
-        Route::get('/', [AgencyController::class, 'index']);
-        Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
-    });
+    // Route::prefix('request-agency')->group(function () {
+    //     Route::get('/', [AgencyController::class, 'index']);
+    //     Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
+    // });
 
     Route::prefix('agencies')->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
