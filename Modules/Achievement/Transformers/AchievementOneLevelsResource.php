@@ -22,7 +22,6 @@ class AchievementOneLevelsResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'name' => $this->name,
             'type' => $this->type,
             'valid_image' => $this->valid_image,
             'invalid_image' => $this->invalid_image,
@@ -40,6 +39,7 @@ class AchievementOneLevelsResource extends JsonResource
                         'id' => $level->id,
                         'achievement_id' => $level->achievement_id,
                         'gift_id' => $level->gift_id,
+                        'name' => $this->type->value . '_'. $level->target,
                         'target' => $level->target,
                         'target_type' => $level->target_type,
                         'image' => $img,

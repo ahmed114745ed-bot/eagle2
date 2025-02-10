@@ -94,7 +94,8 @@ class UserRepository extends Repository
             'agencyUserJob' => fn($q) => $q->where('type', 'requestManger'),
             'agencyJoinRequest' => fn($q) => $q->where('status', '!=', 2),
             'packs',
-            'country'
+            'country',
+            'manager'
         ])
             ->find($userId);
     }

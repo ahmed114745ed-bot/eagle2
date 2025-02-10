@@ -56,10 +56,10 @@ class MyDataResource extends JsonResource
         //     ];
         // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id 
-                ? new \stdClass() 
+            $owner = $agency_joined->app_owner_id == $this->id
+                ? new \stdClass()
                 : new MiniUserResource($agency_joined->owner);
-       
+
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
@@ -67,9 +67,9 @@ class MyDataResource extends JsonResource
                 'owner' => $owner,
             ];
         } else {
-            $agency_joined = (object)[]; 
+            $agency_joined = (object)[];
         }
-        
+
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
@@ -131,12 +131,13 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
-       
+
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
             'name' => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
             'phone' => (string)@$this->phone ?: '',
+            //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
             'intro' => $intro,
             'intro_type' => @$this->dress3?->image_type ?? '',
@@ -148,7 +149,7 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
-          
+
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
@@ -172,9 +173,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-           
+
             'profile' => new ProfileResource(@$this->profile),
-            
+
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
