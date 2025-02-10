@@ -13,12 +13,13 @@ class LevelGiftController extends Controller
     public function index($cp_level_id){
 
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
 
         $result = CpLevelGift::where('vip_id', $cp_level_id)
         ->when($search,function($q)use($search){
             $q->where('id', $search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }

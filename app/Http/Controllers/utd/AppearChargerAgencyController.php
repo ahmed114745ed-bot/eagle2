@@ -15,6 +15,7 @@ class AppearChargerAgencyController extends Controller
     {
         $id = request('id');
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
 
         $users = User::when($id, function ($q) use ($id) {
             $q->where('id', $id);
@@ -27,7 +28,7 @@ class AppearChargerAgencyController extends Controller
                 });
             })
             ->whereIn('type_user', [3, 4])
-            ->paginate(10);
+            ->paginate($perPage);
 
 
             return Common::apiResponse(true,'Success', AppearChargerAgencyResource::collection($users));

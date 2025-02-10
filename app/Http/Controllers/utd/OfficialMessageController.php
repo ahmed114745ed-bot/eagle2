@@ -12,6 +12,8 @@ class OfficialMessageController extends Controller
     public function index(){
         $search = request('search');
         $user_id = request('user_id');
+        $perPage = request('per_page') ?? 10;
+
         $result = OfficialMessage::when($search,function($q)use($search){
             $q->where('id', $search);
         })
@@ -19,7 +21,7 @@ class OfficialMessageController extends Controller
             $q->where('user_id', $user_id);
         })
         ->where('type',2)
-        ->paginate(10);
+        ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }
