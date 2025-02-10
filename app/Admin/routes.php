@@ -36,6 +36,7 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\DeleteAccountController;
+use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
@@ -348,6 +349,7 @@ Route::group(
         $router->resource('interests', InterestsController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+        $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
         $router->resource('core-wallets', CoreWalletsController::class);
