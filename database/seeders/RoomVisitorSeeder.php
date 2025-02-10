@@ -15,7 +15,7 @@ class RoomVisitorSeeder extends Seeder
      */
     public function run(): void
     {
-        for($i=0;$i<10;$i++){
+/*         for($i=0;$i<10;$i++){
 
             $room = Room::create([
                 'numid' => rand(1000,10000),
@@ -26,6 +26,12 @@ class RoomVisitorSeeder extends Seeder
             RoomVisitor::create([
                 'room_id' => $room->id,
                 'user_id' => 828
+            ]);
+        } */
+        $rooms = Room::all();
+        foreach($rooms as $room){
+            $room->update([
+                'uid' => User::inRandomOrder()->first()->id,
             ]);
         }
 
