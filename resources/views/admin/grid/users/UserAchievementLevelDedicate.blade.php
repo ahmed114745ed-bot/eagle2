@@ -88,7 +88,7 @@
                
                     <label class="image-option">
                         <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                        <img src="<?= getImagePath($data->file) ?>" class="img-thumbnail" width="300" height="300">
+                        <img src="<?= getImagePath($data->file) ?>" class="img-thumbnail" width="100" height="100">
                     </label>
                 @endforeach
             </div>
