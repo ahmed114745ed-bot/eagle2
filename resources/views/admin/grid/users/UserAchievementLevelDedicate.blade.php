@@ -76,26 +76,16 @@
         </div>
 
 
-        {{-- <div class="form-group" id="imageDiv" style="display: none;">
-            <label for="custom_image">{{ __('admin.selectImage') }}</label>
-
-            <div class="d-flex flex-wrap">
-                @foreach ($achievementValidImage as $data)
-               
-                    <label class="image-option">
-                        <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                        <img src="<?= getImagePath($data->file) ?>" class="img-thumbnail" width="100" height="100">
-                    </label>
-                @endforeach
-            </div>
-            <hr>
-        </div> --}}
 
         <div class="form-group" id="imageDiv" style="display: none;">
             <label for="custom_image">{{ __('admin.selectImage') }}</label>
         
             <div style="display: flex; overflow-x: auto; white-space: nowrap; gap: 10px; padding-bottom: 10px;">
                 @foreach ($achievementValidImage as $data)
+                {{-- @php
+                dump($achievementValidImage);
+               
+                  @endphp --}}
                     <label class="image-option" style="flex: 0 0 auto;">
                         <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
                         <img src="{{ getImagePath($data->file) }}" class="img-thumbnail" width="100" height="100">
