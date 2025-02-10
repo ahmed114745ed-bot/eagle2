@@ -90,7 +90,7 @@ class AchievementLevelsModuleController extends Controller
             UserAchievementLevel::create($attributes);
         }
 
-        return redirect()->route(nameRoute('admin.user-achievement-levels.index'));
+        return redirect()->route(nameRoute('admin.achievement-dedicate.index'));
     }
 
     public function getAchievementLevels($achievementId)
