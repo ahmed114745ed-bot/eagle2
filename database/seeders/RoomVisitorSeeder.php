@@ -19,7 +19,7 @@ class RoomVisitorSeeder extends Seeder
 
             $room = Room::create([
                 'numid' => rand(1000,10000),
-                'uid' => User::inRandomOrder()->first()->uuid,
+                'uid' => User::inRandomOrder()->first()->id,
                 'room_name' => fake()->name(),
 
             ]);

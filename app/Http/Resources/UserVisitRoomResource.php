@@ -14,18 +14,18 @@ class UserVisitRoomResource extends JsonResource
      */
     public function toArray($request)
     {
-        
+
         return [
             'id'        =>  $this->id,
-            'name'      =>  $this->room_name ?? '',
-            'image'      => $this->room_cover ?? '',
+            'name'      =>  $this->room->room_name ?? '',
+            'image'      => $this->room->room_cover ?? '',
             'owner'      => [
                 'id'      => @$this->room?->owner?->id ??0,
                 'uuid'    => @$this->room?->owner?->uuid ??0,
                 'name'    => @$this->room?->owner?->name ?? '',
                 'image'   => @$this->room?->owner?->profile?->avatar ?? '',
             ]
-            
+
         ];
     }
 }
