@@ -96,7 +96,6 @@ class ReportMomentController extends MainController
     public static function getRoomsShow(Moment $moment){
 
         $show = new Show($moment);
-//        $show->setResource ('admin/auth/users');
         $show->field('id', 'ID');
         $show->field('img', __('Image'))->image(getDriverUrl() . DIRECTORY_SEPARATOR, 500, 500);
         $show->field('description', __('description'));

@@ -148,4 +148,16 @@ class RealsController extends Controller
         return Common::apiResponse(1, 'success');
 
     }
+
+    public function destroy_dash($real_id, $id)
+    {
+        $result = $this->realsService->deleteReeltAndReport($real_id, $id);
+
+        // Check result and return the appropriate response
+        if (!$result['success']) {
+            return redirect()->back()->with('error', $result['message']);
+        }
+
+        return redirect()->back();
+    }
 }

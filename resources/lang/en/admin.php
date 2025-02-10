@@ -178,6 +178,7 @@ return [
      "moment_value_settings"=> "Moment Value Settings",
      "fields"=> "Fields",
      "user_exp"=> "User EXP",
+     'delete_video' => 'Delete Video',
 
 
 ];

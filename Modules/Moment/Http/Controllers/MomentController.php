@@ -129,6 +129,6 @@ class MomentController extends Controller
             return redirect()->back()->with('error', $result['message']);
         }
 
-        return redirect()->back()->with('success', $result['message']);
+        return redirect()->back();
     }
 }

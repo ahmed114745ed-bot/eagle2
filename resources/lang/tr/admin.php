@@ -176,4 +176,5 @@ return [
     'availableBalance' => 'Mevcut Bakiye',
     'data_distribution' => 'Veri Dağılımı',
     'game_recharge_rate' => 'Oyun Şarj Oranı',
+    'delete_video' => 'Videoyu Sil',
 ];
