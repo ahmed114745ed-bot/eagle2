@@ -37,6 +37,7 @@
         </div>
 
 
+
         <input type="hidden" id="achievement_id" value="" name="achievement_id">
 
 {{--         <div class="form-group">
@@ -80,10 +81,12 @@
 
             <div class="d-flex flex-wrap">
                 @foreach ($achievementValidImage as $data)
-
+                @php
+                dump(getImagePath($data->image));
+            @endphp
                     <label class="image-option">
                         <input type="radio" name="custom_image" value="{{ $data->image }}" class="d-none">
-                        <img src="{{ getImagePath($data->image) }}" class="img-thumbnail" width="100" height="100">
+                        <img src="<?= getImagePath($data->image) ?>" class="img-thumbnail" width="300" height="300">
                     </label>
                 @endforeach
             </div>
