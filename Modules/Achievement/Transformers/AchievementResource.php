@@ -17,11 +17,11 @@ class AchievementResource extends JsonResource
      * @return array
      */
     public function toArray($request)
-    { 
-      
+    {
+
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->type . '_' . $this->target,
             'type' => $this->type,
             'valid_image' => $this->valid_image,
             'invalid_image' => $this->invalid_image,
