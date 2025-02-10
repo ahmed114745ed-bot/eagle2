@@ -33,6 +33,7 @@ use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
+use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MultiLanguageController;
