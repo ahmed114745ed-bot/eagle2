@@ -97,7 +97,7 @@ class MangerSettingController extends MainController
 
 
         return parent::index($content
-            ->title(trans('Updates'))
+            ->title(trans('Settings'))
             ->body(new HtmlString($form)));
     }
 }
