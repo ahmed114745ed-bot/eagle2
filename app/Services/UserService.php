@@ -701,9 +701,9 @@ class UserService
         return $updateType;
     }
 
-    public function trashedAccount($perPage, $Page, $search)
+    public function trashedAccount($perPage, $Page, $search,$id)
     {
-        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search);
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search,$id);
     }
 
     public function restoreAccount($id)

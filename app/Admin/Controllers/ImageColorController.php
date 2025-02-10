@@ -29,7 +29,7 @@ class ImageColorController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('image-color'))
+            ->title(trans('ID color'))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });

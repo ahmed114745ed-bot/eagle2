@@ -197,7 +197,7 @@ class AppSitiingCOnfigController extends MainController
 
 
         return parent::index($content
-            ->title(trans('Settings'))
+            ->title(trans('Updates'))
             ->body(new HtmlString($form)));
     }
 }

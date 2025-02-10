@@ -20,7 +20,7 @@ class OfficialMessageController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('official-messages'))
+            ->title(trans('Official messages'))
             ->body($this->grid());
     }
 

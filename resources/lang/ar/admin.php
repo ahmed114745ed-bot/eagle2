@@ -172,6 +172,15 @@ return [
     'huawei' => 'هواوي',
     'ios' => 'iOS',
     'submit' => 'إرسال',
+    "actions"=>"أجراءات",
+     "save"=> "حفظ",
+     "moment_value_settings"=> "اعدادات قيمه اللحظات",
+     "fields"=> "الحقول",
+     "user_exp"=> "exp المستخدم",
+     'used' => 'المستخدم',
+    'availableBalance' => 'الرصيد المتاح',
+    'data_distribution' => 'توزيع البيانات',
+    'game_recharge_rate' => 'نسبه شحن الالعاب',
 
 
 

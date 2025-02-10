@@ -84,7 +84,7 @@
             @csrf
             <div class="row">
                 <div class="col-md-3">
-                <label for="number">exp المستخدم:</label>
+                    <label for="number">{{ __('admin.user_exp') }}</label>
                 <input type="number" id="number" name="number" min="1"  value="{{$vip->value ?? ''}}"/>
                 <button type="submit" >{{ __('Submit') }}</button>
                 </div>

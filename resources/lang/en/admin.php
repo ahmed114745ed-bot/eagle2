@@ -173,6 +173,11 @@ return [
     'huawei' => 'Huawei',
     'ios' => 'iOS',
     'submit' => 'Submit',
+    "actions"=> "actions",
+    "save"=> "Save",
+     "moment_value_settings"=> "Moment Value Settings",
+     "fields"=> "Fields",
+     "user_exp"=> "User EXP",
 
 
 ];
