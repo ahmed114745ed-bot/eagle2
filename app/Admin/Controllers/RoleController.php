@@ -147,6 +147,8 @@ class RoleController extends MainController
         $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
+        $form->image('image', __('Image'))->help('Image will appear beside user in app');
+
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
 
