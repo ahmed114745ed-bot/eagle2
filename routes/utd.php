@@ -98,6 +98,7 @@ use App\Http\Controllers\utd\EmojiController;
 use App\Http\Controllers\utd\EventPeriodController;
 use App\Http\Controllers\utd\ImageController;
 use App\Http\Controllers\utd\SpecialIdRequestController;
+use App\Http\Controllers\Api\V1\RoomController as RoomControllerVi;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -670,7 +671,7 @@ Route::middleware([])->group(function () {
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
-        Route::get('room/{id}', [RoomController::class, 'roomUserDetails']);
+        Route::get('room/{id}', [RoomControllerVi::class, 'roomUserDetails']);
         Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
