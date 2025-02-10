@@ -30,6 +30,7 @@ return [
         'string' => ':attribute يجب أن يكون بين :min و :max أحرف.',
         'array' => ':attribute يجب أن يحتوي بين :min و :max عنصر.',
     ],
+    'select_user' => 'اختر مستخدم',
     'boolean' => 'يجب أن يكون حقل :attribute صحيحًا أو خاطئًا.',
     'confirmed' => 'تأكيد :attribute لا يتطابق.',
     'current_password' => 'كلمة المرور غير صحيحة.',

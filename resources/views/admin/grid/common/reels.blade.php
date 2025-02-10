@@ -86,8 +86,7 @@
                 <div class="col-md-3">
                 <label for="number"> {{__('dashboard.reelValue')}}</label>
                 <input type="number" id="number" name="number" min="1"  value="{{$vip->value ?? ''}}"/>
-                <button type="submit" >حفظ</button>
-                </div>
+                <button type="submit">{{ __('admin.save') }}</button>                </div>
             </div>
             </form>
         </div>

@@ -35,7 +35,7 @@ class UserController extends MainController
 
     public function __construct()
     {
-        $this->title = 'Users';
+        $this->title = 'Hosts';
     }
 
 

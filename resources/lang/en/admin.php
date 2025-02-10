@@ -160,6 +160,24 @@ return [
     'type_file'=>'Type upload',
     'file'=>'File',
     'Image'=>'Image',
-    'select_file'=>'Select File'
+    'select_file'=>'Select File',
+
+    'show_welcome_animation' => 'show welcome animation : ',
+    'enable_chat' => 'Enable Chat',
+    'invitation_code_date' => 'Invitation Code Expiry Date',
+    'invitation_code_date_placeholder' => 'Value taken in months',
+    'android' => 'Android',
+    'minimum_version' => 'Minimum Version',
+    'current_version' => 'Current Version',
+    'update_required' => 'Update Required',
+    'huawei' => 'Huawei',
+    'ios' => 'iOS',
+    'submit' => 'Submit',
+    "actions"=> "actions",
+    "save"=> "Save",
+     "moment_value_settings"=> "Moment Value Settings",
+     "fields"=> "Fields",
+     "user_exp"=> "User EXP",
+
 
 ];

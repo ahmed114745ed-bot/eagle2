@@ -46,7 +46,7 @@ class AdminUsersController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('admins'))
+            ->title(trans('Managers'))
             ->body($this->grid()));
     }
 

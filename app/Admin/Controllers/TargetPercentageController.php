@@ -47,7 +47,7 @@ class TargetPercentageController extends MainController
        
 
         return  parent::index($content
-            ->title(trans('percentage-target'))
+            ->title(trans('Salary Distribution Ratio'))
             ->body(new HtmlString($form)));
     }
 

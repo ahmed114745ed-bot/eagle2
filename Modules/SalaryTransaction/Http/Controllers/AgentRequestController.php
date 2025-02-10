@@ -29,7 +29,7 @@ class AgentRequestController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('agent-salary-requests'))
+            ->title(trans('report'))
             ->body($this->grid()));
     }
 

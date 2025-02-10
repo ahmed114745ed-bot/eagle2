@@ -557,7 +557,7 @@
     "user_charge": "उपयोगकर्ता शुल्क",
     "user_count": "उपयोगकर्ता की संख्या",
     "percentage-target": "लक्षित प्रतिशत",
-    "charges-reports": "शुल्क रिपोर्टें",
+    "charges reports": "शुल्क रिपोर्टें",
     "dash_repo": "डैशबोर्ड शुल्क",
     "app_repo": "ऐप शुल्क",
     "coins_repo": "कॉइन द्वार",
@@ -661,7 +661,7 @@
     "name_en": "नाम (अंग्रेज़ी)",
     "custom_id": "कस्टम आईडी",
     "validate": "मान्य",
-    "request-agencies": "एजेंसी अनुरोध",
+    "Request agencies": "एजेंसी अनुरोध",
     "active vip": "वीआईपी सक्रिय",
     "whats app": "व्हाट्सएप",
     "back nationalId": "नेशनल आईडी का पीछा",
@@ -752,7 +752,57 @@
     "charge system":"चार्ज सिस्टम",
     "Application wallet":"एप्लिकेशन वॉलेट",
     "Edit Level": "स्तर संपादित करें",
-    "Distinguished identifier": "विशिष्ट पहचानकर्ता"
+    "Distinguished identifier": "विशिष्ट पहचानकर्ता",
+    "room vips" : "कमरे के वीआईपी स्तर",
+    "transaction request problem": "लेनदेन अनुरोध समस्या",
+    "Reports": "रिपोर्ट्स",
+    "Featured ids": "विशेष आईडी",
+    "Requests": "अनुरोध",
+    "Details of unique identifiers": "अद्वितीय पहचानकर्ताओं का विवरण",
+    "ID color": "आईडी रंग",
+    "Sales": "बिक्री",
+    "Dumped boxes": "फेंके गए डिब्बे",
+    "Room": "कमरे",
+    "Updates": "अद्यतन",
+    "FAQ": "सामान्य प्रश्न",
+    "Events reports": "घटनाओं की रिपोर्ट",
+    "General rules": "सामान्य नियम",
+    "Exchange currencies": "मुद्राओं का विनिमय",
+    "pk event": "पीके इवेंट",
+    "cp gifts": "सीपी उपहार",
+    "cp vip": "सीपी स्तर",
+    "VIPs": "वीआईपी",
+    "Vip": "वीआईपी",
+    "Agency join requests": "एजेंसी शामिल होने के अनुरोध",
+    "Charge agents": "चार्ज एजेंट्स",
+    "Hosts": "होस्ट्स",
+    "CP":"सीपी",
+    "reels": "रील्स",
+    "Room categories": "कमरे की श्रेणियाँ",
+    "Official messages": "आधिकारिक संदेश",
+    "Moment reports": "क्षण रिपोर्ट",
+    "group Chat": "समूह चैट",
+    "salary requests": "वेतन अनुरोध",
+    "Invitation code": "निमंत्रण कोड",
+    "report": "रिपोर्टें"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
 
 
 
@@ -789,4 +839,3 @@
 
 
     
-}

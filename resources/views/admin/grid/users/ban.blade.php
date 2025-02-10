@@ -1,7 +1,6 @@
 <div class="box box-solid">
     <div class="box-header with-border">
-        <h3 class="box-title">أجراءات</h3>
-
+        <h3 class="box-title">{{ __('admin.actions') }}</h3>
         <div class="box-tools">
             <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
             </button>

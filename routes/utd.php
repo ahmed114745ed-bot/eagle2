@@ -111,6 +111,7 @@ Route::middleware([])->group(function () {
 
     Route::prefix('families')->group(function () {
         Route::get('/', [FamilyController::class, 'index']);
+        Route::get('/all', [FamilyController::class, 'all']);
         Route::post('/', [FamilyController::class, 'store']);
         Route::post('/update/{id}', [FamilyController::class, 'update']);
         Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
@@ -788,6 +789,7 @@ Route::middleware([])->group(function () {
 
     Route::prefix('agencies')->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::get('/all', [AgencyController::class, 'allAgencies']);
         Route::get('/members', [AgencyController::class, 'activeAgenciesMembers']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);

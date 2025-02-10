@@ -12,10 +12,12 @@ class BannerController extends Controller
     public function index(){
 
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         $result = Banner::when($search, function($q) use($search){
             $q->where('id', $search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
         return Common::apiResponse(true,'Success', $result);
     }

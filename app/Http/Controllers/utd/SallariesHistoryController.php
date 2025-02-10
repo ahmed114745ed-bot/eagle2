@@ -14,11 +14,13 @@ class SallariesHistoryController extends Controller
 
         $type = request('type') ?? 0; // 0 => users , 1 => agencies
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         $result = SalaryTrx::where('type', $type)
             ->when($search, function ($q) use ($search) {
                 $q->where('id', $search);
             })
-            ->paginate(10)
+            ->paginate($perPage)
             ->through(function($salary){
                 return [
                     'id' => $salary->id,

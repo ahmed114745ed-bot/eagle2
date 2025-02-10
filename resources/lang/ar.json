@@ -558,7 +558,7 @@
     "user_charge": " قيمه الشحن",
     "user_count": "عدد المستخدين",
     "percentage-target": "النسبة المستهدفة",
-    "charges-reports": "تقارير الشحن",
+    "charges reports": "تقارير الشحن",
     "dash_repo": "شحن داشبورد",
     "app_repo": "شحن عبر التطبيق",
     "coins_repo": "بوابات دفع",
@@ -661,7 +661,7 @@
     "name_en":"الاسم بالانجلش",
     "custom_id":"معرف مخصص",
     "validate":"أيد",
-    "request-agencies":"طلبات انشاء الوكاله",
+    "Request agencies":"طلبات انشاء الوكاله",
     "active vip":"vip فعال لل",
     "whats app":"واتس اب",
     "back nationalId":"ظهر البطاقه",
@@ -712,7 +712,7 @@
     "charge system":"سيستم الشحن",
     "Types of clouds":"انواع السحب",
     "Funds withdrawal requests":"طلبات سحب الاموال",
-    "sales":"مبيعات",
+    "Sales":"مبيعات",
     "Distinguished identifier":"المعرف المميز",
     "frames":"إطارات",
     "Requests":"الطلبات",
@@ -725,7 +725,7 @@
     "Target Agencies":"تارجيت الوكالات",
     "Agency managers":"مديرين الوكلات",
     "Agency":"وكالة",
-    "hosts":"المضيفين",
+    "Hosts":"المضيفين",
     "Reports":"التقارير",
     "Fast orders":"اوامر سريعة",
     "Applications to join agencies":"طلبات الانضمام للوكالات",
@@ -764,7 +764,7 @@
     "Target events":"الأحداث المستهدفة",
     "pk event" : "الاحدات pk",
     "General rules" :"قواعد عامة",
-    "events reports":"تقارير الاحداث",
+    "Events reports":"تقارير الاحداث",
     "Events of the weeks":"احداث الاسابيع",
     "frams":"اطارات",
     "Featured ids" :"مميز ids",
@@ -773,9 +773,9 @@
     "dedicate special id" : "اهداء special id",
     "Requests to establish the agency" :"طلبات انشاء الوكاله",
     "Target users" :"تارجت المستخدمين",
-    "agency join requests" : "طلبات الانضمام للوكالات",
+    "Agency join requests" : "طلبات الانضمام للوكالات",
     "charges" : "شحنات",
-    "charge agents":" وكلاء شحن",
+    "Charge agents":" وكلاء شحن",
     "charge reports" : " تقارير الشحن",
     "permissions" : "صلاحيات",
     "Control panel" :"لوحة التحكم",
@@ -797,7 +797,7 @@
     "cp vip":" مستويات cp",
     "ovip" : "الارستقراطية",
     "vip_privilege":"امتيازات كبار الشخصيات",
-    "room-vips" :" مستويات الغرف",
+    "room vips" :" مستويات الغرف",
     "room-target": " اهداف الغرف",
     "Manger" :" المدير",
     "App Owner" :"مالك التطبيق",
@@ -868,7 +868,7 @@
  "kick_out_greater_than_day": "طرد بعد أكثر من يوم",
  "This user already has an agency job requested!": "هذا المستخدم مضاف بالفعل",
  "salary transaction" : "معاملة الراتب",
- "transaction-request-problem" :"مشكلة طلب المعاملة",
+ "transaction request problem" :"مشكلة طلب المعاملة",
  "agent-salary-requests":"طلبات راتب الوكيل",
  "charge-country":"بلد الشحن البلاد",
  "agency-country":" الوكالة البلاد",
@@ -1657,6 +1657,12 @@
     "Sensitive Settings":"اعدادات حساسة",
     "System Settings":"اعدادات النظام",
     "Login Reward":"مكافئة تسجيل الدخول",
+    "salary requests": "طلبات الراتب",
+
+
+
+
+
 
 
 

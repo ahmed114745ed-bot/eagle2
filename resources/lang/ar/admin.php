@@ -160,7 +160,28 @@ return [
     'type_file'=>'نوع التحميل',
     'file'=>'ملف',
     'Image'=>'صورة',
-    'select_file'=>'اختر الملف'
+    'select_file'=>'اختر الملف',
+    'show_welcome_animation' => 'عرض تحريك الترحيب',
+    'enable_chat' => 'تمكين الدردشة',
+    'invitation_code_date' => 'تاريخ انتهاء كود الدعوه',
+    'invitation_code_date_placeholder' => 'القيمه المؤخوذه ب الشهر',
+    'android' => 'أندرويد',
+    'minimum_version' => 'الحد الأدنى للإصدار',
+    'current_version' => 'الإصدار الحالي',
+    'update_required' => 'التحديث مطلوب',
+    'huawei' => 'هواوي',
+    'ios' => 'iOS',
+    'submit' => 'إرسال',
+    "actions"=>"أجراءات",
+     "save"=> "حفظ",
+     "moment_value_settings"=> "اعدادات قيمه اللحظات",
+     "fields"=> "الحقول",
+     "user_exp"=> "exp المستخدم",
+     'used' => 'المستخدم',
+    'availableBalance' => 'الرصيد المتاح',
+    'data_distribution' => 'توزيع البيانات',
+    'game_recharge_rate' => 'نسبه شحن الالعاب',
+
 
 
 ];

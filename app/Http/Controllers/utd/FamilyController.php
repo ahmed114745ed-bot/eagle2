@@ -23,6 +23,20 @@ class FamilyController extends Controller
         return Common::apiResponse(true, '', $families, 200);
     }
 
+    public function all()
+    {
+
+        $families = Family::all()->map(function($family){
+            return [
+                'id' => $family->id,
+                'name' => $family->name,
+            ];
+        });
+
+
+        return Common::apiResponse(true, '', $families, 200);
+    }
+
     public function store(Request $request)
     {
 

@@ -14,6 +14,7 @@ class SpecialWareController extends Controller
         $id = request('id');
         $value = request('value');
         $sort = request('sort') ?? 'asc';
+        $perPage = request('per_page') ?? 10;
 
         $result = Ware::when($id, function ($q) use ($id) {
             $q->where('id', $id);
@@ -23,7 +24,7 @@ class SpecialWareController extends Controller
             })
             ->where('type', 25)
             ->orderBy('id', $sort)
-            ->paginate(10);
+            ->paginate($perPage);
 
             $getTypeTranslations = [
                 4 => trans('purchase'),

@@ -19,6 +19,7 @@ class DedicateWareController extends Controller
 
         $search = request('search');
         $type = request('type');
+        $perPage = request('per_page') ?? 10;
 
         $result = Ware::when($search, function ($q) use ($search) {
             $q->where('id', $search);
@@ -29,7 +30,7 @@ class DedicateWareController extends Controller
             ->when(!$type || $type != 25, function ($q) {
                 $q->whereNotNull('get_type')->where('type', '!=', 25);
             })
-            ->paginate(10);
+            ->paginate($perPage);
 
         $typeTranslations = [
             1 => trans('Gemstone'),

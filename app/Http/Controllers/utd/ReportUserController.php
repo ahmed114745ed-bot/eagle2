@@ -18,6 +18,7 @@ class ReportUserController extends Controller
         $month= request('month');
         $agency = request('agency');
 
+        $perPage = request('per_page') ?? 10;
 
         $result = User::with('liveTime', 'reals', 'moments')->when($search,function($q)use($search){
             $q->where('uuid', 'like', "%{$search}%");
@@ -31,7 +32,7 @@ class ReportUserController extends Controller
         ->when($agency,function($q) use($agency){
             $q->where('agency_id', $agency);
         })
-        ->paginate(10)
+        ->paginate($perPage)
         ->through(function($user){
             return [
                 'id' => $user->id,
