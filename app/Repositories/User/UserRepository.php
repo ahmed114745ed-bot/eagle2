@@ -263,9 +263,7 @@ class UserRepository extends Repository
     {
         return User::onlyTrashed()->when($search, function ($query) use ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'LIKE', "%$search%")
-                    ->orWhere('phone', 'LIKE', "%$search%")
-                    ->orWhere('uuid', 'LIKE', "%$search%");
+                $q->where('uuid', $search);
             });
         })->when($id, function ($query) use ($id) {
             $query->where(function ($q) use ($id) {
