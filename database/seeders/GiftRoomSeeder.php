@@ -70,7 +70,7 @@ class GiftRoomSeeder  extends Seeder
 
         $cps = Cp::take(2)->get();
         foreach ($cps as $cp) {
-            $cp->user_one_id = 282;
+            $cp->user_one_id = 828;
             $cp->save();
         }
     }
