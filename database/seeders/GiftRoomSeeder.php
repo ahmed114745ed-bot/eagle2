@@ -3,10 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Cp;
+use App\Models\Pack;
 use App\Models\Room;
 use App\Models\Agency;
-use App\Models\GiftLog;
 
+use App\Models\GiftLog;
+use App\Models\UserVip;
 use App\Models\ExchangeLog;
 use App\Models\AgencySallary;
 use Illuminate\Database\Seeder;
@@ -68,10 +70,25 @@ class GiftRoomSeeder  extends Seeder
         //     $giftLog->save();
         // }
 
-        $cps = Cp::take(2)->get();
-        foreach ($cps as $cp) {
-            $cp->user_one_id = 828;
-            $cp->save();
-        }
+        // $cps = Cp::take(2)->get();
+        // foreach ($cps as $cp) {
+        //     $cp->user_one_id = 828;
+        //     $cp->save();
+        // }
+
+        Pack::where([
+            'type' => 4,
+            'is_used' => 1,
+            'expire' => 0
+        ])
+        ->where('get_type', '!=', 1)
+        ->take(2)
+        ->update(['user_id' => 828]);
+        UserVip::where([
+        
+            'is_used' => 1,
+            'expire' => 0
+        ])->take(2)
+        ->update(['user_id' => 828]);
     }
 }
