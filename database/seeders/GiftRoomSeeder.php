@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Room;
+use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\ExchangeLog;
+
 use App\Models\AgencySallary;
-use App\Classes\Facades\Agency;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
