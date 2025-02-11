@@ -9,12 +9,15 @@ use App\Tik\Repositories\UserRepository as Repository;
 
 class UserRepository extends Repository
 {
-    public function search($key, $perPage, $currentPage)
+    public function search($key, $family, $perPage, $currentPage)
     {
-        return User::query()
-            ->where('name', 'like', '%' . $key . '%')
-            ->orWhere('uuid', 'like', '%' . $key . '%')
-            ->orWhere('id', 'like', '%' . $key . '%')
+        return User::query()->where(function ($query) use ($key) {
+            $query->where('name', 'like', '%' . $key . '%')
+                ->orWhere('uuid', 'like', '%' . $key . '%')
+                ->orWhere('id', 'like', '%' . $key . '%');
+        })->when(isset($family), function ($query) {
+            $query->where('family_id', null)->orWhere('family_id', 0);
+        })
             ->select(['id', DB::raw('concat(name , " - ", uuid) as name')])
             ->paginate($perPage, ['*'], 'page', $currentPage);
     }

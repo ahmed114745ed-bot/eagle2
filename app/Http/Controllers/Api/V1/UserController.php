@@ -179,7 +179,8 @@ class UserController extends Controller
     public function search(Request $request)
     {
         $key = $request->search;
-        $users = $this->userService->searchUsers($key);
+        $family = $request->family;
+        $users = $this->userService->searchUsers($key,$family);
 
 
         $users = $users->through(function ($user) {
