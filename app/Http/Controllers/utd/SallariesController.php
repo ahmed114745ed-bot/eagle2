@@ -47,6 +47,7 @@ class SallariesController extends Controller
         $uuid = $request->uuid;
         $year = $request->query('year', now()->year);
         $month = $request->query('month', now()->month);
+        $user = null;
         if ($uuid) {
             $user = User::where('uuid', $uuid)->first();
 
@@ -56,7 +57,7 @@ class SallariesController extends Controller
         }
 
 
-        $userSalaries = UserSallary::when(isset($uuid), function ($query) use ($user) {
+        $userSalaries = UserSallary::when(isset($user), function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })
             ->whereHas('user', function ($q) {
@@ -65,7 +66,7 @@ class SallariesController extends Controller
             ->select(DB::raw('sum(sallary) as totalTarget2'), DB::raw('sum(sallary - cut_amount) as totalSalary2'))
             ->first();
 
-        $userCutAmount = UserSallary::when(isset($uuid), function ($query) use ($user) {
+        $userCutAmount = UserSallary::when(isset($user), function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->where(function ($query) use ($year, $month) {
             $query->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month");
@@ -73,7 +74,7 @@ class SallariesController extends Controller
             $q->where('agency_id', '!=', 0);
         })->select(DB::raw('sum(cut_amount) as totalPayments'))->first();
 
-        $totalDiamonds = UserTarget::when(isset($uuid), function ($query) use ($user) {
+        $totalDiamonds = UserTarget::when(isset($user), function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->sum(DB::raw('user_diamonds'));
 
