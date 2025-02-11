@@ -492,6 +492,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/user', [MusicController::class, 'userMusic']);
                 Route::post('/create', [MusicController::class, 'store']);
             });
+
+            Route::get('/privacy-policy', function () {
+                $Page=\App\Models\Page::where("name","privacy-policy")->first();
+                return response()->json(['html' => $Page]);
+            });
         }
     );
 });
