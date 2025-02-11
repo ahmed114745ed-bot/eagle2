@@ -10,7 +10,7 @@ use App\Classes\Facades\Agency;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class ReactSeeders  extends Seeder
+class GiftRoomSeeder  extends Seeder
 {
     /**
      * Run the database seeds.
