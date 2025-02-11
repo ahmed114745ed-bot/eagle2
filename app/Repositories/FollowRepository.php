@@ -64,7 +64,8 @@ class FollowRepository
                 'followPacks',
                 'profile',
                 'ware',
-                'UserVip'
+                'UserVip',
+                'manager'
             ];
         }
         return $user->following()->with($with)->fitterByUuid($keyword)->paginate(10); // Set pagination limit

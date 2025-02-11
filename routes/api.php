@@ -122,6 +122,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
 
+            Route::get('user-room', [UserController::class, 'userRoom']);
+
             Route::get('/agora-rtc-token', [AgoraController::class, 'RtcToken']);
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 

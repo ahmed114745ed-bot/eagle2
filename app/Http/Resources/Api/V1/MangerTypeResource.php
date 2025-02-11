@@ -17,7 +17,7 @@ class MangerTypeResource extends JsonResource
         return [
             'id'=>$this->id,
             'name'=>app()->getLocale() == "ar" ? $this->name_ar : $this->name_en,
-            'img'=>$this->roles()->first()?->image,
+            'img'=>$this?->roles()?->first()?->image,
             'description'=>app()->getLocale() == "ar" ? $this->description_ar : $this->description_en
         ];
     }

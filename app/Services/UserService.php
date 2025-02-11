@@ -392,7 +392,8 @@ class UserService
             'followPacks',
             'profile',
             'ware',
-            'UserVip'
+            'UserVip',
+            'manager'
         ];
 
         if ($type == 1) {

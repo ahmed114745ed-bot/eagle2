@@ -43,7 +43,6 @@ class UserRelationsResource extends JsonResource
 
         }
 
-
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
             $imageReceiver = $this->getImageReceiverOrSender('receiver_id', 1);
             $imageSender   = $this->getImageReceiverOrSender('sender_id', 2);
@@ -94,7 +93,7 @@ class UserRelationsResource extends JsonResource
             'is_follow'      => $isFollow,
             "is_gold_id" => (bool)$this->is_gold_id,
             'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType),
+            "manger_type"          =>new MangerTypeResource(@$this->manager),
             "multi_images"          => $this->images?->select("img"),
             "statistic"     => [
                 "visitors" => count($this->profileVisits),
