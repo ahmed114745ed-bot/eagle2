@@ -30,9 +30,10 @@ class AgoraController extends Controller
     }
 
     public function webhook(Request $request){
-        // Log::info('agora webhook triggered', [
-        //     $request->all()
-        // ]);
+        Log::info('agora webhook triggered', [
+            $request->all()
+        ]);
+        return ;
         $agoraSignature = $request->header('Agora-Signature');
         Log::info("Agora-Signature: " . $agoraSignature);
 
