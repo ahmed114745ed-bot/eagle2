@@ -36,8 +36,8 @@ class GiftRoomSeeder  extends Seeder
         }
 
         $agency = Agency::where("id", 45)->first();
-        $agency->update(['app_owner_id', 828]);
-
+        $agency->app_owner_id = 828;
+        $agency->save();
         $agencySalaries = AgencySallary::take(3)->get();
         foreach ($agencySalaries as $key => $agencySalary) {
             $agencySalary->agency_id = $agency->id;
