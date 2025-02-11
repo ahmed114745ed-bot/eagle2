@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Log;
 
 class AgoraController extends Controller
 {
@@ -26,5 +27,11 @@ class AgoraController extends Controller
         $token = generateRtcToken($request->channel,$user->id);
 
         return Common::apiResponse(true,'Success',$token);
+    }
+
+    public function webhook(Request $request){
+        Log::info('agora webhook triggered', [
+            $request->all()
+        ]);
     }
 }

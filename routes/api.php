@@ -55,6 +55,12 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
+
+
+
+
+Route::post('agora-webhook', [AgoraController::class, 'webhook']);
+
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
 
