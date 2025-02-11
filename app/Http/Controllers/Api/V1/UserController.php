@@ -64,6 +64,12 @@ class UserController extends Controller
         UserTypeResource::initializeData($senderLevels, $receivedImage, null);
         return Common::apiResponse(1, '', $usersType);
     }
+    public function userRoom(){
+
+        $user = User::with('room')->where('id', Auth::id())->first();
+
+        return Common::apiResponse(true, 'Success', $user);
+    }
 
     public static function checkPack($userId, $type, $dress = null)
     {
