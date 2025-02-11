@@ -295,7 +295,7 @@ class SallariesController extends Controller
 
         return User::with('agency:id,name')
             ->when($search, function($q) use($search){
-                $q->where('id', $search);
+                $q->where('uuid', $search);
             })
             ->paginate($perPage) // Paginate by 10 items per page
             ->through(function ($user) {
