@@ -38,7 +38,7 @@ class AchievementDedicateController extends MainController
 
     public function create(Content $content)
     {
-        $achievementValidImage = AchievementValidImage::all();
+        $achievementValidImage = AchievementValidImage::get();
         return parent::create($content
              ->title(trans('user-achievement-levels'))
             ->body(view('admin.grid.users.UserAchievementLevelDedicate',compact('achievementValidImage'))));
