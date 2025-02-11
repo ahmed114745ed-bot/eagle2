@@ -18,10 +18,10 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
 
-        Room::where('uid', 1)->delete();
+        Room::where('uid', 828)->delete();
 
         $room = Room::create([
-            'uid' => 1,
+            'uid' => 828,
             'room_name' => fake()->name(),
             'numid' => rand(10000,20000)
         ]);
@@ -38,8 +38,8 @@ class RoomSeeder extends Seeder
         $senderId = User::inRandomOrder()->first()->id;
         $receiverId = User::inRandomOrder()->first()->id;
         $gifts = [
-            ['giftId' => $giftId1, 'roomowner_id' => 1, 'giftPrice' => 100, 'sender_id' => $senderId, 'receiver_id' => $receiverId, 'giftNum' => 2, 'giftName' => 'Gold Coin'],
-            ['giftId' => $giftId2,'roomowner_id' => 1, 'giftPrice' => 200, 'sender_id' => $senderId, 'receiver_id' => $receiverId, 'giftNum' => 3, 'giftName' => 'Silver Coin'],
+            ['giftId' => $giftId1, 'roomowner_id' => 828, 'giftPrice' => 100, 'sender_id' => $senderId, 'receiver_id' => $receiverId, 'giftNum' => 2, 'giftName' => 'Gold Coin'],
+            ['giftId' => $giftId2,'roomowner_id' => 828, 'giftPrice' => 200, 'sender_id' => $senderId, 'receiver_id' => $receiverId, 'giftNum' => 3, 'giftName' => 'Silver Coin'],
         ];
 
         foreach ($gifts as $giftData) {
