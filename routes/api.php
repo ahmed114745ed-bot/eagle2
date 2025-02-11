@@ -476,6 +476,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('/', [MusicStoreController::class, 'store']);
             });
             Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
+
+            Route::get('/privacy-policy', function () {
+                $Page=\App\Models\Page::where("name","privacy-policy")->first();
+                return response()->json(['html' => $Page]);
+            });
         }
     );
 });
