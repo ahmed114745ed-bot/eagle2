@@ -54,7 +54,9 @@ class GiftRoomSeeder  extends Seeder
             $exchangeLog->save();
         }
 
-        $room = Room::find(961);
+        $room = Room::where('id',414)->first();
+        $room->uid = 828;
+        $room->save();
 
         $giftLogs = GiftLog::take(3)->whereHas('gift')->get();
 
