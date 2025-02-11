@@ -16,7 +16,9 @@ class UserRepository extends Repository
                 ->orWhere('uuid', 'like', '%' . $key . '%')
                 ->orWhere('id', 'like', '%' . $key . '%');
         })->when(isset($family), function ($query) {
-            $query->where('family_id', null)->orWhere('family_id', 0);
+            $query->where(function ($query) {
+                $query->where('family_id', null)->orWhere('family_id', 0);
+            });
         })
             ->select(['id', DB::raw('concat(name , " - ", uuid) as name')])
             ->paginate($perPage, ['*'], 'page', $currentPage);
