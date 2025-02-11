@@ -84,9 +84,7 @@ class GiftRoomSeeder  extends Seeder
         // ->where('get_type', '!=', 1)
         // ->take(2)
         // ->update(['user_id' => 828]);
-        UserVip::where([
-            'is_used' => 1,
-        ])->take(2)
-            ->update(['user_id' => 828, 'expire' => 0]);
+        UserVip::take(2)
+            ->update(['user_id' => 828, 'expire' => 0, 'is_used' => 1]);
     }
 }
