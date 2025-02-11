@@ -3,10 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Room;
+use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\ExchangeLog;
+
 use App\Models\AgencySallary;
-use App\Classes\Facades\Agency;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -35,8 +36,8 @@ class GiftRoomSeeder  extends Seeder
         }
 
         $agency = Agency::where("id", 45)->first();
-        $agency->update(['app_owner_id', 828]);
-
+        $agency->app_owner_id = 828;
+        $agency->save();
         $agencySalaries = AgencySallary::take(3)->get();
         foreach ($agencySalaries as $key => $agencySalary) {
             $agencySalary->agency_id = $agency->id;
@@ -53,7 +54,9 @@ class GiftRoomSeeder  extends Seeder
             $exchangeLog->save();
         }
 
-        $room = Room::find(961);
+        $room = Room::where('id',414)->first();
+        $room->uid = 828;
+        $room->save();
 
         $giftLogs = GiftLog::take(3)->whereHas('gift')->get();
 
