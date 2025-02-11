@@ -44,17 +44,22 @@ class SallariesController extends Controller
 
     private function getUserDetails(Request $request)
     {
-        $uuid = $request->query('uuid', '0');
+        $uuid = $request->uuid;
         $year = $request->query('year', now()->year);
         $month = $request->query('month', now()->month);
+         if($uuid)
+         {
+            $user = User::where('uuid', $uuid)->first();
 
-        $user = User::where('uuid', $uuid)->first();
+            if (!$user) {
+                return ['message' => 'User not found'];
+            }
+         }
+       
 
-        if (!$user) {
-            return ['message' => 'User not found'];
-        }
-
-        $userSalaries = UserSallary::where('user_id', $user->id)
+        $userSalaries = UserSallary::when(isset($uuid), function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
             ->whereHas('user', function ($q) {
                 $q->where('agency_id', '!=', 0);
             })
@@ -145,7 +150,7 @@ class SallariesController extends Controller
 
 
             UsdTransfer::create([
-                "admin_id"  => request('admin_id'),
+               // "admin_id"  => request('admin_id'),
                 "user_id"   => $userId,
                 "agency_id" => $agencyId,
                 "user_type" => \request('type') == 'agency' ? 1 : 0,
