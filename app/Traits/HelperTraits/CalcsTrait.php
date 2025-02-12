@@ -15,6 +15,7 @@ use App\Models\Vip;
 use App\Models\Ware;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 trait CalcsTrait
 {
@@ -704,7 +705,7 @@ trait CalcsTrait
         }
         $uvip = $user->UserVip;
         if (!$uvip) return new \stdClass();
-
+Log::info('vip iddddddddddddddddddddd: '.$uvip->vip_id);
         $vip = OVip::query()->find($uvip->vip_id);
         if (!$vip) return new \stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();

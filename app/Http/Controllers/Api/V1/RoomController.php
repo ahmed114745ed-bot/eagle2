@@ -40,6 +40,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use App\Http\Resources\GiftRoomResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -1365,7 +1366,7 @@ class RoomController extends Controller
                 "imgbackground" => $room->final_room_image ??  '',
                 "roomIntro" => $room->room_intro ?? "",
                 "roomImg" => $room->room_cover ?? "",
-                // "room_type" => @$room->myType->name ?? "", 
+                // "room_type" => @$room->myType->name ?? "",
                 "room_type" => app()->getLocale() === 'ar' ? @$room->roomCategory?->name  ?? @$room->roomCategory?->name_en : @$room->roomCategory?->name_en ?? @$room->roomCategory?->name,
                 "room_name" => @$room->room_name ?? "",
                 "is_locked" => false
@@ -1748,5 +1749,13 @@ class RoomController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
+    }
+
+    public function roomGifts($id){
+
+        $perPage = request('per_page',10);
+
+        $result = Room::where('uid',$id)->first()?->gifts()->paginate($perPage);
+        return Common::apiResponse(true, 'done',GiftRoomResource::collection($result) );
     }
 }

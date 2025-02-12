@@ -4,11 +4,18 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Repositories\Room\RoomRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Http\Request;
 use Log;
 
 class AgoraController extends Controller
 {
+
+    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository)
+    {
+
+    }
     public function RtcToken(Request $request){
 
         $request->validate([
