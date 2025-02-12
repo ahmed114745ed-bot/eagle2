@@ -31,7 +31,6 @@ class MyDataUtdResource extends JsonResource
                 }
             }
         }
-        Log::info([$this->medals,$achievement_images]);
         return [
             'id' => $this->id ?? 0,
             'name' => $this->name  ?? '',
