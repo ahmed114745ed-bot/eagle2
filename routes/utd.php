@@ -672,6 +672,7 @@ Route::middleware([])->group(function () {
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
         Route::get('room/{id}', [RoomControllerVi::class, 'roomUserDetails']);
+        Route::get('room/gifts/{id}', [RoomControllerVi::class, 'roomGifts']);
         Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
