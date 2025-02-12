@@ -30,7 +30,6 @@ class MyDataUtdResource extends JsonResource
                 }
             }
         }
-        dd($this->medals,$achievement_images);
         return [
             'id' => $this->id ?? 0,
             'name' => $this->name  ?? '',
