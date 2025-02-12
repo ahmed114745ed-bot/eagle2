@@ -21,6 +21,7 @@ class UserVipUtdResource extends JsonResource
             'expire' => @$this?->expire,
             'qty' => $this?->qty ?? 0,
             'total_price' => $this->total,
+            'image' => $this->OVip->img ?? '',
 
         ];
     }
