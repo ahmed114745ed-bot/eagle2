@@ -1752,7 +1752,7 @@ class RoomController extends Controller
 
     public function roomGifts($id){
         $perPage = request('per_page',10);
-        $result = Room::where('uid',$id)->gifts()->paginate($perPage);
+        $result = Room::where('uid',$id)->first()->gifts()->paginate($perPage);
         return Common::apiResponse(true, 'done', $result);
     }
 }
