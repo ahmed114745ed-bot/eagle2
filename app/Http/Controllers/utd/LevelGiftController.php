@@ -2,35 +2,50 @@
 
 namespace App\Http\Controllers\utd;
 
-use App\Helpers\Common;
-use App\Http\Controllers\Controller;
+use Exception;
 use App\Models\Ware;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Modules\CP\Entities\CpLevelGift;
 
 class LevelGiftController extends Controller
 {
-    public function index($cp_level_id){
+    public function index($cp_level_id)
+    {
 
         $search = request('search');
         $perPage = request('per_page') ?? 10;
 
         $result = CpLevelGift::where('vip_id', $cp_level_id)
-        ->when($search,function($q)use($search){
-            $q->where('id', $search);
-        })
-        ->paginate($perPage);
+            ->when($search, function ($q) use ($search) {
+                $q->where('id', $search);
+            })
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function delete($cp_level_id, $id){
-        CpLevelGift::where('vip_id', $cp_level_id)->findOrFail($id)->delete();
+    public function show($id)
+    {
+        try {
+            $data = CpLevelGift::findOrFail($id);
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
 
-        return Common::apiResponse(true,'Success');
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
-    public function delete_all($cp_level_id,Request $request){
+    public function delete($cp_level_id, $id)
+    {
+        CpLevelGift::where('vip_id', $cp_level_id)->findOrFail($id)->delete();
+
+        return Common::apiResponse(true, 'Success');
+    }
+
+    public function delete_all($cp_level_id, Request $request)
+    {
         $request->validate([
             'ids' => 'required'
         ]);
@@ -42,7 +57,8 @@ class LevelGiftController extends Controller
         return Common::apiResponse(true, 'Success');
     }
 
-    public function store($cp_level_id, Request $request){
+    public function store($cp_level_id, Request $request)
+    {
 
         $request->validate([
             'type' => 'required|in:ware,vip,coins,achievement',
@@ -85,7 +101,8 @@ class LevelGiftController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function update($cp_level_id, $id, Request $request){
+    public function update($cp_level_id, $id, Request $request)
+    {
 
         $request->validate([
             'type' => 'required|in:ware,vip,coins,achievement',
@@ -122,7 +139,7 @@ class LevelGiftController extends Controller
             $data['item_id'] = $request->file('achievement')->store('achievements', 'gcs');
         }
 
-        $result = CpLevelGift::where('vip_id',$cp_level_id)->findOrFail($id);
+        $result = CpLevelGift::where('vip_id', $cp_level_id)->findOrFail($id);
 
         $result->update($data);
 
