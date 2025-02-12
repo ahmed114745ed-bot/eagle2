@@ -40,6 +40,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use App\Http\Resources\GiftRoomResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -1753,6 +1754,6 @@ class RoomController extends Controller
     public function roomGifts($id){
         $perPage = request('per_page',10);
         $result = Room::where('uid',$id)->gifts()->paginate($perPage);
-        return Common::apiResponse(true, 'done', $result);
+        return Common::apiResponse(true, 'done',GiftRoomResource::collection($result) );
     }
 }
