@@ -60,7 +60,7 @@ use App\Http\Controllers\MallController as ControllersMallController;
 
 
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
-
+Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
 

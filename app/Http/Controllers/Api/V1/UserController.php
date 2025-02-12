@@ -70,6 +70,18 @@ class UserController extends Controller
 
         return Common::apiResponse(true, 'Success', $user);
     }
+    public function checkPhone(Request $request){
+        $request->validate([
+            'phone' => 'required'
+        ]);
+        $exists = User::where('phone', $request->phone)->first();
+
+        if($exists){
+            return Common::apiResponse(true, 'Success', true);
+        }
+        return Common::apiResponse(true, 'Success', false);
+
+    }
 
     public static function checkPack($userId, $type, $dress = null)
     {
