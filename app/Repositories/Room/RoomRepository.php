@@ -4,13 +4,13 @@ namespace App\Repositories\Room;
 use App\Models\Room;
 use App\Tik\Repositories\AbstractRepository;
 
-class RoomRepository 
+class RoomRepository
 {
 
     public $model;
     public function __construct (Room $model)
     {
-        $this->model = $model; 
+        $this->model = $model;
     }
 
     public function getRoomsByGameId($gameId = null)
@@ -25,6 +25,6 @@ class RoomRepository
 
     public function FindByUserId($userId)
     {
-        return $this->model->where('uid',$userId)->with('lastPk','gifts','topUserGift')->first();
+        return $this->model->where('uid',$userId)->with('lastPk','topUserGift')->first();
     }
 }
