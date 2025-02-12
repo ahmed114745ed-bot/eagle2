@@ -25,6 +25,6 @@ class RoomRepository
 
     public function FindByUserId($userId)
     {
-        return $this->model->where('uid',$userId)->with('lastPk','topUserGift')->first();
+        return $this->model->where('uid',$userId)->with('lastPk','gifts','topUserGift')->first();
     }
 }
