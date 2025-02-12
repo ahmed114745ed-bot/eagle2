@@ -40,38 +40,26 @@ class AgoraController extends Controller
         Log::info('agora webhook triggered', [
             $request->all()
         ]);
+        return ;
+        $agoraSignature = $request->header('Agora-Signature');
+        Log::info("Agora-Signature: " . $agoraSignature);
 
+        // التحقق من أن الطلب يحتوي على JSON صحيح
+        $data = $request->json()->all();
 
-        $event = $request->events[0];
-        $name = $event['name'];
-        $channelName = $event['channel'];
-        $parts = explode('-', $channelName);
-        if (count($parts) >= 3) {
-            $roomId = $parts[1];
-            $userId = $parts[2];
-        } else {
-            return;
+        // التحقق من صحة البيانات المطلوبة
+        if (!isset($data['eventType'], $data['payload'])) {
+            return response()->json(['error' => 'Invalid JSON structure'], 400);
         }
 
-        $room = $this->roomRepository->findRoomUser($roomId);
-        $user = $this->userRepository->findById($userId);
+        // استخراج البيانات
+        $eventType = $data['eventType'];
+        $uid = $data['payload']['uid'] ?? null;
+        $channelName = $data['payload']['channelName'] ?? '';
+        $clientSeq = $data['payload']['clientSeq'] ?? '';
 
-        if ($room === null || $user === null) {
-            // Log::info("Room or User not found");
-            return response()->json(['status' => 'Webhook received']);
-        }
+        // تسجيل البيانات
+        Log::info("Event code: $eventType, UID: $uid, Channel: $channelName, ClientSeq: $clientSeq");
 
-        // Log::info($name . '---' . $room->count_room_socket . '---' . $room->room_visitor . '---' . $user->now_room_uid);
-
-        if ($name == 'channel_occupied' || $name == 'member_added') {
-            $this->handleMemberAdded($room, $userId);
-        } elseif ($name == 'channel_vacated' || $name == 'member_removed') {
-            $this->handleMemberRemoved($room, $user, $request->owner_id);
-        }
-
-        $this->roomRepository->updateRoom($room);
-        $this->userRepository->updateUser($user);
-
-        return response()->json(['status' => 'Webhook received']);
     }
 }

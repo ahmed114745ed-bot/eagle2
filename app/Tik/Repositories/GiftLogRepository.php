@@ -70,6 +70,22 @@ class GiftLogRepository extends AbstractRepository
             ->limit(31)->get();
     }
 
+    public function getByDailyNew($userId, $agencyId, $start_at, $end_at)
+    {
+
+
+        // dd($start_at , $end_at);
+
+        $data = $this->model->query()
+            ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
+            ->whereBetween('created_at', [$start_at, $end_at]) // Applying whereBetween
+            ->where('receiver_id', $userId)
+            ->where('agency_id', $agencyId)->groupBy(\DB::raw('date(created_at)'))
+            ->limit(31)->get();
+
+        return $data;
+    }
+
     public function getByDate($userId, $date)
     {
         return $this->model->query()->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total')->groupBy("receiver_id")->where('receiver_id', $userId)->whereDate("created_at", $date)->first();
@@ -95,7 +111,7 @@ class GiftLogRepository extends AbstractRepository
             ->get();
     }
 
-    public function userGiftInfo($id, $type, $startDate = null, $endDate = null)
+    public function userGiftInfo($id, $type, $startDate = null, $endDate = null, $perPage, $page)
     {
         return $this->model->with('sender', 'receiver', 'gift')
             ->selectRaw('giftId, sender_id, receiver_id, SUM(giftNum * giftPrice) AS total')
@@ -113,6 +129,6 @@ class GiftLogRepository extends AbstractRepository
                 $formattedEndDate = Carbon::parse($endDate)->endOfDay();
                 \Log::info("Filtering from {$formattedStartDate} to {$formattedEndDate}"); // Debugging log
                 $q->whereBetween('created_at', [$formattedStartDate, $formattedEndDate]);
-            })->groupBy('giftId', 'sender_id', 'receiver_id')->get();
+            })->groupBy('giftId', 'sender_id', 'receiver_id')->paginate($perPage, ['*'], 'page', $page);
     }
 }

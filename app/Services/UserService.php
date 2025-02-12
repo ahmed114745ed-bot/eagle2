@@ -77,12 +77,12 @@ class UserService
         $this->blackListRepository = $blackListRepository;
     }
 
-    public function searchUsers($key)
+    public function searchUsers($key,$family)
     {
         $perPage = 10;
         $currentPage = request()->has('page') ? request()->page : 1;
-
-        return $this->userRepository->search($key, $perPage, $currentPage);
+        
+        return $this->userRepository->search($key, $family, $perPage, $currentPage);
     }
 
     public function searchUsersWithPage($key, $page)
@@ -702,9 +702,9 @@ class UserService
         return $updateType;
     }
 
-    public function trashedAccount($perPage, $Page, $search,$id)
+    public function trashedAccount($perPage, $Page, $search, $id)
     {
-        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search,$id);
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search, $id);
     }
 
     public function restoreAccount($id)

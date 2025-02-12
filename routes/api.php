@@ -92,7 +92,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
     });
 
-    Route::get('/image-intro/{id}',[ UserController::class, 'image_intro']);
+    Route::get('/image-intro/{id}', [UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
 
@@ -494,4 +494,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
         }
     );
+
+    Route::get('/privacy-policy', function () {
+        $Page = \App\Models\Page::where("name", "privacy-policy")->first();
+        return response()->json(['html' => $Page]);
+    });
 });
