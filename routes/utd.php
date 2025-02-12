@@ -314,7 +314,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete-all', [CpRelationController::class, 'delete_all']);
         Route::get('/{id}', [CpRelationController::class, 'show']);
     });
-
+    Route::get('cp-types', [CpRelationController::class, 'types']);
 
     Route::prefix('cp-levels/{relation_id}')->group(function () {
         Route::get('/', [LevelController::class, 'index']);

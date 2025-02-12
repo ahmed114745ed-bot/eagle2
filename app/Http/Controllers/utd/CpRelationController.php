@@ -21,6 +21,17 @@ class CpRelationController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
+    public function types(){
+        $types = [
+            'bro',
+            'friend',
+            'lovely',
+            'solution'
+        ];
+
+        return Common::apiResponse(true, 'Success', $types);
+    }
+
     public function show($id){
 
         $result = CpRelation::findOrFail($id);
