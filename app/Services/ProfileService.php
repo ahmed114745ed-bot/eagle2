@@ -43,13 +43,35 @@ class ProfileService
             $this->profileRepo->updateAvatar($profile, $imagePath);
         }
 
-        if ($request->hasFile('multi_image')) {
-            foreach ($user->images as $image) {
-                Storage::delete('profile/' . $image->img);
-                $image->delete();
-            }
+        // if ($request->hasFile('multi_image')) {
+        //     foreach ($user->images as $image) {
+        //         Storage::delete('profile/' . $image->img);
+        //         $image->delete();
+        //     }
 
-            foreach ($request->file('multi_image') as $file) {
+        //     foreach ($request->file('multi_image') as $file) {
+        //         $imagePath = Common::upload('profile', $file);
+
+        //         $user->images()->create([
+        //             'img' => $imagePath,
+        //         ]);
+        //     }
+        // }
+        if ($request->has('old_multi_image')) {
+            $newImages = $request->multi_image; 
+        
+            $existingImages = $user->images()->pluck('img')->toArray();
+        
+            $imagesToDelete = array_diff($existingImages, $newImages);
+        
+            foreach ($imagesToDelete as $image) {
+                Storage::delete('profile/' . $image);
+                $user->images()->where('img', $image)->delete();
+            }
+        }
+
+        if ($request->hasFile('new_multi_image')) {
+            foreach ($request->file('new_multi_image') as $file) {
                 $imagePath = Common::upload('profile', $file);
 
                 $user->images()->create([
@@ -57,6 +79,7 @@ class ProfileService
                 ]);
             }
         }
+
 
         $out = new V1UserResource($user);
         if ($profile->avatar === null) {
