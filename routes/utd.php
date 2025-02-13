@@ -403,12 +403,16 @@ Route::middleware([])->group(function () {
 
     Route::prefix('home-carousels')->group(function () {
         Route::get('/', [HomeCarouselController::class, 'index']);
+        Route::get('/type', [HomeCarouselController::class, 'type']);
+        Route::get('/event-type', [HomeCarouselController::class, 'eventType']);
+        Route::get('/form', [HomeCarouselController::class, 'form']);
         Route::post('/create', [HomeCarouselController::class, 'store']);
         Route::post('/delete-all', [HomeCarouselController::class, 'delete_all']);
         Route::post('update/{id}', [HomeCarouselController::class, 'update']);
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
+       
     });
 
     Route::prefix('official-msgs')->group(function () {
