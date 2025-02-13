@@ -18,10 +18,24 @@ class LevelGiftController extends Controller
         $perPage = request('per_page') ?? 10;
 
         $result = CpLevelGift::where('vip_id', $cp_level_id)
-            ->when($search, function ($q) use ($search) {
-                $q->where('id', $search);
-            })
-            ->paginate($perPage);
+        ->when($search,function($q)use($search){
+            $q->where('id', $search);
+        })
+        ->paginate($perPage)
+        ->through(function($gift){
+            return [
+                'id' => $gift->id,
+                'type' => $gift->type,
+                'gift_id' => match ($gift->type) {
+                    'ware' => optional($gift->ware)->name,
+                    'vip' => optional($gift->vip)->name,
+                    'coins' => $gift->item_id,
+                    'achievement' => $gift->item_id,
+                    default => null,
+                },
+                'created_at' => $gift->created_at,
+            ];
+        });
 
         return Common::apiResponse(true, 'Success', $result);
     }
@@ -62,9 +76,9 @@ class LevelGiftController extends Controller
 
         $request->validate([
             'type' => 'required|in:ware,vip,coins,achievement',
-            'item_id' => 'nullable|integer',
-            'coins' => 'nullable|integer|min:1',
-            'achievement' => 'nullable|image',
+            'item_id' => 'required',
+            // 'coins' => 'nullable|integer|min:1',
+            // 'achievement' => 'nullable|image',
             'expire' => 'nullable|integer|min:1',
             'gender' => 'required|in:all,male,female',
         ]);
@@ -90,9 +104,9 @@ class LevelGiftController extends Controller
         } elseif ($request->type === 'vip') {
             $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'coins') {
-            $data['item_id'] = $request->coins;
-        } elseif ($request->type === 'achievement' && $request->hasFile('achievement')) {
-            $data['item_id'] = $request->file('achievement')->store('achievements', 'gcs');
+            $data['item_id'] = $request->item_id;
+        } elseif ($request->type === 'achievement' && $request->hasFile('item_id')) {
+            $data['item_id'] = Common::upload('achievements', $request->item_id);
         }
 
         $result = CpLevelGift::create($data);
