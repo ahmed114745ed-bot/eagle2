@@ -24,7 +24,6 @@ class MomentController extends Controller
 
     public function index(Request $request)
     {
-        Log::info('Request Headers:', $request->headers->all());
         $type = $request->type;
         $page = $request->get('page', 1);
         $userId = $request->user_id;
@@ -32,8 +31,8 @@ class MomentController extends Controller
 
         if (!$page || $page == 1) {
             $user = Auth::user();
-//            $user->moment_type = $user->id . random_int(1000, 9999);
-//            $user->save();
+            //            $user->moment_type = $user->id . random_int(1000, 9999);
+            //            $user->save();
         }
 
         $data = $this->momentService->getMomentsByType($type, $userId, $page, $currentUser);
@@ -117,7 +116,6 @@ class MomentController extends Controller
 
         // Return the response
         return Common::apiResponse($result['success'] ? 1 : 0, $result['message'], $result['status']);
-
     }
 
     public function destroy_dash($moment_id, $id)
