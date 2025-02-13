@@ -354,23 +354,27 @@ class UserRepository extends AbstractRepository
             $query->where('uuid', $uuid);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
             $query->where('agency_id', $agencyId);
-        })->whereHas('userSallary', function ($q) use ($month,$year) {
-            $q->when(isset($month ) && isset($year ), function ($query) use ($month,$year) {
+        })->whereHas('userSallary', function ($q) use ($month, $year) {
+            $q->when(isset($month) && isset($year), function ($query) use ($month, $year) {
                 $query->where('month', $month)->where('year', $year);
             });
         })->with(['userSallary' => function ($query) use ($month, $year) {
-            $query->when(isset($month ) && isset($year ), function ($query) use ($month,$year) {
+            $query->when(isset($month) && isset($year), function ($query) use ($month, $year) {
                 $query->where('month', $month)->where('year', $year);
             });
         }])->with('agency')
-        ->paginate($perPage, ['*'], 'page', $page)
-        ->through(function ($user) use ($month, $year) {
-            $user->total_diamonds = $user->getTotalDiamond($month, $year);
-            $user->total_salary = $user->getTotalSallary($month, $year);
-            $user->total_cut_amount = $user->getTotalCutAmount($month, $year);
-            $user->final_salary = $user->getSalary($month, $year); // Based on the computed salary attribute
-            return $user;
-        });
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->through(function ($user) use ($month, $year) {
+                $user->total_diamonds = $user->getTotalDiamond($month, $year);
+                $user->total_salary = $user->getTotalSallary($month, $year);
+                $user->total_cut_amount = $user->getTotalCutAmount($month, $year);
+                $user->final_salary = $user->getSalary($month, $year); // Based on the computed salary attribute
+                return $user;
+            });
     }
 
+    public function allUsersPlay()
+    {
+        return $this->model->whereNotNull('game_id')->where('online', 1)->with('nowGame')->paginate(10);
+    }
 }

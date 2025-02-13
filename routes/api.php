@@ -219,6 +219,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
+                Route::get('/play', [UserController::class, 'allUsersPlayGame'])->where('id', '[0-9]+');
+                Route::get('/stop-play', [UserController::class, 'updateGame'])->where('id', '[0-9]+');
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
