@@ -46,9 +46,9 @@ class LevelGiftController extends Controller
 
         $request->validate([
             'type' => 'required|in:ware,vip,coins,achievement',
-            'item_id' => 'nullable|integer',
-            'coins' => 'nullable|integer|min:1',
-            'achievement' => 'nullable|image',
+            'item_id' => 'required',
+            // 'coins' => 'nullable|integer|min:1',
+            // 'achievement' => 'nullable|image',
             'expire' => 'nullable|integer|min:1',
             'gender' => 'required|in:all,male,female',
         ]);
