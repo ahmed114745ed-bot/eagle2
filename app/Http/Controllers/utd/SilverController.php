@@ -64,8 +64,13 @@ class SilverController extends Controller
 
     public function show($id)
     {
-        $data = $this->silverService->show($id);
-        return Common::apiResponse(true, 'done', $data);
+        try {
+            $data = $this->silverService->show($id);
+            return Common::apiResponse(true, 'done', $data);
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
     }
 
     public function destroy($id)
