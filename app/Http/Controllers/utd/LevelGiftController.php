@@ -148,7 +148,7 @@ class LevelGiftController extends Controller
         } elseif ($request->type === 'vip') {
             $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'coins') {
-            $data['item_id'] = $request->coins;
+            $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'achievement' && $request->hasFile('achievement')) {
             $data['item_id'] = Common::upload('achievements', $request->file('item_id'));
         }
