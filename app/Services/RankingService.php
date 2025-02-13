@@ -122,11 +122,24 @@ class RankingService
 
 
         $data = $data->map(function ($v) use ($key, $class, $relation) {
-
+            $achievement_images = [];
             $user = $v->$relation;
 
             if ($user == null) {
                 return null;
+            }
+
+            if ($user->medals) {
+                foreach ($user->medals as $medal) {
+                    if ($medal->achievementLevel) {
+                        $data = [
+                            'image' => @$medal->achievementLevel->valid_image,
+                            'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                            'created_at' => @$medal->created_at,
+                        ];
+                        $achievement_images[] = $data;
+                    }
+                }
             }
 
             $v->user_id = $user->id;
@@ -158,6 +171,7 @@ class RankingService
 
             $v->country = @$user->country;
             $v->age = $user->profile->age;
+            $v->achievement_images = $achievement_images;
             unset($v->$relation);
             return $v;
         })->reject(function ($v) {
@@ -169,6 +183,19 @@ class RankingService
 
     protected function prepareResponse($data, $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
+        $achievement_images = [];
+        if ($user->medals) {
+            foreach ($user->medals as $medal) {
+                if ($medal->achievementLevel) {
+                    $achievementData = [
+                        'image' => @$medal->achievementLevel->valid_image,
+                        'title' => @$medal->achievementLevel?->achievement?->name ?? '',
+                        'created_at' => @$medal->created_at,
+                    ];
+                    $achievement_images[] = $achievementData;
+                }
+            }
+        }
         $kong['user_id']    = 0;
         $kong['uuid']       = '';
         $kong['exp']        = '0';
@@ -192,6 +219,8 @@ class RankingService
 
         $kong['type_user'] = 0;
         $kong['manger_type'] = null;
+        $kong['achievement_images'] = [];
+
 
         $data[0] = isset($data[0]) ? $data[0] : $kong;
         $data[1] = isset($data[1]) ? $data[1] : $kong;
@@ -214,8 +243,10 @@ class RankingService
         if (gettype($vip_level) != 'integer') {
             $vip_level = 0;
         }
+        
         $userData = $data->where($key, $user->id)->first();
-        $arr['user']['exp'] = ($userExp != null) ? ($userExp->exp ?? '0') : ($userData->exp ?? '0');
+      
+        $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');
         $arr['user']['sender_img'] = $sender_img;
         $arr['user']['vip_level']  = $vip_level ?? 0;
         $arr['user']['sender_level']  = $user->total_sender_level ?? '';
@@ -227,6 +258,7 @@ class RankingService
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = $user->profile->age;
+        $arr['user']['achievement_images'] = $achievement_images;
 
 
         $toArray = $data->toArray();
