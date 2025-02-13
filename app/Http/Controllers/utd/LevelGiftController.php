@@ -40,7 +40,7 @@ class LevelGiftController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function show($id)
+    public function show($cpLevelId,$id)
     {
         try {
             $data = CpLevelGift::findOrFail($id);

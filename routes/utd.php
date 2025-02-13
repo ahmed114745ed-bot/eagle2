@@ -328,7 +328,7 @@ Route::middleware([])->group(function () {
     Route::prefix('cp-level-gifts/{cp_level_id}')->group(function () {
         Route::get('/', [LevelGiftController::class, 'index']);
         Route::post('/create', [LevelGiftController::class, 'store']);
-        Route::get('/show/{id}', [LevelGiftController::class, 'index']);
+        Route::get('/show/{id}', [LevelGiftController::class, 'show']);
         Route::post('/update/{id}', [LevelGiftController::class, 'update']);
         Route::post('/delete/{id}', [LevelGiftController::class, 'delete']);
         Route::post('/delete-all', [LevelGiftController::class, 'delete_all']);
