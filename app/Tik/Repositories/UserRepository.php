@@ -377,4 +377,9 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->whereNotNull('game_id')->where('online', 1)->with('nowGame')->paginate(10);
     }
+
+    public function online()
+    {
+        return $this->model->where('online', 1)->paginate(10);
+    }
 }

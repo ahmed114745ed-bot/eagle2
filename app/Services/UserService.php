@@ -958,4 +958,9 @@ class UserService
     {
         return $this->userRepository->allUsersPlay();
     }
+
+    public function online()
+    {
+        return $this->userRepository->online();
+    }
 }

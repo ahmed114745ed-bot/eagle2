@@ -988,4 +988,10 @@ class UserController extends Controller
         $data = $this->userService->allUsersPlayGame();
         return Common::apiResponse(true, 'done', $data);
     }
+
+    public function online()
+    {
+        $data = $this->userService->online();
+        return Common::apiResponse(true, 'done', $data);
+    }
 }
