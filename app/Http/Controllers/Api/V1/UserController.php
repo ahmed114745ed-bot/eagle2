@@ -64,23 +64,24 @@ class UserController extends Controller
         UserTypeResource::initializeData($senderLevels, $receivedImage, null);
         return Common::apiResponse(1, '', $usersType);
     }
-    public function userRoom(){
+    public function userRoom()
+    {
 
         $user = User::with('room')->where('id', Auth::id())->first();
 
         return Common::apiResponse(true, 'Success', $user);
     }
-    public function checkPhone(Request $request){
+    public function checkPhone(Request $request)
+    {
         $request->validate([
             'phone' => 'required'
         ]);
         $exists = User::where('phone', $request->phone)->first();
 
-        if($exists){
+        if ($exists) {
             return Common::apiResponse(true, 'Success', true);
         }
         return Common::apiResponse(true, 'Success', false);
-
     }
 
     public static function checkPack($userId, $type, $dress = null)
@@ -94,12 +95,13 @@ class UserController extends Controller
         if ($dress != null) $pack->where('target_id', $dress);
         return $pack;
     }
-    public function image_intro($id){
+    public function image_intro($id)
+    {
 
         $user = User::find($id);
 
         $dr = '';
-        $pack = self::checkPack($user->id, 6,$user->dress_3);
+        $pack = self::checkPack($user->id, 6, $user->dress_3);
         $pack->where('is_used', 1);
         $pack = $pack->exists();
         if ($pack) {
@@ -109,7 +111,7 @@ class UserController extends Controller
                 ->get();
 
             if (!$ware->isEmpty()) {
-                $dr = $ware->map(function($w){
+                $dr = $ware->map(function ($w) {
                     return [
                         'image' => $w->show_img,
                         'id' => $w->id,
@@ -118,7 +120,7 @@ class UserController extends Controller
             }
         }
 
-        if($dr == ''){
+        if ($dr == '') {
             return Common::apiResponse(true, 'Success', []);
         }
         return Common::apiResponse(true, 'Success', $dr);
@@ -192,7 +194,7 @@ class UserController extends Controller
     {
         $key = $request->search;
         $family = $request->family;
-        $users = $this->userService->searchUsers($key,$family);
+        $users = $this->userService->searchUsers($key, $family);
 
 
         $users = $users->through(function ($user) {
@@ -973,5 +975,23 @@ class UserController extends Controller
             $ops[$user->id] = $user->name;
         }
         return $ops;
+    }
+
+    public function updateGame(Request $request)
+    {
+        $this->userService->updateGame($request->user()->id);
+        return Common::apiResponse(true, 'done', [], 200);
+    }
+
+    public function allUsersPlayGame()
+    {
+        $data = $this->userService->allUsersPlayGame();
+        return Common::apiResponse(true, 'done', $data);
+    }
+
+    public function online()
+    {
+        $data = $this->userService->online();
+        return Common::apiResponse(true, 'done', $data);
     }
 }

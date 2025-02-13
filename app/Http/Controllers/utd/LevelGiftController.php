@@ -40,7 +40,7 @@ class LevelGiftController extends Controller
         return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function show($id)
+    public function show($cpLevelId,$id)
     {
         try {
             $data = CpLevelGift::findOrFail($id);
@@ -106,7 +106,7 @@ class LevelGiftController extends Controller
         } elseif ($request->type === 'coins') {
             $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'achievement' && $request->hasFile('item_id')) {
-            $data['item_id'] = Common::upload('achievements', $request->item_id);
+            $data['item_id'] = Common::upload('achievements', $request->file('item_id'));
         }
 
         $result = CpLevelGift::create($data);
@@ -120,7 +120,7 @@ class LevelGiftController extends Controller
 
         $request->validate([
             'type' => 'required|in:ware,vip,coins,achievement',
-            'item_id' => 'nullable|integer',
+            'item_id' => 'required',
             'coins' => 'nullable|integer|min:1',
             'achievement' => 'nullable|image',
             'expire' => 'nullable|integer|min:1',
@@ -148,9 +148,9 @@ class LevelGiftController extends Controller
         } elseif ($request->type === 'vip') {
             $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'coins') {
-            $data['item_id'] = $request->coins;
-        } elseif ($request->type === 'achievement' && $request->hasFile('achievement')) {
-            $data['item_id'] = $request->file('achievement')->store('achievements', 'gcs');
+            $data['item_id'] = $request->item_id;
+        } elseif ($request->type === 'achievement' && $request->hasFile('item_id')) {
+            $data['item_id'] = Common::upload('achievements', $request->file('item_id'));
         }
 
         $result = CpLevelGift::where('vip_id', $cp_level_id)->findOrFail($id);

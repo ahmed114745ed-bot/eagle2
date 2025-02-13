@@ -77,11 +77,11 @@ class UserService
         $this->blackListRepository = $blackListRepository;
     }
 
-    public function searchUsers($key,$family)
+    public function searchUsers($key, $family)
     {
         $perPage = 10;
         $currentPage = request()->has('page') ? request()->page : 1;
-        
+
         return $this->userRepository->search($key, $family, $perPage, $currentPage);
     }
 
@@ -946,5 +946,21 @@ class UserService
     public function allUserCp($userId)
     {
         return $this->cpRepository->getByUser($userId);
+    }
+
+    public function updateGame($userId)
+    {
+        $this->userRepository->update(['game_id' => null], $userId);
+    }
+
+
+    public function allUsersPlayGame()
+    {
+        return $this->userRepository->allUsersPlay();
+    }
+
+    public function online()
+    {
+        return $this->userRepository->online();
     }
 }

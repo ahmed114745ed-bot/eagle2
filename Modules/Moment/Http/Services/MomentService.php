@@ -14,7 +14,10 @@ use Nwidart\Modules\Facades\Module;
 
 class MomentService extends MomentBaseModelService
 {
-    public function __construct(Moment $model, public MomentRepository $momentRepository) { parent::__construct($model); }
+    public function __construct(Moment $model, public MomentRepository $momentRepository)
+    {
+        parent::__construct($model);
+    }
 
     public function getMomentsByType($type, $userId, $page, $currentUser)
     {
@@ -27,6 +30,10 @@ class MomentService extends MomentBaseModelService
                 return $this->momentRepository->getFollowedMoments($currentUser, $page);
             case 4:
                 return $this->momentRepository->getAllMoments($currentUser, $page);
+            case 5:
+                return $this->momentRepository->getNewMoments($currentUser);
+            case 6:
+                return $this->momentRepository->momentUserFollow($currentUser);
             default:
                 return null;
         }
@@ -140,14 +147,9 @@ class MomentService extends MomentBaseModelService
             'status' => 200,
         ];
     }
-    public function show(User $user)
-    {
+    public function show(User $user) {}
 
-    }
-
-    public function create(array $data, int $userId)
-    {
-    }
+    public function create(array $data, int $userId) {}
 
 
     /*
