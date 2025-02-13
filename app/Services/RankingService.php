@@ -132,12 +132,12 @@ class RankingService
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
                     if ($medal->achievementLevel) {
-                        $data = [
+                        $achievementData = [
                             'image' => @$medal->achievementLevel->valid_image,
                             'title' => @$medal->achievementLevel?->achievement?->name ?? '',
                             'created_at' => @$medal->created_at,
                         ];
-                        $achievement_images[] = $data;
+                        $achievement_images[] = $achievementData;
                     }
                 }
             }
