@@ -70,7 +70,7 @@ class LevelGiftController extends Controller
         ]);
 
         $data = [
-            // 'vip_id' => $cp_level_id,
+            'vip_id' => $cp_level_id,
             'type' => $request->type,
             'expire' => $request->expire,
             'gender' => $request->gender,
