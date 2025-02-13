@@ -70,7 +70,7 @@ class LevelGiftController extends Controller
         ]);
 
         $data = [
-            'vip_id' => $cp_level_id,
+            // 'vip_id' => $cp_level_id,
             'type' => $request->type,
             'expire' => $request->expire,
             'gender' => $request->gender,
@@ -92,7 +92,7 @@ class LevelGiftController extends Controller
         } elseif ($request->type === 'coins') {
             $data['item_id'] = $request->coins;
         } elseif ($request->type === 'achievement' && $request->hasFile('item_id')) {
-            $data['item_id'] = $request->file('item_id')->store('achievements', 'gcs');
+            $data['item_id'] = Common::upload('achievements', $request->item_id);
         }
 
         $result = CpLevelGift::create($data);
