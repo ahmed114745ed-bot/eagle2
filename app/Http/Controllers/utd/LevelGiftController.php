@@ -91,8 +91,8 @@ class LevelGiftController extends Controller
             $data['item_id'] = $request->item_id;
         } elseif ($request->type === 'coins') {
             $data['item_id'] = $request->coins;
-        } elseif ($request->type === 'achievement' && $request->hasFile('achievement')) {
-            $data['item_id'] = $request->file('achievement')->store('achievements', 'gcs');
+        } elseif ($request->type === 'achievement' && $request->hasFile('item_id')) {
+            $data['item_id'] = $request->file('item_id')->store('achievements', 'gcs');
         }
 
         $result = CpLevelGift::create($data);
