@@ -120,7 +120,7 @@ class RankingService
             return $item;
         });
 
-
+        
         $data = $data->map(function ($v) use ($key, $class, $relation) {
 
             $user = $v->$relation;
@@ -129,7 +129,13 @@ class RankingService
                 return null;
             }
 
+            $hasColor = Common::hasInPack($user->id, 18, true);
+
+            $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
+
             $v->user_id = $user->id;
+            $v->color_name = $color_name;
+
             $value = $v->exp;
             $v->exp = numToString(ceil($v->exp));
             $v->exp_int = ceil($value);
@@ -209,6 +215,9 @@ class RankingService
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($user->total_sender_level);
         $vip_level  = Common::ovip_center_rank($arr['user']['user_id']);
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
+        $hasColor = Common::hasInPack($user->id, 18, true);
+
+        $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
 
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
@@ -227,7 +236,7 @@ class RankingService
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = $user->profile->age;
-
+        $arr['user']['color_name'] = $color_name;
 
         $toArray = $data->toArray();
         $countData = count($data);
