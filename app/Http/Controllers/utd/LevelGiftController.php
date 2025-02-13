@@ -19,7 +19,21 @@ class LevelGiftController extends Controller
         ->when($search,function($q)use($search){
             $q->where('id', $search);
         })
-        ->paginate($perPage);
+        ->paginate($perPage)
+        ->through(function($gift){
+            return [
+                'id' => $gift->id,
+                'type' => $gift->type,
+                'gift_id' => match ($gift->type) {
+                    'ware' => optional($gift->ware)->name,
+                    'vip' => optional($gift->vip)->name,
+                    'coins' => $gift->item_id,
+                    'achievement' => $gift->item_id,
+                    default => null,
+                },
+                'created_at' => $gift->created_at,
+            ];
+        });
 
         return Common::apiResponse(true, 'Success', $result);
     }
