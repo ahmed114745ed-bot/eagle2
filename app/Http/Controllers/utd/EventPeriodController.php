@@ -56,11 +56,6 @@ class EventPeriodController extends Controller
 
     public function store(Request $request){
 
-        $check_event_period=WeeklyStar::where("type",'event_period')->where("start_date",'<=',date("Y-m-d"))->where("end_date",'>=',date("Y-m-d"))->first();
-        if ($check_event_period != null){
-            return Common::apiResponse(false, 'Event is already created');;
-        }
-
         $validatedData = $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
