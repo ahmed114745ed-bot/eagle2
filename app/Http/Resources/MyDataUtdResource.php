@@ -50,6 +50,9 @@ class MyDataUtdResource extends JsonResource
                 'owner' => new OwnerAgencyResource(@$this?->agency?->owner)
             ],
             'achievement_images' => $achievement_images,
+            'number_of_fans' => $this->followerss()->count(),
+            'number_of_followings' => $this->following()->count(),
+            'number_of_friends' => $this->friends()->count(),
 
 
 
