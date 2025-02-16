@@ -94,6 +94,7 @@ Route::group(
     function (Router $router) {
         Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
         Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
+        Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');
         Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);

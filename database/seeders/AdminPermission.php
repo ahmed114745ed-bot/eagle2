@@ -100,7 +100,8 @@ class AdminPermission extends Seeder
             'user-agent-target',
             'charges-agency',
             'agent-home',
-            'updates_group_chat'
+            'updates_group_chat',
+            'agora-zego'
 
 
 
@@ -155,6 +156,7 @@ class AdminPermission extends Seeder
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
             'bans' => ['bans'],
             'update-group-chat' => ['updates_group_chat'],
+            'agora-zego' => ['agora-zego']
           
 
         ];

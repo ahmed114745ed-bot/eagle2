@@ -179,4 +179,10 @@ return [
     'delete_video' => 'Videoyu Sil',
     'price' => 'fiyat',
     'value' => 'değer',
+    'Choose Library' => 'Kütüphane Seç',
+    'Agora' => 'Agora',
+    'Zego' => 'Zego',
+    'server_secret' => 'Sunucu Gizli Anahtarı',
+    'app_id' => 'Uygulama Kimliği',
+    'app_sign' => 'Uygulama İmzası',
 ];

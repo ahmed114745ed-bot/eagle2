@@ -45,6 +45,7 @@ use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\TargetPercentageController;
@@ -348,6 +349,7 @@ Route::group(
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+        $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
