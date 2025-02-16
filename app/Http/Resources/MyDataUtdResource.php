@@ -53,6 +53,7 @@ class MyDataUtdResource extends JsonResource
             'number_of_fans' => $this->followerss()->count(),
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
+            'profile_visitors' => $this->profileVisits()->count(),
 
 
 
