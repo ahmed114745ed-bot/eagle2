@@ -80,12 +80,12 @@ class HomeCarouselController extends Controller
             'sort' => $request->input('sort'),
             'img' => $img,
             'enable' => $request->input('enable'),
+            'type' => $request->input('type'),
+            'form' => $request->input('form'),
+            'input' => $request->input('input'),
         ];
 
-        // Handle conditional logic for 'form'
-        if ($request->input('form') != 0) {
-            $data['input'] = $request->input('input');
-        }
+
 
         // Handle conditional logic for 'type'
         switch ($request->input('type')) {
@@ -125,23 +125,22 @@ class HomeCarouselController extends Controller
 
         $result = HomeCarousel::findOrFail($id);
 
-        if ($request->hasFile('img')) {
-            $img = Common::upload('images', $request->file('img'));
-            $result->update([
-                'img' => $img,
-            ]);
-        }
+
 
         // Prepare data for creation
         $data = [
             'sort' => $request->input('sort'),
             'enable' => $request->input('enable'),
+            'type' => $request->input('type'),
+            'form' => $request->input('form'),
+            'input' => $request->input('input'),
         ];
 
-        // Handle conditional logic for 'form'
-        if ($request->input('form') != 0) {
-            $data['input'] = $request->input('input');
+        if ($request->hasFile('img')) {
+            $img = Common::upload('images', $request->file('img'));
+            $data['img'] = $img;
         }
+
 
         // Handle conditional logic for 'type'
         switch ($request->input('type')) {

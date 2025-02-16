@@ -43,33 +43,47 @@ class HomeCarousel extends Model
 
 
         static::creating(function ($model) {
-           if($model->form != null)
-           {
-            $newDuration = Carbon::now();
-            $duration = match ($model->form) {
-                '1' => $model->input > 1 ? $newDuration->addHours($model->input): $newDuration->addMinute($model->input * 60),
-                '2' => $newDuration->addDays($model->input),
-                '3' => $newDuration->addMonths($model->input),
-                default => null
-            };
-            $model->duration  = $duration->timestamp ;
-        }
-        });
-
-        static::saving(function ($model) {
-            $newDuration = Carbon::now();
-            if($model->form != null)
-            {
-            if ($model->isDirty('input') || $model->isDirty('form')) {
+            if ($model->form != null) {
+                $newDuration = Carbon::now();
                 $duration = match ($model->form) {
-                    '1' => $model->input > 1 ? $newDuration->addHours($model->input): $newDuration->addMinute($model->input * 60),
+                    '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
                     '2' => $newDuration->addDays($model->input),
                     '3' => $newDuration->addMonths($model->input),
                     default => null
                 };
                 $model->duration  = $duration->timestamp;
             }
-        }
+        });
+
+        static::saving(function ($model) {
+            $newDuration = Carbon::now();
+            if ($model->form != null) {
+                if ($model->isDirty('input') || $model->isDirty('form')) {
+                    $duration = match ($model->form) {
+                        '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
+                        '2' => $newDuration->addDays($model->input),
+                        '3' => $newDuration->addMonths($model->input),
+                        default => null
+                    };
+                    $model->duration  = $duration->timestamp;
+                }
+            }
+        });
+
+
+        static::updating(function ($model) {
+            $newDuration = Carbon::now();
+            if ($model->form != null) {
+                if ($model->isDirty('input') || $model->isDirty('form')) {
+                    $duration = match ($model->form) {
+                        '1' => $model->input > 1 ? $newDuration->addHours($model->input) : $newDuration->addMinute($model->input * 60),
+                        '2' => $newDuration->addDays($model->input),
+                        '3' => $newDuration->addMonths($model->input),
+                        default => null
+                    };
+                    $model->duration  = $duration->timestamp;
+                }
+            }
         });
     }
 }
