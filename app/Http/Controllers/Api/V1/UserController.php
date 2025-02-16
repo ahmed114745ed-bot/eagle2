@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use DB;
 use Auth;
 use Exception;
+use App\Models\Pack;
 use App\Models\User;
+use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Target;
@@ -22,6 +24,7 @@ use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MyDataUtdResource;
+use App\Http\Resources\UserIntroResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\UserPackVipResource;
@@ -33,6 +36,7 @@ use App\Http\Resources\Api\V1\AllUsersResource;
 use App\Http\Resources\Api\V1\ShowUserResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
@@ -40,9 +44,6 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
-use App\Http\Resources\UserIntroResource;
-use App\Models\Pack;
-use App\Models\Ware;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -986,7 +987,7 @@ class UserController extends Controller
     public function allUsersPlayGame()
     {
         $data = $this->userService->allUsersPlayGame();
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', UserResourceSerche::collection ($data));
     }
 
     public function online()
