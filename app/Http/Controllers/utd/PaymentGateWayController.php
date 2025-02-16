@@ -65,7 +65,7 @@ class PaymentGateWayController extends Controller
 
         $validated = $request->validate([
             'title' => 'required',
-            'photo' => 'nullable|image'
+            'photo' => 'nullable'
         ]);
 
 
