@@ -95,7 +95,7 @@ class AgoraZegoSettingController extends MainController
         $form .= '<div style="display: flex; flex-direction: row;">';
         $form .= '<div style="flex: 1; margin-right: 10px;">';
         $form .= '<h1  class="control-label text-center">' . __('admin.Agora') . '</h1>';
-
+        $form .= '<label for="ios_min_version" class="control-label">' . __('admin.app_id') . ':</label>';
         $form .= '<input type="text" id="huawei_min_version" name="app_id" placeholder="app_id" value="' . $agora_app_id . '"  class="inputs_cus_form">';
         $form .= '</div>';
 

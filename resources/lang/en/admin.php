@@ -187,6 +187,7 @@ return [
     'server_secret' => 'server_secret',
     'app_id' => 'app_id',
     'app_sign' => 'app_sign',
+    'app_id' => 'app_id',
 
     
 

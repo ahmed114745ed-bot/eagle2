@@ -185,4 +185,5 @@ return [
     'server_secret' => 'Sunucu Gizli Anahtarı',
     'app_id' => 'Uygulama Kimliği',
     'app_sign' => 'Uygulama İmzası',
+    'app_id' => 'Uygulama Kimliği',
 ];

@@ -101,8 +101,13 @@ class ConfigController extends Controller
 
             if ($config) {
                 $config->value = $request->input($key);
-                $config->save();
+            } else {
+                $config = new Config();
+                $config->name = $key;  // Set name first
+                $config->value = $request->input($key);
             }
+    
+            $config->save();
         }
         return Redirect::back();
     }
