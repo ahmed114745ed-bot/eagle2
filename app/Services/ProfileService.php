@@ -58,6 +58,7 @@ class ProfileService
         //         ]);
         //     }
         // }
+        Log::info([$request->new_multi_image]);
         if ($request->has('old_multi_image')) {
             $newImages =  explode(',', $request->old_multi_image);
         
@@ -66,6 +67,7 @@ class ProfileService
             $imagesToDelete = array_diff($existingImages, $newImages);
         
             foreach ($imagesToDelete as $image) {
+                Log::info([1]);
                 Storage::delete('profile/' . $image);
                 $user->images()->where('img', $image)->delete();
             }
