@@ -412,7 +412,6 @@ Route::middleware([])->group(function () {
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
-       
     });
 
     Route::prefix('official-msgs')->group(function () {
@@ -674,6 +673,8 @@ Route::middleware([])->group(function () {
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('vip/{id}', [UserController::class, 'userVip']);
+        Route::get('pack/{id}', [UserController::class, 'userPacks']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
         Route::get('room/{id}', [RoomControllerVi::class, 'roomUserDetails']);
@@ -829,7 +830,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [CountryController::class, 'delete']);
         Route::post('/delete-all', [CountryController::class, 'delete_all']);
         Route::get('/{id}', [CountryController::class, 'show']);
-       
     });
 
     Route::prefix('colors')->group(function () {

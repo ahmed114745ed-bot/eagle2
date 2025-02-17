@@ -26,7 +26,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\MyDataUtdResource;
 use App\Http\Resources\UserIntroResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackUtdResource;
 use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
 use App\Http\Resources\UserVisitRoomResource;
@@ -955,6 +957,28 @@ class UserController extends Controller
         }
     }
 
+    public function userPacks($id, Request $request)
+    {
+        try {
+            $data = $this->userService->userPacks($request->type, $id, $request->per_page, $request->page);
+            return Common::apiResponse(true, 'done',  UserPackUtdResource::collection($data));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userVip($id)
+    {
+        try {
+            $data = $this->userService->userPacksAndVip($id);
+            return Common::apiResponse(true, 'done', UserVipUtdResource::collection($data->userHaveVip));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function userVisitRooms($id)
     {
         $data = $this->userService->VisitRoom($id);
@@ -987,7 +1011,7 @@ class UserController extends Controller
     public function allUsersPlayGame()
     {
         $data = $this->userService->allUsersPlayGame();
-        return Common::apiResponse(true, 'done', UserResourceSerche::collection ($data));
+        return Common::apiResponse(true, 'done', UserResourceSerche::collection($data));
     }
 
     public function online()

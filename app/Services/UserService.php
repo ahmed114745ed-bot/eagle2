@@ -953,6 +953,11 @@ class UserService
         $this->userRepository->update(['game_id' => null], $userId);
     }
 
+    public function userPacks($type, $userId, $perPage, $page)
+    {
+        return $this->packRepository->userPacks($type, $userId, $perPage, $page);
+    }
+
 
     public function allUsersPlayGame()
     {
