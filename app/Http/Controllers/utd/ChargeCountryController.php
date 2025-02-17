@@ -66,7 +66,7 @@ class ChargeCountryController extends Controller
     {
         $validator = Validator::make($request->all(), [
 
-            'country_id' => 'required|integer|unique:charge_countries,country_id' . $id,
+            'country_id' => 'required|integer|unique:charge_countries,country_id,' . $id,
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
