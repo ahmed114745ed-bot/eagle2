@@ -75,7 +75,7 @@ class ProfileService
         Log::info([$request->file('new_multi_image')]);
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
-                $imagePath = Common::upload('profile', $request->file('new_multi_image'));
+                $imagePath = Common::upload('profile', $file);
 
                 $user->images()->create([
                     'img' => $imagePath,
