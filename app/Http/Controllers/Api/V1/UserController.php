@@ -23,6 +23,7 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CpUserResource;
 use App\Http\Resources\MyDataUtdResource;
 use App\Http\Resources\UserIntroResource;
 use Illuminate\Support\Facades\Validator;
@@ -988,7 +989,7 @@ class UserController extends Controller
     public function allCpUser($id)
     {
         $data = $this->userService->allUserCp($id);
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', CpUserResource::collection($data));
     }
 
     public static function by_user_filter()
