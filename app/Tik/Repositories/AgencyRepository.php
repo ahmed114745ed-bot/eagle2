@@ -85,16 +85,16 @@ class AgencyRepository extends AbstractRepository
     }
 
     public function getAllActiveAgency($id){
-        return $this->model->where(function ($query) {
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
                 'additionalInfo',
                 function ($query) {
                     $query->where('status', 1);
                 }
             );
-        })->orderByDesc('id')->when(isset($id), function ($query) use ($id) {
-            $query->where('id', $id);
-        })->get();
+        })->orderByDesc('id')->get();
     }
 
     public function agencyById($id){
