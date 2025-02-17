@@ -40,7 +40,7 @@ class ChargeResource extends JsonResource
             'receiver' => $receiver_data,
             'value' => $this->amount,
             'usd' => $this->usd,
-            'time' => $this->created_at->format('Y-m-d h:i:s A')
+            'time' => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A')
         ];
     }
 }
