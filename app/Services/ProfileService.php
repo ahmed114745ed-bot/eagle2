@@ -58,7 +58,7 @@ class ProfileService
         //     }
         // }
         if ($request->has('old_multi_image')) {
-            $newImages = $request->multi_image; 
+            $newImages = $request->old_multi_image; 
         
             $existingImages = $user->images()->pluck('img')->toArray();
         
