@@ -42,8 +42,8 @@ class CpUserResource extends JsonResource
             'diamonds'        => $this->di ?? 0,
             'ratio' => $ratio,
             "user"      => [
-                "id"        => $user?->id,
-                "uid"       => $user?->uuid,
+                "id"        => $user?->id ?? 0,
+                "uid"       => $user?->uuid ?? '',
                 "name"      => $user?->name ?? '',
                 "image"     => $user?->avatar ?? '',
                 "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
