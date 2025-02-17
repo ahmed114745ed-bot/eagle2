@@ -98,7 +98,7 @@ class ChargeCountryController extends Controller
         $page = $request->page;
         $perPage = $request->per_page;
         $search = $request->search;
-        $countries = Country::query()->WhereDoesntHave('chargeCountry')->when(isset($id), function ($query) use ($id) {
+        $countries = Country::query()->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->when(isset($search), function ($query) use ($search) {
             $query->where('name', 'like', "%$search%")->orWhere('e_name', 'like', "%$search%");
