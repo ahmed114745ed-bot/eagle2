@@ -822,13 +822,14 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
+        Route::get('/charge', [ChargeCountryController::class, 'country']);
         Route::post('/create', [CountryController::class, 'store']);
         Route::post('/update/{id}', [CountryController::class, 'update']);
         Route::post('/update-status/{id}', [CountryController::class, 'update_status']);
         Route::post('/delete/{id}', [CountryController::class, 'delete']);
         Route::post('/delete-all', [CountryController::class, 'delete_all']);
         Route::get('/{id}', [CountryController::class, 'show']);
-        Route::get('/charge', [ChargeCountryController::class, 'country']);
+       
     });
 
     Route::prefix('colors')->group(function () {

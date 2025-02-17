@@ -103,6 +103,6 @@ class ChargeCountryController extends Controller
         })->when(isset($search), function ($query) use ($search) {
             $query->where('name', 'like', "% $search%")->orWhere('e_name', 'like', "% $search%");
         })->paginate($perPage, ['*'], 'page', $page);
-        return response()->json($countries);
+        return Common::apiResponse(true, '', $countries);
     }
 }
