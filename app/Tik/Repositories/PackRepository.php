@@ -138,8 +138,9 @@ class PackRepository extends AbstractRepository
 
     public function userPacks($type, $userId, $perPage, $page)
     {
-        return $this->model->where('user_id', $userId)->when(isset($type), function ($query) use ($type) {
-            $query->where('type', $type);
-        })->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('user_id', $userId)
+            ->when(isset($type), function ($query) use ($type) {
+                $query->where('type', $type);
+            })->active()->paginate($perPage, ['*'], 'page', $page);
     }
 }

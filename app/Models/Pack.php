@@ -38,4 +38,11 @@ class Pack extends Model
         return $this->belongTo(User::class,'sender_id');
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        })->where('is_used', 1);
+    }
+
 }
