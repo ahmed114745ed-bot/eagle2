@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
+use Illuminate\Support\Facades\Log;
 
 class ProfileService
 {
@@ -58,7 +59,7 @@ class ProfileService
         //     }
         // }
         if ($request->has('old_multi_image')) {
-            $newImages = is_array($request->old_multi_image) ? $request->old_multi_image : [$request->old_multi_image];
+            $newImages =  explode(',', $request->old_multi_image);
         
             $existingImages = $user->images()->pluck('img')->toArray();
         
@@ -69,7 +70,7 @@ class ProfileService
                 $user->images()->where('img', $image)->delete();
             }
         }
-
+        Log::info([$request->file('new_multi_image')]);
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
                 $imagePath = Common::upload('profile', $file);
