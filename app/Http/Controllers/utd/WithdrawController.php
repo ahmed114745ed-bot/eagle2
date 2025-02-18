@@ -66,7 +66,7 @@ class WithdrawController extends Controller
             'image' => 'nullable|image',
             'min_value' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
-            'withdrawFields' => 'nullable|string',
+            'withdrawFields' => 'nullable',
         ]);
 
 
@@ -81,7 +81,7 @@ class WithdrawController extends Controller
         if ($request->has('withdrawFields')) {
             $json_decoded  = json_decode($request->withdrawFields, true);
 
-            $paymentWithdrawType->withdrawFields()->attach($json_decoded);
+            $paymentWithdrawType->withdrawFields()->createMany($json_decoded);
         }
 
         return Common::apiResponse(true, 'Success', $paymentWithdrawType);
@@ -94,7 +94,7 @@ class WithdrawController extends Controller
             'image' => 'nullable',
             'min_value' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
-            'withdrawFields' => 'nullable|string',
+            'withdrawFields' => 'nullable',
         ]);
 
     $paymentWithdrawType = PaymentWithdrawType::findOrFail($id);
