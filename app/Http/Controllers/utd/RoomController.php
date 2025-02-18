@@ -172,7 +172,7 @@ class RoomController extends Controller
     {
         try {
             $room = Room::findOrFail($id);
-            $room->delete;
+            $room->delete();
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
