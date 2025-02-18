@@ -324,7 +324,7 @@ class ChatRoomService
     {
         // Get room data and check if it has a password
         $room = Room::where('uid', $user2->now_room_uid)->first();
-        $exp = GiftLog::where('room_id', @$room?->id)->sum("giftPrice") ?? 0;
+
         return [
             'room_owner_id' => $user2->now_room_uid,
             'owner' => [
@@ -337,7 +337,7 @@ class ChatRoomService
                 'image' =>  @$room->room_cover ?? '',
                 'mode' => @$room->mode ?? 0,
                 'room_background' => @$room->final_room_image ?? '',
-                'exp' => $exp,
+                'giftPrice' => @$room->session_string ?? 0,
             ],
 
 
