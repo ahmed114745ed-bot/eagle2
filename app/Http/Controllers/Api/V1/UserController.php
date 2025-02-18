@@ -32,6 +32,7 @@ use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\UserPackUtdResource;
 use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\OnlineResource;
 use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
@@ -1018,6 +1019,6 @@ class UserController extends Controller
     public function online()
     {
         $data = $this->userService->online();
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', OnlineResource::collection($data));
     }
 }
