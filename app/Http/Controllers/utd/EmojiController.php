@@ -9,44 +9,49 @@ use Illuminate\Http\Request;
 
 class EmojiController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $search = request('search');
         $perPage = request('per_page') ?? 10;
 
-        $result = Emoji::when($search,function($q)use($search){
-            $q->where('id',$search);
+        $result = Emoji::when($search, function ($q) use ($search) {
+            $q->where('id', $search);
         })
-        ->paginate($perPage);
+            ->paginate($perPage);
 
-        return Common::apiResponse(true,'Success', $result);
+        return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $result = Emoji::findOrFail($id);
 
-        return Common::apiResponse(true,'Success',$result);
+        return Common::apiResponse(true, 'Success', $result);
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         $result = Emoji::findOrFail($id);
 
         $result->delete();
-        return Common::apiResponse(true,'Success');
+        return Common::apiResponse(true, 'Success');
     }
 
-    public function delete_all(Request $request){
+    public function delete_all(Request $request)
+    {
         $request->validate([
             'ids' => 'required'
         ]);
 
-        $ids = explode(',',$request->ids);
+        $ids = explode(',', $request->ids);
 
         Emoji::whereIn('id', $ids)->delete();
 
-        return Common::apiResponse(true,'Success');
+        return Common::apiResponse(true, 'Success');
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $validatedData  = $request->validate([
             'pid'      => 'nullable|integer|exists:emojis,id',
@@ -67,7 +72,8 @@ class EmojiController extends Controller
         return Common::apiResponse(true, 'Success', $emoji);
     }
 
-    public function update($id, Request $request){
+    public function update($id, Request $request)
+    {
         $validatedData = $request->validate([
             'pid'      => 'nullable|integer|exists:emojis,id',
             'name'     => 'required|string|max:255',
@@ -81,7 +87,7 @@ class EmojiController extends Controller
         $emoji = Emoji::findOrFail($id);
 
         if ($request->hasFile('emoji')) {
-            $validatedData['emoji'] =   Common::upload('images',$request->file('emoji'));
+            $validatedData['emoji'] =   Common::upload('images', $request->file('emoji'));
         }
 
         $emoji->update($validatedData);
@@ -90,7 +96,8 @@ class EmojiController extends Controller
         return Common::apiResponse(true, 'Success');
     }
 
-    public function update_status($id,Request $request){
+    public function update_status($id, Request $request)
+    {
         $request->validate([
             'enable' => 'required'
         ]);
@@ -103,5 +110,12 @@ class EmojiController extends Controller
         $emoji->save();
 
         return Common::apiResponse(true, 'Success');
+    }
+
+    public function emojiPid()
+    {
+        $data = Emoji::query()->select('id', 'name')->where('enable', 1)->where('pid', 0)->get();
+        $data = collect([['id' => 0, 'name' => 'root']])->merge($data);
+        return Common::apiResponse(true, 'Success', $data);
     }
 }

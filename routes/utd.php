@@ -251,6 +251,7 @@ Route::middleware([])->group(function () {
     Route::prefix('emojis')->group(function () {
         Route::get('/', [EmojiController::class, 'index']);
         Route::post('/create', [EmojiController::class, 'store']);
+        Route::get('/pid', [EmojiController::class, 'emojiPid']);
         Route::post('/update/{id}', [EmojiController::class, 'update']);
         Route::post('/update-status/{id}', [EmojiController::class, 'update_status']);
         Route::post('/delete/{id}', [EmojiController::class, 'delete']);
