@@ -337,7 +337,7 @@ class ChatRoomService
                 'image' =>  @$room->room_cover ?? '',
                 'mode' => @$room->mode ?? 0,
                 'room_background' => @$room->final_room_image ?? '',
-                'exp' => @$room->session_string ?? 0,
+                'exp' => @$room?->session_string,
             ],
 
 
