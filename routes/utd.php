@@ -689,7 +689,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [RoomController::class, 'update']);
         Route::post('/show/{id}', [RoomController::class, 'show']);
         Route::post('/update-switches', [RoomController::class, 'updateSwitches']);
-        Route::delete('delete/{id}', [RoomController::class, 'delete']);
+        Route::delete('delete/{id}', [RoomController::class, 'destroy']);
     });
 
 
