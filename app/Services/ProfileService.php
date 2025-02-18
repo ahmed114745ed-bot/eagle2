@@ -82,6 +82,7 @@ class ProfileService
                 ]);
             }
         }
+        
 
 
         $out = new V1UserResource($user);

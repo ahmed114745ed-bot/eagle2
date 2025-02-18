@@ -89,15 +89,9 @@ class MomentService extends MomentBaseModelService
         ];
     }
 
-    public function createMoment($contacts, $image)
+    public function createMoment($contacts, $request)
     {
         $userId = Auth::id();
-        $imgPath = '';
-
-        // Handle file upload if present
-        if ($image) {
-            $imgPath = Common::upload('moment', $image);
-        }
 
         // Prevent posting empty content
         if (empty($contacts) && empty($imgPath)) {
@@ -108,17 +102,25 @@ class MomentService extends MomentBaseModelService
         }
 
         // Create moment
-        $created = $this->momentRepository->createMoment([
+        $moment = $this->momentRepository->createMoment([
             'user_id' => $userId,
             'description' => $contacts,
-            'img' => $imgPath,
         ]);
 
-        if (!$created) {
+        if (!$moment) {
             return [
                 'success' => false,
                 'message' => 'Try again',
             ];
+        }
+        if ($request->hasFile('multi_image')) {
+            foreach ($request->file('multi_image') as $file) {
+                $imagePath = Common::upload('profile', $file);
+
+                $moment->images()->create([
+                    'image' => $imagePath,
+                ]);
+            }
         }
 
         return [

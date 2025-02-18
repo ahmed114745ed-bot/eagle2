@@ -13,6 +13,7 @@ class OnlineResource extends JsonResource
         return [
             'id' => $this->id ?? 0,
             'uuid' => $this->uuid ?? 0,
+            'name' => $this->name ?? '',
             'image' => $this->profile?->avatar ?? '',
             'country' => @$this->country,
             'is_followed'            => $this->is_followed,

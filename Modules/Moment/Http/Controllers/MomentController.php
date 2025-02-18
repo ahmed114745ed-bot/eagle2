@@ -51,10 +51,9 @@ class MomentController extends Controller
     public function store(Request $request)
     {
         $contacts = $request->contacts ?? '';
-        $image = $request->file('img');
 
         // Delegate to the service layer
-        $result = $this->momentService->createMoment($contacts, $image);
+        $result = $this->momentService->createMoment($contacts, $request);
 
         // Format and return response
         return Common::apiResponse($result['success'], $result['message']);
