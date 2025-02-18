@@ -686,6 +686,8 @@ Route::middleware([])->group(function () {
     Route::prefix('rooms')->group(function () {
         Route::get('/', [RoomController::class, 'all']);
         Route::post('/create', [RoomController::class, 'store']);
+        Route::get('/class', [RoomController::class, 'roomClass']);
+        Route::get('/type/{classId}', [RoomController::class, 'roomType']);
         Route::post('/update/{id}', [RoomController::class, 'update']);
         Route::get('/show/{id}', [RoomController::class, 'show']);
         Route::post('/update-switches', [RoomController::class, 'updateSwitches']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\utd;
 use Exception;
 use App\Models\Room;
 use App\Helpers\Common;
+use App\Models\RoomCategory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RoomResource;
@@ -166,6 +167,18 @@ class RoomController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function roomClass()
+    {
+        $data = RoomCategory::query()->select('id', 'name')->where('enable', 1)->where('parent_id', 0)->get();
+        return Common::apiResponse(true, '', $data, 200);
+    }
+
+    public function roomType($roomClassId)
+    {
+        $data = RoomCategory::select('id', 'name')->where('parent_id', $roomClassId)->where('enable', 1)->get();
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function destroy($id)
