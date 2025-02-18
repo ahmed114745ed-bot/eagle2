@@ -68,6 +68,13 @@ class RoomCategoryController extends Controller
 
     }
 
+    public function parent()
+    {
+        $data = RoomCategory::query()->select('id', 'name')->where('enable', 1)->where('parent_id', 0)->get();
+        $data = collect([['id' => 0, 'name' => 'root']])->merge($data);
+        return Common::apiResponse(true, '', $data, 200);
+    }
+
     public function update($id, Request $request){
 
         $request->validate([

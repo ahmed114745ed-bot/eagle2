@@ -218,6 +218,7 @@ Route::middleware([])->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [RoomCategoryController::class, 'index']);
         Route::post('/create', [RoomCategoryController::class, 'store']);
+        Route::get('/parent', [RoomCategoryController::class, 'parent']);
         Route::post('/update/{id}', [RoomCategoryController::class, 'update']);
         Route::post('/update-status/{id}', [RoomCategoryController::class, 'update_status']);
         Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
