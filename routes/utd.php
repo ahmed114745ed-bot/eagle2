@@ -687,7 +687,7 @@ Route::middleware([])->group(function () {
         Route::get('/', [RoomController::class, 'all']);
         Route::post('/create', [RoomController::class, 'store']);
         Route::post('/update/{id}', [RoomController::class, 'update']);
-        Route::post('/show/{id}', [RoomController::class, 'show']);
+        Route::get('/show/{id}', [RoomController::class, 'show']);
         Route::post('/update-switches', [RoomController::class, 'updateSwitches']);
         Route::delete('delete/{id}', [RoomController::class, 'destroy']);
     });
