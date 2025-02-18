@@ -24,7 +24,7 @@ class WithdrawController extends Controller
 
     public function show($id)
     {
-        $result = PaymentWithdrawType::findOrFail($id);
+        $result = PaymentWithdrawType::with('withdrawFields')->findOrFail($id);
 
         return Common::apiResponse(true, 'Success', $result);
     }
