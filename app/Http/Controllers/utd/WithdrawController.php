@@ -81,7 +81,7 @@ class WithdrawController extends Controller
         if ($request->has('withdrawFields')) {
             $json_decoded  = json_decode($request->withdrawFields, true);
 
-            $paymentWithdrawType->withdrawFields()->createMany($json_decoded);
+            $paymentWithdrawType->withdrawFields()->attach($json_decoded);
         }
 
         return Common::apiResponse(true, 'Success', $paymentWithdrawType);
@@ -91,7 +91,7 @@ class WithdrawController extends Controller
         $request->validate([
             'name' => 'required|string',
             'name_en' => 'required|string',
-            'image' => 'nullable|image',
+            'image' => 'nullable',
             'min_value' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
             'withdrawFields' => 'nullable|string',
