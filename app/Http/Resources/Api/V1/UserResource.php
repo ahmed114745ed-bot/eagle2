@@ -73,6 +73,7 @@ class UserResource extends JsonResource
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
         $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?? $this->getUserDress(6, $this->dress_3, 'img1');
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
         //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
@@ -128,6 +129,7 @@ class UserResource extends JsonResource
             // both    --------------
             'frame'                => $frame, // both
             'intro'                => $intro, // both
+            'intro_type' => $introType,
             'bubble'               => $bubble, // both
             'bubble_id'            => $bubble != '' ? $this->dress_2 : 0, // both
             'frame_id'             => $frame != '' ? @$this->dress_1 : 0, // both
