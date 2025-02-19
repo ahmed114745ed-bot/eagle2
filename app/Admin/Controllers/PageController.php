@@ -79,7 +79,7 @@ class PageController extends MainController
 
         $grid->id('ID');
         // $grid->type(__('type'));
-        $grid->name(__('name'));
+        $grid->name(__('name_en'));
         $grid->column('link', __('url'))->display(function () {
             $url = url("/$this->name");
             return "<a href='$url'>$url</a>";
@@ -130,7 +130,7 @@ class PageController extends MainController
 
         $form->display('ID');
         // $form->text('type', __('type'));
-        $form->text('name', __('name'));
+        $form->text('name', __('name_en'));
         $form->textarea('content', __('content'));
         $form->textarea('content_en', __('content_en'));
         if ($form->model) {
