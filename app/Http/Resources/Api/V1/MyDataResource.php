@@ -94,6 +94,7 @@ class MyDataResource extends JsonResource
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type1');
 
         $isHideCountry = $this->getPackWithType(13);
 
@@ -140,6 +141,7 @@ class MyDataResource extends JsonResource
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
             'intro' => $intro,
+            'intro_type' => $introType,
             'intro_type' => @$this->dress3?->image_type ?? '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
@@ -201,8 +203,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
-            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
