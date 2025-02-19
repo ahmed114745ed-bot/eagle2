@@ -91,6 +91,7 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+    
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
@@ -142,7 +143,6 @@ class MyDataResource extends JsonResource
             'frame' => $frame,
             'intro' => $intro,
             'intro_type' => $introType,
-            'intro_type' => @$this->dress3?->image_type ?? '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
