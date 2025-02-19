@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class GeneralRole extends Model
 {
     use HasFactory;
+    protected $guarded = ['id'];
+    
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';
