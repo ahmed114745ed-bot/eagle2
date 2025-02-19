@@ -94,7 +94,7 @@ class MyDataResource extends JsonResource
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
-        $introType = $this->getUserDress(6, $this->dress_3, 'image_type1');
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
 
         $isHideCountry = $this->getPackWithType(13);
 
