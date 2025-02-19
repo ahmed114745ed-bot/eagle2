@@ -30,9 +30,10 @@ class CpsUserResource extends JsonResource
         })->where('cp_relation_id', $this->relationType)->where(function ($query) {
             $query->where('status', 1)->orWhere('status', 4);
         })->first();
-        if ($cp->user_one_id == $this->id) {
+
+        if ($cp && ($cp->user_one_id == $this->id)) {
             $otherUser = User::Find($cp->user_two_id);
-        } else {
+        } elseif ($cp && ($cp->user_two_id == $this->id)) {
             $otherUser = User::Find($cp->user_one_id);
         }
         $total_received_level_img = Common::getImageTotalReceiverOrSender($this->total_received_level);
