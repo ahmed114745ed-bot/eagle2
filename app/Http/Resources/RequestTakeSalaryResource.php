@@ -37,7 +37,7 @@ class RequestTakeSalaryResource extends JsonResource
         if (!$data) [];
         $results = [];
 
-        if ($data->isNotEmpty()) {
+        if ($data) {
             foreach ($data as $da) {
                 $key = $da->payment_withdraw_field->name ?? null;
                 $value = $da->value ?? null;
