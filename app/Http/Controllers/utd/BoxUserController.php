@@ -53,7 +53,7 @@ class BoxUserController extends Controller
             'box_id'       => 'required|integer|exists:boxs,id',
             'user_id'      => 'required|integer|exists:users,id',
             'coins'        => 'required|integer|min:0',
-            'end_at'       => 'nullable|date',
+            'end_at'       => 'nullable',
             'room_uid'     => 'nullable|string|max:255',
             'room_id'      => 'nullable|string|max:255',
             'users_num'    => 'required|integer|min:0',
