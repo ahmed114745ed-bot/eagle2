@@ -33,7 +33,8 @@ class RequestTakeSalaryResource extends JsonResource
 
     private function getWithdrawFields()
     {
-        $data = $this->paymentWithDraw?->userWithdrawFields->where("user_id", $this->user_id);
+        $data = @$this->paymentWithDraw?->userWithdrawFields->where("user_id", $this->user_id);
+        if (!$data) [];
         $results = [];
 
         if ($data->isNotEmpty()) {
