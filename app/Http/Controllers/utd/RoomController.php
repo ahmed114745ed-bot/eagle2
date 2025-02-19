@@ -60,7 +60,7 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'numid' => 'required|integer|exists:users,id',
+            'numid' => 'nullable|integer',
             'room_status' => 'required|boolean',
             'top_room' => 'required|boolean',
             'pin' => 'required|boolean',
@@ -110,7 +110,7 @@ class RoomController extends Controller
     public function update($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'numid' => 'required|integer|exists:users,id',
+            'numid' => 'nullable|integer',
             'room_status' => 'required|boolean',
             'top_room' => 'required|boolean',
             'pin' => 'required|boolean',
