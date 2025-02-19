@@ -97,9 +97,9 @@ ul.list-unstyled {
     var myChart = new Chart(ctx, {
         type: 'doughnut', // نوع المخطط دائري
         data: {
-            labels: ['used', 'availabel balance'],
+            labels: ['{{ __('admin.used') }}', '{{ __('admin.availableBalance') }}'],
             datasets: [{
-                label: 'توزيع البيانات',
+                label: '{{ __('admin.data_distribution') }}',
                 data: <?php echo json_encode($data); ?>,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
@@ -120,7 +120,7 @@ ul.list-unstyled {
                 },
                 title: {
                     display: true,
-                    text: 'نسبه شحن الالعاب'
+                    text: '{{ __('admin.game_recharge_rate') }}' // Translation from Laravel lang files
                 }
             }
         }

@@ -42,11 +42,16 @@ class ReportService
 
     public function eventReports($request)
     {
+        $id = $request->id;
         if ($request->type == 'weekly_star' || $request->type == 'event_period') {
-            $data = WinnerReward::where('type', $request->type)->when($request->type == 'weekly_star', fn($q) => $q->where('type', 'weekly_star')->orWhere('type', null))->with('winner', 'reward', 'reward.vip', 'reward.ware')->paginate($request->per_page, ['*'], 'page', $request->page);
+            $data = WinnerReward::where('type', $request->type)->when($request->type == 'weekly_star', fn($q) => $q->where('type', 'weekly_star')->orWhere('type', null))->with('winner', 'reward', 'reward.vip', 'reward.ware')->when(isset($id), function ($query) use ($id) {
+                $query->where('id', $id);
+            })->paginate($request->per_page, ['*'], 'page', $request->page);
             return ReportEventResource::collection($data);
         } elseif ($request->type == 'pk_event') {
-            $data = RewardWinnerPk::with('winner', 'reward', 'reward.vip', 'reward.ware')->paginate($request->per_page, ['*'], 'page', $request->page);
+            $data = RewardWinnerPk::with('winner', 'reward', 'reward.vip', 'reward.ware')->when(isset($id), function ($query) use ($id) {
+                $query->where('id', $id);
+            })->paginate($request->per_page, ['*'], 'page', $request->page);
             return ReportEventResource::collection($data);
         }
     }

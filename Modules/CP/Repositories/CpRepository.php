@@ -283,8 +283,11 @@ class CpRepository
     public function getByUser($userId)
     {
         return Cp::where(function ($query) use ($userId) {
-            $query->where("user_one_id", $userId)
-                ->orWhere("user_two_id", $userId);
+            $query->where(function ($q) use ($userId) {
+                $q->where("user_one_id", $userId)->whereHas('toUser');
+            })->orWhere(function ($q) use ($userId) {
+                $q->where("user_two_id", $userId)->whereHas('fromUser');
+            });
         })->with('relation:id,title,type', 'toUser', 'fromUser')->get();
     }
 }

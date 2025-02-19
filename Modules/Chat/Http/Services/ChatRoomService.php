@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Services;
 
+use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Reals\Entities\Real;
 
 class ChatRoomService
 {
@@ -37,6 +39,28 @@ class ChatRoomService
         } else {
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
+
+        $this->countReel($data, $type, $userId, $userIds);
+    }
+
+    public function countReel($data,  $type, $userId, $userIds)
+    {
+        $parts = explode(':', str_replace("\n", ':', $data['message']));
+        $reelId = $parts[4] ?? null;
+        Log::info('reel id : ' . $reelId);
+        $reel = Real::find($reelId);
+        if (!$reel) return true;
+        $user = User::find($userId);
+        if ($type == 'all' && $userIds == null) {
+            $reel->share_num += $user->friend;
+        } elseif ($type == 'not' && $userIds != null) {
+            $reel->share_num += ($user->friend - count($userIds));
+        } elseif ($type == 'one') {
+            $countUsers = count($userIds);
+            $reel->share_num += $countUsers;
+        }
+        $reel->save();
+        return true;
     }
 
     /**
@@ -161,7 +185,7 @@ class ChatRoomService
         // Get unread messages
         $chatRoomIds = ChatRoom::where(function ($query) use ($user) {
             $query->where('user_id', $user->id)->orWhere('user_id2', $user->id);
-        })->where('type', 'friends') ->pluck('id')->toArray();
+        })->where('type', 'friends')->pluck('id')->toArray();
 
         $unreadMessages = ChatMessage::whereIn('chat_room_id', $chatRoomIds)
             ->where('user_id', '!=', $user->id)
@@ -230,14 +254,14 @@ class ChatRoomService
     {
         // Find existing chat room or create a new one
         $chatRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
-            $query->where(function($q) use($user, $userId2){
+            $query->where(function ($q) use ($user, $userId2) {
                 $q->where('user_id', $user->id)
-                ->where('user_id2', $userId2);
+                    ->where('user_id2', $userId2);
             })
-            ->orWhere(function($q)use($user, $userId2){
-                $q->where('user_id', $userId2)
-                ->where('user_id2', $user->id);
-            });
+                ->orWhere(function ($q) use ($user, $userId2) {
+                    $q->where('user_id', $userId2)
+                        ->where('user_id2', $user->id);
+                });
         })->first();
 
         if (!$chatRoom) {
@@ -300,9 +324,23 @@ class ChatRoomService
     {
         // Get room data and check if it has a password
         $room = Room::where('uid', $user2->now_room_uid)->first();
+
         return [
             'room_owner_id' => $user2->now_room_uid,
-            'has_password' => $room && $room->room_pass ? true : false
+            'owner' => [
+                'uuid' => $user2->uuid ?? 0,
+            ],
+            'has_password' => $room && $room->room_pass ? true : false,
+            'room' => [
+                'id' => @$room->id ?? 0,
+                'name'  => @$room->room_name ?? '',
+                'image' =>  @$room->room_cover ?? '',
+                'mode' => @$room->mode ?? 0,
+                'room_background' => @$room->final_room_image ?? '',
+                'exp' => @$room?->session_string,
+            ],
+
+
         ];
     }
 

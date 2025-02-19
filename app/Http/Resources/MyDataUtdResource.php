@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Log;
 
 class MyDataUtdResource extends JsonResource
 {
@@ -49,6 +50,10 @@ class MyDataUtdResource extends JsonResource
                 'owner' => new OwnerAgencyResource(@$this?->agency?->owner)
             ],
             'achievement_images' => $achievement_images,
+            'number_of_fans' => $this->followerss()->count(),
+            'number_of_followings' => $this->following()->count(),
+            'number_of_friends' => $this->friends()->count(),
+            'profile_visitors' => $this->profileVisits()->count(),
 
 
 

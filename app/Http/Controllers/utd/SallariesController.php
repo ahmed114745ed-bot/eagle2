@@ -34,9 +34,9 @@ class SallariesController extends Controller
         $type = $request->query('type', 'users'); // Default to 'users'
 
         if ($type === 'users') {
-            return Common::apiResponse(true,'Success', $this->getUserDetails($request));
+            return Common::apiResponse(true, 'Success', $this->getUserDetails($request));
         } elseif ($type === 'agencies') {
-            return Common::apiResponse(true, 'Success' , $this->getAgencyDetails($request));
+            return Common::apiResponse(true, 'Success', $this->getAgencyDetails($request));
         }
 
         return Common::apiResponse(true, 'Invalid type');
@@ -44,35 +44,39 @@ class SallariesController extends Controller
 
     private function getUserDetails(Request $request)
     {
-        $uuid = $request->query('uuid', '0');
+        $uuid = $request->uuid;
         $year = $request->query('year', now()->year);
         $month = $request->query('month', now()->month);
+        $user = null;
+        if ($uuid) {
+            $user = User::where('uuid', $uuid)->first();
 
-        $user = User::where('uuid', $uuid)->first();
-
-        if (!$user) {
-            return ['message' => 'User not found'];
+            if (!$user) {
+                return ['message' => 'User not found'];
+            }
         }
 
-        $userSalaries = UserSallary::where('user_id', $user->id)
+
+        $userSalaries = UserSallary::when(isset($user), function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
             ->whereHas('user', function ($q) {
                 $q->where('agency_id', '!=', 0);
             })
             ->select(DB::raw('sum(sallary) as totalTarget2'), DB::raw('sum(sallary - cut_amount) as totalSalary2'))
             ->first();
 
-        $userCutAmount = UserSallary::where('user_id', $user->id)
-            ->where(function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month");
-            })
-            ->whereHas('user', function ($q) {
-                $q->where('agency_id', '!=', 0);
-            })
-            ->select(DB::raw('sum(cut_amount) as totalPayments'))
-            ->first();
+        $userCutAmount = UserSallary::when(isset($user), function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->where(function ($query) use ($year, $month) {
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month");
+        })->whereHas('user', function ($q) {
+            $q->where('agency_id', '!=', 0);
+        })->select(DB::raw('sum(cut_amount) as totalPayments'))->first();
 
-        $totalDiamonds = UserTarget::where('user_id', $user->id)
-            ->sum(DB::raw('user_diamonds'));
+        $totalDiamonds = UserTarget::when(isset($user), function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->sum(DB::raw('user_diamonds'));
 
         return [
             'diamond' => $totalDiamonds ?? 0,
@@ -90,11 +94,9 @@ class SallariesController extends Controller
 
         $agencySallary = AgencySallary::where(function ($query) use ($year, $month) {
             $query->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month");
-        })
-            ->when($agencyId, function ($query) use ($agencyId) {
-                $query->where('agency_id', $agencyId);
-            })
-            ->select(DB::raw('sum(sallary) as totalTarget'), DB::raw('sum(cut_amount) as totalPayments'), DB::raw('sum(sallary - cut_amount) as totalSallary'))
+        })->when($agencyId, function ($query) use ($agencyId) {
+            $query->where('agency_id', $agencyId);
+        })->select(DB::raw('sum(sallary) as totalTarget'), DB::raw('sum(cut_amount) as totalPayments'), DB::raw('sum(sallary - cut_amount) as totalSallary'))
             ->first();
 
         return [
@@ -103,19 +105,20 @@ class SallariesController extends Controller
             'payments' => $agencySallary->totalPayments ?? 0,
         ];
     }
-    public function pay(Request $request){
+    public function pay(Request $request)
+    {
         $amount = \request('amount');
         try {
             DB::beginTransaction();
-            if ( $request->type == "user" ) {
+            if ($request->type == "user") {
                 $user = User::findOrFail(\request('id'));
                 $amount = $amount ?? $user->salary;
-                $agencyId= $user->agency_id;
-                $userId= $user->id;
+                $agencyId = $user->agency_id;
+                $userId = $user->id;
 
                 UserSallary::updateOrCreate(
                     [
-                        'user_id' => $user->id ,
+                        'user_id' => $user->id,
                         'month' => date('m'),
                         'year' => date('Y')
                     ],
@@ -124,16 +127,15 @@ class SallariesController extends Controller
                         'pending_dollar' => DB::raw("pending_dollar - $amount")
                     ]
                 );
-
-            }elseif ( $request->type == "agency") {
+            } elseif ($request->type == "agency") {
                 $agency = Agency::findOrFail(\request('id'));
-                $agencyId= $agency->id;
+                $agencyId = $agency->id;
                 $amount = $amount ?? $agency->salary;
                 $userId = null;
 
                 AgencySallary::updateOrCreate(
                     [
-                        'agency_id' => $agency->id ,
+                        'agency_id' => $agency->id,
                         'month' => date('m'),
                         'year' => date('Y')
                     ],
@@ -145,7 +147,7 @@ class SallariesController extends Controller
 
 
             UsdTransfer::create([
-                "admin_id"  => request('admin_id'),
+                // "admin_id"  => request('admin_id'),
                 "user_id"   => $userId,
                 "agency_id" => $agencyId,
                 "user_type" => \request('type') == 'agency' ? 1 : 0,
@@ -160,7 +162,8 @@ class SallariesController extends Controller
 
         return Common::apiResponse(true, 'Success');
     }
-    public function cashing(Request $request){
+    public function cashing(Request $request)
+    {
         $amount = \request('amount');
 
         try {
@@ -171,7 +174,7 @@ class SallariesController extends Controller
                 if ($agency) {
                     if ($request->select_type == 'decrement') {
                         if ($agency->salary < $amount) {
-                            return Common::apiResponse(false,__('low balance'));
+                            return Common::apiResponse(false, __('low balance'));
                         }
                     }
 
@@ -180,8 +183,8 @@ class SallariesController extends Controller
 
                     if (!$userSallary) {
                         $userSallary = new AgencySallary();
-                        $userSallary->agency_id=\request('id');
-                        $userSallary->sallary=0;
+                        $userSallary->agency_id = \request('id');
+                        $userSallary->sallary = 0;
                         if ($request->select_type == 'increment') {
                             $userSallary->cut_amount = -$m;
                         }
@@ -192,7 +195,7 @@ class SallariesController extends Controller
                         $userSallary->year = now()->year;
                         $userSallary->is_paid = 0;
                         $userSallary->save();
-                    }else{
+                    } else {
                         if ($request->select_type == 'increment') {
                             $userSallary->cut_amount += -$m;
                             $userSallary->update();
@@ -220,25 +223,24 @@ class SallariesController extends Controller
                         );
                     }
                 }
-            }
-            elseif (\request('id') && $type == 'user') {
+            } elseif (\request('id') && $type == 'user') {
                 $user = User::query()->find(\request('id'));
                 if ($user) {
                     if ($request->select_type == 'decrement') {
                         if ($user->salary < $amount) {
-                            return Common::apiResponse(false,__('low balance'));
+                            return Common::apiResponse(false, __('low balance'));
                         }
                     }
                     $m = $amount ?: $user->salary;
                     if ($m > 0) {
                         $userSallary = UserSallary::where('user_id', \request('id'))->latest('created_at')->first();
                         if ($userSallary == null) {
-                            $userSallary= new UserSallary();
-                            $userSallary->user_id=\request('id');
-                            $userSallary->hours="0 / 0";
-                            $userSallary->days="0 / 0";
-                            $userSallary->sallary=0;
-                            $userSallary->agency_sallary=0;
+                            $userSallary = new UserSallary();
+                            $userSallary->user_id = \request('id');
+                            $userSallary->hours = "0 / 0";
+                            $userSallary->days = "0 / 0";
+                            $userSallary->sallary = 0;
+                            $userSallary->agency_sallary = 0;
                             if ($request->select_type == 'increment') {
                                 $userSallary->cut_amount = -$m;
                             }
@@ -249,7 +251,7 @@ class SallariesController extends Controller
                             $userSallary->year = now()->year;
                             $userSallary->is_paid = 0;
                             $userSallary->save();
-                        }else{
+                        } else {
                             if ($request->select_type == 'increment') {
                                 $userSallary->cut_amount -= $m;
                                 $userSallary->save();
@@ -291,11 +293,13 @@ class SallariesController extends Controller
     private function getUsersGrid()
     {
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         return User::with('agency:id,name')
-            ->when($search, function($q) use($search){
-                $q->where('id', $search);
+            ->when($search, function ($q) use ($search) {
+                $q->where('uuid', $search);
             })
-            ->paginate(10) // Paginate by 10 items per page
+            ->paginate($perPage) // Paginate by 10 items per page
             ->through(function ($user) {
                 return [
                     'id' => $user->id,
@@ -312,12 +316,14 @@ class SallariesController extends Controller
     private function getAgenciesGrid()
     {
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         return Agency::select('id', 'name', 'phone', 'old_usd', 'target_usd', 'target_token_usd')
             ->withCount('users')
-            ->when($search, function($q) use($search){
+            ->when($search, function ($q) use ($search) {
                 $q->where('id', $search);
             })
-            ->paginate(10) // Paginate by 10 items per page
+            ->paginate($perPage) // Paginate by 10 items per page
             ->through(function ($agency) {
                 return [
                     'id' => $agency->id,
@@ -331,5 +337,4 @@ class SallariesController extends Controller
                 ];
             });
     }
-
 }

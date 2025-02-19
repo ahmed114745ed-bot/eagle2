@@ -84,6 +84,19 @@ class AgencyRepository extends AbstractRepository
         })->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function getAllActiveAgency($id){
+        return $this->model->when(isset($id), function ($query) use ($id) {
+            $query->where('id', $id);
+        })->where(function ($query) {
+            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+                'additionalInfo',
+                function ($query) {
+                    $query->where('status', 1);
+                }
+            );
+        })->orderByDesc('id')->get();
+    }
+
     public function agencyById($id){
         return $this->model->where(function ($query) {
             $query->WhereDoesntHave('additionalInfo')->orWhereHas(

@@ -312,7 +312,7 @@ class AgencyController extends MainController
 
         $form->display('ID');
         if (!$form->isEditing()) {
-            
+
             $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
                 $ops2 = [];
                 foreach (User::Where('id', $value)->get() as $user) {
@@ -441,6 +441,7 @@ class AgencyController extends MainController
             $newOwnerId = $form->model()->app_owner_id;
             if (!$form->model()->exists)  Common::createUserAdmin($appOwnerId);
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
+                Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 Admin::where('username', $user->uuid)->delete();
                 $user->update([

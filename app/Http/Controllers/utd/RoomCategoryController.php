@@ -11,11 +11,12 @@ class RoomCategoryController extends Controller
 {
     public function index(){
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
 
         $result = RoomCategory::when($search,function($q)use($search){
             $q->where('id',$search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
         return Common::apiResponse(true,'Success', $result);
     }
@@ -65,6 +66,13 @@ class RoomCategoryController extends Controller
 
         return Common::apiResponse(true,'Success', $result);
 
+    }
+
+    public function parent()
+    {
+        $data = RoomCategory::query()->select('id', 'name')->where('enable', 1)->where('parent_id', 0)->get();
+        $data = collect([['id' => 0, 'name' => 'root']])->merge($data);
+        return Common::apiResponse(true, '', $data, 200);
     }
 
     public function update($id, Request $request){

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,7 +28,7 @@ class EventCoinsReportResource extends JsonResource
             'type'        => $this->extraData,
             'diamonds'    => (int)$di,
             'operation_no'=> (int)$this->id,
-            'created_at'  => $this->created_at->format('Y-m-d h:i:s A')
+            'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A')
         ];
     }
 }

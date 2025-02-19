@@ -226,6 +226,10 @@ class User extends Authenticatable
         return $this->belongsTo(MangerType::class, 'manger_type_id');
     }
 
+    public function manager(){
+        return $this->hasOne(Admin::class, 'app_id');
+    }
+
     public function requestBackgroundImages()
     {
         return $this->hasMany(RequestBackgroundImage::class, 'owner_room_id');

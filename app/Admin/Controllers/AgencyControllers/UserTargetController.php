@@ -23,7 +23,7 @@ class UserTargetController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('user target'))
+            ->title(trans('Achieved Target'))
             ->body($this->grid()));
     }
     /**

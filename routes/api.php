@@ -1,11 +1,14 @@
 <?php
 
-use App\Admin\Controllers\WareController;
+use App\Models\Room;
+use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
-use App\Http\Controllers\Api\V1\AgoraController;
-use App\Http\Controllers\Api\V1\MusicStoreController;
 use Illuminate\Support\Facades\Route;
+use App\Jobs\AllOpeningRoomsZegoRequest;
+use App\Admin\Controllers\WareController;
+use App\Http\Controllers\PaySkyController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\VipController;
@@ -17,8 +20,10 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
+use App\Http\Controllers\Api\V1\MusicController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
@@ -29,31 +34,33 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
+use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
+use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
+use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
-use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\MallController as ControllersMallController;
-use App\Http\Controllers\PaySkyController;
-use App\Http\Controllers\StripeController;
-use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Models\Room;
-use App\Models\User;
 
+
+
+
+
+Route::post('agora-webhook', [AgoraController::class, 'webhook']);
+Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
     Route::get('test-game-rtm', function () {
 
@@ -79,6 +86,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
 
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
+    Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
 
     Route::prefix('config')->group(function () {
@@ -120,6 +128,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
+
+            Route::get('user-room', [UserController::class, 'userRoom']);
 
             Route::get('/agora-rtc-token', [AgoraController::class, 'RtcToken']);
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
@@ -210,6 +220,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [\App\Http\Controllers\Api\V1\UserController::class, 'chargerAgency']);
+                Route::get('/play', [UserController::class, 'allUsersPlayGame']);
+                Route::get('/stop-play', [UserController::class, 'updateGame']);
+                Route::get('/online', [UserController::class, 'online']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -472,15 +485,16 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('test-google-id', [AuthController::class, 'verifyGoogleToken']);
 
             // Music Store
-            Route::prefix('music')->group(function () {
-                Route::get('/', [MusicStoreController::class, 'index']);
-                Route::post('/', [MusicStoreController::class, 'store']);
-            });
+            // Route::prefix('music')->group(function () {
+            //     Route::get('/', [MusicStoreController::class, 'index']);
+            //     Route::post('/', [MusicStoreController::class, 'store']);
+            // });
             Route::get('achievement-valid-images', [AchievementController::class, 'achievement_valid_images']);
 
-            Route::get('/privacy-policy', function () {
-                $Page=\App\Models\Page::where("name","privacy-policy")->first();
-                return response()->json(['html' => $Page]);
+            Route::prefix('music')->group(function () {
+                Route::get('/all', [MusicController::class, 'index']);
+                Route::get('/user', [MusicController::class, 'userMusic']);
+                Route::post('/create', [MusicController::class, 'store']);
             });
         }
     );

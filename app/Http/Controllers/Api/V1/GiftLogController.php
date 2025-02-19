@@ -838,7 +838,7 @@ class GiftLogController extends Controller
         }
 
         try {
-            $data = $this->giftLogService->userGiftIfo($id, $request->type, $request->start_date, $request->end_date);
+            $data = $this->giftLogService->userGiftIfo($id, $request->type, $request->start_date, $request->end_date, $request->per_page, $request->page);
             return Common::apiResponse(1, __('api_responses.success'), GiftLogUtdResource::collection($data));
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());

@@ -24,7 +24,7 @@ class WareController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('wares'))
+            ->title(trans('Products'))
             ->body($this->grid());
     }
 

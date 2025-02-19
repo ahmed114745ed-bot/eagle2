@@ -351,8 +351,8 @@ class GiftLogService
         $topUser->save();
     }
 
-    public function userGiftIfo($id, $type, $startDate, $endDate)
+    public function userGiftIfo($id, $type, $startDate, $endDate,$perPage, $page)
     {
-        return $this->giftLogRepository->userGiftInfo($id, $type, $startDate, $endDate);
+        return $this->giftLogRepository->userGiftInfo($id, $type, $startDate, $endDate,$perPage, $page);
     }
 }

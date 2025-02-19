@@ -84,6 +84,7 @@ class RoomRepository extends AbstractRepository
 
         $user = $req?->user();
         $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        
 
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
@@ -129,6 +130,10 @@ class RoomRepository extends AbstractRepository
             case 'popular':
                 $result->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc');
                 break;
+                case 'last_create':
+                  //  dd(Carbon::now()->subDay());
+                    $result->whereDate('created_at', Carbon::now()->subDay())->orderByDesc('id');
+                    break;
             case 'pk':
                 // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');
                 $result->has('lastPk');

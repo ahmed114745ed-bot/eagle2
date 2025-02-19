@@ -56,10 +56,10 @@ class MyDataResource extends JsonResource
         //     ];
         // }
         if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id 
-                ? new \stdClass() 
+            $owner = $agency_joined->app_owner_id == $this->id
+                ? new \stdClass()
                 : new MiniUserResource($agency_joined->owner);
-       
+
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
@@ -67,9 +67,9 @@ class MyDataResource extends JsonResource
                 'owner' => $owner,
             ];
         } else {
-            $agency_joined = (object)[]; 
+            $agency_joined = (object)[];
         }
-        
+
         $pass_status = false;
         $now_room = @$this->room;
         if ($now_room && $now_room->room_pass) {
@@ -91,9 +91,11 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+    
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
 
         $isHideCountry = $this->getPackWithType(13);
 
@@ -131,15 +133,16 @@ class MyDataResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         /**@var User $this
          * @var Room $ownerRoom*/
-       
+
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
             'name' => @$this->name ?: 'user' . ' ' . '#' . @$this->uuid,
             'phone' => (string)@$this->phone ?: '',
+            //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
             'intro' => $intro,
-            'intro_type' => @$this->dress3?->image_type ?? '',
+            'intro_type' => $introType,
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
@@ -148,7 +151,7 @@ class MyDataResource extends JsonResource
             'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
-          
+
             'room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
@@ -172,9 +175,9 @@ class MyDataResource extends JsonResource
             'number_of_followings' => $this->following()->count(),
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
-           
+
             'profile' => new ProfileResource(@$this->profile),
-            
+
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
@@ -200,8 +203,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
-            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",

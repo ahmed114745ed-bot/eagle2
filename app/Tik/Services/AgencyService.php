@@ -759,7 +759,13 @@ class AgencyService
         return $this->agencyRepository->getActiveAgency($id, $perPage, $page);
     }
 
-    public function agencyById($id){
+    public function allActiveAgencies($id)
+    {
+        return $this->agencyRepository->getAllActiveAgency($id);
+    }
+
+    public function agencyById($id)
+    {
         return $this->agencyRepository->agencyById($id);
     }
 
@@ -782,9 +788,9 @@ class AgencyService
         return true;
     }
 
-    public function AllAgencyExceptOld($oldAgencyId,$search, $perPage, $page)
+    public function AllAgencyExceptOld($oldAgencyId, $search, $perPage, $page)
     {
-        return $this->agencyRepository->agencies($oldAgencyId,$search, $perPage, $page);
+        return $this->agencyRepository->agencies($oldAgencyId, $search, $perPage, $page);
     }
 
     public function createAgencyUtd($request)
@@ -792,10 +798,20 @@ class AgencyService
         if ($request->hasFile('img')) {
 
             $image = Common::upload('agency', $request->file('img'));
-            $request->merge(['img' => $image]);
         }
+        $data = [
+            'app_owner_id' => $request->app_owner_id,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'notice' => $request->notice,
+            'url' => $request->url,
+            'img' => $image ?? '',
+            'contents' => $request->contents,
+            'Host_agency' => $request->Host_agency,
+            'Shipping_agency' => $request->Shipping_agency,
+        ];
 
-        $agency =  $this->agencyRepository->create($request->all());
+        $agency =  $this->agencyRepository->create($data);
         Common::createUserAdmin($request->app_owner_id);
 
         if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
@@ -817,11 +833,7 @@ class AgencyService
 
     public function updateAgencyUtd($id, $request)
     {
-        if ($request->hasFile('img')) {
 
-            $image = Common::upload('agency', $request->file('img'));
-            $request->merge(['img' => $image]);
-        }
         $agency = $this->agencyRepository->findOrFail($id);
 
         if ($agency->app_owner_id != $request->app_owner_id) {
@@ -830,6 +842,9 @@ class AgencyService
                 'type_user' => 0,
             ];
             $this->userRepository->update($data, $agency->app_owner_id);
+            $user = User::find($agency->app_owner_id);
+            Admin::where('username', $user->uuid)->delete();
+            Common::createUserAdmin($request->app_owner_id);
         }
 
         if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
@@ -846,7 +861,21 @@ class AgencyService
             'type_user' => $userType,
         ];
         $this->userRepository->update($data, $request->app_owner_id);
-        $this->agencyRepository->update($request, $id);
+        $dataAgency = [
+            'app_owner_id' => $request->app_owner_id,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'notice' => $request->notice,
+            'url' => $request->url,
+            'contents' => $request->contents,
+            'Host_agency' => $request->Host_agency,
+            'Shipping_agency' => $request->Shipping_agency,
+        ];
+        if ($request->hasFile('img')) {
+
+            $dataAgency['img'] = Common::upload('agency', $request->file('img'));
+        }
+        $this->agencyRepository->update($dataAgency, $id);
         return true;
     }
 

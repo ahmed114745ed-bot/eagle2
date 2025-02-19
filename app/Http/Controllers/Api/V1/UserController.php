@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use DB;
 use Auth;
 use Exception;
+use App\Models\Pack;
 use App\Models\User;
+use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Target;
@@ -21,11 +23,16 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CpUserResource;
 use App\Http\Resources\MyDataUtdResource;
+use App\Http\Resources\UserIntroResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackUtdResource;
 use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\OnlineResource;
 use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
@@ -33,6 +40,7 @@ use App\Http\Resources\Api\V1\AllUsersResource;
 use App\Http\Resources\Api\V1\ShowUserResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
@@ -61,7 +69,67 @@ class UserController extends Controller
         UserTypeResource::initializeData($senderLevels, $receivedImage, null);
         return Common::apiResponse(1, '', $usersType);
     }
+    public function userRoom()
+    {
 
+        $user = User::with('room')->where('id', Auth::id())->first();
+
+        return Common::apiResponse(true, 'Success', $user);
+    }
+    public function checkPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required'
+        ]);
+        $exists = User::where('phone', $request->phone)->first();
+
+        if ($exists) {
+            return Common::apiResponse(true, 'Success', true);
+        }
+        return Common::apiResponse(true, 'Success', false);
+    }
+
+    public static function checkPack($userId, $type, $dress = null)
+    {
+        $pack = Pack::query()->with('ware')
+            ->where('user_id', $userId)
+            ->where('type', $type)
+            ->where(function ($q) {
+                $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+            });
+        if ($dress != null) $pack->where('target_id', $dress);
+        return $pack;
+    }
+    public function image_intro($id)
+    {
+
+        $user = User::find($id);
+
+        $dr = '';
+        $pack = self::checkPack($user->id, 6, $user->dress_3);
+        $pack->where('is_used', 1);
+        $pack = $pack->exists();
+        if ($pack) {
+            $ware = Ware::query()
+                ->where('id', $user->dress_3)
+                ->where('type', 6)
+                ->get();
+
+            if (!$ware->isEmpty()) {
+                $dr = $ware->map(function ($w) {
+                    return [
+                        'image' => $w->show_img,
+                        'id' => $w->id,
+                    ];
+                });
+            }
+        }
+
+        if ($dr == '') {
+            return Common::apiResponse(true, 'Success', []);
+        }
+        return Common::apiResponse(true, 'Success', $dr);
+    }
     public function showSetting(Request $request)
     {
         $user = $request->user();
@@ -130,7 +198,8 @@ class UserController extends Controller
     public function search(Request $request)
     {
         $key = $request->search;
-        $users = $this->userService->searchUsers($key);
+        $family = $request->family;
+        $users = $this->userService->searchUsers($key, $family);
 
 
         $users = $users->through(function ($user) {
@@ -199,7 +268,7 @@ class UserController extends Controller
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }      
+        }
         $this->userService->unlockDressHand($user->id);
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->first()?->img;
 
@@ -890,6 +959,28 @@ class UserController extends Controller
         }
     }
 
+    public function userPacks($id, Request $request)
+    {
+        try {
+            $data = $this->userService->userPacks($request->type, $id, $request->per_page, $request->page);
+            return Common::apiResponse(true, 'done',  UserPackUtdResource::collection($data));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userVip($id)
+    {
+        try {
+            $data = $this->userService->userPacksAndVip($id);
+            return Common::apiResponse(true, 'done', UserVipUtdResource::collection($data->userHaveVip));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function userVisitRooms($id)
     {
         $data = $this->userService->VisitRoom($id);
@@ -899,6 +990,35 @@ class UserController extends Controller
     public function allCpUser($id)
     {
         $data = $this->userService->allUserCp($id);
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', CpUserResource::collection($data));
+    }
+
+    public static function by_user_filter()
+    {
+        $ops = [0 => 'no agency'];
+        $app_owner_id = Agency::query()->where('status', 1)->pluck('app_owner_id');
+        $users = User::whereIn('id', $app_owner_id)->get();
+        foreach ($users as $user) {
+            $ops[$user->id] = $user->name;
+        }
+        return $ops;
+    }
+
+    public function updateGame(Request $request)
+    {
+        $this->userService->updateGame($request->user()->id);
+        return Common::apiResponse(true, 'done', [], 200);
+    }
+
+    public function allUsersPlayGame()
+    {
+        $data = $this->userService->allUsersPlayGame();
+        return Common::apiResponse(true, 'done', UserResourceSerche::collection($data));
+    }
+
+    public function online()
+    {
+        $data = $this->userService->online();
+        return Common::apiResponse(true, 'done', OnlineResource::collection($data));
     }
 }

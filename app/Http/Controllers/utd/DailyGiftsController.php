@@ -4,6 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DailyGiftResource;
 use Illuminate\Http\Request;
 use Modules\DailyPrize\Entities\DailyGift;
 
@@ -12,19 +13,23 @@ class DailyGiftsController extends Controller
     public function index($type){
 
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         $results = DailyGift::where('type', $type)->when($search, function($q) use($search){
             $q->where('id', $search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
-        return Common::apiResponse(true, 'Success', $results);
+
+
+        return Common::apiResponse(true, 'Success', DailyGiftResource::collection($results));
     }
 
     public function show($type, $id){
 
         $result = DailyGift::where('type', $type)->findOrFail($id);
 
-        return Common::apiResponse(true, 'Success', $result);
+        return Common::apiResponse(true, 'Success', new DailyGiftResource($result) );
     }
 
     public function store($type, Request $request){
@@ -32,7 +37,10 @@ class DailyGiftsController extends Controller
         $request->validate([
             'order' => 'required|in:1,2,3,4,5,6,7',
             'gift_type' => 'required',
-            'target' => 'required',
+            'target1'    => 'nullable|exists:wares,id',
+            'target2'    => 'nullable|exists:o_vips,id',
+            'target3'    => 'nullable|integer',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
 
@@ -52,7 +60,10 @@ class DailyGiftsController extends Controller
         $request->validate([
             'order' => 'required|in:1,2,3,4,5,6,7',
             'gift_type' => 'required',
-            'target' => 'required',
+            'target1'    => 'nullable|exists:wares,id',
+            'target2'    => 'nullable|exists:o_vips,id',
+            'target3'    => 'nullable|integer',
+            'target4'    => 'nullable|file',
             'expir' => 'required|numeric'
         ]);
         $result = DailyGift::where('type', $type)->findOrFail($id);

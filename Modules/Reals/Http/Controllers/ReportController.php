@@ -43,7 +43,7 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $data =$request->all();
-        $data['Reporter_id'] = Auth::user()->uuid;
+        $data['Reporter_id'] = Auth::user()->id;
 
         $is_set_report = EntitiesReportReals::where('real_id',$data['real_id'])->where('Reported_id',$data['Reported_id'])->where('Reporter_id',$data['Reporter_id'])->first();
         if($is_set_report){
@@ -61,7 +61,7 @@ class ReportController extends Controller
             return Common::apiResponse(0, 'user not found', [], 402);
 
         }
-        $data['Reported_id'] = $user->uuid;
+        $data['Reported_id'] = $user->id;
 
         EntitiesReportReals::create($data);
         if (!$data) {

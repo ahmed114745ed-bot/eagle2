@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LuckyGiftReportResource extends JsonResource
@@ -34,7 +35,7 @@ class LuckyGiftReportResource extends JsonResource
             'name' => $this->gift?->name,
             'img' => $this->gift?->img,
             'value' => $value,
-            'created_at' => $this->created_at->toDateTimeString(),
+            'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
         ];
     }
 }

@@ -23,7 +23,7 @@ class PkResource extends JsonResource
             't2_score' => $this->t2_score,
             'winner' => $this->winner,
             'start_at' => $this->start_at,
-            'end_at'   => $this->ens_at,
+            'end_at'   => $this->end_at,
             'team_1' => $team1,
             'team_2' => $team2,
         ];

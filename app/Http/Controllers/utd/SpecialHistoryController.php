@@ -12,10 +12,12 @@ class SpecialHistoryController extends Controller
 {
     public function index(){
         $search = request('search');
+        $perPage = request('per_page') ?? 10;
+
         $result = SpecialHistory::when($search, function($q)use($search){
             $q->where('id', $search);
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
         $result->getCollection()->transform(function ($item) {
             $item->created_at_diff = Carbon::parse($item->created_at)->diffForHumans();
@@ -32,7 +34,7 @@ class SpecialHistoryController extends Controller
         ]);
 
         $ids = explode(',', $request->ids);
-        
+
         SpecialHistory::whereIn('id', $ids)->delete();
 
         return Common::apiResponse(true,'Success');

@@ -5,6 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Helpers\Common;
 use App\Http\Resources\CountryResource;
 use App\Models\Follow;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -42,7 +43,6 @@ class UserRelationsResource extends JsonResource
 
         }
 
-
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
             $imageReceiver = $this->getImageReceiverOrSender('receiver_id', 1);
             $imageSender   = $this->getImageReceiverOrSender('sender_id', 2);
@@ -51,10 +51,14 @@ class UserRelationsResource extends JsonResource
             $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', $this->total_sender_level)->first() : null;
         }
         $frameAbility = $this->followPacks->where('type', 4)->first();
+        $user = User::where('id', $this->id)->first();
         $data         = [
             'id'             => @$this->id,
             'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
+            'followers' => @$user->follower,
+            'following' => @$user->following,
+            'friends' => @$user->friend,
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
@@ -89,7 +93,7 @@ class UserRelationsResource extends JsonResource
             'is_follow'      => $isFollow,
             "is_gold_id" => (bool)$this->is_gold_id,
             'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType),
+            "manger_type"          =>new MangerTypeResource(@$this->manager),
             "multi_images"          => $this->images?->select("img"),
             "statistic"     => [
                 "visitors" => count($this->profileVisits),

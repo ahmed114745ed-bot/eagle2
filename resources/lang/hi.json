@@ -557,7 +557,7 @@
     "user_charge": "उपयोगकर्ता शुल्क",
     "user_count": "उपयोगकर्ता की संख्या",
     "percentage-target": "लक्षित प्रतिशत",
-    "charges-reports": "शुल्क रिपोर्टें",
+    "charges reports": "शुल्क रिपोर्टें",
     "dash_repo": "डैशबोर्ड शुल्क",
     "app_repo": "ऐप शुल्क",
     "coins_repo": "कॉइन द्वार",
@@ -661,7 +661,7 @@
     "name_en": "नाम (अंग्रेज़ी)",
     "custom_id": "कस्टम आईडी",
     "validate": "मान्य",
-    "request-agencies": "एजेंसी अनुरोध",
+    "Request agencies": "एजेंसी अनुरोध",
     "active vip": "वीआईपी सक्रिय",
     "whats app": "व्हाट्सएप",
     "back nationalId": "नेशनल आईडी का पीछा",
@@ -698,7 +698,133 @@
     "totalDiamond": "मासिक कुल हीरे",
     "Main": "मुख्य",
     "commission": "कमीशन से काटी गई राशि",
-    "date":"तारीख"
+    "date":"तारीख",
+    "Agency Join Requests": "एजेंसी जॉइन अनुरोध",
+    "Background Report": "पृष्ठभूमि रिपोर्ट",
+    "Gift Products": "उपहार उत्पाद",
+    "Gift VIP": "वीआईपी उपहार",
+    "Gift Badges": "बैज उपहार",
+    "Deleted Accounts": "हटाए गए खाते",
+    "Wallet": "बटुआ",
+    "Advertisements": "विज्ञापन",
+    "Banner": "बैनर",
+    "Splash": "स्प्लैश",
+    "Advertising Space": "विज्ञापन स्थान",
+    "Products": "उत्पाद",
+    "Levels": "स्तर",
+    "Level Gifts": "स्तर उपहार",
+    "All Boxes": "सभी बॉक्स",
+    "Room Settings": "कक्ष सेटिंग्स",
+    "Achievement Reports": "उपलब्धि रिपोर्ट",
+    "Reels Reports": "रील्स रिपोर्ट",
+    "Group Chat": "समूह चैट",
+    "Settings": "सेटिंग्स",
+    "Agency System": "एजेंसी प्रणाली",
+    "Internal Sales System": "आंतरिक बिक्री प्रणाली",
+    "Countries Where Salary Payments Are Available": "जहाँ वेतन भुगतान उपलब्ध है",
+    "Host Agencies": "होस्ट एजेंसियाँ",
+    "Hosts Target": "होस्ट लक्ष्य",
+    "Users Wallet": "उपयोगकर्ता बटुआ",
+    "Hosts Reports": "होस्ट रिपोर्ट",
+    "Salary Distribution Ratio": "वेतन वितरण अनुपात",
+    "Achieved Target": "प्राप्त लक्ष्य",
+    "Agency Settings": "एजेंसी सेटिंग्स",
+    "Charging Agencies": "चार्जिंग एजेंसियाँ",
+    "Verified Charging Agents": "सत्यापित चार्जिंग एजेंट",
+    "Payment Methods for Charging Agents": "चार्जिंग एजेंट के लिए भुगतान विधियाँ",
+    "Agency Manager": "एजेंसी प्रबंधक",
+    "VIP Privileges": "वीआईपी विशेषाधिकार",
+    "Managers": "प्रबंधक",
+    "Charging Events": "चार्जिंग इवेंट्स",
+    "Employees and Permissions": "कर्मचारी और अनुमतियाँ",
+    "Employees": "कर्मचारी",
+    "Weekly Star Events": "साप्ताहिक स्टार इवेंट्स",
+    "Work Settings": "कार्य सेटिंग्स",
+    "Delete Account": "खाता हटाएँ",
+    "Work Pages": "कार्य पृष्ठ",
+    "Coins": "सिक्के",
+    "Sensitive Settings": "संवेदनशील सेटिंग्स",
+    "System Settings": "सिस्टम सेटिंग्स",
+    "Login Reward": "लॉगिन इनाम",
+    "Gift Special ID":"उपहार विशेष आईडी",
+    "Fast orders":"तेज़ आदेश",
+    "Complaints":"शिकायतें",
+    "charge system":"चार्ज सिस्टम",
+    "Application wallet":"एप्लिकेशन वॉलेट",
+    "Edit Level": "स्तर संपादित करें",
+    "Distinguished identifier": "विशिष्ट पहचानकर्ता",
+    "room vips" : "कमरे के वीआईपी स्तर",
+    "transaction request problem": "लेनदेन अनुरोध समस्या",
+    "Reports": "रिपोर्ट्स",
+    "Featured ids": "विशेष आईडी",
+    "Requests": "अनुरोध",
+    "Details of unique identifiers": "अद्वितीय पहचानकर्ताओं का विवरण",
+    "ID color": "आईडी रंग",
+    "Sales": "बिक्री",
+    "Dumped boxes": "फेंके गए डिब्बे",
+    "Room": "कमरे",
+    "Updates": "अद्यतन",
+    "FAQ": "सामान्य प्रश्न",
+    "Events reports": "घटनाओं की रिपोर्ट",
+    "General rules": "सामान्य नियम",
+    "Exchange currencies": "मुद्राओं का विनिमय",
+    "pk event": "पीके इवेंट",
+    "cp gifts": "सीपी उपहार",
+    "cp vip": "सीपी स्तर",
+    "VIPs": "वीआईपी",
+    "Vip": "वीआईपी",
+    "Agency join requests": "एजेंसी शामिल होने के अनुरोध",
+    "Charge agents": "चार्ज एजेंट्स",
+    "Hosts": "होस्ट्स",
+    "CP":"सीपी",
+    "reels": "रील्स",
+    "Room categories": "कमरे की श्रेणियाँ",
+    "Official messages": "आधिकारिक संदेश",
+    "Moment reports": "क्षण रिपोर्ट",
+    "group Chat": "समूह चैट",
+    "salary requests": "वेतन अनुरोध",
+    "Invitation code": "निमंत्रण कोड",
+    "report": "रिपोर्टें",
+    "View Reel": "रील देखें",
+    "Report Reel": "रिपोर्ट रील"
+
+
+
+
+
+
+
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     
@@ -710,4 +836,3 @@
 
 
     
-}

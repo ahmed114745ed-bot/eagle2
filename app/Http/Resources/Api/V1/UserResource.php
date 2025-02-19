@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\ChatSettingResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Models\Follow;
+use App\Models\User;
 
 class UserResource extends JsonResource
 {
@@ -72,6 +73,7 @@ class UserResource extends JsonResource
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
         $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?? $this->getUserDress(6, $this->dress_3, 'img1');
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
         //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
@@ -85,7 +87,6 @@ class UserResource extends JsonResource
                 'chat_with_all'         =>  0,
             ]);
         }
-
         $show_user_setting = \App\Models\UserSetting::where("user_id", $this->id)->first();
         if ($show_user_setting == null) {
             $show_user_setting = \App\Models\UserSetting::create([
@@ -128,6 +129,7 @@ class UserResource extends JsonResource
             // both    --------------
             'frame'                => $frame, // both
             'intro'                => $intro, // both
+            'intro_type' => $introType,
             'bubble'               => $bubble, // both
             'bubble_id'            => $bubble != '' ? $this->dress_2 : 0, // both
             'frame_id'             => $frame != '' ? @$this->dress_1 : 0, // both
@@ -157,7 +159,7 @@ class UserResource extends JsonResource
             ], // my
             "change_room_effect"   => new ShowUserSettingResource(@$show_user_setting),
             "chat_setting" => new ChatSettingResource($chat_setting),
-            "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            "manger_type"          => new MangerTypeResource(@$this->manager),
             "top_three_support"    => $userHandling->getTopThreeSupport($this->id),
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),

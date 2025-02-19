@@ -24,7 +24,7 @@ class AdminCheckResource extends JsonResource
                 'status' => $this->request->status,
                 'usd' => $this->request->usd,
                 'coins' => $this->request->coins,
-                'host_check' => $this->request->host_check == 1 ? 'Accept' : ($this->request->host_check == 2 ? 'Reject' : 'Pending'),
+                'host_check' => $this->request->host_check == 1 ? __('Accept') : ($this->request->host_check == 2 ? __('Reject') : __('Pending')),
                 'bill_image' => $this->request->bill_image ?? '',
             ],
             'Shipping_agent_id' => $this->request?->agency?->owner?->uuid ?? 0,

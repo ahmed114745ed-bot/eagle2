@@ -4,8 +4,10 @@
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\utd\BanController;
+use App\Http\Controllers\utd\RoomController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\utd\ColorController;
+use App\Http\Controllers\utd\LevelController;
 use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\addTOjesonController;
@@ -20,7 +22,6 @@ use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\RoleController;
-use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\utd\ChargesController;
@@ -32,11 +33,13 @@ use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\InterestController;
 use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\RoomVipsController;
+use App\Http\Controllers\utd\WithdrawController;
 use App\Admin\Controllers\AllStatisticController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\utd\BlackListController;
 use App\Http\Controllers\utd\GroupChatController;
+use App\Http\Controllers\utd\LevelGiftController;
 use App\Http\Controllers\utd\RoleEventController;
 use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\Api\V1\AllGameController;
@@ -44,6 +47,7 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\UtdUserController;
 use App\Http\Controllers\utd\AdminCheckController;
 use App\Http\Controllers\utd\BackgroundController;
+use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ReportUserController;
@@ -56,6 +60,7 @@ use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\SpecialWareController;
 use App\Http\Controllers\utd\TargetEventController;
 use App\Http\Controllers\utd\WeeklyEventController;
+use App\Http\Controllers\utd\ChargeAgencyController;
 use App\Http\Controllers\utd\ChargeReportController;
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\HomeCarouselController;
@@ -65,24 +70,35 @@ use App\Http\Controllers\Api\V1\AdminUsersController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\PermissionController;
+use App\Http\Controllers\utd\ChargeCountryController;
+use App\Http\Controllers\utd\SalaryRequestController;
 use App\Http\Controllers\utd\SpecialIdFramController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
 use App\Http\Controllers\utd\LevelIntervalsController;
+use App\Http\Controllers\utd\PaymentGateWayController;
 use App\Http\Controllers\utd\SpecialHistoryController;
 use App\Http\Controllers\utd\OfficialMessageController;
 use App\Http\Controllers\utd\RequestAgenciesController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\utd\PercentageTargetController;
 use App\Http\Controllers\utd\SallariesHistoryController;
+use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\Api\V1\AgencyStatisticController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RequestBackgroundImageController;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use App\Http\Controllers\utd\BoxController;
+use App\Http\Controllers\utd\BoxUserController;
+use App\Http\Controllers\utd\EmojiController;
+use App\Http\Controllers\utd\EventPeriodController;
+use App\Http\Controllers\utd\ImageController;
+use App\Http\Controllers\utd\SpecialIdRequestController;
+use App\Http\Controllers\Api\V1\RoomController as RoomControllerVi;
 
 // 'utd.decreptHeader'
 // utd apis
@@ -96,11 +112,15 @@ Route::middleware([])->group(function () {
 
     Route::prefix('families')->group(function () {
         Route::get('/', [FamilyController::class, 'index']);
+        Route::get('/all', [FamilyController::class, 'all']);
         Route::post('/', [FamilyController::class, 'store']);
         Route::post('/update/{id}', [FamilyController::class, 'update']);
         Route::post('/delete/{id}', [FamilyController::class, 'destroy']);
+        Route::post('/delete-all', [FamilyController::class, 'delete_all']);
         Route::get('/{id}', [FamilyController::class, 'show']);
     });
+
+
 
     Route::prefix('level-intervals')->group(function () {
         Route::get('/', [LevelIntervalsController::class, 'index']);
@@ -198,11 +218,122 @@ Route::middleware([])->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [RoomCategoryController::class, 'index']);
         Route::post('/create', [RoomCategoryController::class, 'store']);
+        Route::get('/parent', [RoomCategoryController::class, 'parent']);
         Route::post('/update/{id}', [RoomCategoryController::class, 'update']);
         Route::post('/update-status/{id}', [RoomCategoryController::class, 'update_status']);
         Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
         Route::post('/delete-all', [RoomCategoryController::class, 'delete_all']);
         Route::get('/{id}', [RoomCategoryController::class, 'show']);
+    });
+
+
+
+    Route::prefix('event-period')->group(function () {
+        Route::get('/', [EventPeriodController::class, 'index']);
+        Route::post('/create', [EventPeriodController::class, 'store']);
+        Route::post('/update/{id}', [EventPeriodController::class, 'update']);
+        Route::post('/delete/{id}', [EventPeriodController::class, 'delete']);
+        Route::post('/delete-all', [EventPeriodController::class, 'delete_all']);
+        Route::get('/{id}', [EventPeriodController::class, 'show']);
+    });
+
+
+    Route::prefix('images')->group(function () {
+        Route::get('/', [ImageController::class, 'index']);
+        Route::post('/create', [ImageController::class, 'store']);
+        Route::post('/update/{id}', [ImageController::class, 'update']);
+        Route::post('/update-status/{id}', [ImageController::class, 'update_status']);
+        Route::post('/delete/{id}', [ImageController::class, 'delete']);
+        Route::post('/delete-all', [ImageController::class, 'delete_all']);
+        Route::get('/{id}', [ImageController::class, 'show']);
+    });
+
+
+    Route::prefix('emojis')->group(function () {
+        Route::get('/', [EmojiController::class, 'index']);
+        Route::post('/create', [EmojiController::class, 'store']);
+        Route::get('/pid', [EmojiController::class, 'emojiPid']);
+        Route::post('/update/{id}', [EmojiController::class, 'update']);
+        Route::post('/update-status/{id}', [EmojiController::class, 'update_status']);
+        Route::post('/delete/{id}', [EmojiController::class, 'delete']);
+        Route::post('/delete-all', [EmojiController::class, 'delete_all']);
+        Route::get('/{id}', [EmojiController::class, 'show']);
+    });
+
+
+    Route::prefix('boxes')->group(function () {
+        Route::get('/', [BoxController::class, 'index']);
+        Route::post('/create', [BoxController::class, 'store']);
+        Route::post('/update/{id}', [BoxController::class, 'update']);
+        Route::post('/delete/{id}', [BoxController::class, 'delete']);
+        Route::post('/delete-all', [BoxController::class, 'delete_all']);
+        Route::get('/{id}', [BoxController::class, 'show']);
+    });
+
+
+    Route::prefix('thrown-boxes')->group(function () {
+        Route::get('/', [BoxUserController::class, 'index']);
+        Route::post('/update/{id}', [BoxUserController::class, 'update']);
+        Route::post('/delete/{id}', [BoxUserController::class, 'delete']);
+        Route::post('/delete-all', [BoxUserController::class, 'delete_all']);
+        Route::get('/{id}', [BoxUserController::class, 'show']);
+    });
+
+
+    Route::prefix('payment-gateways')->group(function () {
+        Route::get('/', [PaymentGateWayController::class, 'index']);
+        Route::post('/create', [PaymentGateWayController::class, 'store']);
+        Route::post('/update/{id}', [PaymentGateWayController::class, 'update']);
+        Route::post('/delete/{id}', [PaymentGateWayController::class, 'delete']);
+        Route::post('/delete-all', [PaymentGateWayController::class, 'delete_all']);
+        Route::get('/{id}', [PaymentGateWayController::class, 'show']);
+    });
+
+
+    Route::prefix('withdraw-types')->group(function () {
+        Route::get('/', [WithdrawController::class, 'index']);
+        Route::post('/create', [WithdrawController::class, 'store']);
+        Route::post('/update/{id}', [WithdrawController::class, 'update']);
+        Route::post('/delete/{id}', [WithdrawController::class, 'delete']);
+        Route::post('/delete-all', [WithdrawController::class, 'delete_all']);
+        Route::get('/{id}', [WithdrawController::class, 'show']);
+    });
+
+    Route::prefix('agency-country')->group(function () {
+        Route::get('/', [ChargeAgencyController::class, 'index']);
+        Route::post('/create', [ChargeAgencyController::class, 'store']);
+        Route::post('/update/{id}', [ChargeAgencyController::class, 'update']);
+        Route::post('/delete/{id}', [ChargeAgencyController::class, 'delete']);
+        Route::post('/delete-all', [ChargeAgencyController::class, 'delete_all']);
+        Route::get('/{id}', [ChargeAgencyController::class, 'show']);
+    });
+
+    Route::prefix('cp-relations')->group(function () {
+        Route::get('/', [CpRelationController::class, 'index']);
+        Route::post('/create', [CpRelationController::class, 'store']);
+        Route::post('/update/{id}', [CpRelationController::class, 'update']);
+        Route::post('/delete/{id}', [CpRelationController::class, 'delete']);
+        Route::post('/delete-all', [CpRelationController::class, 'delete_all']);
+        Route::get('/{id}', [CpRelationController::class, 'show']);
+    });
+    Route::get('cp-types', [CpRelationController::class, 'types']);
+
+    Route::prefix('cp-levels/{relation_id}')->group(function () {
+        Route::get('/', [LevelController::class, 'index']);
+        Route::post('/create', [LevelController::class, 'store']);
+        Route::post('/update/{id}', [LevelController::class, 'update']);
+        Route::post('/delete/{id}', [LevelController::class, 'delete']);
+        Route::post('/delete-all', [LevelController::class, 'delete_all']);
+        Route::get('/{id}', [LevelController::class, 'show']);
+    });
+
+    Route::prefix('cp-level-gifts/{cp_level_id}')->group(function () {
+        Route::get('/', [LevelGiftController::class, 'index']);
+        Route::post('/create', [LevelGiftController::class, 'store']);
+        Route::get('/show/{id}', [LevelGiftController::class, 'show']);
+        Route::post('/update/{id}', [LevelGiftController::class, 'update']);
+        Route::post('/delete/{id}', [LevelGiftController::class, 'delete']);
+        Route::post('/delete-all', [LevelGiftController::class, 'delete_all']);
     });
 
     Route::prefix('request-agencies')->group(function () {
@@ -216,6 +347,15 @@ Route::middleware([])->group(function () {
         Route::post('/create', [SpecialIdFramController::class, 'store']);
         Route::post('/update/{id}', [SpecialIdFramController::class, 'update']);
         Route::post('/delete/{id}', [SpecialIdFramController::class, 'delete']);
+    });
+
+
+    Route::prefix('special-id-requests')->group(function () {
+        Route::get('/', [SpecialIdRequestController::class, 'index']);
+        Route::get('/{id}', [SpecialIdRequestController::class, 'show']);
+        Route::post('/update/{id}', [SpecialIdRequestController::class, 'update']);
+        Route::post('/delete/{id}', [SpecialIdRequestController::class, 'delete']);
+        Route::post('/delete-all', [SpecialIdRequestController::class, 'delete_all']);
     });
 
     Route::prefix('special-wares')->group(function () {
@@ -265,6 +405,9 @@ Route::middleware([])->group(function () {
 
     Route::prefix('home-carousels')->group(function () {
         Route::get('/', [HomeCarouselController::class, 'index']);
+        Route::get('/type', [HomeCarouselController::class, 'type']);
+        Route::get('/event-type', [HomeCarouselController::class, 'eventType']);
+        Route::get('/form', [HomeCarouselController::class, 'form']);
         Route::post('/create', [HomeCarouselController::class, 'store']);
         Route::post('/delete-all', [HomeCarouselController::class, 'delete_all']);
         Route::post('update/{id}', [HomeCarouselController::class, 'update']);
@@ -317,6 +460,7 @@ Route::middleware([])->group(function () {
         Route::post('/delete', [BanController::class, 'delete']);
         Route::post('/ban-user', [BanController::class, 'banUser']);
         Route::post('/remove-ban', [BanController::class, 'removeBan']);
+        Route::get('/ban-types', [BanController::class, 'banTypes']);
     });
 
     Route::prefix('sallaries_history')->group(function () {
@@ -487,6 +631,16 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
     });
 
+    Route::prefix('salary-requests')->group(function () {
+        Route::get('/', [SalaryRequestController::class, 'all']);
+        Route::post('/create', [SalaryRequestController::class, 'create']);
+    });
+
+    Route::prefix('filter')->group(function () {
+        Route::get('/agency', [AgencyController::class, 'by_agency_filter']);
+        Route::post('/agency-owner', [UserController::class, 'by_user_filter']);
+    });
+
     Route::prefix('device-token')->group(function () {
         Route::get('/', [UserController::class, 'usersDeviceToken']);
         Route::delete('/delete/{id}', [UserController::class, 'deleteDeviceToken']);
@@ -521,13 +675,25 @@ Route::middleware([])->group(function () {
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('vip/{id}', [UserController::class, 'userVip']);
+        Route::get('pack/{id}', [UserController::class, 'userPacks']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
-        Route::get('room/{id}', [RoomController::class, 'roomUserDetails']);
+        Route::get('room/{id}', [RoomControllerVi::class, 'roomUserDetails']);
+        Route::get('room/gifts/{id}', [RoomControllerVi::class, 'roomGifts']);
         Route::get('room-pk/{id}', [PkController::class, 'roomPk']);
     });
 
-
+    Route::prefix('rooms')->group(function () {
+        Route::get('/', [RoomController::class, 'all']);
+        Route::post('/create', [RoomController::class, 'store']);
+        Route::get('/class', [RoomController::class, 'roomClass']);
+        Route::get('/type/{classId}', [RoomController::class, 'roomType']);
+        Route::post('/update/{id}', [RoomController::class, 'update']);
+        Route::get('/show/{id}', [RoomController::class, 'show']);
+        Route::post('/update-switches', [RoomController::class, 'updateSwitches']);
+        Route::delete('delete/{id}', [RoomController::class, 'destroy']);
+    });
 
 
     Route::prefix('reels')->group(function () {
@@ -628,13 +794,14 @@ Route::middleware([])->group(function () {
         Route::post('delete-moment/{moment_id}/{id}', [ReportMomentController::class, 'destroyDash']);
     });
 
-    Route::prefix('request-agency')->group(function () {
-        Route::get('/', [AgencyController::class, 'index']);
-        Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
-    });
+    // Route::prefix('request-agency')->group(function () {
+    //     Route::get('/', [AgencyController::class, 'index']);
+    //     Route::post('/action', [AgencyController::class, 'actionRequestAgency']);
+    // });
 
     Route::prefix('agencies')->group(function () {
         Route::get('/', [AgencyController::class, 'activeAgencies']);
+        Route::get('/all', [AgencyController::class, 'allAgencies']);
         Route::get('/members', [AgencyController::class, 'activeAgenciesMembers']);
         Route::post('/create', [AgencyController::class, 'create']);
         Route::post('/update/{id}', [AgencyController::class, 'update']);
@@ -649,10 +816,18 @@ Route::middleware([])->group(function () {
         Route::get('/show/{id}', [AgencyController::class, 'showAgencyJoinRequest']);
     });
 
+    Route::prefix('requests-for-get-salary')->group(function () {
+        Route::get('/', [RequestTakeSalaryController::class, 'all']);
+        Route::post('/update/{id}', [RequestTakeSalaryController::class, 'update']);
+        Route::get('/show/{id}', [RequestTakeSalaryController::class, 'show']);
+        Route::get('/history', [RequestTakeSalaryController::class, 'history']);
+    });
+
     Route::get('/reports', [ReportController::class, 'reports']);
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
+        Route::get('/charge', [ChargeCountryController::class, 'country']);
         Route::post('/create', [CountryController::class, 'store']);
         Route::post('/update/{id}', [CountryController::class, 'update']);
         Route::post('/update-status/{id}', [CountryController::class, 'update_status']);
@@ -678,6 +853,14 @@ Route::middleware([])->group(function () {
         Route::post('/create', [TargetEventController::class, 'store']);
         Route::delete('/delete/{id}', [TargetEventController::class, 'destroy']);
         Route::post('/update/{id}', [TargetEventController::class, 'update']);
+    });
+
+    Route::prefix('charge-country')->group(function () {
+        Route::get('/', [ChargeCountryController::class, 'all']);
+        Route::get('/show/{id}', [ChargeCountryController::class, 'show']);
+        Route::post('/create', [ChargeCountryController::class, 'store']);
+        Route::delete('/delete/{id}', [ChargeCountryController::class, 'destroy']);
+        Route::post('/update/{id}', [ChargeCountryController::class, 'update']);
     });
 
     Route::prefix('target-events-gift')->group(function () {
@@ -726,6 +909,8 @@ Route::middleware([])->group(function () {
         Route::get('/', [ReportController::class, 'eventReports']);
         Route::post('/return-reward', [ReportController::class, 'returnReward']);
     });
+
+
 
     Route::prefix('general-roles')->group(function () {
         Route::get('/', [RoleEventController::class, 'all']);

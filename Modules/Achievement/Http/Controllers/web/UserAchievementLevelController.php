@@ -29,7 +29,7 @@ class UserAchievementLevelController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('user-achievement-levels'))
+            ->title(trans('Achievement Reports'))
             ->body($this->grid()));
     }
 
@@ -57,7 +57,7 @@ class UserAchievementLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserAchievementLevel());
-        
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1/2, function ($filter) {
@@ -65,6 +65,7 @@ class UserAchievementLevelController extends MainController
 
             });
         });
+        $grid->disableCreateButton();
         $grid->column('id', __('Id'));
         // $grid->column('achievement_level_id', __('Achievement level id'));
         // $grid->column('user_id', __('User id'));
@@ -98,7 +99,7 @@ class UserAchievementLevelController extends MainController
         ];
         $grid->column('is_enable')->switch($states);
 
-        
+
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();

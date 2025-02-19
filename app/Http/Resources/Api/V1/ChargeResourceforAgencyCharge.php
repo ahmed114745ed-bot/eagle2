@@ -39,7 +39,7 @@ class ChargeResourceforAgencyCharge extends JsonResource
             'sender' => $sender_data,
             'receiver' => $receiver_data,
             'value' => (int) $this->amount,
-            'time' => ($this->created_at ? $this->created_at->format('Y-m-d h:i:s A') : null),
+            'time' => ($this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d h:i:s A') : null),
             'coins' =>  (int)$this->amount ?? 0,
             'usd' => $this->usd ?? 0,
         ];

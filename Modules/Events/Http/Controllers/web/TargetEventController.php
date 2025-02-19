@@ -28,7 +28,7 @@ class TargetEventController extends MainOldController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('target-events'))
+            ->title(trans('Charging Events'))
             ->body($this->grid());
     }
 
@@ -42,7 +42,7 @@ class TargetEventController extends MainOldController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('target-events'))
+            ->title(trans('Charging Events'))
             ->body($this->detail($id));
     }
 
@@ -56,14 +56,14 @@ class TargetEventController extends MainOldController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('target-events'))
+            ->title(trans('Charging Events'))
             ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->title(trans('target-events'))
+            ->title(trans('Charging Events'))
             ->body($this->form());
     }
     protected function grid()

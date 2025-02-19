@@ -65,12 +65,10 @@ class AllStatisticController extends MainController
             $user = Auth::user();
             $usePercentage = ($balance->balance  ?? 0 > 0) ? (($balance->used ?? 0 / $balance->balance) * 100) : 0;
             return $content
-                ->title(trans('statistics'))
-                ->description(__(request('desc') ?: 'الرئيسيه'))
-
-                ->row(function (\Encore\Admin\Layout\Row $row) use ($user,$data, $balanceDollar,$allBalance,$usePercentage ) {
+                ->title(trans('Dashboard'))
+                ->row(function (\Encore\Admin\Layout\Row $row) use ($user, $data, $balanceDollar, $allBalance, $usePercentage) {
                     if ($user->isRole('admin') || $user->isRole('developer')) {
-                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance','usePercentage')));
+                        $row->column(12, view('admin.dashboard.chart', compact("data", 'balanceDollar', 'allBalance', 'usePercentage')));
                     }
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
@@ -102,8 +100,7 @@ class AllStatisticController extends MainController
                 });
         } else {
             return parent::index($content
-                ->title(trans('statistics'))
-                ->description(__(request('desc') ?: __("Main"))));
+                ->title(trans('Dashboard')));
         }
     }
 
@@ -127,14 +124,14 @@ class AllStatisticController extends MainController
         $earned_charge = $first_earned_charge + $second_earned_charge;
         $app_earned_charge = $earned_charge - $lose;
         $data = [
-            'allUsersCount' =>number_format( $allUsersCount) ??0,
+            'allUsersCount' => number_format($allUsersCount) ?? 0,
             'onlineUsers' => number_format($onlineUsers) ?? 0,
             'coins' => number_format($coins) ?? 0,
-            'diamonds' => number_format($total_monthly_di_recieved )?? 0,
-            'user_salaries' =>number_format($user_sallaries) ?? 0,
+            'diamonds' => number_format($total_monthly_di_recieved) ?? 0,
+            'user_salaries' => number_format($user_sallaries) ?? 0,
             'agency_salaries' => number_format($agency_sallaries) ?? 0,
-            'total_salaries' =>number_format($total_sallary) ?? 0 ,
-            'app_earned' => number_format($app_earned_charge )?? 0,
+            'total_salaries' => number_format($total_sallary) ?? 0,
+            'app_earned' => number_format($app_earned_charge) ?? 0,
         ];
         return Common::apiResponse(1, '', $data);
     }

@@ -25,24 +25,26 @@ class ReportEventResource extends JsonResource
 
         $path = "";
         if ($this->reward->type == 'ware') {
-            $path  = $this->reward->ware->img2 ?? $this->reward->ware->show_img;
+            $path  = $this->reward->ware->img2 ?? ($this->reward->ware->show_img ?? '');
         } elseif ($this->reward->type == 'vip') {
-            $path = $this->reward->vip->img;
+            $path = $this->reward->vip->img ?? '';
         } elseif ($this->reward->type == 'achievement') {
-            $path = $this->reward->target;
+            $path = $this->reward->target ?? '';
         } else {
             $path = 'cion.png';
         }
         return [
             'id' => $this->id,
             'winner' => [
+                'id' => $this->winner->id ?? 0,
                 'name' => $this->winner->name ?? '',
                 'uuid' => $this->winner->uuid ?? 0,
                 'image' => @$this->winner->profile->avatar ?? '',
             ],
             'reward' => [
-                'level' => $this->reward->level,
-                'type' => $this->reward->type,
+                'id'    => $this->reward->id ?? 0,
+                'level' => $this->reward->level ?? 0,
+                'type' => $this->reward->type ?? '',
                 'gift' => $target,
                 'image' => $path,
             ],

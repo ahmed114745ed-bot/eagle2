@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Repositories\User\UserRepository;
 use Illuminate\Support\Facades\Storage;
 use Modules\Public\Http\Services\UserCounterServices as ServicesUserCounterServices;
+use Illuminate\Support\Facades\Log;
 
 class ProfileService
 {
@@ -43,13 +44,37 @@ class ProfileService
             $this->profileRepo->updateAvatar($profile, $imagePath);
         }
 
-        if ($request->hasFile('multi_image')) {
-            foreach ($user->images as $image) {
-                Storage::delete('profile/' . $image->img);
-                $image->delete();
-            }
+        // if ($request->hasFile('multi_image')) {
+        //     foreach ($user->images as $image) {
+        //         Storage::delete('profile/' . $image->img);
+        //         $image->delete();
+        //     }
 
-            foreach ($request->file('multi_image') as $file) {
+        //     foreach ($request->file('multi_image') as $file) {
+        //         $imagePath = Common::upload('profile', $file);
+
+        //         $user->images()->create([
+        //             'img' => $imagePath,
+        //         ]);
+        //     }
+        // }
+        Log::info([$request->new_multi_image]);
+        if ($request->has('old_multi_image')) {
+            $newImages =  explode(',', $request->old_multi_image);
+        
+            $existingImages = $user->images()->pluck('img')->toArray();
+        
+            $imagesToDelete = array_diff($existingImages, $newImages);
+        
+            foreach ($imagesToDelete as $image) {
+                Log::info([1]);
+                Storage::delete('profile/' . $image);
+                $user->images()->where('img', $image)->delete();
+            }
+        }
+        Log::info([$request->file('new_multi_image')]);
+        if ($request->hasFile('new_multi_image')) {
+            foreach ($request->file('new_multi_image') as $file) {
                 $imagePath = Common::upload('profile', $file);
 
                 $user->images()->create([
@@ -57,6 +82,8 @@ class ProfileService
                 ]);
             }
         }
+        
+
 
         $out = new V1UserResource($user);
         if ($profile->avatar === null) {

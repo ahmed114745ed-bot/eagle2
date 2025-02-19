@@ -2,22 +2,27 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Interest;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\Interest;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Lang;
+use App\Admin\Controllers\MainController;
 
-class InterestsController extends AdminController
+class InterestsController extends  MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-    protected $title ='الاهتمامات';
-
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('interests'))
+            ->body($this->grid()));
+    }
 
 
     /**

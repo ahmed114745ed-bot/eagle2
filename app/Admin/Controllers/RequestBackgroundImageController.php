@@ -82,8 +82,8 @@ class RequestBackgroundImageController extends MainController
         $grid = new Grid(new RequestBackgroundImage);
         $grid->model()->orderByDesc('id');
         $grid->id(__('admin.ID'));
-        $grid->owner_room_id(__('admin.owner_room_id'));
-        $grid->img(__('admin.img'))->image('', 30);;
+        $grid->owner_room_id(__('owner room id'));
+        $grid->img(__('image'))->image('', 30);;
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),

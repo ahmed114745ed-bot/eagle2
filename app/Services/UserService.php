@@ -77,12 +77,12 @@ class UserService
         $this->blackListRepository = $blackListRepository;
     }
 
-    public function searchUsers($key)
+    public function searchUsers($key, $family)
     {
         $perPage = 10;
         $currentPage = request()->has('page') ? request()->page : 1;
 
-        return $this->userRepository->search($key, $perPage, $currentPage);
+        return $this->userRepository->search($key, $family, $perPage, $currentPage);
     }
 
     public function searchUsersWithPage($key, $page)
@@ -283,21 +283,66 @@ class UserService
 
     public function unFollowUser($request)
     {
-        $this->followRepository->deleteFollow($request->user()->id, $request->user_id);
+        $auth = $request->user();
+        $unFollower = $this->userRepository->findOrFail($request->user_id);
+        $checkFollowing = $this->followRepository->checkFollowing($auth->id, $unFollower->id);
+        $checkFollower = $this->followRepository->checkFollower($auth->id, $unFollower->id);
+        if ($checkFollowing && $checkFollower) { // friend
+            $unFollowStatus = [
+                'friend' => $unFollower->friend - 1,
+                'follower' => $unFollower->follower - 1,
+                'following' => $unFollower->following - 1,
+            ];
+            $userStatus = [
+                'friend' => $auth->friend - 1,
+                'following' => $auth->following - 1,
+                'follower' => $auth->follower - 1,
+            ];
+        } else {
+            $unFollowStatus = [
+                'follower' => $unFollower->follower - 1,
+            ];
+
+            $userStatus = [
+                'following' => $auth->following - 1,
+            ];
+        }
+        $this->userRepository->update($unFollowStatus, $unFollower->id);
+        $this->userRepository->update($userStatus, $auth->id);
+
+
+        $this->followRepository->deleteFollow($auth->id, $unFollower->id);
         return Common::apiResponse(true, 'unFollow done', null, 201);
     }
 
     protected function handleFollowBack($user, $receiver)
     {
         if ($user->followBack($receiver)) {
+            $receiverStatus = [
+                'friend' => $receiver->friend + 1,
+                'follower' => $receiver->follower + 1,
+            ];
+            $userStatus = [
+                'friend' => $receiver->friend + 1,
+                'following' => $receiver->following + 1,
+            ];
             CustomNotification::followBack($receiver, $user);
             (new UserCounterServices)->UpgradeDateForType($receiver, 'friend');
             (new UserCounterServices)->eventUser($receiver, 'friend', 1);
         } else {
+
+            $receiverStatus = [
+                'follower' => $receiver->follower + 1,
+            ];
+            $userStatus = [
+                'following' => $receiver->following + 1,
+            ];
             CustomNotification::follow($receiver, $user);
             (new UserCounterServices)->UpgradeDateForType($receiver, 'followeds');
             (new UserCounterServices)->eventUser($receiver, 'follow', 1);
         }
+        $this->userRepository->update($receiverStatus, $receiver->id);
+        $this->userRepository->update($userStatus, $user->id);
         (new UserCounterServices)->eventUser($receiver, 'follower', 1);
     }
 
@@ -347,7 +392,8 @@ class UserService
             'followPacks',
             'profile',
             'ware',
-            'UserVip'
+            'UserVip',
+            'manager'
         ];
 
         if ($type == 1) {
@@ -656,9 +702,9 @@ class UserService
         return $updateType;
     }
 
-    public function trashedAccount($perPage, $Page, $search)
+    public function trashedAccount($perPage, $Page, $search, $id)
     {
-        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search);
+        return $this->userRepository->trashedUserAccountList($perPage, $Page, $search, $id);
     }
 
     public function restoreAccount($id)
@@ -882,9 +928,9 @@ class UserService
     {
         $salary = $this->userSalaryRepository->userSalary($userId, $month, $year);
         $agency = $this->agencyRepository->findAgencyByOwnerId($userId);
-        $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
+        if ($agency) $agencySalary = $this->agencySalaryRepository->agencySalary($agency->id, $month, $year);
 
-        return  ['user_salary' => $salary, 'agency_Salary' => $agencySalary];
+        return  ['user_salary' => $salary ?? [], 'agency_Salary' => $agencySalary ?? []];
     }
 
     public function userPacksAndVip($id)
@@ -900,5 +946,26 @@ class UserService
     public function allUserCp($userId)
     {
         return $this->cpRepository->getByUser($userId);
+    }
+
+    public function updateGame($userId)
+    {
+        $this->userRepository->update(['game_id' => null], $userId);
+    }
+
+    public function userPacks($type, $userId, $perPage, $page)
+    {
+        return $this->packRepository->userPacks($type, $userId, $perPage, $page);
+    }
+
+
+    public function allUsersPlayGame()
+    {
+        return $this->userRepository->allUsersPlay();
+    }
+
+    public function online()
+    {
+        return $this->userRepository->online();
     }
 }

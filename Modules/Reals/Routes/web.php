@@ -13,4 +13,5 @@
 
 Route::prefix('reals')->middleware("appFeatureEnable:reel")->group(function() {
     Route::get('/', 'RealsController@index');
+    Route::get('delete-reel/{real_id}/{id}', 'RealsController@destroy_dash')->name('delete-reel')->middleware(['appFeatureEnable:reel']);
 });

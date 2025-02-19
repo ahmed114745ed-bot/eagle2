@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Emoji extends Model
 {
     protected $table = 'emojis';
-
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';
