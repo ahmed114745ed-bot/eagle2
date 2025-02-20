@@ -33,9 +33,9 @@ class VipDedicateAction extends Action
         if (!$user) {
             return $this->response()->error(__('dashboard.userNotFound'))->refresh();
         }
-       // dd(request('id'));
+        // dd(request('id'));
         $vip = OVip::find(request('id'));
-       // dd(123, $vip);
+        // dd(123, $vip);
         // admin only put to user vip greater than 30 days
         if (!Admin::user()->can('*') && $request->days > 30) {
             return $this->response()->error(__('dashboard.addAchivement'))->refresh();
@@ -93,9 +93,9 @@ class VipDedicateAction extends Action
 
     public function form()
     {
-        $this->hidden('id', __('id'))->attribute ('id','vid');
-       $this->integer('days', 'days');
-       $this->text('user_uuid', 'user uuid');
+        $this->hidden('id', __('id'))->attribute('id', 'vid');
+        $this->integer('days', 'days');
+        $this->text('user_uuid', 'user uuid');
     }
 
     public function html()
