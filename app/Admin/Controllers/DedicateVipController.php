@@ -8,7 +8,6 @@ use Encore\Admin\Grid;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\DedicateAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class DedicateVipController extends MainController
@@ -71,7 +70,7 @@ class DedicateVipController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('ware', __('wares'))->expand(function ($model) {
+        $grid->column('ware', __('wares'))->expand(function () {
 
             $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $this->level)->where('is_active_for_vip', 1)->get()->map(function ($ware) {
                 $showaImage = $ware->show_img
@@ -103,12 +102,18 @@ class DedicateVipController extends MainController
         });
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'));
+
+        $grid->column ('return',__ ('dedicate'))->display (function (){
+           
+          return (new \App\Admin\Actions\VipDedicateAction($this->id))->render ();
+        });
         $grid->disableCreateButton();
-        $grid->actions(function ($actions) {
+
+          $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-            $actions->add(new DedicateAction());
+           // $actions->add(new DedicateAction());
         });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
