@@ -11,6 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
 use App\Models\RequestBackgroundImage;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RequestBackgroundImageController extends MainController
@@ -81,8 +82,29 @@ class RequestBackgroundImageController extends MainController
     {
         $grid = new Grid(new RequestBackgroundImage);
         $grid->model()->orderByDesc('id');
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('status', __('status'))->select([
+                    0 => __('pending'),
+                    1 => __('accepted'),
+                    2 => __('denied'),
+
+                ]);
+            });
+        });
         $grid->id(__('admin.ID'));
         $grid->owner_room_id(__('owner room id'));
+        $grid->column('owner.name', __('owner'))
+            ->display(function ($name) {
+                $uid = @$this->owner->uuid;
+                $path = @$this->owner->ownerRoom->room_cover;
+                $url = getImagePath($path);
+                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+                return "$image<br>$name <br>
+            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+            });
         $grid->img(__('image'))->image('', 30);;
         $grid->status(__('status'))->using(
             [
@@ -91,8 +113,13 @@ class RequestBackgroundImageController extends MainController
                 2 => __('denied')
             ]
         );
-        $grid->created_at(trans('admin.created_at'));
-        $grid->updated_at(trans('admin.updated_at'));
+       
+        $grid->updated_at(trans('admin.updated_at'))->diffForHumans();
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
