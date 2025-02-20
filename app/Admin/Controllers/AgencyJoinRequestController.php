@@ -107,17 +107,33 @@ class AgencyJoinRequestController extends MainController
         });
 
         $grid->id(__('ID'));
-        $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
-            if ($model->user_id) {
-                return Common::getUserShow($model->user_id);
-            }
-            return null;
+        // $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
+        //     if ($model->user_id) {
+        //         return Common::getUserShow($model->user_id);
+        //     }
+        //     return null;
+        // });
+        // $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
+        //     if ($model->agency_id) {
+        //         return Common::getAgencyShow($model->agency_id);
+        //     }
+        //     return null;
+        // });
+        $grid->column('user.name', __('user'))
+        ->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $path = @$this->user->profile->avatar;
+            $url = getImagePath($path);
+            $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+            return "$image<br>$name <br>
+        <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
         });
-        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
-            if ($model->agency_id) {
-                return Common::getAgencyShow($model->agency_id);
-            }
-            return null;
+        $grid->column('agency.name', __('agency'))
+        ->display(function ($name) {
+            $path = @$this->agency->img;
+            $url = getImagePath($path);
+            $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
+            return "$image<br>$name";
         });
         $grid->column('whatsapp', __('whatsapp'));
         $grid->column('status', __('status'))->using(

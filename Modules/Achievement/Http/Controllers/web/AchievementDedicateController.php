@@ -71,12 +71,19 @@ class AchievementDedicateController extends MainController
         $grid->column('ar_description', __('Description Ar'));
         $grid->column('en_description', __('Description En'));
 
+
+
+        $grid->column ('return',__ ('dedicate'))->display (function (){
+           
+            return (new AchievementDedicateAction($this->id))->render ();
+          });
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();
             $actions->disableDelete();
-            $actions->add(new AchievementDedicateAction());
+           // $actions->add(new AchievementDedicateAction());
         });
+
 
         return $grid;
     }

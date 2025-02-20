@@ -123,6 +123,7 @@ class RoomController extends MainController
         $grid->actions(function ($action) {
             $action->disableView();
         });
+        $grid->disableCreateButton();
         $grid->disableExport();
         $this->extendGrid($grid);
         return $grid;
