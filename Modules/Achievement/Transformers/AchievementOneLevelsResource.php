@@ -30,9 +30,8 @@ class AchievementOneLevelsResource extends JsonResource
             'levels' => $this->whenLoaded('levels', function () {
                 return $this->levels->map(function ($level) {
                     $img = $level->invalid_image;
-                    if ($level->enable == true) {
-                        $img = $level->valid_image;
-                    }
+                   
+                        $valid = $level->valid_image;
                     $description_en = $level->en_description;
                     $description = $level->ar_description;
                     return [
@@ -43,6 +42,7 @@ class AchievementOneLevelsResource extends JsonResource
                         'target' => $level->target,
                         'target_type' => $level->target_type,
                         'image' => $img,
+                        'valid_image'=> $valid,
                         'created_at' => Carbon::parse(@$level?->created_at)->toISOString(),
 
                         'updated_at' => Carbon::parse(@$level?->updated_at)->toISOString(),
