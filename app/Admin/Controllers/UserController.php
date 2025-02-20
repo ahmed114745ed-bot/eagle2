@@ -197,8 +197,18 @@ class UserController extends MainController
         $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
 
         $grid->column('userSetting.hide_chat', __("hide_chat"))->switch($states);
-        $grid->column(__('reals_count'))->display(function () {
-            return count($this->reals);
+        $grid->column(__('user Active'))->display(function () {
+            $reels = count($this->reals);
+            $moment =  count($this->moments);
+            $day = $this->total_days;
+            $hours = $this->liveTime->sum("hours");
+            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('moment_count')  . "$reels</span>
+            <br>
+             <span style=\"color:var(--inverse-box-color) ;\">" .   __('moment_count')  . "$moment</span>
+             <br>
+             <span style=\"color: var(--inverse-box-color) ;\">" .   __('total_days')  . "$day  </span>
+             <span style=\"color: var(--inverse-box-color) ;\">" .   __('total_hours')  . "$hours </span>
+             ";
         });
         $grid->column(__('moment_count'))->display(function () {
             return count($this->moments);
@@ -531,10 +541,36 @@ class UserController extends MainController
                         $user->flowers = 0;
                         $user->save();
                     }
+                    $type = $user->type_user;
+                    switch ($type) {
+                        case 0:
+                            $userType = __("User");
+                            break;
+                        case 1:
+                            $userType = __("Host");
+                            break;
+                        case 2:
+                            $userType = __("Host Agent");
+                            break;
+                        case 3:
+                            $userType = __("Shipping Agent");
+                            break;
+                        case 4:
+                            $userType = __("Resort & Shipping Agent");
+                            break;
+                        case 5:
+                            $userType = __("Admin");
+                            break;
+                        default:
+                            $userType = $type; // Keep the original value if no match is found
+                            break;
+                    }
+
                     $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
                     $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
                     $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
                     $row->column(3, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->coins));
+                    $row->column(3, new InfoBox(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
                 }
             );
     }
@@ -725,9 +761,9 @@ class UserController extends MainController
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-        $form->text('facebook_id', __('facebook id'));
-        $form->text('google_id', __('google id'));
-        $form->text('huawei_id', __('huawei_id'));
+        // $form->text('facebook_id', __('facebook id'));
+        // $form->text('google_id', __('google id'));
+        // $form->text('huawei_id', __('huawei_id'));
         //        $form->switch ('is_host',__('is host'))->options (Common::getSwitchStates ());
 
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
@@ -783,7 +819,7 @@ class UserController extends MainController
 
         ])->default(0);
 
-/*         $ops2 = [];
+        /*         $ops2 = [];
         foreach (MangerType::get() as $manger_type) {
             $ops2[$manger_type->id] = $manger_type->name_en . '_' . $manger_type->description_en;
         }

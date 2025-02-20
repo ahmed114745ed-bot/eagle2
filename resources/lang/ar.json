@@ -1662,7 +1662,13 @@
     "Report Reel":"الإبلاغ عن الفيديو",
     "chose between agora or zego libarary 0 for agora 1 for zego" : "اختر بين مكتبة Agora أو Zego، 0 لـ Agora و 1 لـ Zego",
     "owner room id":"معرّف غرفة المالك",
-    "vips dedicate" : "أهداء الارستقراطيه"
+    "vips dedicate" : "أهداء الارستقراطيه",
+    "user Active":"المستخدم نشط",
+    "Host":"وكيل مضيفين",
+    "Host Agent":"وكيل مضيفين",
+    "Shipping Agent":"وكيل شحن",
+    "Resort & Shipping Agent":"وكيل مصيفين ووكيل شحن"
+ 
     
 
 
