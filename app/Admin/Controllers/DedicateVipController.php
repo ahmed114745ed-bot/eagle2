@@ -71,7 +71,7 @@ class DedicateVipController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('ware', __('ware'))->expand(function ($model) {
+        $grid->column('ware', __('wares'))->expand(function ($model) {
 
             $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $this->level)->where('is_active_for_vip', 1)->get()->map(function ($ware) {
                 $showaImage = $ware->show_img
