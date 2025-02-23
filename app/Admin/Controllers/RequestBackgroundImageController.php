@@ -114,15 +114,32 @@ class RequestBackgroundImageController extends MainController
                 </div>
             ";
             });
-            $grid->img(__('image'))->display(function ($img) {
-                $path = getImagePath($img);
-                $url = url("/$path");
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            
-                return "<a href='$url' target='_blank'>
-                            <img src='$image' style='width: 30px; height: 30px; border-radius: 5px;' />
+        // $grid->img(__('image'))->display(function ($img) {
+        //     $path = getImagePath($img);
+        //     $url = url("/$path");
+        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+        //     return "<a href='$url' target='_blank'>
+        //                 <img src='$image' style='width: 30px; height: 30px; border-radius: 5px;' />
+        //             </a>";
+        // });
+
+        $grid->img(__('image'))->display(function ($img) {
+            // Get the image path
+            $path = getImagePath($img);
+
+            // Ensure correct URL extraction
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            // Generate the image preview
+            $image = handleShowImageWithTypes($this->id, $correctUrl, 40, 40);
+
+            // Return clickable image preview
+            return "<a href='$correctUrl' target='_blank'>
+                            <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px;' />
                         </a>";
-            });
+        });
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),
