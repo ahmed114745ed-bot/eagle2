@@ -122,7 +122,7 @@ class AgencyJoinRequestController extends MainController
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
                 $uid = @$this->user->uuid;
-                $path = @$this->user?->profile?->avatar ?? asset("images/businessman-icon.jpg");
+                $path = @$this->user?->profile?->avatar;
                 $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
