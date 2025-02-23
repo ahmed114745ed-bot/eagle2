@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
 use App\Http\Controllers\addTOjesonController;
+use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ConfigController;
 
 /*
@@ -24,7 +25,7 @@ Route::prefix('payment')->group(function () {
     Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
     Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
 });
-
+Route::get("ware_image", [MallController::class, "wareImage"]);
 Route::get('/page/{name}', function ($name) {
     $page = \App\Models\Page::query()->where('name', $name)->firstOrFail();
     return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));
