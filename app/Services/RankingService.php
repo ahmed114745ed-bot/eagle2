@@ -95,6 +95,11 @@ class RankingService
             $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
             $this->transformData($data, $class, 'user_id', 'user');
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        }elseif($class == 6)
+        {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
