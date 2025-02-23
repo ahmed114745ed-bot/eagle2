@@ -188,19 +188,33 @@ class UserController extends MainController
         $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
 
         $grid->column('userSetting.hide_chat', __("hide_chat"))->switch($states);
-        $grid->column(__('user Active'))->display(function () {
-            $reels = count($this->reals);
-            $moment =  count($this->moments);
-            $day = $this->total_days;
-            $hours = $this->liveTime->sum("hours");
-            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('reel_count')  . "$reels</span>
-            <br>
-             <span style=\"color:var(--inverse-box-color) ;\">" .   __('moment_count')  . "$moment</span>
-             <br>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('total_days')  . "$day  </span>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('total_hours')  . "$hours </span>
-             ";
+        
+
+        $grid->column('reals.user_id',__('user Active'))->modal(__('user Active'), function ($model) {
+            $show = new Show($model);
+          
+            $show->field(__('reel_count'))->display(function ($q) {
+                return count($this->reals);
+            });
+            $show->field(__('moment_count'))->display(function ($q) {
+                return count($this->moments);
+            });
+            $show->field( __('total_days'))->display(function ($q) {
+                return  $this->total_days;
+            });
+            $show->field( __('total_hours'))->display(function ($q) {
+                return  $this->liveTime->sum("hours");
+            });
+            $show->panel()
+            ->tools(function ($tools) {
+                $tools->disableEdit();
+                $tools->disableList();
+                $tools->disableDelete();
+            });
+            return $show;
         });
+
+        
         
         $grid->column('profile.avatar', __('image'))->image('', 50);
         $grid->column('profile.image_id', __('image Id'))->image('', 50);
