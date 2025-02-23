@@ -119,22 +119,36 @@ class AgencyJoinRequestController extends MainController
         //     }
         //     return null;
         // });
-        $grid->column('user.name', __('user'))
-        ->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $path = @$this->user->profile->avatar;
-            $url = getImagePath($path);
-            $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
-            return "$image<br>$name <br>
-        <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
-        });
-        $grid->column('agency.name', __('agency'))
-        ->display(function ($name) {
-            $path = @$this->agency->img;
-            $url = getImagePath($path);
-            $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
-            return "$image<br>$name";
-        });
+        $grid->column('user.name', __('User'))
+            ->display(function ($name) {
+                $uid = @$this->user->uuid;
+                $path = @$this->user?->profile?->avatar ?? asset("images/businessman-icon.jpg");
+                $url = getImagePath($path);
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+            });
+        $grid->column('agency.name', __('Agency'))
+            ->display(function ($name) {
+                $path = @$this->agency->img;
+                $url = getImagePath($path);
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <span>$name</span>
+                </div>
+            ";
+            });
         $grid->column('whatsapp', __('whatsapp'));
         $grid->column('status', __('status'))->using(
             [
