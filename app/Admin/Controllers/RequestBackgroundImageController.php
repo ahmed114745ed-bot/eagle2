@@ -96,16 +96,32 @@ class RequestBackgroundImageController extends MainController
         });
         $grid->id(__('admin.ID'));
         $grid->owner_room_id(__('owner room id'));
+
         $grid->column('owner.name', __('owner'))
             ->display(function ($name) {
                 $uid = @$this->owner->uuid;
-                $path = @$this->owner->ownerRoom->room_cover;
-                $url = getImagePath($path);
-                $image =  handleShowImageWithTypes($this->id, $url, 40, 40);
-                return "$image<br>$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+                $path = @$this->owner?->profile?->avatar;
+                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
             });
-        $grid->img(__('image'))->image('', 30);;
+            $grid->img(__('image'))->display(function ($img) {
+                $image = getImagePath($img);
+                $url = url("/$image");
+            
+                return "<a href='$url' target='_blank'>
+                            <img src='$image' style='width: 30px; height: 30px; border-radius: 5px;' />
+                        </a>";
+            });
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),
@@ -113,7 +129,8 @@ class RequestBackgroundImageController extends MainController
                 2 => __('denied')
             ]
         );
-       
+        $grid->column('expair', __('expire'));
+
         $grid->updated_at(trans('admin.updated_at'))->diffForHumans();
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
