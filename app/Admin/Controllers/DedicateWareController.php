@@ -70,39 +70,28 @@ class DedicateWareController extends MainController
      */
     protected function grid()
     {
-         $typeSpecial = false;
+        $typeSpecial = false;
         $request = request('type');
-        if ($request !=null && ($request == 25)) {
+        if ($request != null && ($request == 25)) {
             $typeSpecial = true;
         }
-         $grid = new Grid(new Ware);
+        $grid = new Grid(new Ware);
         $grid->model()->orderByDesc('created_at');
         if ($typeSpecial) {
             $grid->model()->whereNotNull('get_type')->where('type', '=', 25);
         } else {
-            $grid->model()->whereNotNull('get_type')->where('type', '!=', 25);
+            $grid->model()->where('get_type', 4)->where('type', '!=', 25);
         }
-         $grid->id('ID');
+        $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'))->currency();
         $grid->column('show_img', __('show_img'))->image('', 30);
-        $grid->column('img2',__ ('show_img'))->display(function ($path){
+        $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('get_type', __('get_type'))->select(
-            [
-                1 => trans('vip level automatic acquisition'),
-                //    2=>trans ('activity'),
-                //    3=>trans ('treasure box'),
-                4 => trans('purchase'),
-                // 5=>trans ('background modification'),
-                6 => trans('limited time purchase'),
-                // 7=>trans ('treasure box point exchange'),
-                // 8=>trans ('cp level unlock'),
-            ]
-        );
+
         if (!$typeSpecial) {
             $grid->column('type', __('type'))->select(
                 [
@@ -131,37 +120,31 @@ class DedicateWareController extends MainController
             );
         }
 
-        if (!$typeSpecial) {
-            $grid->title(__('title'));
-        } else {
+        if ($typeSpecial) {
             $grid->value(__('value'));
-        }
+        } 
 
-        $grid->level(__('level'));
-
-        $grid->column('color', __('color'));
-        $grid->expire(__('expire'));
-        if (\Encore\Admin\Facades\Admin::user()->can('*') ||Admin::user()->can('edit_ware_price')) {
-            $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
-        }
-        $grid->sort(__('sort'), __('sort'));
+        $grid->column ('return',__ ('dedicate'))->display (function (){
+           
+            return (new \App\Admin\Actions\WareDedicateAction($this->id))->render ();
+          });
         $grid->disableExport();
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-            $actions->add(new DedicateAction());
+           // $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools) use($typeSpecial) {
+        $grid->tools(function (Grid\Tools $tools) use ($typeSpecial) {
             $url = '/admin/wares/create';
             if ($typeSpecial) {
                 $url = "/admin/special-wares/create";
             }
             $create_new = __('admin.create_new');
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;' .$create_new . '</a>';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;' . $create_new . '</a>';
             $tools->append($button);
         });
         Admin::script("
@@ -223,19 +206,19 @@ class DedicateWareController extends MainController
 
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
-            return 'svga_' . Str::random(6). '.' . $file->getClientOriginalExtension();
-       });
-        $form->select('image_type', __('image_type'))->options (
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        });
+        $form->select('image_type', __('image_type'))->options(
             [
-                'svga'=>__ ('svga'),
-                'alpha'=>__ ('alpha'),
-                'mp4'=>__ ('mp4'),
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
             ]
         )->required();
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-       
+
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
