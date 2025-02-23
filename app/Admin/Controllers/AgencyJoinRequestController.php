@@ -139,7 +139,7 @@ class AgencyJoinRequestController extends MainController
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
                 $path = @$this->agency->img;
-                $url = getImagePath($path)?? asset("images/agency-icon.jpg");
+                $url = getImagePath($path)?? asset("images/icon-agency.jpg");
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                 return "
