@@ -115,8 +115,9 @@ class RequestBackgroundImageController extends MainController
             ";
             });
             $grid->img(__('image'))->display(function ($img) {
-                $image = getImagePath($img);
-                $url = url("/$image");
+                $path = getImagePath($img);
+                $url = url("/$path");
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             
                 return "<a href='$url' target='_blank'>
                             <img src='$image' style='width: 30px; height: 30px; border-radius: 5px;' />
