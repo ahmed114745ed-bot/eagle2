@@ -793,7 +793,11 @@
     "Host Agent": "होस्ट एजेंट",
     "Shipping Agent": "शिपिंग एजेंट",
     "Resort & Shipping Agent": "रिसॉर्ट और शिपिंग एजेंट",
-    "reel_count": "रील की संख्या"
+    "reel_count": "रील की संख्या",
+    "Old total sender level": "पुराना कुल प्रेषक स्तर",
+    "New total sender level": "नया कुल प्रेषक स्तर",
+    "Old total received level": "पुराना कुल प्राप्त स्तर",
+    "New total received level": "नया कुल प्राप्त स्तर"
 
 
 
