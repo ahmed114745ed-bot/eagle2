@@ -35,7 +35,7 @@ class UpdateUserWhenSendGift
         $receivedUser->monthly_diamond_received += $totalCoins;
         $receivedUser->total_diamond_received   += $totalCoins;
         // update levels
-        if ($receivedUser->user_type == 0 && $receivedUser->agency_id == 0) {
+        if ($receivedUser->type_user == 0 && $receivedUser->agency_id == 0) {
             $receivedUser->exchange_diamonds += $totalCoins;
         }
 
