@@ -114,32 +114,46 @@ class RequestBackgroundImageController extends MainController
                 </div>
             ";
             });
+            $grid->img(__('image'))->display(function ($img) {
+                $path = getImagePath($img);
+                $parsedUrl = parse_url($path);
+                $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+            
+                return "
+                    <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7);'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px;' />
+                    </div>
+                    <script>
+                        function openModal(src) {
+                            document.getElementById('imageModal').style.display = 'block';
+                            document.getElementById('modalImage').src = src;
+                        }
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+                    </script>
+                ";
+            });
+            
+
         // $grid->img(__('image'))->display(function ($img) {
+        //     // Get the image path
         //     $path = getImagePath($img);
-        //     $url = url("/$path");
-        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-        //     return "<a href='$url' target='_blank'>
-        //                 <img src='$image' style='width: 30px; height: 30px; border-radius: 5px;' />
-        //             </a>";
+        //     // Ensure correct URL extraction
+        //     $parsedUrl = parse_url($path);
+        //     $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+        //     // Generate the image preview
+        //     $image = handleShowImageWithTypes($this->id, $correctUrl, 40, 40);
+
+        //     // Return clickable image preview
+        //     return "<a href='$correctUrl' target='_blank'>
+        //                     <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px;' />
+        //                 </a>";
         // });
-
-        $grid->img(__('image'))->display(function ($img) {
-            // Get the image path
-            $path = getImagePath($img);
-
-            // Ensure correct URL extraction
-            $parsedUrl = parse_url($path);
-            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
-
-            // Generate the image preview
-            $image = handleShowImageWithTypes($this->id, $correctUrl, 40, 40);
-
-            // Return clickable image preview
-            return "<a href='$correctUrl' target='_blank'>
-                            <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px;' />
-                        </a>";
-        });
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),
