@@ -493,7 +493,7 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'agency_id' => $form->model()->id,]);
+            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'monthly_diamond_received'=> 0,'agency_id' => $form->model()->id,]);
             // }
 
 

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
 
 
-class DeleteBans extends Action
+class UserAction extends Action
 {
     public $name = 'حذف الحظر';
     public $id;

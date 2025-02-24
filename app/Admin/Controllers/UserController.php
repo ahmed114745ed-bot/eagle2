@@ -198,7 +198,7 @@ class UserController extends MainController
         ]);
 
         // $grid->column('return', __('delete'))->display(function () {
-        //     return (new \App\Admin\Actions\DeleteBans($this->id, $this->charge_status, $this->transfer_salary,$this->userSetting->show_invite_code,
+        //     return (new \App\Admin\Actions\UserAction($this->id, $this->charge_status, $this->transfer_salary,$this->userSetting->show_invite_code,
         //     $this->userSetting->hide_chat, $this->can_play
         //     ))->render();
         // });
