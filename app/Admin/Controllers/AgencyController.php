@@ -447,22 +447,26 @@ class AgencyController extends MainController
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
+                    'monthly_diamond_received' => 0,
                 ]);
 
                 if ($Host_agency === 'on' && $Shipping_agency === 'off') {
                     User::find($newOwnerId)->update([
                         'type_user' => 2,
                         'agency_id' => $form->model()->id,
+                        'monthly_diamond_received' => 0,
                     ]);
                 } elseif ($Host_agency === 'on' && $Shipping_agency === 'on') {
                     User::find($newOwnerId)->update([
                         'type_user' => 4,
                         'agency_id' => $form->model()->id,
+                        'monthly_diamond_received' => 0,
                     ]);
                 } elseif ($Host_agency === 'off' && $Shipping_agency === 'on') {
                     User::find($newOwnerId)->update([
                         'type_user' => 3,
                         'agency_id' => $form->model()->id,
+                        'monthly_diamond_received' => 0,
                     ]);
                 }
             }

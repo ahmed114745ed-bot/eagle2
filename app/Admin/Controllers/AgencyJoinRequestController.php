@@ -236,7 +236,7 @@ class AgencyJoinRequestController extends MainController
 
                 $update = DB::table('users')
                     ->where('id', $user_id)
-                    ->update(['type_user' => 1]);
+                    ->update(['type_user' => 1,'monthly_diamond_received' => 0]);
 
                 if (!$update) {
                     $error = new MessageBag([

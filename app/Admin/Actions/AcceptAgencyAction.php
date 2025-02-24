@@ -44,6 +44,7 @@ class AcceptAgencyAction extends RowAction
         $user = User::find($appOwnerId);
         $user->type_user = 2;
         $user->agency_id = $agency->id;
+        $user->monthly_diamond_received = 0;
         $user->save();
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
