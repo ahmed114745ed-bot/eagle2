@@ -101,48 +101,33 @@ class RequestBackgroundImageController extends MainController
             ->display(function ($name) {
                 $uid = @$this->owner->uuid;
                 $path = @$this->owner?->profile?->avatar;
-                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!self::isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                 return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div>
+                            <strong>$name</strong><br>
+                            <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                        </div>
                     </div>
-                </div>
-            ";
+                ";
             });
-            // $grid->img(__('image'))->display(function ($img) {
-            //     $path = getImagePath($img);
-            //     $parsedUrl = parse_url($path);
-            //     $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
-            
-            //     return "
-            //         <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
-            //         <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7);'>
-            //             <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
-            //             <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px;' />
-            //         </div>
-            //         <script>
-            //             function openModal(src) {
-            //                 document.getElementById('imageModal').style.display = 'block';
-            //                 document.getElementById('modalImage').src = src;
-            //             }
-            //             function closeModal() {
-            //                 document.getElementById('imageModal').style.display = 'none';
-            //             }
-            //         </script>
-            //     ";
-            // });
-            
-            $grid->img(__('image'))->display(function ($img) {
-                $path = getImagePath($img);
-                $parsedUrl = parse_url($path);
-                $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
-            
-                return "
+
+        $grid->img(__('image'))->display(function ($img) {
+            $path = getImagePath($img);
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
                     <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
                     
                     <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
@@ -170,8 +155,8 @@ class RequestBackgroundImageController extends MainController
                         });
                     </script>
                 ";
-            });
-        
+        });
+
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),
@@ -265,5 +250,11 @@ class RequestBackgroundImageController extends MainController
         });
 
         return $form;
+    }
+
+    public static  function isImageExists($url)
+    {
+        $headers = @get_headers($url);
+        return $headers && strpos($headers[0], '200') !== false;
     }
 }
