@@ -85,10 +85,22 @@ class DedicateWareController extends MainController
         $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'))->currency();
-        $grid->column('show_img', __('show_img'))->image('', 30);
+        $grid->column('show_img', __('show_img'))->display(function ($path) {
+            /** @var Ware $this */
+            $defaultImage = asset("images/ware-image.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/ware-image.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
@@ -122,19 +134,19 @@ class DedicateWareController extends MainController
 
         if ($typeSpecial) {
             $grid->value(__('value'));
-        } 
+        }
 
-        $grid->column ('return',__ ('dedicate'))->display (function (){
-           
-            return (new \App\Admin\Actions\WareDedicateAction($this->id))->render ();
-          });
+        $grid->column('return', __('dedicate'))->display(function () {
+
+            return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
+        });
         $grid->disableExport();
 
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-           // $actions->add(new DedicateAction());
+            // $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
         Admin::script("

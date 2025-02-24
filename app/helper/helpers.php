@@ -166,7 +166,10 @@ if (!function_exists('get_file_details')) {
     if (!function_exists('isImageExists')) {
         function isImageExists($url)
         {
-            $headers = @get_headers($url);
+            $context = stream_context_create([
+                'http' => ['timeout' => 2] // Set a 2-second timeout
+            ]);
+            $headers = @get_headers($url, 1, $context);
             return $headers && strpos($headers[0], '200') !== false;
         }
     }
