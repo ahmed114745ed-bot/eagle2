@@ -54,7 +54,7 @@ class AchievementDedicateAction extends Action
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-danger salary_action ">' . __('dedicate') . '</a>
+        return '<a href="javascript:void(0);" onclick="pu(' . $this->id . ')" class="btn btn-sm btn-info salary_action ">' . __('dedicate') . '</a>
 <script>
 function pu(val) {
 
