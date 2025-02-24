@@ -137,16 +137,6 @@ class DedicateWareController extends MainController
            // $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
-
-        $grid->tools(function (Grid\Tools $tools) use ($typeSpecial) {
-            $url = '/admin/wares/create';
-            if ($typeSpecial) {
-                $url = "/admin/special-wares/create";
-            }
-            $create_new = __('admin.create_new');
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-plus"></i>&nbsp;&nbsp;' . $create_new . '</a>';
-            $tools->append($button);
-        });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
