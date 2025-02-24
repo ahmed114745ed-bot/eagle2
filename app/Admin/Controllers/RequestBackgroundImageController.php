@@ -105,7 +105,7 @@ class RequestBackgroundImageController extends MainController
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!self::isImageExists($url)) {
+                if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
@@ -252,9 +252,5 @@ class RequestBackgroundImageController extends MainController
         return $form;
     }
 
-    public static  function isImageExists($url)
-    {
-        $headers = @get_headers($url);
-        return $headers && strpos($headers[0], '200') !== false;
-    }
+    
 }
