@@ -188,6 +188,20 @@ class UserController extends MainController
         $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
 
         $grid->column('userSetting.hide_chat', __("hide_chat"))->switch($states);
+        $grid->column('can_play', trans('canPlay'))->value(function ($can_play) {
+
+            $can_play = UserHandling::chickLevelToPlay($this);
+            return $can_play ? 'on' : 'off';
+        })->switch([
+            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
+        ]);
+
+        // $grid->column('return', __('delete'))->display(function () {
+        //     return (new \App\Admin\Actions\DeleteBans($this->id, $this->charge_status, $this->transfer_salary,$this->userSetting->show_invite_code,
+        //     $this->userSetting->hide_chat, $this->can_play
+        //     ))->render();
+        // });
         
 
         $grid->column('reals.user_id',__('user Active'))->modal(__('user Active'), function ($model) {
@@ -216,16 +230,18 @@ class UserController extends MainController
 
         
         
-        $grid->column('profile.avatar', __('image'))->image('', 50);
-        $grid->column('profile.image_id', __('image Id'))->image('', 50);
-        $grid->column('can_play', trans('canPlay'))->value(function ($can_play) {
+        $grid->column('profile.avatar', __('image'))->display(function ($path) {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
 
-            $can_play = UserHandling::chickLevelToPlay($this);
-            return $can_play ? 'on' : 'off';
-        })->switch([
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        ]);
+          
+        });
+        $grid->column('profile.image_id', __('image Id'))->image('', 50);
+        
 
 
         $grid->column('phone', __('Phone'));

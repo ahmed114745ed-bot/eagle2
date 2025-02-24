@@ -12,6 +12,7 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Facades\UserHandling;
 use App\Http\Services\WhatsappOtp;
+use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
 use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
@@ -725,6 +726,16 @@ class UserService
     public function updateUserLevel($id, $request)
     {
         $user = $this->userRepository->findById($id);
+
+        ChangeLevelHistory::create([
+            'user_id' =>  $user->id,
+            'admin_id' => 1,
+            'old_total_sender_level' => $user->total_sender_level ,
+            'new_total_sender_level' => $request->total_sender_level,
+            'old_total_received_level' =>  $user->total_received_level,
+            'new_total_received_level' => $request->total_received_level,
+
+        ]);
         $user->total_sender_level = $request->total_sender_level;
         $user->total_received_level = $request->total_received_level;
         $user->save();
