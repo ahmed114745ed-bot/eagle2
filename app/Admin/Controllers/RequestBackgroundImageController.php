@@ -123,7 +123,11 @@ class RequestBackgroundImageController extends MainController
             });
 
         $grid->img(__('image'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img);
+            if (!isImageExists($path)) {
+                $path = $defaultImage;
+            }
             $parsedUrl = parse_url($path);
             $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
 
