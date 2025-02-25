@@ -178,7 +178,7 @@ class UserController extends MainController
 
         $grid->column('nickname', __('NickName'));
 
-        $grid->column('return', __('status'))->display(function () {
+        $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
                 $this->id, 

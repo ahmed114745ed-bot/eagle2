@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Request;
 
 class UserAction extends Action
 {
-    public $name = 'حذف الحظر';
     public $id;
     public $charge_status;
     public $transfer_salary;
@@ -99,8 +98,9 @@ class UserAction extends Action
             '\'' . $this->show_invite_code . '\', ' .
             '\'' . $this->hide_chat . '\', ' .
             '\'' . $this->can_play . '\'' .
-            ')" class="btn btn-sm btn-info delete-ban">' . __('status') . '</a>
-
+            ')" class="btn btn-sm btn-info delete-ban">
+            <i class="fa fa-edit"></i> ' . ' '. __('status') . '
+        </a>
         <script>
             function openUserForm(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play) {
                 console.log(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play);
