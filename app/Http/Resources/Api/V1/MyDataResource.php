@@ -31,7 +31,7 @@ class MyDataResource extends JsonResource
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'members_num' => $family->members_count,
+                'num_of_members' => $family->members_count,
                 'level' => $family->level,
             ];
         }
@@ -64,6 +64,8 @@ class MyDataResource extends JsonResource
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
+                'image' =>$agency_joined->img,
+                'member_count' => count($agency_joined->mempers),
                 'owner' => $owner,
             ];
         } else {

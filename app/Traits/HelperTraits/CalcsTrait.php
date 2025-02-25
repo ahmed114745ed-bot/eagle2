@@ -776,7 +776,7 @@ Log::info('vip iddddddddddddddddddddd: '.$uvip->vip_id);
 
         // return $vip->level;
         // [
-        return $vipIcon->show_img;
+        return @$vipIcon->show_img ?? '';
         // [
         // 'id'        => 1,
         // 'level'     => $vip->level?? 0,
