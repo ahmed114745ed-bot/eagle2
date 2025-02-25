@@ -380,6 +380,6 @@ class UserRepository extends AbstractRepository
 
     public function online()
     {
-        return $this->model->where('online', 1)->paginate(10);
+        return $this->model->where('online', 1)->inRandomOrder()->paginate(10);
     }
 }
