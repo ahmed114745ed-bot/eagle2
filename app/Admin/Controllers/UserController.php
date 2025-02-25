@@ -197,35 +197,36 @@ class UserController extends MainController
             'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
         ]);
 
-        // $grid->column('return', __('delete'))->display(function () {
+        // $grid->column('return', __('switch'))->display(function () {
         //     return (new \App\Admin\Actions\UserAction($this->id, $this->charge_status, $this->transfer_salary,$this->userSetting->show_invite_code,
         //     $this->userSetting->hide_chat, $this->can_play
+        //     ))->render();
+        // });
+
+        // $grid->column('return', __('switch'))->display(function () {
+        //     $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+        
+        //     return (new \App\Admin\Actions\UserAction(
+        //         $this->id, 
+        //         $this->charge_status, 
+        //         $this->transfer_salary, 
+        //         $userSetting->show_invite_code, 
+        //         $userSetting->hide_chat, 
+        //         $this->can_play
         //     ))->render();
         // });
         
 
         $grid->column('reals.user_id',__('user Active'))->modal(__('user Active'), function ($model) {
-            $show = new Show($model);
-          
-            $show->field(__('reel_count'))->display(function ($q) {
-                return count($this->reals);
-            });
-            $show->field(__('moment_count'))->display(function ($q) {
-                return count($this->moments);
-            });
-            $show->field( __('total_days'))->display(function ($q) {
-                return  $this->total_days;
-            });
-            $show->field( __('total_hours'))->display(function ($q) {
-                return  $this->liveTime->sum("hours");
-            });
-            $show->panel()
-            ->tools(function ($tools) {
-                $tools->disableEdit();
-                $tools->disableList();
-                $tools->disableDelete();
-            });
-            return $show;
+            
+            $results = [
+             __('reel count') => $this->reals()->count() ?? 0,
+             __('moment_count') =>$this->moments()->count() ?? 0,
+             __('total_days') => $this->total_days ?? 0,
+             __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+            ];
+            
+            return new Table([__('Field Name'),__('Value')], $results);
         });
 
         

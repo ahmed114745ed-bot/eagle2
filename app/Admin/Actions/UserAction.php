@@ -44,26 +44,52 @@ class UserAction extends Action
 
     public function form()
     {
-        $this->hidden('id', __('id'))->attribute('id', 'id');
-        $this->hidden('type', __('id'))->attribute('id', 'type');
-        $this->hidden('ban_type_id', __('id'))->attribute('id', 'ban_type_id');
+        $this->hidden('id', __('ID'))->attribute('id', 'id');
 
-        /*$this->hidden('uid', 'uid')->value($this->id);
-        $this->hidden('type', 'type')->value($this->type);
-        $this->hidden('ban_type_id', 'ban_type_id')->value($this->ban_type_id);*/
+        $this->select('charge_status', __('Charge Status'))
+            ->options([1 => __('on'), 0 => __('off')])
+            ->attribute('id', 'charge_status');
+
+        $this->select('transfer_salary', __('Transfer Salary'))
+            ->options([1 => __('on'), 0 => __('off')])
+            ->attribute('id', 'transfer_salary'); // Fixed ID
+
+        $this->select('show_invite_code', __('Show Invite Code'))
+            ->options([1 => __('on'), 0 => __('off')])
+            ->attribute('id', 'show_invite_code'); // Fixed ID
+
+        $this->select('hide_chat', __('Hide Chat'))
+            ->options([1 => __('on'), 0 => __('off')])
+            ->attribute('id', 'hide_chat');
+
+        $this->select('can_play', __('Can Play'))
+            ->options([2 => __('on'), 3 => __('off')])
+            ->attribute('id', 'can_play');
     }
 
 
 
     public function html()
     {
-        return '<a href="#" onclick="pu(\'' . $this->id . '\', \'' . $this->charge_status . '\', \'' . $this->transfer_salary . '\',  \'' . $this->show_invite_code . '\', \'' . $this->hide_chat . '\',' . $this->can_play . ')" class="btn btn-sm btn-success delete-ban">' . __('admin.delete') . '</a>
+        return '<a href="#" onclick="openUserForm(' .
+            '\'' . $this->id . '\', ' .
+            '\'' . $this->charge_status . '\', ' .
+            '\'' . $this->transfer_salary . '\', ' .
+            '\'' . $this->show_invite_code . '\', ' .
+            '\'' . $this->hide_chat . '\', ' .
+            '\'' . $this->can_play . '\'' .
+            ')" class="btn btn-sm btn-success delete-ban">' . __('admin.switch') . '</a>
+
         <script>
-            function pu(val, type, ban_type_id) {
-                console.log(val, type, ban_type_id)
-                $("#id").val(val);
-                $("#type").val(type);
-                $("#ban_type_id").val(ban_type_id);
+            function openUserForm(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play) {
+                console.log(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play);
+                
+                $("#id").val(id);
+                $("#charge_status").prop("checked", charge_status == 1);
+                $("#transfer_salary").prop("checked", transfer_salary == 1);
+                $("#show_invite_code").prop("checked", show_invite_code == 1);
+                $("#hide_chat").prop("checked", hide_chat == 1);
+                $("#can_play").val(can_play);
             }
         </script>';
     }
