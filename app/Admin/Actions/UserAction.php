@@ -20,10 +20,18 @@ class UserAction extends Action
     public $show_invite_code;
     public $hide_chat;
     public $can_play;
+
+
     protected $selector = '.delete-ban';
 
     public function __construct($id = 0, $charge_status = 0, $transfer_salary = 0, $show_invite_code = 0, $hide_chat = 0, $can_play = 3)
     {
+
+        if ($can_play == 0) {
+            $can_play = 3;
+        } elseif ($can_play == 1) {
+            $can_play = 2;
+        }
         $this->id = $id;
         $this->charge_status = $charge_status;
         $this->transfer_salary = $transfer_salary;
@@ -38,6 +46,22 @@ class UserAction extends Action
     public function handle(\Illuminate\Http\Request $request)
     {
 
+        $user = User::find($request->id);
+        if (!$user) {
+            return $this->response()->error(__('user not found'))->refresh();
+        }
+        $user->update([
+            'charge_status'   => $request->charge_status,
+            'transfer_salary'  => $request->transfer_salary,
+            'can_play' => $request->can_play,
+        ]);
+        $user->userSetting()->update(
+            [
+                'show_invite_code'  => $request->show_invite_code,
+                'hide_chat' => $request->hide_chat,
+            ]
+
+        );
         return $this->response()->success('success')->refresh();
     }
 
@@ -46,25 +70,22 @@ class UserAction extends Action
     {
         $this->hidden('id', __('ID'))->attribute('id', 'id');
 
-        $this->select('charge_status', __('Charge Status'))
+        $this->radio('charge_status', __('Charge Status'))
             ->options([1 => __('on'), 0 => __('off')])
-            ->attribute('id', 'charge_status');
+            ->value($this->charge_status);
 
-        $this->select('transfer_salary', __('Transfer Salary'))
-            ->options([1 => __('on'), 0 => __('off')])
-            ->attribute('id', 'transfer_salary'); // Fixed ID
+        $this->radio('transfer_salary', __('Transfer Salary'))
+            ->options([1 => __('on'), 0 => __('off')])->value($this->transfer_salary);
 
-        $this->select('show_invite_code', __('Show Invite Code'))
-            ->options([1 => __('on'), 0 => __('off')])
-            ->attribute('id', 'show_invite_code'); // Fixed ID
+        $this->radio('show_invite_code', __('Show Invite Code'))
+            ->options([1 => __('on'), 0 => __('off')])->value($this->show_invite_code);
 
-        $this->select('hide_chat', __('Hide Chat'))
-            ->options([1 => __('on'), 0 => __('off')])
-            ->attribute('id', 'hide_chat');
 
-        $this->select('can_play', __('Can Play'))
-            ->options([2 => __('on'), 3 => __('off')])
-            ->attribute('id', 'can_play');
+        $this->radio('hide_chat', __('Hide Chat'))
+            ->options([1 => __('on'), 0 => __('off')])->value($this->hide_chat);
+
+        $this->radio('can_play', __('Can Play'))
+            ->options([2 => __('yes'), 3 => __('no')])->value($this->can_play);
     }
 
 
@@ -78,17 +99,17 @@ class UserAction extends Action
             '\'' . $this->show_invite_code . '\', ' .
             '\'' . $this->hide_chat . '\', ' .
             '\'' . $this->can_play . '\'' .
-            ')" class="btn btn-sm btn-success delete-ban">' . __('admin.switch') . '</a>
+            ')" class="btn btn-sm btn-info delete-ban">' . __('status') . '</a>
 
         <script>
             function openUserForm(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play) {
                 console.log(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play);
                 
                 $("#id").val(id);
-                $("#charge_status").prop("checked", charge_status == 1);
-                $("#transfer_salary").prop("checked", transfer_salary == 1);
-                $("#show_invite_code").prop("checked", show_invite_code == 1);
-                $("#hide_chat").prop("checked", hide_chat == 1);
+                $("#charge_status").val(charge_status);
+                $("#transfer_salary").val(transfer_salary);
+                $("#show_invite_code").val(show_invite_code);
+                $("#hide_chat").val(hide_chat);
                 $("#can_play").val(can_play);
             }
         </script>';

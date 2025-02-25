@@ -135,7 +135,6 @@ class UserController extends MainController
         $grid->model()->with("ownerRoom");
 
         $grid->model();
-        //$grid->model()->where('phone', '!=', '');//scope
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp);
@@ -178,43 +177,18 @@ class UserController extends MainController
 
 
         $grid->column('nickname', __('NickName'));
-        $states = [
-            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
-            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
-        ];
 
-        $grid->column('charge_status', __("charge status"))->switch($states);
-        $grid->column('transfer_salary', __("transfer_salary"))->switch($states);
-        $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
-
-        $grid->column('userSetting.hide_chat', __("hide_chat"))->switch($states);
-        $grid->column('can_play', trans('canPlay'))->value(function ($can_play) {
-
-            $can_play = UserHandling::chickLevelToPlay($this);
-            return $can_play ? 'on' : 'off';
-        })->switch([
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        ]);
-
-        // $grid->column('return', __('switch'))->display(function () {
-        //     return (new \App\Admin\Actions\UserAction($this->id, $this->charge_status, $this->transfer_salary,$this->userSetting->show_invite_code,
-        //     $this->userSetting->hide_chat, $this->can_play
-        //     ))->render();
-        // });
-
-        // $grid->column('return', __('switch'))->display(function () {
-        //     $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-        
-        //     return (new \App\Admin\Actions\UserAction(
-        //         $this->id, 
-        //         $this->charge_status, 
-        //         $this->transfer_salary, 
-        //         $userSetting->show_invite_code, 
-        //         $userSetting->hide_chat, 
-        //         $this->can_play
-        //     ))->render();
-        // });
+        $grid->column('return', __('status'))->display(function () {
+            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+            return (new \App\Admin\Actions\UserAction(
+                $this->id, 
+                $this->charge_status, 
+                $this->transfer_salary, 
+                $userSetting->show_invite_code, 
+                $userSetting->hide_chat, 
+                $this->can_play
+            ))->render();
+        });
         
 
         $grid->column('reals.user_id',__('user Active'))->modal(__('user Active'), function ($model) {

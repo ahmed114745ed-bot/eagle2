@@ -1669,10 +1669,15 @@
     "Shipping Agent":"وكيل شحن",
     "Resort & Shipping Agent":"وكيل مصيفين ووكيل شحن",
     "reel count" : "عدد الريلز",
-        "Old total sender level": "المستوى الإجمالي القديم للمرسل",
-        "New total sender level": "المستوى الإجمالي الجديد للمرسل",
-        "Old total received level": "المستوى الإجمالي القديم للمستلم",
-        "New total received level": "المستوى الإجمالي الجديد للمستلم"
+ "Old total sender level": "المستوى الإجمالي القديم للمرسل",
+ "New total sender level": "المستوى الإجمالي الجديد للمرسل",
+ "Old total received level": "المستوى الإجمالي القديم للمستلم",
+"New total received level": "المستوى الإجمالي الجديد للمستلم",
+"Can Play": "يستطيع اللعب",
+"Hide Chat" : " اخفاء الدردشه",
+"Transfer Salary":"تحويل الراتب",
+"Charge Status":"تفعيل الشحن",
+"Show Invite Code":"عرض زورار كود الدعوه"
     
  
     

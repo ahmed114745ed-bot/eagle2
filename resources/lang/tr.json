@@ -1654,7 +1654,11 @@
     "Old total sender level": "Eski toplam gönderici seviyesi",
     "New total sender level": "Yeni toplam gönderici seviyesi",
     "Old total received level": "Eski toplam alıcı seviyesi",
-    "New total received level": "Yeni toplam alıcı seviyesi"
+    "New total received level": "Yeni toplam alıcı seviyesi",
+    "Can Play": "Oynayabilir",
+    "Hide Chat": "Sohbeti Gizle",
+    "Transfer Salary": "Maaş Transferi",
+    "Charge Status": "Şarj Durumu"
 
 
 
