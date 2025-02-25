@@ -158,9 +158,11 @@ class ChargeReportController extends MainController {
         $grid->column ('amount',__("amount"))->display (function ($coin){
             return number_format($coin); 
          });
-        $grid->column ('balance_before',__("balance_before"));
+        $grid->column ('balance_before',__("balance_before"))->display (function ($coin){
+            return number_format($coin); 
+         });;
         $grid->column ('balance_after',__("balance_after"))->display (function (){
-           return $this->amount + $this->balance_before;
+           return number_format($this->amount + $this->balance_before);
         });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
