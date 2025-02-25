@@ -29,6 +29,8 @@ class UserResource extends JsonResource
                     'id'     => $this->agency->id,
                     'name'   => $this->agency->name,
                     'status' => $this->agency->status,
+                    'image' => $this->agency->img,
+                    'member_count' => count($this->agency?->mempers),
                     'owner'  => $owner,
                 ];
             } else {
