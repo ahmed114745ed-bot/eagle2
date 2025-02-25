@@ -101,18 +101,63 @@ class ChargeReportController extends MainController {
         $grid->column ('id',__ ('id'));
         $grid->column ('charger_id',__("receiver"))->display (function () use ($charger_type){
             if ($charger_type == "dash") {
-                return @$this->admin_user->name ."<br>"."#".@$this->admin_user->id;
+                $name= @$this->admin_user->name?? '' ;
+                $uuid =@$this->admin_user->id;
+                $path = @$this->admin_user->avatar;
+                
             }else{
-                return @$this->sender->name ."<br>"."#".@$this->sender->uuid;
+               $name= @$this->sender->name ?? '';
+               $uuid =@$this->sender->uuid;
+               $path = @$this->sender?->profile?->avatar;
             }
+
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
+                    </div>
+                </div>
+            ";
+            
         });
         $grid->column ('user_id',__ ('sendTo'))->display (function ($recever){
-            if (!isset($this->receiver->name)) {
-                return "not user found";
+           $name =  $this->receiver->name ?? '';
+            $uid = @$this->receiver->uuid ?? 0;
+            $path = @$this->receiver?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
             }
-            return @$this->receiver->name."<br>"."#".@$this->receiver->uuid;
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        
         });
-        $grid->column ('amount',__("amount"));
+        $grid->column ('amount',__("amount"))->display (function ($coin){
+            return number_format($coin); 
+         });
         $grid->column ('balance_before',__("balance_before"));
         $grid->column ('balance_after',__("balance_after"))->display (function (){
            return $this->amount + $this->balance_before;
@@ -134,13 +179,33 @@ class ChargeReportController extends MainController {
 
 
         $grid->column ('id',__ ('id'));
-        $grid->column ('user_id',__ ('charger'))->display (function (){
-            if (!isset($this->user->name)) {
-                return "not found user";
-            }
-            return @$this->user->name ."<br>"."#".@$this->user->uuid;
-        });
-        $grid->column ('obtained_coins',__ ('amount'));
+        $grid->column ('user_id',__ ('charger'))->display (function ($recever){
+            $name =  $this->user->name ?? '';
+             $uid = @$this->user->uuid ?? 0;
+             $path = @$this->user?->profile?->avatar;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
+
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+ 
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 $image
+                 <div>
+                     <strong>$name</strong><br>
+                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                 </div>
+             </div>
+         ";
+         
+         });
+        $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
+            return number_format($coin); 
+         });
         $grid->column ('trx',__ ('trx'));
         $grid->column ('status',__ ('status'))->display (function (){
             if ($this->status == 1) {
@@ -180,13 +245,33 @@ class ChargeReportController extends MainController {
 
         $grid->quickSearch ();
         $grid->column ('id',__ ('id'));
-        $grid->column ('user_id',__ ('charger'))->display (function (){
-            if (!isset($this->user->name)) {
-                return "not found user";
-            }
-            return @$this->user->name ."<br>"."#".@$this->user->uuid;
-        });
-        $grid->column ('obtained_coins',__ ('amount'));
+        $grid->column ('user_id',__ ('charger'))->display (function ($recever){
+            $name =  $this->user->name ?? '';
+             $uid = @$this->user->uuid ?? 0;
+             $path = @$this->user?->profile?->avatar;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
+
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+ 
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 $image
+                 <div>
+                     <strong>$name</strong><br>
+                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                 </div>
+             </div>
+         ";
+         
+         });
+        $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
+            return number_format($coin); 
+         });
         $grid->column ('trx',__ ('trx'));
         $grid->column ('status',__ ('status'))->display (function (){
             if ($this->status == 1) {
