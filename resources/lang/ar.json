@@ -202,7 +202,9 @@
     "All permission": "كل الصلاحيات",
     "gender": "الجنس",
     "trxs": "التحويلات",
-    "worth": "مستوي المتلقى",
+    //"worth": "مستوي المتلقى",
+   "worth": " المتلقى",
+
     "Balance": "الرصيد",
     "sender_level": "مستوى المرسل",
     "Browse Categories": "قائمة الفئات",
