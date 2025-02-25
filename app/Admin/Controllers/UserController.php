@@ -169,7 +169,7 @@ class UserController extends MainController
                 return number_format($value);
             });
         }
-        
+
         $grid->column('uuid', __('uuid'))->display(function () {
             return $this->uuid . ' ' . $this->original_uuid;
         });
@@ -181,30 +181,30 @@ class UserController extends MainController
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
-                $this->id, 
-                $this->charge_status, 
-                $this->transfer_salary, 
-                $userSetting->show_invite_code, 
-                $userSetting->hide_chat, 
+                $this->id,
+                $this->charge_status,
+                $this->transfer_salary,
+                $userSetting->show_invite_code,
+                $userSetting->hide_chat,
                 $this->can_play
             ))->render();
         });
-        
 
-        $grid->column('reals.user_id',__('user Active'))->modal(__('user Active'), function ($model) {
-            
+
+        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
+
             $results = [
-             __('reel count') => $this->reals()->count() ?? 0,
-             __('moment_count') =>$this->moments()->count() ?? 0,
-             __('total_days') => $this->total_days ?? 0,
-             __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+                __('reel count') => $this->reals()->count() ?? 0,
+                __('moment_count') => $this->moments()->count() ?? 0,
+                __('total_days') => $this->total_days ?? 0,
+                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
             ];
-            
-            return new Table([__('Field Name'),__('Value')], $results);
+
+            return new Table([__('Field Name'), __('Value')], $results);
         });
 
-        
-        
+
+
         $grid->column('profile.avatar', __('image'))->display(function ($path) {
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -212,11 +212,9 @@ class UserController extends MainController
                 $url = $defaultImage;
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
-
-          
         });
         $grid->column('profile.image_id', __('image Id'))->image('', 50);
-        
+
 
 
         $grid->column('phone', __('Phone'));
@@ -396,7 +394,7 @@ class UserController extends MainController
                     $user->flowers = 0;
                     $user->save();
                 }
-               
+
                 $type = $user->type_user;
                 switch ($type) {
                     case 0:
@@ -421,12 +419,12 @@ class UserController extends MainController
                         $userType = $type; // Keep the original value if no match is found
                         break;
                 }
-                $row->column(2, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
-                    $row->column(2, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamond()));
-                    $row->column(2, new InfoBox(__('coins'), 'dollar', 'yellow', '?type=balance_details', $user->di));
-                    $row->column(2, new InfoBox(__('type'),'', 'green', '?type=balance_details', $userType ?? ''));
+                $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
+                $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+                $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
+                $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
+                $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
+                $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
             }
         )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->packList($id));
@@ -522,8 +520,8 @@ class UserController extends MainController
             return __('no time');
         });
         $grid->column('qty', __('qty'));
-        $grid->column('total', __('totalPrice'));
-        $grid->column('price', __('price'));
+        $grid->column('total', __('total Price'));
+        // $grid->column('price', __('price'));
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
