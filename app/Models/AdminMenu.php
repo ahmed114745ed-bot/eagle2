@@ -10,8 +10,8 @@ class AdminMenu extends Menu
 {
     
 
-    public function getTitleAttribute($value)
-    {
-        return __($value);
-    }
+    // public function getTitleAttribute($value)
+    // {
+    //     return __($value);
+    // }
 }
