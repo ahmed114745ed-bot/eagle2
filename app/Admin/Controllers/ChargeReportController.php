@@ -27,7 +27,6 @@ class ChargeReportController extends MainController {
     {
         return parent::index($content
             ->title(trans("Reports"))
-            ->description("Charges")
             ->row(function(Row $row) {
                 $row->column(12, $this->tabsComponent());
             })
