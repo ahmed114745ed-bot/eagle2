@@ -24,7 +24,7 @@ class NowRoomResource extends JsonResource
         return [
             'is_in_room'      => @$this->now_room_uid != 0,
             'uid'             => @(int)$this->now_room_uid,
-            'is_mine'         => @$this->id == $this->now_room_uid,
+            'is_mine'         => @$this->id == @$this->now_room_uid,
             'password_status' => $pass_status,
             "id"              => @$now_room->id,
             "room_name"       => @$now_room->room_name,

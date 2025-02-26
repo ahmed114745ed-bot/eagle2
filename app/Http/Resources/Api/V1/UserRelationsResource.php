@@ -37,9 +37,9 @@ class UserRelationsResource extends JsonResource
         }
 
         if(self::$userFollowers != null && count(self::$userFollowers) > 0){
-            $isFollow = in_array($this->id, self::$userFollowers);
+            $isFollow = in_array(@$this->id, self::$userFollowers);
         }else{
-            $isFollow = @(bool)Common::IsFollow(@$request->user()->id, $this->id);
+            $isFollow = @(bool)Common::IsFollow(@$request->user()->id, @$this->id);
 
         }
 
@@ -47,11 +47,11 @@ class UserRelationsResource extends JsonResource
             $imageReceiver = $this->getImageReceiverOrSender('receiver_id', 1);
             $imageSender   = $this->getImageReceiverOrSender('sender_id', 2);
         } else {
-            $imageReceiver = count(self::$vipsReceivedImages) > 0 ? self::$vipsReceivedImages->where('level', $this->total_received_level)->first() : null;
-            $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', $this->total_sender_level)->first() : null;
+            $imageReceiver = count(self::$vipsReceivedImages) > 0 ? self::$vipsReceivedImages->where('level', @$this->total_received_level)->first() : null;
+            $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', @$this->total_sender_level)->first() : null;
         }
         $frameAbility = $this->followPacks->where('type', 4)->first();
-        $user = User::where('id', $this->id)->first();
+        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
             'uuid'           => @$this->uuid,
@@ -67,7 +67,7 @@ class UserRelationsResource extends JsonResource
                 'gender' => @$this->profile->gender ?? 1,
                 'country'=> @$this->profile->country?:'',
             ],
-            'country'=> new CountryResource($this->resource),
+            'country'=> new CountryResource(@$this->resource),
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
             'now_room'             =>  new NowRoomResource($this)
@@ -87,9 +87,9 @@ class UserRelationsResource extends JsonResource
                 'sender_level'  =>@$this->total_sender_level ?? 0,
                 'reciver_level' =>@$this->total_received_level ?? 0
             ],
-            'online_time'    => $this->online_time ? date("Y-m-d H:i:s", $this->online_time) : '',
-            'has_color_name' => count($this->followPacks->where('type', 18)) > 0,
-            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => $this->id])->first() != null ? true : false,
+            'online_time'    => @$this->online_time ? date("Y-m-d H:i:s", @$this->online_time) : '',
+            'has_color_name' => count(@$this->followPacks->where('type', 18)) > 0,
+            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => @$this->id])->first() != null ? true : false,
             'is_follow'      => $isFollow,
             "is_gold_id" => (bool)$this->is_gold_id,
             'type_user'            => intval(@$this->type_user) ?: 0, // both
