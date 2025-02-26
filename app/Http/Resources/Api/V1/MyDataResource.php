@@ -165,6 +165,8 @@ class MyDataResource extends JsonResource
                 "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
+                'type-number'                => @$ownerRoom->room_type ?? 0,
+                'type' => @$ownerRoom->myType ?: new \stdClass(),
 
             ],
             'phone_bind' => (bool)@$this->phone,
