@@ -138,7 +138,7 @@ class MomentRepository
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
-            ->take(10)->orderByDesc('id')->get();
+            ->take(10)->orderByDesc('id')->paginate(10);
     }
 
 
