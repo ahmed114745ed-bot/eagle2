@@ -28,7 +28,7 @@ class UserRelationsResource extends JsonResource
 
         $pass_status = false;
 
-        $now_room = $this->room;
+        $now_room = @$this->room;
 
         if ($now_room) {
             if ($now_room->room_pass != null && $now_room->room_pass != '') {
@@ -44,13 +44,13 @@ class UserRelationsResource extends JsonResource
         }
 
         if (!self::$vipsReceivedImages && !self::$vipsSenderImages) {
-            $imageReceiver = $this->getImageReceiverOrSender('receiver_id', 1);
-            $imageSender   = $this->getImageReceiverOrSender('sender_id', 2);
+            $imageReceiver = @$this->getImageReceiverOrSender('receiver_id', 1);
+            $imageSender   = @$this->getImageReceiverOrSender('sender_id', 2);
         } else {
             $imageReceiver = count(self::$vipsReceivedImages) > 0 ? self::$vipsReceivedImages->where('level', @$this->total_received_level)->first() : null;
             $imageSender = count(self::$vipsSenderImages) > 0 ? self::$vipsSenderImages->where('level', @$this->total_sender_level)->first() : null;
         }
-        $frameAbility = $this->followPacks->where('type', 4)->first();
+        $frameAbility = @$this->followPacks->where('type', 4)->first();
         $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
@@ -96,10 +96,10 @@ class UserRelationsResource extends JsonResource
             "manger_type"          =>new MangerTypeResource(@$this->manager),
             "multi_images"          => $this->images?->select("img"),
             "statistic"     => [
-                "visitors" => count($this->profileVisits),
-                "licked" => count($this->likes),
-                "followers" => count($this->followers),
-                "bio" => $this->bio,
+                "visitors" => count(@$this->profileVisits),
+                "licked" => count(@$this->likes),
+                "followers" => count(@$this->followers),
+                "bio" => @$this->bio,
             ],
             'image_color'          => @$this->color_image,
         ];
