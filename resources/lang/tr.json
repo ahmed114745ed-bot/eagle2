@@ -1649,7 +1649,19 @@
     "Host": "Sunucu Temsilcisi",
     "Host Agent": "Sunucu Temsilcisi",
     "Shipping Agent": "Nakliye Temsilcisi",
-    "Resort & Shipping Agent": "Tatil ve Nakliye Temsilcisi"
+    "Resort & Shipping Agent": "Tatil ve Nakliye Temsilcisi",
+    "reel_count": "Rulo Sayısı",
+    "Old total sender level": "Eski toplam gönderici seviyesi",
+    "New total sender level": "Yeni toplam gönderici seviyesi",
+    "Old total received level": "Eski toplam alıcı seviyesi",
+    "New total received level": "Yeni toplam alıcı seviyesi",
+    "Can Play": "Oynayabilir",
+    "Hide Chat": "Sohbeti Gizle",
+    "Transfer Salary": "Maaş Transferi",
+    "Charge Status": "Şarj Durumu",
+    "status user": "Kullanıcı durumu",
+    "total Price": "Toplam Fiyat"
+
 
 
 

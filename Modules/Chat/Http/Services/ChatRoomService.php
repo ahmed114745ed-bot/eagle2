@@ -220,7 +220,10 @@ class ChatRoomService
         // Get chat requests (guest)
         $guestChats = ChatRoom::WhereHas('messages')
             ->select('chat_rooms.*')
-            ->where('chat_rooms.user_id2', $user->id)
+            ->where(function($q) use($user){
+                $q->where('chat_rooms.user_id2', $user->id)
+                ->orWhere('chat_rooms.user_id', $user->id);
+            })
             ->where('chat_rooms.type', 'guest')
             ->has('messages')
             // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')

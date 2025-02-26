@@ -54,6 +54,7 @@ use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
+use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
@@ -311,6 +312,7 @@ Route::group(
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
         $router->resource('reels', ReelController::class);
+        $router->resource('change-level-histories', ChangeLevelHistoryController::class);
         $router->resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
             'create' => 'levels.users.create',

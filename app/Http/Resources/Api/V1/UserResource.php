@@ -29,6 +29,8 @@ class UserResource extends JsonResource
                     'id'     => $this->agency->id,
                     'name'   => $this->agency->name,
                     'status' => $this->agency->status,
+                    'image' => $this->agency->img,
+                    'member_count' => count($this->agency?->mempers),
                     'owner'  => $owner,
                 ];
             } else {
@@ -51,6 +53,7 @@ class UserResource extends JsonResource
                 'owner_id'    => $family->user_id,
                 'family_name' => $family->name,
                 'img'         => $family->image,
+                'num_of_members'     => $family->members_count,
             ];
         }
         // if ($request->user()) {
@@ -164,7 +167,7 @@ class UserResource extends JsonResource
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
             'image_color'          => @$this->color_image,
-            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
@@ -189,9 +192,9 @@ class UserResource extends JsonResource
         // }
         // return '';
         $pack = $this->packs
-        ->where('type', $type)
-        ->where('target_id', $dress)
-        ->first();
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
 
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }

@@ -261,7 +261,7 @@ class UserRepository extends Repository
                     * sin(radians(users.lat)))) AS distance")
             )->whereNotNull('lat')->whereNotNull('long');
         }
-        return     $builder->paginate(10);
+        return     $builder->inRandomOrder()->paginate(10);
     }
 
 

@@ -12,6 +12,6 @@ class AdminMenu extends Menu
 
     public function getTitleAttribute($value)
     {
-        return __($value);
+        return \Str::contains(request()->fullUrl(), 'edit') ? $value : __($value);
     }
 }

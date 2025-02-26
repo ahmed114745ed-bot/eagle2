@@ -776,7 +776,7 @@ Log::info('vip iddddddddddddddddddddd: '.$uvip->vip_id);
 
         // return $vip->level;
         // [
-        return $vipIcon->show_img;
+        return @$vipIcon->show_img ?? '';
         // [
         // 'id'        => 1,
         // 'level'     => $vip->level?? 0,
@@ -805,7 +805,7 @@ Log::info('vip iddddddddddddddddddddd: '.$uvip->vip_id);
 
         if (!$vip) return new \stdClass();
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
-        return @$ware?->{$item};
+        return @$ware?->{$item} ?? '';
     }
 
 
