@@ -838,6 +838,7 @@ class UserService
         $data = [
             'uuid' => $request->uuid,
             'name' => $request->name,
+            'nickname' => $request->nickname,
             'charge_status' => $request->charge_status,
             'transfer_salary' => $request->transfer_salary,
             'can_play' => $request->can_play,

@@ -9,12 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserSetting extends Model
 {
     use HasFactory;
-    protected $fillable=[
-        'user_id',
-        'show_git',
-        'show_intro',
-        'show_banner'
-    ];
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';
