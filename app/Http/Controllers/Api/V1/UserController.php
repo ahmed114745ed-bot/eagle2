@@ -882,7 +882,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'uuid'         => [
                 'required',
-                'exists:users,id',
+                'exists:users,uuid',
                 Rule::unique('users', 'uuid')->ignore($id),
             ],
             'name'         => 'required|string',
