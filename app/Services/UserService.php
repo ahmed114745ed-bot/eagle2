@@ -446,7 +446,7 @@ class UserService
     public function myStore($user, $request)
     {
         $cacheKey = 'cache-data-mystore-' . $user->id;
-        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+        // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
             $targetService = new FixedTargetService($user);
             $targetService->calculateTarget();
@@ -454,7 +454,7 @@ class UserService
                 $roomTarget = new RoomGameServices();
                 $roomTarget->CalculateRoomSalaries($user->ownerRoom);
             }
-        }
+        // }
 
         if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
@@ -850,8 +850,8 @@ class UserService
             'country_id' => $request->country_id,
             'di' => $request->di,
             'user_diamond' => $request->user_diamond,
-            'total_sender_level' => $request->total_sender_level,
-            'total_received_level' => $request->total_received_level,
+            'sender_level' => $request->total_sender_level,
+            'received_level' => $request->total_received_level,
             'salary' => $request->salary,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -878,6 +878,7 @@ class UserService
             'user_id' => $user->id,
         ];
         $this->profileRepository->create($profileData);
+
         $dataUserSitting = [
             'show_invite_code' => $request->show_invite_code,
             'hide_chat' => $request->hide_chat,
