@@ -4,9 +4,11 @@ namespace App\Admin\Controllers;
 
 use App\Models\User;
 use Encore\Admin\Form;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use App\Models\ChangeLevelHistory;
+use Illuminate\Support\Facades\Auth;
 
 class UserLevelController extends MainController
 {
@@ -18,7 +20,7 @@ class UserLevelController extends MainController
     protected $title = 'User Levels';
 
     public $permission_name = 'user-levels';
-    
+
 
     public function index(Content $content)
     {
@@ -54,11 +56,11 @@ class UserLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $grid->quickSearch ();
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('uuid',__ ('uuid'));
+        $grid->quickSearch();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('uuid', __('uuid'));
             });
         });
 
@@ -74,6 +76,12 @@ class UserLevelController extends MainController
         });
 
         $grid->disableCreateButton();
+
+        $grid->tools(function (Grid\Tools $tools){
+            $url = '/admin/change-level-histories';
+            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
+            $tools->append($button);
+        });
         return $grid;
     }
 
@@ -85,7 +93,7 @@ class UserLevelController extends MainController
      */
     protected function detail($id)
     {
-//        $show = new Show(User::findOrFail($id));
+        //        $show = new Show(User::findOrFail($id));
 
         return null;
     }
@@ -99,10 +107,27 @@ class UserLevelController extends MainController
     {
         $form = new Form(new User());
 
-        $form->text ('uuid', __('uuid'))->updateRules('unique:users,uuid,{{id}}')->creationRules('unique:users,uuid')->required();
-        $form->number ('total_sender_level', __('Sender Level'))->default(0);
-        $form->number ('total_received_level', __('Received Level'))->default(0);
+        $form->text('uuid', __('uuid'))->updateRules('unique:users,uuid,{{id}}')->creationRules('unique:users,uuid')->required();
+        $form->number('total_sender_level', __('Sender Level'))->default(0);
+        $form->number('total_received_level', __('Received Level'))->default(0);
+        $form->saving(function (Form $form) {
 
+            $new_total_sender_level = $form->input('total_sender_level');
+            $old_total_sender_level = $form->model()->getOriginal('total_sender_level');
+            $new_total_received_level = $form->input('total_received_level');
+            $old_total_received_level = $form->model()->getOriginal('total_received_level');
+            $userId = $form->model()->id;
+
+            ChangeLevelHistory::create([
+                'user_id' =>  $userId,
+                'admin_id' => Auth::id(),
+                'old_total_sender_level' => $old_total_sender_level,
+                'new_total_sender_level' => $new_total_sender_level,
+                'old_total_received_level' => $old_total_received_level,
+                'new_total_received_level' => $new_total_received_level,
+
+            ]);
+        });
         return $form;
     }
 }

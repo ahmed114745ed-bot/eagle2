@@ -34,7 +34,7 @@ class MomentRepository
     public function getMomentById($id, $userId)
     {
         return Moment::where('id', $id)
-            ->likeExists($userId)
+            ->likeExists($userId)->with('images')
             ->with('user')
             ->withCount(['likes', 'comments'])
             ->with(['gifts' => function ($query) {
@@ -52,7 +52,7 @@ class MomentRepository
     public function getUserMoments($userId, $page)
     {
         return Moment::where('user_id', $userId)
-            ->whereHas('user')
+            ->whereHas('user')->with('images')
             ->likeExists($userId)
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
@@ -73,7 +73,7 @@ class MomentRepository
         return MomentLikes::with([
             'moment.user',
             'moment' => function ($query) use ($userId) {
-                $query->likeExists($userId)
+                $query->likeExists($userId)->with('images')
                     ->withCount(['likes', 'comments'])
                     ->with(['gifts' => function ($query) {
                         $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
@@ -97,7 +97,7 @@ class MomentRepository
             ->with([
                 'moments.user',
                 'moments' => function ($query) use ($userId) {
-                    $query->likeExists($userId)
+                    $query->likeExists($userId)->with('images')
                         ->withCount(['likes', 'comments'])
                         ->with(['gifts' => function ($query) {
                             $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
@@ -114,7 +114,7 @@ class MomentRepository
     public function getAllMoments($userId, $page)
     {
         return Moment::likeExists($userId)
-            ->whereHas('user')
+            ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
@@ -131,14 +131,14 @@ class MomentRepository
     public function getNewMoments($userId)
     {
         return Moment::likeExists($userId)
-            ->whereHas('user')
+            ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
-            ->take(10)->orderByDesc('id')->get();
+            ->take(10)->orderByDesc('id')->paginate(10);
     }
 
 
@@ -146,7 +146,7 @@ class MomentRepository
     {
         $followId = Follow::where('user_id', $userId)->pluck('followed_user_id');
         return Moment::likeExists($userId)->whereIn('user_id', $followId)
-            ->whereHas('user')
+            ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
             ->with(['user', 'gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))

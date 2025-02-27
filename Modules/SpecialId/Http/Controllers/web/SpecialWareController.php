@@ -84,9 +84,9 @@ class SpecialWareController extends  MainController
             ]
         );
         $grid->column('value', __('value'));
-        $grid->title(__('title'));
-        $grid->column('price', __('price'))->editable();
-        $grid->level(__('level'));
+        $grid->column('price', __('price'))->display (function ($coin){
+            return number_format($coin); 
+         })->editable();
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));

@@ -372,6 +372,7 @@ class AgencyService
         if ($Host_agency == 1) {
             $user->type_user = 2;
             $user->agency_id = $agency->id;
+            $user->monthly_diamond_received = 0;
             $user->save();
         }
         if ($agency->additionalInfo->gmail) {
@@ -826,6 +827,7 @@ class AgencyService
         $data = [
             'agency_id' =>  $agency->id,
             'type_user' => $userType,
+            'monthly_diamond_received' => 0,
         ];
         $this->userRepository->update($data, $request->app_owner_id);
         return true;
@@ -840,6 +842,7 @@ class AgencyService
             $data = [
                 'agency_id' => 0,
                 'type_user' => 0,
+               'monthly_diamond_received' => 0,
             ];
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
@@ -859,6 +862,7 @@ class AgencyService
         $data = [
             'agency_id' =>  $agency->id,
             'type_user' => $userType,
+            'monthly_diamond_received' => 0,
         ];
         $this->userRepository->update($data, $request->app_owner_id);
         $dataAgency = [
@@ -916,7 +920,7 @@ class AgencyService
         $this->agencyJoinRequestRepository->update($data, $id);
         if ($request->status == 1) {
             UserCommon::userVip($user);
-            $this->userRepository->update(['type_user' => 1], $user->id);
+            $this->userRepository->update(['type_user' => 1,'monthly_diamond_received' => 0], $user->id);
         }
         return true;
     }

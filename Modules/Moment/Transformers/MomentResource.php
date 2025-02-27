@@ -26,11 +26,12 @@ class MomentResource extends JsonResource
             'created_at'         => $this->created_at,
             'updated_at'         => $this->updated_at ?? '',
             'img'                => $this->img ?? '',
+            'images'             => $this->images,
             'is_like'            => @$this->likes_exists ?? false,
+            'images'             => @$this->images,
             'user'               => @$this->whenLoaded('user') ?  new UserResource($this->whenLoaded('user')) : [],
             // 'user' => optional($this->user??0)->relationLoaded('user') ? new UserResource($this->user) : [],
 
         ];
-
     }
 }

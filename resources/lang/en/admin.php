@@ -181,6 +181,14 @@ return [
     'delete_video' => 'Delete Video',
     'price' => 'price',
     'value' => 'value',
+    'Choose Library' => 'Choose Library',
+    'Agora' => 'Agora',
+    'Zego' => 'Zego',
+    'server_secret' => 'server_secret',
+    'app_id' => 'app_id',
+    'app_sign' => 'app_sign',
+    'app_id' => 'app_id',
+
     
 
 

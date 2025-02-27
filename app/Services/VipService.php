@@ -258,6 +258,7 @@ class VipService
                     'expire'   => $ex,
                     'qty'      => $userVip->qty + $qty,
                     'total'    => $userVip->total + $total,
+                    'is_used'  => 1,
 
                 ];
                 $this->userVipRepository->update($data, $userVip->id);

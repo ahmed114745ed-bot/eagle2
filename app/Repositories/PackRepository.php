@@ -4,8 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Pack;
 use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\PackRepository as Repository;
 
-class PackRepository
+class PackRepository extends Repository
 {
     public function getExistingPack($userId, $type, $targetId)
     {

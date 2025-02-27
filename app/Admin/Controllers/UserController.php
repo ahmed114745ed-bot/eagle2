@@ -135,7 +135,6 @@ class UserController extends MainController
         $grid->model()->with("ownerRoom");
 
         $grid->model();
-        //$grid->model()->where('phone', '!=', '');//scope
 
         if (request()->online == 1) {
             $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp);
@@ -170,60 +169,55 @@ class UserController extends MainController
                 return number_format($value);
             });
         }
-        //$grid->column('original_uuid', __('uuid'));
-        //$grid->column('uuid', __('uuid used'));
-        //$grid->column('uuid1', __('uuid used'))->display(function () {
-        //    return $this->id;
-        //});
+
         $grid->column('uuid', __('uuid'))->display(function () {
             return $this->uuid . ' ' . $this->original_uuid;
         });
-
-
-        //        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
-        //   return $value??'undefined name';
-        //});
 
 
         $grid->column('nickname', __('NickName'));
-        $states = [
-            'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
-            'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
-        ];
 
-        $grid->column('charge_status', __("charge status"))->switch($states);
-        $grid->column('transfer_salary', __("transfer_salary"))->switch($states);
-        $grid->column('userSetting.show_invite_code', __("show invite code"))->switch($states);
+        $grid->column('return', __('status user'))->display(function () {
+            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+            return (new \App\Admin\Actions\UserAction(
+                $this->id,
+                $this->charge_status,
+                $this->transfer_salary,
+                $userSetting->show_invite_code,
+                $userSetting->hide_chat,
+                $this->can_play
+            ))->render();
+        });
 
-        $grid->column('userSetting.hide_chat', __("hide_chat"))->switch($states);
-        $grid->column(__('reals_count'))->display(function () {
-            return count($this->reals);
+
+        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
+
+            $results = [
+                __('reel count') => $this->reals()->count() ?? 0,
+                __('moment_count') => $this->moments()->count() ?? 0,
+                __('total_days') => $this->total_days ?? 0,
+                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+            ];
+
+            return new Table([__('Field Name'), __('Value')], $results);
         });
-        $grid->column(__('moment_count'))->display(function () {
-            return count($this->moments);
+
+
+
+        $grid->column('profile.avatar', __('image'))->display(function ($path) {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('total_days', __('total_days'));
-        $grid->column(__('total_hours'))->display(function () {
-            return $this->liveTime->sum("hours");
-        });
-        $grid->column('profile.avatar', __('image'))->image('', 50);
         $grid->column('profile.image_id', __('image Id'))->image('', 50);
-        $grid->column('can_play', trans('canPlay'))->value(function ($can_play) {
 
-            $can_play = UserHandling::chickLevelToPlay($this);
-            return $can_play ? 'on' : 'off';
-        })->switch([
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        ]);
 
 
         $grid->column('phone', __('Phone'));
-        //        $grid->column('di', __('coins'));
-        //        $grid->column('gold', __('silver coins'));
-        //        $grid->column('coins', __('diamonds'));
-        //        $grid->column('status', __('block status'))->switch (Common::getSwitchStates2 () );
         $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
             if ($model->agency_id) {
                 $a = Agency::query()->find($model->agency_id);
@@ -400,10 +394,37 @@ class UserController extends MainController
                     $user->flowers = 0;
                     $user->save();
                 }
-                $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
-                $row->column(3, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->coins));
+
+                $type = $user->type_user;
+                switch ($type) {
+                    case 0:
+                        $userType = __("User");
+                        break;
+                    case 1:
+                        $userType = __("Host");
+                        break;
+                    case 2:
+                        $userType = __("Host Agent");
+                        break;
+                    case 3:
+                        $userType = __("Shipping Agent");
+                        break;
+                    case 4:
+                        $userType = __("Resort & Shipping Agent");
+                        break;
+                    case 5:
+                        $userType = __("Admin");
+                        break;
+                    default:
+                        $userType = $type; // Keep the original value if no match is found
+                        break;
+                }
+                $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
+                $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+                $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
+                $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
+                $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
+                $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
             }
         )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->packList($id));
@@ -499,8 +520,8 @@ class UserController extends MainController
             return __('no time');
         });
         $grid->column('qty', __('qty'));
-        $grid->column('total', __('totalPrice'));
-        $grid->column('price', __('price'));
+        $grid->column('total', __('total Price'));
+        // $grid->column('price', __('price'));
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
@@ -531,10 +552,37 @@ class UserController extends MainController
                         $user->flowers = 0;
                         $user->save();
                     }
-                    $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(3, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                    $row->column(3, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
-                    $row->column(3, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->coins));
+                    $type = $user->type_user;
+                    switch ($type) {
+                        case 0:
+                            $userType = __("User");
+                            break;
+                        case 1:
+                            $userType = __("Host");
+                            break;
+                        case 2:
+                            $userType = __("Host Agent");
+                            break;
+                        case 3:
+                            $userType = __("Shipping Agent");
+                            break;
+                        case 4:
+                            $userType = __("Resort & Shipping Agent");
+                            break;
+                        case 5:
+                            $userType = __("Admin");
+                            break;
+                        default:
+                            $userType = $type; // Keep the original value if no match is found
+                            break;
+                    }
+
+                    $row->column(2, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
+                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
+                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
+                    $row->column(2, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
+                    $row->column(2, new InfoBox(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
+                    $row->column(2, new InfoBox(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
                 }
             );
     }
@@ -725,9 +773,9 @@ class UserController extends MainController
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-        $form->text('facebook_id', __('facebook id'));
-        $form->text('google_id', __('google id'));
-        $form->text('huawei_id', __('huawei_id'));
+        // $form->text('facebook_id', __('facebook id'));
+        // $form->text('google_id', __('google id'));
+        // $form->text('huawei_id', __('huawei_id'));
         //        $form->switch ('is_host',__('is host'))->options (Common::getSwitchStates ());
 
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
@@ -783,7 +831,7 @@ class UserController extends MainController
 
         ])->default(0);
 
-/*         $ops2 = [];
+        /*         $ops2 = [];
         foreach (MangerType::get() as $manger_type) {
             $ops2[$manger_type->id] = $manger_type->name_en . '_' . $manger_type->description_en;
         }

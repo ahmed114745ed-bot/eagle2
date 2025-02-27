@@ -107,18 +107,48 @@ class AgencyJoinRequestController extends MainController
         });
 
         $grid->id(__('ID'));
-        $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
-            if ($model->user_id) {
-                return Common::getUserShow($model->user_id);
-            }
-            return null;
-        });
-        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
-            if ($model->agency_id) {
-                return Common::getAgencyShow($model->agency_id);
-            }
-            return null;
-        });
+        // $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
+        //     if ($model->user_id) {
+        //         return Common::getUserShow($model->user_id);
+        //     }
+        //     return null;
+        // });
+        // $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
+        //     if ($model->agency_id) {
+        //         return Common::getAgencyShow($model->agency_id);
+        //     }
+        //     return null;
+        // });
+        $grid->column('user.name', __('User'))
+            ->display(function ($name) {
+                $uid = @$this->user->uuid;
+                $path = @$this->user?->profile?->avatar;
+                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+            });
+        $grid->column('agency.name', __('Agency'))
+            ->display(function ($name) {
+                $path = @$this->agency->img;
+                $url = getImagePath($path)?? asset("images/icon-agency.jpg");
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <span>$name</span>
+                </div>
+            ";
+            });
         $grid->column('whatsapp', __('whatsapp'));
         $grid->column('status', __('status'))->using(
             [
@@ -206,7 +236,7 @@ class AgencyJoinRequestController extends MainController
 
                 $update = DB::table('users')
                     ->where('id', $user_id)
-                    ->update(['type_user' => 1]);
+                    ->update(['type_user' => 1,'monthly_diamond_received' => 0]);
 
                 if (!$update) {
                     $error = new MessageBag([

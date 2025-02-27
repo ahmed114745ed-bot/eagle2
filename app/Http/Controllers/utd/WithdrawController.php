@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Models\PaymentWithdrawType;
 use Illuminate\Http\Request;
+use App\Models\PaymentWithdrawType;
+use App\Http\Controllers\Controller;
+use App\Models\PaymentWithdrawField;
 
 class WithdrawController extends Controller
 {
@@ -24,7 +25,7 @@ class WithdrawController extends Controller
 
     public function show($id)
     {
-        $result = PaymentWithdrawType::findOrFail($id);
+        $result = PaymentWithdrawType::with('withdrawFields')->findOrFail($id);
 
         return Common::apiResponse(true, 'Success', $result);
     }
@@ -66,7 +67,7 @@ class WithdrawController extends Controller
             'image' => 'nullable|image',
             'min_value' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
-            'withdrawFields' => 'nullable|string',
+            'withdrawFields' => 'nullable',
         ]);
 
 
@@ -79,25 +80,30 @@ class WithdrawController extends Controller
         $paymentWithdrawType = PaymentWithdrawType::create($data);
 
         if ($request->has('withdrawFields')) {
-            $json_decoded  = json_decode($request->withdrawFields, true);
+            $paymentWithdrawTypes  = json_decode($request->withdrawFields, true);
 
-            $paymentWithdrawType->withdrawFields()->createMany($json_decoded);
+            foreach ($paymentWithdrawTypes as &$withdrawField) { // Use &$withdrawField to modify the array directly
+                $withdrawField['payment_withdraw_type_id'] = $paymentWithdrawType->id;
+                PaymentWithdrawField::create($withdrawField);
+            }
+            // $paymentWithdrawType->withdrawFields()->attach($json_decoded);
         }
 
         return Common::apiResponse(true, 'Success', $paymentWithdrawType);
     }
 
-    public function update($id, Request $request){
+    public function update($id, Request $request)
+    {
         $request->validate([
             'name' => 'required|string',
             'name_en' => 'required|string',
-            'image' => 'nullable|image',
+            'image' => 'nullable',
             'min_value' => 'required|numeric',
             'exchange_rate' => 'required|numeric',
-            'withdrawFields' => 'nullable|string',
+            'withdrawFields' => 'nullable',
         ]);
 
-    $paymentWithdrawType = PaymentWithdrawType::findOrFail($id);
+        $paymentWithdrawType = PaymentWithdrawType::findOrFail($id);
 
         $data = $request->except('image');
 
@@ -109,8 +115,11 @@ class WithdrawController extends Controller
 
         if ($request->has('withdrawFields')) {
             $paymentWithdrawType->withdrawFields()->delete();
-            $json_decoded = json_decode($request->withdrawFields,true);
-            $paymentWithdrawType->withdrawFields()->createMany($json_decoded);
+            $paymentWithdrawTypes  = json_decode($request->withdrawFields, true);
+            foreach ($paymentWithdrawTypes as &$withdrawField) { // Use &$withdrawField to modify the array directly
+                $withdrawField['payment_withdraw_type_id'] = $paymentWithdrawType->id;
+                PaymentWithdrawField::create($withdrawField);
+            }
         }
 
         return Common::apiResponse(true, 'Success', $paymentWithdrawType);

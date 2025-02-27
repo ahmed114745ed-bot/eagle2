@@ -29,6 +29,8 @@ class UserResource extends JsonResource
                     'id'     => $this->agency->id,
                     'name'   => $this->agency->name,
                     'status' => $this->agency->status,
+                    'image' => $this->agency->img,
+                    'member_count' => count($this->agency?->mempers),
                     'owner'  => $owner,
                 ];
             } else {
@@ -51,6 +53,7 @@ class UserResource extends JsonResource
                 'owner_id'    => $family->user_id,
                 'family_name' => $family->name,
                 'img'         => $family->image,
+                'num_of_members'     => $family->members_count,
             ];
         }
         // if ($request->user()) {
@@ -73,6 +76,7 @@ class UserResource extends JsonResource
         $bubble = $this->getUserDress(5, $this->dress_2, 'show_img');
         //  Common::getUserDress($this->id, $this->dress_2, 5, 'show_img', true);
         $intro  = $this->getUserDress(6, $this->dress_3, 'img2') ?? $this->getUserDress(6, $this->dress_3, 'img1');
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
         //  Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true) ?: Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
 
         $isHideCountry = $this->getPackWithType(13);
@@ -128,6 +132,7 @@ class UserResource extends JsonResource
             // both    --------------
             'frame'                => $frame, // both
             'intro'                => $intro, // both
+            'intro_type' => $introType,
             'bubble'               => $bubble, // both
             'bubble_id'            => $bubble != '' ? $this->dress_2 : 0, // both
             'frame_id'             => $frame != '' ? @$this->dress_1 : 0, // both
@@ -162,7 +167,7 @@ class UserResource extends JsonResource
             'level' => Common::level_center($this->id),
             'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
             'image_color'          => @$this->color_image,
-            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
@@ -187,9 +192,9 @@ class UserResource extends JsonResource
         // }
         // return '';
         $pack = $this->packs
-        ->where('type', $type)
-        ->where('target_id', $dress)
-        ->first();
+            ->where('type', $type)
+            ->where('target_id', $dress)
+            ->first();
 
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }

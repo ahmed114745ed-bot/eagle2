@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,7 +32,7 @@ class ChargeRecievedInfoResource extends JsonResource
             'sender'=>$sender_data,
             'value'=>$this->amount,
             'usd'=> $this->usd,
-            'time'=>$this->created_at->format('Y-m-d h:i:s A')
+            'time'=>Carbon::parse($this->created_at)->format('Y-m-d h:i:s A')
         ];
     }
 }

@@ -9,6 +9,7 @@ use App\Enums\TypeGeneralRole;
 use App\Http\Controllers\Controller;
 use Modules\Events\Entities\GeneralRole;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class RoleEventController extends Controller
 {
@@ -51,7 +52,11 @@ class RoleEventController extends Controller
     public function update($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|string|unique:general_roles,type' . $id,
+            'type' => [
+                'required',
+                'string',
+                Rule::unique('general_roles', 'type')->ignore($id)
+            ],
             'url' => 'required',
             'sub_type' => 'nullable|string',
             'desc_en' => 'required',

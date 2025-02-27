@@ -66,7 +66,7 @@ class ChargeCountryController extends Controller
     {
         $validator = Validator::make($request->all(), [
 
-            'country_id' => 'required|integer|unique:charge_countries,country_id' . $id,
+            'country_id' => 'required|integer|unique:charge_countries,country_id,' . $id,
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -98,11 +98,11 @@ class ChargeCountryController extends Controller
         $page = $request->page;
         $perPage = $request->per_page;
         $search = $request->search;
-        $countries = Country::query()->WhereDoesntHave('chargeCountry')->when(isset($id), function ($query) use ($id) {
+        $countries = Country::query()->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->when(isset($search), function ($query) use ($search) {
-            $query->where('name', 'like', "% $search%")->orWhere('e_name', 'like', "% $search%");
+            $query->where('name', 'like', "%$search%")->orWhere('e_name', 'like', "%$search%");
         })->paginate($perPage, ['*'], 'page', $page);
-        return response()->json($countries);
+        return Common::apiResponse(true, '', $countries);
     }
 }

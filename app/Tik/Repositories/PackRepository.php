@@ -17,7 +17,6 @@ class PackRepository extends AbstractRepository
     public function __construct()
     {
         parent::__construct(new Pack());
-
     }
 
 
@@ -39,7 +38,7 @@ class PackRepository extends AbstractRepository
         return $this->model->query()->where('user_id', $userId)->where('type', $type)->where('is_used', !$isAvailable)->exists();
     }
 
-    public function changeAvailabilityAllPack($userId,$type,$isAvailable)
+    public function changeAvailabilityAllPack($userId, $type, $isAvailable)
     {
         $this->model->query()->where('user_id', $userId)->where('type', $type)->update(['is_used' => $isAvailable]);
         return true;
@@ -97,7 +96,7 @@ class PackRepository extends AbstractRepository
         return true;
     }
 
-    public function packsJoinWithGift($userId, $type) : \Illuminate\Support\Collection
+    public function packsJoinWithGift($userId, $type): \Illuminate\Support\Collection
     {
         return $this->model->join('gifts as b', 'packs.target_id', '=', 'b.id')
             ->where(['packs.user_id' => $userId, 'packs.type' => $type])
@@ -105,7 +104,7 @@ class PackRepository extends AbstractRepository
             ->get();
     }
 
-    public function packsJoinWithWare($userId, $type) : \Illuminate\Support\Collection
+    public function packsJoinWithWare($userId, $type): \Illuminate\Support\Collection
     {
         return $this->model->join('wares as b', 'packs.target_id', '=', 'b.id')
             ->where(['packs.user_id' => $userId, 'packs.type' => $type])
@@ -135,5 +134,13 @@ class PackRepository extends AbstractRepository
     public function  bestSale()
     {
         return $this->model->select('target_id', \DB::raw('SUM(num) as total_num'))->groupBy('target_id')->with('ware')->orderByDesc('total_num')->limit(10)->get();
+    }
+
+    public function userPacks($type, $userId, $perPage, $page)
+    {
+        return $this->model->where('user_id', $userId)
+            ->when(isset($type), function ($query) use ($type) {
+                $query->where('type', $type);
+            })->active()->paginate($perPage, ['*'], 'page', $page);
     }
 }

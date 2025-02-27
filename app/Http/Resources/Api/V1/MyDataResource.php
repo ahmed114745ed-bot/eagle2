@@ -31,7 +31,7 @@ class MyDataResource extends JsonResource
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'members_num' => $family->members_count,
+                'num_of_members' => $family->members_count,
                 'level' => $family->level,
             ];
         }
@@ -64,6 +64,8 @@ class MyDataResource extends JsonResource
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
+                'image' =>$agency_joined->img,
+                'member_count' => count($agency_joined->mempers),
                 'owner' => $owner,
             ];
         } else {
@@ -91,9 +93,11 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
+    
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
+        $introType = $this->getUserDress(6, $this->dress_3, 'image_type');
 
         $isHideCountry = $this->getPackWithType(13);
 
@@ -140,7 +144,7 @@ class MyDataResource extends JsonResource
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
             'intro' => $intro,
-            'intro_type' => @$this->dress3?->image_type ?? '',
+            'intro_type' => $introType,
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
@@ -161,6 +165,8 @@ class MyDataResource extends JsonResource
                 "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
                 "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
+                'type-number'                => @$ownerRoom->room_type ?? 0,
+                'type' => @$ownerRoom->myType ?: new \stdClass(),
 
             ],
             'phone_bind' => (bool)@$this->phone,
@@ -201,8 +207,8 @@ class MyDataResource extends JsonResource
             $this->mergeWhen($request->show_counter == true, [
                 'unread_counter'       =>  $counters,
             ]),
-            'profile_frame' =>common::wareUserVip($this->id, 28, 'img2'),
-            'profile_frame_id' =>common::wareUserVip($this->id, 28, 'id'),
+            'profile_frame' => common::wareUserVip($this->id, 28, 'img2'),
+            'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             'company_number' => Common::getConfig('company_number'),
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",

@@ -45,6 +45,7 @@ use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\TargetPercentageController;
@@ -53,6 +54,7 @@ use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
+use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
@@ -310,6 +312,7 @@ Route::group(
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
         $router->resource('reels', ReelController::class);
+        $router->resource('change-level-histories', ChangeLevelHistoryController::class);
         $router->resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
             'create' => 'levels.users.create',
@@ -348,6 +351,7 @@ Route::group(
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+        $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);

@@ -2,6 +2,7 @@
 
 namespace Modules\Chat\Http\Services;
 
+use App\Models\GiftLog;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -39,10 +40,10 @@ class ChatRoomService
             $this->inviteToSpecificUsers($userId, $data, $userIds);
         }
 
-        $this->countReel($data, $type , $userId, $userIds);
+        $this->countReel($data, $type, $userId, $userIds);
     }
 
-    public function countReel($data,  $type , $userId, $userIds)
+    public function countReel($data,  $type, $userId, $userIds)
     {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
@@ -219,7 +220,10 @@ class ChatRoomService
         // Get chat requests (guest)
         $guestChats = ChatRoom::WhereHas('messages')
             ->select('chat_rooms.*')
-            ->where('chat_rooms.user_id2', $user->id)
+            ->where(function($q) use($user){
+                $q->where('chat_rooms.user_id2', $user->id)
+                ->orWhere('chat_rooms.user_id', $user->id);
+            })
             ->where('chat_rooms.type', 'guest')
             ->has('messages')
             // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
@@ -323,9 +327,23 @@ class ChatRoomService
     {
         // Get room data and check if it has a password
         $room = Room::where('uid', $user2->now_room_uid)->first();
+
         return [
             'room_owner_id' => $user2->now_room_uid,
-            'has_password' => $room && $room->room_pass ? true : false
+            'owner' => [
+                'uuid' => $user2->uuid ?? 0,
+            ],
+            'has_password' => $room && $room->room_pass ? true : false,
+            'room' => [
+                'id' => @$room->id ?? 0,
+                'name'  => @$room->room_name ?? '',
+                'image' =>  @$room->room_cover ?? '',
+                'mode' => @$room->mode ?? 0,
+                'room_background' => @$room->final_room_image ?? '',
+                'exp' => @$room?->session_string,
+            ],
+
+
         ];
     }
 

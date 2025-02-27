@@ -11,6 +11,7 @@ use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
 use App\Models\RequestBackgroundImage;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RequestBackgroundImageController extends MainController
@@ -81,9 +82,85 @@ class RequestBackgroundImageController extends MainController
     {
         $grid = new Grid(new RequestBackgroundImage);
         $grid->model()->orderByDesc('id');
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('status', __('status'))->select([
+                    0 => __('pending'),
+                    1 => __('accepted'),
+                    2 => __('denied'),
+
+                ]);
+            });
+        });
         $grid->id(__('admin.ID'));
         $grid->owner_room_id(__('owner room id'));
-        $grid->img(__('image'))->image('', 30);;
+
+        $grid->column('owner.name', __('owner'))
+            ->display(function ($name) {
+                $uid = @$this->owner->uuid;
+                $path = @$this->owner?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div>
+                            <strong>$name</strong><br>
+                            <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                        </div>
+                    </div>
+                ";
+            });
+
+        $grid->img(__('image'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img);
+            if (!isImageExists($path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
+                    <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+                    
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
+            
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
+            
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+            
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
+
         $grid->status(__('status'))->using(
             [
                 0 => __('pending'),
@@ -91,8 +168,14 @@ class RequestBackgroundImageController extends MainController
                 2 => __('denied')
             ]
         );
-        $grid->created_at(trans('admin.created_at'));
-        $grid->updated_at(trans('admin.updated_at'));
+        $grid->column('expair', __('expire'));
+
+        $grid->updated_at(trans('admin.updated_at'))->diffForHumans();
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -172,4 +255,6 @@ class RequestBackgroundImageController extends MainController
 
         return $form;
     }
+
+    
 }

@@ -2,11 +2,12 @@
 
 namespace Modules\Moment\Entities;
 
+use Carbon\Carbon;
 use App\Models\Gift;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\MomentGallery;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
 
 class Moment extends Model
 {
@@ -43,6 +44,11 @@ class Moment extends Model
     public function gifts()
     {
         return $this->belongsToMany(Gift::class, 'moment_user_gifts');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(MomentGallery::class);
     }
 
 

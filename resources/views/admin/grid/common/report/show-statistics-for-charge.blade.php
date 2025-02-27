@@ -66,7 +66,8 @@
                         }
 
                     @endphp
-                    <input type="text" class="form-control" name="{{ $name }}" id="{{ $name }}" value="{{ $value }}">
+                    <input type="text" class="form-control" name="{{ $name }}" id="{{ $name }}" value="{{ $value }}" readonly>
+
 
                 </div>
             @endforeach

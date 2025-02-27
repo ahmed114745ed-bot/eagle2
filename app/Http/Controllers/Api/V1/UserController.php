@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use DB;
 use Auth;
 use Exception;
+use App\Models\Pack;
 use App\Models\User;
+use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Target;
@@ -21,11 +23,16 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CpUserResource;
 use App\Http\Resources\MyDataUtdResource;
+use App\Http\Resources\UserIntroResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\UserPackUtdResource;
 use App\Http\Resources\UserPackVipResource;
 use App\Http\Resources\Api\V1\MyDataResource;
+use App\Http\Resources\Api\V1\OnlineResource;
 use App\Http\Resources\UserVisitRoomResource;
 use App\Http\Resources\Api\V1\MyStoreResource;
 use App\Http\Services\ProfileRelationsService;
@@ -33,6 +40,7 @@ use App\Http\Resources\Api\V1\AllUsersResource;
 use App\Http\Resources\Api\V1\ShowUserResource;
 use App\Http\Resources\Api\V1\UserTypeResource;
 use App\Http\Resources\Api\V1\LevelUserResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
@@ -40,9 +48,6 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
-use App\Http\Resources\UserIntroResource;
-use App\Models\Pack;
-use App\Models\Ware;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -954,6 +959,28 @@ class UserController extends Controller
         }
     }
 
+    public function userPacks($id, Request $request)
+    {
+        try {
+            $data = $this->userService->userPacks($request->type, $id, $request->per_page, $request->page);
+            return Common::apiResponse(true, 'done',  UserPackUtdResource::collection($data));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+    public function userVip($id)
+    {
+        try {
+            $data = $this->userService->userPacksAndVip($id);
+            return Common::apiResponse(true, 'done', UserVipUtdResource::collection($data->userHaveVip));
+        } catch (Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
     public function userVisitRooms($id)
     {
         $data = $this->userService->VisitRoom($id);
@@ -963,7 +990,7 @@ class UserController extends Controller
     public function allCpUser($id)
     {
         $data = $this->userService->allUserCp($id);
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', CpUserResource::collection($data));
     }
 
     public static function by_user_filter()
@@ -986,12 +1013,12 @@ class UserController extends Controller
     public function allUsersPlayGame()
     {
         $data = $this->userService->allUsersPlayGame();
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', UserResourceSerche::collection($data));
     }
 
     public function online()
     {
         $data = $this->userService->online();
-        return Common::apiResponse(true, 'done', $data);
+        return Common::apiResponse(true, 'done', OnlineResource::collection($data));
     }
 }

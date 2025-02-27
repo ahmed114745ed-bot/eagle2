@@ -2,11 +2,13 @@
 
 namespace Modules\Moment\Transformers;
 
+use Carbon\Carbon;
 use App\Models\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+
 class UserResource extends JsonResource
 {
     /**
@@ -33,17 +35,17 @@ class UserResource extends JsonResource
 
         $vip       = @Common::ovip_center($this->id) ?? 0;
         $vip_level = (gettype($vip) == 'array') ? $vip['level'] : 0;
-       // $frame  = Common::getUserDress($this->id, $this->dress_1, 4, 'img2') ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1');
-       $frameDress  = $this->dress1;
-       $frame  = ($this->packs->where('type', 4)->first() != null)? (($frameDress != null) ? $frameDress->img2: ''): '';
+        // $frame  = Common::getUserDress($this->id, $this->dress_1, 4, 'img2') ?: Common::getUserDress($this->id, $this->dress_1, 4, 'img1');
+        $frameDress  = $this->dress1;
+        $frame  = ($this->packs->where('type', 4)->first() != null) ? (($frameDress != null) ? $frameDress->img2 : '') : '';
 
-       $pass_status = false;
-       $now_room    = Room::query()->where('uid', $this->now_room_uid)->first();
-       if ($now_room) {
-           if ($now_room->room_pass) {
-               $pass_status = true;
-           }
-       }
+        $pass_status = false;
+        $now_room    = Room::query()->where('uid', $this->now_room_uid)->first();
+        if ($now_room) {
+            if ($now_room->room_pass) {
+                $pass_status = true;
+            }
+        }
 
         return [
             'id'                 => @$this->id, // both
@@ -58,21 +60,25 @@ class UserResource extends JsonResource
             'sender_img'         => $sender_img, // both
             'vip'                => $vip_level, // both
             'has_color_name'     => Common::hasInPack($this->id, 18), // both
-            'frame_id'           => $frame != ''? @$this->dress_1 : 0,
+            'frame_id'           => $frame != '' ? @$this->dress_1 : 0,
             'frame'              => $frame,
-            'senderLevel'        =>$this->total_sender_level,
-            'reciverLevel'        =>$this->total_received_level,
+            'senderLevel'        => $this->total_sender_level,
+            'reciverLevel'        => $this->total_received_level,
             'now_room'             => [
                 'is_in_room'      => @$this->now_room_uid != 0,
-                'uid'             => @(integer)$this->now_room_uid,
+                'uid'             => @(int)$this->now_room_uid,
                 'is_mine'         => @$this->id == $this->now_room_uid,
                 'password_status' => $pass_status
             ],
             'type_user'            => intval(@$this->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->mangerType)
-
+            "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            'age'    => Carbon::parse(@$this->profile->birthday)->age,
+            'gender' => @$this->profile->gender ?? 1,
+            'is_follow'            => $this->is_follow,
+            'image_color'          => @$this->color_image ?? '',
+            'special_color'    => @$this->color_id ?? '',
+            'color_name'   => common::wareUserVip($this->id, 18, 'color') ?? ''
 
         ];
-
     }
 }

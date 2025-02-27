@@ -2,18 +2,20 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Models\Ware;
 use App\Helpers\Common;
 use App\Models\AppFeature;
-use App\Models\Ware;
+use Modules\CP\Entities\CpRelation;
 use App\Repositories\RankingRepository;
+use App\Http\Resources\GameRankingResource;
 use App\Tik\Repositories\GiftLogRepository;
+use Modules\CP\Transformers\RankingResource;
+use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
-use App\Models\User;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-use Modules\CP\Entities\CpRelation;
-use Modules\CP\Transformers\RankingResource;
 
 
 class RankingService
@@ -23,6 +25,7 @@ class RankingService
     public function __construct(
         RankingRepository $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
+        private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementService $achievementService,
         RepositoriesCpRepository $cpRepository
     ) {
@@ -95,6 +98,11 @@ class RankingService
             $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
             $this->transformData($data, $class, 'user_id', 'user');
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+        }elseif($class == 6)
+        {
+            $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
+
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
@@ -326,6 +334,7 @@ class RankingService
 
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
         $cp_top_2 = $data->take(2);
+        $topGamer = $this->coinGameUserRepository->topThree();
 
         return Common::apiResponse(
             1,
@@ -335,6 +344,7 @@ class RankingService
                 'receiver' => $receiverImage,
                 'room' => $roomImage,
                 'top_cp' => RankingResource::collection($cp_top_2),
+                'top_gamer' => GameRankingResource::collection($topGamer),
             ]
         );
     }

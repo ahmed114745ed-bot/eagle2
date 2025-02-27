@@ -91,4 +91,24 @@ class ConfigController extends Controller
         $config->save();
         return Redirect::back();
     }
+
+    public function updateConfigAgoraZego(Request $request)
+    {
+        $keys = array_keys($request->all());
+
+        foreach ($keys as $key) {
+            $config = Config::where('name', $key)->first();
+
+            if ($config) {
+                $config->value = $request->input($key);
+            } else {
+                $config = new Config();
+                $config->name = $key;  // Set name first
+                $config->value = $request->input($key);
+            }
+    
+            $config->save();
+        }
+        return Redirect::back();
+    }
 }

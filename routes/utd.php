@@ -218,6 +218,7 @@ Route::middleware([])->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [RoomCategoryController::class, 'index']);
         Route::post('/create', [RoomCategoryController::class, 'store']);
+        Route::get('/parent', [RoomCategoryController::class, 'parent']);
         Route::post('/update/{id}', [RoomCategoryController::class, 'update']);
         Route::post('/update-status/{id}', [RoomCategoryController::class, 'update_status']);
         Route::post('/delete/{id}', [RoomCategoryController::class, 'delete']);
@@ -251,6 +252,7 @@ Route::middleware([])->group(function () {
     Route::prefix('emojis')->group(function () {
         Route::get('/', [EmojiController::class, 'index']);
         Route::post('/create', [EmojiController::class, 'store']);
+        Route::get('/pid', [EmojiController::class, 'emojiPid']);
         Route::post('/update/{id}', [EmojiController::class, 'update']);
         Route::post('/update-status/{id}', [EmojiController::class, 'update_status']);
         Route::post('/delete/{id}', [EmojiController::class, 'delete']);
@@ -412,7 +414,6 @@ Route::middleware([])->group(function () {
         Route::post('delete/{id}', [HomeCarouselController::class, 'delete']);
         Route::post('update-enable/{id}', [HomeCarouselController::class, 'update_is_active']);
         Route::get('/{id}', [HomeCarouselController::class, 'show']);
-       
     });
 
     Route::prefix('official-msgs')->group(function () {
@@ -674,6 +675,8 @@ Route::middleware([])->group(function () {
         Route::get('exchange-diamonds/{id}', [ExchangeDiamondController::class, 'UserExchangeLogs']);
         Route::get('charge-month/{id}', [ChargesController::class, 'userMonthCharge']);
         Route::get('pack-vip/{id}', [UserController::class, 'userPacksAndVip']);
+        Route::get('vip/{id}', [UserController::class, 'userVip']);
+        Route::get('pack/{id}', [UserController::class, 'userPacks']);
         Route::get('room-visit/{id}', [UserController::class, 'userVisitRooms']);
         Route::get('cp/{id}', [UserController::class, 'allCpUser']);
         Route::get('room/{id}', [RoomControllerVi::class, 'roomUserDetails']);
@@ -684,10 +687,12 @@ Route::middleware([])->group(function () {
     Route::prefix('rooms')->group(function () {
         Route::get('/', [RoomController::class, 'all']);
         Route::post('/create', [RoomController::class, 'store']);
+        Route::get('/class', [RoomController::class, 'roomClass']);
+        Route::get('/type/{classId}', [RoomController::class, 'roomType']);
         Route::post('/update/{id}', [RoomController::class, 'update']);
-        Route::post('/show/{id}', [RoomController::class, 'show']);
+        Route::get('/show/{id}', [RoomController::class, 'show']);
         Route::post('/update-switches', [RoomController::class, 'updateSwitches']);
-        Route::delete('delete/{id}', [RoomController::class, 'delete']);
+        Route::delete('delete/{id}', [RoomController::class, 'destroy']);
     });
 
 
@@ -822,13 +827,13 @@ Route::middleware([])->group(function () {
 
     Route::prefix('countries')->group(function () {
         Route::get('/', [CountryController::class, 'index']);
+        Route::get('/charge', [ChargeCountryController::class, 'country']);
         Route::post('/create', [CountryController::class, 'store']);
         Route::post('/update/{id}', [CountryController::class, 'update']);
         Route::post('/update-status/{id}', [CountryController::class, 'update_status']);
         Route::post('/delete/{id}', [CountryController::class, 'delete']);
         Route::post('/delete-all', [CountryController::class, 'delete_all']);
         Route::get('/{id}', [CountryController::class, 'show']);
-        Route::get('/charge', [ChargeCountryController::class, 'country']);
     });
 
     Route::prefix('colors')->group(function () {
