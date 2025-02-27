@@ -19,7 +19,6 @@ class ShowUserResource extends JsonResource
      */
     public function toArray($request)
     {
-
         return [
             'id' => $this->id,
             'coins' => number_format($this->di),
