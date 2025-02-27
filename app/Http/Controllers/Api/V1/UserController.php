@@ -48,6 +48,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
+use App\Http\Resources\Api\V1\UserLevelHistoryResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -690,6 +691,12 @@ class UserController extends Controller
         }
         $this->userService->updateUserLevel($id, $request);
         return Common::apiResponse(true, ' updated successfully');
+    }
+
+    public function userLevelHistory(Request $request)
+    {
+        $data = $this->userService->levelHistory($request->per_page, $request->page);
+        return Common::apiResponse(true, ' successfully', UserLevelHistoryResource::collection($data));
     }
 
     public function usersDeviceToken(Request $request)
