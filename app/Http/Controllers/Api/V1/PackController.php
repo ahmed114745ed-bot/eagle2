@@ -99,19 +99,6 @@ class PackController extends Controller
         return Common::apiResponse(1, 'success', $data);
     }
 
-    public function unusedPackItem(Request $request)
-    {
-        $itemId = $request->item_id;
-        if (!$itemId) return Common::apiResponse(0, 'missing params');
-
-        try {
-           $this->packService->unusedPack($itemId);
-        } catch (\Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-        return Common::apiResponse(1, 'success',);
-    }
 
     public function takeOff(Request $request)
     {
