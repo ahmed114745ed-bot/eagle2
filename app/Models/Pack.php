@@ -4,10 +4,15 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pack extends Model
 {
+    use SoftDeletes;
+    
     protected $guarded = ['id'];
+
+    protected $dates = ['deleted_at'];
 
     public function getCreatedAtAttribute($value)
     {

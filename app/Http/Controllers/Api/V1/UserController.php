@@ -48,6 +48,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
+use App\Http\Resources\Api\V1\UserLevelHistoryResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -692,6 +693,12 @@ class UserController extends Controller
         return Common::apiResponse(true, ' updated successfully');
     }
 
+    public function userLevelHistory(Request $request)
+    {
+        $data = $this->userService->levelHistory($request->per_page, $request->page);
+        return Common::apiResponse(true, ' successfully', UserLevelHistoryResource::collection($data));
+    }
+
     public function usersDeviceToken(Request $request)
     {
         $data = $this->userService->userDeviceToken($request->per_page, $request->Page, $request->device_token, $request);
@@ -816,9 +823,11 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'uuid'         => 'required',
             'name'         => 'required|string',
+            'nickname'         => 'nullable|string',
             'charge_status'         => 'required|boolean',
             'transfer_salary'         => 'required|boolean',
             'can_play'         => 'required|integer|in:0,2,3',
@@ -861,7 +870,6 @@ class UserController extends Controller
 
         try {
             $user  = $this->userService->showDataUser($id);
-
             return Common::apiResponse(true, 'done', new ShowUserResource($user));
         } catch (Exception $exception) {
 

@@ -86,6 +86,12 @@ class UserVisitorResource extends JsonResource
             "manger_type"          => new MangerTypeResource(@$this->mangerType),
             'type_user' => @$this->type_user ?? 0,
             'image_color'          => @$this->color_image,
+            "statistic"     => [
+                "visitors" => count(@$this->profileVisits),
+                "licked" => count(@$this->likes),
+                "followers" => count(@$this->followers),
+                "bio" => @$this->bio,
+            ],
 
         ];
 

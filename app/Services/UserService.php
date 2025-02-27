@@ -742,6 +742,11 @@ class UserService
         return true;
     }
 
+    public function levelHistory($perPage,$page)
+    {
+        return ChangeLevelHistory::with('user','admin') ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function userDeviceToken($perPage, $Page, $deviceToken, $request)
     {
         return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken, $request);
@@ -838,6 +843,7 @@ class UserService
         $data = [
             'uuid' => $request->uuid,
             'name' => $request->name,
+            'nickname' => $request->nickname,
             'charge_status' => $request->charge_status,
             'transfer_salary' => $request->transfer_salary,
             'can_play' => $request->can_play,
@@ -872,6 +878,7 @@ class UserService
             'user_id' => $user->id,
         ];
         $this->profileRepository->create($profileData);
+
         $dataUserSitting = [
             'show_invite_code' => $request->show_invite_code,
             'hide_chat' => $request->hide_chat,
