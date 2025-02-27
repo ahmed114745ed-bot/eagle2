@@ -33,15 +33,16 @@ class UserStatisticsController extends Controller
                 }
                 if ($user != null) {
                     $userCommon = new UserCommon();
-
                     $data=$userCommon->userMoreStatistics($user);
-                    $totalLosed = ($data['losed']['charges'] * -1 ?? 0) + ($data['losed']['request_background_images']??0) + ($data['losed']['packs'] ?? 0) + ($data['losed']['coin_games'] ??0) + ($data['losed']['gift_logs'] ??0);
+                    $totalLosed = ($data['losed']['charges'] * -1 ?? 0) + ($data['losed']['request_background_images']??0) + ($data['losed']['packs'] ?? 0) + ($data['losed']['coin_games'] ??0) + ($data['losed']['gift_logs'] ??0) + ($data['losed']['vip_price'] ??0);
                     $totalMinusBetween = (@$data['total']['earned'] ??0) - ($totalLosed ?? 0);
-
                     $userRacksPrice = $user->userPacks->where('user_id',$user->id)->whereIn('type',[4,5,6])->where('sender_id',null)->sum('price');
                   $senderPacksPrice =  $user->sendPacks->whereIn('type',[4,5,6])->sum('price');
                  $totalPacksPrice = ($userRacksPrice ?? 0) + ($senderPacksPrice ?? 0);
                 }
+
+              
+
                 $row->column(6, new InfoBox(__('charges'), 'dollar', 'green', '?type=balance_details', @$data['earned']['charges'] ?? 0));
                 $row->column(6, new InfoBox(__('charges'), 'dollar', 'red', '?type=balance_details', @$data['losed']['charges'] * -1 ?? 0));
 
@@ -57,11 +58,14 @@ class UserStatisticsController extends Controller
                 $row->column(6, new InfoBox(__('lucky_gifts'), 'dollar', 'green', '?type=balance_details', @$data['earned']['lucky_gifts'] ?? 0 ));
                 $row->column(6, new InfoBox(__('gift_logs'), 'dollar', 'red', '?type=balance_details',  @$data['losed']['gift_logs'] ?? 0 ));
 
+                $row->column(6, new InfoBox(__('total vip price'), 'dollar', 'green', '?type=balance_details', $data['losed']['vip_price'] ?? 0));
+
                 $row->column(6, new InfoBox(__('total earned'), 'dollar', 'blue', '?type=balance_details', @$data['total']['earned'] ?? 0 ));
                 $row->column(6, new InfoBox(__('total losed'), 'dollar', 'blue', '?type=balance_details', @$totalLosed ?? 0 ));
 
                 $row->column(6, new InfoBox(__('total mins'), 'dollar', 'yellow', '?type=balance_details', @$totalMinusBetween ?? 0 ));
                 $row->column(6, new InfoBox(__('total'), 'dollar', 'yellow', '?type=balance_details', @$user?->di ??0 ));
+ 
             }
         );
     }

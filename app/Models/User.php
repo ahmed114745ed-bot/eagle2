@@ -1121,4 +1121,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(AllGame::class, 'game_id');
     }
+
+    public function userVips()
+    {
+        return $this->hasMany(UserVip::class, 'user_id'); 
+    }
 }
