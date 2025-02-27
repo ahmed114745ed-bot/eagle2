@@ -28,7 +28,6 @@ class MyStoreResource extends JsonResource
     {
 
         /** @var User $this*/
-
         $agency_owner = $this->agency;
         $salary       = $this->salary;
         $sallary      = $salary; //
@@ -46,6 +45,7 @@ class MyStoreResource extends JsonResource
         });
 
         $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
+        \Log::info(['salary'=>$sallary]);
        
         $data = [
 
