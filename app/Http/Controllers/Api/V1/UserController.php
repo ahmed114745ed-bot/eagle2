@@ -826,6 +826,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'uuid'         => 'required',
             'name'         => 'required|string',
+            'nickname'         => 'nullable|string',
             'charge_status'         => 'required|boolean',
             'transfer_salary'         => 'required|boolean',
             'can_play'         => 'required|integer|in:0,2,3',
@@ -868,7 +869,6 @@ class UserController extends Controller
 
         try {
             $user  = $this->userService->showDataUser($id);
-
             return Common::apiResponse(true, 'done', new ShowUserResource($user));
         } catch (Exception $exception) {
 
