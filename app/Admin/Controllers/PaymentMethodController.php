@@ -9,6 +9,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class PaymentMethodController extends AdminController
 {
@@ -30,6 +31,11 @@ class PaymentMethodController extends AdminController
         $grid->column('amount', __('amount'));
         $grid->column('payment_method', __('payment method'));
         $grid->column('status', __('status'));
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+
+            
+            return Carbon::parse($date)->format('Y-m-d H:i:s');
+        });
         $grid->disableActions();
 
         return $grid;
