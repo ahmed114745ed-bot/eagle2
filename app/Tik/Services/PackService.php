@@ -120,6 +120,12 @@ class PackService
         return  $data['target_id'] = $pack->target_id;
     }
 
+    public function unusedPack($itemId)
+    {
+        $this->packRepository->update(['is_used' => 0],$itemId);
+        return true;
+    }
+
     public function updateDress($user, $type)
     {
         $this->userRepository->nullDress($user, $type);

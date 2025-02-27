@@ -324,6 +324,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
                 Route::get('my_pack', [PackController::class, 'my_pack']);
                 Route::post('use_pack_item', [PackController::class, 'usePackItem']);
+                Route::post('unused_pack_item', [PackController::class, 'unusedPackItem']);
                 Route::post('takeOff', [PackController::class, 'takeOff']);
                 //                Route::get('my_store', [UserController::class, 'my_store']);
                 //                Route::get('my_income', [UserController::class, 'my_income']);
