@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProfileVisitor extends Model
 {
     protected $table = 'profile_visitors';
-
+    protected $guarded = [];
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';
