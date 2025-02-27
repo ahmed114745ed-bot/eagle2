@@ -35,7 +35,7 @@ class ShowUserResource extends JsonResource
             'total_sender_level' => $this->sender_level,
             'total_received_level' => $this->received_level,
             'gender' => @$this->profile->gender,
-            'image' => $this->profile->avatar ?? '',
+            'avatar' => $this->profile->avatar ?? '',
             'image_id' => $this->profile->image_id ?? '',
             'can_play' => UserHandling::chickLevelToPlay($this->resource),
             'phone' => $this->phone ?? '',
