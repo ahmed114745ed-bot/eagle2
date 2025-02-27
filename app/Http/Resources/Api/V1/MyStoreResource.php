@@ -26,12 +26,14 @@ class MyStoreResource extends JsonResource
     public function toArray($request)
     {
 
+        /** @var User $this*/
+
         $agency_owner = $this->agency;
         $salary       = $this->salary;
-        $sallary      = $salary;//
+        $sallary      = $salary; //
         $userSalary   = $sallary;
-        if(($this->type_user == 2 || $this->type_user == 4)){
-            $userSalary = $salary;//
+        if (($this->type_user == 2 || $this->type_user == 4)) {
+            $userSalary = $salary; //
             $hostSalary = floor($agency_owner?->salary ?? 0);
             $sallary = $hostSalary;
         }
@@ -42,19 +44,21 @@ class MyStoreResource extends JsonResource
             return $roomSalary->salary - $roomSalary->cut_amount;
         });
 
+        $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
+
         $data = [
 
-            'my_store'=> [
-                'id'=>$this->id,
-                'coins_new'=> numToStringNew($this->di),
-                'coins'=> (string)$this->di,
-                'diamonds'=>(string)$this->exchange_diamonds,
-                'silver_coins'=> (string)$this->gold,
-                'usd' => (string)$sallary ,
-                'user_usd' =>(string) $userSalary ?? '',
-                'host_usd' =>(string) @$hostSalary ??'',
-                'pending_dollar' =>(string) $pendingDollar ?? '',
-                'room_salary' =>(string) $roomSalary ?? '',
+            'my_store' => [
+                'id' => $this->id,
+                'coins_new' => numToStringNew($this->di),
+                'coins' => (string)$this->di,
+                'diamonds' =>  (string)$diamonds,
+                'silver_coins' => (string)$this->gold,
+                'usd' => (string)$sallary,
+                'user_usd' => (string) $userSalary ?? '',
+                'host_usd' => (string) @$hostSalary ?? '',
+                'pending_dollar' => (string) $pendingDollar ?? '',
+                'room_salary' => (string) $roomSalary ?? '',
                 'paid' =>  $paid ?? 0,
             ], // my
 
