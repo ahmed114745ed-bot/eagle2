@@ -878,6 +878,7 @@ class UserService
             'user_id' => $user->id,
         ];
         $this->profileRepository->create($profileData);
+
         $dataUserSitting = [
             'show_invite_code' => $request->show_invite_code,
             'hide_chat' => $request->hide_chat,

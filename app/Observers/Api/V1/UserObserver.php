@@ -33,11 +33,11 @@ class UserObserver
      */
     public function created(User $user)
     {
-        $user->profile()->create(
+        /* $user->profile()->create(
             [
                 'gender' => 1
             ]
-        );
+        ); */
     }
 
     /**

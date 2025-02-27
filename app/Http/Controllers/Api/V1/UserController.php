@@ -823,6 +823,7 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'uuid'         => 'required',
             'name'         => 'required|string',
