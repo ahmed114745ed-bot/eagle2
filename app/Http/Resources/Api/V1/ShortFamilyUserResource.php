@@ -32,7 +32,8 @@ class ShortFamilyUserResource extends JsonResource
 
         $data = [
             'id'=>@$this->user?->id,
-            'is_family_admin'=>@$this->user_type == 1 ? true : false,
+           // 'is_family_admin'=>@$this->user_type == 1 ? true : false,
+           'is_family_admin'=> @$this->user?->is_family_admin,
             'name'  => $this->user?->name,
 //            'profile'=>new ProfileResource(@$this->profile),
             'profile'=> [

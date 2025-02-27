@@ -1548,7 +1548,7 @@
     "Is unlocked":"الحاله",
     "Total Points":"عدد النقاط",
     "Up mic":"الجلوس علي ال mic",
-    "admin" : "المدير",
+    "admin" : "المسؤول",
     "string":" نص",
     "integer":"رقم",
     "yes_or_no":"نعم و لا",
@@ -1682,7 +1682,8 @@
 "Show Invite Code":"عرض زورار كود الدعوه",
 "status user":"حالة المستخدم",
 "total Price":"السعر الإجمالي",
-"Edit" : "تعديل"
+"Edit" : "تعديل",
+"Level user history":"سجل مستويات المستخدم"
     
  
     

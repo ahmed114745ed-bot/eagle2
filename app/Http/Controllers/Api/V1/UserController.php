@@ -676,7 +676,7 @@ class UserController extends Controller
 
     public function userLevel(Request $request)
     {
-        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->search);
+        $trashed = $this->userService->userLevel($request->per_page, $request->Page, $request->uuid);
         return Common::apiResponse(true, 'success', LevelUserResource::collection($trashed));
     }
 
@@ -882,7 +882,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'uuid'         => [
                 'required',
-                'exists:users,id',
+                'exists:users,uuid',
                 Rule::unique('users', 'uuid')->ignore($id),
             ],
             'name'         => 'required|string',
