@@ -446,7 +446,7 @@ class UserService
     public function myStore($user, $request)
     {
         $cacheKey = 'cache-data-mystore-' . $user->id;
-        if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
+        // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
             $targetService = new FixedTargetService($user);
             $targetService->calculateTarget();
@@ -454,7 +454,7 @@ class UserService
                 $roomTarget = new RoomGameServices();
                 $roomTarget->CalculateRoomSalaries($user->ownerRoom);
             }
-        }
+        // }
 
         if ($user->device_token  != $request->header('X-Device-Token')) {
             $user->enableSaving = true;
