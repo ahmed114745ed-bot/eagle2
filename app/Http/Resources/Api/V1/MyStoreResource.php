@@ -13,6 +13,7 @@ use App\Models\Target;
 use App\Models\UserSallary;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MyStoreResource extends JsonResource
 {
@@ -45,7 +46,7 @@ class MyStoreResource extends JsonResource
         });
 
         $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
-
+       
         $data = [
 
             'my_store' => [
