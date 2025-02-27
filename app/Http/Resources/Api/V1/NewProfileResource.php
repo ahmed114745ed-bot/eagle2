@@ -11,7 +11,7 @@ class NewProfileResource extends JsonResource
     public function toArray($request)
     {
 
-        $vip_level_img  = Common::ovip_center_rank_img($this->id);
+        $vip_level_img  = Common::ovip_center_rank_img(@$this->id);
         $total_received_level_img = Common::getImageTotalReceiverOrSender($this->total_received_level);
         $total_sender_level_img = Common::getImageTotalReceiverOrSender($this->total_sender_level);
 
@@ -29,7 +29,7 @@ class NewProfileResource extends JsonResource
             'liked'=>$this->likes_exists ?? false,
             "multi_images"          => $this->images?->select("img"),
             'gender' => intval(@$this->type_user) ?: 0,
-            'vip_level_img' => $vip_level_img == 0 ? "" : $vip_level_img,
+            'vip_level_img' =>  $vip_level_img ?? '',
             'sender_level_img' =>$total_sender_level_img->img ?? '',
             'reciver_level_img' => $total_received_level_img->img ?? '',
             'has_color_name'=>Common::hasInPack ($this->id,18,true), // both
