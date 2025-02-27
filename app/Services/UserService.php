@@ -742,6 +742,11 @@ class UserService
         return true;
     }
 
+    public function levelHistory($perPage,$page)
+    {
+        return ChangeLevelHistory::with('user','admin') ->paginate($perPage, ['*'], 'page', $page);
+    }
+
     public function userDeviceToken($perPage, $Page, $deviceToken, $request)
     {
         return $this->userDevicesHistoryRepository->all($perPage, $Page, $deviceToken, $request);

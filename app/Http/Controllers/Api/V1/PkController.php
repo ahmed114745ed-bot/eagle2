@@ -188,7 +188,7 @@ class PkController extends Controller
         }
         // \Log::info($room->id . ' rooms');
         if ($isPkCustom) {
-            $jsons[] = $this->changeBackgroundResponse($room, $request->owner_id, PK_IMAGE);
+            $jsons[] = $this->changeBackground($room, $request->owner_id, PK_IMAGE);
         }
         $mc   = [
             'messageContent' => [

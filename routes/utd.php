@@ -629,6 +629,7 @@ Route::middleware([])->group(function () {
     Route::prefix('users-level')->group(function () {
         Route::get('/', [UserController::class, 'userLevel']);
         Route::post('/update/{id}', [UserController::class, 'updateUserLevel']);
+        Route::get('/history', [UserController::class, 'userLevelHistory']);
     });
 
     Route::prefix('salary-requests')->group(function () {
