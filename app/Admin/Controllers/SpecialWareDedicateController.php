@@ -102,12 +102,11 @@ class SpecialWareDedicateController extends MainController
             return (new \App\Admin\Actions\WareDedicateAction($this->id))->render();
         });
         $grid->disableExport();
-
+        $grid->disableActions();
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-            // $actions->add(new DedicateAction());
         });
         $grid->disableCreateButton();
         Admin::script("

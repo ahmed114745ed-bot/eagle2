@@ -108,7 +108,7 @@ class DedicateVipController extends MainController
           return (new \App\Admin\Actions\VipDedicateAction($this->id))->render ();
         });
         $grid->disableCreateButton();
-
+        $grid->disableActions();
           $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
