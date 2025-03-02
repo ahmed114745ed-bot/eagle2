@@ -2,16 +2,17 @@
 
 namespace App\Admin\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
 use App\Models\RequestBackgroundImage;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RequestBackgroundImageController extends MainController
@@ -94,8 +95,30 @@ class RequestBackgroundImageController extends MainController
                 ]);
             });
         });
-        $grid->id(__('admin.ID'));
-        $grid->owner_room_id(__('owner room id'));
+        $grid->id(__('ID'));
+        $grid->owner_room_id(__('owner room id'))->display(function () {
+            $name = @$this->owner->name ?? '';
+            $path = @$this->owner?->ownerRoom->room_cover;
+            $defaultImage = asset("images/room.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom->id}");
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                </div>
+            ";
+        });
 
         $grid->column('owner.name', __('owner'))
             ->display(function ($name) {
@@ -110,12 +133,14 @@ class RequestBackgroundImageController extends MainController
                 }
 
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+                $showUrl = url("admin/users/{$this->id}");
                 return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         $image
                         <div>
-                            <strong>$name</strong><br>
+                           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                            </a>
                             <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                         </div>
                     </div>
@@ -132,7 +157,7 @@ class RequestBackgroundImageController extends MainController
             $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
 
             return "
-                    <img src='$correctUrl' style='width: 30px; height: 30px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+                    <img src='$correctUrl' style='width: 100px; height: 100px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
                     
                     <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
                         <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
@@ -169,8 +194,10 @@ class RequestBackgroundImageController extends MainController
             ]
         );
         $grid->column('expair', __('expire'));
+        $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {   
+            return Carbon::parse($date)->format('Y-m-d H:i:s');
+        });
 
-        $grid->updated_at(trans('admin.updated_at'))->diffForHumans();
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
@@ -255,6 +282,4 @@ class RequestBackgroundImageController extends MainController
 
         return $form;
     }
-
-    
 }
