@@ -388,6 +388,34 @@ if (!function_exists('handleShowImageWithTypes')) {
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important;' alt='' />";
     }
 }
+if (!function_exists('userType')) {
+    function userType($type)
+    {
+        switch ($type) {
+            case 0:
+                $userType = __("User");
+                break;
+            case 1:
+                $userType = __("Host");
+                break;
+            case 2:
+                $userType = __("Host Agent");
+                break;
+            case 3:
+                $userType = __("Shipping Agent");
+                break;
+            case 4:
+                $userType = __("Resort & Shipping Agent");
+                break;
+            case 5:
+                $userType = __("Admin");
+                break;
+            default:
+                $userType = $type; // Keep the original value if no match is found
+                break;
+        }
+    }
+}
 
 if (!function_exists('showSvgaImage')) {
     /**
