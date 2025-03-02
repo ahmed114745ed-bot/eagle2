@@ -19,13 +19,14 @@ use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
+use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
+
 use Encore\Admin\Auth\Permission;
-use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Selectable\ImageColors;
