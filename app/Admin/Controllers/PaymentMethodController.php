@@ -31,9 +31,7 @@ class PaymentMethodController extends AdminController
         $grid->column('amount', __('amount'));
         $grid->column('payment_method', __('payment method'));
         $grid->column('status', __('status'));
-        $grid->column('created_at', __('Created at'))->display(function ($date) {
-
-            
+        $grid->column('created_at', __('Created at'))->display(function ($date) {   
             return Carbon::parse($date)->format('Y-m-d H:i:s');
         });
         $grid->disableActions();

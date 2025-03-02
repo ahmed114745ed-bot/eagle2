@@ -658,7 +658,7 @@ class User extends Authenticatable
         })
             ->orderByDesc('id')
             ->sum(DB::raw('salary - cut_amount'));
-
+        \Log::info([$userSallary,$roomSalary]);
         return (floor($userSallary + (int)$roomSalary));
         //        } else {
         //            return 0;

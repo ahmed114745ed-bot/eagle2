@@ -60,6 +60,7 @@ class MembersUserResource extends JsonResource
             ],*/
             'frame_id' => @$this->dress_1,
             'frame' => Common::getUserDress(@$this->id, @$this->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$this->id, @$this->dress_1, 4, 'img1', true),
+            'is_family_admin'=> @$this->is_family_admin,
         ];
 
         return $data;

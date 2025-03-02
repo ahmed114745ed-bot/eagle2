@@ -31,6 +31,6 @@ class CoreWallets extends Model
     public function getUpdateForHumanAttribute(): string
     {
 
-        return carbon::parse(@$this?->updated_at)->diffForHumans() ?? '';
+        return Carbon::parse(@$this?->updated_at)->diffForHumans() ?? '';
     }
 }

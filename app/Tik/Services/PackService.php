@@ -53,7 +53,7 @@ class PackService
     }
 
 
-    public function userPack($request) : mixed
+    public function userPack($request): mixed
     {
         $this->packRepository->deleteExpirePack();
         $userId = $request->user_id ?:  $request->user()->id;
@@ -120,9 +120,12 @@ class PackService
         return  $data['target_id'] = $pack->target_id;
     }
 
-    public function updateDress($user, $type)
+
+    public function updateDress($user, $type, $itemId)
     {
         $this->userRepository->nullDress($user, $type);
+        if ($itemId) $this->packRepository->update(['is_used' => 0], $itemId);
+
         return true;
     }
 }

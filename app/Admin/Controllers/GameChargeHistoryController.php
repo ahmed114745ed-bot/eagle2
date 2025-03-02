@@ -29,7 +29,8 @@ class GameChargeHistoryController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new GameChargeHistory());
-
+        
+        $grid->model()->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('value', __('Value'));
         $grid->actions(function ($actions) {

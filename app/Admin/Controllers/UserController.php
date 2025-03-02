@@ -19,13 +19,14 @@ use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
+use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
+
 use Encore\Admin\Auth\Permission;
-use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Selectable\ImageColors;
@@ -153,13 +154,14 @@ class UserController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
+                $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
                 $filter->column('1/2', function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('phone', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
-                    }, __('User'))->placeholder(__('Search by name , UUID , phone , nickname and email'));
+                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
+                    }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
                 });
             });
         });
@@ -171,12 +173,11 @@ class UserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid . ' ' . $this->original_uuid;
+            return $this->uuid == $this->original_uuid 
+                ? __("uuid") . ' : ' . $this->uuid 
+                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
-
-
-        $grid->column('nickname', __('NickName'));
 
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
@@ -213,23 +214,39 @@ class UserController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('profile.image_id', __('image Id'))->image('', 50);
-
-
 
         $grid->column('phone', __('Phone'));
-        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
-            if ($model->agency_id) {
-                $a = Agency::query()->find($model->agency_id);
-                if (!$a) {
-                    $model->agency_id = 0;
-                    $model->save();
-                    return null;
-                }
-                return Common::getAgencyShow(@$model->agency_id);
-            }
-            return null;
-        });
+        // $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
+        //     if ($model->agency_id) {
+        //         $a = Agency::query()->find($model->agency_id);
+        //         if (!$a) {
+        //             $model->agency_id = 0;
+        //             $model->save();
+        //             return null;
+        //         }
+        //         return Common::getAgencyShow(@$model->agency_id);
+        //     }
+        //     return null;
+        // });
+
+        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
+            $agency =  Agency::query()->find(@$this->agency_id);
+            $path = @$agency?->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+ 
+                 // Check if the image exists
+                 if (!isImageExists($url)) {
+                     $url = $defaultImage;
+                 }
+            $results = [
+             __('name') => @$agency->owner->name ??'',
+             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+            
+         ];
+ 
+         return new Table([__('Field Name'), __('Value')], $results);
+         });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
@@ -240,14 +257,11 @@ class UserController extends MainController
                         'add_month',
                         'add_year',
                         'target_usd',
-                        'target_hours',
-                        'target_days',
                         'target_agency_share',
                         'user_diamonds',
                         'user_hours',
                         'user_days',
                         'user_obtain',
-                        'agency_obtain',
                         'updated_at'
                     ]
                 );
@@ -259,17 +273,13 @@ class UserController extends MainController
             return new Table(
                 [
                     'ID',
-                    __('month'),
-                    __('year'),
+                    __('month') .'/'.__('year') ,
                     __('usd') . ' ' . __('deserved'),
-                    __('target hours'),
-                    __('target days'),
                     __('agency share') . '(%)',
                     __('user diamonds'),
                     __('user hours'),
                     __('user days'),
                     __('user obtain'),
-                    __('agency obtain'),
                     __('at time'),
 
                 ],
@@ -339,6 +349,8 @@ class UserController extends MainController
 
 
         $grid->disableExport();
+        $appEnv = config('app.env');
+        if ($appEnv == 'production') $grid->disableCreateButton();
 
         $this->extendGrid($grid);
         $grid->actions(function ($actions) {

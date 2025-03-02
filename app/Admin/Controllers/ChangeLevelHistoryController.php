@@ -2,13 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\ChangeLevelHistory;
-use Encore\Admin\Controllers\AdminController;
+use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Content;
+use App\Models\ChangeLevelHistory;
+use App\Admin\Controllers\MainController;
 
-class ChangeLevelHistoryController extends AdminController
+class ChangeLevelHistoryController extends MainController
 {
     /**
      * Title for current resource.
@@ -22,6 +24,12 @@ class ChangeLevelHistoryController extends AdminController
      *
      * @return Grid
      */
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans(__('Level user history')))
+            ->body($this->grid()));
+    }
     protected function grid()
     {
         $grid = new Grid(new ChangeLevelHistory());
@@ -35,40 +43,60 @@ class ChangeLevelHistoryController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))
-            ->display(function ($name) {
-                $uid = @$this->user->uuid;
-                $path = @$this->user?->profile?->avatar;
-                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-                return "
+        ->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            $editUrl = url("admin/users/{$this->user->id}"); // Using named route
+    
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+    
+            return "
             <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                </div>
+                <a href='{$editUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong style='text-decoration: underline; cursor: pointer;'>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </a>
             </div>
-        ";
-            });
+            ";
+        });
+    
         $grid->column('admin.name', __('admin'))
             ->display(function ($name) {
                 $path = @$this->admin->avatar;
-                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+    
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+                $showUrl = url("admin/auth/users/{$this->admin->id}");
                 return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span>$name</span>
-            </div>
-        ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                </div>
+            ";
             });
         $grid->column('old_total_sender_level', __('Old total sender level'));
         $grid->column('new_total_sender_level', __('New total sender level'));
         $grid->column('old_total_received_level', __('Old total received level'));
         $grid->column('new_total_received_level', __('New total received level'));
-        $grid->column('created_at', __('Created at'))->diffForHumans();
+        $grid->column('created_at', __('Created at'))->display(function ($date) {   
+            return Carbon::parse($date)->format('Y-m-d H:i:s');
+        });
 
 
 

@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
 
 class UserLevelController extends MainController
 {
@@ -65,7 +66,27 @@ class UserLevelController extends MainController
         });
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->display(function ($name) {
+            $path = @$this->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->id}");
+
+            return "
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                $image
+                <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+            </a>
+        </div>
+    ";
+        });
 
         $grid->column('uuid', __('uuid'));
         $grid->column('total_sender_level', __('Sender Level'));
