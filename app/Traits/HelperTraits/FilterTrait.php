@@ -4,9 +4,10 @@
 namespace App\Traits\HelperTraits;
 
 
+use App\Models\OVip;
+use App\Models\User;
 use App\Models\Agency;
 use App\Models\Family;
-use App\Models\User;
 
 trait FilterTrait
 {
@@ -43,6 +44,15 @@ trait FilterTrait
         $families = Family::query ()->where ('status',1)->get ();
         foreach ($families as $family){
             $ops[$family->id]=$family->name;
+        }
+        return $ops;
+    }
+
+    public static function by_ovip_filter (){
+        $ops = [0=>'no ovip'];
+        $OVips = OVip::query ()->get ();
+        foreach ($OVips as $OVips){
+            $ops[$OVips->id]=$OVips->level;
         }
         return $ops;
     }

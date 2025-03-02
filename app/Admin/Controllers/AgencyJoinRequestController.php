@@ -189,10 +189,6 @@ class AgencyJoinRequestController extends MainController
         ];
 
         return new Table([__('Field Name'), __('Value')], $results);
-            if ($model->change_status_admin_id) {
-                return Common::getAdminShow($model->change_status_admin_id);
-            }
-            return null;
         });
         $grid->column('created_at', trans('time'))->diffForHumans();
         // $grid->column('created_at', __('Created at'))->display(function ($date) {   
