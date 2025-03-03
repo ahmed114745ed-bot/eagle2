@@ -53,6 +53,7 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -93,6 +94,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::post('app-check', [VersionController::class, 'versionAndCache']);
     });
 
+    Route::post('/chatVideo', [StorageUploadController::class, 'chatVideo']);
     Route::get('/image-intro/{id}', [UserController::class, 'image_intro']);
     Route::get('colors', [ColorController::class, 'index']);
     Route::get('all-servers', [RegisterController::class, 'all_servers']);
