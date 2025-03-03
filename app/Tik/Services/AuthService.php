@@ -58,8 +58,14 @@ class AuthService
         if ($this->userRepository->findByPhoneUser($request->phone))  throw new \Exception('already exists');
         if ($this->userRepository->findByPhoneUserTrashed($request->phone))  throw new \Exception(__('api_responses.reserved'));
 
+     
+            $phone = str_replace([' ', '-','/','{','}','_','(',')'], '', $request->phone);
+
+        
+     
+
         $data = [
-            'phone' => $request->phone,
+            'phone' => $phone,
             'password' => $request->password,
         ];
         \DB::beginTransaction();

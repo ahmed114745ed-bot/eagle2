@@ -268,6 +268,10 @@ class UserObserver
 
     public function saving(User $user)
     {
+        if ($user->phone) {
+            $user->phone = str_replace([' ', '-','/','{','}','_','(',')'], '', $user->phone);
+        }
+
         if (isset($user->oldDiValue)) {
             unset($user->oldDiValue);
             unset($user->oldDiamoundValue);
