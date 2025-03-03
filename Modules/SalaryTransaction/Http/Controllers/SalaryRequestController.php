@@ -71,7 +71,7 @@ class SalaryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryRequest());
-        $grid->model()->orderByDesc('id');
+        $grid->model()->whereHas('agency')->orderByDesc('id');
         $grid->filter (function (Grid\Filter $filter){
             $filter->column(1/2, function ($filter) {
                 $filter->equal('status',__('status'))->select([0=>__('waiting'),1=>__('accepting'),2=>__('transferred'),3=>__('completed'),4=>__('rejected')]);
