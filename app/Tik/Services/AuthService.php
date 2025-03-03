@@ -62,7 +62,6 @@ class AuthService
             'phone' => $request->phone,
             'password' => $request->password,
         ];
-
         \DB::beginTransaction();
         try {
             $user = $this->userRepository->create($data);
