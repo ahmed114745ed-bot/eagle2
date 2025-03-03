@@ -143,4 +143,11 @@ class PackRepository extends AbstractRepository
                 $query->where('type', $type);
             })->active()->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function pack($id, $userId)
+    {
+        return $this->model->query()->where('id', $id)->where('user_id', $userId)->where(function ($q) {
+            $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
+        })->first();
+    }
 }
