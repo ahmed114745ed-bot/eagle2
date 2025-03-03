@@ -71,17 +71,24 @@ class RequestBackgroundImagService
     {
         if ($request->hasFile('img')) {
             $img = Common::upload('images', $request->file('img'));
-            $request->merge(['img' => $img]);
+        } else {
+            $img = $request->img;
         }
-        $request->merge(['type' => 'admin']);
-        $this->requestBackgroundImageRepository->update($request->all(), $id);
+
+
+        $data = [
+            'type' => 'admin',
+            'img' => $img,
+            'owner_room_id' => $request->owner_room_id,
+            'status' => $request->status,
+            'expair' => $request->expair,
+        ];
+        $this->requestBackgroundImageRepository->update($data, $id);
         return true;
     }
 
     public function delete($id)
     {
         return  $this->requestBackgroundImageRepository->delete($id);
-  
-        
     }
 }
