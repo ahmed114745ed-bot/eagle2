@@ -53,7 +53,7 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\API\V1\StorageUploadController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
