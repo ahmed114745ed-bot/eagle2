@@ -108,6 +108,7 @@ class SalaryRequestController extends MainController
 
         $grid->column('agencyOwner.name', __('Agency owner'))
         ->display(function ($name) {
+            $name = $name ??'';
             $uid = @$this->agencyOwner->uuid;
             $path = @$this->agencyOwner?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
