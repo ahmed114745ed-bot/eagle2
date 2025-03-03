@@ -876,7 +876,6 @@ class UserService
             'avatar' => $avatar ?? '',
             'image_id' => $image_id ?? '',
             'gender' => $request->gender,
-            'user_id' => $user->id,
         ]);
         //$this->profileRepository->create($profileData);
 
