@@ -63,21 +63,24 @@ class UserHandling
     public function AddUserVip(User $user, $type = null)
     {
         $vip = OVip::query()->whereLevel(2)->first();
-        UserVip::query()->create(
-            [
-                'type' => 1,
-                'sender_id' => 0,
-                'user_id' => $user->id,
-                'vip_id' => $vip->id,
-                'level' => $vip->level,
-                'expire' => Carbon::now()->addDays($vip->expire ?: 1)->timestamp,
-                'qty' => 1,
-                'price' => 0,
-                'total' => 0,
-                'type_send' => $type,
-            ]
-        );
-        Common::handelVip($vip, $user);
+
+        if($vip){
+            UserVip::query()->create(
+                [
+                    'type' => 1,
+                    'sender_id' => 0,
+                    'user_id' => $user->id,
+                    'vip_id' => $vip->id,
+                    'level' => $vip->level,
+                    'expire' => Carbon::now()->addDays($vip->expire ?: 1)->timestamp,
+                    'qty' => 1,
+                    'price' => 0,
+                    'total' => 0,
+                    'type_send' => $type,
+                ]
+            );
+            Common::handelVip($vip, $user);
+        }
     }
     public function kickUserFromAgency(User &$user)
     {

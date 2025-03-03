@@ -1661,7 +1661,9 @@
     "Charge Status": "Şarj Durumu",
     "status user": "Kullanıcı durumu",
     "total Price": "Toplam Fiyat",
-    "Level user history": "Kullanıcı seviye geçmişi"
+    "Level user history": "Kullanıcı seviye geçmişi",
+    "uuid dedicate": "Benzersiz Kimlik Adama",
+    "special uuid": "Özel UUID"
 
 
 

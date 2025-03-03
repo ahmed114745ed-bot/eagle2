@@ -2,16 +2,18 @@
 
 namespace App\Admin\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Admin;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -123,7 +125,13 @@ class AgencyJoinRequestController extends MainController
             ->display(function ($name) {
                 $uid = @$this->user->uuid;
                 $path = @$this->user?->profile?->avatar;
-                $url = getImagePath($path) ?? asset("images/businessman-icon.jpg");
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                 return "
@@ -139,7 +147,13 @@ class AgencyJoinRequestController extends MainController
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
                 $path = @$this->agency->img;
-                $url = getImagePath($path)?? asset("images/icon-agency.jpg");
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
                 return "
@@ -158,12 +172,28 @@ class AgencyJoinRequestController extends MainController
             ]
         );
         $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
-            if ($model->change_status_admin_id) {
-                return Common::getAdminShow($model->change_status_admin_id);
-            }
-            return null;
+           $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+           $path = @$admin->profile?->avatar ?? @$admin->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+           $results = [
+            __('name') => @$admin->name ??'',
+            __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+            __('type') => userType(@$admin?->type_user ?? '') ?? '',
+           
+        ];
+
+        return new Table([__('Field Name'), __('Value')], $results);
         });
         $grid->column('created_at', trans('time'))->diffForHumans();
+        // $grid->column('created_at', __('Created at'))->display(function ($date) {   
+        //     return Carbon::parse($date)->format('Y-m-d H:i:s');
+        // });
         $this->extendGrid($grid);
 
 

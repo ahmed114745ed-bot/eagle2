@@ -871,13 +871,13 @@ class UserService
         if ($request->hasFile('image_id')) {
             $image_id = Common::upload('profile', $request->file('image_id'));
         }
-        $profileData = [
+
+        $user->profile->update([
             'avatar' => $avatar ?? '',
             'image_id' => $image_id ?? '',
             'gender' => $request->gender,
-            'user_id' => $user->id,
-        ];
-        $this->profileRepository->create($profileData);
+        ]);
+        //$this->profileRepository->create($profileData);
 
         $dataUserSitting = [
             'show_invite_code' => $request->show_invite_code,

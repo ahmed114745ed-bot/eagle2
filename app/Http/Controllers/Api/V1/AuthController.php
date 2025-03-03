@@ -154,10 +154,10 @@ class AuthController extends Controller
         );
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
-    
-   
 
-    
+
+
+
 
     protected function loginWithApple($data)
     {

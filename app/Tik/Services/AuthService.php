@@ -63,7 +63,6 @@ class AuthService
             'password' => $request->password,
             'di' => 1000000,
         ];
-
         \DB::beginTransaction();
         try {
             $user = $this->userRepository->create($data);

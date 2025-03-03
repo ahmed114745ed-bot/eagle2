@@ -72,7 +72,7 @@ class HomeCarouselController extends MainController
         $grid->column('img', trans('img'))->image('', 235, 77);
         $grid->column('url', trans('url'))->url();
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates())->display(function ($enable, $column) {
-            if ($this->duration > carbon::now()->timestamp || $this->duration == null) {
+            if ($this->duration > Carbon::now()->timestamp || $this->duration == null) {
                 return $enable;
             }
             return null;

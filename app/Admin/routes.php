@@ -16,7 +16,7 @@ use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomVipController;
-use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -345,6 +345,7 @@ Route::group(
         });
 
         $router->resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
+        $router->resource('/uuid_dedicate', 'SpecialWareDedicateController');
         $router->get('/vips_dedicate', 'DedicateVipController@index');
         $router->resource('/bans', 'BanController');
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
