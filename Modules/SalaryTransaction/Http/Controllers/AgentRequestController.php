@@ -99,20 +99,42 @@ class AgentRequestController extends MainController
         return $grid;
     }
 
+    // protected function detail($id)
+    // {
+       
+    //     $show = new Show(Emoji::findOrFail($id));
+
+    //     $show->id(__('admin.ID'));
+    //     $show->pid('pid');
+    //     $show->name('name');
+    //     $show->emoji('emoji');
+    //     $show->t_length('t_length');
+    //     $show->enable('enable');
+    //     $show->sort('sort');
+    //     $this->extendShow ($show);
+    //     return $show;
+    // }
+
     protected function detail($id)
     {
-        $show = new Show(Emoji::findOrFail($id));
+        $show = new Show(AgentSalaryRequest::findOrFail($id));
 
-        $show->id(__('admin.ID'));
-        $show->pid('pid');
-        $show->name('name');
-        $show->emoji('emoji');
-        $show->t_length('t_length');
-        $show->enable('enable');
-        $show->sort('sort');
-        $this->extendShow ($show);
+        $show->id(__('Id'));
+        $show->field('agency.name', __('Agency'));
+        $show->field('agent.name', __('Agent Name'));
+        $show->field('agent.uuid', __('Agent ID'));
+        $show->field('type', __('Payment Method'))->as(function ($type) {
+            return $type == 1 ? __('Coins') : 'USD';
+        });
+        $show->field('usd', __('USD'));
+        $show->field('coins', __('Coins'));
+        $show->field('created_at', __('Created At'));
+
+        $this->extendShow($show);
+        
         return $show;
     }
+
 
     /**
      * Make a form builder.
