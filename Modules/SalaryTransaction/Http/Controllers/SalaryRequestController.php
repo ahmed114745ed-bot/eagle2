@@ -8,6 +8,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 
 class SalaryRequestController extends MainController
@@ -83,42 +84,144 @@ class SalaryRequestController extends MainController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('agency.name', __('agency'))->display(function ($name) {
-            $imageUrl =getImagePath( $this->agency?->img ??''); // Assuming 'img' is the field in the 'agency' model where the image URL is stored
-            return "{$name} <br> <img src='{$imageUrl}'  style='max-width: 50px; margin-top: 10px;'>";
+        $grid->column('agency.name', __('Agency'))
+        ->display(function ($name) {
+            $path = @$this->agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/agencies/{$this->agency->id}");
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+               <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                </a>
+            </div>
+        ";
         });
-        $grid->column('agencyOwner.name', __('Agency owner'))->display(function ($name) {
-            $imageUrl = getImagePath($this->agencyOwner?->profile?->avatar ??''); // Assuming 'img' is the field in the 'agency' model where the image URL is stored
-            return "{$name} <br> <img src='{$imageUrl}'  style='max-width: 50px; margin-top: 10px;'>";
+
+        $grid->column('agencyOwner.name', __('Agency owner'))
+        ->display(function ($name) {
+            $uid = @$this->agencyOwner->uuid;
+            $path = @$this->agencyOwner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->agencyOwner->id}");
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
-        $grid->column('host.name', __('host'))->display(function ($name) {
-            $imageUrl = getImagePath($this->host?->profile?->avatar ??''); // Assuming 'img' is the field in the 'agency' model where the image URL is stored
-            return "{$name} <br> <img src='{$imageUrl}'  style='max-width: 50px; margin-top: 10px;'>";
+
+        $grid->column('host.name', __('host'))
+        ->display(function ($name) {
+            $uid = @$this->host->uuid;
+            $path = @$this->host?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->host->id}");
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
         $grid->column('status', __('status'))->display(function ($status) {
             switch ($status) {
                 case 0:
-                 return __('waiting');
-                  break;
+                    return "<span style='color: orange; font-weight: bold;'>" . __('waiting') . "</span>";
                 case 1:
-                    return __('accepting');
-                  break;
-                  case 2:
-                    return __('transferred');
-                  break;
-                  case 3:
-                    return __('completed');
-                  break;
-                  case 4:
-                    return $this->request_admin_status==1 ?__('rejectedAdmin'):__('rejected');
-                  break;
-                }
+                    return "<span style='color: blue; font-weight: bold;'>" . __('accepting') . "</span>";
+                case 2:
+                    return "<span style='color: purple; font-weight: bold;'>" . __('transferred') . "</span>";
+                case 3:
+                    return "<span style='color: green; font-weight: bold;'>" . __('completed') . "</span>";
+                case 4:
+                    $text = $this->request_admin_status == 1 ? __('rejectedAdmin') : __('rejected');
+                    return "<span style='color: red; font-weight: bold;'>$text</span>";
+            }
         });
         $grid->column('payment_gateway.title', __('Payment gateway'));
         $grid->column('country.name', __('country'));
         $grid->column('usd', __('Usd'));
         $grid->column('coins', __('coins'));
-        $grid->column('bill_image', __('bill image'))->image ('',50);
+        $grid->column('bill_image', __('bill image'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img) ??$defaultImage ;
+            if (!isImageExists($path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
+                    <img src='$correctUrl' style='width: 80px; height: 80px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+                    
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
+            
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
+            
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+            
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
+
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         $grid->disableActions ();
         return $grid;
