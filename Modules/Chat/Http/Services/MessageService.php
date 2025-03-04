@@ -107,21 +107,19 @@ class MessageService
     {
         if (!is_string($file)) {
             $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
-            $name = pathinfo($file_name, PATHINFO_FILENAME);
-
-            $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
-            $videoPath = $file_name;
-            $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
-
-            try {
-                $this->extract_frame($videoPath, $thumbnailPath);
-            } catch (\Throwable $e) {
-                return $e->getMessage();
-            }
         } else {
-            $thumbnailPath = $file;
+            $file_name = $file;
         }
-
+        
+        $name = pathinfo($file_name, PATHINFO_FILENAME);
+        $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
+        $videoPath = $file_name;
+        $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
+        try {
+            $this->extract_frame($videoPath, $thumbnailPath);
+        } catch (\Throwable $e) {
+            return $e->getMessage();
+        }
 
         $album->frame = $thumbnailPath;
         $album->save();
