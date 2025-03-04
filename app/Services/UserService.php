@@ -21,6 +21,7 @@ use App\Repositories\FollowRepository;
 use Illuminate\Database\Query\Builder;
 use App\Http\Services\RoomGameServices;
 use App\Tik\Repositories\VipRepository;
+use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
 use Modules\CP\Repositories\CpRepository;
@@ -66,6 +67,7 @@ class UserService
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
         private readonly CpRepository $cpRepository,
+        private readonly WareRepository $wareRepository,
         UserRepository $userRepository,
         PackRepository $packRepository,
         FollowRepository $followRepository,
@@ -448,12 +450,12 @@ class UserService
         $cacheKey = 'cache-data-mystore-' . $user->id;
         // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
-            $targetService = new FixedTargetService($user);
-            $targetService->calculateTarget();
-            if ($user->ownerRoom != null) {
-                $roomTarget = new RoomGameServices();
-                $roomTarget->CalculateRoomSalaries($user->ownerRoom);
-            }
+        $targetService = new FixedTargetService($user);
+        $targetService->calculateTarget();
+        if ($user->ownerRoom != null) {
+            $roomTarget = new RoomGameServices();
+            $roomTarget->CalculateRoomSalaries($user->ownerRoom);
+        }
         // }
 
         if ($user->device_token  != $request->header('X-Device-Token')) {
@@ -730,7 +732,7 @@ class UserService
         ChangeLevelHistory::create([
             'user_id' =>  $user->id,
             'admin_id' => 1,
-            'old_total_sender_level' => $user->total_sender_level ,
+            'old_total_sender_level' => $user->total_sender_level,
             'new_total_sender_level' => $request->total_sender_level,
             'old_total_received_level' =>  $user->total_received_level,
             'new_total_received_level' => $request->total_received_level,
@@ -742,9 +744,9 @@ class UserService
         return true;
     }
 
-    public function levelHistory($perPage,$page)
+    public function levelHistory($perPage, $page)
     {
-        return ChangeLevelHistory::with('user','admin') ->paginate($perPage, ['*'], 'page', $page);
+        return ChangeLevelHistory::with('user', 'admin')->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function userDeviceToken($perPage, $Page, $deviceToken, $request)
@@ -985,5 +987,20 @@ class UserService
     public function online()
     {
         return $this->userRepository->online();
+    }
+
+    public function sendPack($user, $request)
+    {
+        $pack = $this->packRepository->pack($request->pack_id, $user->id);
+        if (!$pack) return Common::apiResponse(0, 'item not found or expired', null, 404);
+        $ware = $this->wareRepository->findOrFail($pack->target_id);
+        if (!$ware) return Common::apiResponse(0, 'product not found', null, 404);
+        $to = User::query()->searchByUuid($request->touid)->first();
+        if (!$to) return Common::apiResponse(0, 'user not found', null, 404);
+        $pack->user_id   = $to->id;
+        $pack->sender_id = $user->id;
+            $pack->save();
+        CustomNotification::mallSend($user, $to, $pack->type, $ware->show_img);
+        return Common::apiResponse(1, 'sent successfully');
     }
 }

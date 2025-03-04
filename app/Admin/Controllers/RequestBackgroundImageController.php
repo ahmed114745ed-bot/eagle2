@@ -133,7 +133,7 @@ class RequestBackgroundImageController extends MainController
                 }
 
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = url("admin/users/{$this->id}");
+                $showUrl = url("admin/users/{$this->owner->id}");
                 return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         $image

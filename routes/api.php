@@ -259,7 +259,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
-
+           
             Route::prefix('families')->middleware(['appFeatureEnable:families'])->group(function () {
                 Route::get('all', [FamilyController::class, 'index']);
                 Route::get('show/{id}', [FamilyController::class, 'show']);
@@ -331,6 +331,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 //                Route::get('my_income', [UserController::class, 'my_income']);
                 Route::post('getTimes', [HomeController::class, 'getTimes']);
             });
+            Route::post('send_pack', [UserController::class, 'sendPack']);
 
             Route::prefix('exchange')->group(function () {
                 Route::get('/list', [ExchangeController::class, 'exchangeList']);
