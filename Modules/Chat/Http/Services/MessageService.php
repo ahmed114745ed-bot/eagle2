@@ -56,7 +56,7 @@ class MessageService
             $this->processImageFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'gif') {
             $this->processGifFile($file, $chatRoom, $message, $user);
-        } elseif ($extension == 'mp4') {
+        } elseif ($extension == 'mp4' || is_string($file)) {
             $this->processVideoFile($file, $chatRoom, $message, $user);
         } elseif (in_array($extension, ['mp3', 'wav', 'm4a', 'aac'])) {
             $this->processAudioFile($file, $chatRoom, $message, $user);
