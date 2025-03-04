@@ -71,7 +71,7 @@ class SalaryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryRequest());
-        $grid->model()->whereHas('agency')->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
         $grid->filter (function (Grid\Filter $filter){
             $filter->column(1/2, function ($filter) {
                 $filter->equal('status',__('status'))->select([0=>__('waiting'),1=>__('accepting'),2=>__('transferred'),3=>__('completed'),4=>__('rejected')]);
@@ -95,15 +95,23 @@ class SalaryRequestController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/agencies/{$this->agency->id}");
+            if ($this->agency) {
+                $showUrl = url("admin/agencies/{$this->agency->id}");
+                $link = "
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                ";
+            } else {
+                $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
+            }
+            
             return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-               <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                </a>
-            </div>
-        ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    $link
+                </div>
+            ";
         });
 
         $grid->column('agencyOwner.name', __('Agency owner'))
