@@ -41,6 +41,8 @@ class MessageService
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
+        }elseif ($request->video_name) {
+            $this->processVideoFile($request->video_name, $chatRoom, $message, $user);
         }
     }
 
