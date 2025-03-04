@@ -113,7 +113,7 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {   if(!$ownerRoom) return [];
+    {   if(!$ownerRoom) return null;
         $data = [];
             $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
@@ -215,7 +215,7 @@ class RankingService
             $v->country = @$user->country;
             $v->age = $user->profile->age;
             $v->achievement_images = $achievement_images;
-            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : [];
+            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
             unset($v->$relation);
             return $v;
         })->reject(function ($v) {
