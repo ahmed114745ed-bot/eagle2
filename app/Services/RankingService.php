@@ -113,7 +113,7 @@ class RankingService
     }
 
     protected function roomData($ownerRoom)
-    {
+    {   if(!$ownerRoom) return [];
         $data = [];
             $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
         $data =  [
