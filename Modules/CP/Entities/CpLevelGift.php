@@ -3,8 +3,10 @@
 namespace Modules\CP\Entities;
 
 use App\Models\OVip;
+use App\Models\Setting;
 use App\Models\Vip;
 use App\Models\Ware;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,17 +16,39 @@ class CpLevelGift extends Model
 
     public function getCreatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+            // Cache key for the timezone setting
+    $cacheKey = 'timezone';
+
+    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+    $timezone = Cache::rememberForever($cacheKey, function () {
+        $setting = Setting::where('key', 'timezone')->first();
+        return $setting?->value ?? 'UTC';
+    });
+
+    // Get the timezone from the request header or use the cached setting
+    $timeZone = request()->header('tz') ?? $timezone;
+
+    // Parse the date and set the timezone
+    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
     // Convert updated_at to the user's local time zone
     public function getUpdatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+            // Cache key for the timezone setting
+    $cacheKey = 'timezone';
+
+    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+    $timezone = Cache::rememberForever($cacheKey, function () {
+        $setting = Setting::where('key', 'timezone')->first();
+        return $setting?->value ?? 'UTC';
+    });
+
+    // Get the timezone from the request header or use the cached setting
+    $timeZone = request()->header('tz') ?? $timezone;
+
+    // Parse the date and set the timezone
+    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
     public function cp_level()
     {

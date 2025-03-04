@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Models\Timezone;
+use Cache;
 use Illuminate\Http\Request;
 
 class SettingsController extends Controller
@@ -21,6 +22,7 @@ class SettingsController extends Controller
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Cache::put($key, $value);
         }
 
         return back()->with(['success' => 'App settings updated successfully']);
