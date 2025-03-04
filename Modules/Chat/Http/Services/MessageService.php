@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\ChatRoom;
 use App\Models\User;
 use App\Helpers\Common;
+use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom as EntitiesChatRoom;
 use Modules\Chat\Http\Repositories\MessageAlbumRepository;
@@ -46,6 +47,7 @@ class MessageService
     private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user)
     {
         $extension = $file->getClientOriginalExtension();
+        Log::info('extension : '. $extension);
         if (!$this->isValidExtension($extension, $validExtensions)) {
             return response()->json(['status' => 404, 'message' => "Invalid file type"], 404);
         }
