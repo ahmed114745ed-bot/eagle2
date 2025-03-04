@@ -1663,7 +1663,13 @@
     "total Price": "Toplam Fiyat",
     "Level user history": "Kullanıcı seviye geçmişi",
     "uuid dedicate": "Benzersiz Kimlik Adama",
-    "special uuid": "Özel UUID"
+    "special uuid": "Özel UUID",
+    "waiting": "Bekleniyor",
+    "accepting": "Kabul ediliyor",
+    "transferred": "Aktarıldı",
+    "completed": "Tamamlandı",
+    "rejected": "Reddedildi",
+    "rejectedAdmin": "Yönetici tarafından reddedildi"
 
 
 

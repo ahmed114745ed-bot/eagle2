@@ -133,7 +133,7 @@ class AgentRequestController extends MainController
         });
         $grid->column('usd', __('Usd'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center;'>
                       
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
@@ -142,7 +142,7 @@ class AgentRequestController extends MainController
         
         $grid->column('coins', __('Coins'))->display(function ($coins) {
             $image = asset('images/coin.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center;'>
                        
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>

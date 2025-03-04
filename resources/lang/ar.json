@@ -1686,7 +1686,13 @@
     "Edit" : "تعديل",
     "Level user history":"سجل مستويات المستخدم",
     "uuid dedicate":"  اهداء المعرف المميز",
-    "special uuid": "المعرف الفريد الخاص"
+    "special uuid": "المعرف الفريد الخاص",
+    "waiting": "في انتظار",
+    "accepting": "جارٍ القبول",
+    "transferred": "تم التحويل",
+    "completed": "مكتمل",
+    "rejected": "مرفوض",
+    "rejectedAdmin": "مرفوض من قبل المسؤول"
 
     
  

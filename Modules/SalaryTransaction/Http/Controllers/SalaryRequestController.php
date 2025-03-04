@@ -188,7 +188,7 @@ class SalaryRequestController extends MainController
         $grid->column('country.name', __('country'));
         $grid->column('usd', __('Usd'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center; '>
                       
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
@@ -197,7 +197,7 @@ class SalaryRequestController extends MainController
         
         $grid->column('coins', __('Coins'))->display(function ($coins) {
             $image = asset('images/coin.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
+            return "<div style='display: flex; align-items: center;'>
                        
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
@@ -248,8 +248,8 @@ class SalaryRequestController extends MainController
         //     }
         // ");
 
-        $grid->column('bill_image', __('bill image'))->modal('show image' , function ($model ) {
-            $img = $model->bill_image;
+        $grid->column( __('bill image'))->modal('show image' , function ( ) {
+            $img = $this->bill_image;
             if($img == null || $img == ''){
                 return 'No image founded';
             }
@@ -257,7 +257,7 @@ class SalaryRequestController extends MainController
             $img = getDriverUrl().'/'.$img;
             $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
 
-            return (new WidgetsTable([''], [[$img]]));
+            return (new WidgetsTable([__('img')], [[$img]]));
         });
 
         $grid->disableActions ();

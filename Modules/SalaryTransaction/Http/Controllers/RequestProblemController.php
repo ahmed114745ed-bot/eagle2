@@ -89,7 +89,7 @@ class RequestProblemController extends MainController
             $show->field('request.bill_image', __('bill image'))->image();
             return $show;
         });
-        $grid->column('request.bill_image', __('bill image'))->modal('show image' , function ($model ) {
+        $grid->column( __('bill image'))->modal('show image' , function ($model ) {
             $img = $model->bill_image;
             if($img == null || $img == ''){
                 return 'No image founded';
