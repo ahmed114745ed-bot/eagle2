@@ -37,6 +37,9 @@ use Illuminate\Support\ServiceProvider;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 use Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -100,5 +103,22 @@ class AppServiceProvider extends ServiceProvider
         Pk::observe (PKObserver::class);
         Agency::observe (AgencyObserver::class);
         AgencyJoinRequest::observe (AgencyJoinRequestObserver::class);
+
+        if (Schema::hasTable('settings')) {
+            $settings = DB::table('settings')->pluck('value', 'key')->toArray();
+    
+            config([
+                'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
+                'themes.secondaryColor' => $settings['secondary_color'] ?? '#1A1A1A',
+                'themes.textPrimaryColor' => $settings['text_primary_color'] ?? '#fdf8f8',
+                'themes.textSecondaryColor' => $settings['text_secondary_color'] ?? '#c1b9b9',
+                'themes.boxBackgroundColor' => $settings['box_background_color'] ?? '#222222',
+                'themes.backgroundImage' => $settings['background_image'] ?? '',
+                'themes.tableBackGroundColor' => $settings['table_background_color'] ?? '#c88213',
+            ]);
+          
+
+        }
+
     }
 }

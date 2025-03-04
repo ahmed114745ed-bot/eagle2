@@ -17,12 +17,22 @@ class SettingsController extends Controller
 
     public function update(Request $request){
 
-        $data = $request->only(['timezone']);
-
+    
+        $data = $request->all();
         foreach ($data as $key => $value) {
+            if ($request->hasFile($key)) {
+                $file = $request->file($key);
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('uploads/settings', $fileName, 'public');
+                $value = $fileName;
+                
+            }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
+   
 
-        return back()->with(['success' => 'App settings updated successfully']);
-    }
+        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
+    
+        return redirect(admin_url('settings'));
+        }
 }

@@ -103,6 +103,8 @@ Route::group(
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        // Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+
 
     }
 );
