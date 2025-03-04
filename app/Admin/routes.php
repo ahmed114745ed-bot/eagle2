@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\LanguageController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -397,6 +398,7 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
+        $router->resource('languages', LanguageController::class);
     }
 
 

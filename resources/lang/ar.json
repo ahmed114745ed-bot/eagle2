@@ -1686,11 +1686,14 @@
     "Edit" : "تعديل",
     "Level user history":"سجل مستويات المستخدم",
     "uuid dedicate":"  اهداء المعرف المميز",
-    "special uuid": "المعرف الفريد الخاص"
-
-    
- 
-    
+    "special uuid": "المعرف الفريد الخاص",
+    "Languages" : "اللغات",
+    "Code" : "كود اللغة",
+    "Is enabled" : "حالة التفعيل",
+    "Direction" : "الاتجاه",
+    "Left to Right (LTR)" : "من اليسار إلى اليمين (LTR)",
+    "Right to Left (RTL)" : "من اليمين إلى اليسار (RTL)",
+    "Manage the available languages":"اداره اللغات"
 
 
 
