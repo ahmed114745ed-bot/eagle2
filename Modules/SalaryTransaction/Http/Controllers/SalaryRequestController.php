@@ -248,8 +248,8 @@ class SalaryRequestController extends MainController
         //     }
         // ");
 
-        $grid->column('bill_image', __('bill image'))->modal('show image' , function ( ) {
-            $img = $this->bill_image;
+        $grid->column('bill_image', __('bill image'))->modal('show image' , function ($model ) {
+            $img = $model->bill_image;
             if($img == null || $img == ''){
                 return 'No image founded';
             }
