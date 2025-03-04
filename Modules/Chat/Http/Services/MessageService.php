@@ -101,18 +101,23 @@ class MessageService
 
     private function processVideoFile($file, $chatRoom, $message, $user)
     {
-        $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
-        $name = pathinfo($file_name, PATHINFO_FILENAME);
+        if (!is_string($file)) {
+            $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+            $name = pathinfo($file_name, PATHINFO_FILENAME);
 
-        $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
-        $videoPath = $file_name;
-        $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
+            $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
+            $videoPath = $file_name;
+            $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
 
-        try {
-            $this->extract_frame($videoPath, $thumbnailPath);
-        } catch (\Throwable $e) {
-            return $e->getMessage();
+            try {
+                $this->extract_frame($videoPath, $thumbnailPath);
+            } catch (\Throwable $e) {
+                return $e->getMessage();
+            }
+        } else {
+            $thumbnailPath = $file;
         }
+
 
         $album->frame = $thumbnailPath;
         $album->save();
@@ -168,8 +173,8 @@ class MessageService
             $condition = ($user2->current_room_chat == $chatRoom->id);
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
-            if(!$condition){
-                event(new UnreadCounterIndividual('message',$user2,1));
+            if (!$condition) {
+                event(new UnreadCounterIndividual('message', $user2, 1));
             }
         }
     }
