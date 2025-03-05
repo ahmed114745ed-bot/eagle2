@@ -367,7 +367,7 @@ class NotificationSeeder extends Seeder
 
         $notifications = Notification::all();
         foreach($notifications as $n){
-            Cache::put($n->key, $n->translations->toArray());
+            Cache::forever($n->key, $n->translations->toArray());
         }
     }
 }
