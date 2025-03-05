@@ -1,9 +1,10 @@
 <?php
 
-user_namespace Database\Seeders;
+namespace Database\Seeders;
 
 use App\Models\Notification;
 use App\Models\NotificationTranslation;
+use Cache;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -230,7 +231,7 @@ class NotificationSeeder extends Seeder
         /* ----------------------------------- like real ------------------------------------ */
 
         $like_real = DB::table('notifications')->insertGetId([
-            'key' => 'comment_moment'
+            'key' => 'like_real'
         ]);
 
         // Insert translations in batch
@@ -295,5 +296,78 @@ class NotificationSeeder extends Seeder
                 'language' => 'tu'
             ]
         ]);
+
+        /* ----------------------------------- Like Moment ---------------------------------------- */
+
+        $like_moment = DB::table('notifications')->insertGetId([
+            'key' => 'like_moment'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $like_moment,
+                'title' => 'like moment',
+                'message' =>'{user_name} reacted your moment',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $like_moment,
+                'title' => "الاعجاب بلحظة",
+                'message' => '  قام {user_name} بالتفاعل على اللحظة الخاصة بك',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $like_moment,
+                'title' => 'जैसे पल',
+                'message' =>'{user_name} ने आपके पल पर प्रतिक्रिया दी',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $like_moment,
+                'title' => 'an gibi',
+                'message' => '{user_name} anınıza tepki gösterdi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* -------------------------------- accept agency ------------------------------------ */
+
+        $accept_agency = DB::table('notifications')->insertGetId([
+            'key' => 'accept_agency'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $accept_agency,
+                'title' => '',
+                'message' =>'Congrats! Your request to join {agency_name} agency is accepted',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $accept_agency,
+                'title' => '',
+                'message' =>  'مبروك لقد تم قبول طلب الانضمام وكاله {agency_name}',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $accept_agency,
+                'title' => '',
+                'message' =>'बधाई हो! {agency_name} एजेंसी में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $accept_agency,
+                'title' => '',
+                'message' => 'Tebrikler! {agency_name} ajansına katılma isteğiniz kabul edildi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        $notifications = Notification::all();
+        foreach($notifications as $n){
+            Cache::put($n->key, $n->translations->toArray());
+        }
     }
 }
