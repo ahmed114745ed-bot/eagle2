@@ -54,6 +54,7 @@ class Common
 
     use CalcsTrait, AdminTrait, MoneyTrait, RoomTrait, AttributesTrait, ZegoTrait, InfoTrait, FilterTrait;
 
+
     public static function level_center_min($user_id)
     {
         $user = User::query()->find($user_id);

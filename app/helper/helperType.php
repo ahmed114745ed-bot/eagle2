@@ -1,5 +1,6 @@
 <?php
 
+const VARIABLES = ['level', 'user_name', 'agency', 'salary'];
 const TYPE_GIFT =
 [
     1 => 'normal',
