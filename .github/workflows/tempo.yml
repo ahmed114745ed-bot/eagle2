@@ -7,14 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: print out Tempo
-      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+      uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.53.132"
-        user: ${{ secrets.USERNAME }}
+        username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
-        command_timeout: 3m
-        first_ssh: |
+        script: |
           echo "$USER"
           pwd
           cd /var/www/tempo
