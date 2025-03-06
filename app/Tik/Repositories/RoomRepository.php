@@ -132,7 +132,7 @@ class RoomRepository extends AbstractRepository
                 break;
                 case 'last_create':
                   //  dd(Carbon::now()->subDay());
-                    $result->whereDate('created_at', Carbon::now()->subDay())->orderByDesc('id');
+                    $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))->orderByDesc('id');
                     break;
             case 'pk':
                 // $result->where('is_show_pk', 1)->orderByDesc('room_visitors_count');

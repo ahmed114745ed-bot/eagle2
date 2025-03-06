@@ -74,14 +74,80 @@ class AgentRequestController extends MainController
         $grid = new Grid(new AgentSalaryRequest());
         $grid->model()->where("status",0);
         $grid->column('id', __('Id'));
-        $grid->column('agency.name',__("agency"));
-        $grid->column('agent.name',__("name"));
-        $grid->column('agent.uuid',__("Id"));
+        $grid->column('agency.name',__("agency"))->display(function ($name) {
+            $path = @$this->agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            if ($this->agency) {
+                $showUrl = url("admin/agencies/{$this->agency->id}");
+                $link = "
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                ";
+            } else {
+                $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
+            }
+            
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    $link
+                </div>
+            ";
+        });
+        $grid->column('agent.name',__("name"))->display(function ($name) {
+            $name = $name ??'';
+            $uid = @$this->agent->uuid;
+            $path = @$this->agent?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->agent->id}");
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });;
         $grid->column('type',__('Payment method'))->display(function($q){
             return $this->type == 1 ? __('coins') : 'usd' ;
         });
-        $grid->column('usd',__("usd"));
-        $grid->column('coins',__("coins"));
+        $grid->column('usd', __('Usd'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center;'>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        
+        $grid->column('coins', __('Coins'))->display(function ($coins) {
+            $image = asset('images/coin.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center;'>
+                       
+                        <span>{$coins}</span>
+                         <img src='{$image}' alt='Coins' width='20' height='20'>
+                    </div>";
+        });
         // $grid->column('payment_gateway.title',__("payment title"));
         // $grid->column('country.name',__("country"));
         $grid->disableCreateButton();
