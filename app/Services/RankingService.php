@@ -213,7 +213,7 @@ class RankingService
             $v->reciver_level_img = @$total_sender_level_img->img ?? '';
 
             $v->country = @$user->country;
-            $v->age = $user->profile->age;
+            $v->age = @$user->profile->age ?? '';
             $v->achievement_images = $achievement_images;
             $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
             unset($v->$relation);
@@ -304,7 +304,7 @@ class RankingService
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
-        $arr['user']['age'] = $user->profile->age;
+        $arr['user']['age'] = @$user->profile?->age ?? '';
         $arr['user']['color_name'] = $color_name;
         $arr['user']['achievement_images'] = $achievement_images;
 
