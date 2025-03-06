@@ -30,8 +30,20 @@ class ProfileRepository
 
     public function updateProfile($profile, $data)
     {
-        $profile->fill($data);
-        $profile->save();
+        if($profile)
+        {
+            $profile->fill($data);
+            $profile->save();
+        }else{
+            $profile = Profile::create([
+             'gender' => $data->gender,
+             'birthday' => $data->birthday,
+             'province' => $data->province,
+             'city' => $data->city,
+             'country' => $data->country,
+            ]);
+        }
+        
         return $profile;
     }
 
