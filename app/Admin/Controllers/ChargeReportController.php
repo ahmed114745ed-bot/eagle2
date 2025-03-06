@@ -83,15 +83,15 @@ class ChargeReportController extends MainController {
             $filter->expand ();
             if ($charger_type == "dash" ) {
                 $filter->column(1/2, function ($filter) {
-                    $filter->equal('receiver.uuid', __("sendTo"));
+                    $filter->equal('receiver.uuid', __("receiver"));
                 });
             }else{
                 $filter->column(1/2, function ($filter) {
-                    $filter->equal('sender.uuid', __('receiver'));
+                    $filter->equal('sender.uuid', __('Sender'));
                 });
 
                 $filter->column(1/2, function ($filter) {
-                    $filter->equal('receiver.uuid', __('sendTo'));
+                    $filter->equal('receiver.uuid', __('receiver'));
                 });
             }
         });
