@@ -28,10 +28,23 @@ class ProfileRepository
         return $user;
     }
 
-    public function updateProfile($profile, $data)
+    public function updateProfile($profile, $data, $userId )
     {
-        $profile->fill($data);
-        $profile->save();
+        if($profile)
+        {
+            $profile->fill($data);
+            $profile->save();
+        }else{
+            $profile = Profile::create([
+             'gender' => @$data?->gender,
+             'birthday' => @$data->birthday,
+             'province' => @$data->province,
+             'city' => @$data->city,
+             'country' => @$data->country,
+             'user_id'=>@$userId,
+            ]);
+        }
+        
         return $profile;
     }
 

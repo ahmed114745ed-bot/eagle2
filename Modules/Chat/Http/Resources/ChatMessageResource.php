@@ -112,6 +112,7 @@ class ChatMessageResource extends JsonResource
                 'message_user_id' => $data->user_id,
                 'message'         => $data->message,
                 'message_type'    => $data->type,
+                'duration'        => $data->duration,
                 'message_albums'  => $data->albums->count() > 0 ?
                                     $data->albums->map(function ($item) {
                                         return [
