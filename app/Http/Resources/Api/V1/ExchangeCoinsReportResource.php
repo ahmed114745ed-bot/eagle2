@@ -19,6 +19,8 @@ class ExchangeCoinsReportResource extends JsonResource
             'value'       => $this->value,
             'operation_no' => (int)$this->operation_no,
             'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
+            'coins' => $this->value,
+            
         ];
     }
 }
