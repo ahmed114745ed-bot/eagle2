@@ -30,14 +30,18 @@ class HomeCarouselResource extends JsonResource
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
 
         $urlEvent = GeneralRole::where('type',$this->event_type)->first();
-        return [
+        $data =  [
             'id'         => $this->id,
             'img'        => $this->img ?:'',
             'type'   => $this->type ?? '',
             'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period')? ($urlEvent->url ?? ''):''),
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
-            'room' => [
+
+        ];
+
+        if($this->type == 'room'){
+            $data += ['room' => [
                 "id" => @$ownerRoom->id ?? 0,
                 "owner_uuid" => @$this->uuid,
                 "room_name" => @$ownerRoom->room_name ?? '',
@@ -50,7 +54,9 @@ class HomeCarouselResource extends JsonResource
                 'password_status'     => !(@$ownerRoom->room_pass == ""),
                 'type-number'                => @$ownerRoom->room_type ?? 0,
                 'type' => @$ownerRoom->myType ?: new \stdClass(),
-            ],
-        ];
+            ]];
+        }
+
+        return $data;
     }
 }
