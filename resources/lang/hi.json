@@ -806,7 +806,13 @@
     "total Price": "कुल मूल्य",
     "Level user history": "उपयोगकर्ता स्तर इतिहास",
     "uuid dedicate": "अद्वितीय पहचान समर्पण",
-    "special uuid": "विशेष यूयूआईडी"
+    "special uuid": "विशेष यूयूआईडी",
+    "waiting": "प्रतीक्षा में",
+    "accepting": "स्वीकृति जारी",
+    "transferred": "स्थानांतरित",
+    "completed": "पूरा हुआ",
+    "rejected": "अस्वीकृत",
+    "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत"
 
 
 

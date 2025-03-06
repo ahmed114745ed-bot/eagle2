@@ -14,13 +14,11 @@ class StorageUploadController extends Controller
          $request->validate([
             'name' => 'required|string',
             'type' => 'required|string',
-            'size' => 'nullable|integer', // Optional file size
             'folder' => 'nullable|string'
         ]);
 
         $filename = $request->input('name');
         $filetype = $request->input('type');
-        $size = $request->input('size'); // File size
         $folder = $request->folder ?? 'pre-sign';
 
         // Generate a unique file name to avoid conflicts
@@ -39,10 +37,7 @@ class StorageUploadController extends Controller
             now()->addMinutes(15),
             [
                 'method' => 'PUT',
-                'contentType' => $filetype,
-                'headers' => [
-                    'x-goog-meta-file-size' => $size, // Store file size as metadata
-                ],
+                'contentType' => $filetype
             ]
         );
 
@@ -54,7 +49,6 @@ class StorageUploadController extends Controller
             'upload_url' => $url,
             'delete_url' => $deleteUrl,
             'name' => $uniqueFilename,
-            'size' => $size, // Return size in response
         ]);
     }
 }

@@ -1029,4 +1029,10 @@ class UserController extends Controller
         $data = $this->userService->online();
         return Common::apiResponse(true, 'done', OnlineResource::collection($data));
     }
+
+    public function sendPack(Request $request)
+    {
+        $user = $request->user();
+        return $this->userService->sendPack($user, $request);
+    }
 }

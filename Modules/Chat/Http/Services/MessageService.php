@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\ChatRoom;
 use App\Models\User;
 use App\Helpers\Common;
+use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom as EntitiesChatRoom;
 use Modules\Chat\Http\Repositories\MessageAlbumRepository;
@@ -40,12 +41,15 @@ class MessageService
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
+        }elseif ($request->video_name) {
+            $this->processVideoFile($request->video_name, $chatRoom, $message, $user);
         }
     }
 
     private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user)
     {
         $extension = $file->getClientOriginalExtension();
+        Log::info('extension : '. $extension);
         if (!$this->isValidExtension($extension, $validExtensions)) {
             return response()->json(['status' => 404, 'message' => "Invalid file type"], 404);
         }
@@ -54,7 +58,7 @@ class MessageService
             $this->processImageFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'gif') {
             $this->processGifFile($file, $chatRoom, $message, $user);
-        } elseif ($extension == 'mp4') {
+        } elseif ($extension == 'mp4' || is_string($file)) {
             $this->processVideoFile($file, $chatRoom, $message, $user);
         } elseif (in_array($extension, ['mp3', 'wav', 'm4a', 'aac'])) {
             $this->processAudioFile($file, $chatRoom, $message, $user);
@@ -101,13 +105,16 @@ class MessageService
 
     private function processVideoFile($file, $chatRoom, $message, $user)
     {
-        $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        if (!is_string($file)) {
+            $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        } else {
+            $file_name = $file;
+        }
+        
         $name = pathinfo($file_name, PATHINFO_FILENAME);
-
         $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
         $videoPath = $file_name;
         $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
-
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
         } catch (\Throwable $e) {
@@ -168,8 +175,8 @@ class MessageService
             $condition = ($user2->current_room_chat == $chatRoom->id);
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
-            if(!$condition){
-                event(new UnreadCounterIndividual('message',$user2,1));
+            if (!$condition) {
+                event(new UnreadCounterIndividual('message', $user2, 1));
             }
         }
     }
