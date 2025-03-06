@@ -28,7 +28,7 @@ class ProfileRepository
         return $user;
     }
 
-    public function updateProfile($profile, $data)
+    public function updateProfile($profile, $data, $userId )
     {
         if($profile)
         {
@@ -41,6 +41,7 @@ class ProfileRepository
              'province' => $data->province,
              'city' => $data->city,
              'country' => $data->country,
+             'user_id'=>$userId,
             ]);
         }
         
