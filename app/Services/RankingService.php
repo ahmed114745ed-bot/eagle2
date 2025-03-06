@@ -213,7 +213,7 @@ class RankingService
             $v->reciver_level_img = @$total_sender_level_img->img ?? '';
 
             $v->country = @$user->country;
-            $v->age = @$user->profile->age ?? '';
+            $v->age = @$user->profile->age ?? 'P';
             $v->achievement_images = $achievement_images;
             $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
             unset($v->$relation);
