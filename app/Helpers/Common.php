@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\NotificationTemplate;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -48,6 +49,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Cache;
 
 class Common
 {
@@ -1144,4 +1146,31 @@ class Common
         }
         return true;
     }
+
+
+
+    public static function getNotificationContent(string $key, string $language = 'en', array $variables = []): array
+    {
+        $notificationData = Cache::rememberForever("notification_{$key}", function () use ($key) {
+            $notification = \App\Models\Notification::with('translations')->where('key', $key)->first();
+            return $notification ? $notification->translations->pluck('message', 'language')->toArray() : null;
+        });
+    
+        if (!$notificationData) {
+            return [
+                'title' => __('Notification'),
+                'body'  => __('No content available'),
+            ];
+        }
+    
+        $body = $notificationData[$language] ?? __('No translation available');
+    
+        foreach ($variables as $varKey => $value) {
+            $body = str_replace("{{$varKey}}", '  ' . $value, $body);
+        }
+    
+        return ['title' => __('Notification'), 'body' => $body];
+    }
+    
+
 }

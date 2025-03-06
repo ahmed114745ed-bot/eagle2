@@ -418,8 +418,12 @@
      "Main" : "Main",
      "commission": "The amount deducted from the commission",
      "date":"date",
-     "party" :"Party"
+     "party" :"Party",
 
 
+        "available_variables" : "Available Variables",
+        "help_message" : "You can use the following variables in the message: :variables"
+   
+    
 
 }

@@ -1707,9 +1707,10 @@
     "Text Secondary Color:" : "لون النص الثانوي:",
     "Box Background Color:" : "لون خلفية الصندوق:",
     "Table Background Color:" : "لون خلفية الجدول:",
-    "Time zone:" : "المنطقة الزمنية:"
-  
-  
+    "Time zone:" : "المنطقة الزمنية:",
+      "available_variables" : "المتغيرات المتاحة",
+      "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables"
 
+  
 
 }
