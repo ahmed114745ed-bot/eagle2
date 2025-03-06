@@ -37,7 +37,7 @@ class MessageService
             $count = count($files);
 
             if ($count == 1) {
-                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user);
+                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user,$request->duration);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
