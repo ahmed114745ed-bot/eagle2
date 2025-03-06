@@ -10,7 +10,7 @@ jobs:
       uses: cross-the-world/ssh-scp-ssh-pipelines@latest
       with:
         host: "34.18.53.132"
-        user: "abdallahabdelfattah1297" #${{ secrets.USERNAME }}
+        user: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 3m
