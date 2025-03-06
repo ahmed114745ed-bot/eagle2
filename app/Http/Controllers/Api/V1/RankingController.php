@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Services\RankingService;
 use App\Services\VipService;
 use Illuminate\Http\Request;
+use App\Http\Resources\Api\V1\AgencyRankingRecourse;
+use Illuminate\Support\Facades\Log;
 
 class RankingController extends Controller
 {
@@ -20,6 +22,7 @@ class RankingController extends Controller
 
     public function ranking(Request $request)
     {
+        Log::info("makled makled makled");
         $class = $request->class ?: 1;
         $type = $request->type !== null ? $request->type : 1;
 
