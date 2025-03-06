@@ -16,9 +16,15 @@ class SettingsController extends Controller
         return view('admin.settings', compact('timezones', 'settings'));
     }
 
+    public function room(){
+        $settings = Setting::all();
+
+        return view('admin.room_settings', compact('settings'));
+    }
+
     public function update(Request $request){
 
-    
+
         $data = $request->all();
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
@@ -26,15 +32,15 @@ class SettingsController extends Controller
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->storeAs('uploads/settings', $fileName, 'public');
                 $value = $fileName;
-                
+
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
         }
-   
+
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
-    
-        return redirect(admin_url('settings'));
+
+        return back();
         }
 }
