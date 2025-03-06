@@ -26,8 +26,8 @@ class HomeCarouselResource extends JsonResource
     public function toArray($request)
     {
         $roomPass = $this->room?->room_pass ?? '';
-        $ownerRoom = $this->user->ownerRoom;
-        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $ownerRoom = $this->user?->ownerRoom;
+        $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
 
         $urlEvent = GeneralRole::where('type',$this->event_type)->first();
         return [
