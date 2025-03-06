@@ -43,15 +43,16 @@ class DeleteBans extends Action
 
     public function form()
     {
-        $this->hidden('uid', __('id'))->attribute('id', 'uid');
-        $this->hidden('type', __('id'))->attribute('id', 'type');
-        $this->hidden('ban_type_id', __('id'))->attribute('id', 'ban_type_id');
-
-        /*$this->hidden('uid', 'uid')->value($this->id);
-        $this->hidden('type', 'type')->value($this->type);
-        $this->hidden('ban_type_id', 'ban_type_id')->value($this->ban_type_id);*/
-    }
-
+        $this->hidden('uid', __('id'))->default($this->id);
+        $this->hidden('type', __('id'))->default($this->type);
+        // $this->hidden('ban_type_id', __('id'))->default($this->ban_type_id);
+    
+        $this->confirm(__('messages.confirm_delete'), __('messages.are_you_sure'), [
+            'icon' => 'warning',
+            'showCancelButton' => true,
+            'confirmButtonText' => __('messages.yes_delete'),
+            'cancelButtonText' => __('messages.cancel'),
+        ]);    }
 
 
     public function html()
@@ -62,7 +63,9 @@ class DeleteBans extends Action
                 console.log(val, type, ban_type_id)
                 $("#uid").val(val);
                 $("#type").val(type);
+                $("#deleteModal").modal("hide");
                 $("#ban_type_id").val(ban_type_id);
+                
             }
         </script>';
     }
