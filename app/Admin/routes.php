@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\SettingController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Routing\Router;
@@ -402,6 +403,7 @@ Route::group(
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);
         $router->resource('settings', SettingController::class);
+        $router->resource('notification-templates', NotificationsTemplatesController::class);
 
     }
 
