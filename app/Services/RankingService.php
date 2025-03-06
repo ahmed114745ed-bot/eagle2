@@ -195,7 +195,7 @@ class RankingService
             $v->remaining_int = ceil($value2);
 
             $v->name = $class == 3 ? (@$user->ownerRoom?->room_name ?? '') : $user->name;
-            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : $user->profile->avatar;
+            $v->avatar = $class == 3 ? (@$user->ownerRoom?->room_cover ?? '') : @$user->profile?->avatar;
             $v->frame = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true) ?: Common::getUserDress($user->id, $user->dress_1, 4, 'img1', true);
             $v->frame_id = $user->dress_1;
             $v->type_user =  intval(@$user->type_user) ?: 0;
