@@ -19,6 +19,11 @@ class NotificationSeeder extends Seeder
         DB::table('notifications')->truncate();
         DB::table('notification_translations')->truncate();
 
+        $notifications = Notification::all();
+        foreach($notifications as $n){
+            Cache::forget($n->key);
+        }
+
         // Insert notification
 
         /* ----------------------------------------sender level --------------------------------------------- */
@@ -361,6 +366,674 @@ class NotificationSeeder extends Seeder
                 'notification_id' => $accept_agency,
                 'title' => '',
                 'message' => 'Tebrikler! {agency_name} ajansına katılma isteğiniz kabul edildi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ----------------------------------- visit profile ------------------------------------------------ */
+        $visited_profile = DB::table('notifications')->insertGetId([
+            'key' => 'visited_profile'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $visited_profile,
+                'title' => '',
+                'message' =>'{user_name} visited your profile',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $visited_profile,
+                'title' => '',
+                'message' =>  '{user_name} قام بزياره ملفك الشخصى',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $visited_profile,
+                'title' => '',
+                'message' =>'{user_name} ने आपकी प्रोफ़ाइल देखी',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $visited_profile,
+                'title' => '',
+                'message' => '{user_name} profilinizi ziyaret etti',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------------- follow ------------------------------------------- */
+
+        $follow = DB::table('notifications')->insertGetId([
+            'key' => 'follow'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $follow,
+                'title' => '',
+                'message' =>'{user_name} followed you',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $follow,
+                'title' => '',
+                'message' =>  ' بمتابعتك{user_name} قام',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $follow,
+                'title' => '',
+                'message' =>'{user_name} ने आपका अनुसरण किया',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $follow,
+                'title' => '',
+                'message' => '{user_name} sizi takip etti',
+                'language' => 'tu'
+            ]
+        ]);
+
+
+        /* ------------------------------------- follow back ---------------------------------------- */
+
+        $follow_back = DB::table('notifications')->insertGetId([
+            'key' => 'follow_back'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $follow_back,
+                'title' => '',
+                'message' =>'Now you are friend with {user_name}',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $follow_back,
+                'title' => '',
+                'message' =>  '{user_name} اصبحت صديق مع ',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $follow_back,
+                'title' => '',
+                'message' =>'अब आप {user_name} के मित्र हैं',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $follow_back,
+                'title' => '',
+                'message' => 'Artık {user_name} ile arkadaşsın',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------------ remove from family ---------------------------------- */
+        $remove_from_family = DB::table('notifications')->insertGetId([
+            'key' => 'remove_from_family'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $remove_from_family,
+                'title' => '',
+                'message' =>'Sorry! You are removed from family {family_name} ',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $remove_from_family,
+                'title' => '',
+                'message' =>  'تم حظرك من عائله {family_name}',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $remove_from_family,
+                'title' => '',
+                'message' =>'क्षमा करें! आपको परिवार {family_name} से निकाल दिया गया है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $remove_from_family,
+                'title' => '',
+                'message' => 'Üzgünüz! {family_name} ailesinden çıkarıldınız',
+                'language' => 'tu'
+            ]
+        ]);
+
+
+        /* ----------------------------------- admin family ---------------------------------------------- */
+        $admin_family = DB::table('notifications')->insertGetId([
+            'key' => 'admin_family'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $admin_family,
+                'title' => '',
+                'message' =>"Congrats! You are now admin in family {fmaily_name} \nBe worthy of your position to raise EL Safwa",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $admin_family,
+                'title' => '',
+                'message' =>  ' تهانينا لقد اصبحت الان مشرف فى عائلة {family_name} يجب عليك ان تكون جيد بالمنصب من اجل ارتقاء الصفوة ',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $admin_family,
+                'title' => '',
+                'message' =>"बधाई हो! अब आप परिवार {family_name} में व्यवस्थापक हैं \EL Safwa को बढ़ाने के लिए अपने पद के योग्य बनें",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $admin_family,
+                'title' => '',
+                'message' => "Tebrikler! Artık {family_name} ailesinde admin oldun \ EL Safwa'yı yetiştirmek için pozisyonuna layık ol",
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------------- accept request agency ------------------------------ */
+        $accept_request_agency = DB::table('notifications')->insertGetId([
+            'key' => 'accept_request_agency'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $accept_request_agency,
+                'title' => '',
+                'message' =>'Your  agency has been accepted',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $accept_request_agency,
+                'title' => '',
+                'message' =>   'لقد تم قبول وكالتك',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $accept_request_agency,
+                'title' => '',
+                'message' =>'आपकी एजेंसी स्वीकार कर ली गई है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $accept_request_agency,
+                'title' => '',
+                'message' => 'Acentanız kabul edildi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ---------------------------------- refuse request agency ------------------------------ */
+        $refuse_request_agency = DB::table('notifications')->insertGetId([
+            'key' => 'refuse_request_agency'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $refuse_request_agency,
+                'title' => '',
+                'message' =>'Your agency has been refused',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $refuse_request_agency,
+                'title' => '',
+                'message' =>  'لقد تم رفض وكالتك',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $refuse_request_agency,
+                'title' => '',
+                'message' =>'आपकी एजेंसी को अस्वीकार कर दिया गया है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $refuse_request_agency,
+                'title' => '',
+                'message' => 'Acentanız reddedildi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ---------------------------------- user_send_gift_moment --------------------------------- */
+
+        $user_send_gift_moment = DB::table('notifications')->insertGetId([
+            'key' => 'user_send_gift_moment'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $user_send_gift_moment,
+                'title' => '',
+                'message' =>'{user_name} send you a {gift} in your moment',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $user_send_gift_moment,
+                'title' => '',
+                'message' =>  'قام {user_name} بارسال {gift} علي اللحظة الخاصة بك.',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $user_send_gift_moment,
+                'title' => '',
+                'message' =>'{user_name} आपको इस समय एक {gift} भेज रहा हूँ',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $user_send_gift_moment,
+                'title' => '',
+                'message' => '{user_name} size bu anınızda bir {gift} gönderdi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ----------------------------------- mallSend --------------------------------------- */
+        $gift_aristocracy = DB::table('notifications')->insertGetId([
+            'key' => 'gift_aristocracy'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $gift_aristocracy,
+                'title' => '',
+                'message' => "{user_name} sent you {ware} gift \nClick and activate your gift now from the bag",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $gift_aristocracy,
+                'title' => '',
+                'message' =>  "{user_name} ارسل لك {ware} جائزه \nاضغط وقم بتفعيل هديتك الآن من الحقيبة",
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $gift_aristocracy,
+                'title' => '',
+                'message' =>"{user_name} ने आपको {ware} उपहार भेजा है \क्लिक करें और बैग से अभी अपना उपहार सक्रिय करें",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $gift_aristocracy,
+                'title' => '',
+                'message' => "{user_name} size {ware} hediye gönderdi \Tıklayın ve hediyenizi şimdi çantadan etkinleştirin",
+                'language' => 'tu'
+            ]
+        ]);
+
+
+        /* ----------------------------------accept user family------------------------------------- */
+        $accept_family = DB::table('notifications')->insertGetId([
+            'key' => 'accept_family'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $accept_family,
+                'title' => '',
+                'message' => "Congrats! Your request to join family {family_name} is accepted \nFamily is everything, come on participate and grow your family",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $accept_family,
+                'title' => '',
+                'message' =>  'تهانينا: لقد تم قبول اضافتك الى عائلة {family_name} . العائلة يعنى اللمة الحلوة يلا شارك وكبر اللمة الحلوة',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $accept_family,
+                'title' => '',
+                'message' =>"बधाई हो! परिवार {family_name} में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है \nपरिवार ही सब कुछ है, आइए भाग लें और अपना परिवार बढ़ाएँ",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $accept_family,
+                'title' => '',
+                'message' => "Tebrikler! {family_name} ailesine katılma isteğiniz kabul edildi \nAile her şeydir, gelin katılın ve ailenizi büyütün",
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------------ send family ---------------------------------------- */
+        $send_Family = DB::table('notifications')->insertGetId([
+            'key' => 'send_Family'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $send_Family,
+                'title' => '',
+                'message' => "{user_name} send request to join your family",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $send_Family,
+                'title' => '',
+                'message' =>  ' {user_name} طلب الاندمام الى عائله',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $send_Family,
+                'title' => '',
+                'message' =>"{user_name} आपके परिवार में शामिल होने के लिए अनुरोध भेजें",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $send_Family,
+                'title' => '',
+                'message' => "{user_name} ailenize katılmak için istek gönderdi",
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ----------------------------------------- got coin --------------------------------------- */
+        $got_coin = DB::table('notifications')->insertGetId([
+            'key' => 'got_coin'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $got_coin,
+                'title' => '',
+                'message' => 'Congrats {user_name} !   {coins} coins are added to your account',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $got_coin,
+                'title' => '',
+                'message' =>  'تهانينا يا {user_name} . لقد تم اضافة {coins} كوين الى حسابك',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $got_coin,
+                'title' => '',
+                'message' =>'बधाई हो {user_name}! आपके खाते में {coins} सिक्के जोड़ दिए गए हैं',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $got_coin,
+                'title' => '',
+                'message' => 'Tebrikler {user_name}! {coins} coin hesabınıza eklendi',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------ ban user id --------------------------------- */
+        $ban_user_id = DB::table('notifications')->insertGetId([
+            'key' => 'ban_user_id'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $ban_user_id,
+                'title' => '',
+                'message' => "Sorry! You cannot log in to EL Safwa  now, you can log in after {duration} hours \nFor objection and complaint contact customer service",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $ban_user_id,
+                'title' => '',
+                'message' =>  ' ابلاغك انك لن تستطيع الدخول الى الصفوة الا بعد مرور  {duration} ساعة. للاعتراض و الشكوى يرجى التواصل مع خدمة العملاء',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $ban_user_id,
+                'title' => '',
+                'message' =>"क्षमा करें! आप अभी EL Safwa में लॉग इन नहीं कर सकते, आप {duration} घंटे बाद लॉग इन कर सकते हैं \nआपत्ति और शिकायत के लिए ग्राहक सेवा से संपर्क करें",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $ban_user_id,
+                'title' => '',
+                'message' => "Üzgünüz! Şu anda EL Safwa'ya giriş yapamazsınız, {duration} saat sonra giriş yapabilirsiniz \nİtiraz ve şikayet için müşteri hizmetleriyle iletişime geçin",
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* --------------------------------- remove ban user ---------------------------------------- */
+        $removeBan_user_id = DB::table('notifications')->insertGetId([
+            'key' => 'removeBan_user_id'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $removeBan_user_id,
+                'title' => '',
+                'message' => 'Congrats! You can log in to EL Safwa now,',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $removeBan_user_id,
+                'title' => '',
+                'message' =>  'مبروك انت الان تستطيع استخدام الصفوة',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $removeBan_user_id,
+                'title' => '',
+                'message' =>'बधाई हो! अब आप EL Safwa में लॉग इन कर सकते हैं,',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $removeBan_user_id,
+                'title' => '',
+                'message' => 'Tebrikler! Artık EL Safwa\'ya giriş yapabilirsiniz,',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ----------------------------user vips --------------------------------- */
+        $userVips = DB::table('notifications')->insertGetId([
+            'key' => 'userVips'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $userVips,
+                'title' => '',
+                'message' => 'Congrats! You reach {vip}, for {duration} days ',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $userVips,
+                'title' => '',
+                'message' =>  ' مبروك تم حصولك على {vip} لمدة {duration} يوم ',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $userVips,
+                'title' => '',
+                'message' =>'बधाई हो! आप {vip} तक पहुंच गए हैं, {duration} दिनों के लिए',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $userVips,
+                'title' => '',
+                'message' => 'Tebrikler! {duration} gün boyunca {vip} oldunuz',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* -----------------------------family level up---------------------------------- */
+        $family_level_up = DB::table('notifications')->insertGetId([
+            'key' => 'family_level_up'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $family_level_up,
+                'title' => 'Family level up',
+                'message' =>'Congrats! your family {family_name} level up to {family_level}',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $family_level_up,
+                'title' => 'رفع مستوى العائلة',
+                'message' =>  'تهانينا! تم ترقية عائلتك {family_name} إلى المستوى {family_level}',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $family_level_up,
+                'title' => 'परिवार का स्तर ऊपर',
+                'message' =>'बधाई हो! आपके परिवार का {family_name} स्तर {family_level} तक पहुंच गया है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $family_level_up,
+                'title' => 'Aile seviyesi yükseldi',
+                'message' => 'Tebrikler! Aileniz {family_name} {family_level} seviyesine yükseldi',
+                'language' => 'tu'
+            ]
+        ]);
+
+
+        /* -------------------------------------------ware Vips----------------------------------------- */
+        $wareVips = DB::table('notifications')->insertGetId([
+            'key' => 'wareVips'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $wareVips,
+                'title' => '',
+                'message' =>'Congrats! You reach {ware_vip}, for {duration} days ',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $wareVips,
+                'title' => '',
+                'message' =>  ' مبروك تم حصولك على {ware_vip} لمدة {duration} يوم ',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $wareVips,
+                'title' => '',
+                'message' =>'बधाई हो! आप {ware_vip} पर पहुंच गए, {duration} दिनों के लिए',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $wareVips,
+                'title' => '',
+                'message' => 'Tebrikler! {duration} gün boyunca {ware_vip} seviyesine ulaştınız',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* ------------------------------accept request salary-------------------------------------------- */
+        $accept_request_sallary = DB::table('notifications')->insertGetId([
+            'key' => 'accept_request_sallary'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $accept_request_sallary,
+                'title' => '',
+                'message' =>'Your salary transfer request with value {value}  has been accepted',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $accept_request_sallary,
+                'title' => '',
+                'message' =>  ' تم قبول طلبك الخاص بتحويل الراتب والذي يبلغ قيمه {value} ',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $accept_request_sallary,
+                'title' => '',
+                'message' =>'आपका {value} मूल्य वाला वेतन स्थानांतरण अनुरोध स्वीकार कर लिया गया है',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $accept_request_sallary,
+                'title' => '',
+                'message' => '{value} tutarındaki maaş transfer talebiniz kabul edildi',
+                'language' => 'tu'
+            ]
+        ]);
+
+
+        /* ------------------------------denied request sallary------------------------------------ */
+        $denied_request_sallary = DB::table('notifications')->insertGetId([
+            'key' => 'denied_request_sallary'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $denied_request_sallary,
+                'title' => '',
+                'message' =>'Your request for salary transfer with value: {value} was rejected for reason: {reason}',
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $denied_request_sallary,
+                'title' => '',
+                'message' =>  'تم رفض طلبك الخاص بتحويل الراتب الذي يبلغ قيمته {value} وذالك لسبب {reason}',
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $denied_request_sallary,
+                'title' => '',
+                'message' =>'आपका वेतन हस्तांतरण का अनुरोध, जिसका मूल्य {value} है, इस कारण से अस्वीकृत कर दिया गया है: {reason}',
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $denied_request_sallary,
+                'title' => '',
+                'message' => '{value} değerindeki maaş transferi talebiniz şu nedenle reddedildi: {reason}',
+                'language' => 'tu'
+            ]
+        ]);
+
+        /* -------------------------------- room target ------------------------------ */
+        $roomTarget = DB::table('notifications')->insertGetId([
+            'key' => 'roomTarget'
+        ]);
+
+        // Insert translations in batch
+        DB::table('notification_translations')->insert([
+            [
+                'notification_id' => $roomTarget,
+                'title' => '',
+                'message' =>"Congrats! you achieve new target in {room} you got {coins}",
+                'language' => 'en'
+            ],
+            [
+                'notification_id' => $roomTarget,
+                'title' => '',
+                'message' =>  "   تهانينا! لقد حققت هدفا جديدا فى {room} وحصلت على {coins}",
+                'language' => 'ar'
+            ],
+            [
+                'notification_id' => $roomTarget,
+                'title' => '',
+                'message' =>"बधाई हो! आपने {room} में नया लक्ष्य हासिल कर लिया है, आपको {coins} मिल गए हैं",
+                'language' => 'hi'
+            ],
+            [
+                'notification_id' => $roomTarget,
+                'title' => '',
+                'message' => "Tebrikler! {room}da yeni hedefe ulaştın, {coins} kazandın",
                 'language' => 'tu'
             ]
         ]);

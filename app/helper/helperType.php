@@ -1,6 +1,21 @@
 <?php
 
-const VARIABLES = ['level', 'user_name', 'agency', 'salary', 'agency_name'];
+const VARIABLES = [
+    'level',
+    'user_name',
+    'agency',
+    'salary',
+    'agency_name',
+    'family_name',
+    'gift',
+    'coins',
+    'vip',
+    'family_level',
+    'ware_vip',
+    'value',
+    'reason',
+    'room'
+];
 const TYPE_GIFT =
 [
     1 => 'normal',
