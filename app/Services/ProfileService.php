@@ -32,7 +32,7 @@ class ProfileService
         $user = $this->profileRepo->updateUser($request->user(), $data);
 
         $profileData = $request->only(['gender', 'birthday', 'province', 'city', 'country']);
-        if($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData);
+        if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
 
         if ($request->hasFile('image')) {
             $img = $request->file('image');
@@ -61,11 +61,11 @@ class ProfileService
         Log::info([$request->new_multi_image]);
         if ($request->has('old_multi_image')) {
             $newImages =  explode(',', $request->old_multi_image);
-        
+
             $existingImages = $user->images()->pluck('img')->toArray();
-        
+
             $imagesToDelete = array_diff($existingImages, $newImages);
-        
+
             foreach ($imagesToDelete as $image) {
                 Log::info([1]);
                 Storage::delete('profile/' . $image);
@@ -82,7 +82,7 @@ class ProfileService
                 ]);
             }
         }
-        
+
 
 
         $out = new V1UserResource($user);
