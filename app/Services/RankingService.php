@@ -350,17 +350,17 @@ class RankingService
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
         $img      = [];
         foreach ($giftLogs as $giftLog) {
-            $img[] = $giftLog->sender->profile->avatar ?? '';
+            $img[] = $giftLog?->sender?->profile?->avatar ?? '';
         }
 
         $receiverImage = [];
         foreach ($giftLogsReceiver as $giftLog) {
-            $receiverImage[] = $giftLog->receiver->profile->avatar ?? '';
+            $receiverImage[] = $giftLog?->receiver?->profile?->avatar ?? '';
         }
 
         $roomImage = [];
         foreach ($giftLogsRooms as $giftLogsRoom) {
-            $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
+            $roomImage[] = $giftLogsRoom?->roomOwner?->ownerRoom?->room_cover ?? '';
         }
 
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
@@ -387,17 +387,17 @@ class RankingService
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
         $img      = [];
         foreach ($giftLogs as $giftLog) {
-            $img[] = $giftLog->sender->profile->avatar ?? '';
+            $img[] = @$giftLog->sender->profile->avatar ?? '';
         }
 
         $receiverImage = [];
         foreach ($giftLogsReceiver as $giftLog) {
-            $receiverImage[] = $giftLog->receiver->profile->avatar ?? '';
+            $receiverImage[] = @$giftLog->receiver->profile->avatar ?? '';
         }
 
         $roomImage = [];
         foreach ($giftLogsRooms as $giftLogsRoom) {
-            $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
+            $roomImage[] = @$giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
         }
         return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
     }
