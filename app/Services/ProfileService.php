@@ -58,7 +58,6 @@ class ProfileService
         //         ]);
         //     }
         // }
-        Log::info([$request->new_multi_image]);
         if ($request->has('old_multi_image')) {
             $newImages =  explode(',', $request->old_multi_image);
 
@@ -72,7 +71,6 @@ class ProfileService
                 $user->images()->where('img', $image)->delete();
             }
         }
-        Log::info([$request->file('new_multi_image')]);
         if ($request->hasFile('new_multi_image')) {
             foreach ($request->file('new_multi_image') as $file) {
                 $imagePath = Common::upload('profile', $file);

@@ -36,12 +36,12 @@ class ProfileRepository
             $profile->save();
         }else{
             $profile = Profile::create([
-             'gender' => $data->gender,
-             'birthday' => $data->birthday,
-             'province' => $data->province,
-             'city' => $data->city,
-             'country' => $data->country,
-             'user_id'=>$userId,
+             'gender' => @$data?->gender,
+             'birthday' => @$data->birthday,
+             'province' => @$data->province,
+             'city' => @$data->city,
+             'country' => @$data->country,
+             'user_id'=>@$userId,
             ]);
         }
         
