@@ -105,7 +105,7 @@ class MessageService
 
     private function processVideoFile($file, $chatRoom, $message, $user, $duration = null)
     {
-                 Log::info('video ');
+                 Log::info('video :'. $file);
         if (!is_string($file)) {
             $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
         } else {
