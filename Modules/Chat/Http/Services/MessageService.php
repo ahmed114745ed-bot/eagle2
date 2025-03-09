@@ -121,7 +121,7 @@ class MessageService
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
         } catch (\Throwable $e) {
-           
+            Log::info('error :'. $e);
             return $e->getMessage();
         }
 
