@@ -42,6 +42,8 @@ class MessageService
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
         } elseif ($request->video_name) {
+            Log::info('video string : ' . $request->video_name);
+
             $this->processVideoFile($request->video_name, $chatRoom, $message, $user, $request->duration);
         }
     }
