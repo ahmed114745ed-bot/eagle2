@@ -37,7 +37,7 @@ class MessageService
             $count = count($files);
 
             if ($count == 1) {
-                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user,$request->duration);
+                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user, $request->duration);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
@@ -46,7 +46,7 @@ class MessageService
         }
     }
 
-    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user)
+    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user, $duration)
     {
         $extension = $file->getClientOriginalExtension();
         Log::info('extension : ' . $extension);
@@ -59,7 +59,7 @@ class MessageService
         } elseif ($extension == 'gif') {
             $this->processGifFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'mp4' || is_string($file)) {
-            $this->processVideoFile($file, $chatRoom, $message, $user);
+            $this->processVideoFile($file, $chatRoom, $message, $user, $duration);
         } elseif (in_array($extension, ['mp3', 'wav', 'm4a', 'aac'])) {
             $this->processAudioFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'pdf') {
@@ -118,12 +118,13 @@ class MessageService
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
         } catch (\Throwable $e) {
+           
             return $e->getMessage();
         }
 
         $album->frame = $thumbnailPath;
         $album->save();
-
+    
         $message->type = 'video';
         $message->message = null;
         $message->duration = $duration;
