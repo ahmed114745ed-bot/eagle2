@@ -97,6 +97,7 @@ class EnteranceRoomServices
         //     $room->count_room_socket = count($visitors);
         //     $room->room_visitor = trim(implode(",", $visitors), ",");
         // }
+        Log::info("room addedroom addedroom addedroom addedroom added");
         RoomVisitor::query()->where(['user_id' => $userId])->delete();
         RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $room->id]);
     }
