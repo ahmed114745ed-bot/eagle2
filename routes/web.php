@@ -5,9 +5,11 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\UserController;
+use App\Facades\CustomNotification;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ConfigController;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +21,6 @@ use App\Http\Controllers\Api\V1\ConfigController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 
 Route::prefix('payment')->group(function () {
     Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
