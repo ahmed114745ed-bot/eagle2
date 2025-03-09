@@ -19,7 +19,7 @@ class PusherController extends Controller
 
     }
     public function edit_user(Request $request) {
-        // Log::info(json_encode($request->all()));
+        Log::info(json_encode($request->all()));
         if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
             // Log::info('Pusher error');
             abort(403, 'Invalid Pusher webhook request');
