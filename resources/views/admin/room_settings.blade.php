@@ -173,12 +173,6 @@
                 <label>{{  __('Cost request background:')}} </label>
                 <input type="text" name="cost_request_background" value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
 
-                <label> {{  __('Rooms Bacground:')}}</label>
-                <input type="file" name="room_background" class="form-control">
-                @if(!empty($settings['room_background']))
-                    <img src="{{ asset('uploads/settings/' . $settings['room_background']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
-                @endif
-
                 <label>{{  __('Background expiration in days:')}} </label>
                 <input type="text" name="background_expiration" value="{{ $settings['background_expiration'] ?? '' }}" class="form-control">
 

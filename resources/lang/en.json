@@ -201,7 +201,18 @@
     "worth": "Receiver Level",
     "Balance": "Balance",
     "sender_level": "Sender Level",
+    "Custom Background settings" : "Custom Background settings",
+    "Additional settings" : "Additional settings",
+    "Live Stream settings" : "Live Stream settings",
+    "Cost request background:" : "Cost request background:",
     "Browse Categories": "Browse Categories",
+    "Rooms Bacground:" : "Rooms Bacground:",
+    "Background expiration in days:" : "Background expiration in days:",
+    "Room Rule:" : "Room Rule:",
+    "Room Rule en:" : "Room Rule en:",
+    "Youtube Key:": "Youtube Key:",
+    "Pk Background:" : "Pk Background:",
+    "Private Comment Price:" : "Private Comment Price:",
     "reports": "Reports",
     "dedicate": "Dedicate",
     "dashboard": "Dashboard",
@@ -423,7 +434,7 @@
 
         "available_variables" : "Available Variables",
         "help_message" : "You can use the following variables in the message: :variables"
-   
-    
+
+
 
 }

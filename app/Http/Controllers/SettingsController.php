@@ -16,11 +16,6 @@ class SettingsController extends Controller
         return view('admin.settings', compact('timezones', 'settings'));
     }
 
-    public function room(){
-        $settings = Setting::all();
-
-        return view('admin.room_settings', compact('settings'));
-    }
 
     public function update(Request $request){
 

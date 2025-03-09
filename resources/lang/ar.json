@@ -1698,6 +1698,17 @@
     "Brand settings" : "إعدادات العلامة التجارية",
     "Theme settings" : "إعدادات السمة",
     "Timing settings" : "إعدادات التوقيت",
+    "Custom Background settings" : "إعدادات الخلفية المخصصة",
+    "Additional settings" : "الإعدادات الإضافية",
+    "Live Stream settings" : "إعدادات البث المباشر",
+    "Cost request background:" : "خلفية طلب التكلفة:",
+    "Rooms Bacground:" : "خلفية الغرف:",
+    "Background expiration in days:" : "انتهاء صلاحية الخلفية بالأيام:",
+    "Room Rule:" : "قواعد الغرفة:",
+    "Room Rule en:" : "قواعد الغرفة بالانجليزية: ",
+    "Youtube Key:" : "مفتاح اليوتيوب:",
+    "Pk Background:" : "خلفية ال pk: ",
+    "Private Comment Price:" : "تعليق خاص السعر:",
     "Application title:" : "عنوان التطبيق:",
     "Application logo:" : "شعار التطبيق:",
     "save" : "حفظ",
@@ -1711,6 +1722,6 @@
       "available_variables" : "المتغيرات المتاحة",
       "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables"
 
-  
+
 
 }

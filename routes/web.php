@@ -8,6 +8,7 @@ use App\Admin\Controllers\UserController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ConfigController;
+use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
 
 /*
@@ -102,7 +103,6 @@ Route::group(
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
-        Route::get('/room-settings', [SettingsController::class, 'room'])->name('room.index');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
         // Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
 
