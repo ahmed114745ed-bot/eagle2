@@ -14,6 +14,7 @@ use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
 use App\Tik\Repositories\VipPrivilegeRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class VipService
@@ -280,6 +281,7 @@ class VipService
             }
             Common::handelVip($vip, $user);
             DB::commit();
+            $ex = Carbon::parse($ex)->diffInDays(now());
             CustomNotification::vips($user, $ex, $vip->img);
             return Common::apiResponse(1, 'done', null, 201);
         } catch (\Exception $exception) {
