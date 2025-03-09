@@ -37,19 +37,21 @@ class MessageService
             $count = count($files);
 
             if ($count == 1) {
-                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user);
+                $this->processSingleFile($files[0], $validExtensions, $chatRoom, $message, $user, $request->duration);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
-        }elseif ($request->video_name) {
-            $this->processVideoFile($request->video_name, $chatRoom, $message, $user);
+        } elseif ($request->video_name) {
+            Log::info('video string : ' . $request->video_name);
+
+            $this->processVideoFile($request->video_name, $chatRoom, $message, $user, $request->duration);
         }
     }
 
-    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user)
+    private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user, $duration)
     {
         $extension = $file->getClientOriginalExtension();
-        Log::info('extension : '. $extension);
+        Log::info('extension : ' . $extension);
         if (!$this->isValidExtension($extension, $validExtensions)) {
             return response()->json(['status' => 404, 'message' => "Invalid file type"], 404);
         }
@@ -59,7 +61,7 @@ class MessageService
         } elseif ($extension == 'gif') {
             $this->processGifFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'mp4' || is_string($file)) {
-            $this->processVideoFile($file, $chatRoom, $message, $user);
+            $this->processVideoFile($file, $chatRoom, $message, $user, $duration);
         } elseif (in_array($extension, ['mp3', 'wav', 'm4a', 'aac'])) {
             $this->processAudioFile($file, $chatRoom, $message, $user);
         } elseif ($extension == 'pdf') {
@@ -103,14 +105,15 @@ class MessageService
         $message->update();
     }
 
-    private function processVideoFile($file, $chatRoom, $message, $user)
+    private function processVideoFile($file, $chatRoom, $message, $user, $duration = null)
     {
+                 Log::info('video :'. $file);
         if (!is_string($file)) {
             $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
         } else {
             $file_name = $file;
         }
-        
+
         $name = pathinfo($file_name, PATHINFO_FILENAME);
         $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
         $videoPath = $file_name;
@@ -118,14 +121,16 @@ class MessageService
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
         } catch (\Throwable $e) {
+           
             return $e->getMessage();
         }
 
         $album->frame = $thumbnailPath;
         $album->save();
-
+    
         $message->type = 'video';
         $message->message = null;
+        $message->duration = $duration;
         $message->update();
     }
 

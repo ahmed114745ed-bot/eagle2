@@ -43,7 +43,8 @@ class HomeCarouselResource extends JsonResource
         if($this->type == 'room'){
             $data += ['room' => [
                 "id" => @$ownerRoom->id ?? 0,
-                "owner_uuid" => @$this->uuid,
+                "owner_id" => @@$this->user->id ?? 0,
+                "owner_uuid" => @$this->user->uuid ?? 0,
                 "room_name" => @$ownerRoom->room_name ?? '',
                 "room_cover" => @$ownerRoom->room_cover ?? '',
                 "room_background" => @$ownerRoom->final_room_image ?? '',

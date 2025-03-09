@@ -11,17 +11,20 @@ class RecevingReportResource extends JsonResource
 
     public function toArray($request)
     {
-
+        $user = auth()->user();
         if ($this->charger_type == 'dash') {
             $name = $this->admin->name ?? '';
             $image = $this->admin->avatar ?? '';
+            $uuid = $this->sender->uuid ?? '';
         } else {
             $name = $this->sender->name ?? '';
             $image = $this->sender->profile->avatar ?? '';
+            $uuid = $this->sender->uuid ?? '';
         }
 
         return [
             'id'          => $this->user_id,
+            'uuid'          => $uuid,
             'diamonds'    => numToStringNew($this->amount),
             'operation_no' => (int)$this->id,
             'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),

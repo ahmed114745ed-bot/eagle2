@@ -155,7 +155,7 @@ class GiftLogService
                 $ms1 = [
                     'messageContent' => [
                         'message'        => 'topSendGifts',
-                        'img'            => $fUser->profile->avatar,
+                        'img'            => $fUser?->profile?->avatar,
                         'id'             => $fUser->id,
                         'name'           => $fUser->name,
                         'has_color_name' => Common::hasInPack($fUser->id, 18),

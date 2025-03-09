@@ -213,8 +213,9 @@ class UserHandling
     public function getUserBan(string $uuid, $request)
     {
         $now = now();
+        
         return Ban::query()->where('type', '!=', 'action')
-            ->where(fn ($q) => $q->where('uid', $uuid)->orWhere(fn ($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn ($q) => $q->where('device_number', '!=', null)->where('device_number', $request->header('device'))))
+            ->where(fn ($q) => $q->where('uid', $uuid)->orWhere(fn ($q) => $q->where('ip', '!=', null)->where('ip', $request->ip()))->orWhere(fn ($q) => $q->where('device_number', '!=', null)->where('device_number', $request->device_token)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->first();
     }
