@@ -89,14 +89,16 @@ class EnteranceRoomServices
 
     private function handleMemberAdded($room, $userId)
     {
-        $visitors = explode(',', $room->room_visitor);
-        if ($visitors[0] == '') $visitors = [];
-        if (!in_array($userId, $visitors)) {
-            $visitors[] = $userId;
-            $visitors = array_unique($visitors);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
-        }
+        // $visitors = explode(',', $room->room_visitor);
+        // if ($visitors[0] == '') $visitors = [];
+        // if (!in_array($userId, $visitors)) {
+        //     $visitors[] = $userId;
+        //     $visitors = array_unique($visitors);
+        //     $room->count_room_socket = count($visitors);
+        //     $room->room_visitor = trim(implode(",", $visitors), ",");
+        // }
+        RoomVisitor::query()->where(['user_id' => $userId])->delete();
+        RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $room->id]);
     }
 
     private function handleMemberRemoved($room, $user, $ownerId)
@@ -120,13 +122,14 @@ class EnteranceRoomServices
             Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
         }
 
-        $visitors = explode(',', $room->room_visitor);
-        if (in_array($userId, $visitors)) {
-            $index = array_search($userId, $visitors);
-            unset($visitors[$index]);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
-        }
+        // $visitors = explode(',', $room->room_visitor);
+        // if (in_array($userId, $visitors)) {
+        //     $index = array_search($userId, $visitors);
+        //     unset($visitors[$index]);
+        //     $room->count_room_socket = count($visitors);
+        //     $room->room_visitor = trim(implode(",", $visitors), ",");
+        // }
+        RoomVisitor::query()->where(['user_id' => $userId, 'room_id'=> $room->id])->delete();
 
         if ($room->uid == $userId->now_room_uid) {
             $user->now_room_uid = 0;
