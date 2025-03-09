@@ -712,7 +712,7 @@ Log::info('vip iddddddddddddddddddddd: '.$uvip->vip_id);
         $hasColor = Common::hasInPack($user->id, 18, true);
         return [
             'id'        => 1,
-            'level'     => $vip->level ?? '',
+            'level'     => $vip->level ?? 0,
             'name'      => $vip->name ?? '',
             'price'     => $vip->price ?? 0,
             'img_old'     => $vip->img ?? '',
