@@ -160,12 +160,14 @@ class EnteranceRoomServices
 
 
         if ($event == 'room_login'){
+            Log::info('room login : ' );
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
         }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
             $user->now_room_uid = 0;
         }
         if ($event == 'room_logout' ){
+            Log::info('room logout : ' );
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
