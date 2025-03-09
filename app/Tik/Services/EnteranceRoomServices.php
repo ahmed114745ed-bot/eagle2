@@ -48,6 +48,8 @@ class EnteranceRoomServices
     ///////////////////////////////////////pusher////////////////////////////////////
     public function updateRoomCountFromPusher(Request $request)
     {
+        Log::info(json_decode($request->all));
+        Log::info("agora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-settingagora-zego-setting");
         if ($request->header('X-Pusher-Key') !== env('PUSHER_APP_KEY')) {
             abort(403, 'Invalid Pusher webhook request');
         }

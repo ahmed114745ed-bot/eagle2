@@ -57,6 +57,11 @@ class EnteranceController extends Controller
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
     }
 
+    public function updateRoomCountPusher(Request $request)
+    {
+        return $this->enteranceRoomService->updateRoomCountFromPusher($request);
+    }
+
     public function libraryAgoraZego()
     {
         $agora_app_id = Common::getConfig('app_id');
