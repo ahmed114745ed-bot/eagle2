@@ -469,6 +469,13 @@ class EnteranceController extends Controller
                 $room->room_intro = $request->room_intro;
             }
 
+            if ($request->type) {
+                $room->type = $request->type;
+                if ($request->type == 'single_live' || $request->type == 'multi_live' ) {
+                    $room->is_live = true;
+                }
+            }
+
             if ($request->room_pass) {
                 $room->room_pass = $request->room_pass;
             }
@@ -527,7 +534,9 @@ class EnteranceController extends Controller
                     "roomImg" => $room->room_cover ?: "",
                     "room_type" => @$room->myType->name ?: "",
                     "room_name" => @$room->room_name ?: "",
-                    "is_locked" => @$is_locked ?: false
+                    "is_locked" => @$is_locked ?: false,
+                    "type_room" => @$room->type_room ?: "",
+                    "is_live"   => @$room->is_live ?: false,
                 ]
             ];
             $json = json_encode($data);

@@ -33,6 +33,8 @@ class UserRoomResource extends JsonResource
             "room_background" => @$now_room->final_room_image,
             "mode"            => @$now_room->mode,
             'giftPrice'       => @$now_room->session_string,
+            'room_type'       => @$now_room->type,
+            'is_live'       => @$now_room->is_live,
         ];
 
         // return [
