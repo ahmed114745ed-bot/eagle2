@@ -1669,7 +1669,10 @@
     "transferred": "Aktarıldı",
     "completed": "Tamamlandı",
     "rejected": "Reddedildi",
-    "rejectedAdmin": "Yönetici tarafından reddedildi"
+    "rejectedAdmin": "Yönetici tarafından reddedildi",
+    "The user ID that referred you to us": "Bizi size yönlendiren kullanıcı kimliği",
+    "The platform you worked on": "Üzerinde çalıştığınız platform"
+
 
 
 
