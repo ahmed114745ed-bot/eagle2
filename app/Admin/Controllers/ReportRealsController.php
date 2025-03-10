@@ -51,13 +51,18 @@ class ReportRealsController extends AdminController
         
         $name = $reporter->name;
         $uuid = $reporter->uuid;
-        $avatar = $reporter->avatar ? getImagePath($reporter->avatar) : asset("images/default-avatar.png");
+        $defaultImage = asset("images/businessman-icon.jpg");   
+        $avatarPath = @$reporter->avatar;    
+        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
+        $userUrl = admin_url('users/' . $reporter->id); // رابط صفحة المستخدم في لوحة التحكم
 
-        return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                <img src='$avatar' alt='Reporter Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+        return "<div style='display: flex; align-items: center; gap: 10px;'>
+                <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                 <div>
-                    <span style='color: #3498db; font-weight: bold;'>$name</span><br>
+                    <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
                     <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
                 </div>
             </div>";
@@ -70,13 +75,21 @@ class ReportRealsController extends AdminController
 
         $name = $reportedUser->name;
         $uuid = $reportedUser->uuid;
-        $avatar = $reportedUser->avatar ? getImagePath($reportedUser->avatar) : asset("images/default-avatar.png");
+        // $avatar = $reportedUser->avatar ? getImagePath($reportedUser->avatar) : asset("images/default-avatar.png");
+        
+        $defaultImage = asset("images/businessman-icon.jpg");   
+        $avatarPath = @$reportedUser->avatar;    
+        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
+        
+        $userUrl = admin_url('users/' . $reportedUser->id); // رابط صفحة المستخدم في لوحة التحكم
 
-        return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                <img src='$avatar' alt='Reported User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+        return "<div style='display: flex; align-items: center; gap: 10px;'>
+                <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                 <div>
-                    <span style='color: #e74c3c; font-weight: bold;'>$name</span><br>
+                    <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
                     <span style='color: #aaa; font-size: smaller;'>UUID: $uuid</span>
                 </div>
             </div>";

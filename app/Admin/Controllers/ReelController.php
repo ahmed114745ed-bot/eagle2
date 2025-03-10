@@ -67,11 +67,7 @@ class ReelController extends MainController
 
         //     return $limitedDescription;
         // });
-        $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 30 ? '...' : '');
-            
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-        });
+
         
         
         $grid->column('user.name', __('user'))->display(function ($name) {
@@ -87,6 +83,8 @@ class ReelController extends MainController
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
+
+          
         
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
@@ -110,6 +108,12 @@ class ReelController extends MainController
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
+        });
+
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 30 ? '...' : '');
+            
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
