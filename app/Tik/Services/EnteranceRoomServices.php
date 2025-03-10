@@ -18,6 +18,7 @@ use App\Tik\Repositories\UserRepository;
 use App\Jobs\SendNotificationToAllFollowers;
 use App\Tik\Repositories\EnteranceRoomRepository;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
+use Illuminate\Support\Facades\Schema;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
 
@@ -219,6 +220,11 @@ class EnteranceRoomServices
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
+           
+            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+                $room->update(['is_live' => false]);
+            }
+            
         }
     
         if ($eventType == 'room_logout' && $room->charizma_status) {

@@ -480,6 +480,10 @@ class EnteranceController extends Controller
                 $room->room_pass = $request->room_pass;
             }
 
+            if ($request->mode) {
+                $room->mode = $request->mode;
+            }
+            
             if ($request->room_type) {
                 if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
                 $room->room_type = $request->room_type;
