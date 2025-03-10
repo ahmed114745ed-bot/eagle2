@@ -22,7 +22,7 @@ class RoomSearchResource extends JsonResource
         $room = Room::find(@$this->id);
         return [
             'id' => $this->id ?? 0,
-            'room_id' => $this->id ?? 0,
+            'room_id' => (string) $this->id ?? '0',
             "room_name" => $this->room_name ?? '',
             "numid" => $this->numid ?? 0,
             "hot" => $this->hot ?? '',
