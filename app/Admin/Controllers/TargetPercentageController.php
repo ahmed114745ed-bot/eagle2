@@ -37,14 +37,14 @@ class TargetPercentageController extends MainController
         $form .= '<input type="text" id="moments" name="moments" placeholder="moments" value="' . $moments .'" class="inputs_cus_form">';
         $form .= '<label for="reels" class="control-label">Reels:</label>';
         $form .= '<input type="text" id="reels" name="reels" placeholder="reels" value="' . $reels .'" class="inputs_cus_form">';
-     
+
         $form .= '<button type="submit" class="button_form_cus">Submit</button>';
 
         $form .= '</form>';
 
-       
 
-       
+
+
 
         return  parent::index($content
             ->title(trans('Salary Distribution Ratio'))
