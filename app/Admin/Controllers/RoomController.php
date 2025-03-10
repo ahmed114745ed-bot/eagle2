@@ -122,6 +122,7 @@ class RoomController extends MainController
 
         $grid->actions(function ($action) {
             $action->disableView();
+            $actions->disableDelete();
         });
         $grid->disableCreateButton();
         $grid->disableExport();
