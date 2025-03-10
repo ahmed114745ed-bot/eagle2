@@ -37,6 +37,23 @@ class Target extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($banner) {
+
+            if (auth()->user() && $banner->creator?->isRole('developer')) {
+                abort(403);
+            }
+        });
+    }
+
+    public function creator(){
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
+
     //     public function setReelAttribute($values)
     // {
     //     $this->attributes['reel'] = implode(',', $values);

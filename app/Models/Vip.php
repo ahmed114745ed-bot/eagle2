@@ -18,8 +18,26 @@ class Vip extends Model
             'co',
             'name_en',
             'name_ar',
+            'created_by',
+            'updated_by'
         ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($vip) {
+            if (auth()->user() && $vip->creator?->isRole('developer')) {
+                abort(403);
+            }
+        });
+    }
+
+    public function creator(){
+
+        return $this->belongsTo(Admin::class, 'created_by');
+
+    }
     public function getCreatedAtAttribute($value)
     {
         $timeZone = request()->header('tz') ?? 'UTC';
