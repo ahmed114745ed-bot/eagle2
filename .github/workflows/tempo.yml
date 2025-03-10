@@ -9,7 +9,7 @@ jobs:
     - name: print out Tempo
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.53.132"
+        host: "34.18.56.160"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
