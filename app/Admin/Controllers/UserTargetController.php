@@ -118,11 +118,21 @@ class UserTargetController extends MainController
             </div>
         ";
         });
-
-
         $grid->column('month', __('date'))->display(function ($month) {
             return $month . '/' . $this->year;
         });
+
+        $grid->column('hours',__ ('target hours'))->display(function ($hours) {
+            return explode('/', $hours)[1] ?? 0;
+        });
+        $grid->column('days',__ ('target days'))->display(function ($days) {
+            return explode('/', $days)[1] ?? 0;
+        });
+
+        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
+            return explode('/', $diamond)[1] ?? 0;
+        });
+       
         $grid->column('hours', __('user hours'))->display(function ($hours) {
             return explode('/', $hours)[0] ?? 0;
         });
