@@ -2,23 +2,20 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-use App\Admin\Actions\ChargeAction;
-use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
-use App\Models\Agency;
-use App\Models\Charge;
-use App\Models\Country;
+
 use App\Models\User;
-use App\Models\Ware;
-use App\Traits\AdminTraits\AdminControllersTrait;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Facades\Admin;
+use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\Table;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use App\Admin\Controllers\MainController;
+use Modules\SwitchAccount\Entities\UserAccount;
+use Modules\Achievement\Http\Services\UserAchievementService;
 
 
 class UserController extends MainController
@@ -98,29 +95,191 @@ class UserController extends MainController
     {
 
         $grid = new Grid(new User());
-        $grid->model()->ofAgency();
+        $haveCoins = (request()->have_coins == 1);
+        $grid->model()->ofAgency()->with("ownerRoom");
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('uuid', __('uuid'));
+                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
+
+                $filter->column(1/2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $input = $this->input;
+                        $query->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
+                    }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+                });
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('uuid', 'uuid');
+        if ($haveCoins) {
+            $grid->column('di', __('coins'))->display(function ($value) {
+                return number_format($value);
+            });
+        }
 
-        $grid->column('name', __('Name'));
-        $grid->column('nickname', __('NickName'));
-        $grid->column('email', __('Email'));
-        $grid->column('phone', __('Phone'));
+        $grid->column('uuid', __('uuid'))->display(function () {
+            return $this->uuid == $this->original_uuid 
+                ? __("uuid") . ' : ' . $this->uuid 
+                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
+        });
+        $grid->column('name', __('Name')); //->display(function ($value){//attribute
 
-        $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
-            if ($model->agency_id) {
-                return Common::getAgencyShow($model->agency_id);
-            }
-            return null;
+        $grid->column('return', __('status user'))->display(function () {
+            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+            return (new \App\Admin\Actions\UserAction(
+                $this->id,
+                $this->charge_status,
+                $this->transfer_salary,
+                $userSetting->show_invite_code,
+                $userSetting->hide_chat,
+                $this->can_play
+            ))->render();
         });
 
+
+        $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
+
+            $results = [
+                __('reel count') => $this->reals()->count() ?? 0,
+                __('moment_count') => $this->moments()->count() ?? 0,
+                __('total_days') => $this->total_days ?? 0,
+                __('total_hours') => $this->liveTime->sum("hours") ?? 0,
+            ];
+
+            return new Table([__('Field Name'), __('Value')], $results);
+        });
+
+
+
+        $grid->column('profile.avatar', __('image'))->display(function ($path) {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+
+        $grid->column('phone', __('Phone'));
+        
+        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
+            $agency =  Agency::query()->find(@$this->agency_id);
+            $path = @$agency?->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+ 
+                 // Check if the image exists
+                 if (!isImageExists($url)) {
+                     $url = $defaultImage;
+                 }
+            $results = [
+             __('name') => @$agency->owner->name ??'',
+             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+            
+         ];
+ 
+         return new Table([__('Field Name'), __('Value')], $results);
+         });
+
+        $grid->column('target', __('target'))->expand(function ($model) {
+
+            $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
+                $target = $target->only(
+                    [
+                        'id',
+                        'add_month',
+                        'add_year',
+                        'target_usd',
+                        'target_agency_share',
+                        'user_diamonds',
+                        'user_hours',
+                        'user_days',
+                        'user_obtain',
+                        'updated_at'
+                    ]
+                );
+
+
+                return $target;
+            });
+
+            return new Table(
+                [
+                    'ID',
+                    __('month') .'/'.__('year') ,
+                    __('usd') . ' ' . __('deserved'),
+                    __('agency share') . '(%)',
+                    __('user diamonds'),
+                    __('user hours'),
+                    __('user days'),
+                    __('user obtain'),
+                    __('at time'),
+
+                ],
+                $targets->toArray()
+            );
+        });
+        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+            $id           = $this->id;
+            $device_token = $this->device_token;
+            $count        = User::where('device_token', $device_token)->where('device_token', '!=', null)->count();
+            $class        = 1 == 0 ? 'btn-danger' : 'btn-success';
+            return $count;
+        })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+            $device_token  = $this->device_token;
+            $users         =
+                User::select("name", 'uuid', 'phone')->where('device_token', $device_token)->where('device_token', '!=', null)->get();
+            $filteredUsers = $users->map(function ($user) {
+                return $user->only(["name", "uuid", "phone"]);
+            });
+            return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
+        });
+
+        $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
+            $achivement      = new UserAchievementService();
+            $data_achivement = $achivement->getUserAchievement($model);
+
+            $filtered = $data_achivement->map(function ($user) {
+
+                $img = $user["valid_image"] ?? $user["custom_image"];
+                $img = getDriverUrl() . '/' . $img;
+                $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
+                //                $user->only(["user_achievement_levels.id","achievement_levels.valid_image"]);
+                return [
+                    'id'     => $user['id'],
+                    'target' => $user['target'],
+                    'image'  => $img,
+                ];
+            });
+            return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
+        });
+
+        $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+            $device_token  = $this->device_token;
+            $users = UserAccount::where('device_token', $device_token)->get();
+            $parentUserIds = $users->pluck('parent_user_id');
+            $childUserIds = $users->pluck('child_user_id');
+
+            $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
+            $userId = $this->id;
+            $filteredIds = array_filter($allIds, function ($id) use ($userId) {
+                return $id != $userId;
+            });
+            $filteredIds = array_values($filteredIds);
+            $users = User::query()->whereIn('id', $filteredIds)->select("name", 'uuid', 'phone')->get();
+            $filteredUsers = $users->map(function ($user) {
+                return $user->only(["name", "uuid", "phone"]);
+            });
+            return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
+        });
+
+        
+
+ 
+    
         $grid->disableActions();
         $grid->disableCreateButton();
 
