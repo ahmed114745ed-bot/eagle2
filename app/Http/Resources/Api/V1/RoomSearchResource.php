@@ -36,7 +36,7 @@ class RoomSearchResource extends JsonResource
             'password_status'     => !(@$this->room_pass == ""),
             'type-number'                => @$this->room_type ?? 0,
             'type' => @$room->myType ?: new \stdClass(),
-            "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
+            "is_pk"               => (bool)((@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0),
 
             "room_pass" => $this->room_pass ?? '',
             "uid" => $this->uid ?? 0,
