@@ -6,6 +6,7 @@ use App\Models\Pk;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\Police;
+use App\Http\Resources\CountryResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomSearchResource extends JsonResource
@@ -20,13 +21,22 @@ class RoomSearchResource extends JsonResource
     {
         $pks = !is_null(@$this?->room_id) ? $this->getRoomTwoLastPk(@$this?->room_id) : null;
         $room = Room::find(@$this->id);
+        $achievement_images = [];
+        if (@$room->owner?->medals) {
+            foreach (@$room->owner?->medals as $medal) {
+                if ($medal->achievementLevel && $medal->achievementLevel->achievement && $medal->achievementLevel->achievement->type?->value == 'room_target') {
+                    $achievement_images[] = $medal->achievementLevel->valid_image;
+                }
+            }
+        }
         return [
             'id' => $this->id ?? 0,
             'room_id' => (string) $this->id ?? '0',
             "room_name" => $this->room_name ?? '',
             "numid" => $this->numid ?? 0,
             "hot" => $this->hot ?? '',
-            "room_cover" => $this->room_cover ?? '',
+            "room_cover" => $room->room_cover ?? '',
+            "cover" => $room->room_cover ?? '',
             "room_intro" => $this->room_intro ?? '',
             "room_background" => @$room->final_room_image ?? '',
             "room_welcome" => $this->room_welcome ?? '',
@@ -45,6 +55,17 @@ class RoomSearchResource extends JsonResource
             "name" => $this->name ?? '',
 
             "nickname" => $this->nickname ?? '',
+            'country' => $room->country
+            ? new CountryResource($room->country)
+            : [
+                'id' => 0,
+                'name' => '',
+                'flag' => '',
+                'lang' => '',
+                'phone_code' => ''
+            ],
+            'achievement_images' => $achievement_images,
+            'medals'               => @$room->owner?->medals()?->where('is_enable', true)->get() ?? [],
 
 
         ];
