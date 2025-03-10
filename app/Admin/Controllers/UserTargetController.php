@@ -73,6 +73,7 @@ class UserTargetController extends MainController
         $grid = new Grid(new UserSallary);
 
         $grid->column('user_id', __('user id'))->display(function ($name) {
+            $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
