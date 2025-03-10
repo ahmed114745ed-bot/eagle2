@@ -40,6 +40,8 @@ class SearchRepository implements SearchRepositoryInterface
             ->where('rooms.uid', 'like', '%' . $keywords . '%')
             ->where('users.status', 1)
             ->select([
+                'rooms.*',
+                'rooms.id as room_id',
                 'rooms.room_name',
                 'rooms.uid',
                 'rooms.numid',
@@ -49,12 +51,13 @@ class SearchRepository implements SearchRepositoryInterface
                 'rooms.room_welcome',
                 'rooms.room_pass',
                 'users.nickname',
-                'users.name'
+                'users.name',
+                'users.uuid'
             ])
             ->orderBy('rooms.hot', 'desc')
             ->take(2)
             ->get();
-
+//dd( $rooms);
         return $rooms->toArray();
     }
 

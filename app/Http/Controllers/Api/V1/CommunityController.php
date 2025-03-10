@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\UserResourceSerche;
-use App\Repositories\Community\SearchRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Api\V1\RoomSearchResource;
+use App\Http\Resources\Api\V1\UserResourceSerche;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Repositories\Community\SearchRepositoryInterface;
 
 class CommunityController extends Controller
 {
@@ -32,7 +33,7 @@ class CommunityController extends Controller
 
         $this->searchRepository->saveSearchHistory($user_id, $keywords);
 
-        $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => $this->searchRepository->searchRooms($user_id, (int)$keywords),];
+        $result = ['user' => UserResourceSerche::collection($this->searchRepository->userSearchHand($user_id, $keywords)), 'rooms' => RoomSearchResource::collection($this->searchRepository->searchRooms($user_id, $keywords)),];
 
         return Common::apiResponse(1, '', $result, paginationKey: 'user');
     }
