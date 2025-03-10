@@ -171,10 +171,32 @@ class AgencyController extends MainController
         $grid->id(__('ID'));
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
-        $grid->column('owner.name', trans('owner'));
-        // $grid->column('status',trans ('status'))->switch(Common::getSwitchStates ());
-        // $grid->column('Shipping_agency',trans ('Shipping agency'))->switch(Common::getSwitchStates ());
-        // $grid->column('Host_agency',trans ('Host agency'))->switch(Common::getSwitchStates ());
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
         $grid->column('phone', trans('phone'));
         $grid->column('target', trans('target'))->display(function () {
             $target = $this->getTargetAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
@@ -493,7 +515,7 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'monthly_diamond_received'=> 0,'agency_id' => $form->model()->id,]);
+            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'monthly_diamond_received' => 0, 'agency_id' => $form->model()->id,]);
             // }
 
 

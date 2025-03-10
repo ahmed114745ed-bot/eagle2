@@ -86,12 +86,53 @@ class RequestAgencyController extends MainController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'));
-        $grid->column('owner.uuid', trans('uuid'));
-        $grid->column('name', __('Name'));
+        $grid->column('owner.name', trans('name'))->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this?->owner->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+       
+        $grid->column('name', __(' agency'))->display(function () {
+            $name = @$this->name ?? '';
+            $path = @$this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <span>$name</span>
+            </div>
+        ";
+        });
         $grid->column('phone', __('whats app'));
         $grid->column('additionalInfo.country', __('country'));
-        $grid->column('img', __('Img'))->image('', 30);
         $grid->column('additionalInfo.gmail', __('Email'));
         $grid->column('additionalInfo.video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
@@ -122,10 +163,41 @@ class RequestAgencyController extends MainController
         });
 
 
-        $grid->column('additionalInfo.salary', __('salary'));
+        $grid->column('additionalInfo.salary', __('salary'))->display(function ($salary) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$salary}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $grid->column('additionalInfo.host', 'host');
-        $grid->column('additionalInfo.user_id', 'معرف المستخدم الذي اوصلك الينا');
-        $grid->column('additionalInfo.history_app_info', 'المنصه التي عملت به');
+        $grid->column('additionalInfo.user.name', 'The user ID that referred you to us')->display(function ($name) {
+            $uid = @$this->additionalInfo->user->uuid;
+            $path = @$this?->additionalInfo->user->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  ($this->additionalInfo->user) ? url("admin/users/{$this->additionalInfo->user->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+        $grid->column('additionalInfo.history_app_info', 'The platform you worked on');
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableEdit();
