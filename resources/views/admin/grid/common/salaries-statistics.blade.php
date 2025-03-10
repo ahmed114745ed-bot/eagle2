@@ -58,25 +58,25 @@
         <div class="col my-1 form-Roles">
             <label class="form-label">{{ __('admin.diamond') }}</label>
 
-            <input type="text" class="form-control" name="diamond" id="diamond" value= "{{ $diamons }}">
+            <input type="text" class="form-control" name="diamond" id="diamond" value= "{{ $diamons }}" readonly>
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.target') }}</label>
 
-            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}">
+            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.salary') }}</label>
 
-            <input type="text" class="form-control " id="salary" name="salary" value="{{ $salary }}">
+            <input type="text" class="form-control " id="salary" name="salary" value="{{ $salary }}" readonly>
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.payments') }}</label>
 
-            <input type="text" class="form-control " id="payments" name="payments" value="{{ $payments }}">
+            <input type="text" class="form-control " id="payments" name="payments" value="{{ $payments }}"readonly>
         </div>
     @else
         @php
@@ -97,19 +97,19 @@
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.target') }}</label>
 
-            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}">
+            <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.salary') }}</label>
 
-            <input type="text" class="form-control " id="sender" name="sender" value="{{ $salary }}">
+            <input type="text" class="form-control " id="sender" name="sender" value="{{ $salary }}" readonly>
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
             <label class="form-label">{{ __('admin.payments') }}</label>
 
-            <input type="text" class="form-control " id="sender" name="sender" value="{{ $payments }}">
+            <input type="text" class="form-control " id="sender" name="sender" value="{{ $payments }}" readonly>
         </div>
     @endif
 
