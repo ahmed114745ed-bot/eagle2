@@ -354,6 +354,7 @@ class UserController extends MainController
 
         $this->extendGrid($grid);
         $grid->actions(function ($actions) {
+            $actions->disableDelete();
             $model = $actions->row;
             if ($model->agency_id >= 1) {
                 $actions->add(new KickOfAgencyAction());
