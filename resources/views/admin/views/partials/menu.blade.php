@@ -60,7 +60,7 @@
                     if (@$permissionExists || $isRoleVisible ){
                         $anyChild = true;
                     }
-                    
+
     @endphp
 @endif
 

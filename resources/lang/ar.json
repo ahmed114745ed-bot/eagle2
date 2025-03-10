@@ -1692,11 +1692,16 @@
     "transferred": "تم التحويل",
     "completed": "مكتمل",
     "rejected": "مرفوض",
-    "rejectedAdmin": "مرفوض من قبل المسؤول"
+    "rejectedAdmin": "مرفوض من قبل المسؤول",
+    "Percentage target": "نسبة الهدف",
+    "Hours:":"الساعات",
+    "Days:":"الايام",
+    "Moments:": "اللحظات",
+    "Reels:": "الفيديوهات",
+    "Save": "حفظ"
 
-    
- 
-    
+
+
 
 
 

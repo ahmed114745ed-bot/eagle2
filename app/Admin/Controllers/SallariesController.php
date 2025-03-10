@@ -25,9 +25,9 @@ class SallariesController extends MainController
             ->title(trans('Sallaries'))
             ->description(__(request('desc') ?: 'users'))
             ->row(function ($row) {
-            $row->column(3, $this->salaryNavbar());
-            $row->column(9, $this->grid());
-        }));
+                $row->column(3, $this->salaryNavbar());
+                $row->column(9, $this->grid());
+            }));
     }
 
     protected function grid()
@@ -40,157 +40,6 @@ class SallariesController extends MainController
         $grid->disableexport();
         $grid->disableActions();
         $grid->disableCreateButton();
-        return $grid;
-    }
-
-    public function cashing000()
-    {
-        $amount = request('amount');
-        try {
-            DB::beginTransaction();
-            if (request('id') && request('type') == 'agency') {
-                $agency = Agency::query()->find(request('id'));
-                if ($agency) {
-                    $prev = $agency->old_usd;
-                    if ($amount) {
-                        $agency->old_usd -= $amount;
-                    } else {
-                        $agency->old_usd = 0;
-                    }
-                    $agency->save();
-                    $m = $amount ?: $agency->old_usd;
-                    if ($m > 0) {
-                        SalaryTrx::query()->create([
-                            'type' => 1, 'oid' => $agency->id,
-                            'amount' => $amount ?: $agency->old_usd,
-                            't_no' => rand(11111111, 99999999),
-                            'note' => 'paid via admin', 'before_pay' => $prev,
-                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
-                            'payer_type' => 0
-                        ]);
-                    }
-                }
-            } elseif (request('id') && request('type') == 'user') {
-                $user = User::query()->find(request('id'));
-                if ($user) {
-                    $prev = $user->old_usd;
-                    $m = $amount ?: $user->old_usd;
-                    if ($amount) {
-                        $user->old_usd -= $amount;
-                    } else {
-                        $user->old_usd = 0;
-                        $user->coins = 0;
-                    }
-                    $user->save();
-                    if ($m > 0) {
-                        SalaryTrx::query()->create([
-                            'type' => 0, 'oid' => $user->id,
-                            'amount' => $amount ?: $user->old_usd,
-                            't_no' => rand(11111111, 99999999),
-                            'note' => 'paid via admin', 'before_pay' => $prev,
-                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
-                            'payer_type' => 0
-                        ]);
-                    }
-                }
-            } elseif (request('id') && request('type') == 'agency_users') {
-                $agency = Agency::query()->find(request('id'));
-                if ($agency) {
-                    $prev = $agency->old_usd;
-                    $m = $agency->old_usd;
-                    $agency->old_usd = 0;
-                    if ($m > 0) {
-                        SalaryTrx::query()->create([
-                            'type' => 0, 'oid' => $agency->id,
-                            'amount' => $agency->old_usd,
-                            't_no' => rand(11111111, 99999999),
-                            'note' => 'paid via admin', 'before_pay' => $prev,
-                            'after_pay' => $prev - $m, 'payer_id' => auth()->id(),
-                            'payer_type' => 0
-                        ]);
-                    }
-                    $users = $agency->users;
-                    foreach ($users as $user) {
-                        $m = $user->old_usd;
-                        $user->old_usd = 0;
-                        $user->coins = 0;
-                        if ($m > 0) {
-                            SalaryTrx::query()->create([
-                                'type' => 0, 'oid' => $user->id,
-                                'amount' => $user->old_usd,
-                                't_no' => rand(11111111, 99999999),
-                                'note' => 'paid via admin for agency , contact your agent for your salary',
-                                'before_pay' => $prev, 'after_pay' => $prev - $m,
-                                'payer_id' => auth()->id(), 'payer_type' => 0
-                            ]);
-                        }
-                        $user->save();
-                    }
-                    $agency->save();
-                }
-            }
-            DB::commit();
-        } catch (Exception $exception) {
-            DB::rollBack();
-            return $this->response()->error(__('un known error'))->refresh();
-        }
-
-        return $this->response()->success('success')->refresh();
-
-    }
-
-    protected function users_grid()
-    {
-        $grid = new Grid(new User());
-        $grid->column('id', __('id'));
-        $grid->column('agency', __('agency'))->display(function () {
-            return @$this->agency->name;
-        });
-        // $grid->column ('uuid',__ ('uuid'));
-        $grid->column('name', __('name'));
-        $grid->column('old_usd', __('old usd'));
-        $grid->column('target_usd', __('target usd'));
-        $grid->column('target_token_usd', __('target token usd'));
-        $grid->column('due', __('due'))->display(function () {
-            return $this->old_usd + $this->target_usd - $this->target_token_usd;
-        });
-        $grid->column('cashing', __('cashing'))->display(function () {
-            $options = ['user' => __('user')];
-            return (new SalariesAction($this->id, 'user'))->render();
-        });
-
-        $grid->export(function ($export) {
-            $export->filename('report');
-            $export->column('uuid', function ($value, $original) {
-                return $value;
-            });
-        });
-
-        $grid->disableExport();
-
-        return $grid;
-    }
-
-    protected function agencies_grid()
-    {
-        $grid = new Grid(new Agency());
-        $grid->model()->where('target_usd', '>', 0);
-        $grid->column('id', __('id'));
-        $grid->column('name', __('name'));
-        $grid->column('phone', __('phone'));
-        $grid->column('old_usd', __('old usd'));
-        $grid->column('target_usd', __('target usd'));
-        $grid->column('target_token_usd', __('target token usd'));
-        $grid->column('due', __('due'))->display(function () {
-            return $this->old_usd + $this->target_usd - $this->target_token_usd;
-        });
-        $grid->column('users', __('users'))->display(function () {
-            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users()->count() . '</a>';
-        });
-        $grid->column('cashing', __('cashing'))->display(function () {
-            return (new SalariesAction($this->id, 'agency'))->render();
-        });
-
         return $grid;
     }
 
@@ -211,9 +60,40 @@ class SallariesController extends MainController
             });
         });
         $grid->column('id', __('id'));
-        $grid->column('uuid', __('uuid'));
-        $grid->column('name', __('name'));
-        $grid->column('total', __('salary'))->default(0);
+
+        $grid->column('name', __('name'))->display(function ($name) {
+            $uid = @$this->uuid;
+            $path = @$this->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  ($this->user) ? url("admin/users/{$this->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });;
+        $grid->column('total', __('salary'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        })->default(0);
         $grid->column('cashing', __('cashing'))->display(function () {
             return (new SalariesAction($this->id, 'user'))->render();
         });
@@ -222,7 +102,6 @@ class SallariesController extends MainController
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
-
         });
         return $grid;
     }
@@ -234,7 +113,7 @@ class SallariesController extends MainController
         $model = $grid->model()
             ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
             ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
-//            ->where('agencies.id', request('id'))
+            //            ->where('agencies.id', request('id'))
             ->orderByRaw('total desc')
             ->groupBy('agencies.id', 'agencies.name');
 
@@ -249,13 +128,44 @@ class SallariesController extends MainController
                 $filter->where(function ($q) {
                     $q->where('agencies.id', '=', $this->input);
                 }, 'id');
-
             });
         });
 
         $grid->column('id', __('id'));
-        $grid->column('name', __('name'));
-        $grid->column('total', __('salary'))->default(0);
+        $grid->column('name', __('name'))->display(function ($name) {
+            $path = @$this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            $showUrl = $this->agency ? url("admin/agencies/{$this->id}") : 0;
+            $link = "
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                ";
+
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    $link
+                </div>
+            ";
+        });
+        $grid->column('total', __('salary'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        })->default(0);
 
         $grid->column('cashing', __('cashing'))->display(function () {
             $options = ['agency' => __('agency')];
@@ -288,6 +198,4 @@ class SallariesController extends MainController
 
         return $content;
     }
-
-
 }

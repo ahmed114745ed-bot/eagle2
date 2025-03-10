@@ -2,15 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\User;
-use App\Models\UserTarget;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\UserTarget;
+use App\Models\UserSallary;
+use Encore\Admin\Layout\Content;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class UserTargetController extends MainController
 {
@@ -34,7 +35,7 @@ class UserTargetController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('users targets'))
             ->body($this->detail($id)));
     }
@@ -48,7 +49,7 @@ class UserTargetController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('users targets'))
             ->body($this->form()->edit($id)));
     }
@@ -68,131 +69,105 @@ class UserTargetController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new UserTarget);
-//         $grid->model ()->ofAgency();
-//         $grid->id('ID');
-//         $grid->column('user_id',__('user id'))->modal ('user info',function ($model){
-//             return Common::getUserShow ($model->user_id);
-//         });
-//         $grid->column ('uuid',__('uuid'))->display (function (){
-//             $user = User::query ()->find ($this->user_id);
-//             return @$user->uuid;
-//         });
-//         $grid->column('agency_id',__ ('agency id'))->modal ('agency info',function ($model){
-//             return Common::getAgencyShow ($model->agency_id);
-//         });
-// //        $grid->union_id('union_id');
-// //        $grid->family_id('family_id');
-//         $grid->column('target_id',__ ('target id'));
-//         $grid->column('target_diamonds',__ ('target diamonds'));
-//         $grid->column('add_month',__ ('month'));
-//         $grid->column('add_year',__ ('year'));
-//         $grid->column('target_usd',__('usd').' '.__ ('deserved'));
-//         $grid->column('target_hours',__ ('target hours'));
-//         $grid->column('target_days',__ ('target days'));
-//         $grid->column('target_agency_share',__ ('agency share').'(%)');
-//         $grid->column('user_diamonds',__ ('user diamonds'));
-//         $grid->column('user_hours',__ ('user hours'));
-//         $grid->column('user_days',__ ('user days'));
-//         $grid->column('user_obtain',__ ('user obtain'));
-//         $grid->column('agency_obtain',__ ('agency obtain'));
-//         $grid->disableActions ();
-//         $grid->disableCreateButton ();
-//         $this->extendGrid ($grid);
 
-$grid = new Grid(new UserTarget);
-        $grid->id(__('admin.ID'));
-        $grid->column('user_id',__('user id'))->modal ('user info',function ($model){
-            return Common::getUserShow ($model->user_id);
+        $grid = new Grid(new UserSallary);
+
+        $grid->column('user_id', __('user id'))->display(function ($name) {
+            $name =@$this->user->name ?? '';
+            $uid = @$this->user->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  ($this->user) ? url("admin/users/{$this->user->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
-        $grid->column ('uuid',__('uuid'))->display (function (){
-            $user = User::query ()->find ($this->user_id);
-            return @$user->uuid;
+
+        $grid->column('user_agency_id', __('agency id'))->display(function () {
+            $name = @$this->agency->name ?? '';
+            $path = @$this->agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <span>$name</span>
+            </div>
+        ";
         });
-        $grid->column('agency_id',__ ('agency id'))->modal ('agency info',function ($model){
-            return Common::getAgencyShow ($model->agency_id);
+        $grid->column('month', __('date'))->display(function ($month) {
+            return $month . '/' . $this->year;
         });
-//        $grid->union_id('union_id');
-//        $grid->family_id('family_id');
-        $grid->column('target_id',__ ('target id'));
-        $grid->column('target_diamonds',__ ('target diamonds'));
-        $grid->column('add_month',__ ('month'));
-        $grid->column('add_year',__ ('year'));
-        $grid->column('target_usd',__('usd').' '.__ ('deserved'));
-        $grid->column('target_hours',__ ('target hours'));
-        $grid->column('target_days',__ ('target days'));
-        $grid->column('target_agency_share',__ ('agency share').'(%)');
-        $grid->column('user_diamonds',__ ('user diamonds'));
-        $grid->column('user_hours',__ ('user hours'));
-        $grid->column('user_days',__ ('user days'));
-        $grid->column('user_obtain',__ ('user obtain'));
-        $grid->column('agency_obtain',__ ('agency obtain'));
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
-        $this->extendGrid ($grid);
+
+        $grid->column('hours',__ ('target hours'))->display(function ($hours) {
+            return explode('/', $hours)[1] ?? 0;
+        });
+        $grid->column('days',__ ('target days'))->display(function ($days) {
+            return explode('/', $days)[1] ?? 0;
+        });
+
+        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
+            return explode('/', $diamond)[1] ?? 0;
+        });
+       
+        $grid->column('hours', __('user hours'))->display(function ($hours) {
+            return explode('/', $hours)[0] ?? 0;
+        });
+        $grid->column('days', __('user days'))->display(function ($days) {
+            return explode('/', $days)[0] ?? 0;
+        });
+        $grid->column('diamond', __('user diamonds'))->display(function ($diamond) {
+            $usd = explode('/', $diamond)[0] ?? 0;
+            $image = asset('images/diamond.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+       
+        $grid->column('sallary', __('user obtain'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('agency_sallary', __('agency obtain'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        $this->extendGrid($grid);
         return $grid;
-    }
-
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        $show = new Show(UserTarget::findOrFail($id));
-
-//        $show->id('ID');
-//        $show->user_id('user_id');
-//        $show->agency_id('agency_id');
-//        $show->union_id('union_id');
-//        $show->family_id('family_id');
-//        $show->target_id('target_id');
-//        $show->target_diamonds('target_diamonds');
-//        $show->add_month('add_month');
-//        $show->add_year('add_year');
-//        $show->target_usd('target_usd');
-//        $show->target_hours('target_hours');
-//        $show->target_days('target_days');
-//        $show->target_agency_share('target_agency_share');
-//        $show->user_diamonds('user_diamonds');
-//        $show->user_hours('user_hours');
-//        $show->user_days('user_days');
-//        $show->created_at(trans('admin.created_at'));
-//        $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
-        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        $form = new Form(new UserTarget);
-
-//        $form->display('ID');
-//        $form->text('user_id', 'user_id');
-//        $form->text('agency_id', 'agency_id');
-//        $form->text('union_id', 'union_id');
-//        $form->text('family_id', 'family_id');
-//        $form->text('target_id', 'target_id');
-//        $form->text('target_diamonds', 'target_diamonds');
-//        $form->text('add_month', 'add_month');
-//        $form->text('add_year', 'add_year');
-//        $form->text('target_usd', 'target_usd');
-//        $form->text('target_hours', 'target_hours');
-//        $form->text('target_days', 'target_days');
-//        $form->text('target_agency_share', 'target_agency_share');
-//        $form->text('user_diamonds', 'user_diamonds');
-//        $form->text('user_hours', 'user_hours');
-//        $form->text('user_days', 'user_days');
-//        $form->display(trans('admin.created_at'));
-//        $form->display(trans('admin.updated_at'));
-
-        return $form;
     }
 }

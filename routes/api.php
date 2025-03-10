@@ -55,10 +55,10 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\MallController as ControllersMallController;
+use App\Http\Controllers\NowPaymentsController;
 
-
-
-
+Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
+Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
 
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
@@ -259,7 +259,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [HomeCarouselController::class, 'index']);
             });
 
-           
+
             Route::prefix('families')->middleware(['appFeatureEnable:families'])->group(function () {
                 Route::get('all', [FamilyController::class, 'index']);
                 Route::get('show/{id}', [FamilyController::class, 'show']);

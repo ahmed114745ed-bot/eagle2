@@ -41,4 +41,9 @@ public bool $allowSaving = true;
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'user_agency_id');
+    }
 }
