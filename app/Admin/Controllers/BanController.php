@@ -87,7 +87,7 @@ class BanController extends MainController
         $now = now();
         $grid = new Grid(new Ban);
         $grid->model()->whereHas('user')
-            // ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
+            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->select('uid', 'duration', 'type', 'device_number', 'staff_id', 'description_ar', 'img', DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
             ->groupBy(['uid', 'type', 'duration', 'device_number', 'staff_id', 'description_ar', 'img', 'ban_type_id'])->orderByDesc('created_at');
         //        $grid->id(__ ('ID'));
