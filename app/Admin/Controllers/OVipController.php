@@ -159,7 +159,7 @@ class OVipController extends MainController
          </script>');
         }
         $form->display(__('ID'));
-        $form->hidden('level', __('level'));
+        $form->number('level', __('level'))->creationRules(['required', "unique:o_vips,level,{{id}}"])->updateRules(['required', "unique:o_vips,level,{{id}}"]);;
         $form->text('name', __('name'));
         $form->file('img', __('img'));
         $form->number('exp', __('exp'));
