@@ -68,12 +68,20 @@ class ReelController extends MainController
 
             return $limitedDescription;
         });
-        $grid->column('user.name', __('user_id'))->display(function ($name) {
+        $grid->column('user.name', __('user'))->display(function ($name) {
             $uid = @$this->user->uuid;
-
-            return "$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+            $avatar = @$this->user->avatar ?: 'default-avatar.png'; // صورة افتراضية
+            $userId = @$this->user->id;
+        
+            return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <div>
+                            <span style='color: #3498db; font-weight: bold;'>$name</span><br>
+                            <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                        </div>
+                    </div>";
         });
+        
         $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
