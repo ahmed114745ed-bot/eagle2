@@ -22,7 +22,7 @@ class RoomSearchResource extends JsonResource
         $room = Room::find(@$this->id);
         return [
             'id' => $this->id ?? 0,
-            'room_id' => $this->id ?? 0,
+            'room_id' => (string) $this->id ?? '0',
             "room_name" => $this->room_name ?? '',
             "numid" => $this->numid ?? 0,
             "hot" => $this->hot ?? '',
@@ -36,7 +36,7 @@ class RoomSearchResource extends JsonResource
             'password_status'     => !(@$this->room_pass == ""),
             'type-number'                => @$this->room_type ?? 0,
             'type' => @$room->myType ?: new \stdClass(),
-            "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
+            "is_pk"               => (bool)((@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0),
 
             "room_pass" => $this->room_pass ?? '',
             "uid" => $this->uid ?? 0,
