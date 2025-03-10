@@ -2,6 +2,7 @@
 
 namespace Modules\Reals\Entities;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,4 +29,16 @@ class ReportReals extends Model
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
     // protected $table = ['Report_reals'];
+
+      public function reporter()
+        {
+            return $this->belongsTo(User::class, 'Reporter_id');
+        }
+
+        public function reportedUser()
+        {
+            return $this->belongsTo(User::class, 'Reported_id');
+        }
+
+    
 }

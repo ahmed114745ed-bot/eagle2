@@ -62,15 +62,21 @@ class ReelController extends MainController
         });
         $grid->model()->orderByDesc('created_at');
 
-        $grid->column('description', __('Description'))->display(function ($description) {
-            // تحديد عدد الأحرف المطلوبة، على سبيل المثال 50 حرفًا
-            $limitedDescription = mb_substr($description, 0, 50);
+        // $grid->column('description', __('Description'))->display(function ($description) {
+        //     $limitedDescription = mb_substr($description, 0, 50);
 
-            return $limitedDescription;
+        //     return $limitedDescription;
+        // });
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 30 ? '...' : '');
+            
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
+        
+        
         $grid->column('user.name', __('user'))->display(function ($name) {
             $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
-            $avatarPath = @$this->user->avatar; // الصورة من قاعدة البيانات
+            $avatarPath = @$this->user->avatar;    
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
         
