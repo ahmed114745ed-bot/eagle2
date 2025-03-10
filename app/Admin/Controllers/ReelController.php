@@ -69,18 +69,28 @@ class ReelController extends MainController
             return $limitedDescription;
         });
         $grid->column('user.name', __('user'))->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $avatar = @$this->user->avatar ?: 'default-avatar.png'; // صورة افتراضية
+            $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+            $avatarPath = @$this->user->avatar; // الصورة من قاعدة البيانات
             $userId = @$this->user->id;
+            $uid = @$this->user->uuid;
+        
+            // الحصول على الصورة الفعلية أو الافتراضية
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            
+            // التحقق من وجود الصورة
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
         
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
-                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                         <div>
                             <span style='color: #3498db; font-weight: bold;'>$name</span><br>
                             <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                         </div>
                     </div>";
         });
+        
         
         $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
             $like = count(@$this->likes);
