@@ -187,7 +187,52 @@ class EnteranceRoomServices
         // Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
     }
+    public function updateRoomCountFromAgora(Request $request)
+    {
+    
+        $data = $request->all(); 
+    
+        if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
+            return response()->json(['status' => 'Invalid Webhook Data'], 400);
+        }
+    
+        $eventType = $data[0]['eventType'];
+        $roomId = $data[0]['payload']['channelName'];
+        $userId = $data[0]['payload']['lastUid'];
+    
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
+                    ->find($roomId);
+                  
+        $user = User::find($userId);
+    
+        if (!$room || !$user) {
+            return response()->json(['status' => 'Room or user not found'], 404);
+        }
+    
+        $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
+    
+        if (in_array($eventType, [101, 103])) {
+            $this->addUserToVisitors($room->id, $user->id);
+            $user->now_room_uid = $room->uid;
+        } elseif ($eventType == 'room_logout' && $room->uid == $user->now_room_uid) {
+            $user->now_room_uid = 0;
+        } elseif (in_array($eventType, [102, 104])) {
+            $this->removeUserToVisitors($room->id, $user->id);
+            $this->handleLeaveCp($user, $room);
+        }
+    
+        if ($eventType == 'room_logout' && $room->charizma_status) {
+            $ownerId = $data[0]['payload']['owner_id'] ?? null;
+            $this->handleCharismaStatusOnLogout($room, $user, $ownerId);
+        }
+    
+        $user->save();
+    
+        return response()->json(['status' => 'Webhook processed successfully']);
+    
+    }
 
+    
     public function handleLeaveCp($user,$room)
     {
         $userId = $user->id;
