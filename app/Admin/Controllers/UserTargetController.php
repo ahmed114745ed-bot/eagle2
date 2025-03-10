@@ -72,7 +72,7 @@ class UserTargetController extends MainController
 
         $grid = new Grid(new UserSallary);
 
-        $grid->column('user_id', __('user id'))->display(function ($name) {
+        $grid->column('user_id', __('user'))->display(function ($name) {
             $name =@$this->user->name ?? '';
             $uid = @$this->user->uuid;
             $path = @$this->user?->profile?->avatar;
@@ -99,7 +99,7 @@ class UserTargetController extends MainController
             ";
         });
 
-        $grid->column('user_agency_id', __('agency id'))->display(function () {
+        $grid->column('user_agency_id', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
             $defaultImage = asset("images/icon-agency.jpg");

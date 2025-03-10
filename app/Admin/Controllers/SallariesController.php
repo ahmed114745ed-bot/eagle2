@@ -73,7 +73,7 @@ class SallariesController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->user) ? url("admin/users/{$this->id}") : 0;
+            $showUrl =  url("admin/users/{$this->id}");
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -143,7 +143,7 @@ class SallariesController extends MainController
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            $showUrl = $this->agency ? url("admin/agencies/{$this->id}") : 0;
+            $showUrl =  url("admin/agencies/{$this->id}");
             $link = "
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
