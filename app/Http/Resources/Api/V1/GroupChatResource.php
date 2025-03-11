@@ -52,7 +52,7 @@ class GroupChatResource extends JsonResource
             'group_message' => @$this->text ?? '',
             'group_image' => $this->image,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
-            'replay' => $this->parent ? new ReplayGroupChatResource(@$this->parent) : [],
+            'replay' => $this->parent ? new ReplayGroupChatResource(@$this->parent) : null,
         ];
 
         return $data;
