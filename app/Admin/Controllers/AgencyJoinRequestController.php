@@ -183,8 +183,8 @@ class AgencyJoinRequestController extends MainController
                 2 => ['label' => __('denied'), 'color' => 'red'],
             ];
 
-            $badgeColor = $statuses[$status]['color'] ?? 'gray';
-            $statusLabel = $statuses[$status]['label'] ?? 'unknown';
+            $badgeColor = $statuses[$status]['color'] ?? 'orange';
+            $statusLabel = $statuses[$status]['label'] ?? __('pending');
 
             return "<span style='display: inline-block; padding: 5px 10px; color: white; background-color: $badgeColor; border-radius: 5px;'>
                         $statusLabel

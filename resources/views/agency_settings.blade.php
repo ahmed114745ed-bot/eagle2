@@ -159,7 +159,8 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('PercentageTarget')">{{ __('Percentage target') }}</button>
+                <button onclick="showSection('PercentageTarget')"
+                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('Percentage target') }}</button>
             </div>
         </div>
 
