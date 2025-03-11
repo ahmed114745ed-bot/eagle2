@@ -164,13 +164,16 @@ class AgencyJoinRequestController extends MainController
             ";
             });
             $grid->column('whatsapp', __('whatsapp'))->display(function ($number) {
+                if (!$number) return '-';
+
                 $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
 
                 // Return an image with a WhatsApp link
                 return "<div style='display: flex; align-items: center; '>
 
-                <span>{$number}</span>
-                  <img src='{$iconUrl}' alt='USD' width='20' height='20' style='filter: invert(1);'>
+                <span>{$number} </span>
+
+                  <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
             </div>";
             });
             $grid->column('status', __('status'))->display(function ($status) {
