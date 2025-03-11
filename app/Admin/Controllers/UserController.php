@@ -252,20 +252,20 @@ class UserController extends MainController
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = $target->only(
+                $target = 
                     [
-                        'id',
-                        'add_month'.'/'. 'add_year',
+                        'id' =>$target->id ,
+                        'add_month' => $target->add_month.'/'. $target->add_year,
                        
-                        'target_usd',
-                        'target_agency_share',
-                        'user_diamonds',
-                        'user_hours',
-                        'user_days',
-                        'user_obtain',
-                        'updated_at'
-                    ]
-                );
+                        'target_usd' => $target->target_usd,
+                        'target_agency_share' => $target->target_agency_share,
+                        'user_diamonds' => $target->user_diamonds,
+                        'user_hours'=> $target->user_hours,
+                        'user_days' => $target->user_days,
+                        'user_obtain' => $target->user_obtain,
+                        'updated_at' => $target->updated_at,
+                    ];
+               
 
 
                 return $target;
