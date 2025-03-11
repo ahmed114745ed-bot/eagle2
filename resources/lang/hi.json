@@ -814,7 +814,18 @@
     "rejected": "अस्वीकृत",
     "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत",
     "The user ID that referred you to us": "जिस उपयोगकर्ता आईडी ने आपको हमारी ओर भेजा",
-    "The platform you worked on": "जिस प्लेटफ़ॉर्म पर आपने काम किया"
+    "The platform you worked on": "जिस प्लेटफ़ॉर्म पर आपने काम किया",
+    "first_week"  : "पहला सप्ताह",
+    "second_week" : "दूसरा सप्ताह",
+    "third_week"  : "तीसरा सप्ताह",
+    "fourth_week" : "चौथा सप्ताह",
+    "first_day"  : "पहला दिन",
+    "second_day" : "दूसरा दिन",
+    "third_day"  : "तीसरा दिन",
+    "fourth_day" : "चौथा दिन",
+    "fifth_day"  : "पाँचवा दिन",
+    "sixth_day"  : "छठा दिन",
+    "seventh_day" : "सातवां दिन"
 
 
 

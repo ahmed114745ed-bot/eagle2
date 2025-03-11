@@ -1671,8 +1671,18 @@
     "rejected": "Reddedildi",
     "rejectedAdmin": "Yönetici tarafından reddedildi",
     "The user ID that referred you to us": "Bizi size yönlendiren kullanıcı kimliği",
-    "The platform you worked on": "Üzerinde çalıştığınız platform"
-
+    "The platform you worked on": "Üzerinde çalıştığınız platform",
+    "first_week"  : "Birinci Hafta",
+    "second_week" : "İkinci Hafta",
+    "third_week"  : "Üçüncü Hafta",
+    "fourth_week" : "Dördüncü Hafta",
+    "first_day"  : "Birinci Gün",
+    "second_day" : "İkinci Gün",
+    "third_day"  : "Üçüncü Gün",
+    "fourth_day" : "Dördüncü Gün",
+    "fifth_day"  : "Beşinci Gün",
+    "sixth_day"  : "Altıncı Gün",
+    "seventh_day" : "Yedinci Gün"
 
 
 
