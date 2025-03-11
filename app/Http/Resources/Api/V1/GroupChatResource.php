@@ -48,11 +48,11 @@ class GroupChatResource extends JsonResource
                 'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
             ],
             'has_color_name'=>Common::hasInPack (@$this->user->id,18),
-            'group_id' => $this->id,
+            'message_id' => $this->id,
             'group_message' => $this->text,
             'group_image' => $this->image,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
-            'replay' => ReplayGroupChatResource::collection($this->children)
+            'replay' =>new ReplayGroupChatResource($this->parent)
         ];
 
         return $data;
