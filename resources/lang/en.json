@@ -418,8 +418,18 @@
      "Main" : "Main",
      "commission": "The amount deducted from the commission",
      "date":"date",
-     "party" :"Party"
-
+     "party" :"Party",
+     "first_week"  : "First Week",
+     "second_week" : "Second Week",
+     "third_week"  : "Third Week",
+     "fourth_week" : "Fourth Week",
+     "first_day"  : "First Day",
+     "second_day" : "Second Day",
+     "third_day"  : "Third Day",
+     "fourth_day" : "Fourth Day",
+     "fifth_day"  : "Fifth Day",
+     "sixth_day"  : "Sixth Day",
+     "seventh_day" : "Seventh Day"
 
 
 }

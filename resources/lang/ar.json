@@ -1702,9 +1702,18 @@
     "Reels:": "الفيديوهات",
     "Save": "حفظ",
     "The user ID that referred you to us":"معرف المستخدم الذي اوصلك الينا",
-    "The platform you worked on":"المنصه التي عملت به"
-
-
+    "The platform you worked on":"المنصه التي عملت به",
+    "first_week"  : "الأسبوع الأول",
+    "second_week" : "الأسبوع الثاني",
+    "third_week"  : "الأسبوع الثالث",
+    "fourth_week" : "الأسبوع الرابع",
+    "first_day"  : "اليوم الأول",
+    "second_day" : "اليوم الثاني",
+    "third_day"  : "اليوم الثالث",
+    "fourth_day" : "اليوم الرابع",
+    "fifth_day"  : "اليوم الخامس",
+    "sixth_day"  : "اليوم السادس",
+    "seventh_day" : "اليوم السابع"
 
 
 

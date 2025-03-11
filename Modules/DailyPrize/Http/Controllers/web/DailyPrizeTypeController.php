@@ -105,8 +105,14 @@ class DailyPrizeTypeController extends MainController
     {
         $form = new Form(new DailyGiftType());
 
-        $form->select('type', __('type'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4]);
-
+        // $form->select('type', __('type'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4]);
+        $form->select('type', __('type'))->options([
+            1 => __('first_week'),
+            2 => __('second_week'),
+            3 => __('third_week'),
+            4 => __('fourth_week'),
+        ]);
+        
         return $form;
     }
 }
