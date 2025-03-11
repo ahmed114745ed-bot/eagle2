@@ -825,8 +825,13 @@
     "fourth_day" : "चौथा दिन",
     "fifth_day"  : "पाँचवा दिन",
     "sixth_day"  : "छठा दिन",
-    "seventh_day" : "सातवां दिन"
-
+    "seventh_day" : "सातवां दिन",
+    "Percentage target": "प्रतिशत लक्ष्य",
+    "Hours:": "घंटे:",
+    "Days:": "दिन:",
+    "Moments:": "क्षण:",
+    "Reels:": "वीडियो:",
+    "Save": "सहेजें"
 
 
 

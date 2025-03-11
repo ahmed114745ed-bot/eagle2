@@ -1682,8 +1682,13 @@
     "fourth_day" : "Dördüncü Gün",
     "fifth_day"  : "Beşinci Gün",
     "sixth_day"  : "Altıncı Gün",
-    "seventh_day" : "Yedinci Gün"
-
+    "seventh_day" : "Yedinci Gün",
+    "Percentage target": "Yüzde hedef",
+    "Hours:": "Saatler:",
+    "Days:": "Günler:",
+    "Moments:": "Anlar:",
+    "Reels:": "Videolar:",
+    "Save": "Kaydet"
 
 
 

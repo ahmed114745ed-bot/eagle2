@@ -190,25 +190,39 @@ class AgencyJoinRequestController extends MainController
                         $statusLabel
                     </span>";
         });
-        $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
-           $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
-           $path = @$admin->profile?->avatar ?? @$admin->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+        $grid->column('change_status_admin_id', __('Change Status Admin'))
+    ->display(function () {
+        $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
 
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-           $results = [
-            __('name') => @$admin->name ??'',
-            __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            __('type') => userType(@$admin?->type_user ?? '') ?? '',
+        if (!$admin) {
+            return '-';
+        }
 
-        ];
+        $name = $admin->name ?? 'Unknown';
+        $uid = $admin->uuid ?? 'N/A';
+        $path = @$admin->profile?->avatar ?? @$admin->avatar;
+        $defaultImage = asset("images/businessman-icon.jpg");
+        $url = getImagePath($path) ?? $defaultImage;
 
-        return new Table([__('Field Name'), __('Value')], $results);
-        });
+        // Check if the image exists
+        if (!isImageExists($url)) {
+            $url = $defaultImage;
+        }
+
+        $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        $type = userType(@$admin?->type_user ?? '') ?? 'Unknown Type';
+
+        return "
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            $image
+            <div>
+                <strong>$name</strong><br>
+                <span style='color: #aaa; font-size: smaller;'>$type</span>
+            </div>
+        </div>
+        ";
+    });
+
         $grid->column('created_at', trans('time'))->diffForHumans();
         // $grid->column('created_at', __('Created at'))->display(function ($date) {
         //     return Carbon::parse($date)->format('Y-m-d H:i:s');

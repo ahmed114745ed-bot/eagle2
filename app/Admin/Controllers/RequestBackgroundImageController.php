@@ -98,6 +98,7 @@ class RequestBackgroundImageController extends MainController
         $grid->id(__('ID'));
         $grid->owner_room_id(__('owner room id'))->display(function () {
             $name = @$this->owner->name ?? '';
+            $uuid = @$this->owner->uuid ?? '';
             $path = @$this->owner?->ownerRoom->room_cover;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -108,14 +109,18 @@ class RequestBackgroundImageController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom->id}");
+            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom?->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
-                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                    </a>
+                    <div>
+                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
+                    </div>
+
                 </div>
             ";
         });
@@ -157,13 +162,13 @@ class RequestBackgroundImageController extends MainController
             $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
 
             return "
-                    <img src='$correctUrl' style='width: 100px; height: 100px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
-                    
+                    <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+
                     <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
                         <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
                         <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
                     </div>
-            
+
                     <script>
                         function openModal(src) {
                             let modal = document.getElementById('imageModal');
@@ -171,11 +176,11 @@ class RequestBackgroundImageController extends MainController
                             modal.style.display = 'block';
                             modalImage.src = src;
                         }
-            
+
                         function closeModal() {
                             document.getElementById('imageModal').style.display = 'none';
                         }
-            
+
                         // Close modal when clicking outside the image
                         document.getElementById('imageModal').addEventListener('click', function(event) {
                             if (event.target === this) {
@@ -186,15 +191,23 @@ class RequestBackgroundImageController extends MainController
                 ";
         });
 
-        $grid->status(__('status'))->using(
-            [
-                0 => __('pending'),
-                1 => __('accepted'),
-                2 => __('denied')
-            ]
-        );
+        $grid->column('status', __('status'))->display(function ($status) {
+            $statuses = [
+                0 => ['label' => __('pending'), 'color' => 'orange'],
+                1 => ['label' => __('accepted'), 'color' => 'green'],
+                2 => ['label' => __('denied'), 'color' => 'red'],
+            ];
+
+            $badgeColor = $statuses[$status]['color'] ?? 'orange';
+            $statusLabel = $statuses[$status]['label'] ?? __('pending');
+
+            return "<span style='display: inline-block; padding: 5px 10px; color: white; background-color: $badgeColor; border-radius: 5px;'>
+                        $statusLabel
+                    </span>";
+        });
+
         $grid->column('expair', __('expire'));
-        $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {   
+        $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
         });
 
