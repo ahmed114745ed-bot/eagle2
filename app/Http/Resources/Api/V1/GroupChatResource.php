@@ -30,32 +30,31 @@ class GroupChatResource extends JsonResource
         $frame  =
             (@$this->user  && $this->user->dress_1) ? Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img2', true) ?: Common::getUserDress($this->user->id, $this->user->dress_1, 4, 'img1', true) : '';
         $data = [
-            'id'=>(int)(@$this->user?->id ?? 0),
-            'uuid'=>@$this->user?->uuid ?? '',
-            'name'=>@$this->user?->name??'',
-            'profile'=> [
+            'id' => (int)(@$this->user?->id ?? 0),
+            'uuid' => @$this->user?->uuid ?? '',
+            'name' => @$this->user?->name ?? '',
+            'profile' => [
                 'image' => @$this->user->profile->avatar,
-                'age' => Carbon::parse (@$this->user->profile->birthday)->age,
-                'gender'=>$this->user?->gender ?? 0,
+                'age' => Carbon::parse(@$this->user->profile->birthday)->age,
+                'gender' => $this->user?->gender ?? 0,
             ],
-            'frame'=> $frame,
-            'frame_id'=>$frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
-            'vip'=> [
+            'frame' => $frame,
+            'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
+            'vip' => [
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],
-            'level'=> [
-                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id',1)->img ,
-                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id',2)->img ,
+            'level' => [
+                'receiver_img' => @$this->user?->getImageReceiverOrSender('receiver_id', 1)->img,
+                'sender_img' => @$this->user?->getImageReceiverOrSender('sender_id', 2)->img,
             ],
-            'has_color_name'=>Common::hasInPack (@$this->user->id,18),
-            'message_id' => $this->id,
-            'group_message' => $this->text,
+            'has_color_name' => Common::hasInPack(@$this->user->id, 18),
+            'message_id' => @$this->id,
+            'group_message' => @$this->text ?? '',
             'group_image' => $this->image,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
-            'replay' =>new ReplayGroupChatResource($this->parent)
+            'replay' => $this->parent ? new ReplayGroupChatResource(@$this->parent) : null,
         ];
 
         return $data;
     }
-
 }

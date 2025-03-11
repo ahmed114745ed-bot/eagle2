@@ -33,4 +33,11 @@ class Ban extends Model
     {
         return $this->belongsTo(BanType::class,);
     }
+
+        public function staff()
+    {
+        return $this->belongsTo(Admin::class, 'staff_id');
+    }
+
+
 }

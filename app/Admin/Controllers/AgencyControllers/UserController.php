@@ -96,7 +96,7 @@ class UserController extends MainController
 
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->ofAgency()->with("ownerRoom");
+        $grid->model()->ofAgency()->with("ownerRoom")->where('is_host',1);
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

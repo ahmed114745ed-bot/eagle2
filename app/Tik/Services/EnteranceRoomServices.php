@@ -201,6 +201,12 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
     
+        Log::info('Agora data received', [
+            'event_type' => $eventType,
+            'user_id' => $userId,
+            'room_id' => $roomId,
+        ]);
+
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
                   
@@ -215,15 +221,21 @@ class EnteranceRoomServices
         if (in_array($eventType, [101, 103])) {
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
-        } elseif ($eventType == 'room_logout' && $room->uid == $user->now_room_uid) {
-            $user->now_room_uid = 0;
+        
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
            
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                 $room->update(['is_live' => false]);
+                Log::info('agora webhook triggered', [
+                    $room->uid,
+                    $user->id
+                ]);
             }
+            Log::info('not if', [
+             
+            ]);
             
         }
     
@@ -394,7 +406,7 @@ class EnteranceRoomServices
 
     public function enterRoom($user, $request, $room_pass, $owner_id)
     {
-
+        
         if ($request->type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
