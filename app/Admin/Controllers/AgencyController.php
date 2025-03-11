@@ -217,7 +217,7 @@ class AgencyController extends MainController
                     $imageHtml = $memper->profile && $memper->profile->avatar
                         ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
                         : 'No Image';
-                    $salary = $memper->userSallary->sallary ?? '';
+                    $salary = $memper->userSallary->sallary ?? 0;
                     return [
                         'id' => $memper->id ?? 0,
                         'uuid' => $memper->uuid ?? 0,
@@ -233,7 +233,7 @@ class AgencyController extends MainController
                 });
 
             // Using the mapped data to create a new table
-            return new Table(
+            return new TableWidget(
                 [
                     'ID',
                     'UID',
