@@ -27,4 +27,14 @@ class GroupChat extends Model
     public function user(){
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function parent()
+    {
+        return $this->belongsTo(GroupChat::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(GroupChat::class, 'parent_id');
+    }
 }

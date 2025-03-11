@@ -174,8 +174,8 @@ class UserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid 
-                ? __("uuid") . ' : ' . $this->uuid 
+            return $this->uuid == $this->original_uuid
+                ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
@@ -235,7 +235,7 @@ class UserController extends MainController
             $path = @$agency?->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
- 
+
                  // Check if the image exists
                  if (!isImageExists($url)) {
                      $url = $defaultImage;
@@ -243,20 +243,20 @@ class UserController extends MainController
             $results = [
              __('name') => @$agency->owner->name ??'',
              __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            
+
          ];
- 
+
          return new Table([__('Field Name'), __('Value')], $results);
          });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = 
+                $target =
                     [
                         'id' =>$target->id ,
                         'add_month' => $target->add_month.'/'. $target->add_year,
-                       
+
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
@@ -265,7 +265,7 @@ class UserController extends MainController
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
                     ];
-               
+
 
 
                 return $target;

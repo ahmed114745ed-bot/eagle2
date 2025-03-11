@@ -19,6 +19,6 @@ class GroupChatRepository extends AbstractRepository
 
     public function getWithPaginate()
     {
-        return $this->model->whereHas('user')->with('user')->orderBy('created_at', 'DESC')->paginate(10);
+        return $this->model->whereHas('user')->with('user','parent')->orderBy('created_at', 'DESC')->paginate(10);
     }
 }
