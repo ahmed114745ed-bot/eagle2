@@ -25,7 +25,7 @@ class SettingsController extends Controller
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
                 $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('uploads/settings', $fileName, 'public');
+                $filePath = $file->move('uploads/settings', $fileName);
                 $value = $fileName;
 
             }

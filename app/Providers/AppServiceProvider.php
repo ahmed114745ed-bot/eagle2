@@ -14,6 +14,7 @@ use App\Models\FamilyUser;
 use App\Models\Gift;
 use App\Models\Pk;
 use App\Models\Room;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserSallary;
 use App\Models\Ware;
@@ -91,6 +92,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $appName = Setting::where('key','app_title')->first();
+        config(['app.name' => $appName ?? 'Default']);
+
         Schema::defaultStringLength(191);
         User::observe (UserObserver::class);
         Gift::observe (GiftObserver::class);
@@ -106,7 +110,7 @@ class AppServiceProvider extends ServiceProvider
 
         if (Schema::hasTable('settings')) {
             $settings = DB::table('settings')->pluck('value', 'key')->toArray();
-    
+
             config([
                 'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
                 'themes.secondaryColor' => $settings['secondary_color'] ?? '#1A1A1A',
@@ -116,7 +120,7 @@ class AppServiceProvider extends ServiceProvider
                 'themes.backgroundImage' => $settings['background_image'] ?? '',
                 'themes.tableBackGroundColor' => $settings['table_background_color'] ?? '#c88213',
             ]);
-          
+
 
         }
 

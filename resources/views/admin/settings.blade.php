@@ -15,7 +15,7 @@
             $selectedTimeZone = App\Models\Setting::where('key','timezone')->first();
         @endphp
         <label for="">TimeZone</label>
-        
+
 
         <button type="submit">Update</button>
     </form>
@@ -24,13 +24,13 @@
 
     @php
          $selectedTimeZone = App\Models\Setting::where( 'key','timezone')->first();
-                $settings = App\Models\Setting::pluck('value', 'key')->toArray(); 
+                $settings = App\Models\Setting::pluck('value', 'key')->toArray();
 
             @endphp
     <style>
-   
 
- 
+
+
 
     body {
             font-family: Arial, sans-serif;
@@ -139,10 +139,10 @@
 
         /* تصميم النافذة */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            padding-top: 50px; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
             left: 0;
             top: 0;
             width: 100%;
@@ -177,7 +177,7 @@
 
         button{
             width: 200px;
-   
+
         }
 
 
@@ -196,9 +196,9 @@
 
     <div class="settings-content">
         <div id="brandSettings" class="settings-section active">
-          
+
             <h3> {{  __('Brand settings')}}</h3>
-            
+
             <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form">
@@ -209,6 +209,13 @@
                 <input type="file" name="app_logo" class="form-control">
                 @if(!empty($settings['app_logo']))
                     <img src="{{ asset('uploads/settings/' . $settings['app_logo']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
+                @endif
+
+
+                <label> {{  __('Application Fav Icon:')}}</label>
+                <input type="file" name="app_fav_icon" class="form-control">
+                @if(!empty($settings['app_fav_icon']))
+                    <img src="{{ asset('uploads/settings/' . $settings['app_fav_icon']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
                 @endif
 
                 <button type="submit">{{ __('save') }}</button>
@@ -260,7 +267,7 @@
                 <label>{{ __('Time zone:') }}</label>
                 <select name="timezone">
                     @foreach ($timezones as $timezone)
-                        <option value="{{ $timezone->name }}" 
+                        <option value="{{ $timezone->name }}"
                                 {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
                             {{ $timezone->name }}
                         </option>
@@ -301,12 +308,12 @@
 
         // تحديد الزر المضغوط عليه
         const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-        
+
         // تعيين لون الزر من متغير CSS
         activeButton.style.backgroundColor = 'var(--primary-color)';
         activeButton.style.color = 'var(--text-primary-color)';
 
-        
+
     }
 
     function openFullScreen(imgElement) {
