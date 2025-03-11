@@ -32,7 +32,7 @@ class TargetEventResource extends JsonResource
         } elseif ($this->type == 'achievement') {
             $path = $this->target;
         } else {
-            $path = 'cion.png';
+            $path = 'coin.png';
         }
         return [
             'id' => $this->id,
