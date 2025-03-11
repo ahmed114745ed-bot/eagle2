@@ -45,7 +45,7 @@ class GroupChatController extends Controller
             'image' => 'sometimes|image|mimes:jpeg,png,gif,bmp,tiff,webp',
             'image_url' => 'sometimes|string|max:255',
             'text' => 'required',
-            'parent_id' => 'nullable|integer|exists:group_chat,id'
+            'message_id' => 'nullable|integer|exists:group_chat,id'
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
