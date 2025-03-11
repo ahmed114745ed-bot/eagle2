@@ -31,7 +31,26 @@ class DailyPrizeController extends AdminController
         $type = request('type');
         $grid = new Grid(new DailyGift());
         $grid->model()->where('type', $type);
-        $grid->column('order', __('Order'))->editable();
+        // $grid->column('order', __('Order'))->editable();
+        $grid->column('order', __('Order'))
+        ->display(function ($order) {
+            $days = [
+                1 => __('first_day'),
+                2 => __('second_day'),
+                3 => __('third_day'),
+                4 => __('fourth_day'),
+                5 => __('fifth_day'),
+                6 => __('sixth_day'),
+                7 => __('seventh_day'),
+            ];
+            return $days[$order] ?? $order; 
+        });
+       
+    
+
+    
+    
+
         $grid->column('gift_type', __('gifts'));
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
