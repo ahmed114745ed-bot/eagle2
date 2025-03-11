@@ -216,26 +216,6 @@ class FreeUserController extends MainController
         });
 
         $grid->column('phone', __('Phone'));
-
-        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
-            $agency =  Agency::query()->find(@$this->agency_id);
-            $path = @$agency?->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
- 
-                 // Check if the image exists
-                 if (!isImageExists($url)) {
-                     $url = $defaultImage;
-                 }
-            $results = [
-             __('name') => @$agency->owner->name ??'',
-             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            
-         ];
- 
-         return new Table([__('Field Name'), __('Value')], $results);
-         });
-
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
