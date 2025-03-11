@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 
 class ReportMomentController extends MainController
 {
@@ -136,7 +137,34 @@ class ReportMomentController extends MainController
                 $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
                 return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
             });
-            
+            Admin::script("
+                $(document).ready(function () {
+                    $('.view-description').click(function (e) {
+                        e.preventDefault();
+
+                        var description = $(this).data('description');
+
+                        $('#modalDescriptionTitle').text('Full Description');
+                        $('#modalDescriptionContent').text(description);
+
+                        $('#descriptionModal').modal('show');
+                    });
+
+                    $('.view-image').click(function (e) {
+                        e.preventDefault();
+                        var imgSrc = $(this).data('img');
+                        $('#modalImageContent').attr('src', imgSrc);
+                        $('#imageModal').modal('show');
+                    });
+                }); ");
+
+                Admin::script("
+                    $('head').append(`<style>
+                    .modal-title{
+                    color: white;
+                        }
+                    </style>`);
+            ");
              $grid->column('type', __('Type'));
 
              $grid->column(__('redirect_button'))->display(function () {
@@ -167,6 +195,31 @@ class ReportMomentController extends MainController
          return $show;
      }
      
+
+     public static function getDescriptionShow(Real $reel)
+     {
+         $show = new Show($reel);
+ 
+         $show->field('description', __('Description'))->unescape()->as(function ($description) {
+             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+         });
+ 
+         $show->panel()->tools(function ($tools) {
+             $tools->disableEdit();
+             $tools->disableList();
+             $tools->disableDelete();
+         });
+ 
+         Admin::script("
+             if (window.innerWidth >= 1024) { 
+                 $('.table-responsive').removeClass('table-responsive');
+             }
+         ");
+ 
+         return $show;
+     }
+ 
 
     // protected function grid()
     // {

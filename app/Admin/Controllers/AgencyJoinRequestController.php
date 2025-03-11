@@ -163,14 +163,33 @@ class AgencyJoinRequestController extends MainController
                 </div>
             ";
             });
-        $grid->column('whatsapp', __('whatsapp'));
-        $grid->column('status', __('status'))->using(
-            [
-                0 => __('pending'),
-                1 => __('accepted'),
-                2 => __('denied')
-            ]
-        );
+            $grid->column('whatsapp', __('whatsapp'))->display(function ($number) {
+                if (!$number) return '-';
+
+                $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
+
+                // Return an image with a WhatsApp link
+                return "<div style='display: flex; align-items: center; '>
+
+                <span>{$number} </span>
+
+                  <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+            </div>";
+            });
+            $grid->column('status', __('status'))->display(function ($status) {
+            $statuses = [
+                0 => ['label' => __('pending'), 'color' => 'orange'],
+                1 => ['label' => __('accepted'), 'color' => 'green'],
+                2 => ['label' => __('denied'), 'color' => 'red'],
+            ];
+
+            $badgeColor = $statuses[$status]['color'] ?? 'gray';
+            $statusLabel = $statuses[$status]['label'] ?? 'unknown';
+
+            return "<span style='display: inline-block; padding: 5px 10px; color: white; background-color: $badgeColor; border-radius: 5px;'>
+                        $statusLabel
+                    </span>";
+        });
         $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
            $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
            $path = @$admin->profile?->avatar ?? @$admin->avatar;
@@ -185,13 +204,13 @@ class AgencyJoinRequestController extends MainController
             __('name') => @$admin->name ??'',
             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
             __('type') => userType(@$admin?->type_user ?? '') ?? '',
-           
+
         ];
 
         return new Table([__('Field Name'), __('Value')], $results);
         });
         $grid->column('created_at', trans('time'))->diffForHumans();
-        // $grid->column('created_at', __('Created at'))->display(function ($date) {   
+        // $grid->column('created_at', __('Created at'))->display(function ($date) {
         //     return Carbon::parse($date)->format('Y-m-d H:i:s');
         // });
         $this->extendGrid($grid);

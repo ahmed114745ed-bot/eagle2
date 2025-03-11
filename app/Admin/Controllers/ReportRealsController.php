@@ -44,7 +44,6 @@ class ReportRealsController extends AdminController
 
     $grid->column('id', __('ID'));
 
-    // 🔹 **عرض بيانات المراسل (Reporter)**
     $grid->column('reporter.name', __('Reporter'))->display(function () {
         $reporter = $this->reporter;
         if (!$reporter) return '-';
@@ -57,7 +56,7 @@ class ReportRealsController extends AdminController
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        $userUrl = admin_url('users/' . $reporter->id); // رابط صفحة المستخدم في لوحة التحكم
+        $userUrl = admin_url('users/' . $reporter->id);  
 
         return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -68,14 +67,12 @@ class ReportRealsController extends AdminController
             </div>";
     });
 
-    // 🔹 **عرض بيانات المستخدم الذي تم الإبلاغ عنه (Reported User)**
     $grid->column('reportedUser.name', __('Reported User'))->display(function () {
         $reportedUser = $this->reportedUser;
         if (!$reportedUser) return '-';
 
         $name = $reportedUser->name;
         $uuid = $reportedUser->uuid;
-        // $avatar = $reportedUser->avatar ? getImagePath($reportedUser->avatar) : asset("images/default-avatar.png");
         
         $defaultImage = asset("images/businessman-icon.jpg");   
         $avatarPath = @$reportedUser->avatar;    
@@ -84,7 +81,7 @@ class ReportRealsController extends AdminController
                 $avatar = $defaultImage;
             }
         
-        $userUrl = admin_url('users/' . $reportedUser->id); // رابط صفحة المستخدم في لوحة التحكم
+        $userUrl = admin_url('users/' . $reportedUser->id);  
 
         return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -95,19 +92,45 @@ class ReportRealsController extends AdminController
             </div>";
     });
 
-    // 🔹 **عرض الوصف**
     $grid->column('description', __('Description'))->display(function ($description) {
         $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
         return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
     });
 
-    // 🔹 **زر حذف الفيديو**
+    Admin::script("
+    $(document).ready(function () {
+        $('.view-description').click(function (e) {
+            e.preventDefault();
+
+            var description = $(this).data('description');
+
+            $('#modalDescriptionTitle').text('Full Description');
+            $('#modalDescriptionContent').text(description);
+
+            $('#descriptionModal').modal('show');
+        });
+
+        $('.view-image').click(function (e) {
+            e.preventDefault();
+            var imgSrc = $(this).data('img');
+            $('#modalImageContent').attr('src', imgSrc);
+            $('#imageModal').modal('show');
+        });
+    }); ");
+
+    Admin::script("
+        $('head').append(`<style>
+        .modal-title{
+        color: white;
+            }
+        </style>`);
+   ");
+
     $grid->column(__('redirect_button'))->display(function () {
         $redirectRoute = 'delete-reel';
         return '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-danger">'.__('admin.delete_video').'</a>';
     });
-
-    // 🔹 **عرض الفيديو في مودال**
+  
     $grid->column('real_id', __('View Reel'))->modal('Video Preview', function ($model) {
         return self::getRoomsShow($model->reel);
     });
@@ -124,9 +147,7 @@ class ReportRealsController extends AdminController
 public static function getRoomsShow(Real $reel)
 {
     $show = new Show($reel);
-    // $show->field('id', 'ID');
-
-    // 🔹 **عرض الفيديو**
+  
     $show->field('url', __('Video'))->unescape()->as(function ($path) {
         $url = getImagePath($path);
         return "<video width='100%' controls>
@@ -135,8 +156,7 @@ public static function getRoomsShow(Real $reel)
                 </video>";
     });
 
-    // 🔹 **عرض الوصف**
-    // $show->field('description', __('Description'));
+
 
     $show->panel()->tools(function ($tools) {
         $tools->disableEdit();
@@ -152,6 +172,9 @@ public static function getRoomsShow(Real $reel)
 
     return $show;
 }
+
+
+
 
 
     // protected function grid()
