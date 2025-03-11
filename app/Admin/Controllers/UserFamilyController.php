@@ -22,7 +22,6 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -39,6 +38,8 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use App\Admin\Widgets\Table as TableWidget;
+use Encore\Admin\Widgets\Table;
+
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
@@ -250,14 +251,28 @@ class UserFamilyController extends MainController
             return new Table([__('Field Name'), __('Value')], $results);
         });
 
-        // $grid->column('familyType.', __('family'))->display(function ($path) {
-        //     $defaultImage = asset("images/businessman-icon.jpg");
-        //     $url = getImagePath($path) ?? $defaultImage;
-        //     if (!isImageExists($url)) {
-        //         $url = $defaultImage;
-        //     }
-        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
-        // });
+        $grid->column('familyType.user_type', __('type'))->display(function ($userType) {
+            switch ($userType) {
+                case 2:
+                    $color = 'green';
+                    $label = __('Owner'); // Translation for Owner
+                    break;
+                case 1:
+                    $color = 'blue';
+                    $label = __('Admin'); // Translation for Admin
+                    break;
+                case 0:
+                    $color = 'red';
+                    $label = __('Member'); // Translation for Member
+                    break;
+                default:
+                    $color = 'gray';
+                    $label = __('Unknown'); // Default label
+            }
+        
+            // Return styled label
+            return "<span style='color: $color; font-weight: bold;'>$label</span>";
+        });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
