@@ -12,7 +12,8 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
 use Encore\Admin\Controllers\AdminController;
-
+use Illuminate\Support\Str;
+use Encore\Admin\Facades\Admin;
 class ReportMomentController extends MainController
 {
     /**
@@ -132,9 +133,12 @@ class ReportMomentController extends MainController
                 return self::getRoomsShow($model->moment);
             });
 
-            $grid->column('description', __('Description'))->display(function ($description) {
-                $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-                return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+         
+            $grid->column('description', __('Description'))
+            ->display(function ($description) {
+                return Str::limit($description, 20);
+            })->modal('Description', function ($model) {
+                return self::getDescriptionShow($model->moment);
             });
             
              $grid->column('type', __('Type'));
@@ -167,6 +171,31 @@ class ReportMomentController extends MainController
          return $show;
      }
      
+
+     public static function getDescriptionShow(Moment $Moment)
+     {
+         $show = new Show($Moment);
+ 
+         $show->field('description', __('Description'))->unescape()->as(function ($description) {
+             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+         });
+ 
+         $show->panel()->tools(function ($tools) {
+             $tools->disableEdit();
+             $tools->disableList();
+             $tools->disableDelete();
+         });
+ 
+         Admin::script("
+             if (window.innerWidth >= 1024) { 
+                 $('.table-responsive').removeClass('table-responsive');
+             }
+         ");
+ 
+         return $show;
+     }
+ 
 
     // protected function grid()
     // {

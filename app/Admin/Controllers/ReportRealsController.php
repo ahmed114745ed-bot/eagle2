@@ -7,10 +7,12 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\Reals\Entities\ReportReals;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
 use Modules\Reals\Entities\Real;
+use Illuminate\Support\Str;
+use Encore\Admin\Facades\Admin;
+
 
 class ReportRealsController extends AdminController
 {
@@ -44,7 +46,6 @@ class ReportRealsController extends AdminController
 
     $grid->column('id', __('ID'));
 
-    // 🔹 **عرض بيانات المراسل (Reporter)**
     $grid->column('reporter.name', __('Reporter'))->display(function () {
         $reporter = $this->reporter;
         if (!$reporter) return '-';
@@ -68,14 +69,12 @@ class ReportRealsController extends AdminController
             </div>";
     });
 
-    // 🔹 **عرض بيانات المستخدم الذي تم الإبلاغ عنه (Reported User)**
     $grid->column('reportedUser.name', __('Reported User'))->display(function () {
         $reportedUser = $this->reportedUser;
         if (!$reportedUser) return '-';
 
         $name = $reportedUser->name;
         $uuid = $reportedUser->uuid;
-        // $avatar = $reportedUser->avatar ? getImagePath($reportedUser->avatar) : asset("images/default-avatar.png");
         
         $defaultImage = asset("images/businessman-icon.jpg");   
         $avatarPath = @$reportedUser->avatar;    
@@ -84,7 +83,7 @@ class ReportRealsController extends AdminController
                 $avatar = $defaultImage;
             }
         
-        $userUrl = admin_url('users/' . $reportedUser->id); // رابط صفحة المستخدم في لوحة التحكم
+        $userUrl = admin_url('users/' . $reportedUser->id); 
 
         return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -95,19 +94,19 @@ class ReportRealsController extends AdminController
             </div>";
     });
 
-    // 🔹 **عرض الوصف**
-    $grid->column('description', __('Description'))->display(function ($description) {
-        $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-        return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-    });
-
-    // 🔹 **زر حذف الفيديو**
+   
     $grid->column(__('redirect_button'))->display(function () {
         $redirectRoute = 'delete-reel';
         return '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-danger">'.__('admin.delete_video').'</a>';
     });
 
-    // 🔹 **عرض الفيديو في مودال**
+    $grid->column('description', __('Description'))
+    ->display(function ($description) {
+        return Str::limit($description, 20);
+    })->modal('Description', function ($model) {
+        return self::getDescriptionShow($model->reel);
+    });
+
     $grid->column('real_id', __('View Reel'))->modal('Video Preview', function ($model) {
         return self::getRoomsShow($model->reel);
     });
@@ -124,9 +123,7 @@ class ReportRealsController extends AdminController
 public static function getRoomsShow(Real $reel)
 {
     $show = new Show($reel);
-    // $show->field('id', 'ID');
 
-    // 🔹 **عرض الفيديو**
     $show->field('url', __('Video'))->unescape()->as(function ($path) {
         $url = getImagePath($path);
         return "<video width='100%' controls>
@@ -134,9 +131,32 @@ public static function getRoomsShow(Real $reel)
                     Your browser does not support the video tag.
                 </video>";
     });
+   
 
-    // 🔹 **عرض الوصف**
-    // $show->field('description', __('Description'));
+    $show->panel()->tools(function ($tools) {
+        $tools->disableEdit();
+        $tools->disableList();
+        $tools->disableDelete();
+    });
+
+    Admin::script("
+        if (window.innerWidth >= 1024) { 
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+
+    return $show;
+}
+
+
+public static function getDescriptionShow(Real $reel)
+{
+    $show = new Show($reel);
+
+    $show->field('description', __('Description'))->unescape()->as(function ($description) {
+        $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+        return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+    });
 
     $show->panel()->tools(function ($tools) {
         $tools->disableEdit();
