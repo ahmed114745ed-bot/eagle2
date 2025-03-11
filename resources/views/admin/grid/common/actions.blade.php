@@ -1,11 +1,22 @@
 <style>
-    .nav-pills .active {
-        background-color: rgb(223, 137, 79) !important;
-        color: white !important;
-    }
+.nav-pills .active {
+    background-color: #fe9127 !important;
+    color: white !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.nav-pills .active::before {
+    content: none !important;
+}
+
+.nav-pills > li.active > a {
+    border-left: none !important;
+}
 </style>
-   
-   
+
+
 
 <div class="box box-solid">
     <div class="box-header with-border">
@@ -16,7 +27,7 @@
     </div>
     <div class="box-body no-padding">
         <ul class="nav nav-pills nav-stacked">
-            <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' ? 'background-color: orange;' : '' }}">
+            <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' || empty(request('name')) ? 'background-color: orange;' : '' }}">
                 <a href="?name=users" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('users report') }}
                 </a>
