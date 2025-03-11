@@ -156,7 +156,7 @@ class FreeUserController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
-                $filter->column('1/2', function ($filter) {
+                $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")

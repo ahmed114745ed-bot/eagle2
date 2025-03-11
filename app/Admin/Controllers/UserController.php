@@ -157,7 +157,7 @@ class UserController extends MainController
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
-                $filter->column('1/2', function ($filter) {
+                $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
