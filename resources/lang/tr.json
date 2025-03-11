@@ -1671,7 +1671,13 @@
     "rejected": "Reddedildi",
     "rejectedAdmin": "Yönetici tarafından reddedildi",
     "The user ID that referred you to us": "Bizi size yönlendiren kullanıcı kimliği",
-    "The platform you worked on": "Üzerinde çalıştığınız platform"
+    "The platform you worked on": "Üzerinde çalıştığınız platform",
+    "Percentage target": "Yüzde hedef",
+    "Hours:": "Saatler:",
+    "Days:": "Günler:",
+    "Moments:": "Anlar:",
+    "Reels:": "Videolar:",
+    "Save": "Kaydet"
 
 
 

@@ -814,7 +814,13 @@
     "rejected": "अस्वीकृत",
     "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत",
     "The user ID that referred you to us": "जिस उपयोगकर्ता आईडी ने आपको हमारी ओर भेजा",
-    "The platform you worked on": "जिस प्लेटफ़ॉर्म पर आपने काम किया"
+    "The platform you worked on": "जिस प्लेटफ़ॉर्म पर आपने काम किया",
+    "Percentage target": "प्रतिशत लक्ष्य",
+    "Hours:": "घंटे:",
+    "Days:": "दिन:",
+    "Moments:": "क्षण:",
+    "Reels:": "वीडियो:",
+    "Save": "सहेजें"
 
 
 
