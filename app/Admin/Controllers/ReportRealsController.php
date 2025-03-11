@@ -117,6 +117,15 @@ class ReportRealsController extends AdminController
             $('#imageModal').modal('show');
         });
     }); ");
+
+    Admin::script("
+        $('head').append(`<style>
+        .modal-title{
+        color: white;
+            }
+        </style>`);
+   ");
+
     $grid->column(__('redirect_button'))->display(function () {
         $redirectRoute = 'delete-reel';
         return '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-danger">'.__('admin.delete_video').'</a>';
