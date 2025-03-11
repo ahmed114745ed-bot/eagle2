@@ -14,7 +14,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
 use Encore\Admin\Facades\Admin;
-use App\Admin\Widgets\Table;
+use Encore\Admin\Widgets\Table;
 use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
@@ -227,7 +227,7 @@ class AgencyController extends MainController
                         'total_hours' => $memper->liveTime->sum("hours"),
                         'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
                         'image' => $imageHtml,
-                        'salary' => $salary ?? '',
+                        'salary' => $salary ?? 0,
 
                     ];
                 });
