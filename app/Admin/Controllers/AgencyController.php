@@ -14,7 +14,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
+use App\Admin\Widgets\Table;
 // use Encore\Admin\Admin;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
