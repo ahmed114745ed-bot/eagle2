@@ -21,8 +21,8 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
-//use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table;
+use Encore\Admin\Widgets\Table;
+use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -255,8 +255,8 @@ class UserController extends MainController
                 $target = $target->only(
                     [
                         'id',
-                        'add_month',
-                        'add_year',
+                        'add_month'.'/'. 'add_year',
+                       
                         'target_usd',
                         'target_agency_share',
                         'user_diamonds',
@@ -271,7 +271,7 @@ class UserController extends MainController
                 return $target;
             });
 
-            return new Table(
+            return new TableWidget(
                 [
                     'ID',
                     __('month') .'/'.__('year') ,
