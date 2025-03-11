@@ -108,7 +108,7 @@ class RequestBackgroundImageController extends MainController
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom->id}");
+            $showUrl = url("admin/rooms/{$this->owner?->ownerRoom?->id}");
 
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -158,12 +158,12 @@ class RequestBackgroundImageController extends MainController
 
             return "
                     <img src='$correctUrl' style='width: 100px; height: 100px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
-                    
+
                     <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
                         <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
                         <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
                     </div>
-            
+
                     <script>
                         function openModal(src) {
                             let modal = document.getElementById('imageModal');
@@ -171,11 +171,11 @@ class RequestBackgroundImageController extends MainController
                             modal.style.display = 'block';
                             modalImage.src = src;
                         }
-            
+
                         function closeModal() {
                             document.getElementById('imageModal').style.display = 'none';
                         }
-            
+
                         // Close modal when clicking outside the image
                         document.getElementById('imageModal').addEventListener('click', function(event) {
                             if (event.target === this) {
@@ -194,7 +194,7 @@ class RequestBackgroundImageController extends MainController
             ]
         );
         $grid->column('expair', __('expire'));
-        $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {   
+        $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
         });
 
