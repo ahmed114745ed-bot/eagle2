@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -14,8 +15,6 @@ use Encore\Admin\Grid\Displayers\Table;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form\Field\Table as FieldTable;
 use Encore\Admin\Widgets\Table as WidgetsTable;
-use Illuminate\Support\Str;
-use Encore\Admin\Facades\Admin;
 
 class ReelController extends MainController
 {
@@ -78,10 +77,8 @@ class ReelController extends MainController
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
         
-            // الحصول على الصورة الفعلية أو الافتراضية
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             
-            // التحقق من وجود الصورة
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
@@ -112,17 +109,32 @@ class ReelController extends MainController
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
         });
 
-        // $grid->column('description', __('Description'))->display(function ($description) {
-        //     $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 30 ? '...' : '');
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
             
-        //     return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-        // });
-        $grid->column('description', __('Description'))
-        ->display(function ($description) {
-            return Str::limit($description, 20);
-        })->modal('Description', function ($model) {
-            return self::getDescriptionShow($model);
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
+
+        Admin::script("
+        $(document).ready(function () {
+            $('.view-description').click(function (e) {
+                e.preventDefault();
+
+                var description = $(this).data('description');
+
+                $('#modalDescriptionTitle').text('Full Description');
+                $('#modalDescriptionContent').text(description);
+
+                $('#descriptionModal').modal('show');
+            });
+
+            $('.view-image').click(function (e) {
+                e.preventDefault();
+                var imgSrc = $(this).data('img');
+                $('#modalImageContent').attr('src', imgSrc);
+                $('#imageModal').modal('show');
+            });
+        }); ");
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();
@@ -131,31 +143,6 @@ class ReelController extends MainController
 
         return $grid;
     }
-
-    public static function getDescriptionShow(Real $reel)
-    {
-        $show = new Show($reel);
-
-        $show->field('description', __('Description'))->unescape()->as(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-        });
-
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableList();
-            $tools->disableDelete();
-        });
-
-        Admin::script("
-            if (window.innerWidth >= 1024) { 
-                $('.table-responsive').removeClass('table-responsive');
-            }
-        ");
-
-        return $show;
-    }
-
 
     /**
      * Make a show builder.

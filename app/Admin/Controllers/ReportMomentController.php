@@ -12,8 +12,8 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Modules\Moment\Entities\ReportMoment;
 use Encore\Admin\Controllers\AdminController;
-use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
+
 class ReportMomentController extends MainController
 {
     /**
@@ -133,14 +133,30 @@ class ReportMomentController extends MainController
                 return self::getRoomsShow($model->moment);
             });
 
-         
-            $grid->column('description', __('Description'))
-            ->display(function ($description) {
-                return Str::limit($description, 20);
-            })->modal('Description', function ($model) {
-                return self::getDescriptionShow($model->moment);
+            $grid->column('description', __('Description'))->display(function ($description) {
+                $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+                return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
             });
-            
+            Admin::script("
+                $(document).ready(function () {
+                    $('.view-description').click(function (e) {
+                        e.preventDefault();
+
+                        var description = $(this).data('description');
+
+                        $('#modalDescriptionTitle').text('Full Description');
+                        $('#modalDescriptionContent').text(description);
+
+                        $('#descriptionModal').modal('show');
+                    });
+
+                    $('.view-image').click(function (e) {
+                        e.preventDefault();
+                        var imgSrc = $(this).data('img');
+                        $('#modalImageContent').attr('src', imgSrc);
+                        $('#imageModal').modal('show');
+                    });
+                }); ");
              $grid->column('type', __('Type'));
 
              $grid->column(__('redirect_button'))->display(function () {
@@ -172,9 +188,9 @@ class ReportMomentController extends MainController
      }
      
 
-     public static function getDescriptionShow(Moment $Moment)
+     public static function getDescriptionShow(Real $reel)
      {
-         $show = new Show($Moment);
+         $show = new Show($reel);
  
          $show->field('description', __('Description'))->unescape()->as(function ($description) {
              $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
