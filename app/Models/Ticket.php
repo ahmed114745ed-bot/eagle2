@@ -22,4 +22,9 @@ class Ticket extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

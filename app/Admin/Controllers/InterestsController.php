@@ -35,7 +35,9 @@ class InterestsController extends  MainController
         $grid = new Grid(new Interest());
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'));
+        $grid->column('name', __('Name'))->editable(
+          'text'
+        );
         $grid->column('img', __('Img'))->image(width: 100, height: 100);
         // $grid->column('created_at', __('Created at'));
         // $grid->column('updated_at', __('Updated at'));

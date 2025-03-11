@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ban;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -88,14 +89,78 @@ class BanController extends MainController
         $grid = new Grid(new Ban);
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select('uid', 'duration', 'type', 'device_number', 'staff_id', 'description_ar', 'img', DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy(['uid', 'type', 'duration', 'device_number', 'staff_id', 'description_ar', 'img', 'ban_type_id'])->orderByDesc('created_at');
-        //        $grid->id(__ ('ID'));
-        $grid->uid(__('uuid'));
+            ->select('uid', 'duration', 'type', 'device_number', 'staff_id',  DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy(['uid', 'type', 'duration', 'device_number', 'staff_id',  'ban_type_id'])->orderByDesc('created_at');
+            //    $grid->id(__ ('ID'));
+        // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
+        $grid->column('user_id', __('User'))->display(function () {
+            $user = $this->user; // العلاقة مع المستخدم
+            if (!$user) return '-';
+        
+            $name = $user->name;
+            $uuid = $user->uuid;
+            $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
+            $defaultImage = asset("images/businessman-icon.jpg");   
+            $avatarPath = @$user->avatar;    
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
+        
+            $userUrl = admin_url('users/' . $user->id);  
+        
+            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <div>
+                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
+                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
+                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
+                        </div>
+                    </div>";
+        });
+        
         $grid->duration(__('duration'));
-        $grid->type(__('type'));
-        $grid->column('description_ar', __('reason'));
+        $grid->column('type', __('Type'))->display(function ($type) {
+            $types = [
+                1 => __('normal'),
+                2 => __('ip'),
+                3 => __('device'),
+            ];
+        
+            return $types[$type] ?? '-';
+        });
+
+        // $grid->column('description_ar', __('reason'));
+        $grid->column('description_ar', __('reason'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (mb_strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
+        
+        // إضافة سكريبت JavaScript لمعالجة النوافذ المنبثقة
+        Admin::script("
+            $(document).ready(function () {
+                $('.view-description').click(function (e) {
+                    e.preventDefault();
+        
+                    var description = $(this).data('description');
+        
+                    $('#modalDescriptionTitle').text('" . __('Full Description') . "');
+                    $('#modalDescriptionContent').text(description);
+        
+                    $('#descriptionModal').modal('show');
+                });
+        
+                $('.view-image').click(function (e) {
+                    e.preventDefault();
+                    var imgSrc = $(this).data('img');
+                    $('#modalImageContent').attr('src', imgSrc);
+                    $('#imageModal').modal('show');
+                });
+            });
+        ");
+        
         $grid->column('ban_type_id', __('ban_type'))->display(function ($row) {
 
             $banType = BanType::find($this->ban_type_id);
@@ -107,9 +172,27 @@ class BanController extends MainController
         });
         $grid->column('img', trans('image'))->image('', 30);
 
-        //        $grid->ip(__ ('ip'));
         $grid->device_number(__('device_number'));
-        $grid->staff_id(__('staff_id'));
+        // $grid->staff_id(__('staff_id'));
+        $grid->column('staff_id', __('staff'))->display(function () {
+            if (!$this->staff) return '-';
+        
+            $name = $this->staff->name ?? '-';
+            $email = $this->staff->email ?? '-';
+            $defaultImage = asset("images/admin-icon.png");
+            $avatarPath = $this->staff->avatar ?? null;
+            $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
+            
+            $adminUrl = admin_url('admins/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
+        
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <div>
+                            <a href='$adminUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
+                            <span style='color: #aaa; font-size: smaller;'>$email</span>
+                        </div>
+                    </div>";
+        });
 
         $grid->column('created_at', __('created'))->display(function () {
             return \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
