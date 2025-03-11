@@ -11,6 +11,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Encore\Admin\Facades\Admin as AdminScript;
 
 class TicketController extends MainController
 {
@@ -114,7 +115,7 @@ class TicketController extends MainController
             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
-        Admin::script("
+        AdminScript::script("
             $(document).ready(function () {
                 $('.view-description').click(function (e) {
                     e.preventDefault();
