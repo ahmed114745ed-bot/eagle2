@@ -201,7 +201,7 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
     
-        Log::info('agora webhook triggered', [
+        Log::info('agora data', [
             $eventType,
             $userId,
             $roomId,
