@@ -40,6 +40,7 @@ class GroupChatService
             'text' => $request->text,
             'user_id' => $user->id,
             'image' => $image ?? '',
+            'parent_id' => $request->parent_id,
         ];
         $groupChatMessage = $this->groupChatRepository->create($data);
         if ($request->message_type != null && $request->message_type == 'reel')  $this->countReel($request->text);

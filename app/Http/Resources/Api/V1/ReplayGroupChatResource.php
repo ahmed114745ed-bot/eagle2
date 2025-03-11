@@ -16,7 +16,7 @@ use Carbon\Carbon;
 use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class GroupChatResource extends JsonResource
+class ReplayGroupChatResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -49,10 +49,10 @@ class GroupChatResource extends JsonResource
             ],
             'has_color_name'=>Common::hasInPack (@$this->user->id,18),
             'group_id' => $this->id,
+            'reply_id' => $this->parent_id,
             'group_message' => $this->text,
             'group_image' => $this->image,
             'created_at' => Carbon::parse($this->created_at)->toDateTimeString(),
-            'replay' => ReplayGroupChatResource::collection($this->children)
         ];
 
         return $data;
