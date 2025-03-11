@@ -24,7 +24,7 @@ class ReportUserController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('dashboard.users_report'))
+            ->title(trans('Hosts Reports'))
             ->body($this->grid()));
     }
 
@@ -38,7 +38,7 @@ class ReportUserController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('dashboard.users_report'))
+            ->title(trans('Hosts Reports'))
             ->body($this->detail($id));
     }
 
@@ -52,7 +52,7 @@ class ReportUserController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('dashboard.users_report'))
+            ->title(trans('Hosts Reports'))
             ->body($this->form()->edit($id));
     }
 
@@ -65,7 +65,7 @@ class ReportUserController extends MainController
     public function create(Content $content)
     {
         return $content
-            ->title(trans('dashboard.users_report'))
+            ->title(trans('Hosts Reports'))
             ->body($this->form());
     }
 
@@ -98,11 +98,37 @@ class ReportUserController extends MainController
         });
 
         $grid->column('id', __('Id'));
-        $grid->column('name', __('Name'));
-        $grid->column('uuid', __('uuid'));
+        $grid->column('name', __('user'))->display(function ($name) {
+            $name = @$this->name ?? '';
+            $uid = @$this->uuid;
+            $path = @$this?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl =  ($this) ? url("admin/users/{$this->id}") : 0;
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });;
+
         $grid->column('total_days', __('total_days'))->display(function () {
+            $image = asset('images/day.jpg');
             if (request()->year == null && request()->month == null) {
-                return $this->total_days;
+                $days= $this->total_days;
             } else {
                 // The subquery equivalent in Laravel
                 $subQuery = DB::table('live_times')
@@ -113,28 +139,44 @@ class ReportUserController extends MainController
                     ->havingRaw('SUM(hours) > 1')
                     ->get(); // Having condition
 
+                $days = $subQuery->count('entry_count');
+                
 
-
-                return $subQuery->count('entry_count');
             }
+            return "<span style='color:green; font-weight: bold;'>{$days}</span>";
         });
         $grid->column(__('reals_count'))->display(function () {
 
-            return request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+           $count = request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+           return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
         });
         $grid->column(__('moment_count'))->display(function () {
-            return request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+            $count= request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+            return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
         });
         $grid->column(__('total_hours'))->display(function () {
-            return  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
+           $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
+           return "<span style='color:red; font-weight: bold;'>{$count}</span>";
         });
 
         $grid->column(__('Filtered salary'))->display(function () {
-            return  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
+            $usd =  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
         });
 
         $grid->column(__('Current Salary'))->display(function () {
-            return  $this->salary;
+            $usd =  $this->salary;
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
         });
 
         $grid->disableActions();

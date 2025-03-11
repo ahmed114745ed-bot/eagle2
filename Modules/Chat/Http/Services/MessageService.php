@@ -42,6 +42,8 @@ class MessageService
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
             }
         } elseif ($request->video_name) {
+            Log::info('video string : ' . $request->video_name);
+
             $this->processVideoFile($request->video_name, $chatRoom, $message, $user, $request->duration);
         }
     }
@@ -105,6 +107,7 @@ class MessageService
 
     private function processVideoFile($file, $chatRoom, $message, $user, $duration = null)
     {
+                 Log::info('video :'. $file);
         if (!is_string($file)) {
             $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
         } else {
@@ -118,7 +121,7 @@ class MessageService
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
         } catch (\Throwable $e) {
-           
+            Log::info('error :'. $e);
             return $e->getMessage();
         }
 

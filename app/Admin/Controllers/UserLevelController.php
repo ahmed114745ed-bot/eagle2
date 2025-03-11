@@ -77,20 +77,40 @@ class UserLevelController extends MainController
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/users/{$this->id}");
+            $uuid = $this->uuid;
+
 
             return "
-        <div style='display: flex; align-items: center; gap: 10px;'>
-            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                $image
-                <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+    <div style='display: flex; align-items: center; gap: 10px;'>
+        $image
+        <div>
+           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
             </a>
+            <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
         </div>
-    ";
+    </div>
+";
         });
 
-        $grid->column('uuid', __('uuid'));
-        $grid->column('total_sender_level', __('Sender Level'));
-        $grid->column('total_received_level', __('Received Level'));
+        //$grid->column('uuid', __('uuid'));
+        $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
+
+        $grid->column('total_sender_level', __('Sender Level'))
+            ->display(function ($value) use ($arrowIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>$value</span>
+                            <img src='$arrowIcon' style='width: 16px; height: 16px;'>
+                        </div>";
+            });
+
+        $grid->column('total_received_level', __('Received Level'))
+            ->display(function ($value) use ($arrowIcon) {
+                return "<div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>$value</span>
+                            <img src='$arrowIcon' style='width: 16px; height: 16px;'>
+                        </div>";
+            });
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableDelete();
@@ -98,9 +118,9 @@ class UserLevelController extends MainController
 
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools){
+        $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/change-level-histories';
-            $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__("admin.history").'</a>';
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
             $tools->append($button);
         });
         return $grid;

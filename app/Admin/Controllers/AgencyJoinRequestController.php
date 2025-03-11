@@ -163,35 +163,68 @@ class AgencyJoinRequestController extends MainController
                 </div>
             ";
             });
-        $grid->column('whatsapp', __('whatsapp'));
-        $grid->column('status', __('status'))->using(
-            [
-                0 => __('pending'),
-                1 => __('accepted'),
-                2 => __('denied')
-            ]
-        );
-        $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
-           $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
-           $path = @$admin->profile?->avatar ?? @$admin->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+            $grid->column('whatsapp', __('whatsapp'))->display(function ($number) {
+                if (!$number) return '-';
 
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-           $results = [
-            __('name') => @$admin->name ??'',
-            __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            __('type') => userType(@$admin?->type_user ?? '') ?? '',
-           
-        ];
+                $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
 
-        return new Table([__('Field Name'), __('Value')], $results);
+                // Return an image with a WhatsApp link
+                return "<div style='display: flex; align-items: center; '>
+
+                <span>{$number} </span>
+
+                  <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+            </div>";
+            });
+            $grid->column('status', __('status'))->display(function ($status) {
+            $statuses = [
+                0 => ['label' => __('pending'), 'color' => 'orange'],
+                1 => ['label' => __('accepted'), 'color' => 'green'],
+                2 => ['label' => __('denied'), 'color' => 'red'],
+            ];
+
+            $badgeColor = $statuses[$status]['color'] ?? 'orange';
+            $statusLabel = $statuses[$status]['label'] ?? __('pending');
+
+            return "<span style='display: inline-block; padding: 5px 10px; color: white; background-color: $badgeColor; border-radius: 5px;'>
+                        $statusLabel
+                    </span>";
         });
+        $grid->column('change_status_admin_id', __('Change Status Admin'))
+    ->display(function () {
+        $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+
+        if (!$admin) {
+            return '-';
+        }
+
+        $name = $admin->name ?? 'Unknown';
+        $uid = $admin->uuid ?? 'N/A';
+        $path = @$admin->profile?->avatar ?? @$admin->avatar;
+        $defaultImage = asset("images/businessman-icon.jpg");
+        $url = getImagePath($path) ?? $defaultImage;
+
+        // Check if the image exists
+        if (!isImageExists($url)) {
+            $url = $defaultImage;
+        }
+
+        $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        $type = userType(@$admin?->type_user ?? '') ?? 'Unknown Type';
+
+        return "
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            $image
+            <div>
+                <strong>$name</strong><br>
+                <span style='color: #aaa; font-size: smaller;'>$type</span>
+            </div>
+        </div>
+        ";
+    });
+
         $grid->column('created_at', trans('time'))->diffForHumans();
-        // $grid->column('created_at', __('Created at'))->display(function ($date) {   
+        // $grid->column('created_at', __('Created at'))->display(function ($date) {
         //     return Carbon::parse($date)->format('Y-m-d H:i:s');
         // });
         $this->extendGrid($grid);

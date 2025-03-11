@@ -22,6 +22,7 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
+use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -157,7 +158,7 @@ class UserController extends MainController
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
-                $filter->column('1/2', function ($filter) {
+                $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
@@ -174,8 +175,8 @@ class UserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid 
-                ? __("uuid") . ' : ' . $this->uuid 
+            return $this->uuid == $this->original_uuid
+                ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
@@ -235,7 +236,7 @@ class UserController extends MainController
             $path = @$agency?->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
- 
+
                  // Check if the image exists
                  if (!isImageExists($url)) {
                      $url = $defaultImage;
@@ -243,35 +244,35 @@ class UserController extends MainController
             $results = [
              __('name') => @$agency->owner->name ??'',
              __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            
+
          ];
- 
+
          return new Table([__('Field Name'), __('Value')], $results);
          });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = $target->only(
+                $target =
                     [
-                        'id',
-                        'add_month',
-                        'add_year',
-                        'target_usd',
-                        'target_agency_share',
-                        'user_diamonds',
-                        'user_hours',
-                        'user_days',
-                        'user_obtain',
-                        'updated_at'
-                    ]
-                );
+                        'id' =>$target->id ,
+                        'add_month' => $target->add_month.'/'. $target->add_year,
+
+                        'target_usd' => $target->target_usd,
+                        'target_agency_share' => $target->target_agency_share,
+                        'user_diamonds' => $target->user_diamonds,
+                        'user_hours'=> $target->user_hours,
+                        'user_days' => $target->user_days,
+                        'user_obtain' => $target->user_obtain,
+                        'updated_at' => $target->updated_at,
+                    ];
+
 
 
                 return $target;
             });
 
-            return new Table(
+            return new TableWidget(
                 [
                     'ID',
                     __('month') .'/'.__('year') ,
@@ -287,7 +288,7 @@ class UserController extends MainController
                 $targets->toArray()
             );
         });
-        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             $id           = $this->id;
             $device_token = $this->device_token;

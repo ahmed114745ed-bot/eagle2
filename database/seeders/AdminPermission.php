@@ -102,7 +102,11 @@ class AdminPermission extends Seeder
             'agent-home',
             'updates_group_chat',
             'agora-zego',
-            'uuid-dedicate'
+            'uuid-dedicate',
+            'agency-setting',
+            'free-users',
+            'users-family',
+            
 
 
 
@@ -124,14 +128,14 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target',],
+            'user' => ['users', 'trashed-account-user', 'user-target','free-users'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips'],
             'moment' => ['moment',],
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting'],
             'agent' => ['agent-user', 'agent-request', 'agent-target','user-agent-target','charges-agency','agent-home'],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
@@ -157,7 +161,8 @@ class AdminPermission extends Seeder
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
             'bans' => ['bans'],
             'update-group-chat' => ['updates_group_chat'],
-            'agora-zego' => ['agora-zego']
+            'agora-zego' => ['agora-zego'],
+            'users-family' => ['users-family'],
           
 
         ];

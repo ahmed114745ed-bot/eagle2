@@ -2,6 +2,7 @@
 
 namespace Modules\Moment\Entities;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,6 +30,15 @@ class ReportMoment extends Model
     public function moment()
     {
         return $this->belongsTo(Moment::class);
+    }
+    public function reporter()
+    {
+        return $this->belongsTo(User::class, 'Reporter_id');
+    }
+
+    public function reportedUser()
+    {
+        return $this->belongsTo(User::class, 'Reported_id');
     }
 }
 

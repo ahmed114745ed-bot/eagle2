@@ -31,7 +31,26 @@ class DailyPrizeController extends AdminController
         $type = request('type');
         $grid = new Grid(new DailyGift());
         $grid->model()->where('type', $type);
-        $grid->column('order', __('Order'))->editable();
+        // $grid->column('order', __('Order'))->editable();
+        $grid->column('order', __('Order'))
+        ->display(function ($order) {
+            $days = [
+                1 => __('first_day'),
+                2 => __('second_day'),
+                3 => __('third_day'),
+                4 => __('fourth_day'),
+                5 => __('fifth_day'),
+                6 => __('sixth_day'),
+                7 => __('seventh_day'),
+            ];
+            return $days[$order] ?? $order; 
+        });
+       
+    
+
+    
+    
+
         $grid->column('gift_type', __('gifts'));
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
@@ -112,7 +131,17 @@ class DailyPrizeController extends AdminController
         $form = new Form(new DailyGift());
 
         $form->hidden('type')->value(request('type'));
-        $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
+        // $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
+        $form->select('order', __('order'))->options([
+            1 => __('first_day'),
+            2 => __('second_day'),
+            3 => __('third_day'),
+            4 => __('fourth_day'),
+            5 => __('fifth_day'),
+            6 => __('sixth_day'),
+            7 => __('seventh_day'),
+        ])->required();
+        
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));

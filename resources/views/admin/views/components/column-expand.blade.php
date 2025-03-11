@@ -4,7 +4,7 @@
         <a href="javascript:void(0)"><i class="fa fa-angle-double-down"></i>&nbsp;&nbsp;{{ $value }}</a>
     </span>
     <template class="grid-expand-{{ $name }}">
-        <tr style='background-color: #ecf0f5;'>
+        <tr style='background-color:var(--table-background-color);'>
             <td colspan='100%' style='padding:0 !important; border:0;'>
                 <div id="grid-collapse-{{ $name }}" class="collapse">
                     <div style="padding: 10px 10px 0 10px;" class="html">

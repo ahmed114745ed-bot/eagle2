@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -62,18 +63,38 @@ class ReelController extends MainController
         });
         $grid->model()->orderByDesc('created_at');
 
-        $grid->column('description', __('Description'))->display(function ($description) {
-            // تحديد عدد الأحرف المطلوبة، على سبيل المثال 50 حرفًا
-            $limitedDescription = mb_substr($description, 0, 50);
+        // $grid->column('description', __('Description'))->display(function ($description) {
+        //     $limitedDescription = mb_substr($description, 0, 50);
 
-            return $limitedDescription;
-        });
-        $grid->column('user.name', __('user_id'))->display(function ($name) {
+        //     return $limitedDescription;
+        // });
+
+        
+        
+        $grid->column('user.name', __('user'))->display(function ($name) {
+            $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+            $avatarPath = @$this->user->avatar;    
+            $userId = @$this->user->id;
             $uid = @$this->user->uuid;
+        
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
 
-            return "$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+          
+        
+            return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
+                        <div>
+                            <span style='color: #3498db; font-weight: bold;'>$name</span><br>
+                            <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                        </div>
+                    </div>";
         });
+        
+        
         $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
@@ -87,6 +108,34 @@ class ReelController extends MainController
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
         });
+
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
+            
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
+
+        Admin::script("
+        $(document).ready(function () {
+            $('.view-description').click(function (e) {
+                e.preventDefault();
+
+                var description = $(this).data('description');
+
+                $('#modalDescriptionTitle').text('Full Description');
+                $('#modalDescriptionContent').text(description);
+
+                $('#descriptionModal').modal('show');
+            });
+
+            $('.view-image').click(function (e) {
+                e.preventDefault();
+                var imgSrc = $(this).data('img');
+                $('#modalImageContent').attr('src', imgSrc);
+                $('#imageModal').modal('show');
+            });
+        }); ");
+    
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();

@@ -390,6 +390,7 @@
     "interests": "الاهتمامات",
     "Actions": "أجراءات",
     "Reporter id": "مقدم البلاغ",
+    "Reporter": "مقدم البلاغ",
     "User id": "متلقي البلاغ",
     "Report details": "تفاصيل البلاغ",
     "User_Report": "بلاغات المستخدمين",
@@ -490,6 +491,7 @@
     "Room not found": "الغرفة غير موجودة",
     "Real id": "معرف المقطع",
     "Reported id": "معرف  متلقي البلاغ",
+    "Reported User": "  متلقي البلاغ",
     "Description": "المحتوي",
     "churching": "شحن",
     "Agency Managers": " مدرين الوكاله",
@@ -1664,9 +1666,11 @@
     "View Reel":"عرض الفيديو",
     "Report Reel":"الإبلاغ عن الفيديو",
     "chose between agora or zego libarary 0 for agora 1 for zego" : "اختر بين مكتبة Agora أو Zego، 0 لـ Agora و 1 لـ Zego",
-    "owner room id":"معرّف غرفة المالك",
+    "owner room id":"مالك الغرفة",
     "vips dedicate" : "أهداء الارستقراطيه",
     "user Active":" نشاط المستخدمين",
+    "Achievement Id" : "معرف الانجاز",
+    "Description Ar" : "الوصف بالعربية",
     "Host":"وكيل مضيفين",
     "Host Agent":"وكيل مضيفين",
     "Shipping Agent":"وكيل شحن",
@@ -1692,11 +1696,36 @@
     "transferred": "تم التحويل",
     "completed": "مكتمل",
     "rejected": "مرفوض",
-    "rejectedAdmin": "مرفوض من قبل المسؤول"
+    "rejectedAdmin": "مرفوض من قبل المسؤول",
+    "Percentage target": "نسبة الهدف",
+    "Hours:":"الساعات",
+    "Days:":"الايام",
+    "Moments:": "اللحظات",
+    "Reels:": "الفيديوهات",
+    "Save": "حفظ",
+    "The user ID that referred you to us":"معرف المستخدم الذي اوصلك الينا",
+    "The platform you worked on":"المنصه التي عملت به",
+    "first_week"  : "الأسبوع الأول",
+    "second_week" : "الأسبوع الثاني",
+    "third_week"  : "الأسبوع الثالث",
+    "fourth_week" : "الأسبوع الرابع",
+    "first_day"  : "اليوم الأول",
+    "second_day" : "اليوم الثاني",
+    "third_day"  : "اليوم الثالث",
+    "fourth_day" : "اليوم الرابع",
+    "fifth_day"  : "اليوم الخامس",
+    "sixth_day"  : "اليوم السادس",
+    "seventh_day" : "اليوم السابع",
+    "device": "جهاز",
+    "staff": "الموظف",
+    "Owner": "المالك",
+    "Admin": "المشرف",
+    "Member": "عضو",
+    "Unknown": "غير معروف",
+    "family": "العائلة"
+    
 
-    
- 
-    
+
 
 
 

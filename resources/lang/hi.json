@@ -14,6 +14,8 @@
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
     "App": "एप्लिकेशन",
+    "Achievement Id": "उपलब्धि आईडी",
+    "Description Ar": "विवरण अरबी",
     "Email": "ईमेल",
     "action": "कार्रवाई",
     "All Managers": "सभी प्रबंधक",
@@ -812,7 +814,33 @@
     "transferred": "स्थानांतरित",
     "completed": "पूरा हुआ",
     "rejected": "अस्वीकृत",
-    "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत"
+    "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत",
+    "The user ID that referred you to us": "जिस उपयोगकर्ता आईडी ने आपको हमारी ओर भेजा",
+    "The platform you worked on": "जिस प्लेटफ़ॉर्म पर आपने काम किया",
+    "first_week"  : "पहला सप्ताह",
+    "second_week" : "दूसरा सप्ताह",
+    "third_week"  : "तीसरा सप्ताह",
+    "fourth_week" : "चौथा सप्ताह",
+    "first_day"  : "पहला दिन",
+    "second_day" : "दूसरा दिन",
+    "third_day"  : "तीसरा दिन",
+    "fourth_day" : "चौथा दिन",
+    "fifth_day"  : "पाँचवा दिन",
+    "sixth_day"  : "छठा दिन",
+    "seventh_day" : "सातवां दिन",
+    "Percentage target": "प्रतिशत लक्ष्य",
+    "Hours:": "घंटे:",
+    "Days:": "दिन:",
+    "Moments:": "क्षण:",
+    "Reels:": "वीडियो:",
+    "Save": "सहेजें",
+    "device": "डिवाइस",
+    "staff": "कर्मचारी",
+    "Owner": "मालिक",
+    "Admin": "प्रशासक",
+    "Member": "सदस्य",
+    "Unknown": "अज्ञात",
+    "family": "परिवार"
 
 
 
@@ -822,7 +850,8 @@
 
 
 
-    
+
+
 }
 
 
@@ -855,12 +884,12 @@
 
 
 
-    
- 
 
 
 
 
 
 
-    
+
+
+

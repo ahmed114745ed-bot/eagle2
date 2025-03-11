@@ -48,51 +48,124 @@ class MomentController extends MainController
 
         return $form;
     }
+
+
     protected function grid()
-    {
-        $grid = new Grid(new Moment());
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->disableIdFilter();
-            $filter->column('1/2', function ($filter) {
-                $filter->where(function ($query) {
-                    $input = $this->input;
+{
+    $grid = new Grid(new Moment());
 
-                    $query->whereHas('user', function ($query) use ($input) {
-                        $query->where('name', 'like', "%$input%")
-                        ->orWhere('uuid', 'like', "%$input%");
-                    });
-                }, __('User'))->placeholder(__('Search by name or UUID'));
-            });
-        });
-        $grid->model()->orderByDesc('created_at');
-        $grid->column('description', __('Description'));
-        $grid->column('user.name', __('user_id'))->display(function ($name) {
-            $uid = @$this->user->uuid;
+    // 🔹 **إضافة الفلتر للبحث عن المستخدم بالاسم أو UUID**
+    $grid->filter(function (Grid\Filter $filter) {
+        $filter->expand();
+        $filter->disableIdFilter();
+        $filter->column('1/2', function ($filter) {
+            $filter->where(function ($query) {
+                $input = $this->input;
 
-            return "$name <br>
-            <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+                $query->whereHas('user', function ($query) use ($input) {
+                    $query->where('name', 'like', "%$input%")
+                          ->orWhere('uuid', 'like', "%$input%");
+                });
+            }, __('User'))->placeholder(__('Search by name or UUID'));
         });
-        $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
-            $like = count(@$this->likes);
-            $commentNum = count(@$this->comments);
-            return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
-        });
-        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
-        $grid->column('img',__('Img'))->modal('show image' , function ($model, ) {
-            $img = $model->img;
-            if($img == null || $img == ''){
-                return 'No image founded';
+    });
+
+    $grid->model()->orderByDesc('created_at');
+
+    // 🔹 **عرض الوصف في مودال عند النقر عليه**
+    $grid->column('description', __('Description'))->display(function ($description) {
+        $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+        return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+    });
+
+    // 🔹 **عرض معلومات المستخدم**
+    $grid->column('user.name', __('User'))->display(function ($name) {
+        $uid = @$this->user->uuid;
+        $defaultImage = asset("images/businessman-icon.jpg");   
+        $avatarPath = @$this->user->avatar;    
+        $avatar = getImagePath($avatarPath) ?? $defaultImage;
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
             }
+        $userUrl = admin_url('users/' . $this->user_id); // رابط صفحة المستخدم في لوحة التحكم
+    
+        return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                    <div>
+                        <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>";
+    });
+    
 
-            $img = getDriverUrl().'/'.$img;
-            $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+    // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
+    $grid->column('comment_num', __('Stats'))->display(function () {
+        $likeCount = count(@$this->likes);
+        $commentCount = count(@$this->comments);
+        return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
+    });
 
-            return (new WidgetsTable([''], [[$img]]));
-        });
+    // 🔹 **عرض تاريخ الإنشاء**
+    $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
-        return $grid;
-    }
+    // 🔹 **عرض الصورة في مودال**
+    $grid->column('img', __('Image'))->display(function () {
+        $img = $this->img;
+        if (!$img) return 'No image found';
+
+        $imgUrl = getDriverUrl() . '/' . $img;
+        return "<a href='#' class='view-image' data-img='$imgUrl'><img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'></a>";
+    });
+
+    return $grid;
+}
+
+    // protected function grid()
+    // {
+    //     $grid = new Grid(new Moment());
+    //     $grid->filter(function (Grid\Filter $filter) {
+    //         $filter->expand();
+    //         $filter->disableIdFilter();
+    //         $filter->column('1/2', function ($filter) {
+    //             $filter->where(function ($query) {
+    //                 $input = $this->input;
+
+    //                 $query->whereHas('user', function ($query) use ($input) {
+    //                     $query->where('name', 'like', "%$input%")
+    //                     ->orWhere('uuid', 'like', "%$input%");
+    //                 });
+    //             }, __('User'))->placeholder(__('Search by name or UUID'));
+    //         });
+    //     });
+    //     $grid->model()->orderByDesc('created_at');
+    //     $grid->column('description', __('Description'));
+    //     $grid->column('user.name', __('user_id'))->display(function ($name) {
+    //         $uid = @$this->user->uuid;
+
+    //         return "$name <br>
+    //         <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+    //     });
+    //     $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
+    //         $like = count(@$this->likes);
+    //         $commentNum = count(@$this->comments);
+    //         return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
+    //     });
+    //     $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+    //     $grid->column('img',__('Img'))->modal('show image' , function ($model, ) {
+    //         $img = $model->img;
+    //         if($img == null || $img == ''){
+    //             return 'No image founded';
+    //         }
+
+    //         $img = getDriverUrl().'/'.$img;
+    //         $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+
+    //         return (new WidgetsTable([''], [[$img]]));
+    //     });
+
+    //     return $grid;
+    // }
 
     /**
      * Make a show builder.
