@@ -26,6 +26,8 @@ use Encore\Admin\Widgets\Tab;
 
 class  AgencySettingController extends MainController
 {
+
+    public $permission_name = 'agency-setting';
     public function index(Content $content)
     {
         $tab = new Tab();
@@ -37,9 +39,9 @@ class  AgencySettingController extends MainController
         $tab->add(__("targets"), view('admin.targets.targets', ["targets" => $targets]));
         $tab->add('Settings', "هنا هيكون حاجه جميله انتظر");
 
-        return $content
+        return parent::index($content
             ->header('Dynamic Tabs Page')
             ->description('Tabs displaying dynamic data.')
-            ->body($tab);
+            ->body($tab));
     }
 }

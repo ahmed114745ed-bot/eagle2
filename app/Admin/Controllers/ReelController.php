@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -76,10 +77,8 @@ class ReelController extends MainController
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
         
-            // الحصول على الصورة الفعلية أو الافتراضية
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             
-            // التحقق من وجود الصورة
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
@@ -111,10 +110,32 @@ class ReelController extends MainController
         });
 
         $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 30 ? '...' : '');
+            $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
             
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
+
+        Admin::script("
+        $(document).ready(function () {
+            $('.view-description').click(function (e) {
+                e.preventDefault();
+
+                var description = $(this).data('description');
+
+                $('#modalDescriptionTitle').text('Full Description');
+                $('#modalDescriptionContent').text(description);
+
+                $('#descriptionModal').modal('show');
+            });
+
+            $('.view-image').click(function (e) {
+                e.preventDefault();
+                var imgSrc = $(this).data('img');
+                $('#modalImageContent').attr('src', imgSrc);
+                $('#imageModal').modal('show');
+            });
+        }); ");
+    
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();

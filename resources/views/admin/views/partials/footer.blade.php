@@ -14,7 +14,11 @@
 
     </div>
     <!-- 🔹 مودال عرض الوصف -->
-
+<style>
+    .modal-title{
+        color: var(--text-primary-color);
+    }
+</style>
         <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document" style="max-width: 800px; min-height: 400px;">
             <div class="modal-content" style="background-color: var(--box-background-color); color: var(--text-primary-color); height:100%;">
