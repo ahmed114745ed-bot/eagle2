@@ -175,6 +175,13 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+
+        $router->resource('free-users', 'FreeUserController', [
+            'names' => [
+                'index' => 'users',
+                'show' => 'users.show'
+            ]
+        ]);
         $router->post('send-request-invite-code', 'UserController@request_invite_code');
         $router->resource('user-statistics', 'UserStatisticsController');
         $router->resource('profiles', 'ProfileController');
