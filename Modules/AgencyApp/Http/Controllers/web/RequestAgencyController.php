@@ -28,7 +28,7 @@ class RequestAgencyController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('request-agencies'))
+            ->title(trans('Request agencies'))
             ->body($this->grid()));
     }
 
@@ -42,7 +42,7 @@ class RequestAgencyController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('request-agencies'))
+            ->title(trans('Request agencies'))
             ->body($this->detail($id)));
     }
 
@@ -56,14 +56,14 @@ class RequestAgencyController extends MainController
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title(trans('request-agencies'))
+            ->title(trans('Request agencies'))
             ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('request-agencies'))
+            ->title(trans('Request agencies'))
             ->body($this->form()));
     }
 
@@ -112,7 +112,7 @@ class RequestAgencyController extends MainController
             ";
         });
        
-        $grid->column('name', __(' agency'))->display(function () {
+        $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';
             $path = @$this->img;
             $defaultImage = asset("images/icon-agency.jpg");
@@ -171,8 +171,8 @@ class RequestAgencyController extends MainController
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('additionalInfo.host', 'host');
-        $grid->column('additionalInfo.user.name', 'The user ID that referred you to us')->display(function ($name) {
+        $grid->column('additionalInfo.host', __('host'));
+        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
             $uid = @$this->additionalInfo->user->uuid;
             $path = @$this?->additionalInfo->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -197,7 +197,7 @@ class RequestAgencyController extends MainController
                 </div>
             ";
         });
-        $grid->column('additionalInfo.history_app_info', 'The platform you worked on');
+        $grid->column('additionalInfo.history_app_info', __('The platform you worked on'));
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableEdit();
