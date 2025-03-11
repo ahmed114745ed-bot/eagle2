@@ -1669,6 +1669,8 @@
     "owner room id":"مالك الغرفة",
     "vips dedicate" : "أهداء الارستقراطيه",
     "user Active":" نشاط المستخدمين",
+    "Achievement Id" : "معرف الانجاز",
+    "Description Ar" : "الوصف بالعربية",
     "Host":"وكيل مضيفين",
     "Host Agent":"وكيل مضيفين",
     "Shipping Agent":"وكيل شحن",
@@ -1715,7 +1717,13 @@
     "sixth_day"  : "اليوم السادس",
     "seventh_day" : "اليوم السابع",
     "device": "جهاز",
-    "staff": "الموظف"
+    "staff": "الموظف",
+    "Owner": "المالك",
+    "Admin": "المشرف",
+    "Member": "عضو",
+    "Unknown": "غير معروف",
+    "family": "العائلة"
+    
 
 
 

@@ -1,6 +1,6 @@
 {
 
-  
+
 
   "Id": "Kimlik",
   "ID": "ID",
@@ -11,6 +11,7 @@
   "Admin": "Yönetici",
   "Users": "Kullanıcılar",
   "URI": "URI",
+  "Achievement Id" : "Başarı Kimliği",
   "Roles": "Roller",
   "Permission": "İzin",
   "Menu": "Menü",
@@ -225,105 +226,105 @@
   "image Id": "Resim Kimliği",
 
 
-"to many send": "Çok fazla istek",       
-"code is sent to your phone": "Kod telefonunuza gönderildi",         
-"logged in successfully": "Başarıyla giriş yapıldı",                  
+"to many send": "Çok fazla istek",
+"code is sent to your phone": "Kod telefonunuza gönderildi",
+"logged in successfully": "Başarıyla giriş yapıldı",
 "credentials does`t match": "Kimlik bilgileri uyuşmuyor",
-"phone number not register with your account": "Telefon numarası hesabınızla kayıtlı değil",        
-"this phone not verified": "Bu telefon onaylanmamış",               
-"reset successful": "Sıfırlama başarılı",       
-"email already taken": "E posta zaten alınmış",      
-"you are blocked": "Engellendiniz",     
+"phone number not register with your account": "Telefon numarası hesabınızla kayıtlı değil",
+"this phone not verified": "Bu telefon onaylanmamış",
+"reset successful": "Sıfırlama başarılı",
+"email already taken": "E posta zaten alınmış",
+"you are blocked": "Engellendiniz",
 "missing params": "Eksik parametreler",
 "invalid credential": "Geçersiz kimlik bilgisi",
 "Un expected error": "Beklenmedik hata",
-"agency not found": "Ajans bulunamadı",               
+"agency not found": "Ajans bulunamadı",
 "you are already under agency": "Zaten bir ajans altındasınız",
-"you have +5 requests ,not allowed to request other more": " +5 isteğiniz var, diğerlerini istemenize izin verilmiyor",       
-"request sent": "İstek gönderildi",       
+"you have +5 requests ,not allowed to request other more": " +5 isteğiniz var, diğerlerini istemenize izin verilmiyor",
+"request sent": "İstek gönderildi",
 "done": "Tamamlandı",
-"fail": "Başarısız",    
+"fail": "Başarısız",
 "not found": "Bulunamadı",
 "low balance": "Düşük bakiye",
 "used it before": "Daha önce kullandınız",
 "ok": "Tamam",
 "un_auth": "Yetkisiz",
 "Missing parameters": "Eksik parametreler",
-"Empty successfully": "Başarıyla boşaltıldı",       
+"Empty successfully": "Başarıyla boşaltıldı",
 "Empty failed": "Boşaltılamadı",
-"config returned success": "Yapılandırma başarıyla döndü",  
+"config returned success": "Yapılandırma başarıyla döndü",
 "anonymous icon": "Anonim simge",
 "user_id , room_id are required": "Kullanıcı kimliği ve oda kimliği gereklidir",
 "time is required": "Zaman gerekli",
 "Insufficient balance, please go to recharge!": "Yetersiz bakiye, lütfen yenilemeye gidiniz!",
-"already have family": "Zaten bir aileniz var",      
+"already have family": "Zaten bir aileniz var",
 "created": "Oluşturuldu",
 "not allowed": "İzin verilmedi",
 "success": "Başarılı",
-"failed": "Başarısız",  
+"failed": "Başarısız",
 "already have one": "Zaten bir tane var",
 "family not found": "Aile bulunamadı",
-"already joined": "Zaten katıldınız",      
+"already joined": "Zaten katıldınız",
 "family is full members": "Aile üye doldu",
 "user already joined to other family": "Kullanıcı zaten başka bir aileye katıldı",
 "invalid data": "Geçersiz veri",
-"full admins": "Dolu yöneticiler",  
+"full admins": "Dolu yöneticiler",
 "full members": "Dolu üyeler",
 "try to remove your self": "Kendinizi kaldırmaya çalışın",
 "cant follow your self": "Kendinizi takip edemezsiniz",
 "this user not found": "Bu kullanıcı bulunamadı",
-"follow done": "Takip tamamlandı",       
+"follow done": "Takip tamamlandı",
 "unFollow done": "Takibi kaldırıldı",
 "The number of gifts cannot be less than 1": "Hediyelerin sayısı 1'den küçük olamaz",
 "Gift does not exist or has been removed": "Hediye mevcut değil veya kaldırılmış",
 "room does not exist": "Oda mevcut değil",
 "you are not in this room": "Bu odada değilsiniz",
-"to send this gift": "Bu hediyeyi göndermek için", 
+"to send this gift": "Bu hediyeyi göndermek için",
 "Gift delivery failed": "Hediye teslimatı başarısız oldu",
 "Gift sent successfully": "Hediye başarıyla gönderildi",
-"not found params (group_chat) in config dashboard": "Yapılandırma panosunda params (grup_chat) bulunamadı",       
+"not found params (group_chat) in config dashboard": "Yapılandırma panosunda params (grup_chat) bulunamadı",
 "created done": "Başarıyla oluşturuldu",
 "error": "Hata",
 "balance low": "Düşük bakiye",
 "has wapel": "Wapel var",
 "no wapel": "Wapel yok",
 "type is required": "Tür gerekli",
-"un supported payment gateway": "Desteklenmeyen ödeme yolu", 
+"un supported payment gateway": "Desteklenmeyen ödeme yolu",
 "item not found or not for sale": "Öğe bulunamadı veya satılmıyor",
 "receiver user not found": "Alıcı kullanıcı bulunamadı",
 "you have this item in your pack no need to buy it": "Bu öğeyi zaten setinizde var satın almana gerek yok",
 "success process": "Başarılı işlem",
 "user has this item in his pack no need to send it": "Kullanıcının setinde bu öğe var, göndermene gerek yok",
 "an error occurred please try again later!": "Bir hata oluştu lütfen tekrar deneyin!",
-"The service time cannot be empty or less than the current time": "Servistime boş veya şuanki zamandan az olamaz",  
+"The service time cannot be empty or less than the current time": "Servistime boş veya şuanki zamandan az olamaz",
 "Serving Quantity Wrong": "Servis miktarı yanlış",
 "Great master skill information is wrong": "Büyük usta bilgisi yanlış",
 "master is currently not accepting orders": "Usta şuanda sipariş kabul etmiyor",
 "Can`t place an order on myself": "Kendi üstüme sipariş koyamam",
 "wrong price": "Yanlış fiyat"
-, "Failed to set administrator": "Yönetici ayarlamada başarısız oldu"     
-, "This user is not an administrator of this room": "Bu kullanıcı bu odanın yöneticisi değil"      
+, "Failed to set administrator": "Yönetici ayarlamada başarısız oldu"
+, "This user is not an administrator of this room": "Bu kullanıcı bu odanın yöneticisi değil"
 , "Cancel administrator successfully": "Yönetici iptal edildi"
 , "Failed to cancel administrator": "Yöneticiyi iptal etme başarısız oldu"
 , "Illegal operation": "Yasadışı işlem",
-"This user is already on the ban list": "Bu kullanıcı zaten yasaklı listededir"      
-, "Succeeded adding writing ban for": "Şu kullanıcı için yazma yasağı eklendi"          
-, "Failed to add writing ban": "Yazma yasağı ekleme başarısız oldu"       
+"This user is already on the ban list": "Bu kullanıcı zaten yasaklı listededir"
+, "Succeeded adding writing ban for": "Şu kullanıcı için yazma yasağı eklendi"
+, "Failed to add writing ban": "Yazma yasağı ekleme başarısız oldu"
 , "room closed": "Oda kapalı"
 , "already exist": "Zaten var"
-, "not found params (cost_request_backround) in config dashboard": "Yapılandırma panosunda params (cost_request_backround) bulunamadı"           
+, "not found params (cost_request_backround) in config dashboard": "Yapılandırma panosunda params (cost_request_backround) bulunamadı"
 ,  "Yellow banner Done": "Sarı şerit başarıyla eklendi"
-, "No data": "Veri yok"       
+, "No data": "Veri yok"
 , "Parameter exception!": "Parametre hatası!"
 , "Already applied": "Zaten uygulandı"
 , "Added successfully": "Başarıyla eklendi"
 , "add failed": "Ekleme başarısız"
-, "You have joined other guilds": "Diğer loncalara katılmışsın"       
-, "Failed to add, please try again": "Ekleme başarısız, lütfen tekrar deneyin"       
+, "You have joined other guilds": "Diğer loncalara katılmışsın"
+, "Failed to add, please try again": "Ekleme başarısız, lütfen tekrar deneyin"
 , "logged out": "Oturum kapandı"
 , "in black list": "Siyah listenin içinde"
-, "please select type": "Lütfen tür seçin"    
-, "type not found": "Tür bulunamadı" 
+, "please select type": "Lütfen tür seçin"
+, "type not found": "Tür bulunamadı"
 , "Parameter error": "Parametre hatası",
 
 
@@ -345,18 +346,18 @@
 "This slot has been locked": "Bu yuva kilitlendi",
 "There is a user on the mic": "Mikrofonda kullanıcı var",
 "Please enter this room first": "Lütfen önce bu odaya girin",
-  "You do not have this permission yet": "Henüz bu izne sahip değilsiniz",          
-  "Success on the mic": "Mikrofon başarıyla elde edildi",   
-  "Failed to mic": "Mikrofona erişilemedi",   
-  "You have been blocked by the other party": "Karşı tarafın tarafından engellenmişsiniz",         
-  "Password is incorrect, please re-enter": "Parola yanlış, lütfen yeniden girin",   
-  "you dont have permission": "İzne sahip değilsin",   
-  "Successfully locked the microphone position": "Mikrofon konumu başarıyla kilitlendi",  
+  "You do not have this permission yet": "Henüz bu izne sahip değilsiniz",
+  "Success on the mic": "Mikrofon başarıyla elde edildi",
+  "Failed to mic": "Mikrofona erişilemedi",
+  "You have been blocked by the other party": "Karşı tarafın tarafından engellenmişsiniz",
+  "Password is incorrect, please re-enter": "Parola yanlış, lütfen yeniden girin",
+  "you dont have permission": "İzne sahip değilsin",
+  "Successfully locked the microphone position": "Mikrofon konumu başarıyla kilitlendi",
   "Failed to lock microphone": "Mikrofon kilidi açılamadı",
   "Successfully unlocked the microphone": "Mikrofon başarıyla kilidi açıldı",
-  "Failed to unlock microphone": "Mikrofon kilidi açılamadı",  
-  "require user_id and owner_id": "Kullanıcı kimliği ve sahip kimliği gerektirir",     
-  "The user is already muted, please do not repeat the settings": "Kullanıcı zaten susturulmuş, lütfen ayarları tekrarlamayın",   
+  "Failed to unlock microphone": "Mikrofon kilidi açılamadı",
+  "require user_id and owner_id": "Kullanıcı kimliği ve sahip kimliği gerektirir",
+  "The user is already muted, please do not repeat the settings": "Kullanıcı zaten susturulmuş, lütfen ayarları tekrarlamayın",
   "Successfully unmuted": "Susturma başarıyla kaldırıldı",
   "Unmute failed": "Susturma kaldırılamadı",
   "joinSacses": "İstek gönderildi",
@@ -1545,6 +1546,7 @@
   "Target type": "Hedef Türü",
   "ar_description": "Arapça Açıklama",
   "en_description": "İngilizce Açıklama",
+  "Description Ar" : "Açıklama Arapça",
   "default": "Varsayılan",
   "week": "Hafta",
   "monthly": "Aylık",
@@ -1690,7 +1692,12 @@
     "Reels:": "Videolar:",
     "Save": "Kaydet",
     "device": "Cihaz",
-    "staff": "Personel"
+    "staff": "Personel",
+    "Owner": "Sahip",
+    "Admin": "Yönetici",
+    "Member": "Üye",
+    "Unknown": "Bilinmeyen",
+    "family": "Aile"
 
 
 
@@ -1702,6 +1709,6 @@
 
 
 
-    
+
 
 }
