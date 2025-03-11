@@ -201,6 +201,12 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
     
+        Log::info('agora webhook triggered', [
+            $eventType,
+            $userId,
+            $roomId,
+        ]);
+
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
                   
@@ -215,8 +221,7 @@ class EnteranceRoomServices
         if (in_array($eventType, [101, 103])) {
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
-        } elseif ($eventType == 'room_logout' && $room->uid == $user->now_room_uid) {
-            $user->now_room_uid = 0;
+        
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
