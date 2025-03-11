@@ -201,10 +201,10 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
     
-        Log::info('agora data', [
-            $eventType,
-            $userId,
-            $roomId,
+        Log::info('Agora data received', [
+            'event_type' => $eventType,
+            'user_id' => $userId,
+            'room_id' => $roomId,
         ]);
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
