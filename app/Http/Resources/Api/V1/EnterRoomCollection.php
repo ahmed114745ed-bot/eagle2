@@ -100,6 +100,8 @@ class EnterRoomCollection extends JsonResource
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",
             'cp_indexs'         => $indices,
+            'type'         =>  $this->type ?? '',
+             'is_live' => (bool) ($this->is_live ?? false),
             'room_keys' => [
                 "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
             ],
