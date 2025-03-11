@@ -223,7 +223,14 @@ class EnteranceRoomServices
            
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                 $room->update(['is_live' => false]);
+                Log::info('agora webhook triggered', [
+                    $room->uid,
+                    $user->id
+                ]);
             }
+            Log::info('not if', [
+             
+            ]);
             
         }
     
@@ -394,7 +401,7 @@ class EnteranceRoomServices
 
     public function enterRoom($user, $request, $room_pass, $owner_id)
     {
-
+        
         if ($request->type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
