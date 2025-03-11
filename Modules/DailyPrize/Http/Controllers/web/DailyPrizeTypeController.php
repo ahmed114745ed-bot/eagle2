@@ -70,7 +70,18 @@ class DailyPrizeTypeController extends MainController
     {
         $grid = new Grid(new DailyGiftType());
 
-        $grid->column('type', __('Type'));
+        // $grid->column('type', __('Type'));
+        $grid->column('type', __('Type'))
+        ->display(function ($type) {
+            $weeks = [
+                1 => __('first_week'),
+                2 => __('second_week'),
+                3 => __('third_week'),
+                4 => __('fourth_week'),
+            ];
+            return $weeks[$type] ?? $type; // عرض النص بدلاً من الرقم
+        });
+
         $grid->column( __('procedures'))->display(function () {
             $url1 = url('admin/daily-gifts/'.$this->type);
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('create')."</a>";
