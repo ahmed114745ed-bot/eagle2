@@ -183,7 +183,7 @@ class BanController extends MainController
             $avatarPath = $this->staff->avatar ?? null;
             $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
             
-            $adminUrl = admin_url('admins/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
+            $adminUrl = admin_url('admin/auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
         
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
