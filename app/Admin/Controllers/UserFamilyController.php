@@ -7,6 +7,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
+use App\Models\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -22,7 +23,6 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -38,6 +38,7 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use App\Admin\Widgets\Table as TableWidget;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
@@ -134,15 +135,15 @@ class UserFamilyController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-       // $grid->model()->with("ownerRoom")->whereHas('family')->whereHas('familyType', fn($q) => $q->where('status',1))->orderByDesc('id');
-       $grid->model()
-       ->select('users.*') // Select all user fields
-       ->leftJoin('family_user as fu', 'users.id', '=', 'fu.user_id') // Join familyType relation
-       ->whereHas('family')
-       ->whereHas('familyType', fn($q) => $q->where('status', 1))
-       ->orderByDesc('fu.user_type') // Sort by user_type from family_users
-       ->orderByDesc('users.id');
-        
+        // $grid->model()->with("ownerRoom")->whereHas('family')->whereHas('familyType', fn($q) => $q->where('status',1))->orderByDesc('id');
+        $grid->model()
+            ->select('users.*') // Select all user fields
+            ->leftJoin('family_user as fu', 'users.id', '=', 'fu.user_id') // Join familyType relation
+            ->whereHas('family')
+            ->whereHas('familyType', fn($q) => $q->where('status', 1))
+            ->orderByDesc('fu.user_type') // Sort by user_type from family_users
+            ->orderByDesc('users.id');
+
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -150,7 +151,7 @@ class UserFamilyController extends MainController
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
-                $filter->column(1/2, function ($filter) {
+                $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
@@ -211,37 +212,65 @@ class UserFamilyController extends MainController
 
         $grid->column('phone', __('Phone'));
 
-        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
-            $agency =  Agency::query()->find(@$this->agency_id);
-            $path = @$agency?->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+        // $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
+        //     $agency =  Agency::query()->find(@$this->agency_id);
+        //     $path = @$agency?->img;
+        //     $defaultImage = asset("images/icon-agency.jpg");
+        //     $url = getImagePath($path) ?? $defaultImage;
 
-                 // Check if the image exists
-                 if (!isImageExists($url)) {
-                     $url = $defaultImage;
-                 }
+        //     // Check if the image exists
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
+        //     $results = [
+        //         __('name') => @$agency->owner->name ?? '',
+        //         __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
+
+        //     ];
+
+        //     return new Table([__('Field Name'), __('Value')], $results);
+        // });
+
+        $grid->column('family_id', __('family'))->modal('family', function () {
+            $agency =  Family::query()->find(@$this->family_id);
+            $path = @$agency?->image;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             $results = [
-             __('name') => @$agency->owner->name ??'',
-             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+                __('name') => @$agency->owner->name ?? '',
+                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
 
-         ];
+            ];
 
-         return new Table([__('Field Name'), __('Value')], $results);
-         });
+            return new Table([__('Field Name'), __('Value')], $results);
+        });
+
+        // $grid->column('familyType.', __('family'))->display(function ($path) {
+        //     $defaultImage = asset("images/businessman-icon.jpg");
+        //     $url = getImagePath($path) ?? $defaultImage;
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
+        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
+        // });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
                 $target =
                     [
-                        'id' =>$target->id ,
-                        'add_month' => $target->add_month.'/'. $target->add_year,
+                        'id' => $target->id,
+                        'add_month' => $target->add_month . '/' . $target->add_year,
 
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
-                        'user_hours'=> $target->user_hours,
+                        'user_hours' => $target->user_hours,
                         'user_days' => $target->user_days,
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
@@ -255,7 +284,7 @@ class UserFamilyController extends MainController
             return new TableWidget(
                 [
                     'ID',
-                    __('month') .'/'.__('year') ,
+                    __('month') . '/' . __('year'),
                     __('usd') . ' ' . __('deserved'),
                     __('agency share') . '(%)',
                     __('user diamonds'),
@@ -751,7 +780,6 @@ class UserFamilyController extends MainController
                         break;
                 }
             }
-
         });
 
 
