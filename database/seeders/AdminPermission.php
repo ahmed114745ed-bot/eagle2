@@ -102,7 +102,8 @@ class AdminPermission extends Seeder
             'agent-home',
             'updates_group_chat',
             'agora-zego',
-            'uuid-dedicate'
+            'uuid-dedicate',
+            'agency-setting'
 
 
 
@@ -131,7 +132,7 @@ class AdminPermission extends Seeder
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting'],
             'agent' => ['agent-user', 'agent-request', 'agent-target','user-agent-target','charges-agency','agent-home'],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
