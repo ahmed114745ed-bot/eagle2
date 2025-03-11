@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
+use App\Models\Admin;
 use App\Models\Ticket;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -113,7 +114,26 @@ class TicketController extends MainController
             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
-        
+        Admin::script("
+            $(document).ready(function () {
+                $('.view-description').click(function (e) {
+                    e.preventDefault();
+
+                    var description = $(this).data('description');
+
+                    $('#modalDescriptionTitle').text('Full Description');
+                    $('#modalDescriptionContent').text(description);
+
+                    $('#descriptionModal').modal('show');
+                });
+
+                $('.view-image').click(function (e) {
+                    e.preventDefault();
+                    var imgSrc = $(this).data('img');
+                    $('#modalImageContent').attr('src', imgSrc);
+                    $('#imageModal').modal('show');
+                });
+            }); ");
     
         $grid->column('img',__ ('img'))->image ('',30);
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
