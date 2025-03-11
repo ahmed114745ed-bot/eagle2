@@ -429,7 +429,13 @@
      "fourth_day" : "Fourth Day",
      "fifth_day"  : "Fifth Day",
      "sixth_day"  : "Sixth Day",
-     "seventh_day" : "Seventh Day"
+     "seventh_day" : "Seventh Day",
+     "ip": "IP",
+     "device": "Device",
+     "staff": "Staff"
+
+
+
 
 
 }
