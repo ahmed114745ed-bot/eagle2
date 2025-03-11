@@ -76,10 +76,16 @@ class WeeklyStarController extends Controller
                                      ->orderBy('start_date', 'desc')
                                      ->first();
 
+        $previousWeeklyEvent = WeeklyStar::where('start_date', '<', $weeklyEvent->start_date)
+        ->with('gifts')
+        ->orderBy('start_date', 'desc')
+        ->first();
+
         $data = [
             'winner_previous_event' => TopPreviousResource::collection($winners),
             'weekly_event' => new WeeklyEventResource($weeklyEvent,'weekly_star'),
             'Next_event_gifts' => $nextWeeklyEvent != null ? weeklyGiftResource::collection($nextWeeklyEvent?->gifts) : null,
+            'Previous_event_gifts' => $previousWeeklyEvent != null ? weeklyGiftResource::collection($previousWeeklyEvent?->gifts) : null,
         ];
         return Common::apiResponse(1, '', $data);
     }
