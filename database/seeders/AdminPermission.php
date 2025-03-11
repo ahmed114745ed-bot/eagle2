@@ -103,7 +103,10 @@ class AdminPermission extends Seeder
             'updates_group_chat',
             'agora-zego',
             'uuid-dedicate',
-            'agency-setting'
+            'agency-setting',
+            'free-users',
+            'users-family',
+            
 
 
 
@@ -125,7 +128,7 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target',],
+            'user' => ['users', 'trashed-account-user', 'user-target','free-users'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips'],
             'moment' => ['moment',],
@@ -158,7 +161,8 @@ class AdminPermission extends Seeder
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
             'bans' => ['bans'],
             'update-group-chat' => ['updates_group_chat'],
-            'agora-zego' => ['agora-zego']
+            'agora-zego' => ['agora-zego'],
+            'users-family' => ['users-family'],
           
 
         ];

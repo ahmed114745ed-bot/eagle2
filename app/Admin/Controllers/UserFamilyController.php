@@ -42,9 +42,9 @@ use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
 
-class FreeUserController extends MainController
+class UserFamilyController extends MainController
 {
-    public $permission_name = 'free-users';
+    public $permission_name = 'users-family';
     public $hiddenColumns = [
         'is_host',
         'status',
@@ -122,6 +122,9 @@ class FreeUserController extends MainController
         $stop_invite_code = settings()->get('stop_invite_code');
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
+
+        //        $form->collapsable();
+
         return (new Box(
             title: __('admin.Actions'),
             content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary',])),
@@ -131,23 +134,20 @@ class FreeUserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->with("ownerRoom");
-
-        $grid->model()->where('type_user',0)->where('is_host',0)->where(function ($query) {
-            $query->whereNull('family_id')->orWhere('family_id',0);
-        });
-
-        // if (request()->online == 1) {
-        //     $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp);
-        // } else if ($haveCoins) {
-        //     $grid->model()->where('di', '>', 0)->orderByDesc('di');
-        // } else {
-            $grid->model()->orderByDesc('id');
-        // }
+       // $grid->model()->with("ownerRoom")->whereHas('family')->whereHas('familyType', fn($q) => $q->where('status',1))->orderByDesc('id');
+       $grid->model()
+       ->select('users.*') // Select all user fields
+       ->leftJoin('family_user as fu', 'users.id', '=', 'fu.user_id') // Join familyType relation
+       ->whereHas('family')
+       ->whereHas('familyType', fn($q) => $q->where('status', 1))
+       ->orderByDesc('fu.user_type') // Sort by user_type from family_users
+       ->orderByDesc('users.id');
+        
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
+                $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
                 $filter->column(1/2, function ($filter) {
@@ -167,8 +167,8 @@ class FreeUserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid 
-                ? __("uuid") . ' : ' . $this->uuid 
+            return $this->uuid == $this->original_uuid
+                ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
@@ -210,14 +210,34 @@ class FreeUserController extends MainController
         });
 
         $grid->column('phone', __('Phone'));
+
+        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
+            $agency =  Agency::query()->find(@$this->agency_id);
+            $path = @$agency?->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                 // Check if the image exists
+                 if (!isImageExists($url)) {
+                     $url = $defaultImage;
+                 }
+            $results = [
+             __('name') => @$agency->owner->name ??'',
+             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+
+         ];
+
+         return new Table([__('Field Name'), __('Value')], $results);
+         });
+
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = 
+                $target =
                     [
                         'id' =>$target->id ,
                         'add_month' => $target->add_month.'/'. $target->add_year,
-                       
+
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
@@ -226,7 +246,7 @@ class FreeUserController extends MainController
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
                     ];
-               
+
 
 
                 return $target;
@@ -302,8 +322,6 @@ class FreeUserController extends MainController
             });
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });
-
-
         $grid->disableExport();
         $appEnv = config('app.env');
         if ($appEnv == 'production') $grid->disableCreateButton();
@@ -474,8 +492,6 @@ class FreeUserController extends MainController
 
     protected function vipList($id)
     {
-        // UserVip::query ()->where ('expire','!=',0)->where ('expire','<',time ())->delete ();
-
         $grid = new Grid(new UserVip());
         $grid->model()->where('user_id', $id);
         $grid->id('ID');
@@ -565,9 +581,9 @@ class FreeUserController extends MainController
 
     public function update($id)
     {
-
         unset(request()['level']);
         unset(request()['worth']);
+
 
         return $this->form()->update($id);
     }
@@ -671,13 +687,11 @@ class FreeUserController extends MainController
             $form->number('salary', __('salary'))->disable();
         }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
-
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-    
-
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
+
         $form->select('type_user', trans('User Type'))->options([
             $form->model()->type_user => $form->model()->type_user,
             0                         => 'مستخدم',
@@ -689,7 +703,6 @@ class FreeUserController extends MainController
 
         ])->default(0);
 
-       
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -698,7 +711,6 @@ class FreeUserController extends MainController
             });
         </script>');
         }
-
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
             $model     = $form->model();
@@ -745,8 +757,6 @@ class FreeUserController extends MainController
 
         return $form;
     }
-
-   
 
 
     public function request_invite_code(Request $request)
