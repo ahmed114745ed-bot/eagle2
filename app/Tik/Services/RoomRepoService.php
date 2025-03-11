@@ -2,6 +2,8 @@
 
 namespace App\Tik\Services;
 
+
+use Illuminate\Support\Facades\Schema;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -155,7 +157,11 @@ class RoomRepoService
 
         $user->now_room_uid = 0;
         $user->save();
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+            $room->update(['is_live' => false]);
 
+          
+        }
         /* if ($room->count_room_socket > 0) {
             $room->count_room_socket -= 1;
         } else {

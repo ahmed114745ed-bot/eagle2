@@ -192,7 +192,7 @@ class EnteranceRoomServices
     {
     
         $data = $request->all(); 
-    
+      
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
@@ -201,11 +201,11 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
     
-        Log::info('Agora data received', [
-            'event_type' => $eventType,
-            'user_id' => $userId,
-            'room_id' => $roomId,
-        ]);
+        // Log::info('Agora data received', [
+        //     'event_type' => $eventType,
+        //     'user_id' => $userId,
+        //     'room_id' => $roomId,
+        // ]);
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
@@ -215,7 +215,7 @@ class EnteranceRoomServices
         if (!$room || !$user) {
             return response()->json(['status' => 'Room or user not found'], 404);
         }
-    
+      
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
     
         if (in_array($eventType, [101, 103])) {
@@ -228,14 +228,10 @@ class EnteranceRoomServices
            
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                 $room->update(['is_live' => false]);
-                Log::info('agora webhook triggered', [
-                    $room->uid,
-                    $user->id
-                ]);
+
+              
             }
-            Log::info('not if', [
-             
-            ]);
+          
             
         }
     
