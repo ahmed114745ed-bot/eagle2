@@ -118,13 +118,7 @@ class ReportRealsController extends AdminController
         });
     }); ");
 
-    Admin::script("
-        $('head').append(`<style>
-        .modal-title{
-        color: white;
-            }
-        </style>`);
-   ");
+
 
     $grid->column(__('redirect_button'))->display(function () {
         $redirectRoute = 'delete-reel';

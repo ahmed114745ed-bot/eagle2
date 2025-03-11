@@ -158,13 +158,7 @@ class ReportMomentController extends MainController
                     });
                 }); ");
 
-                Admin::script("
-                    $('head').append(`<style>
-                    .modal-title{
-                    color: white;
-                        }
-                    </style>`);
-            ");
+            
              $grid->column('type', __('Type'));
 
              $grid->column(__('redirect_button'))->display(function () {

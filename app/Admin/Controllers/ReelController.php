@@ -135,13 +135,7 @@ class ReelController extends MainController
                 $('#imageModal').modal('show');
             });
         }); ");
-        Admin::script("
-                $('head').append(`<style>
-                .modal-title{
-                color: white;
-                    }
-                </style>`);
-        ");
+    
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();
