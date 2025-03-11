@@ -573,6 +573,11 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'id');
     }
 
+    public function familyType()
+    {
+        return $this->hasOne(FamilyUser::class, 'user_id', 'id');
+    }
+
 
     public function tags()
     {
