@@ -51,7 +51,7 @@ class RoomResource extends JsonResource
             'is_party' => $isParty,
             'room_background' => $this->final_room_image,
             'room_type' => $this->type,
-            'is_live' => $this->is_live,
+            'is_live' => (bool)$this->is_live,
             'country' => $this->country
                 ? new CountryResource($this->country)
                 : [
