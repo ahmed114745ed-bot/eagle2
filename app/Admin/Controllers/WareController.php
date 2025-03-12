@@ -10,10 +10,11 @@ use App\Helpers\Common;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
 use Illuminate\Support\Facades\Session;
+use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
 
 class WareController extends MainController
 {
@@ -162,6 +163,16 @@ class WareController extends MainController
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $admin = Auth::user();
+            $created = AdminModel::find($model->created_by);
+
+           // dd( $admin ,$created);
+            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+                $actions->disableDelete();
+            }
+        });
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens

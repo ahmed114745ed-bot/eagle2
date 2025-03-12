@@ -45,12 +45,12 @@ class Gift extends Model
     {
         parent::boot();
 
-        static::deleting(function ($gift) {
+        // static::deleting(function ($gift) {
 
-            if (auth()->user() && $gift->creator?->isRole('developer')) {
-                abort(403);
-            }
-        });
+        //     if (auth()->user() && $gift->creator?->isRole('developer')) {
+        //         abort(403);
+        //     }
+        // });
     }
 
     public function creator(){

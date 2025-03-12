@@ -58,12 +58,12 @@ class Banner extends Model
             unset($model->publish);
         });
 
-        static::deleting(function ($banner) {
+        // static::deleting(function ($banner) {
 
-            if (auth()->user() && $banner->creator?->isRole('developer')) {
-                abort(403);
-            }
-        });
+        //     if (auth()->user() && $banner->creator?->isRole('developer')) {
+        //         abort(403);
+        //     }
+        // });
 
 
     }

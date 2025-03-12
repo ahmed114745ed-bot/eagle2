@@ -7,11 +7,12 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-//use Encore\Admin\Admin;
 use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
 
 class GiftController extends MainController
 {
@@ -119,6 +120,16 @@ class GiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $admin = Auth::user();
+            $created = AdminModel::find($model->created_by);
+
+           // dd( $admin ,$created);
+            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+                $actions->disableDelete();
+            }
+        });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');

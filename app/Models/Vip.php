@@ -26,11 +26,11 @@ class Vip extends Model
     {
         parent::boot();
 
-        static::deleting(function ($vip) {
-            if (auth()->user() && $vip->creator?->isRole('developer')) {
-                abort(403);
-            }
-        });
+        // static::deleting(function ($vip) {
+        //     if (auth()->user() && $vip->creator?->isRole('developer')) {
+        //         abort(403);
+        //     }
+        // });
     }
 
     public function creator(){

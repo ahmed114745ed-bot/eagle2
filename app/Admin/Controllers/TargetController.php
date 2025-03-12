@@ -3,13 +3,13 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Target;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Http\Request as HttpRequest;
+use App\Services\AppFeatureService;
+use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Request;
 
 class TargetController extends MainController
@@ -121,6 +121,16 @@ class TargetController extends MainController
         })->editable();
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $admin = Auth::user();
+            $created = AdminModel::find($model->created_by);
+
+           // dd( $admin ,$created);
+            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+                $actions->disableDelete();
+            }
+        });
         return $grid;
     }
 

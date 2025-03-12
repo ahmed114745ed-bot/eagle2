@@ -5,10 +5,13 @@ namespace App\Admin\Controllers;
 use App\Helpers\Common;
 use App\Http\Services\BannerServices;
 use App\Models\Banner;
+use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+
 use Encore\Admin\Show;
 
 class BannerController extends MainController
@@ -78,6 +81,17 @@ class BannerController extends MainController
         $grid->column('publish_at', __('Publish at'));
         $grid->column('is_active', __('Is active'))->switch();
         $grid->column('updated_at', __('Updated at'));
+
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $admin = Auth::user();
+            $created = AdminModel::find($model->created_by);
+
+           // dd( $admin ,$created);
+            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+                $actions->disableDelete();
+            }
+        });
 
         return $grid;
     }
