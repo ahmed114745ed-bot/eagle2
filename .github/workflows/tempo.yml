@@ -15,7 +15,6 @@ jobs:
         port: ${{ secrets.PORT }}
         script: |
           echo "$USER"
-          pwd
           cd /var/www/tempo
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
