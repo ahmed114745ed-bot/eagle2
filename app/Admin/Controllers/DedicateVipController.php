@@ -70,6 +70,21 @@ class DedicateVipController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+        Admin::style("
+    .table {
+        background-color: #222323 !important; /* Dark brown */
+        color: white !important;
+    }
+
+    .table th, .table td {
+        background-color: #222323 !important; /* Lighter brown for contrast */
+        color: white !important;
+    }
+
+    .table tbody tr:hover {
+        background-color: #704214 !important; /* Slightly darker brown on hover */
+    }
+");
         $grid->column('ware', __('wares'))->expand(function () {
 
             $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $this->level)->where('is_active_for_vip', 1)->get()->map(function ($ware) {
@@ -104,7 +119,7 @@ class DedicateVipController extends MainController
         $grid->column('expire', __('expire'));
 
         $grid->column ('return',__ ('dedicate'))->display (function (){
-           
+
           return (new \App\Admin\Actions\VipDedicateAction($this->id))->render ();
         });
         $grid->disableCreateButton();
