@@ -175,20 +175,27 @@ class ChargeReportController extends MainController {
         
         $grid->column('balance_before', __("Balance Before"))->display(function ($coin) {
             $balance_after = $this->amount + $this->balance_before;
-            $icon = ($balance_after < $this->balance_before) ? "⬇️" : ""; // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
+            $icon = asset('images/arrowdown.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>🏦 " . number_format($coin) . " {$icon}</span>
-                    </div>";
+            <span>{
+            ".number_format($balance_after)."}</span>
+            <img src='{$icon}' alt='USD' width='20' height='20'>
+            </div>";
+         
         });
         
         $grid->column('balance_after', __("Balance After"))->display(function () {
+            
             $balance_after = $this->amount + $this->balance_before;
-            $icon = ($this->amount >= 0) ? "⬆️" : "⬇️"; // أيقونة صعود أو نزول حسب المبلغ
+            $icon =asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
         
             return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>🏦 " . number_format($balance_after) . " {$icon}</span>
-                    </div>";
+            <span>{
+            ".number_format($balance_after)."}</span>
+            <img src='{$icon}' alt='USD' width='20' height='20'>
+            </div>";
+         
         });
         
         
@@ -240,8 +247,8 @@ class ChargeReportController extends MainController {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
+                  <span>" . number_format($coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
-                    <span>" . number_format($coin) . "</span>
                 </div>
             ";
         });
@@ -316,8 +323,9 @@ class ChargeReportController extends MainController {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
                     <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
                 </div>
             ";
         });
