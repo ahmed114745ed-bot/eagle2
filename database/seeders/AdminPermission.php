@@ -106,6 +106,7 @@ class AdminPermission extends Seeder
             'agency-setting',
             'free-users',
             'users-family',
+            'updates_family-config'
             
 
 
@@ -163,6 +164,7 @@ class AdminPermission extends Seeder
             'update-group-chat' => ['updates_group_chat'],
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
+            'updates_family-config' => ['updates_family-config'],
           
 
         ];
