@@ -15,11 +15,11 @@ class SettingController extends AdminController
     public function index(Content $content)
     {
         $settings = Setting::pluck('value', 'key')->toArray();
-        $timezones = Timezone::all();  
+        $timezones = Timezone::all();
         return $content
             ->header(__('Settings'))
             ->description('')
-            
+
             ->body(view('admin.settings', compact('settings','timezones')));
     }
 

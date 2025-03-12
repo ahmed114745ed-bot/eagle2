@@ -16,25 +16,26 @@ class SettingsController extends Controller
         return view('admin.settings', compact('timezones', 'settings'));
     }
 
+
     public function update(Request $request){
 
-    
+
         $data = $request->all();
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
                 $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('uploads/settings', $fileName, 'public');
+                $filePath = $file->move('uploads/settings', $fileName);
                 $value = $fileName;
-                
+
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
         }
-   
+
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
-    
-        return redirect(admin_url('settings'));
+
+        return back();
         }
 }

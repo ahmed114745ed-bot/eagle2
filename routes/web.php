@@ -8,6 +8,7 @@ use App\Admin\Controllers\UserController;
 use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ConfigController;
+use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
 
 /*

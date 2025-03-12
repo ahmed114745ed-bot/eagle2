@@ -1,37 +1,5 @@
 
-<!-- <!DOCTYPE html>
-<html lang="en">-->
- <!-- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    </head>  -->
-<!--
-<body>
-    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('POST')
-        @php
-            $selectedTimeZone = App\Models\Setting::where('key','timezone')->first();
-        @endphp
-        <label for="">TimeZone</label>
-
-
-        <button type="submit">Update</button>
-    </form>
-</body>
-</html> -->
-
-    @php
-         $selectedTimeZone = App\Models\Setting::where( 'key','timezone')->first();
-                $settings = App\Models\Setting::pluck('value', 'key')->toArray();
-
-            @endphp
     <style>
-
-
-
-
     body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -188,35 +156,25 @@
     <div class="settings-sidebar">
         <h2>إعدادات</h2>
         <div class="settings-menu">
-            <button onclick="showSection('brandSettings')">{{  __('Brand settings')}}</button>
-            <button onclick="showSection('themeSettings')">{{  __('Theme settings')}}</button>
-            <button onclick="showSection('timeSettings')"> {{  __('Timing settings')}}</button>
+            <button onclick="showSection('custom_background_settings')">{{  __('Custom Background settings')}}</button>
+            <button onclick="showSection('additional_settings')">{{  __('Additional settings')}}</button>
+            <button onclick="showSection('live_stream_settings')"> {{  __('Live Stream settings')}}</button>
         </div>
     </div>
 
     <div class="settings-content">
-        <div id="brandSettings" class="settings-section active">
+        <div id="custom_background_settings" class="settings-section active">
 
-            <h3> {{  __('Brand settings')}}</h3>
+            <h3> {{  __('Custom Background settings')}}</h3>
 
             <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form">
-                <label>{{  __('Application title:')}} </label>
-                <input type="text" name="app_title" value="{{ $settings['app_title'] ?? '' }}" class="form-control">
+                <label>{{  __('Cost request background:')}} </label>
+                <input type="text" name="cost_request_background" value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
 
-                <label> {{  __('Application logo:')}}</label>
-                <input type="file" name="app_logo" class="form-control">
-                @if(!empty($settings['app_logo']))
-                    <img src="{{ asset('uploads/settings/' . $settings['app_logo']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
-                @endif
-
-
-                <label> {{  __('Application Fav Icon:')}}</label>
-                <input type="file" name="app_fav_icon" class="form-control">
-                @if(!empty($settings['app_fav_icon']))
-                    <img src="{{ asset('uploads/settings/' . $settings['app_fav_icon']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
-                @endif
+                <label>{{  __('Background expiration in days:')}} </label>
+                <input type="text" name="background_expiration" value="{{ $settings['background_expiration'] ?? '' }}" class="form-control">
 
                 <button type="submit">{{ __('save') }}</button>
                 </div>
@@ -224,57 +182,43 @@
             </form>
         </div>
 
-        <div id="themeSettings" class="settings-section">
-            <h3>{{  __('Theme settings')}}</h3>
+        <div id="additional_settings" class="settings-section">
+            <h3>{{  __('Additional settings')}}</h3>
             <form action="{{ route('admin.settings.update') }}" method="POST">
             <div class="form">
                 @csrf
-                <label>{{ __('Primary Color:') }}</label>
-                <input type="color" name="primary_color" value="{{ $settings['primary_color'] ?? '#000000' }}"
-                    style="background: {{ $settings['primary_color'] ?? '#000000' }};">
 
-                <label>{{ __('Secondary Color:') }}</label>
-                <input type="color" name="secondary_color" value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                    style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};">
+                <label>{{ __('Room Rule:') }}</label>
+                <input class="form-control" type="text" name="room_rule" value="{{ $settings['room_rule'] ?? '' }}">
 
-                <label>{{ __('Text Primary Color:') }}</label>
-                <input type="color" name="text_primary_color" value="{{ $settings['text_primary_color'] ?? '#000000' }}"
-                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};">
+                <label>{{ __('Room Rule en:') }}</label>
+                <input class="form-control" type="text" name="room_rule_en" value="{{ $settings['room_rule_en'] ?? '' }}">
 
-                <label>{{ __('Text Secondary Color:') }}</label>
-                <input type="color" name="text_secondary_color" value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
-                    style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};">
 
-                <label>{{ __('Box Background Color:') }}</label>
-                <input type="color" name="box_background_color" value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};">
+                <label>{{ __('Youtube Key:') }}</label>
+                <input class="form-control" type="text" name="youtube_key" value="{{ $settings['youtube_key'] ?? '' }}">
 
-                <label>{{ __('Table Background Color:') }}</label>
-                <input type="color" name="table_background_color" value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                    style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};">
+
+                <label>{{ __('Pk Background:') }}</label>
+                <input class="form-control" type="text" name="pk_background" value="{{ $settings['pk_background'] ?? '' }}">
+
+
+                <label>{{ __('Private Comment Price:') }}</label>
+                <input class="form-control" type="text" name="private_comment_price" value="{{ $settings['private_comment_price'] ?? '' }}">
 
                 <button type="submit">{{ __('save') }}</button>
                 </div>
             </form>
         </div>
 
-        <div id="timeSettings" class="settings-section">
+        <div id="live_stream_settings" class="settings-section">
             <h3>{{  __('Timing settings')}}</h3>
             <form action="{{ route('admin.settings.update') }}" method="POST">
                 @csrf
                 <div class="form">
 
-                <label>{{ __('Time zone:') }}</label>
-                <select name="timezone">
-                    @foreach ($timezones as $timezone)
-                        <option value="{{ $timezone->name }}"
-                                {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
-                            {{ $timezone->name }}
-                        </option>
-                    @endforeach
-                </select>
 
-                <button type="submit">{{ __('save') }}</button>
+                    <button type="submit">{{ __('save') }}</button>
                 </div>
             </form>
         </div>
