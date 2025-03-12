@@ -237,7 +237,7 @@ class ChargeReportController extends MainController {
         //     return number_format($coin); 
         //  });
         $grid->column('obtained_coins', __('Amount'))->display(function ($coin) {
-            $icon = asset('images/coin.png'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
@@ -308,11 +308,12 @@ class ChargeReportController extends MainController {
          ";
          
          });
-        $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
-            return number_format($coin); 
-         });
-         $grid->column('obtained_coins', __('Amount'))->display(function ($coin) {
-            $icon = asset('images/coin.png'); // تأكد من وجود الصورة في هذا المسار
+        // $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
+        //     return number_format($coin); 
+        //  });
+
+        $grid->column('obtained_coins', __('amount'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
@@ -320,7 +321,7 @@ class ChargeReportController extends MainController {
                 </div>
             ";
         });
-        // $grid->column ('trx',__ ('trx'));
+        $grid->column ('trx',__ ('trx'));
         $grid->column ('status',__ ('status'))->display (function (){
             if ($this->status == 1) {
                 return "success";
