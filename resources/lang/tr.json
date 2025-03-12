@@ -1692,7 +1692,12 @@
     "Reels:": "Videolar:",
     "Save": "Kaydet",
     "device": "Cihaz",
-    "staff": "Personel"
+    "staff": "Personel",
+    "Owner": "Sahip",
+    "Admin": "Yönetici",
+    "Member": "Üye",
+    "Unknown": "Bilinmeyen",
+    "family": "Aile"
 
 
 
