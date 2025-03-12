@@ -14,7 +14,8 @@ use App\Selectables\Privileges;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
+use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -107,6 +108,16 @@ class OVipController extends MainController
         //        $grid->updated_at(trans('admin.updated_at'));
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+            $admin = Auth::user();
+            $created = AdminModel::find($model->created_by);
+
+           // dd( $admin ,$created);
+           if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
+                $actions->disableDelete();
+            }
+        });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');

@@ -89,7 +89,7 @@ class HomeCarouselController extends MainController
             $created = AdminModel::find($model->created_by);
 
            // dd( $admin ,$created);
-            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+           if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
             }
         });

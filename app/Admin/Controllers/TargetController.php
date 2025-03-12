@@ -10,6 +10,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Services\AppFeatureService;
 use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
 class TargetController extends MainController
@@ -127,7 +128,7 @@ class TargetController extends MainController
             $created = AdminModel::find($model->created_by);
 
            // dd( $admin ,$created);
-            if (($admin->username != 'developer') && $created && ($created->username == 'developer')) {
+           if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
             }
         });
