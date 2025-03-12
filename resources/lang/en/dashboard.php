@@ -15,7 +15,7 @@ return [
     'username'              => 'Username',
     'password'              => 'Password',
     'password_confirmation' => 'Password confirmation',
-
+    'moment_value_settings' => 'moment value settings',
     'user_setting'          => 'User setting',
     'avatar'                => 'Avatar',
     'list'                  => 'List',

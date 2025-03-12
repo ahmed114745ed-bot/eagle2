@@ -34,9 +34,6 @@ class MomentController extends MainController
     {
         return $content
             ->title(__($this->title))
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
@@ -81,14 +78,14 @@ class MomentController extends MainController
     // 🔹 **عرض معلومات المستخدم**
     $grid->column('user.name', __('User'))->display(function ($name) {
         $uid = @$this->user->uuid;
-        $defaultImage = asset("images/businessman-icon.jpg");   
-        $avatarPath = @$this->user->avatar;    
+        $defaultImage = asset("images/businessman-icon.jpg");
+        $avatarPath = @$this->user->avatar;
         $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
         $userUrl = admin_url('users/' . $this->user_id); // رابط صفحة المستخدم في لوحة التحكم
-    
+
         return "<div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                     <div>
@@ -97,7 +94,7 @@ class MomentController extends MainController
                     </div>
                 </div>";
     });
-    
+
 
     // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
     $grid->column('comment_num', __('Stats'))->display(function () {

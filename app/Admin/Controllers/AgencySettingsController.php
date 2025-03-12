@@ -2,11 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class AgencySettingsController extends AdminController
+class AgencySettingsController extends MainController
 {
+
+    public $permission_name = 'agency-settings';
     /**
      * Title for current resource.
      *
