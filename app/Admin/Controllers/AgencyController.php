@@ -169,6 +169,7 @@ class AgencyController extends MainController
             });
         }
         $grid->id(__('ID'));
+        $grid->column('img', trans('img'))->image('', 30);
         $grid->column('name', trans('name'));
         $grid->column('notice', trans('notice'));
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
@@ -249,7 +250,6 @@ class AgencyController extends MainController
             );
         });
 
-        $grid->column('img', trans('img'))->image('', 30);
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action

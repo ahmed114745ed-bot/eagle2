@@ -3,6 +3,7 @@
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ColorController;
@@ -16,7 +17,6 @@ use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomVipController;
-use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -35,12 +35,14 @@ use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReportMomentController;
+use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -58,9 +60,9 @@ use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\AgencySettingController;
-use App\Admin\Controllers\AgencySettingsController;
+use App\Admin\Controllers\ReelSettingsController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -318,6 +320,7 @@ Route::group(
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
         $router->resource('reels', ReelController::class);
+        $router->resource('reel-settings', ReelSettingsController::class);
         $router->resource('change-level-histories', ChangeLevelHistoryController::class);
         $router->resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
@@ -360,6 +363,7 @@ Route::group(
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+        $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
