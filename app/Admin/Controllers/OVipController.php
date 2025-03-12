@@ -241,6 +241,10 @@ class OVipController extends MainController
                 session()->forget('show_alert_vip');
             }
         });
+        if ($form->isCreating()) {
+            $form->model()->created_by = auth()->id();
+        }
+        $form->model()->updated_by = auth()->id();
 
         return $form;
     }

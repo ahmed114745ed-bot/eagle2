@@ -151,6 +151,10 @@ class HomeCarouselController extends MainController
                     $form->url('url', trans('url'));
                 });
             });
+            if ($form->isCreating()) {
+                $form->model()->created_by = auth()->id();
+            }
+            $form->model()->updated_by = auth()->id();
 
         return $form;
     }
