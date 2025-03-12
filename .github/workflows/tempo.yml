@@ -18,7 +18,6 @@ jobs:
           cd /var/www/tempo
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          php artisan migrate --force
           php artisan optimize:clear
           docker build -t tempo:${{ github.sha }} .
           docker service update --image tempo:${{ github.sha }} tempo-app
