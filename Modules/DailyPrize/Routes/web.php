@@ -32,13 +32,13 @@ Route::group(
     function (\Illuminate\Routing\Router $router) {
        // $router->resource('daily-gifts', DailyPrizeController::class);
         $router->resource('daily-gift-types', DailyPrizeTypeController::class);
-        Route::prefix('daily-gifts/{type}/')->group(function () {
+        Route::prefix('daily-gifts/{type}')->group(function () {
             Route::get('/', [DailyPrizeController::class, 'index']);
             Route::get('/create', [DailyPrizeController::class, 'create']);
             Route::post('/', [DailyPrizeController::class, 'store']);
             Route::get('/{id}', [DailyPrizeController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [DailyPrizeController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [DailyPrizeController::class, 'update'])->where('id', '[0-9]+');
+            Route::put('/{id}', [DailyPrizeController::class, 'updated']);
             Route::delete('/{id}', [DailyPrizeController::class, 'destroy'])->where('id', '[0-9]+');
         });
     });

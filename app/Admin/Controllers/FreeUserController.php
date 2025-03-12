@@ -9,11 +9,9 @@ use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\UserVip;
-use App\Models\MangerType;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
@@ -26,8 +24,6 @@ use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
-
-use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use App\Admin\Selectable\ImageColors;
@@ -38,6 +34,7 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use Encore\Admin\Auth\Permission;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
@@ -579,9 +576,11 @@ class FreeUserController extends MainController
      */
     protected function form()
     {
+
         $form = new Form(new User());
         if ($form->isEditing()) {
-            $userId           = request()->route('user');
+            $userId           = request()->segment(3);
+           
             $user             = User::findOrFail($userId);
             $oldDiValue       = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');

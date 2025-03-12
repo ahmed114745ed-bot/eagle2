@@ -641,7 +641,8 @@ class UserFamilyController extends MainController
     {
         $form = new Form(new User());
         if ($form->isEditing()) {
-            $userId           = request()->route('user');
+            $userId           = request()->segment(3);
+
             $user             = User::findOrFail($userId);
             $oldDiValue       = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
