@@ -57,7 +57,21 @@ class Banner extends Model
             }
             unset($model->publish);
         });
+
+        static::deleting(function ($banner) {
+
+            if (auth()->user() && $banner->creator?->isRole('developer')) {
+                abort(403);
+            }
+        });
+
+
     }
+
+    public function creator(){
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
+
     public function getPublishAttribute()
     {
         return $this->publish_at == null ? 0 : 1;

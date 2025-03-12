@@ -115,13 +115,18 @@ class BannerController extends MainController
     {
 
         $form = new Form(new Banner());
-        
+
         $form->image('image_url', __('Image url'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->required()->dir('banners');
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
+
+        if ($form->isCreating()) {
+            $form->model()->created_by = auth()->id();
+        }
+        $form->model()->updated_by = auth()->id();
         return $form;
     }
 

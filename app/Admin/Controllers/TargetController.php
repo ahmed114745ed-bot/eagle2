@@ -208,6 +208,11 @@ class TargetController extends MainController
         });
 
 
+        if ($form->isCreating()) {
+            $form->model()->created_by = auth()->id();
+        }
+        $form->model()->updated_by = auth()->id();
+
         return $form;
     }
 

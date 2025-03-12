@@ -45,11 +45,17 @@ class Ware extends Model
         });
         // Listen for the 'deleting' event of the Agency model
         static::deleting(function ($id) {
-
+            if (auth()->user() && $id->creator?->isRole('developer')) {
+                abort(403);
+            }
             $pack = Pack::where('target_id', $id->id)->delete();
         });
     }
 
+    public function creator(){
+
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
     public function packs()
     {
         return $this->hasMany(Pack::class, 'target_id');

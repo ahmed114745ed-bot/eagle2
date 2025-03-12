@@ -40,4 +40,20 @@ class Gift extends Model
     {
         return $this->hasOne(LuckyGift::class,'gift_id');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($gift) {
+
+            if (auth()->user() && $gift->creator?->isRole('developer')) {
+                abort(403);
+            }
+        });
+    }
+
+    public function creator(){
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
 }

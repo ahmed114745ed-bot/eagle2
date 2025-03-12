@@ -283,7 +283,7 @@ class WareController extends MainController
                      } else {
                          $('#profile_frame').closest('.form-group').hide();
                          $('#image_type1').closest('.form-group').show();
-                         
+
                      }
                  }
                  toggleWinProbability();
@@ -319,7 +319,11 @@ class WareController extends MainController
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
-            
+            if ($form->isCreating()) {
+                $form->model()->created_by = auth()->id();
+            }
+            $form->model()->updated_by = auth()->id();
+
 
             (new UserCounterServices)->eventUsers('ware');
         });

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use Admin;
 use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -115,7 +116,7 @@ class VipController extends MainController
                 4=>__ ('room'),
             ]
         );
-        $grid->column('level', __('Level'))->editable();   
+        $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
             return number_format($value);
@@ -178,6 +179,12 @@ class VipController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
 
+        $form->saving(function (Form $form) {
+            if ($form->isCreating()) {
+                $form->model()->created_by = auth()->id();
+            }
+            $form->model()->updated_by = auth()->id();
+        });
         return $form;
     }
 }
