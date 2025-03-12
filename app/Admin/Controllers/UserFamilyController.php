@@ -159,6 +159,8 @@ class UserFamilyController extends MainController
                             ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
                 });
+                $filter->equal('familyType.user_type', __('type'))->select([2 =>  __('Owner'), 1 => __('Admin'),0 => __('Member')]);
+
             });
         });
         $grid->column('id', __('Id'));
