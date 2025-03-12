@@ -98,7 +98,8 @@ class RealsService extends BaseModelService
         ->inRandomOrder($user->real_type);
 
         if ($filter === 'following') {
-            $followedUserIds = app(FollowRepository::class)->getFollowedUserIds($userId);
+            
+            $followedUserIds = auth()->user()->friendsFollowedId(); // جلب معرفات الأصدقاء فقط
             $reals->whereIn('user_id', $followedUserIds);
         }
 
