@@ -42,12 +42,12 @@ class Target extends Model
     {
         parent::boot();
 
-        static::deleting(function ($banner) {
+        // static::deleting(function ($banner) {
 
-            if (auth()->user() && $banner->creator?->isRole('developer')) {
-                abort(403);
-            }
-        });
+        //     if (auth()->user() && $banner->creator?->isRole('developer')) {
+        //         abort(403);
+        //     }
+        // });
     }
 
     public function creator(){
