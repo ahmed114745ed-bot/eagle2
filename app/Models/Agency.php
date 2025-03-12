@@ -177,9 +177,6 @@ class Agency extends Model
                     ]);
 
                 }
-
-
-
             }
         });
     }
