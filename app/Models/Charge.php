@@ -48,4 +48,9 @@ class Charge extends Model
     {
         return $this->belongsTo(Admin::class, 'charger_id');
     }
+
+    public function admin_user()
+{
+    return $this->belongsTo(AdminUser::class, 'charger_id'); 
+}
 }
