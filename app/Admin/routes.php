@@ -61,6 +61,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\AgencySettingsController;
+use App\Admin\Controllers\ReelSettingsController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -318,6 +319,7 @@ Route::group(
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
         $router->resource('reels', ReelController::class);
+        $router->resource('reel-settings', ReelSettingsController::class);
         $router->resource('change-level-histories', ChangeLevelHistoryController::class);
         $router->resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
