@@ -8,6 +8,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Widgets\Table as WidgetsTable;
 use Encore\Admin\Facades\Admin;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 
@@ -71,7 +72,7 @@ class SalaryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryRequest());
-        $grid->model()->whereHas('agency')->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
         $grid->filter (function (Grid\Filter $filter){
             $filter->column(1/2, function ($filter) {
                 $filter->equal('status',__('status'))->select([0=>__('waiting'),1=>__('accepting'),2=>__('transferred'),3=>__('completed'),4=>__('rejected')]);
@@ -95,15 +96,23 @@ class SalaryRequestController extends MainController
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/agencies/{$this->agency->id}");
+            if ($this->agency) {
+                $showUrl = url("admin/agencies/{$this->agency->id}");
+                $link = "
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                    </a>
+                ";
+            } else {
+                $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
+            }
+            
             return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-               <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                </a>
-            </div>
-        ";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    $link
+                </div>
+            ";
         });
 
         $grid->column('agencyOwner.name', __('Agency owner'))
@@ -177,52 +186,79 @@ class SalaryRequestController extends MainController
         });
         $grid->column('payment_gateway.title', __('Payment gateway'));
         $grid->column('country.name', __('country'));
-        $grid->column('usd', __('Usd'));
-        $grid->column('coins', __('coins'));
-        $grid->column('bill_image', __('bill image'))->display(function ($img) {
-            $defaultImage = asset("images/background_room.jpg");
-            $path = getImagePath($img) ??$defaultImage ;
-            if (!isImageExists($path)) {
-                $path = $defaultImage;
-            }
-            $parsedUrl = parse_url($path);
-            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
-
-            return "
-                    <img src='$correctUrl' style='width: 80px; height: 80px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
-                    
-                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
-                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
-                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
-                    </div>
-            
-                    <script>
-                        function openModal(src) {
-                            let modal = document.getElementById('imageModal');
-                            let modalImage = document.getElementById('modalImage');
-                            modal.style.display = 'block';
-                            modalImage.src = src;
-                        }
-            
-                        function closeModal() {
-                            document.getElementById('imageModal').style.display = 'none';
-                        }
-            
-                        // Close modal when clicking outside the image
-                        document.getElementById('imageModal').addEventListener('click', function(event) {
-                            if (event.target === this) {
-                                closeModal();
-                            }
-                        });
-                    </script>
-                ";
+        $grid->column('usd', __('Usd'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+                      
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
         });
+        
+        $grid->column('coins', __('Coins'))->display(function ($coins) {
+            $image = asset('images/coin.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center;'>
+                       
+                        <span>{$coins}</span>
+                         <img src='{$image}' alt='Coins' width='20' height='20'>
+                    </div>";
+        });
+        // $grid->column('bill_image', __('bill image'))->display(function ($img) {
+        //     $defaultImage = asset("images/background_room.jpg");
+        //     $path = getImagePath($img) ??$defaultImage ;
+        //     if (!isImageExists($path)) {
+        //         $path = $defaultImage;
+        //     }
+        //     $parsedUrl = parse_url($path);
+        //     $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
 
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
+        //     return "
+        //             <img src='$correctUrl' style='width: 80px; height: 80px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+                    
+        //             <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+        //                 <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+        //                 <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+        //             </div>
+            
+        //             <script>
+        //                 function openModal(src) {
+        //                     let modal = document.getElementById('imageModal');
+        //                     let modalImage = document.getElementById('modalImage');
+        //                     modal.style.display = 'block';
+        //                     modalImage.src = src;
+        //                 }
+            
+        //                 function closeModal() {
+        //                     document.getElementById('imageModal').style.display = 'none';
+        //                 }
+            
+        //                 // Close modal when clicking outside the image
+        //                 document.getElementById('imageModal').addEventListener('click', function(event) {
+        //                     if (event.target === this) {
+        //                         closeModal();
+        //                     }
+        //                 });
+        //             </script>
+        //         ";
+        // });
+
+        // Admin::script("
+        // if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+        //     $('.table-responsive').removeClass('table-responsive');
+        //     }
+        // ");
+
+        $grid->column( __('bill image'))->modal('show image' , function ( ) {
+            $img = $this->bill_image;
+            if($img == null || $img == ''){
+                return 'No image founded';
             }
-        ");
+
+            $img = getDriverUrl().'/'.$img;
+            $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+
+            return (new WidgetsTable([__('img')], [[$img]]));
+        });
 
         $grid->disableActions ();
         return $grid;

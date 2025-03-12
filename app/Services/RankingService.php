@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Pk;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
@@ -98,11 +99,9 @@ class RankingService
             $data = $this->rankingRepo->getUserLuckyGifts($type, $limit);
             $this->transformData($data, $class, 'user_id', 'user');
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
-        }elseif($class == 6)
-        {
+        } elseif ($class == 6) {
             $data = $this->rankingRepo->getUserGameCoins($type, $limit);
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
-
         }
 
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
@@ -111,6 +110,37 @@ class RankingService
         $this->transformData($data, $class, $keywords, $rel);
 
         return $this->prepareResponse($data, $user, $type, $keywords, $user->id, $class, $limit);
+    }
+
+    protected function roomData($ownerRoom)
+    {   if(!$ownerRoom) return null;
+        $data = [];
+            $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom->id) : null;
+        $data =  [
+            "id" => @$ownerRoom->id ?? 0,
+            "owner_uuid" => @@$ownerRoom->owner->uuid ?? 0,
+            "room_name" => @$ownerRoom->room_name ?? '',
+            "room_cover" => @$ownerRoom->room_cover ?? '',
+            "room_background" => @$ownerRoom->final_room_image ?? '',
+            "mode" => @$ownerRoom->mode ?? 0,
+            'giftPrice' => @$ownerRoom->session_string ?? "0",
+            "is_pk"               => (@$pks[0]) && @$pks[0]->end_at >= now() ? @$pks[0]->status : 0,
+            "show_pk"             => @$ownerRoom->is_show_pk ?? 0,
+            'password_status'     => !(@$ownerRoom->room_pass == ""),
+            'type-number'                => @$ownerRoom->room_type ?? 0,
+            'type' => @$ownerRoom->myType ?: new \stdClass(),
+
+        ];
+
+        return $data;
+    }
+    private function getRoomTwoLastPk(int $roomId)
+    {
+        return Pk::query()
+            ->where('room_id', $roomId)
+            ->orderByDesc('created_at')
+            ->limit(2)
+            ->get();
     }
 
     protected function transformData(&$data, $class, $key, $relation)
@@ -183,8 +213,9 @@ class RankingService
             $v->reciver_level_img = @$total_sender_level_img->img ?? '';
 
             $v->country = @$user->country;
-            $v->age = $user->profile->age;
+            $v->age = @$user->profile->age ?? 'P';
             $v->achievement_images = $achievement_images;
+            $v->room = $class == 3 ? $this->roomData(@$user->ownerRoom) : null;
             unset($v->$relation);
             return $v;
         })->reject(function ($v) {
@@ -273,7 +304,7 @@ class RankingService
         $arr['user']['type_user'] =  intval(@$user->type_user) ?: 0;
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
-        $arr['user']['age'] = $user->profile->age;
+        $arr['user']['age'] = @$user->profile?->age ?? '';
         $arr['user']['color_name'] = $color_name;
         $arr['user']['achievement_images'] = $achievement_images;
 
@@ -319,17 +350,17 @@ class RankingService
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
         $img      = [];
         foreach ($giftLogs as $giftLog) {
-            $img[] = $giftLog->sender->profile->avatar ?? '';
+            $img[] = $giftLog?->sender?->profile?->avatar ?? '';
         }
 
         $receiverImage = [];
         foreach ($giftLogsReceiver as $giftLog) {
-            $receiverImage[] = $giftLog->receiver->profile->avatar ?? '';
+            $receiverImage[] = $giftLog?->receiver?->profile?->avatar ?? '';
         }
 
         $roomImage = [];
         foreach ($giftLogsRooms as $giftLogsRoom) {
-            $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
+            $roomImage[] = $giftLogsRoom?->roomOwner?->ownerRoom?->room_cover ?? '';
         }
 
         $data = $this->cpRepository->getCpRankingWithOutRelation(1);
@@ -356,17 +387,17 @@ class RankingService
         $giftLogsRooms = $this->GiftLogRepository->topUser('roomOwner', 'roomowner_id');
         $img      = [];
         foreach ($giftLogs as $giftLog) {
-            $img[] = $giftLog->sender->profile->avatar ?? '';
+            $img[] = @$giftLog->sender->profile->avatar ?? '';
         }
 
         $receiverImage = [];
         foreach ($giftLogsReceiver as $giftLog) {
-            $receiverImage[] = $giftLog->receiver->profile->avatar ?? '';
+            $receiverImage[] = @$giftLog->receiver->profile->avatar ?? '';
         }
 
         $roomImage = [];
         foreach ($giftLogsRooms as $giftLogsRoom) {
-            $roomImage[] = $giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
+            $roomImage[] = @$giftLogsRoom->roomOwner->ownerRoom->room_cover ?? '';
         }
         return Common::apiResponse(1, '', ['sender' => $img, 'receiver' => $receiverImage, 'room' => $roomImage]);
     }

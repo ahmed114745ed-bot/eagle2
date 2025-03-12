@@ -27,7 +27,7 @@ class LanguageController extends AdminController
      public function index(Content $content)
      {
          return $content
-             ->title(__('Languages')) // تم نقل الترجمة هنا
+             ->title(__('Languages'))
              ->description(__('Manage the available languages'))
              ->body($this->grid());
      }

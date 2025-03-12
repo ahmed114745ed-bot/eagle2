@@ -5,16 +5,13 @@ namespace Modules\SalaryTransaction\Http\Controllers;
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Emoji;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\SalaryTransaction\Entities\AdminCheck;
-use Encore\Admin\Widgets\Table;
-use Illuminate\Support\Collection;
+use Encore\Admin\Widgets\Table as WidgetsTable;
 use Modules\SalaryTransaction\Actions\AccepRequestAction;
 use Modules\SalaryTransaction\Actions\CancelRequestAction;
 
@@ -28,7 +25,7 @@ class RequestProblemController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('transaction-request-problem'))
+            ->title(trans('transaction request problem'))
             ->body($this->grid()));
     }
 
@@ -42,7 +39,7 @@ class RequestProblemController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id,$content
-            ->title(trans('transaction-request-problem'))
+            ->title(trans('transaction request problem'))
             ->body($this->detail($id)));
     }
 
@@ -56,14 +53,14 @@ class RequestProblemController extends MainController
     public function edit($id, Content $content)
     {
         return parent::edit($id,$content
-            ->title(trans('transaction-request-problem'))
+            ->title(trans('transaction request problem'))
             ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('transaction-request-problem'))
+            ->title(trans('transaction request problem'))
             ->body($this->form()));
     }
     protected function grid()
@@ -92,19 +89,70 @@ class RequestProblemController extends MainController
             $show->field('request.bill_image', __('bill image'))->image();
             return $show;
         });
-        $grid->column('request.bill_image', __('bill image'))->image('', 50);
-        $grid->column('request',__('Shipping agent ID'))->display(function () {
-            return $this->request?->agency?->owner?->uuid;
-        });
-        $grid->column(__('Shipping Agent Name'))->display(function () {
-            return $this->request?->agency?->owner?->name;
+        $grid->column( __('bill image'))->modal('show image' , function ($model ) {
+            $img = $model->bill_image;
+            if($img == null || $img == ''){
+                return 'No image founded';
+            }
+
+            $img = getDriverUrl().'/'.$img;
+            $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+
+            return (new WidgetsTable([''], [[$img]]));
         });
 
-        $grid->column(__('Host ID'))->display(function () {
-            return $this->request?->host?->uuid;
+        $grid->column(__('Shipping Agent Name'))
+        ->display(function () {
+            $name =  $this->request?->agency?->owner?->name??'';
+            $uid = @$this->request?->agency?->owner->uuid;
+            $path = @$this->request?->agency?->owner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->request?->agency?->owner->id}");
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
         $grid->column(__('Host Name'))->display(function () {
-            return $this->request?->host?->name;
+            $name = $this->request?->host?->name ??'';
+            $uid = @$this->request?->host->uuid;
+            $path = @$this->request?->host?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$this->request?->host->id}");
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
         });
 
         $grid->column('type', __('type'));
