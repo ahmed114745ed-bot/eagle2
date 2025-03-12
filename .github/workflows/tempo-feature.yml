@@ -1,4 +1,4 @@
-name: SSh-test-pipline
+name: SSh-tempo-feature-pipline
 on:
   push:
     branches: ["tempo-feature"]
