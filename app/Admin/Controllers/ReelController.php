@@ -23,16 +23,13 @@ class ReelController extends MainController
      *
      * @var string
      */
-    
+
 
     public $permission_name = 'Real';
     public function index(Content $content)
     {
         return $content
             ->title(__('reels'))
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid2());
-            })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
@@ -69,22 +66,22 @@ class ReelController extends MainController
         //     return $limitedDescription;
         // });
 
-        
-        
+
+
         $grid->column('user.name', __('user'))->display(function ($name) {
             $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
-            $avatarPath = @$this->user->avatar;    
+            $avatarPath = @$this->user->avatar;
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
-        
+
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-          
-        
+
+
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                         <div>
@@ -93,8 +90,8 @@ class ReelController extends MainController
                         </div>
                     </div>";
         });
-        
-        
+
+
         $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
@@ -111,7 +108,7 @@ class ReelController extends MainController
 
         $grid->column('description', __('Description'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
-            
+
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
 
@@ -135,7 +132,7 @@ class ReelController extends MainController
                 $('#imageModal').modal('show');
             });
         }); ");
-    
+
         $grid->disableCreateButton();
         $grid->actions(function ($actions) {
             $actions->disableEdit();

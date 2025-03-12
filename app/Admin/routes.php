@@ -62,6 +62,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\ReelSettingsController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
@@ -319,6 +320,7 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
+        $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
         $router->resource('reel-settings', ReelSettingsController::class);
         $router->resource('change-level-histories', ChangeLevelHistoryController::class);

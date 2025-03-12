@@ -15,7 +15,7 @@ return [
     'username'              => 'اسم المستخدم',
     'password'              => 'الرقم السري',
     'password_confirmation' => 'تأكيد الرقم السري',
-
+    'moment_value_settings' => 'قيمة اللحظة',
     'user_setting'          => 'ضبط المستخدم',
     'avatar'                => 'الصورة',
     'list'                  => 'القائمة',
