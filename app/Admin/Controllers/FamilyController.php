@@ -103,7 +103,7 @@ class FamilyController extends MainController
                 </div>
             </div>
         ";
-        });;
+        });
         $grid->column('num', __('number of people'));
        
        
