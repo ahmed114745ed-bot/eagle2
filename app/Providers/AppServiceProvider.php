@@ -93,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $appName = Setting::where('key','app_title')->first();
-        config(['app.name' => $appName ?? 'Default']);
+        config(['app.name' => $appName->value ?? 'Default']);
 
         Schema::defaultStringLength(191);
         User::observe (UserObserver::class);
