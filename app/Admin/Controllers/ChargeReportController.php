@@ -154,15 +154,44 @@ class ChargeReportController extends MainController {
         ";
         
         });
-        $grid->column ('amount',__("amount"))->display (function ($coin){
-            return number_format($coin); 
-         });
-        $grid->column ('balance_before',__("balance_before"))->display (function ($coin){
-            return number_format($coin); 
-         });;
-        $grid->column ('balance_after',__("balance_after"))->display (function (){
-           return number_format($this->amount + $this->balance_before);
+        // $grid->column ('amount',__("amount"))->display (function ($coin){
+        //     return number_format($coin); 
+        //  });
+        // $grid->column ('balance_before',__("balance_before"))->display (function ($coin){
+        //     return number_format($coin); 
+        //  });
+        // $grid->column ('balance_after',__("balance_after"))->display (function (){
+        //    return number_format($this->amount + $this->balance_before);
+        // });
+        $grid->column('amount', __("Amount"))->display(function ($coin) {
+            $image = asset('images/dollar.jpg'); // تأكد من أن الصورة موجودة
+        
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coin}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+          
         });
+        
+        $grid->column('balance_before', __("Balance Before"))->display(function ($coin) {
+            $balance_after = $this->amount + $this->balance_before;
+            $icon = ($balance_after < $this->balance_before) ? "⬇️" : ""; // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>🏦 " . number_format($coin) . " {$icon}</span>
+                    </div>";
+        });
+        
+        $grid->column('balance_after', __("Balance After"))->display(function () {
+            $balance_after = $this->amount + $this->balance_before;
+            $icon = ($this->amount >= 0) ? "⬆️" : "⬇️"; // أيقونة صعود أو نزول حسب المبلغ
+        
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>🏦 " . number_format($balance_after) . " {$icon}</span>
+                    </div>";
+        });
+        
+        
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
         return $grid;
