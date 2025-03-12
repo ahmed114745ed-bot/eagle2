@@ -31,12 +31,12 @@ class RealsController extends Controller
     public function index()
     {
         $user = Auth::user();
-
+        $filter=request('filter');
         if (!request("page")  || request("page") == 1 ) {
             $user->real_type = $user->id . random_int(1000,9999);
 
         }
-        $reals = $this->realsService->showNew($user);
+        $reals = $this->realsService->showNew($user,$filter);
         //return $reals;
 
 /*         return response()->json([
