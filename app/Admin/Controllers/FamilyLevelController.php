@@ -27,27 +27,27 @@ class FamilyLevelController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('family-level'))
+            ->title(trans('family levels'))
             ->body($this->grid()));
     }
 
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title(trans('family-level'))
+            ->title(trans('family levels'))
             ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('family-level'))
+            ->title(trans('family levels'))
             ->body($this->form()));
     }
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('family-level'))
+            ->title(trans('family levels'))
             ->body($this->detail($id)));
     }
 
@@ -62,14 +62,28 @@ class FamilyLevelController extends MainController
         $grid = new Grid(new FamilyLevel);
 
         $grid->id( __ ('ID'));
-        $grid->column('name',__ ('name'));
-        $grid->column('img',__ ('img'))->image ('',30);
+        $grid->column('name',__ ('level'))->display(function ($name) {
+            $path = @$this->img;
+            $defaultImage = asset("images/level.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                  <strong>$name</strong><br>
+            </div>
+        ";
+        });
         $grid->column('exp',__ ('exp'));
         $grid->column('members',__ ('members'));
         $grid->column('admins',__ ('admins'));
-//        $grid->type('type');
-//        $grid->created_at(trans('admin.created_at'));
-//        $grid->updated_at(trans('admin.updated_at'));
+
 
         $grid->actions (function ($actions){
             $actions->disableView();

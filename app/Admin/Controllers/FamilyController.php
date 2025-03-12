@@ -62,20 +62,51 @@ class FamilyController extends MainController
         $grid = new Grid(new Family);
 
         $grid->id(__('ID'));
-        //        $grid->is_success('is_success');
-        $grid->column('image', __('image'))->image('', 30);
-        $grid->column('name', __('name'));
-        $grid->column('introduce', __('introduce'));
-        $grid->column('notice', __('notice'));
+        $grid->column('image', __('family'))->display(function ($image) {
+            $path = @$image;
+            $name = $this->name;
+            $defaultImage = asset("images/family.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                  <strong>$name</strong><br>
+            </div>
+        ";
+        });
+      
+        $grid->column('owner.name', __('owner'))->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
         $grid->column('num', __('number of people'));
-        $grid->column('user_id', __('user id'));
-        $grid->column('speakswitch', __('speak switch'));
-        $grid->column('status', __('status'));
-        //        $grid->update_user_id('update_user_id');
-        //        $grid->suctime('suctime');
-        //        $grid->start_time('start_time');
-        //        $grid->created_at(trans('admin.created_at'));
-        //        $grid->updated_at(trans('admin.updated_at'));
+       
+       
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
