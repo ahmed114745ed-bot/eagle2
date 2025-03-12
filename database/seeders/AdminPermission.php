@@ -104,10 +104,10 @@ class AdminPermission extends Seeder
             'agora-zego',
             'uuid-dedicate',
             'agency-setting',
-            'agency-settings'
+            'agency-settings',
             'free-users',
             'users-family',
-            'updates_family-config'
+            'updates_family-config',
             
 
 
