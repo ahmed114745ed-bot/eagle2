@@ -2,13 +2,15 @@
 
 namespace App\Admin\Controllers;
 
+
+use App\Models\Language;
+use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\Language;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
 
 class LanguageController extends MainController
 {
@@ -48,6 +50,8 @@ class LanguageController extends MainController
         
         
         $grid->column('is_enabled', __('Is enabled'))->switch();
+
+       
 
         $grid->disableCreateButton();  // تعطيل زر الإنشاء
         $grid->disableActions();       // تعطيل زر العرض والتعديل والحذف لكل صف
