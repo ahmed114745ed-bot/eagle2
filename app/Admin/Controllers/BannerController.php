@@ -2,17 +2,18 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
-use App\Http\Services\BannerServices;
 use App\Models\Banner;
-use App\Models\Admin as AdminModel;
-use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Admin;
+use Encore\Admin\Layout\Content;
+use App\Models\Admin as AdminModel;
+use Illuminate\Support\Facades\Auth;
+
+use App\Http\Services\BannerServices;
+use App\Admin\Actions\DenyDeleteAction;
 
 class BannerController extends MainController
 {
@@ -90,7 +91,10 @@ class BannerController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
+            
+           
         });
 
         return $grid;

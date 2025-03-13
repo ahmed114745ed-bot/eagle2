@@ -2,11 +2,12 @@
 
 namespace App\Admin\Actions;
 
-use App\Facades\CustomNotification;
 use App\Models\Ban;
 use App\Models\User;
 use Encore\Admin\Actions\Action;
+use App\Facades\CustomNotification;
 use Encore\Admin\Actions\RowAction;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
 
@@ -31,6 +32,11 @@ class DeleteBans extends Action
 
     public function handle( \Illuminate\Http\Request $request)
     {
+
+        $admin = Auth::user();
+        if ($admin->username == 'demo' || !$admin->isRole('developer')) {
+            return $this->response()->error(__('messages.denyDelete'))->refresh();
+        }
         $user = User::query ()->where ('uuid',$request->uid)->first();
         if (!$user){
             return $this->response()->error(__('user not found'))->refresh();

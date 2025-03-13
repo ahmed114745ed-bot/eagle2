@@ -11,6 +11,7 @@ use App\Models\HomeCarousel;
 use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class HomeCarouselController extends MainController
@@ -91,6 +92,7 @@ class HomeCarouselController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
         return $grid;

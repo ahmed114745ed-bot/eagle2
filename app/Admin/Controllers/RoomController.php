@@ -2,18 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Room;
-use App\Http\Controllers\Controller;
-use App\Models\RoomCategory;
 use App\Models\User;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\RoomCategory;
+use Encore\Admin\Widgets\Table;
 
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
-use Encore\Admin\Widgets\Table;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class RoomController extends MainController
 {
@@ -122,7 +124,11 @@ class RoomController extends MainController
 
         $grid->actions(function ($action) {
             $action->disableView();
-            $actions->disableDelete();
+            $admin = Auth::user();
+            if ($admin->username == 'demo' || !$admin->isRole('developer')) {
+                $action->disableDelete();
+                $action->add(new DenyDeleteAction());
+            }
         });
         $grid->disableCreateButton();
         $grid->disableExport();

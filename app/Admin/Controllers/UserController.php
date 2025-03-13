@@ -22,23 +22,24 @@ use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
-
 use Encore\Admin\Auth\Permission;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Actions\DeletePackAction;
+use App\Admin\Actions\DenyDeleteAction;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
+use App\Admin\Widgets\Table as TableWidget;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
@@ -368,8 +369,9 @@ class UserController extends MainController
                 $actions->add(new ChangeAgencyAction($model->id));
             }
             $admin = Auth::user();
-            if ($admin->username == 'demo') {
+            if ($admin->username == 'demo' || !$admin->isRole('developer')) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
 

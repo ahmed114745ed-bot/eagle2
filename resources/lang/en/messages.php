@@ -7,5 +7,6 @@ return[
 'yesterday' => 'Yesterday',
 'days_ago' => ':days days ago',
 "coins"=> "Sorry, the user does not have this amount",
+'denyDelete' => 'You can use this feature after owning the application.',
 
 ];

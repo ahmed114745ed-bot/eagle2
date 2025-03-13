@@ -7,11 +7,12 @@ use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Services\AppFeatureService;
-use App\Models\Admin as AdminModel;
-use Illuminate\Support\Facades\Auth;
-
 use Encore\Admin\Layout\Content;
+use App\Models\Admin as AdminModel;
+use App\Services\AppFeatureService;
+
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
 
 class VipController extends MainController
 {
@@ -136,6 +137,7 @@ class VipController extends MainController
            // dd( $admin ,$created);
             if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
         return $grid;

@@ -13,9 +13,10 @@ use Encore\Admin\Widgets\Box;
 use App\Selectables\Privileges;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
 use App\Models\Admin as AdminModel;
+use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -116,6 +117,7 @@ class OVipController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
         Admin::script("

@@ -6,5 +6,6 @@ return [
     'yesterday' => 'Dün',
     'days_ago' => ':days gün önce',
     'coins' => "Üzgünüz, kullanıcının bu kadar parası yok",
+    'denyDelete' => 'Bu özelliği uygulamaya sahip olduktan sonra kullanabilirsiniz.',
 
 ];

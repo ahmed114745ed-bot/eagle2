@@ -199,9 +199,9 @@ class BanController extends MainController
                 ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
         });
 
-        // $grid->column('return', __('delete'))->display(function () {
-        //     return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
-        // });
+        $grid->column('return', __('delete'))->display(function () {
+            return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
+        });
 
         $grid->disableExport();
         $grid->disableRowSelector();

@@ -3,15 +3,16 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Target;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use App\Services\AppFeatureService;
+use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
+use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
 use Illuminate\Support\Facades\Request;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class TargetController extends MainController
 {
@@ -130,6 +131,7 @@ class TargetController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
         return $grid;

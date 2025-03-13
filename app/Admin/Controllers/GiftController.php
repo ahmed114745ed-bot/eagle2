@@ -8,11 +8,12 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use Illuminate\Support\Str;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class GiftController extends MainController
 {
@@ -128,6 +129,7 @@ class GiftController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
         Admin::script("

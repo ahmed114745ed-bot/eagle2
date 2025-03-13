@@ -10,11 +10,12 @@ use App\Helpers\Common;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Public\Http\Services\UserCounterServices;
-use Illuminate\Support\Facades\Session;
 use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
+use App\Admin\Actions\DenyDeleteAction;
+use Illuminate\Support\Facades\Session;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Public\Http\Services\UserCounterServices;
 
 class WareController extends MainController
 {
@@ -171,6 +172,7 @@ class WareController extends MainController
            // dd( $admin ,$created);
            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
+                $actions->add(new DenyDeleteAction());
             }
         });
 
