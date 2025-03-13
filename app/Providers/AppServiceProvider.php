@@ -41,6 +41,9 @@ use Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use App\Models\Language;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -123,6 +126,13 @@ class AppServiceProvider extends ServiceProvider
 
 
         }
+
+        $enabledLanguages = Cache::rememberForever('languages', function () {
+            return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
+        });        
+        Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
+        
+        
 
     }
 }

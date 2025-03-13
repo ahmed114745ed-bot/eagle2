@@ -1726,8 +1726,8 @@
     "Table Background Color:" : "لون خلفية الجدول:",
     "Time zone:" : "المنطقة الزمنية:",
       "available_variables" : "المتغيرات المتاحة",
-      "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables"
-
+      "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables",
+"Message":"الرساله"
 
 
 }

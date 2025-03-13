@@ -6,14 +6,22 @@ use App\Models\Notification;
 use App\Models\NotificationTemplate;
 use App\Models\NotificationTranslation;
 use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\helper\HelperType; 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
 require_once app_path('helper/helperType.php'); 
 
 class NotificationsTemplatesController extends AdminController
 {
+
+
+  
+
     /**
      * Title for current resource.
      *
@@ -35,34 +43,48 @@ class NotificationsTemplatesController extends AdminController
      
          $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
      
-         foreach ($languages as $code => $lang) {
-             $grid->column($code, __($lang))->display(function () use ($code, $lang) {
-                 $translation = $this->translations->where('language', $code)->first();
-                 $message = $translation ? htmlentities($translation->message) : '-';
-                 
-                 return "<a href='#' class='view-lang' data-lang='{$lang}' data-value='{$message}'>عرض</a>";
-             });
-         }
+    //      foreach ($languages as $code => $lang) {
+    //          $grid->column($code, __($lang))->display(function () use ($code, $lang) {
+    //              $translation = $this->translations->where('language', $code)->first();
+    //              $message = $translation ? htmlentities($translation->message) : '-';
+    //              $title = $translation ? htmlentities($translation->title) : '-';
+
+    //              return "<a href='#' class='view-lang' data-title='{$title}'  data-lang='{$lang}' data-value='{$message}'>عرض</a>";
+    //          });
+    //      }
+    //      Admin::script("
+    //      $(document).ready(function () {
+    //          console.log('Modal Script Loaded');
      
-         $grid->script = <<<SCRIPT
-             document.addEventListener("DOMContentLoaded", function() {
-                 document.querySelectorAll('.view-lang').forEach(function(element) {
-                     element.addEventListener('click', function(event) {
-                         event.preventDefault();
-                         var lang = this.getAttribute('data-lang');
-                         var message = this.getAttribute('data-value');
-                         alert("اللغة: " + lang + "\\n" + "الرسالة: " + message);
-                     });
-                 });
-             });
-         SCRIPT;
+    //          $('.view-lang').click(function (e) {
+    //              e.preventDefault();
      
+    //              var lang = $(this).data('lang');
+    //              var title = $(this).data('title');
+    //              var message = $(this).data('value');
+     
+    //              $('#modalLangTitle').text(lang + ' Content');
+    //              $('#modalNotifTitle').text(title);
+    //              $('#modalNotifMessage').text(message);
+     
+    //              $('#langModal').modal('show');
+    //          });
+    //      });
+    //  ");
+     
+    
+    
+     
+         $grid->tools(function ($tools) {
+            $tools->append("<a href='/admin/notification-templates/create' class='btn btn-success'>إنشاء جديد</a>");
+        });
          return $grid;
      }
      
      
 
 
+     
     /**
      * Make a show builder.
      *
@@ -70,45 +92,70 @@ class NotificationsTemplatesController extends AdminController
      * @return Show
      */
     protected function detail($id)
-{
-    $show = new Show(Notification::with('translations')->findOrFail($id));
+    {
+        $show = new Show(Notification::with('translations')->findOrFail($id));
+    
+        $show->field('key', __('Name'));
+    
+        $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
+    
+        foreach ($languages as $code => $lang) {
+            $show->field($lang, __($lang))->as(function () use ($code, $lang) {
+                $translation = $this->translations->where('language', $code)->first();
+                if ($translation) {
+                    return "<strong>📌 " . __("{$lang} Title") . ":</strong> {$translation->title}<br> 
+                            <strong>📩 " . __("{$lang} Message") . ":</strong> {$translation->message}";
+                }
+                return '-';
+            })->unescape();
+        }
+    
+        return $show;
+    }
+    
+    
 
-    $show->field('key', __('Name'));
 
-    $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
+    // public function create(\Encore\Admin\Layout\Content $content)
+    // {
+    //     return $content
+    //         ->title('إنشاء قالب جديد')
+    //         ->body(view('admin.notifications.create'));
+    // }
 
-    foreach ($languages as $code => $lang) {
-        $show->field($code, __($lang))->as(function () use ($code) {
-            $translation = $this->translations->where('language', $code)->first();
-            return $translation ? $translation->message : '-';
-        });
+    public function edit($id, \Encore\Admin\Layout\Content $content)
+    {
+        $template = Notification::with('translations')->findOrFail($id);
+
+        return $content
+            ->title('تعديل القالب')
+            ->body(view('admin.notifications.edit', compact('template')));
     }
 
-    return $show;
-}
 
 
+ 
     /**
      * Make a form builder.
      *
      * @return Form
      */
-    // protected function form()
-    // {
-    //     $form = new Form(new Notification());
+    protected function form()
+    {
+        $form = new Form(new Notification());
     
-    //     $form->text('key', __('Key'))->rules(function ($form) {
-    //         return $form->model()->id
-    //             ? 'required|max:255|unique:notifications,key,' . $form->model()->id
-    //             : 'required|max:255|unique:notifications,key';
-    //     });
+        $form->text('key', __('Key'))->rules(function ($form) {
+            return $form->model()->id
+                ? 'required|max:255|unique:notifications,key,' . $form->model()->id
+                : 'required|max:255|unique:notifications,key';
+        });
     
-    //     $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
+        // $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
     
-    //     // foreach ($languages as $code => $lang) {
-    //     //     $form->textarea("title_{$code}", __("{$lang} Title"))->rules('nullable|max:255');
-    //     //     $form->textarea("message_{$code}", __("{$lang} Message"))->rules('nullable');
-    //     // }
+        // foreach ($languages as $code => $lang) {
+        //     $form->textarea("title_{$code}", __("{$lang} Title"))->rules('nullable|max:255');
+        //     $form->textarea("message_{$code}", __("{$lang} Message"))->rules('nullable');
+        // }
 
     // foreach ($languages as $code => $lang) {
     //     $form->textarea("title_{$code}", __("{$lang} Title"))
@@ -132,61 +179,20 @@ class NotificationsTemplatesController extends AdminController
     //         ->rules('nullable');
     // }
 
-    //     $form->ignore(['title_ar', 'message_ar', 'title_en', 'message_en', 'title_tr', 'message_tr', 'title_hi', 'message_hi']);
+        // $form->ignore(['title_ar', 'message_ar', 'title_en', 'message_en', 'title_tr', 'message_tr', 'title_hi', 'message_hi']);
 
     
-    //     return $form;
-    // }
+        return $form;
+    }
 
     // تضمين الملف للوصول إلى المتغيرات
 
-    protected function form()
-    {
-        $form = new Form(new Notification());
-    
-        $form->text('key', __('Key'))->rules(function ($form) {
-            return $form->model()->id
-                ? 'required|max:255|unique:notifications,key,' . $form->model()->id
-                : 'required|max:255|unique:notifications,key';
-        });
-    
-        $languages = ['ar' => 'Arabic', 'en' => 'English', 'tr' => 'Turkish', 'hi' => 'Indian'];
-    
-        $variablesList = implode(', ', VARIABLES);
-    
-        $form->html(
-            "<div style='border: 1px solid var(--primary-hover-alpha) !important; padding: 10px; border-radius: 4px; '>
-               <br> 
-                " . $variablesList . "
-            </div>",
-            'Available Variables'
-        );
-            
-        foreach ($languages as $code => $lang) {
-            $form->textarea("title_{$code}", __("{$lang} Title"))
-                ->default(function ($form) use ($code) {
-                    if ($form->model()->id) {
-                        $translation = $form->model()->translations->where('language', $code)->first();
-                        return $translation ? $translation->title : null;
-                    }
-                    return null;
-                })
-                ->rules('nullable|max:255');
-    
-            $form->textarea("message_{$code}", __("{$lang} Message"))
-                ->default(function ($form) use ($code) {
-                    if ($form->model()->id) {
-                        $translation = $form->model()->translations->where('language', $code)->first();
-                        return $translation ? $translation->message : null;
-                    }
-                    return null;
-                })
-                ->rules('nullable')
-                ->help(__('help_message', ['variables' => $variablesList]))  ;      }
-            $form->ignore(['title_ar', 'message_ar', 'title_en', 'message_en', 'title_tr', 'message_tr', 'title_hi', 'message_hi']);
+   
+ 
 
-        return $form;
-    }
-    
+
+
+
+
     
 }    

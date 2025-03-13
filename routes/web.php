@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\DeleteAccount;
+use Encore\Admin\Controllers\AdminController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
@@ -104,11 +105,14 @@ Route::group(
 
         Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
-        // Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
+
+        // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
 
 
     }
 );
+
 Route::group(
     [
         'prefix' => '',

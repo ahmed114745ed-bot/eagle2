@@ -1669,7 +1669,8 @@
     "transferred": "Aktarıldı",
     "completed": "Tamamlandı",
     "rejected": "Reddedildi",
-    "rejectedAdmin": "Yönetici tarafından reddedildi"
+    "rejectedAdmin": "Yönetici tarafından reddedildi",
+    "Message":"Mesajı"
 
 
 

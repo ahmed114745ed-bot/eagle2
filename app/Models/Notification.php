@@ -33,18 +33,18 @@ class Notification extends Model
         static::saved(function ($notification) {
             $languages = ['ar', 'en', 'tr', 'hi'];
 
-            foreach ($languages as $code) {
-                NotificationTranslation::updateOrCreate(
-                    [
-                        'notification_id' => $notification->id,
-                        'language' => $code
-                    ],
-                    [
-                        'title'   => request()->input("title_{$code}"),
-                        'message' => request()->input("message_{$code}")
-                    ]
-                );
-            }
+            // foreach ($languages as $code) {
+            //     NotificationTranslation::updateOrCreate(
+            //         [
+            //             'notification_id' => $notification->id,
+            //             'language' => $code
+            //         ],
+            //         [
+            //             'title'   => request()->input("title_{$code}"),
+            //             'message' => request()->input("message_{$code}")
+            //         ]
+            //     );
+            // }
             Cache::put($notification->key, $notification->translations->toArray());
 
         });
