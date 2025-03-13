@@ -2,26 +2,27 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Notification;
-use App\Models\NotificationTemplate;
-use App\Models\NotificationTranslation;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\helper\HelperType; 
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use Encore\Admin\Facades\Admin;
+use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Cache;
+use App\Models\NotificationTranslation;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
 require_once app_path('helper/helperType.php'); 
 
-class NotificationsTemplatesController extends AdminController
+class NotificationsTemplatesController extends MainController
 {
 
 
   
-
+    public $permission_name = 'notification';
     /**
      * Title for current resource.
      *
