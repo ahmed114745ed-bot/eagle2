@@ -176,7 +176,7 @@
         }
 
         button{
-            width: 200px;
+            width: 198px;
 
         }
 
@@ -226,34 +226,46 @@
 
         <div id="themeSettings" class="settings-section">
             <h3>{{  __('Theme settings')}}</h3>
-            <form action="{{ route('admin.settings.update') }}" method="POST">
+            <form id="themeSettingsForm"  action="{{ route('admin.settings.update') }}" method="POST">
             <div class="form">
                 @csrf
-                <label>{{ __('Primary Color:') }}</label>
-                <input type="color" name="primary_color" value="{{ $settings['primary_color'] ?? '#000000' }}"
-                    style="background: {{ $settings['primary_color'] ?? '#000000' }};">
+                <label for="primary_color">{{ __('Primary Color:') }}</label>
+            <input type="color" id="primary_color" name="primary_color" 
+                value="{{ $settings['primary_color'] ?? '#000000' }}"
+                style="background: {{ $settings['primary_color'] ?? '#000000' }};"
+                title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
 
-                <label>{{ __('Secondary Color:') }}</label>
-                <input type="color" name="secondary_color" value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                    style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};">
+            <label for="secondary_color">{{ __('Secondary Color:') }}</label>
+            <input type="color" id="secondary_color" name="secondary_color" 
+                value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
+                title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
 
-                <label>{{ __('Text Primary Color:') }}</label>
-                <input type="color" name="text_primary_color" value="{{ $settings['text_primary_color'] ?? '#000000' }}"
-                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};">
+            <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>
+            <input type="color" id="text_primary_color" name="text_primary_color" 
+                value="{{ $settings['text_primary_color'] ?? '#000000' }}"
+                style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"
+                title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">
 
-                <label>{{ __('Text Secondary Color:') }}</label>
-                <input type="color" name="text_secondary_color" value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
-                    style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};">
+            <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
+            <input type="color" id="text_secondary_color" name="text_secondary_color" 
+                value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
+                style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};"
+                title="لون النص الثانوي المستخدم في الشروحات أو النصوص المساعدة.">
 
-                <label>{{ __('Box Background Color:') }}</label>
-                <input type="color" name="box_background_color" value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};">
+            <label for="box_background_color">{{ __('Box Background Color:') }}</label>
+            <input type="color" id="box_background_color" name="box_background_color" 
+                value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
+                title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
 
-                <label>{{ __('Table Background Color:') }}</label>
-                <input type="color" name="table_background_color" value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                    style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};">
-
+            <label for="table_background_color">{{ __('Table Background Color:') }}</label>
+            <input type="color" id="table_background_color" name="table_background_color" 
+                value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
+                style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
+                title="لون خلفية الجداول في التقارير أو البيانات.">
                 <button type="submit">{{ __('save') }}</button>
+                <button type="button" id="resetColors">{{ __('Reset Colors') }}</button>
                 </div>
             </form>
         </div>
@@ -328,5 +340,35 @@
         document.getElementById("imageModal").style.display = "none";
     }
     </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+        let resetButton = document.getElementById('resetColors');
+
+        if (resetButton) {
+            resetButton.addEventListener('click', function () {
+                let colorInputs = {
+                    'primary_color': "#FF9428",
+                    'secondary_color': "#1A1A1A",
+                    'text_primary_color': "#fdf8f8",
+                    'text_secondary_color': "#c1b9b9",
+                    'box_background_color': "#222222",
+                    'table_background_color': "#c88213"
+                };
+
+                Object.keys(colorInputs).forEach(id => {
+                    let input = document.getElementById(id);
+                    if (input) {
+                        input.value = colorInputs[id];
+                    }
+                });
+
+                // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
+                document.getElementById('themeSettingsForm').submit();
+            });
+        }
+    });
+</script>
+
     </div>
 </body>
