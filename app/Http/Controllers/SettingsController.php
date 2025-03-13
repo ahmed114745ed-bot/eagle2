@@ -22,19 +22,18 @@ class SettingsController extends Controller
     public function update(Request $request){
 
 
-        $data = $request->all();
+        $data = $request->except('_token');
+        
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
                 $file = $request->file($key);
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 $filePath = $file->move('uploads/settings', $fileName);
                 $value = $fileName;
-
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
         }
-
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

@@ -25,7 +25,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>'.env('APP_NAME', 'Laravel').'</b>',
+    // 'logo' => '<b>'.env('APP_NAME', 'Laraveuuuul').'</b>',
 
     /*
     |--------------------------------------------------------------------------
