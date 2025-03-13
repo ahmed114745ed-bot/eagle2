@@ -66,6 +66,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\CustomController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -303,10 +304,10 @@ Route::group(
 
         $router->resource('ovip', 'OVipController');
 
-       
+
             Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
-               
+
                 Route::get('/{type}', [OvipGiftController::class, 'create']);
                 Route::post('/', [OvipGiftController::class, 'store']);
                 Route::get('/{id}/edit', [OvipGiftController::class, 'edit'])->where('id', '[0-9]+');
@@ -375,6 +376,7 @@ Route::group(
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
+        $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
