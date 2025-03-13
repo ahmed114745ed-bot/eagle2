@@ -132,6 +132,7 @@ class BannerController extends MainController
         $show->field('expire', __('duration(days)'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
+        $this->extendShow($show);
 
         return $show;
     }
