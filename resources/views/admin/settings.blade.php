@@ -208,14 +208,14 @@
                 <label> {{  __('Application logo:')}}</label>
                 <input type="file" name="app_logo" class="form-control">
                 @if(!empty($settings['app_logo']))
-                    <img src="{{ asset('uploads/settings/' . $settings['app_logo']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
+                    <img src="{{ getImagePath( $settings['app_logo']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
                 @endif
 
 
                 <label> {{  __('Application Fav Icon:')}}</label>
                 <input type="file" name="app_fav_icon" class="form-control">
                 @if(!empty($settings['app_fav_icon']))
-                    <img src="{{ asset('uploads/settings/' . $settings['app_fav_icon']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
+                    <img src="{{ getImagePath( $settings['app_fav_icon']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
                 @endif
 
                 <button type="submit">{{ __('save') }}</button>
