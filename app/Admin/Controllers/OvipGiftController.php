@@ -6,17 +6,10 @@ use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use Illuminate\Support\Str;
-use App\Models\VipPrivilege;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
-use App\Selectables\Privileges;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
-use Google\Service\Classroom\Level;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -36,7 +29,12 @@ class OvipGiftController extends MainController
         <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
-        $ovip = OVip::find(request('ovip_id'));
+        if (request('ovip_id')) {
+            $ovip = OVip::find(request('ovip_id'));
+        } elseif (request('level')) {
+            $ovip = OVip::where('level', request('level'));
+        }
+
 
         // Add the back button
 
@@ -92,11 +90,10 @@ class OvipGiftController extends MainController
 
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->tools(function (Grid\Tools $tools)use ($level, $type,$name)  {
-            $url = route('admin.ware-gift.create', ['level' => $level, 'type' => $type]);
-
+        $grid->tools(function (Grid\Tools $tools) use ($level, $type, $name) {
+            $url =    url('admin/ware-gift/' . $level . '/' . $type);
             $add = __('add');
-           
+
             $customButtonHTML = <<<HTML
 
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
@@ -142,7 +139,7 @@ class OvipGiftController extends MainController
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
-        
+
         $form->number('exp', __('exp'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
@@ -215,9 +212,16 @@ class OvipGiftController extends MainController
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
-            
+
 
             (new UserCounterServices)->eventUsers('ware');
+        });
+
+        $form->saved(function (Form $form) {
+            $level = $form->model()->level; // Get the saved model's ID
+            $ovip = Ovip::where('level', $level)->first();
+            $url = url('admin/ovip-gift/' . $ovip->id);
+            return redirect()->to($url);
         });
 
 

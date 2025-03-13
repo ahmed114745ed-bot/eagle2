@@ -17,6 +17,8 @@ use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomVipController;
+use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -34,6 +36,7 @@ use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
@@ -44,6 +47,7 @@ use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
@@ -62,8 +66,6 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\MomentSettingsController;
-use App\Admin\Controllers\ReelSettingsController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -124,7 +126,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::post('targe-percentage', [AddTargetToJsonController::class,'targetPercentage'])->name('target-percentage');
+        Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
 
         $router->post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
@@ -300,6 +302,17 @@ Route::group(
 
 
         $router->resource('ovip', 'OVipController');
+
+       
+            Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
+            Route::prefix('ware-gift/{level}')->group(function () {
+               
+                Route::get('/{type}', [OvipGiftController::class, 'create']);
+                Route::post('/', [OvipGiftController::class, 'store']);
+                Route::get('/{id}/edit', [OvipGiftController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftController::class, 'destroy'])->where('id', '[0-9]+');
+            });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -378,7 +391,7 @@ Route::group(
         //             ->icon('fa-file');
         //     }));
 
-       // $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+        // $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->resource('report-reals', ReportRealsController::class);
         $router->resource('report-moments', ReportMomentController::class);
         $router->resource('admin-users', AdminUsersController::class);

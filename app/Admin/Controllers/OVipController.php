@@ -103,8 +103,12 @@ class OVipController extends MainController
         });
         $grid->column('price', __('price'));
         $grid->column('expire', __('expire'));
-        //        $grid->created_at(trans('admin.created_at'));
-        //        $grid->updated_at(trans('admin.updated_at'));
+        $grid->column(__('gifts'))->display(function () {
+            // توليد الروابط
+            $url1 = url('admin/ovip-gift/' . $this->id);
+        
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gifts') . "</a>";            return $button1;
+        });
         $this->extendGrid($grid);
         $grid->disableExport();
         Admin::script("
