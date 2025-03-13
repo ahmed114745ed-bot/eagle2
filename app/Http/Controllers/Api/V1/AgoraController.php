@@ -43,7 +43,7 @@ class AgoraController extends Controller
 
     public function webhook(Request $request){
 
-        // Log::info('agora webhook triggered', [
+        // Log::info('agora webhook triggered enter room ', [
         //     $request->all()
         // ]);
         // return ;

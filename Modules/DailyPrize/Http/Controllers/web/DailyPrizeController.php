@@ -117,6 +117,11 @@ class DailyPrizeController extends AdminController
             ->description(trans('admin.description'))
             ->body($form);
     }
+    public function update($id)
+    {
+        $id = request()->route('id');
+        return $this->form()->update($id);
+    }
 
     public function show($id, Content $content)
     {

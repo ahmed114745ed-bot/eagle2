@@ -23,9 +23,11 @@ class Room extends Model
 
     protected $guarded = ['id'];
     protected $appends = ['lang', 'country'];
+    protected $casts = [
+        'is_pk' => 'boolean',
+    ];
     //    protected $attributes = ['room_background'];
 
-    protected $casts = [];
 
     public function getCreatedAtAttribute($value)
     {

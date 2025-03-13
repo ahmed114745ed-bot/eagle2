@@ -74,6 +74,28 @@ trait FollowTrait
     }
 
 
+    public function friendsFollowedId()
+    {
+        $friendsIds = $this->belongsToMany(
+            User::class,
+            'follows',
+            'user_id',
+            'followed_user_id'
+        )
+        ->whereIn('followed_user_id', function ($query) {
+            $query->select('user_id')
+                  ->from('follows')
+                  ->where('followed_user_id', $this->id);
+        })
+        ->wherePivot('status', 1)
+        ->pluck('followed_user_id'); // استخراج معرفات الأصدقاء
+    
+        $followedIds = Follow::where('user_id', $this->id)
+            ->pluck('followed_user_id'); // استخراج معرفات المستخدمين الذين يتابعهم
+    
+        return $friendsIds->merge($followedIds)->unique(); // دمج النتائج وإزالة التكرارات
+    }
+    
     // Assume we have a relationship to check if the user is being followed
     public function followedByAuthUser()
     {

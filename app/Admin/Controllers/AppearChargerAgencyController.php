@@ -147,11 +147,12 @@ class AppearChargerAgencyController extends MainController
         
         // $grid->column('agency.name', __('agency_name'));
         // $grid->column('agency.coins', __('agency_coins'));
-        // $grid->column('agency.img', __('agency_image'));
-        // $grid->column('profile.avatar', __('image'))->image('', 50);
+        // // $grid->column('agency.img', __('agency_image'));
+        // // $grid->column('profile.avatar', __('image'))->image('', 50);
         // $grid->column('phone', __('Phone'));
         // $grid->column('agency_id', __('agency_id'));
         $grid->column('appear_charger_agency', __('Appear charger agency'))->switch(Common::getSwitchStates());
+        $grid->column('is_frozen', __("frozen"))->switch(Common::getSwitchStates());
         $grid->disableCreateButton();
         $grid->disableActions();
 

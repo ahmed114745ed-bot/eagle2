@@ -1697,7 +1697,10 @@
     "Admin": "Yönetici",
     "Member": "Üye",
     "Unknown": "Bilinmeyen",
-    "family": "Aile"
+    "family": "Aile",
+    "Publish at": "Yayınlanma tarihi",
+    "Is active": "Aktif mi",
+    "frozen": "Şarjı Dondur"
 
 
 

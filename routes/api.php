@@ -85,7 +85,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
-
+    Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
+    
     Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego']);
     Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");

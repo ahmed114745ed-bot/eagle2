@@ -51,6 +51,13 @@ class EnteranceController extends Controller
     {
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
+    public function updateRoomCountFromPusher_new(Request $request)
+    {
+         Log::info(' pusher triggered enter room ', [
+            $request->all()
+        ]);
+    }
+    
 
     public function updateRoomCountFromZego(Request $request)
     {

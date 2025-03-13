@@ -1725,7 +1725,10 @@
     "Admin": "المشرف",
     "Member": "عضو",
     "Unknown": "غير معروف",
-    "family": "العائلة"
+    "family": "العائلة",
+   "Publish at": "النشر في",
+    "Is active": "نشط",
+    "frozen" :"تجميد الشحن"
 
 
 

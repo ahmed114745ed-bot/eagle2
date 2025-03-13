@@ -81,7 +81,8 @@ class User extends Authenticatable
         'user_diamond',
         'total_sender_level',
         'total_received_level',
-        'original_uuid'
+        'original_uuid',
+        'is_frozen'
     ];
 
     /* protected $appends = [
@@ -1130,5 +1131,28 @@ class User extends Authenticatable
     public function userVips()
     {
         return $this->hasMany(UserVip::class, 'user_id'); 
+    }
+
+    public function getIsFrozenAttribute()
+    {
+        return optional($this->agency)->is_frozen; 
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+
+        static::saving(function ($model) {
+            if (request()->has('is_frozen')) {
+
+                if ($model->agency) {
+                    $model->agency->update(['is_frozen' => request()->is_frozen]);
+                } else {
+                    \Log::warning("User ID {$model->id} does not have an agency.");
+                }
+                request()->request->remove('is_frozen');
+            }
+        });
     }
 }
