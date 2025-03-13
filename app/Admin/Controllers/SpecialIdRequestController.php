@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use Admin;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
@@ -21,9 +22,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\SpecialId\Entities\UserWare;
 use App\Admin\Controllers\MainController;
+use App\Admin\Widgets\Table;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use Modules\SwitchAccount\Entities\UserAccount;
 
 class SpecialIdRequestController extends MainController
 {
@@ -80,10 +84,34 @@ class SpecialIdRequestController extends MainController
         $grid->id('ID');
         $grid->column('ware.value',__("special_id"));
 
-        $grid->column('user.name',__ ('user'));
-        $grid->column('user.uuid',__ ('user id'));
-        $grid->column('disable',__ ('status'))->display (function (){
-            return ($this->disable ? __('Enabled') : __('Disabled')) ;
+        $grid->column('user.name', __('User'))->display(function () {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($this->user->profile?->avatar) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return '
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
+                    <div>
+                        <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">'.$this->user->name.'</a>
+                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user->uuid.'</div>
+                    </div>
+                </div>
+            ';
+        });
+        $grid->column('user.phone', __('Phone'));
+
+
+
+        $grid->column('disable', __('Status'))->display(function () {
+            if ($this->disable) {
+                return '<span style="background-color: #28a745; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px;">'.__('Enabled').'</span>';
+            } else {
+                return '<span style="background-color: #dc3545; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 12px;">'.__('Disabled').'</span>';
+            }
         });
 
 

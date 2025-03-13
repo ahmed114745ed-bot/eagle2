@@ -63,7 +63,7 @@ class SpecialWareController extends  MainController
      * Make a grid builder.
      *
      * @return Grid
-     * 
+     *
      */
     protected function grid()
     {
@@ -83,10 +83,14 @@ class SpecialWareController extends  MainController
                 6 => trans('limited time purchase'),
             ]
         );
-        $grid->column('value', __('value'));
-        $grid->column('price', __('price'))->display (function ($coin){
-            return number_format($coin); 
-         })->editable();
+        $grid->column('value', __('value'))->display(function ($coin) {
+            $icon = asset('images/coin.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
+        });
+        $grid->column('price', __('Price'))->display(function ($coin) {
+            $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
+        });
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
@@ -177,7 +181,7 @@ class SpecialWareController extends  MainController
         $form->text('title_en', trans('Title en'));
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
-                
+
                 $form->number('price', trans('price'))->rules('required|max:9', [
 
                     'max' => __('The maximum price allowed is 9 hundred million'),
@@ -194,7 +198,7 @@ class SpecialWareController extends  MainController
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
-       
+
         $form->number('level', trans('level'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
@@ -204,7 +208,7 @@ class SpecialWareController extends  MainController
         })->rules('required');
         $form->color('color', trans('color'));
 
-       
+
         $form->number('num', __('num'));
 
 

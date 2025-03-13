@@ -53,10 +53,9 @@ class EnteranceController extends Controller
     }
     public function updateRoomCountFromPusher_new(Request $request)
     {
-         Log::info(' webhook triggered enter room ', [
+         Log::info(' pusher triggered enter room ', [
             $request->all()
         ]);
-        // return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
     
 
