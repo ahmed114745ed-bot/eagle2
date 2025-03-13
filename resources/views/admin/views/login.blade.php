@@ -9,7 +9,7 @@
 
         
         if ($logoDb) {
-            $logo = asset('uploads/settings/' . $logoDb);
+            $logo = getImagePath( $logoDb);
         }
     }
 @endphp
