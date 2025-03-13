@@ -199,6 +199,7 @@ class EnteranceRoomServices
     
         $data = $request->all(); 
       
+        // Log::info('Agora data ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
@@ -225,6 +226,11 @@ class EnteranceRoomServices
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
     
         if (in_array($eventType, [101, 103])) {
+            // Log::info('enter rooom 101,102', [
+            //     'event_type' => $eventType,
+          
+            // ]);
+    
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
         

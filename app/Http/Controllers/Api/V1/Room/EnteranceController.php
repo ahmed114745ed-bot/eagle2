@@ -51,6 +51,14 @@ class EnteranceController extends Controller
     {
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
+    public function updateRoomCountFromPusher_new(Request $request)
+    {
+         Log::info(' webhook triggered enter room ', [
+            $request->all()
+        ]);
+        // return $this->enteranceRoomService->updateRoomCountFromPusher($request);
+    }
+    
 
     public function updateRoomCountFromZego(Request $request)
     {
