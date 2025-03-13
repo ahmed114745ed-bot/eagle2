@@ -2,14 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Language;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\Language;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class LanguageController extends AdminController
+class LanguageController extends MainController
 {
     /**
      * Title for current resource.
@@ -17,6 +18,7 @@ class LanguageController extends AdminController
      * @var string
      */
     protected $title = 'Language';
+    public $permission_name = 'language';
 
     /**
      * Make a grid builder.

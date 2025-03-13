@@ -1670,7 +1670,8 @@
     "completed": "Tamamlandı",
     "rejected": "Reddedildi",
     "rejectedAdmin": "Yönetici tarafından reddedildi",
-    "Message":"Mesajı"
+    "Message":"Mesajı",
+    "notification": "Bildirim"
 
 
 

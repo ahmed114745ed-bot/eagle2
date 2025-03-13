@@ -813,7 +813,8 @@
     "completed": "पूरा हुआ",
     "rejected": "अस्वीकृत",
     "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत",
-    "Message":"संदेश"
+    "Message":"संदेश",
+     "notification": "सूचना"
 
 
 
