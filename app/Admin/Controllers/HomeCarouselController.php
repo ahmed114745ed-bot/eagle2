@@ -60,6 +60,20 @@ class HomeCarouselController extends MainController
             ->body($this->form());
     }
 
+    public function update($id)
+    {
+        // $id = request()->route('id');
+        $banner = HomeCarousel::find($id);
+        $admin = Auth::user();
+        $created = AdminModel::find($banner->created_by);
+        if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
+            admin_info(trans('messages.denyDelete'));
+            return redirect()->route('admin.home_carousels.index');
+        } else {
+            return $this->form()->update($id);
+        }
+    }
+
 
     /**
      * Make a grid builder.

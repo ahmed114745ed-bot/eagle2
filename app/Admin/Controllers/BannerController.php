@@ -61,6 +61,20 @@ class BannerController extends MainController
             ->body($this->form()->edit($id));
     }
 
+    public function update($id)
+    {
+        // $id = request()->route('id');
+        $banner = Banner::find($id);
+        $admin = Auth::user();
+        $created = AdminModel::find($banner->created_by);
+        if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
+            admin_info(trans('messages.denyDelete'));
+            return redirect()->route('admin.banners.index');
+        } else {
+            return $this->form()->update($id);
+        }
+    }
+
 
 
     /**
@@ -88,13 +102,11 @@ class BannerController extends MainController
             $admin = Auth::user();
             $created = AdminModel::find($model->created_by);
 
-           // dd( $admin ,$created);
-           if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
+            // dd( $admin ,$created);
+            if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
                 $actions->disableDelete();
                 $actions->add(new DenyDeleteAction());
             }
-            
-           
         });
 
         return $grid;
@@ -136,7 +148,7 @@ class BannerController extends MainController
 
         $form->image('image_url', __('Image url'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        })->required()->dir('banners');
+        });
         $form->switch('publish', __('Publish Now'));
         $form->number('expire', __('duration(days)'));
         $form->switch('is_active', __('Is active'));
@@ -148,18 +160,18 @@ class BannerController extends MainController
         return $form;
     }
 
-//     public function store()
-//     {
-//          $data = request()->all();
-//         (new BannerServices())->store($data);
-//     }
+    //     public function store()
+    //     {
+    //          $data = request()->all();
+    //         (new BannerServices())->store($data);
+    //     }
 
-//     public function update($id)
-//     {
-//         $data = request()->all();
-// //        dd($data);
-//         (new BannerServices())->update($id, $data);
-//     }
+    //     public function update($id)
+    //     {
+    //         $data = request()->all();
+    // //        dd($data);
+    //         (new BannerServices())->update($id, $data);
+    //     }
 
     public function create(Content $content)
     {

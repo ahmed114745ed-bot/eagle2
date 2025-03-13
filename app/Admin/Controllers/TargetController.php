@@ -62,6 +62,8 @@ class TargetController extends MainController
             ->body($this->form()));
     }
 
+   
+
 
 
     /**
@@ -231,6 +233,9 @@ class TargetController extends MainController
 
     public function update($id)
     {
+        $banner = Target::find($id);
+        $admin = Auth::user();
+        $created = AdminModel::find($banner->created_by);
         $data   = \request()->all();
         if (isset($data['reel1'])) {
             $reel1  = $data['reel1'];
@@ -265,13 +270,19 @@ class TargetController extends MainController
         }
 
 
-
-        Request::replace($data);
-        return $this->form()->update($id);
+        if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
+            admin_info(trans('messages.denyDelete'));
+            return redirect()->route('admin.targets.index');
+        } else {
+            Request::replace($data);
+            return $this->form()->update($id);
+        }
+        
     }
 
     public function store()
     {
+        
 
         $data = \request()->all();
         $values = [
