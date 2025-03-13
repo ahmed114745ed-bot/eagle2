@@ -1727,7 +1727,8 @@
     "Time zone:" : "المنطقة الزمنية:",
       "available_variables" : "المتغيرات المتاحة",
       "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables",
-"Message":"الرساله"
+"Message":"الرساله",
+"Notification": "الإشعار"
 
 
 }
