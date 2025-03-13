@@ -38,7 +38,7 @@ Route::group(
             Route::post('/', [DailyPrizeController::class, 'store']);
             Route::get('/{id}', [DailyPrizeController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/{id}/edit', [DailyPrizeController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [DailyPrizeController::class, 'updated']);
+            Route::put('/{id}', [DailyPrizeController::class, 'update']);
             Route::delete('/{id}', [DailyPrizeController::class, 'destroy'])->where('id', '[0-9]+');
         });
     });
