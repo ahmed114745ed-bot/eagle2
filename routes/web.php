@@ -94,6 +94,11 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+        Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
+        Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
+        Route::post('ios-setting', [addTOjesonController::class, 'ios'])->name('ios-setting');
+        Route::post('huawi-setting', [addTOjesonController::class, 'hawawi'])->name('huawi-setting');
+
         Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
         Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
         Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');

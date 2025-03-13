@@ -170,7 +170,7 @@
 
                 $vip=DB::table('configs')->where('name','upload_reel')->first();
                // $users=DB::table('users')->get();
-    @endphp
+                @endphp
                 <h3> {{ __('Reel Settings') }}</h3>
 
                 <form action="{{ route('admin.reel-config') }}" method="POST" enctype="multipart/form-data">
