@@ -87,7 +87,10 @@ class OvipGiftController extends MainController
         $grid->expire(__('expire'));
 
 
-
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+        $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) use ($level, $type, $name) {
