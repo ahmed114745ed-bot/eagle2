@@ -94,7 +94,7 @@ class  AdminAgencyMangerController extends MainController
             $uid = @$this->username;
             $path = $this->avatar;
             // $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ;
+            $url = $path;
 
             // Check if the image exists
             // if (!isImageExists($url)) {
