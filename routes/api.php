@@ -135,7 +135,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         function () {
 
             Route::post('/broadcasting/auth', function (Request $request) {
-                Log::info(json_decode(Broadcast::auth($request)));
+                Log::info('broadcasting: '.json_decode(Broadcast::auth($request)));
                 return Broadcast::auth($request);
             });
 
