@@ -92,7 +92,6 @@ class  AdminAgencyMangerController extends MainController
 
         $grid->column('name', __('Agency Manager'))->display(function ($name) {
             $uid = @$this->username;
-            $path = @$this->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
