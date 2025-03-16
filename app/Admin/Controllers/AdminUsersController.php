@@ -101,7 +101,7 @@ class AdminUsersController extends MainController
 
         $grid->column('user.name', __('User'))->display(function () {
             $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($this->user->profile?->avatar) ?? $defaultImage;
+            $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
@@ -112,7 +112,7 @@ class AdminUsersController extends MainController
                     <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
                     <div>
                         <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">'.$this->user->name.'</a>
-                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user->uuid.'</div>
+                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user?->uuid.'</div>
                     </div>
                 </div>
             ';
