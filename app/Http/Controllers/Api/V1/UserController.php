@@ -68,7 +68,7 @@ class UserController extends Controller
         if (!$user) {
             return Common::apiResponse(false, 'Unauthorized', []);
         }
-        $user->update(['new_gift' => true]);
+        $user->update(['new_gift' => false]);
 
         $gifts = Gift::where('price', '<=', $user->di)->paginate(10);
         return Common::apiResponse(true,'', $gifts);
