@@ -49,6 +49,7 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\ZegoCreditionalResource;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
+use App\Models\Gift;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -59,6 +60,12 @@ class UserController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
+    }
+
+    public function userGifts(){
+        $di = auth()->user()->di;
+        $gifts = Gift::where('price', '<=', $di)->where('new_gift', false)->paginate(10);
+        return Common::apiResponse(true,'', $gifts);
     }
 
     public function chargerAgency(Request $request, ProfileRelationsService $profileRelationsService)
