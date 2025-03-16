@@ -143,7 +143,7 @@ class OfficialMessageController extends MainController
         });
         $grid->column('url', trans('url'))
         ->display(function ($value) {
-            return "<span style='color: blue;'>$value</span>";
+            return "<span style='color: #89CFF0;'>$value</span>";
         });
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
