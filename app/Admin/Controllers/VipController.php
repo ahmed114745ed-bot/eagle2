@@ -92,9 +92,12 @@ class VipController extends MainController
                     case 'cp':
                         $query->where('type', 3);
                         break;
-                        case 'room':
-                            $query->where('type', 4);
-                            break;
+                    case 'room':
+                        $query->where('type', 4);
+                        break;
+                    case 'charge':
+                        $query->where('type', 5);
+                        break;
                 }
             }, __('Select type'), 'name_for_url_shortcut')->radio([
                 '' => __('All'),
@@ -111,11 +114,12 @@ class VipController extends MainController
             [
                 1 => __('broadcaster'),
                 2 => __('honor'),
-                3=>__ ('cp'),
-                4=>__ ('room'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
             ]
         );
-        $grid->column('level', __('Level'))->editable();   
+        $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
             return number_format($value);
@@ -164,8 +168,9 @@ class VipController extends MainController
             [
                 1 => __('broadcaster'),
                 2 => __('honor'),
-                3=>__ ('cp'),
-                4=>__ ('room'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
             ]
         )->default(2);
         $form->textarea('name_ar', __('name_ar'));
