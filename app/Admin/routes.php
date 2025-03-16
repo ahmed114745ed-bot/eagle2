@@ -68,6 +68,7 @@ use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\GroupChatController;
+use App\Admin\Controllers\OVipController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -304,6 +305,7 @@ Route::group(
 
 
         $router->resource('ovip', 'OVipController');
+        $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
             Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
