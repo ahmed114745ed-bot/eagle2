@@ -85,6 +85,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         return "gooooooooooooooooooooooooooooood";
     });
 
+    
+    Route::post('/broadcasting/auth', function (Request $request) {
+        return Broadcast::auth($request);
+    });
+
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
     Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
 
