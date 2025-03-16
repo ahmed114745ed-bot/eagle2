@@ -74,10 +74,30 @@ class ParentUsersController extends MainController {
                     });
 
             });
-        $grid->column ('uuid',__ ('uuid'));
+        $grid->column ('name',__ ('name'))->display (function ($recever){
+            $name =  $this->name ?? '';
+             $uid = @$this->uuid ?? 0;
+             $path = @$this->profile?->avatar;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
 
-        $grid->column ('name',__("name"));
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 $image
+                 <div>
+                     <strong>$name</strong><br>
+                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                 </div>
+             </div>
+         ";
+
+         });
         $grid->column ('user_count',__("user_count"))->display (function (){
             return count($this->codeInvitations);
         });

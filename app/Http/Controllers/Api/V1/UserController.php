@@ -63,8 +63,14 @@ class UserController extends Controller
     }
 
     public function userGifts(){
-        $di = auth()->user()->di;
-        $gifts = Gift::where('price', '<=', $di)->where('new_gift', false)->paginate(10);
+        $user = auth()->user();
+
+        if (!$user) {
+            return Common::apiResponse(false, 'Unauthorized', []);
+        }
+        $user->update(['new_gift' => true]);
+
+        $gifts = Gift::where('price', '<=', $user->di)->paginate(10);
         return Common::apiResponse(true,'', $gifts);
     }
 

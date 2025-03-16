@@ -160,7 +160,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
-                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('family') }}</button>
+                    style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('family') }}</button>
             </div>
         </div>
 
@@ -176,9 +176,10 @@
 
                         <label for="android_min_version" class="control-label">{{ __('admin.price') }} :</label>
 
-                        <input type="number" id="android_min_version" name="value"  placeholder="android_min_version" value="{{ $configValue }}"  min="1" class="inputs_cus_form">
+                        <input type="number" id="android_min_version" name="value" placeholder="android_min_version"
+                            value="{{ $configValue }}" min="1" class="inputs_cus_form">
                         <button type="submit">{{ __('Save') }}</button>
-                        
+
                     </div>
 
                 </form>
@@ -190,36 +191,48 @@
         </div>
         <!-- كود JavaScript -->
         <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Function to get query parameter by name
+                function getQueryParam(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
+
+                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+                const activeTab = getQueryParam("firsttab") || "PercentageTarget";
+
+                // Show the selected tab
+                showSection(activeTab);
+            });
+
             function showSection(sectionId) {
-                //     document.querySelectorAll('.settings-section').forEach(section => {
-                //         section.classList.remove('active');
-                //     });
-
-                //     document.getElementById(sectionId).classList.add('active');
-                // }
-
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
-                    button.style.color = ''; // إرجاع لون النص الافتراضي
-                });
-
-                // إخفاء جميع الأقسام
+                // Remove active class from all sections
                 document.querySelectorAll('.settings-section').forEach(section => {
                     section.classList.remove('active');
                 });
 
-                // إظهار القسم المطلوب
+                // Add active class to the selected section
                 document.getElementById(sectionId).classList.add('active');
 
-                // تحديد الزر المضغوط عليه
+                // Reset button styles
+                document.querySelectorAll('.settings-menu button').forEach(button => {
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+                });
+
+                // Highlight the active button
                 const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                if (activeButton) {
+                    activeButton.style.backgroundColor = 'var(--primary-color)';
+                    activeButton.style.color = 'var(--text-primary-color)';
+                }
 
-                // تعيين لون الزر من متغير CSS
-                activeButton.style.backgroundColor = 'var(--primary-color)';
-                activeButton.style.color = 'var(--text-primary-color)';
-
-
+                // Update the URL with the selected tab without reloading
+                const url = new URL(window.location);
+                url.searchParams.set("firsttab", sectionId);
+                window.history.pushState({}, "", url);
             }
+
 
             function openFullScreen(imgElement) {
                 var modal = document.getElementById("imageModal");

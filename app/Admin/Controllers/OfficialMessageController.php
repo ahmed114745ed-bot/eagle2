@@ -73,21 +73,78 @@ class OfficialMessageController extends MainController
         $grid->filter (function (Grid\Filter $filter){
             $filter->expand ();
             $filter->column(1/2, function ($filter) {
-                $filter->equal('user_id',__ ('uuid'));
+                $filter->equal('user.uuid',__ ('uuid'));
             });
         });
         $grid->id(__ ('ID'));
+        $grid->column('user.name',trans ('user id'))->display(function ($name) {
+            $uid = @$this->user->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
         $grid->title(trans('title'));
-        $grid->column('img',trans ('img'))->image ('',30);
-        $grid->column('user_id',trans ('user id'));
+       
+      
         $grid->content(__ ('content'));
-//        $grid->column('type',trans ('type'))->select (
-//            [
-//                1=>trans('system message'),
-//                2=>trans('system announcement')
-//            ]
-//        );
-        $grid->url( __ ('url'));
+        $grid->column('img',trans ('img'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img);
+            if (!isImageExists(@$path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
+                    <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
+
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
+
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
+        $grid->column('url', trans('url'))
+        ->display(function ($value) {
+            return "<span style='color: #89CFF0;'>$value</span>";
+        });
         $grid->created_at(trans('admin.created_at'));
         $grid->disableExport();
 
