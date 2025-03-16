@@ -13,7 +13,7 @@ class MangerSettingController extends MainController
 
 
     
-    public function index(Content $content)
+    public function index1(Content $content)
     {
         $route = 'admin.update-config-group-chat';
 
@@ -99,5 +99,16 @@ class MangerSettingController extends MainController
         return parent::index($content
             ->title(trans('Settings'))
             ->body(new HtmlString($form)));
+    }
+
+
+
+    public function index(Content $content)
+    {
+
+        $config = Config::where('name', 'system_default_manger')->first();
+        $configValue = $config->value ?? '';
+        return  parent::index($content
+            ->view('mangerSetting', compact('config', 'configValue')));
     }
 }

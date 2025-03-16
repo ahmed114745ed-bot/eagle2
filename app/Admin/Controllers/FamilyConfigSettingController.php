@@ -11,13 +11,12 @@ class FamilyConfigSettingController extends MainController
 
 
 
-    public function index(Content $content){
+    public function index(Content $content)
+    {
 
         $config = Config::where('name', 'family_price')->first();
-    $configValue = $config->value ?? '';
-        return $content
-        ->view('familySetting',compact('config', 'configValue'));
+        $configValue = $config->value ?? '';
+        return  parent::index($content
+            ->view('familySetting', compact('config', 'configValue')));
     }
-    
-   
 }
