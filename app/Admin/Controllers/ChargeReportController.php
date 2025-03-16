@@ -259,7 +259,7 @@ class ChargeReportController extends MainController {
             } elseif ($this->status == 0) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
             }
-        })->unescape(); // Allows rendering raw HTML
+        }); // Allows rendering raw HTML
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         return $grid;
     }
@@ -336,7 +336,7 @@ class ChargeReportController extends MainController {
             } elseif ($this->status == 0) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
             }
-        })->unescape(); // Allows rendering raw HTML
+        }); // Allows rendering raw HTML
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';
