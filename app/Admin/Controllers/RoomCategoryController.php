@@ -72,7 +72,44 @@ class RoomCategoryController extends MainController
         $grid->id(__ ('ID'));
         $grid->name(trans('name'));
         $grid->column('name_en',trans ('name_en'));
-        $grid->column('img',trans ('img'))->image ('',30);
+        $grid->column('img',trans ('img'))->display(function ($img) {
+            $defaultImage = asset("images/background_room.jpg");
+            $path = getImagePath($img);
+            if (!isImageExists(@$path)) {
+                $path = $defaultImage;
+            }
+            $parsedUrl = parse_url($path);
+            $correctUrl = isset($parsedUrl['host']) ? $path : url("/$path");
+
+            return "
+                    <img src='$correctUrl' style='width: 50px; height: 50px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
+
+                    <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
+                        <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
+                        <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
+                    </div>
+
+                    <script>
+                        function openModal(src) {
+                            let modal = document.getElementById('imageModal');
+                            let modalImage = document.getElementById('modalImage');
+                            modal.style.display = 'block';
+                            modalImage.src = src;
+                        }
+
+                        function closeModal() {
+                            document.getElementById('imageModal').style.display = 'none';
+                        }
+
+                        // Close modal when clicking outside the image
+                        document.getElementById('imageModal').addEventListener('click', function(event) {
+                            if (event.target === this) {
+                                closeModal();
+                            }
+                        });
+                    </script>
+                ";
+        });
         $grid->column('type',trans ('type'));
         $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
         $this->extendGrid ($grid);
