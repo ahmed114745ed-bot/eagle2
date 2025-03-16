@@ -434,8 +434,9 @@
      "device": "Device",
      "staff": "Staff",
      "frozen": "Freeze Charging",
-     "Box":"Box"
-
+     "Box":"Box",
+     "type_local" : "Local",
+     "type_global" : "Global"
 
 
 

@@ -1700,8 +1700,11 @@
     "family": "Aile",
     "Publish at": "Yayınlanma tarihi",
     "Is active": "Aktif mi",
-    "frozen": "Şarjı Dondur"
+    "frozen": "Şarjı Dondur",
+    "Max Admin": "Maksimum Yönetici Sayısı",
 
+    "type_local" : "Yerel",
+    "type_global" : "Küresel"
 
 
 

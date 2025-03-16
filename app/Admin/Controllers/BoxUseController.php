@@ -182,10 +182,10 @@ class BoxUseController extends MainController
         
         $grid->coins(__('coins'));
         $grid->end_at(__('end_at'));
-        // $grid->room_uid(__('room_uid'));
         $grid->users_num(__('users_num'));
-        $grid->type(__('type'));
-        $grid->label(__('label'));
+        $grid->column('type', __('Type'))->display(function ($value) {
+            return $value == 1 ? __('type_global') : __('type_local');
+        });        $grid->label(__('label'));
         $grid->used_num(__('used_num'));
         $grid->not_used_num(__('not_used_num'));
         

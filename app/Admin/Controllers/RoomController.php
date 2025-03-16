@@ -76,7 +76,7 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->orderByDesc('rooms.pin')
+        $grid->model()->orderByDesc('rooms.pin')->whereHas('owner')
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
             ->orderByDesc('count_room_socket');
@@ -98,27 +98,70 @@ class RoomController extends MainController
         });
 
         $grid->id(__('ID'));
-        $grid->column('owner.name', __('room owner'))->display(function ($name) {
-            $uid = $this->owner->uuid ?? '';
-            return "$name <br> <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+        $grid->column('owner.name', __('room owner')) ->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
         });
-        $grid->column('room_status')->switch(Common::getSwitchStates());
-        $grid->column('top_room')->switch(Common::getSwitchStates());
-        $grid->column('pin', __('pin'))->switch(Common::getSwitchStates());
+
+        $grid->column('room_name', __('room'))->display(function ($name) {
+            
+            $path = @$this->room_cover;
+            $defaultImage = asset("images/room.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <span  cursor: pointer;'>$name</span>
+                        </a>
+                    </div>
+
+                </div>
+            ";
+        });
+        $grid->column(__('status'))->display(function () {
+            return (new \App\Admin\Actions\RoomAction(
+                $this->id,
+                $this->room_status,
+                $this->top_room,
+                $this->is_afk,
+                $this->pin
+            ))->render();
+        });;
         $grid->column('sort_num', __('Sort Num'))->currency();
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
             return $maxAdmin ?? $maxRoomAdmin;
         });
-
-        $grid->column('room_name', __('room name'));
-        $grid->column('room_cover', __('room cover'))->image('', 30);
-        $grid->column('room_intro', __('room_intro'));
-        $grid->column('microphone', __('microphone'));
         $grid->column('count_room_socket', __('Number of users'));
-        $grid->column('is_afk', __('owner in'))->switch(Common::getSwitchStates());
-        //        $grid->column('free_mic',__ ('is mic free'))->switch (Common::getSwitchStates ());
+       
 
         $grid->actions(function ($action) {
             $action->disableView();
