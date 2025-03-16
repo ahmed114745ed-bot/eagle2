@@ -1154,5 +1154,16 @@ class User extends Authenticatable
                 request()->request->remove('is_frozen');
             }
         });
+        static::updating(function ($user) {
+            $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
+            $newCoins = $user->di;
+    
+            if ($newCoins > $originalCoins) {
+                $user->new_gift = true;
+            }
+        });
     }
+
+
+   
 }
