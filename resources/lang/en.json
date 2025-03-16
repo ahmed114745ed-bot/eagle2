@@ -433,7 +433,10 @@
      "ip": "IP",
      "device": "Device",
      "staff": "Staff",
-     "frozen": "Freeze Charging"
+     "frozen": "Freeze Charging",
+     "Box":"Box",
+     "type_local" : "Local",
+     "type_global" : "Global"
 
 
 

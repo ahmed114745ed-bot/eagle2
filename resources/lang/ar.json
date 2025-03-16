@@ -1670,6 +1670,7 @@
     "vips dedicate" : "أهداء الارستقراطيه",
     "user Active":" نشاط المستخدمين",
     "Achievement Id" : "معرف الانجاز",
+    "Chat Settings" : "اعدادات الجروب شات",
     "Custom Settings" : "الاعدادات المخصصة",
     "Description Ar" : "الوصف بالعربية",
     "Reel Settings" : "اعدادات الفيديوهات",
@@ -1730,7 +1731,10 @@
    "Publish at": "النشر في",
     "Is active": "نشط",
     "frozen" :"تجميد الشحن",
-    "Max Admin": "أعلى عدد للمديرين"
+    "Max Admin": "أعلى عدد للمديرين",
+    "Box":"صندوق",
+    "type_local" : "محلي",
+    "type_global" : "عالمي"
 
 
 

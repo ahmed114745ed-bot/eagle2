@@ -159,25 +159,25 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('MomentSettings')"
-                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('Moment Settings') }}</button>
+                <button onclick="showSection('ChatSettings')"
+                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('Chat Settings') }}</button>
             </div>
         </div>
 
         <div class="settings-content">
-            <div id="MomentSettings" class="settings-section active">
-                @php
+            <div id="ChatSettings" class="settings-section active">
+                <h3> {{ __('Chat Settings') }}</h3>
 
-            $vip=DB::table('configs')->where('name','upload_moment')->first();
-// $users=DB::table('users')->get();
-    @endphp
-                <h3> {{ __('Moment Settings') }}</h3>
-
-                <form action="{{ route('admin.moment-config') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.update-config-group-chat') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @php
+                                $config = App\Models\Config::where('name', 'group_chat')->first();
+                                $configValue =  $config->value;
+                    @endphp
                     <div class="form">
-                        <label>{{__('dashboard.moment_value_settings')}} </label>
-                        <input type="text" name="number" min="1"  value="{{$vip->value ?? ''}}" class="form-control">
+                        <input type="hidden"  name="id" value="{{ $config->id ?? '' }}">
+                        <label>{{__('admin.price')}} </label>
+                        <input type="number" min="1" name="value"   value="{{ $configValue ?? ''}}" class="form-control">
 
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-    const activeTab = getQueryParam("firsttab") || "MomentSettings";
+    const activeTab = getQueryParam("firsttab") || "ChatSettings";
 
     // Show the selected tab
     showSection(activeTab);
