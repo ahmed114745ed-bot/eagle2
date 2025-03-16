@@ -747,9 +747,10 @@ class UserController extends MainController
 
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            $form->number('di', __('Coins'))->default(0)->readonly();
+            // $form->number('di', __('Coins'))->default(0)->readonly();
             // $form->model();
             // dd($form->getOriginal('di'));
+            $form->display('di', __('Coins'));
 
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
