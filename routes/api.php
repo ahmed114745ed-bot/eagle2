@@ -57,6 +57,7 @@ use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
+use Illuminate\Support\Facades\Log;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -134,9 +135,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         function () {
 
             Route::post('/broadcasting/auth', function (Request $request) {
+                Log::info(json_decode(Broadcast::auth($request)));
                 return Broadcast::auth($request);
             });
-            
+
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
 
             Route::get('user-room', [UserController::class, 'userRoom']);
