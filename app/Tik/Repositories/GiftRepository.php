@@ -27,7 +27,7 @@ class GiftRepository extends AbstractRepository
        
             return $this->model->query()
                 ->where('enable', 1)
-                ->pluck('show_img'); 
+                ->pluck('img'); 
        
     }
     
