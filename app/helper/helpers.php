@@ -164,8 +164,13 @@ if (!function_exists('get_file_details')) {
     }
 
     if (!function_exists('isImageExists')) {
+
         function isImageExists($url)
         {
+            if (empty($url)) {
+                return false; // Prevent empty path error
+            }
+
             $context = stream_context_create([
                 'http' => ['timeout' => 2] // Set a 2-second timeout
             ]);

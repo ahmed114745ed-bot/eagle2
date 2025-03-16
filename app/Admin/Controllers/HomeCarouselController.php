@@ -76,8 +76,6 @@ class HomeCarouselController extends MainController
             }
             return null;
         });
-
-        $grid->column('contents', trans('contents'));
         $grid->column('sort', trans('sort'))->editable();
         $this->extendGrid($grid);
         $grid->disableExport();
