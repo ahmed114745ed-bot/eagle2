@@ -34,6 +34,11 @@ class GroupChatController extends MainController
             }));
     }
 
+    public function chat_settings(Content $content){
+        return $content
+        ->view('chat_settings');
+    }
+
     /**
      * Make a grid builder.
      *
