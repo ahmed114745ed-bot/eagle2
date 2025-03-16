@@ -191,8 +191,8 @@ class ChargeReportController extends MainController {
             $icon =asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
-            <span>{
-            ".number_format($balance_after)."}</span>
+            <span>
+            ".number_format($balance_after)."</span>
             <img src='{$icon}' alt='USD' width='20' height='20'>
             </div>";
 
