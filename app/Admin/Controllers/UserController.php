@@ -747,7 +747,7 @@ class UserController extends MainController
 
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            // $form->number('di', __('Coins'))->default(0)->disable();
+            $form->number('di', __('Coins'))->default(0);
             // $form->model();
             // dd($form->getOriginal('di'));
 
