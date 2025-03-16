@@ -67,6 +67,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\CustomController;
+use App\Admin\Controllers\GroupChatController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -400,6 +401,7 @@ Route::group(
         $router->resource('parent-users', ParentUsersController::class);
         $router->resource('custom-zego-messages', CustomZegoMessageController::class);
         $router->resource('agency-settings', AgencySettingsController::class);
+        $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         $router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         $router->get('convert-is_gold', function () {

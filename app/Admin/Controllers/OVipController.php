@@ -101,12 +101,20 @@ class OVipController extends MainController
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        $grid->column('price', __('price'));
-        $grid->column('expire', __('expire'));
+        $grid->column('price', __('price'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });        $grid->column('expire', __('expire'));
         $grid->column(__('gifts'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/ovip-gift/' . $this->id);
-        
+
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gifts') . "</a>";            return $button1;
         });
         $this->extendGrid($grid);
