@@ -30,6 +30,11 @@ class OVipController extends MainController
         (new AppFeatureService)->validateStatusEnable("vips");
     }
 
+    public function vip_settings(Content $content){
+        return $content
+        ->view('vip_settings');
+    }
+
     public function index(Content $content)
     {
         return $content
