@@ -93,13 +93,13 @@ class  AdminAgencyMangerController extends MainController
         $grid->column('name', __('Agency Manager'))->display(function ($name) {
             $uid = @$this->username;
             $path = $this->avatar;
-            // $defaultImage = asset("images/businessman-icon.jpg");
-            $url = $path;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = $path ?? $defaultImage;
 
-            // Check if the image exists
-            // if (!isImageExists($url)) {
-            //     $url = $defaultImage;
-            // }
+            //  Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
             return "
