@@ -253,13 +253,13 @@ class ChargeReportController extends MainController {
             ";
         });
         $grid->column ('trx',__ ('trx'));
-        $grid->column ('status',__ ('status'))->display (function (){
+        $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
-                return "success";
-            }elseif ($this->status == 0) {
-                return "faild";
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
+            } elseif ($this->status == 0) {
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
             }
-        });
+        })->unescape(); // Allows rendering raw HTML
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         return $grid;
     }
@@ -330,13 +330,13 @@ class ChargeReportController extends MainController {
             ";
         });
         $grid->column ('trx',__ ('trx'));
-        $grid->column ('status',__ ('status'))->display (function (){
+        $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
-                return "success";
-            }elseif ($this->status == 0) {
-                return "faild";
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
+            } elseif ($this->status == 0) {
+                return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#dc3545; color:white;">Failed</span>';
             }
-        });
+        })->unescape(); // Allows rendering raw HTML
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';
