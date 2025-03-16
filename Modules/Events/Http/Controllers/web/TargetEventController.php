@@ -72,7 +72,14 @@ class TargetEventController extends MainOldController
         $grid = new Grid(new ChargeTargetEvent());
 
         $grid->column('id', __('Id'));
-        $grid->column('value', __('value'));
+        $grid->column('value', __('value'))->display(function ($value) {
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$value}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $grid->column('الاجرائات')->display(function () {
             // توليد الروابط
             $url1 = url('admin/target-events-gift/' . $this->id);
