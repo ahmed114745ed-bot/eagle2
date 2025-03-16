@@ -113,8 +113,30 @@ class GroupChatController extends MainController
             });
         });
         $grid->id(__('ID'));
-        $grid->column('user.uuid', __('uuid'));
-        $grid->column('user.name', __('name'));
+        $grid->column ('user.name',__ ('name'))->display (function ($recever){
+            $name =  $this->user?->name ?? '';
+             $uid = @$this->user?->uuid ?? 0;
+             $path = @$this->user?->profile?->avatar;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
+
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 $image
+                 <div>
+                     <strong>$name</strong><br>
+                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                 </div>
+             </div>
+         ";
+
+         });
         $grid->text(__('text'));
 
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
