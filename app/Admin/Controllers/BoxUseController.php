@@ -77,7 +77,7 @@ class BoxUseController extends MainController
      *
      * @return Grid
      */
-    // protected function grid()
+    // protected function grid0()
     // {
     //     $grid = new Grid(new BoxUse);
 
