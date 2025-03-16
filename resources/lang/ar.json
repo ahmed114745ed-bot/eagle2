@@ -1730,7 +1730,9 @@
    "Publish at": "النشر في",
     "Is active": "نشط",
     "frozen" :"تجميد الشحن",
-    "Box":"صندوق"
+    "Box":"صندوق",
+    "type_local" : "محلي",
+    "type_global" : "عالمي"
 
 
 

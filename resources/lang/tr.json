@@ -1700,8 +1700,9 @@
     "family": "Aile",
     "Publish at": "Yayınlanma tarihi",
     "Is active": "Aktif mi",
-    "frozen": "Şarjı Dondur"
-
+    "frozen": "Şarjı Dondur",
+    "type_local" : "Yerel",
+    "type_global" : "Küresel"
 
 
 
