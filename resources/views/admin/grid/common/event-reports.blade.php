@@ -14,5 +14,36 @@
             <li class="{{ request()->name == 'pk_event' ? 'active' : '' }}"><a href="?name=pk_event" class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{__('admin.pk_event')}}</a></li>
         </ul>
     </div>
+    <style>
+        .nav-pills .active {
+    background-color: #d9534f !important; /* لون الخلفية */
+    color: #fff !important; /* لون النص */
+    font-weight: bold; /* جعل النص عريضًا */
+    border-radius: 5px; /* تدوير الحواف */
+}
+
+.nav-pills .active a {
+    color: #fff !important; /* لون النص داخل الرابط */
+}
+
+.nav-pills li a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: background 0.3s, color 0.3s;
+}
+
+.nav-pills li a:hover {
+    background-color: var(--primary-color) ; /* لون خلفية عند التحويم */
+    color: var(--text-primary-color) ;
+}
+
+.nav-pills li.active a {
+    background-color: var(--primary-color) !important;
+}
+
+    </style>
     <!-- /.box-body -->
 </div>
