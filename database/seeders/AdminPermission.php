@@ -102,7 +102,9 @@ class AdminPermission extends Seeder
             'agent-home',
             'updates_group_chat',
             'agora-zego',
-            'uuid-dedicate'
+            'uuid-dedicate',
+            'settings',
+            'notification',
 
 
 
@@ -157,7 +159,8 @@ class AdminPermission extends Seeder
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
             'bans' => ['bans'],
             'update-group-chat' => ['updates_group_chat'],
-            'agora-zego' => ['agora-zego']
+            'agora-zego' => ['agora-zego'],
+            'setting' => ['language','settings','notification']
           
 
         ];

@@ -528,7 +528,7 @@
     "success": "نجاح",
     "Received Level": "مستوى المتلقى",
     "Sender Level": "مستوى المرسل",
-    "receiver": "الراسل",
+    "receiver": "المستلم",
     "amount_type": "نوع القيمه",
     "balance_before": "المحفظه من قبل",
     "balance_after": "المحفظه بعد",
@@ -1695,7 +1695,12 @@
     "Left to Right (LTR)" : "من اليسار إلى اليمين (LTR)",
     "Right to Left (RTL)" : "من اليمين إلى اليسار (RTL)",
     "Manage the available languages":"اداره اللغات",
-
+    "waiting": "في انتظار",
+    "accepting": "جارٍ القبول",
+    "transferred": "تم التحويل",
+    "completed": "مكتمل",
+    "rejected": "مرفوض",
+    "rejectedAdmin": "مرفوض من قبل المسؤول",
     "Brand settings" : "إعدادات العلامة التجارية",
     "Theme settings" : "إعدادات السمة",
     "Timing settings" : "إعدادات التوقيت",
@@ -1721,8 +1726,9 @@
     "Table Background Color:" : "لون خلفية الجدول:",
     "Time zone:" : "المنطقة الزمنية:",
       "available_variables" : "المتغيرات المتاحة",
-      "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables"
-
+      "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables",
+"Message":"الرساله",
+"Notification": "الإشعار"
 
 
 }

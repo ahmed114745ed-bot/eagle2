@@ -90,9 +90,9 @@ class Administrator extends Model implements AuthenticatableContract
 
         $disk = config('admin.upload.disk');
 
-        if ($avatar && array_key_exists($disk, config('filesystems.disks'))) {
-            return Storage::disk(config('admin.upload.disk'))->url($avatar);
-        }
+        // if ($avatar && array_key_exists($disk, config('filesystems.disks'))) {
+        //     return Storage::disk(config('admin.upload.disk'))->url($avatar);
+        // }
 
         $default = config('admin.default_avatar') ?: '/vendor/laravel-admin/AdminLTE/dist/img/user2-160x160.jpg';
 

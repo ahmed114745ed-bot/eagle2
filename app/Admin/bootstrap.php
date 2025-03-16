@@ -30,7 +30,7 @@ if (Schema::hasTable('settings')) {
     $favicon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');
 
     if ($favicon) {
-        Admin::favicon(asset('uploads/settings/' . $favicon)); // Use the correct path
+        Admin::favicon(getImagePath($favicon)); // Use the correct path
     } else {
         Admin::favicon(asset('images/app-logo.png')); // Default favicon
     }

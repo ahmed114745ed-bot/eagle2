@@ -16,8 +16,8 @@ class NotificationSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('notifications')->truncate();
-        DB::table('notification_translations')->truncate();
+        // DB::table('notifications')->truncate();
+        // DB::table('notification_translations')->truncate();
 
         $notifications = Notification::all();
         foreach($notifications as $n){

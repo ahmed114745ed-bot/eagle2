@@ -101,7 +101,7 @@ class RealsService extends BaseModelService
             ->inRandomOrder($user->real_type);
 
 
-            $countInterested   = $reals->count();
+        $countInterested   = $reals->count();
         $currentPage       = request()->page ?? 1;
         $pagination        = 10;
 

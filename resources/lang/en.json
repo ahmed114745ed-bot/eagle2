@@ -430,6 +430,7 @@
      "commission": "The amount deducted from the commission",
      "date":"date",
      "party" :"Party",
+      "Message":"Message",
 
 
         "available_variables" : "Available Variables",

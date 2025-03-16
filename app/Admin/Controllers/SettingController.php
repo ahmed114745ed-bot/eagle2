@@ -4,13 +4,15 @@ namespace App\Admin\Controllers;
 
 use App\Models\Setting;
 use App\Models\Timezone;
-use Encore\Admin\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\AdminController;
 
-class SettingController extends AdminController
+class SettingController extends MainController
 {
     protected $title = 'Settings';
+    public $permission_name = 'settings';
 
     public function index(Content $content)
     {

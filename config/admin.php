@@ -25,7 +25,7 @@ return [
     | `img` tag, eg '<img src="http://logo-url" alt="Admin logo">'.
     |
     */
-    'logo' => '<b>'.env('APP_NAME', 'Laravel').'</b>',
+    // 'logo' => '<b>'.env('APP_NAME', 'Laraveuuuul').'</b>',
 
     /*
     |--------------------------------------------------------------------------
@@ -456,12 +456,12 @@ return [
             'enable' => true,
             // the key should be same as var locale in config/app.php
             // the value is used to show
-            'languages' => [
-                'en' => 'English',
-                'ar' => 'Arabic',
-                'tr' => 'Turkish',
-                'hi' => 'Hindi',
-            ],
+            // 'languages' => [
+            //     'en' => 'English',
+            //     'ar' => 'Arabic',
+            //     'tr' => 'Turkish',
+            //     'hi' => 'Hindi',
+            // ],
             // default locale
             'default' => 'ar',
             // if or not show multi-language login page, optional, default is true

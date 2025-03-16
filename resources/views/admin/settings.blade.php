@@ -131,10 +131,8 @@
 
     }
 
-    .form {
-        width: 400px;
-        margin: auto;
-    }
+        button{
+            width: 198px;
 
     /* تصميم النافذة */
     .modal {
@@ -183,109 +181,110 @@
 </head>
 
 <body>
-    <div class="all-page">
-        <div class="settings-sidebar">
-            <h2>إعدادات</h2>
-            <div class="settings-menu">
-                <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
-                <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
-                <button onclick="showSection('timeSettings')"> {{ __('Timing settings') }}</button>
-            </div>
+<div class="all-page">
+    <div class="settings-sidebar">
+        <h2>إعدادات</h2>
+        <div class="settings-menu">
+            <button onclick="showSection('brandSettings')">{{  __('Brand settings')}}</button>
+            <button onclick="showSection('themeSettings')">{{  __('Theme settings')}}</button>
+            <button onclick="showSection('timeSettings')"> {{  __('Timing settings')}}</button>
+        </div>
+    </div>
+
+    <div class="settings-content">
+        <div id="brandSettings" class="settings-section active">
+
+            <h3> {{  __('Brand settings')}}</h3>
+
+            <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="form">
+                <label>{{  __('Application title:')}} </label>
+                <input type="text" name="app_title" value="{{ $settings['app_title'] ?? '' }}" class="form-control">
+
+                <label> {{  __('Application logo:')}}</label>
+                <input type="file" name="app_logo" class="form-control">
+                @if(!empty($settings['app_logo']))
+                    <img src="{{ getImagePath( $settings['app_logo']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
+                @endif
+
+
+                <label> {{  __('Application Fav Icon:')}}</label>
+                <input type="file" name="app_fav_icon" class="form-control">
+                @if(!empty($settings['app_fav_icon']))
+                    <img src="{{ getImagePath( $settings['app_fav_icon']) }}" width="100" class="mt-2" onclick="openFullScreen(this)">
+                @endif
+
+                <button type="submit">{{ __('save') }}</button>
+                </div>
+
+            </form>
         </div>
 
-        <div class="settings-content">
-            <div id="brandSettings" class="settings-section active">
+        <div id="themeSettings" class="settings-section">
+            <h3>{{  __('Theme settings')}}</h3>
+            <form id="themeSettingsForm"  action="{{ route('admin.settings.update') }}" method="POST">
+            <div class="form">
+                @csrf
+                <label for="primary_color">{{ __('Primary Color:') }}</label>
+            <input type="color" id="primary_color" name="primary_color"
+                value="{{ $settings['primary_color'] ?? '#000000' }}"
+                style="background: {{ $settings['primary_color'] ?? '#000000' }};"
+                title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
 
-                <h3> {{ __('Brand settings') }}</h3>
+            <label for="secondary_color">{{ __('Secondary Color:') }}</label>
+            <input type="color" id="secondary_color" name="secondary_color"
+                value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
+                title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="form">
-                        <label>{{ __('Application title:') }} </label>
-                        <input type="text" name="app_title" value="{{ $settings['app_title'] ?? '' }}"
-                            class="form-control">
+            <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>
+            <input type="color" id="text_primary_color" name="text_primary_color"
+                value="{{ $settings['text_primary_color'] ?? '#000000' }}"
+                style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"
+                title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">
 
-                        <label> {{ __('Application logo:') }}</label>
-                        <input type="file" name="app_logo" class="form-control">
-                        @if (!empty($settings['app_logo']))
-                            <img src="{{ asset('uploads/settings/' . $settings['app_logo']) }}" width="100"
-                                class="mt-2" onclick="openFullScreen(this)">
-                        @endif
+            <label for="text_secondary_color">{{ __('Text Secondary Color:') }}</label>
+            <input type="color" id="text_secondary_color" name="text_secondary_color"
+                value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
+                style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};"
+                title="لون النص الثانوي المستخدم في الشروحات أو النصوص المساعدة.">
 
+            <label for="box_background_color">{{ __('Box Background Color:') }}</label>
+            <input type="color" id="box_background_color" name="box_background_color"
+                value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
+                title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
 
-                        <label> {{ __('Application Fav Icon:') }}</label>
-                        <input type="file" name="app_fav_icon" class="form-control">
-                        @if (!empty($settings['app_fav_icon']))
-                            <img src="{{ asset('uploads/settings/' . $settings['app_fav_icon']) }}" width="100"
-                                class="mt-2" onclick="openFullScreen(this)">
-                        @endif
+            <label for="table_background_color">{{ __('Table Background Color:') }}</label>
+            <input type="color" id="table_background_color" name="table_background_color"
+                value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
+                style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
+                title="لون خلفية الجداول في التقارير أو البيانات.">
+                <button type="submit">{{ __('save') }}</button>
+                <button type="button" id="resetColors">{{ __('Reset Colors') }}</button>
+                </div>
+            </form>
+        </div>
+        <div id="timeSettings" class="settings-section">
+            <h3>{{  __('Timing settings')}}</h3>
+            <form action="{{ route('admin.settings.update') }}" method="POST">
+                @csrf
+                <div class="form">
 
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
+                <label>{{ __('Time zone:') }}</label>
+                <select name="timezone">
+                    @foreach ($timezones as $timezone)
+                        <option value="{{ $timezone->name }}"
+                                {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
+                            {{ $timezone->name }}
+                        </option>
+                    @endforeach
+                </select>
 
-                </form>
-            </div>
-
-            <div id="themeSettings" class="settings-section">
-                <h3>{{ __('Theme settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    <div class="form">
-                        @csrf
-                        <label>{{ __('Primary Color:') }}</label>
-                        <input type="color" name="primary_color"
-                            value="{{ $settings['primary_color'] ?? '#000000' }}"
-                            style="background: {{ $settings['primary_color'] ?? '#000000' }};">
-
-                        <label>{{ __('Secondary Color:') }}</label>
-                        <input type="color" name="secondary_color"
-                            value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                            style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};">
-
-                        <label>{{ __('Text Primary Color:') }}</label>
-                        <input type="color" name="text_primary_color"
-                            value="{{ $settings['text_primary_color'] ?? '#000000' }}"
-                            style="background: {{ $settings['text_primary_color'] ?? '#000000' }};">
-
-                        <label>{{ __('Text Secondary Color:') }}</label>
-                        <input type="color" name="text_secondary_color"
-                            value="{{ $settings['text_secondary_color'] ?? '#808080' }}"
-                            style="background: {{ $settings['text_secondary_color'] ?? '#808080' }};">
-
-                        <label>{{ __('Box Background Color:') }}</label>
-                        <input type="color" name="box_background_color"
-                            value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                            style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};">
-
-                        <label>{{ __('Table Background Color:') }}</label>
-                        <input type="color" name="table_background_color"
-                            value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                            style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};">
-
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="timeSettings" class="settings-section">
-                <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    @csrf
-                    <div class="form">
-
-                        <label>{{ __('Time zone:') }}</label>
-                        <select name="timezone">
-                            @foreach ($timezones as $timezone)
-                                <option value="{{ $timezone->name }}"
-                                    {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
-                                    {{ $timezone->name }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
+                <button type="submit">{{ __('save') }}</button>
+                </div>
+            </form>
         </div>
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
@@ -344,9 +343,39 @@
                 modalImg.src = imgElement.src;
             }
 
-            function closeFullScreen() {
-                document.getElementById("imageModal").style.display = "none";
-            }
-        </script>
+    function closeFullScreen() {
+        document.getElementById("imageModal").style.display = "none";
+    }
+    </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+        let resetButton = document.getElementById('resetColors');
+
+        if (resetButton) {
+            resetButton.addEventListener('click', function () {
+                let colorInputs = {
+                    'primary_color': "#FF9428",
+                    'secondary_color': "#1A1A1A",
+                    'text_primary_color': "#fdf8f8",
+                    'text_secondary_color': "#c1b9b9",
+                    'box_background_color': "#222222",
+                    'table_background_color': "#c88213"
+                };
+
+                Object.keys(colorInputs).forEach(id => {
+                    let input = document.getElementById(id);
+                    if (input) {
+                        input.value = colorInputs[id];
+                    }
+                });
+
+                // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
+                document.getElementById('themeSettingsForm').submit();
+            });
+        }
+    });
+</script>
+
     </div>
 </body>

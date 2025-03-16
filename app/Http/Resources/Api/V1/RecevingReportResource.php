@@ -11,7 +11,7 @@ class RecevingReportResource extends JsonResource
 
     public function toArray($request)
     {
-
+        $user = auth()->user();
         if ($this->charger_type == 'dash') {
             $name = $this->admin->name ?? '';
             $image = $this->admin->avatar ?? '';
@@ -22,6 +22,7 @@ class RecevingReportResource extends JsonResource
 
         return [
             'id'          => $this->user_id,
+            'uuid'          => $user->uuid,
             'diamonds'    => numToStringNew($this->amount),
             'operation_no' => (int)$this->id,
             'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
