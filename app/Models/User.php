@@ -82,7 +82,8 @@ class User extends Authenticatable
         'total_sender_level',
         'total_received_level',
         'original_uuid',
-        'is_frozen'
+        'is_frozen',
+        'total_charge_level',
     ];
 
     /* protected $appends = [
@@ -671,7 +672,21 @@ class User extends Authenticatable
         //        }
     }
 
+    public function setTotalChargeLevelAttribute(float $value)
+    {
+        $level = @$this->charge_level  + $this->sub_charger_level;
+        if ($level == $value) return;
 
+        $this->sub_charger_level = $value - @$this->charge_level ?? 0;
+        $diamonds               =
+            (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
+    }
+
+    public function getTotalChargeLevelAttribute()
+    {
+        return $this->charge_level  + $this->sub_charger_level;
+    }
 
     public function setSalaryAttribute()
     {

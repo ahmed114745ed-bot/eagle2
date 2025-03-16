@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
@@ -42,20 +43,20 @@ use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
+use App\Http\Controllers\Api\V1\ChargeLevelController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\MallController as ControllersMallController;
-use App\Http\Controllers\NowPaymentsController;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -504,6 +505,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
         }
     );
+    Route::get ('/charge-level',[ChargeLevelController::class,'chargeLevel']);
 
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
