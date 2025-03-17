@@ -52,7 +52,6 @@ class EnteranceRoomServices
         if ($request->header('X-Pusher-Key') !== env('PUSHER_APP_KEY')) {
             abort(403, 'Invalid Pusher webhook request');
         }
-        return [];
         $event = $request->events[0];
         $name = $event['name'];
         $channelName = $event['channel'];

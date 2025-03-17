@@ -17,7 +17,7 @@ class TicketController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ticket';
-    
+
     public function index(Content $content)
     {
         return $content
@@ -74,22 +74,22 @@ class TicketController extends MainController
         $grid->id(__ ('ID_tiket'));
         // $grid->user_id( __ ('ID'));
         $grid->column('user_id', __('User Info'))->display(function () {
-            $user = $this->user;   
+            $user = $this->user;
             if (!$user) return '-';
-    
+
             $name = $user->name;
             $uuid = $user->uuid;
-            $phone = $user->phone ?: '-';  
+            $phone = $user->phone ?: '-';
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-    
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-    
+
             $userUrl = admin_url('users/' . $user->id);
-    
+
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -99,7 +99,7 @@ class TicketController extends MainController
                         </div>
                     </div>";
         });
-    
+
         // $grid->column('contact_num',__ ('contact'));
         // $grid->column('problem',__ ('problem'));
         // $grid->column('description',__ ('description'))->limit(15);
@@ -135,8 +135,10 @@ class TicketController extends MainController
                     $('#imageModal').modal('show');
                 });
             }); ");
-    
-        $grid->column('img',__ ('img'))->image ('',30);
+
+            $grid->column('img', __('img'))->display(function ($img) {
+                return $img ?: asset('images/image.png');
+            })->image('', 30);
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
 //        $grid->admin_id('admin_id');
 //        $grid->created_at(trans('admin.created_at'));
