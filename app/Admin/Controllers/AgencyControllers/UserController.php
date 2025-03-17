@@ -13,6 +13,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Controllers\MainController;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
@@ -297,10 +298,16 @@ class UserController extends MainController
         });
 
 
+        $grid->actions(function ($actions) {
+            $model = $actions->row;
+           
+            if ($model->agency_id >= 1) {
+                $actions->add(new ChangeAgencyAction($model->id));
+            }
+        });
 
 
-
-        $grid->disableActions();
+       // $grid->disableActions();
         $grid->disableCreateButton();
 
         return $grid;
