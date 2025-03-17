@@ -207,7 +207,7 @@ class FreeUserController extends MainController
         });
 
         $grid->column('phone', __('Phone'));
-        $grid->column('total_charge_level', __('admin.charge_level'));
+       // $grid->column('total_charge_level', __('admin.charge_level'));
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
@@ -668,7 +668,7 @@ class FreeUserController extends MainController
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
             $form->number('total_received_level', __('Received Level'))->default(0);
-            $form->number('total_charge_level', __('charge Level'))->default(0);
+            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
             $form->number('salary', __('salary'))->disable();
         }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);

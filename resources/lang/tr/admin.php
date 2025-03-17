@@ -186,4 +186,5 @@ return [
     'app_id' => 'Uygulama Kimliği',
     'app_sign' => 'Uygulama İmzası',
     'app_id' => 'Uygulama Kimliği',
+    "charge_level" => "şarj seviyesi",
 ];
