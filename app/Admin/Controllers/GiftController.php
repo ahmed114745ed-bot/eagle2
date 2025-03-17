@@ -130,7 +130,7 @@ class GiftController extends MainController
         $grid->column("use_count", __('use count'));
         $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
         // $grid->vip_level(__('vip_level'));
-        $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
+      //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
         $grid->model()->where('type', '!=', 8)->orderBy('type')->orderByRaw('ISNULL(`sort`), `sort`')->orderBy('price');
         //        $grid->column('international_gift',trans ('international_gift'))->switch (Common::getSwitchStatesGiftINtrnahional());
