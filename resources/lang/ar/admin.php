@@ -191,6 +191,7 @@ return [
     'app_id' => 'معرف التطبيق',
     'app_sign' => 'توقيع التطبيق',
     'app_id' => 'app_id',
+    "charge_level" => "مستوي الشحن",
 
 
 

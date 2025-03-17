@@ -49,13 +49,16 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromPusher(Request $request)
     {
+        Log::info('test old shami enter room ', [
+            $request->all()
+        ]);
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
     public function updateRoomCountFromPusher_new(Request $request)
     {
-        //  Log::info(' pusher triggered enter room ', [
-        //     $request->all()
-        // ]);
+         Log::info('test new shami enter room ', [
+            $request->all()
+        ]);
     }
     
 
