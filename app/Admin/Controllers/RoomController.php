@@ -191,7 +191,7 @@ class RoomController extends MainController
 
         // Add Font Awesome icon for "more info"
         $url1 = url('admin/room-mic/' . $this->id);
-        $arrowIcon = asset('images/addd.jpg');
+        $arrowIcon = asset('images/add.png');
         $html .= '
         <div>
             <a href="' . $url1 . '" 
