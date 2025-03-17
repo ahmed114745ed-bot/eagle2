@@ -280,7 +280,6 @@ class GiftController extends MainController
                 'vap' => __('vap'),
             ]
         )->required();
-        $form->number('sort', __('sort'));
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
         $form->saving(function (Form $form) {
