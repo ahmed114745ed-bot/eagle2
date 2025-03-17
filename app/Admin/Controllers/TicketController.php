@@ -140,9 +140,9 @@ class TicketController extends MainController
             $grid->column('img', __('img'))->display(function ($img) {
 
                 $defaultImage = asset('images/image.png');
-                if (!Storage::disk('gcs')->exists("ticket/$img")) {
+                /* if (!Storage::disk('gcs')->exists("ticket/$img")) {
                     return $defaultImage;
-                }
+                } */
                 return $img;
             })->image('', 30);
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
