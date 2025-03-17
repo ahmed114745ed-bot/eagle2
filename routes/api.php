@@ -140,7 +140,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //     return Broadcast::auth($request);
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
-                Log::info('📌 Received Webhook Data:', $request->all());
+                Log::info('📌 Received Webhook Data:', ['request' => $request->all(),'header' => $request->header()]);
             
                 if (!$request->has('channel_name')) {
                     Log::error('❌ channel_name غير موجود في الطلب!');
