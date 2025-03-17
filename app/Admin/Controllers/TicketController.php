@@ -143,7 +143,7 @@ class TicketController extends MainController
                 /* if (!Storage::disk('gcs')->exists("ticket/$img")) {
                     return $defaultImage;
                 } */
-                return $img;
+                return @getimagesize($img) ? $img : $defaultImage;
             })->image('', 30);
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
 //        $grid->admin_id('admin_id');
