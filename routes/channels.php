@@ -13,6 +13,10 @@ use App\Models\Room;
 |
 */
 
+Broadcast::channel('presence-room-{roomId}', function ($user, $roomId) {
+    return ['id' => $user->id, 'name' => $user->name]; // Must return user details
+});
+
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     // \Illuminate\Support\Facades\Log::info('test - '.$user->name .' : '. $user->id);
 
