@@ -12,6 +12,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin as AdminScript;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends MainController
 {
@@ -137,7 +138,12 @@ class TicketController extends MainController
             }); ");
 
             $grid->column('img', __('img'))->display(function ($img) {
-                return $img ?: asset('images/image.png');
+
+                $defaultImage = asset('images/image.png');
+                if (!Storage::exists("ticket/$img")) {
+                    return $defaultImage;
+                }
+                return $img;
             })->image('', 30);
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
 //        $grid->admin_id('admin_id');
