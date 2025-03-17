@@ -24,6 +24,13 @@ class SwitchAccountController extends Controller
         $otherUser = $this->getOtherUser($request);
         if ($otherUser->id == $user->id) return Common::apiResponse(0, 'can not add yourself', null, 422);
         $key = \Illuminate\Support\Str::uuid();
+        $found = UserAccount::where(function($q)use($otherUser){
+            $q->where('child_user_id', $otherUser->id)->orWhere('parent_user_id', $otherUser->id);
+        })->first();
+
+        if($found){
+            return Common::apiResponse(0, 'account is related to another account', null, 422);
+        }
         UserAccount::firstOrCreate([
             'parent_user_id' => $user->id,
             'child_user_id' => $otherUser->id,
@@ -50,7 +57,7 @@ class SwitchAccountController extends Controller
     }
 
     public function getAccounts($userId, $otherUserId, $deviceToken)
-    {        
+    {
 
         if (empty($deviceToken))  return  [];
 
@@ -63,7 +70,7 @@ class SwitchAccountController extends Controller
             //            })
             where('device_token', $deviceToken)
             ->get();
-            
+
         $parentUserIds = $users->pluck('parent_user_id');
         $childUserIds = $users->pluck('child_user_id');
 
@@ -119,7 +126,7 @@ class SwitchAccountController extends Controller
         $currentUser = User::find($user->id);
         $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->pluck('id')->toArray();
         $total_unread_message=  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id','not Like',$user->id)->where('status','not Like','seen')->count();
-        
+
         $accounts = $this->getAccounts($user->id, 0, $user->device_token);
         $user_acount = UserAccount::query()->where(function ($q) use ($user) {
             $q->where("parent_user_id", $user->id)->orWhere("child_user_id", $user->id);
