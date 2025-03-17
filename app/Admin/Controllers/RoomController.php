@@ -196,7 +196,8 @@ class RoomController extends MainController
         <div>
             <a href="' . $url1 . '" 
                style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
-                <img src="' . $arrowIcon . '" style="width: 16px; height: 16px;">
+                <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
+            
             </a>
         </div>';
 
