@@ -140,11 +140,15 @@ class TicketController extends MainController
             $grid->column('img', __('img'))->display(function ($img) {
 
                 $defaultImage = asset('images/image.png');
-                if (!Storage::disk('gcs')->exists("ticket/$img")) {
-                    return $defaultImage;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($img) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
                 }
-                return $img;
-            })->image('', 30);
+                return $url;
+            });
         $grid->column('status',__ ('status'))->switch (Common::getSwitchStates ());
 //        $grid->admin_id('admin_id');
 //        $grid->created_at(trans('admin.created_at'));
