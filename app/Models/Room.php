@@ -258,4 +258,19 @@ class Room extends Model
     {
         return $value === 0 ? 3 : $value;
     }
+
+    protected function  getAdminsAttribute()
+    {
+        $ids = explode(',', $this->room_admin);
+        $ids = $this->removeOwner($ids);
+        return User::query()->whereIn('id', $ids)->get();
+    }
+
+    protected function removeOwner($ids)
+    {
+        if (($key = array_search($this->uid, $ids)) !== false) {
+            unset($ids[$key]);
+        }
+        return $ids;
+    }
 }
