@@ -163,49 +163,47 @@ class RoomController extends MainController
         $grid->column('count_room_socket', __('Number of users'));
 
         $grid->column(__('microphone'))
-            ->display(function () {
-                $ids = explode(',', $this->microphone);
-                $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-                if (!$this->cachedUsers) {
-                    return '';
-                } else {
-
-                    $ids = explode(',', $this->microphone);
-                    $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-
-
-                    $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-
-                    foreach ($this->cachedUsers as $user) {
-                        $path = @$user->profile?->avatar;
-                        $defaultImage = asset("images/businessman-icon.jpg");
-                        $url = $path ? getImagePath($path) : $defaultImage;
-
-                        if (!isImageExists($url)) {
-                            $url = $defaultImage;
-                        }
-
-                        $html .= '
+        ->display(function () {
+            $ids = explode(',', $this->microphone);
+            $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+    
+            // Check if there are no users
+            if ($cachedUsers->isEmpty()) {
+                return '';
+            }
+    
+            $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+    
+            foreach ($cachedUsers as $user) {
+                $path = @$user->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = $path ? getImagePath($path) : $defaultImage;
+    
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+    
+                $html .= '
                 <div style="text-align: center;">
                     <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
                     <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
                 </div>';
-                    }
-                    $url1 = url('admin/room-mic/' . $this->id);
-                    // Add arrow button
-                    $html .= '
+            }
+    
+            // Add arrow button to navigate to another page
+            $url1 = url('admin/room-mic/' . $this->id);
+            $html .= '
             <div>
                 <a href="' . $url1 . '" 
                    style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
                     ⬇️
                 </a>
             </div>';
-
-                    $html .= '</div>';
-                    return $html;
-                }
-            });
-
+    
+            $html .= '</div>';
+            return $html;
+        });
+    
 
         $grid->actions(function ($action) {
             $action->disableView();
