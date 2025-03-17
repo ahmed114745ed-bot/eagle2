@@ -469,6 +469,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
+            Route::get ('/charge-level',[ChargeLevelController::class,'chargeLevel']);
 
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
@@ -512,7 +513,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
         }
     );
-    Route::get ('/charge-level',[ChargeLevelController::class,'chargeLevel']);
+
 
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
