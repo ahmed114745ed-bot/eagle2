@@ -108,7 +108,8 @@ class AdminPermission extends Seeder
             'free-users',
             'users-family',
             'updates_family-config',
-            'ovip-gift'
+            'ovip-gift',
+            'charge-level'
             
 
 
@@ -133,7 +134,7 @@ class AdminPermission extends Seeder
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
             'user' => ['users', 'trashed-account-user', 'user-target','free-users'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
-            'level' => ['level', 'ovip','wares-vips','ovip-gift'],
+            'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level'],
             'moment' => ['moment',],
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate'],
             'version' => ['version'],

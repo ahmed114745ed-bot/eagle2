@@ -6,30 +6,30 @@ use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Services\AppFeatureService;
-
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
 
-class VipController extends MainController
+
+class ChargeVipController extends MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
+    protected $title = 'المستويات';
 
-    public $permission_name = 'level';
+    public $permission_name = 'charge-level';
     public $hiddenColumns = [];
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("vips");
+        $this->title = __('Levels');
     }
-
     public function index(Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->grid());
     }
 
@@ -43,7 +43,7 @@ class VipController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->detail($id));
     }
 
@@ -57,14 +57,14 @@ class VipController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->title(trans('charge level'))
+            ->title(trans('level'))
             ->body($this->form());
     }
 
@@ -77,55 +77,15 @@ class VipController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Vip());
-        $grid->model()->orderByDesc('type')->orderBy('exp');
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            $filter->where(function ($query) {
-                switch ($this->input) {
-                    case 'sender':
-                        // custom complex query if the 'yes' option is selected
-                        $query->where('type', 2);
-                        break;
-                    case 'received':
-                        $query->where('type', 1);
-                        break;
-                    case 'cp':
-                        $query->where('type', 3);
-                        break;
-                    case 'room':
-                        $query->where('type', 4);
-                        break;
-                    case 'charge':
-                        $query->where('type', 5);
-                        break;
-                }
-            }, __('Select type'), 'name_for_url_shortcut')->radio([
-                '' => __('All'),
-                'sender' => __('Sender'),
-                'received' => __('Received'),
-                'cp' => __('cp'),
-                'room' => __('room'),
-            ]);
-        });
+        $grid->model()->where('type', 5)->orderBy('exp');
 
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5=>__ ('charge'),
-            ]
-        );
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -164,17 +124,7 @@ class VipController extends MainController
     {
         $form = new Form(new Vip());
 
-        $form->select('type', __('Type'))->options(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5=>__ ('charge'),
-            ]
-        )->default(2);
-        $form->textarea('name_ar', __('name_ar'));
-        $form->textarea('name_en', __('name_en'));
+        $form->hidden('type')->value(5);
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));

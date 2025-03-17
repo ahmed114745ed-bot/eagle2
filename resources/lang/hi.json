@@ -847,7 +847,8 @@
     "Max Admin": "अधिकतम प्रबंधक संख्या",
 
     "type_local" : "स्थानीय",
-    "type_global" : "वैश्विक"
+    "type_global" : "वैश्विक",
+    "charge level": "चार्ज स्तर"
 
 
 

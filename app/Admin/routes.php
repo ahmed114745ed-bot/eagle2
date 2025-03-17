@@ -26,6 +26,7 @@ use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
@@ -209,6 +210,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+        $router->resource('charge-vips', ChargeVipController::class);
         $router->resource('delete-accounts', DeleteAccountController::class);
         $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         $router->resource('test-pusher', TestPusherController::class);
