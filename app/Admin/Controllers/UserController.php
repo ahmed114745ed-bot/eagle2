@@ -102,6 +102,7 @@ class UserController extends MainController
 
     public function index(Content $content)
     {
+
         if (!Admin::user()->can('*')) {
             Permission::check('browse-users');
         }

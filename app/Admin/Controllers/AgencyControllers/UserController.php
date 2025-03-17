@@ -93,7 +93,6 @@ class UserController extends MainController
      */
     protected function grid()
     {
-
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()->with("ownerRoom")->where('is_host',1);
@@ -120,12 +119,33 @@ class UserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid 
-                ? __("uuid") . ' : ' . $this->uuid 
+            return $this->uuid == $this->original_uuid
+                ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
-        $grid->column('name', __('Name')); //->display(function ($value){//attribute
+        $grid->column('name', __('Name'))
+        ->display(function ($name) {
+            $uid = @$this->uuid;
+            $path = @$this->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
@@ -163,13 +183,13 @@ class UserController extends MainController
         });
 
         $grid->column('phone', __('Phone'));
-        
+
         $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
             $agency =  Agency::query()->find(@$this->agency_id);
             $path = @$agency?->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
- 
+
                  // Check if the image exists
                  if (!isImageExists($url)) {
                      $url = $defaultImage;
@@ -177,9 +197,9 @@ class UserController extends MainController
             $results = [
              __('name') => @$agency->owner->name ??'',
              __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
-            
+
          ];
- 
+
          return new Table([__('Field Name'), __('Value')], $results);
          });
 
@@ -276,10 +296,10 @@ class UserController extends MainController
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });
 
-        
 
- 
-    
+
+
+
         $grid->disableActions();
         $grid->disableCreateButton();
 
