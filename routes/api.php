@@ -58,6 +58,7 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -134,9 +135,26 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
 
+            // Route::post('/broadcasting/auth', function (Request $request) {
+            //     Log::info('broadcasting: '. json_encode($request->all()));
+            //     return Broadcast::auth($request);
+            // });
             Route::post('/broadcasting/auth', function (Request $request) {
-                Log::info('broadcasting: '.json_decode(Broadcast::auth($request)));
-                return Broadcast::auth($request);
+                Log::info('📌 Received Webhook Data:', ['request' => $request->all(),'header' => $request->header()]);
+            
+                if (!$request->has('channel_name')) {
+                    Log::error('❌ channel_name غير موجود في الطلب!');
+                    return response()->json(['success' => false, 'message' => 'Missing channel_name'], 400);
+                }
+            
+                try {
+                    $authResponse = Broadcast::auth($request);
+                    Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
+                    return $authResponse;
+                } catch (\Exception $e) {
+                    Log::error('❌ Broadcast Auth Error:', ['error' => $e->getMessage()]);
+                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                }
             });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
