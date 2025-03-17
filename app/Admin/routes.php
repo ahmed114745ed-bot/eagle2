@@ -193,6 +193,11 @@ Route::group(
         $router->resource('user-statistics', 'UserStatisticsController');
         $router->resource('profiles', 'ProfileController');
         $router->resource('vips', 'VipController');
+        $router->get('vips-sender', [VipController::class, 'senderIndex']);
+        $router->get('vips-receiver', [VipController::class, 'receiverIndex']);
+        $router->get('vips-cp', [VipController::class, 'cpIndex']);
+        $router->get('vips-room', [VipController::class, 'roomIndex']);
+        $router->get('vips-charge', [VipController::class, 'chargeIndex']);
         $router->resource('rooms', 'RoomController', [
             'names' => [
                 'index' => 'rooms'
