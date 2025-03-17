@@ -1737,7 +1737,8 @@
     "Max Admin": "أعلى عدد للمديرين",
     "Box":"صندوق",
     "type_local" : "محلي",
-    "type_global" : "عالمي"
+    "type_global" : "عالمي",
+    "charge level": "مستوى الشحن"
 
 
 

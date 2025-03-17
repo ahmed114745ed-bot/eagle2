@@ -1704,7 +1704,8 @@
     "Max Admin": "Maksimum Yönetici Sayısı",
 
     "type_local" : "Yerel",
-    "type_global" : "Küresel"
+    "type_global" : "Küresel",
+    "charge level": "Şarj seviyesi"
 
 
 
