@@ -35,7 +35,7 @@ class RoomController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Rooms'))
             ->body($this->detail($id)));
     }
@@ -49,7 +49,7 @@ class RoomController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Rooms'))
             ->body($this->form()->edit($id)));
     }
@@ -91,38 +91,15 @@ class RoomController extends MainController
 
                     $query->whereHas('owner', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%");
+                            ->orWhere('uuid', 'like', "%$input%")->orWhere('id', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or numId'));
             });
         });
 
         $grid->id(__('ID'));
-        $grid->column('owner.name', __('room owner')) ->display(function ($name) {
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div>
-                    <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                </div>
-            </div>
-        ";
-        });
-
         $grid->column('room_name', __('room'))->display(function ($name) {
-            
+
             $path = @$this->room_cover;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -145,6 +122,30 @@ class RoomController extends MainController
                 </div>
             ";
         });
+        $grid->column('owner.name', __('room owner'))->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
+
+
         $grid->column(__('status'))->display(function () {
             return (new \App\Admin\Actions\RoomAction(
                 $this->id,
@@ -153,15 +154,76 @@ class RoomController extends MainController
                 $this->is_afk,
                 $this->pin
             ))->render();
-        });;
-        $grid->column('sort_num', __('Sort Num'))->currency();
+        });
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
-            return $maxAdmin ?? $maxRoomAdmin;
+            return $this->admins->count() . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
         $grid->column('count_room_socket', __('Number of users'));
-       
+        $grid->column(__('microphone'))
+        // ->display(function () {
+        //     if (!$this->microphone) return '';
+    
+        //     $ids = explode(',', $this->microphone);
+        //     $users = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+    
+        //     $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+    
+        //     foreach ($users as $user) {
+        //         $path = optional($user->profile)->avatar;
+        //         $defaultImage = asset("images/businessman-icon.jpg");
+        //         $url = $path ? getImagePath($path) : $defaultImage;
+    
+        //         // Check if the image exists
+        //         if (!isImageExists($url)) {
+        //             $url = $defaultImage;
+        //         }
+    
+        //         $html .= '
+        //         <div style="text-align: center;">
+        //             <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
+        //             <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
+        //         </div>';
+        //     }
+    
+        //     $html .= '</div>';
+        //     return $html;
+        // }) // Fix rendering issue
+    
+        ->expand(function ($model) {
+            if (!$model->microphone) return '';
+    
+            $ids = explode(',', $model->microphone);
+            $users = \App\Models\User::whereIn('id', $ids)->get();
+    
+            // Convert users into table format
+            $filteredUsers = $users->map(function ($user) {
+                $path = optional($user->profile)->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = $path ? getImagePath($path) : $defaultImage;
+    
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+    
+                $imgTag = "<img src='$url' style='width:50px; height:50px; border-radius:50%; object-fit:cover;' class='img-thumbnail' />";
+    
+                return [
+                    'name'  => $user->name,
+                    'uuid'  => $user->uuid,
+                    'image' => $imgTag,
+                ];
+            });
+    
+            return new \Encore\Admin\Widgets\Table(
+                [__('Name'), __('UUID'), __('Image')],
+                $filteredUsers->toArray()
+            );
+        });
+    
+
 
         $grid->actions(function ($action) {
             $action->disableView();
