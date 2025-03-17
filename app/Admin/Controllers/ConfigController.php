@@ -27,6 +27,8 @@ class ConfigController extends MainController
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("config");
+
+        $this->middleware(['auth.config', 'clear.session'])->only('index');
     }
 
     /**
@@ -54,7 +56,7 @@ class ConfigController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('configs'))
             ->body($this->detail($id)));
     }
@@ -74,7 +76,7 @@ class ConfigController extends MainController
         } elseif ($form->model()->type == 'select') {
             $form->valueSelect = $form->model()->value;
         }
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('configs'))
             ->body($form));
     }
@@ -226,11 +228,11 @@ class ConfigController extends MainController
         $password = $request->input('password');
 
         // Define your credentials
-        $validUsername = config("app.balance_user_name"); 
+        $validUsername = config("app.balance_user_name");
         $validPassword = config("app.balance_password");
         // Check if the provided credentials are correct
         if ($username == $validUsername && $password == $validPassword) {
-           
+
             // Store a session variable to indicate the user is authenticated
             session(['auth' => true]);
 

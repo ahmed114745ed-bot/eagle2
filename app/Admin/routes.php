@@ -205,7 +205,7 @@ Route::group(
         $router->resource('test-pusher', TestPusherController::class);
         $router->resource('report_user', ReportUserController::class);
         $router->resource('coupons', 'CouponController');
-        $router->resource('configs', 'ConfigController')->middleware(['auth.config', 'clear.session']);
+        $router->resource('configs', 'ConfigController');
         $router->resource('categories', 'RoomCategoryController');
         $router->resource('countries', 'CountryController');
         $router->resource('backgrounds', 'BackgroundController');
