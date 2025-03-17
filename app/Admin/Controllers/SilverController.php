@@ -73,7 +73,15 @@ class SilverController extends MainController
         $grid = new Grid(new Silver);
 
         $grid->id('ID');
-        $grid->column('coin',__ ('coin'));
+        $grid->column('coin', __('coin'))->display(function ($coin) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coin}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $grid->column('silver',__ ('silver'));
         $grid->column('sort',__ ('sort'));
         $this->extendGrid ($grid);

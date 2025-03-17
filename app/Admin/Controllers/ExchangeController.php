@@ -15,7 +15,7 @@ class ExchangeController extends MainController
      *
      * @var string
      */
-    
+
 
     public $permission_name = 'exchange';
     public function index(Content $content)
@@ -77,8 +77,24 @@ class ExchangeController extends MainController
         $grid = new Grid(new Exchange());
 
         $grid->column('id', __('ID'))->sortable();
-        $grid->column('diamonds', __('diamonds'));
-        $grid->column('value', __('value'));
+        $grid->column('diamonds', __('diamonds'))->display(function ($usd) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('value', __('value'))->display(function ($value) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$value}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+
         $grid->column('type', __('type'));
         $this->extendGrid ($grid);
         $grid->disableExport();

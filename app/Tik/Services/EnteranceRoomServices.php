@@ -52,7 +52,7 @@ class EnteranceRoomServices
         if ($request->header('X-Pusher-Key') !== env('PUSHER_APP_KEY')) {
             abort(403, 'Invalid Pusher webhook request');
         }
-
+        return [];
         $event = $request->events[0];
         $name = $event['name'];
         $channelName = $event['channel'];
@@ -190,17 +190,17 @@ class EnteranceRoomServices
     }
     public function updateRoomCountFromAgora(Request $request)
     {
-    
-        $data = $request->all(); 
+
+        $data = $request->all();
         // Log::info('Agora data ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
-    
+
         $eventType = $data[0]['eventType'];
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
-    
+
         // Log::info('Agora data received', [
         //     'event_type' => $eventType,
         //     'user_id' => $userId,
@@ -209,49 +209,49 @@ class EnteranceRoomServices
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
-                  
+
         $user = User::find($userId);
-    
+
         if (!$room || !$user) {
             return response()->json(['status' => 'Room or user not found'], 404);
         }
-      
+
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
-    
+
         if (in_array($eventType, [101, 103])) {
             // Log::info('enter rooom 101,102', [
             //     'event_type' => $eventType,
-          
+
             // ]);
-    
+
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
-        
+
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
-           
+
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                 $room->update(['is_live' => false]);
 
-              
+
             }
-          
-            
+
+
         }
-    
+
         if ($eventType == 'room_logout' && $room->charizma_status) {
             $ownerId = $data[0]['payload']['owner_id'] ?? null;
             $this->handleCharismaStatusOnLogout($room, $user, $ownerId);
         }
-    
+
         $user->save();
-    
+
         return response()->json(['status' => 'Webhook processed successfully']);
-    
+
     }
 
-    
+
     public function handleLeaveCp($user,$room)
     {
         $userId = $user->id;
@@ -407,7 +407,7 @@ class EnteranceRoomServices
 
     public function enterRoom($user, $request, $room_pass, $owner_id)
     {
-        
+
         if ($request->type == 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }

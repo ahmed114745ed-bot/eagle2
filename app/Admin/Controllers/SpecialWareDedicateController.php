@@ -79,7 +79,7 @@ class SpecialWareDedicateController extends MainController
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                  <span>" . number_format($coin) . "</span>
+                  <span>" . number_format((int)$coin) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
                 </div>
             ";
