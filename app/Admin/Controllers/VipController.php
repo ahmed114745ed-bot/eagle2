@@ -29,7 +29,7 @@ class VipController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->grid());
     }
 
@@ -43,7 +43,7 @@ class VipController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->detail($id));
     }
 
@@ -57,14 +57,14 @@ class VipController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->form());
     }
 
