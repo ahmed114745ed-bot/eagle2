@@ -161,38 +161,6 @@ class RoomController extends MainController
             return $this->admins->count() . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
         $grid->column('count_room_socket', __('Number of users'));
-        // $grid->column(__('microphone'))
-        //     ->display(function () {
-        //         if (!$this->microphone) return '';
-
-        //         // Fetch the users only once and store them in a property
-        //         if (!isset($this->cachedUsers)) {
-        //             $ids = explode(',', $this->microphone);
-        //             $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-        //         }
-
-        //         $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-
-        //         foreach ($this->cachedUsers as $user) {
-        //             $path = @$user->profile?->avatar;
-        //             $defaultImage = asset("images/businessman-icon.jpg");
-        //             $url = $path ? getImagePath($path) : $defaultImage;
-
-        //             // Check if the image exists
-        //             if (!isImageExists($url)) {
-        //                 $url = $defaultImage;
-        //             }
-
-        //             $html .= '
-        //         <div style="text-align: center;">
-        //             <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
-        //             <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
-        //         </div>';
-        //         }
-
-        //         $html .= '</div>';
-        //         return $html;
-        //     });
 
         $grid->column(__('microphone'))
             ->display(function () {
