@@ -5,17 +5,20 @@ use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Admin\Controllers\BannerController;
+use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\OvipGiftController;
@@ -23,6 +26,7 @@ use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
@@ -66,9 +70,6 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\CustomController;
-use App\Admin\Controllers\GroupChatController;
-use App\Admin\Controllers\OVipController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -309,6 +310,8 @@ Route::group(
 
 
             Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
+
+            Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
 
                 Route::get('/{type}', [OvipGiftController::class, 'create']);

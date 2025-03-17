@@ -161,68 +161,82 @@ class RoomController extends MainController
             return $this->admins->count() . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
         $grid->column('count_room_socket', __('Number of users'));
-        $grid->column(__('microphone'))
-        // ->display(function () {
-        //     if (!$this->microphone) return '';
-    
-        //     $ids = explode(',', $this->microphone);
-        //     $users = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-    
-        //     $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-    
-        //     foreach ($users as $user) {
-        //         $path = optional($user->profile)->avatar;
-        //         $defaultImage = asset("images/businessman-icon.jpg");
-        //         $url = $path ? getImagePath($path) : $defaultImage;
-    
-        //         // Check if the image exists
-        //         if (!isImageExists($url)) {
-        //             $url = $defaultImage;
+        // $grid->column(__('microphone'))
+        //     ->display(function () {
+        //         if (!$this->microphone) return '';
+
+        //         // Fetch the users only once and store them in a property
+        //         if (!isset($this->cachedUsers)) {
+        //             $ids = explode(',', $this->microphone);
+        //             $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
         //         }
-    
-        //         $html .= '
+
+        //         $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+
+        //         foreach ($this->cachedUsers as $user) {
+        //             $path = @$user->profile?->avatar;
+        //             $defaultImage = asset("images/businessman-icon.jpg");
+        //             $url = $path ? getImagePath($path) : $defaultImage;
+
+        //             // Check if the image exists
+        //             if (!isImageExists($url)) {
+        //                 $url = $defaultImage;
+        //             }
+
+        //             $html .= '
         //         <div style="text-align: center;">
         //             <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
         //             <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
         //         </div>';
-        //     }
-    
-        //     $html .= '</div>';
-        //     return $html;
-        // }) // Fix rendering issue
-    
-        ->expand(function ($model) {
-            if (!$model->microphone) return '';
-    
-            $ids = explode(',', $model->microphone);
-            $users = \App\Models\User::whereIn('id', $ids)->get();
-    
-            // Convert users into table format
-            $filteredUsers = $users->map(function ($user) {
-                $path = optional($user->profile)->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = $path ? getImagePath($path) : $defaultImage;
-    
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
+        //         }
+
+        //         $html .= '</div>';
+        //         return $html;
+        //     });
+
+        $grid->column(__('microphone'))
+            ->display(function () {
+                $ids = explode(',', $this->microphone);
+                $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+                if (!$this->cachedUsers) {
+                    return '';
+                } else {
+
+                    $ids = explode(',', $this->microphone);
+                    $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+
+
+                    $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+
+                    foreach ($this->cachedUsers as $user) {
+                        $path = @$user->profile?->avatar;
+                        $defaultImage = asset("images/businessman-icon.jpg");
+                        $url = $path ? getImagePath($path) : $defaultImage;
+
+                        if (!isImageExists($url)) {
+                            $url = $defaultImage;
+                        }
+
+                        $html .= '
+                <div style="text-align: center;">
+                    <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
+                    <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
+                </div>';
+                    }
+                    $url1 = url('admin/room-mic/' . $this->id);
+                    // Add arrow button
+                    $html .= '
+            <div>
+                <a href="' . $url1 . '" 
+                   style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
+                    ⬇️
+                </a>
+            </div>';
+
+                    $html .= '</div>';
+                    return $html;
                 }
-    
-                $imgTag = "<img src='$url' style='width:50px; height:50px; border-radius:50%; object-fit:cover;' class='img-thumbnail' />";
-    
-                return [
-                    'name'  => $user->name,
-                    'uuid'  => $user->uuid,
-                    'image' => $imgTag,
-                ];
             });
-    
-            return new \Encore\Admin\Widgets\Table(
-                [__('Name'), __('UUID'), __('Image')],
-                $filteredUsers->toArray()
-            );
-        });
-    
 
 
         $grid->actions(function ($action) {
