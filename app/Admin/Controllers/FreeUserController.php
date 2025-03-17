@@ -164,12 +164,34 @@ class FreeUserController extends MainController
         }
 
         $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid 
-                ? __("uuid") . ' : ' . $this->uuid 
+            return $this->uuid == $this->original_uuid
+                ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
-        $grid->column('name', __('Name')); //->display(function ($value){//attribute
 
+        $grid->column('name', __('Name'))
+        ->display(function ($name) {
+            $uid = @$this->uuid;
+            $path = @$this->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
@@ -210,11 +232,11 @@ class FreeUserController extends MainController
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
-                $target = 
+                $target =
                     [
                         'id' =>$target->id ,
                         'add_month' => $target->add_month.'/'. $target->add_year,
-                       
+
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
@@ -223,7 +245,7 @@ class FreeUserController extends MainController
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
                     ];
-               
+
 
 
                 return $target;
@@ -580,7 +602,7 @@ class FreeUserController extends MainController
         $form = new Form(new User());
         if ($form->isEditing()) {
             $userId           = request()->segment(3);
-           
+
             $user             = User::findOrFail($userId);
             $oldDiValue       = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
@@ -674,7 +696,7 @@ class FreeUserController extends MainController
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-    
+
 
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
         $form->select('type_user', trans('User Type'))->options([
@@ -688,7 +710,7 @@ class FreeUserController extends MainController
 
         ])->default(0);
 
-       
+
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -745,7 +767,7 @@ class FreeUserController extends MainController
         return $form;
     }
 
-   
+
 
 
     public function request_invite_code(Request $request)

@@ -69,7 +69,29 @@ class UserAchievementLevelController extends MainController
         $grid->column('id', __('Id'));
         // $grid->column('achievement_level_id', __('Achievement level id'));
         // $grid->column('user_id', __('User id'));
-        $grid->column('user.name', __('Users'));
+        $grid->column('user.name', __('Users'))
+        ->display(function ($name) {
+            $uid = @$this->user?->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
         $grid->column('achievementLevel.target', __('achievement_level_target'))->display(function( $column) {
             if($this->achievement_level_id != null )
             {

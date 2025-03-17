@@ -26,9 +26,9 @@ class GroupChatController extends MainController
     {
         return parent::index($content
             ->title("group Chat")
-            ->row(function (Row $row) {
+            /* ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
-            })
+            }) */
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
