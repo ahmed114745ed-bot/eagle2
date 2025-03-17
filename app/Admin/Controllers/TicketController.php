@@ -140,7 +140,7 @@ class TicketController extends MainController
             $grid->column('img', __('img'))->display(function ($img) {
 
                 $defaultImage = asset('images/image.png');
-                if (!Storage::exists("ticket/$img")) {
+                if (!Storage::exists("eagle-t/ticket/$img")) {
                     return $defaultImage;
                 }
                 return $img;
