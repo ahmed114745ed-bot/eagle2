@@ -1,0 +1,31 @@
+name: SSh-voiceboom-pipline
+on:
+  push:
+    branches: ["voiceBoom"]
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out voiceboom
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.30.252"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        script: |
+          echo "$USER"
+          threshold=60
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
+          cd /var/www/voiceboom
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t voice-boom:${{ github.sha }} .
+          docker service update --image voice-boom:${{ github.sha }} voiceboom-app
