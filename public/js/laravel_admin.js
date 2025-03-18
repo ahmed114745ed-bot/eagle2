@@ -32,91 +32,167 @@ document.addEventListener("DOMContentLoaded", function() {
     document.head.appendChild(script);
 });
 
-var map, drawingManager;
-var markers = [];
-var polyline = null;
+var map;
+var circles = [];
+var activePath = [];
+var lines = [];
+var lastCircle = null;
+var polygon = null;
+
+// إعدادات الدوائر (لون وحجم)
+var circleOptions = {
+    radius: 170,
+    strokeColor: "#FF0000",
+    strokeOpacity: 1.0,
+    strokeWeight: 2,
+    fillColor: "#FF0000",
+    fillOpacity: 0.8
+};
+
+// إعدادات المضلع عند الإغلاق
+var polygonOptions = {
+    strokeColor: "#FF0000",
+    strokeOpacity: 1.0,
+    strokeWeight: 2,
+    fillColor: "#FFCCCC",
+    fillOpacity: 0.5
+};
 
 function initMap() {
-    setTimeout(() => {
-        var mapElement = document.getElementById('map');
-        if (!mapElement) {
-            console.error("❌ العنصر #map غير موجود في الصفحة.");
-            return;
-        }
+    var mapElement = document.getElementById('map');
+    if (!mapElement) {
+        console.error("❌ العنصر #map غير موجود في الصفحة.");
+        return;
+    }
 
-        console.log("✅ عنصر الخريطة موجود، جاري التهيئة...");
+    console.log("✅ عنصر الخريطة موجود، جاري التهيئة...");
 
-        map = new google.maps.Map(mapElement, {
-            center: { lat: 23.8103, lng: 90.4125 },
-            zoom: 12
-        });
+    map = new google.maps.Map(mapElement, {
+        center: { lat: 23.8103, lng: 90.4125 },
+        zoom: 12
+    });
 
-        drawingManager = new google.maps.drawing.DrawingManager({
-            drawingMode: google.maps.drawing.OverlayType.MARKER,
-            drawingControl: true,
-            drawingControlOptions: {
-                position: google.maps.ControlPosition.TOP_CENTER,
-                drawingModes: ['marker']
-            }
-        });
-        
-        drawingManager.setMap(map);
-        polyline = new google.maps.Polyline({
-            path: [],
-            geodesic: true,
-            strokeColor: "#FF0000",
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-            map: map
-        });
+    
+    map.addListener('click', function(event) {
+        addCircle(event.latLng);
+        updateCoordinates();
+    });
 
-        google.maps.event.addListener(drawingManager, 'overlaycomplete', function(event) {
-            if (event.type === 'marker') {
-                var marker = event.overlay;
-                markers.push(marker);
-                updatePolyline();
-                  
-                updateCoordinates();
-                 }
-        });
-
-        function updatePolyline() {
-            var path = markers.map(marker => ({
-                lat: marker.getPosition().lat(),
-                lng: marker.getPosition().lng()
-            }));
-            polyline.setPath(path);
-        }
-
+    
+    // التحقق من وجود الزر قبل إضافته لمنع التكرار
+    if (!document.getElementById("reset-map-btn")) {
         var resetButton = document.createElement("button");
         resetButton.textContent = "🔄 إعادة تعيين";
-        resetButton.style.position = "absolute";
-        resetButton.style.top = "10px";
-        resetButton.style.right = "10px";
-        resetButton.style.padding = "8px 12px";
-        resetButton.style.backgroundColor = "#ff4d4d";
-        resetButton.style.color = "#fff";
-        resetButton.style.border = "none";
-        resetButton.style.cursor = "pointer";
-        resetButton.style.borderRadius = "5px";
-        resetButton.onclick = function() {
-            markers.forEach(marker => marker.setMap(null));
-            markers = [];
-            polyline.setPath([]);
-            console.log("✅ تم إعادة تعيين الخريطة ومسح جميع البيانات.");
-        };
-
+        resetButton.id = "reset-map-btn";
+        resetButton.style.cssText = "position:absolute;top:10px;right:10px;padding:8px 12px;background-color:#ff4d4d;color:#fff;border:none;cursor:pointer;border-radius:5px;";
+        resetButton.onclick = resetMap;
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(resetButton);
-    }, 2000);
+    }
+}
+
+function addCircle(position) {
+    if (circles.length > 2 && isSamePosition(position, circles[0].getCenter())) {
+        closePolygon();
+        return;
+    }
+
+    var circle = new google.maps.Circle({
+        center: position,
+        radius: circleOptions.radius,
+        strokeColor: circleOptions.strokeColor,
+        strokeOpacity: circleOptions.strokeOpacity,
+        strokeWeight: circleOptions.strokeWeight,
+        fillColor: circleOptions.fillColor,
+        fillOpacity: circleOptions.fillOpacity,
+        map: map
+    });
+
+    circles.push(circle);
+
+    circle.addListener('click', function() {
+        connectToLastPoint(position);
+        updateCoordinates();
+    });
+
+    if (lastCircle) {
+        drawLine(lastCircle.getCenter(), position);
+    }
+
+    lastCircle = circle;
+    activePath.push(position);
+}
+
+function connectToLastPoint(position) {
+    if (lastCircle) {
+        drawLine(lastCircle.getCenter(), position);
+        lastCircle = { getCenter: () => position };
+        activePath.push(position);
+    }
+
+    if (circles.length > 2 && isSamePosition(position, circles[0].getCenter())) {
+        closePolygon();
+    }
+}
+
+function drawLine(start, end) {
+    var line = new google.maps.Polyline({
+        path: [start, end],
+        geodesic: true,
+        strokeColor: "#FF0000",
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        map: map
+    });
+
+    lines.push(line);
+}
+
+function closePolygon() {
+    if (polygon) {
+        polygon.setMap(null);
+    }
+
+    polygon = new google.maps.Polygon({
+        paths: activePath,
+        strokeColor: polygonOptions.strokeColor,
+        strokeOpacity: polygonOptions.strokeOpacity,
+        strokeWeight: polygonOptions.strokeWeight,
+        fillColor: polygonOptions.fillColor,
+        fillOpacity: polygonOptions.fillOpacity,
+        map: map
+    });
+
+    lines.forEach(line => line.setMap(null));
+    lines = [];
+
+    console.log("✅ المضلع تم إغلاقه بنجاح!");
+    updateCoordinates();
+}
+
+function resetMap() {
+    circles.forEach(circle => circle.setMap(null));
+    circles = [];
+
+    lines.forEach(line => line.setMap(null));
+    lines = [];
+
+    if (polygon) {
+        polygon.setMap(null);
+        polygon = null;
+    }
+
+    activePath = [];
+    lastCircle = null;
+    document.getElementById("coord-display").innerText = "";
+    document.querySelector("[name=coordinates]").value = "";
 }
 
 function updateCoordinates() {
-   
-    var path = polyline.getPath().getArray().map(p => ({ lat: p.lat(), lng: p.lng() }));
-    
-    var formattedCoordinates = path.map(p => `(${p.lat}, ${p.lng})`).join(',');
-
+    var formattedCoordinates = activePath.map(p => `(${p.lat()}, ${p.lng()})`).join(', ');
     document.querySelector("[name=coordinates]").value = formattedCoordinates;
-
     document.getElementById("coord-display").innerText = formattedCoordinates;
+}
+
+function isSamePosition(pos1, pos2) {
+    return pos1.lat().toFixed(6) === pos2.lat().toFixed(6) && pos1.lng().toFixed(6) === pos2.lng().toFixed(6);
 }

@@ -39,7 +39,7 @@ class ZonesController extends AdminController
                 if (!$coordinates) return 'N/A';
     
                 // $data = json_decode($coordinates, true);
-                return isset($data['latitude'], $data['longitude']) ? "{$data['latitude']}, {$data['longitude']}" : 'Invalid Data';
+                // return isset($data['latitude'], $data['longitude']) ? "{$data['latitude']}, {$data['longitude']}" : 'Invalid Data';
             });
             $grid->column('created_at', __('Created At'))->sortable();
     
@@ -62,12 +62,18 @@ class ZonesController extends AdminController
             $form->hidden('coordinates')->default('');
 
 
-            $form->html('<pre id="coord-display"></pre>', __('الإحداثيات الحالية'));
+            $form->html('<pre id="coord-display"
+            style="
+             background:  var(--box-background-color);
+                color:  var(--primary-color);
+            "
+            ></pre>', __('الإحداثيات الحالية'));
 
-            $form->html('<div id="map" style="height: 400px; border: 1px solid #ccc; margin-top: 10px;"></div>', __('حدد المنطقة على الخريطة'));
+            $form->html('<div id="map"  style="height: 400px; border: 1px solid #ccc; margin-top: 10px; 
+               
+            "></div>', __('حدد المنطقة على الخريطة'));
         
             $form->saving(function ($form) {
-                // dd($form->coordinates); // تحقق من القيم الواردة
             
                 // التحقق من وجود الإحداثيات
                 if (!$form->coordinates) {
