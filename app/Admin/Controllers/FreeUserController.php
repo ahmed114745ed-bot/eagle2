@@ -130,8 +130,8 @@ class FreeUserController extends MainController
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->with("ownerRoom");
 
-        $grid->model()->where('type_user',0)->where('is_host',0)->where(function ($query) {
-            $query->whereNull('family_id')->orWhere('family_id',0);
+        $grid->model()->where('type_user', 0)->where('is_host', 0)->where(function ($query) {
+            $query->whereNull('family_id')->orWhere('family_id', 0);
         });
 
         // if (request()->online == 1) {
@@ -139,7 +139,7 @@ class FreeUserController extends MainController
         // } else if ($haveCoins) {
         //     $grid->model()->where('di', '>', 0)->orderByDesc('di');
         // } else {
-            $grid->model()->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
         // }
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
@@ -147,7 +147,7 @@ class FreeUserController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
-                $filter->column(1/2, function ($filter) {
+                $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
@@ -170,19 +170,19 @@ class FreeUserController extends MainController
         });
 
         $grid->column('name', __('Name'))
-        ->display(function ($name) {
-            $uid = @$this->uuid;
-            $path = @$this->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
@@ -191,7 +191,7 @@ class FreeUserController extends MainController
                 </div>
             </div>
         ";
-        });
+            });
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
@@ -229,19 +229,19 @@ class FreeUserController extends MainController
         });
 
         $grid->column('phone', __('Phone'));
-       // $grid->column('total_charge_level', __('admin.charge_level'));
+        // $grid->column('total_charge_level', __('admin.charge_level'));
         $grid->column('target', __('target'))->expand(function ($model) {
 
             $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
                 $target =
                     [
-                        'id' =>$target->id ,
-                        'add_month' => $target->add_month.'/'. $target->add_year,
+                        'id' => $target->id,
+                        'add_month' => $target->add_month . '/' . $target->add_year,
 
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
-                        'user_hours'=> $target->user_hours,
+                        'user_hours' => $target->user_hours,
                         'user_days' => $target->user_days,
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
@@ -255,7 +255,7 @@ class FreeUserController extends MainController
             return new TableWidget(
                 [
                     'ID',
-                    __('month') .'/'.__('year') ,
+                    __('month') . '/' . __('year'),
                     __('usd') . ' ' . __('deserved'),
                     __('agency share') . '(%)',
                     __('user diamonds'),
@@ -407,6 +407,7 @@ class FreeUserController extends MainController
                         $userType = $type; // Keep the original value if no match is found
                         break;
                 }
+                $row->column(12, view('admin.grid.users.show'), compact('user'));
                 $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
                 $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
                 $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
@@ -762,7 +763,6 @@ class FreeUserController extends MainController
                         break;
                 }
             }
-
         });
 
 
