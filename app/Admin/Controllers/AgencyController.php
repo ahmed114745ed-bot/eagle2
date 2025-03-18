@@ -169,9 +169,25 @@ class AgencyController extends MainController
             });
         }
         $grid->id(__('ID'));
-        $grid->column('img', trans('img'))->image('', 30);
-        $grid->column('name', trans('name'));
-        $grid->column('notice', trans('notice'));
+        $grid->column('name', __('Agency'))
+        ->display(function ($name) {
+            $path = @$this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <span>$name</span>
+            </div>
+        ";
+        });
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
