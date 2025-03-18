@@ -14,7 +14,6 @@ jobs:
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         script: |
-          echo "$USER"
           threshold=60
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
