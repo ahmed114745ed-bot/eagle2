@@ -216,7 +216,7 @@ class AgencyController extends MainController
 
         $grid->column('phone', trans('phone'));
         $grid->column('coins', __('coins'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
@@ -226,7 +226,7 @@ class AgencyController extends MainController
             ";
         });
         $grid->column('salary', __('salary'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
