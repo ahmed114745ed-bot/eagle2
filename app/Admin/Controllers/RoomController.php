@@ -166,7 +166,7 @@ class RoomController extends MainController
         $grid->column(__('microphone'))
             ->display(function () {
                 $ids = explode(',', $this->microphone);
-                $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+                $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(6)->get();
 
                 // Check if there are no users
                 if ($cachedUsers->isEmpty()) {
@@ -176,37 +176,32 @@ class RoomController extends MainController
                 $html = '<div style="display: flex; gap: 10px; align-items: center;">';
 
                 foreach ($cachedUsers as $user) {
-                    $path = @$user->profile?->avatar;
+                    $path = $user->profile?->avatar;
                     $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = $path ? getImagePath($path) : $defaultImage;
-
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    $html .= '
-            <div style="position: relative; margin-left: -20px;">
-                <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
-            </div>';
-                }
-
-                // Add Font Awesome icon for "more info"
-                $url1 = url('admin/room-mic/' . $this->id);
-                $arrowIcon = asset('images/add.png');
-
-                if (count($ids) > 5) {
-                    $html .= '
-        <div>
-            <a href="' . $url1 . '" 
-               style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
-                <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
+                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
             
-            </a>
-        </div>';
-
-                    $html .= '</div>';
-                    return $html;
+                    $html .= '
+                    <div style="position: relative; margin-left: -20px;">
+                        <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
+                    </div>';
                 }
+            
+                // Show "add" icon if more than 5 users
+                if (count($cachedUsers) > 5) {
+                    $url1 = url('admin/room-mic/' . $this->id);
+                    $arrowIcon = asset('images/add.png');
+            
+                    $html .= '
+                    <div>
+                        <a href="' . $url1 . '" 
+                           style="text-decoration: none; cursor: pointer;">
+                            <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
+                        </a>
+                    </div>';
+                }
+            
+                $html .= '</div>';
+                return $html;
             });
 
 
