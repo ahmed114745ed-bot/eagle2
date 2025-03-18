@@ -76,7 +76,7 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->with('owner.profile')
+        $grid->model()->with('owner.profile','owner:uuid,id,name',)
             ->orderByDesc('rooms.pin')->whereHas('owner')
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
@@ -166,7 +166,8 @@ class RoomController extends MainController
         $grid->column(__('microphone'))
             ->display(function () {
                 $ids = explode(',', $this->microphone);
-                $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(6)->get();
+                $cachedUsers = \App\Models\User::whereIn('id', $ids)->with(['profile:user_id,avatar'])->take(6)->get(['id']);
+               
 
                 // Check if there are no users
                 if ($cachedUsers->isEmpty()) {
@@ -175,7 +176,7 @@ class RoomController extends MainController
 
                 $html = '<div style="display: flex; gap: 10px; align-items: center;">';
 
-                foreach ($cachedUsers as $user) {
+                foreach ($cachedUsers->take(5) as $user) {
                     $path = $user->profile?->avatar;
                     $defaultImage = asset("images/businessman-icon.jpg");
                     $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
