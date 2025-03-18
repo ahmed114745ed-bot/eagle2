@@ -76,7 +76,8 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->orderByDesc('rooms.pin')->whereHas('owner')
+        $grid->model()->with('owner.profile')
+            ->orderByDesc('rooms.pin')->whereHas('owner')
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
             ->orderByDesc('count_room_socket');
