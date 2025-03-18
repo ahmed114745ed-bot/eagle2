@@ -377,6 +377,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
+            Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
             Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');

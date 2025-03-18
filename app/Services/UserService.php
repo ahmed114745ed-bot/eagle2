@@ -170,6 +170,17 @@ class UserService
         return $userWithMedals;
     }
 
+    public function update_user_multi_images($user, $id, $src)
+    {
+        
+     
+
+        return $this->userRepository->update_user_multi_images($user,$id,$src);
+
+    }
+
+
+    
     public function unlockDressHand($userId)
     {
         $vip = Common::getLevel($userId, 3);
