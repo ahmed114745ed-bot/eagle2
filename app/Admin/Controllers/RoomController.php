@@ -91,7 +91,7 @@ class RoomController extends MainController
 
                     $query->whereHas('owner', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")->orWhere('id', 'like', "%$input%");
+                            ->orWhere('uuid', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or numId'));
             });
@@ -158,41 +158,43 @@ class RoomController extends MainController
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
-            return $this->admins->count() . '/' . ($maxAdmin ?? $maxRoomAdmin);
+            return count($this->admins) . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
         $grid->column('count_room_socket', __('Number of users'));
 
         $grid->column(__('microphone'))
-    ->display(function () {
-        $ids = explode(',', $this->microphone);
-        $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
+            ->display(function () {
+                $ids = explode(',', $this->microphone);
+                $cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
 
-        // Check if there are no users
-        if ($cachedUsers->isEmpty()) {
-            return '';
-        }
+                // Check if there are no users
+                if ($cachedUsers->isEmpty()) {
+                    return '';
+                }
 
-        $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+                $html = '<div style="display: flex; gap: 10px; align-items: center;">';
 
-        foreach ($cachedUsers as $user) {
-            $path = @$user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = $path ? getImagePath($path) : $defaultImage;
+                foreach ($cachedUsers as $user) {
+                    $path = @$user->profile?->avatar;
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = $path ? getImagePath($path) : $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
 
-            $html .= '
+                    $html .= '
             <div style="position: relative; margin-left: -20px;">
                 <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
             </div>';
-        }
+                }
 
-        // Add Font Awesome icon for "more info"
-        $url1 = url('admin/room-mic/' . $this->id);
-        $arrowIcon = asset('images/add.png');
-        $html .= '
+                // Add Font Awesome icon for "more info"
+                $url1 = url('admin/room-mic/' . $this->id);
+                $arrowIcon = asset('images/add.png');
+
+                if (count($ids) > 5) {
+                    $html .= '
         <div>
             <a href="' . $url1 . '" 
                style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
@@ -201,12 +203,13 @@ class RoomController extends MainController
             </a>
         </div>';
 
-        $html .= '</div>';
-        return $html;
-    });
+                    $html .= '</div>';
+                    return $html;
+                }
+            });
 
-    
-    
+
+
 
         $grid->actions(function ($action) {
             $action->disableView();
