@@ -26,7 +26,8 @@ use Encore\Admin\Facades\Admin;
 Admin::favicon(asset('images/app-logo.png')); //config('app.appLogo')
 Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));
-
+Admin::css('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+Admin::script('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js');
 app('view')->prependNamespace('admin', resource_path('views/admin'));
 view()->composer('admin::partials.menu', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/menu.blade.php'));

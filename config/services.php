@@ -43,5 +43,8 @@ return [
         "fawry_return_url"      => env('FAWRY_RETURN_URL','/admin/payment-with-method'),
         "fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
     ],
+    'google_maps' => [
+        'key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
 
 ];

@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\ZonesController;
+use App\Admin\Controllers\ZonsController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -429,6 +431,11 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
+        $router->resource('zones', ZonesController::class);
+        // Route::get('zones/create', [ZonesController::class, 'form'])->name('admin.zones.create');
+        // Route::get('zones/{id}/edit', [ZonesController::class, 'form'])->name('admin.zones.edit');
+        // Route::post('zones', [ZonesController::class, 'store'])->name('admin.zones.store');
+        // Route::put('zones/{id}', [ZonesController::class, 'update'])->name('admin.zones.update');
     }
 
 
