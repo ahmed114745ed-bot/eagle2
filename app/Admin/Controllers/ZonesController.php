@@ -74,7 +74,7 @@ class ZonesController extends AdminController
             "></div>', __('حدد المنطقة على الخريطة'));
         
             $form->saving(function ($form) {
-            
+           
                 // التحقق من وجود الإحداثيات
                 if (!$form->coordinates) {
                     admin_error('خطأ', 'يجب تحديد المنطقة على الخريطة!');
@@ -85,7 +85,6 @@ class ZonesController extends AdminController
                 if (is_string($form->coordinates)) {
                     // تحويل الإحداثيات إلى مصفوفة
                     $coordinates = explode('),(', trim($form->coordinates, '()'));
-            
                     // التأكد من أن الإحداثيات تحتوي على قيم
                     if (count($coordinates) < 3) {
                         admin_error('خطأ', 'يجب أن تحتوي الإحداثيات على 3 نقاط على الأقل لتشكيل شكل Polygon.');

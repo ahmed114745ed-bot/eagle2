@@ -18,6 +18,9 @@ $(document).ready(function () {
     });
 });
 
+function getComputedStyleVar(variable) {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+}
 document.addEventListener("DOMContentLoaded", function() {
     console.log("🚀 جاري تحميل خريطة جوجل...");
 
@@ -42,19 +45,19 @@ var polygon = null;
 // إعدادات الدوائر (لون وحجم)
 var circleOptions = {
     radius: 170,
-    strokeColor: "#FF0000",
+    strokeColor: getComputedStyleVar("--primary-color"),
     strokeOpacity: 1.0,
     strokeWeight: 2,
-    fillColor: "#FF0000",
+    fillColor: getComputedStyleVar("--primary-color"),
     fillOpacity: 0.8
 };
 
 // إعدادات المضلع عند الإغلاق
 var polygonOptions = {
-    strokeColor: "#FF0000",
+    strokeColor: getComputedStyleVar("--primary-color"),
     strokeOpacity: 1.0,
     strokeWeight: 2,
-    fillColor: "#FFCCCC",
+    fillColor: getComputedStyleVar("--primary-color"),
     fillOpacity: 0.5
 };
 
@@ -77,6 +80,7 @@ function initMap() {
         addCircle(event.latLng);
         updateCoordinates();
     });
+
 
     
     // التحقق من وجود الزر قبل إضافته لمنع التكرار
@@ -188,7 +192,7 @@ function resetMap() {
 }
 
 function updateCoordinates() {
-    var formattedCoordinates = activePath.map(p => `(${p.lat()}, ${p.lng()})`).join(', ');
+    var formattedCoordinates = activePath.map(p => `(${p.lat()},${p.lng()})`).join(',');
     document.querySelector("[name=coordinates]").value = formattedCoordinates;
     document.getElementById("coord-display").innerText = formattedCoordinates;
 }
