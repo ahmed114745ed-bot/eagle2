@@ -20,9 +20,15 @@ class FilterAgencyMangerResource extends JsonResource
             'id' => $this->id,
             'agency_id' => (string)$this->agency_id ?? '0',
             'uuid' => $this->uuid,
-            'name'=>@$this->name,
-            'image'=>@$this->profile?->avatar,
-            'total_member'=>$this->ownAgency?->mempers->count(),
+            'name' => @$this->name,
+            'image' => @$this->profile?->avatar,
+            'total_member' => $this->ownAgency?->mempers->count(),
+            'agency' => [
+                'members' => $this->ownAgency?->mempers,
+                'id' => $this->ownAgency?->id ?? 0,
+                'name' => @$this->ownAgency?->name ?? '',
+                'image' => @$this->ownAgency?->img ?? '',
+            ],
         ];
     }
 }

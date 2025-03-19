@@ -18,9 +18,16 @@ class FilterAgancyResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name'=>@$this->name,
-            'image'=>@$this->img,
-            'total_members'=>$this->mempers->count(),
+            'name' => @$this->name,
+            'image' => @$this->img,
+            'total_members' => $this->mempers->count(),
+            'members' => $this->mempers,
+            'owner' => [
+                'id' => $this->owner->id ?? 0,
+                'uuid' => $this->owner->uuid ?? '',
+                'name' => @$this->owner->name ?? '',
+                'image' => @$this->owner->profile?->avatar ?? '',
+            ]
         ];
     }
 }
