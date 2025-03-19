@@ -185,7 +185,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-
+            Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
