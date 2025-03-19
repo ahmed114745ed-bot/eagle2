@@ -3,10 +3,11 @@
 namespace App\Repositories\User;
 
 use App\Models\Follow;
+use App\Models\ProfileGallary;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
-
+use Exception;
 class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
@@ -104,6 +105,21 @@ class UserRepository extends Repository
         ])
             ->find($userId);
     }
+
+    public function update_user_multi_images($user, $id, $src)
+    {
+        $updated = ProfileGallary::where('id', $id)
+                                 ->where('user_id', $user->id)
+                                 ->update(['img' => $src]);
+    
+        if (!$updated) {
+            throw new Exception("Error updating image Or image not found");
+        }
+    
+        return true;
+    }
+
+    
 
     public function userCharge()
     {
