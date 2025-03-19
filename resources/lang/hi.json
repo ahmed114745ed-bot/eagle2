@@ -847,7 +847,39 @@
     "Max Admin": "अधिकतम प्रबंधक संख्या",
 
     "type_local" : "स्थानीय",
-    "type_global" : "वैश्विक"
+    "type_global" : "वैश्विक",
+    "coordinates": "निर्देशांक",
+    "zones": "क्षेत्र",
+    "name": "नाम",
+    "zone_name": "क्षेत्र का नाम",
+    "my_zone": "मेरा क्षेत्र",
+    "app_manager": "ऐप प्रबंधक",
+    "select_area_on_map": "नक्शे पर क्षेत्र चुनें",
+    "must_select_area_on_map": "आपको नक्शे पर क्षेत्र चुनना होगा!",
+    "coordinates_must_have_three_points": "बहुभुज बनाने के लिए निर्देशांकों में कम से कम 3 बिंदु होने चाहिए।",
+    "invalid_coordinates_format": "निर्देशांक प्रारूप गलत है।",
+    "manager":"प्रबंधक",
+    "id": "आईडी",
+    "username": "उपयोगकर्ता नाम",
+    "name": "नाम",
+    "avatar": "अवतार",
+    "user_info": "उपयोगकर्ता जानकारी",
+    "app_manager": "ऐप प्रबंधक",
+    "created": "बनाया गया",
+    "created_at": "बनाने की तिथि",
+    "updated_at": "अद्यतन तिथि",
+    "agency_manager": "एजेंसी प्रबंधक",
+    "app_id": "ऐप आईडी",
+    "is_preview": "क्या यह पूर्वावलोकन है?",
+    "app_manager_id": "ऐप प्रबंधक आईडी",
+    "password": "पासवर्ड",
+    "app_name": "ऐप का नाम",
+    "email": "ईमेल",
+    "app_password": "ऐप पासवर्ड",
+    "username_taken": "उपयोगकर्ता नाम पहले से ही लिया जा चुका है। कृपया कोई और चुनें।",
+        "manager_zones_dash": "प्रबंधक क्षेत्र डैशबोर्ड",
+    "manager_zones_app": "प्रबंधक क्षेत्र ऐप"
+
 
 
 

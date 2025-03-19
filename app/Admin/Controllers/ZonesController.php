@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Manager;
 use App\Models\Zone;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Facades\Admin;
@@ -13,7 +14,7 @@ use Illuminate\Http\Request;
 use MatanYadaev\EloquentSpatial\Objects\Polygon;
 use MatanYadaev\EloquentSpatial\Objects\Point;
 use MatanYadaev\EloquentSpatial\Objects\LineString;
-
+use App\Models\Admin as AdminModel;
 class ZonesController extends AdminController
 {
 
@@ -22,8 +23,13 @@ class ZonesController extends AdminController
          *
          * @var string
          */
-        protected $title = 'Zones';
-    
+        protected $title = '';
+        public function index(Content $content)
+        {
+            return $content
+                ->title(trans('zones'))
+                ->body($this->grid());
+        }
         /**
          * Make a grid builder.
          *
@@ -35,13 +41,13 @@ class ZonesController extends AdminController
     
             $grid->column('id', __('ID'))->sortable();
             $grid->column('name', __('Name'))->sortable();
-            $grid->column('coordinates', __('Coordinates'))->display(function ($coordinates) {
+            $grid->column('coordinates', __('coordinates'))->display(function ($coordinates) {
                 if (!$coordinates) return 'N/A';
     
                 // $data = json_decode($coordinates, true);
                 // return isset($data['latitude'], $data['longitude']) ? "{$data['latitude']}, {$data['longitude']}" : 'Invalid Data';
             });
-            $grid->column('created_at', __('Created At'))->sortable();
+            $grid->column('created_at', __('created'))->sortable();
     
             return $grid;
         }
@@ -57,8 +63,15 @@ class ZonesController extends AdminController
         {
             $form = new Form(new Zone());
         
-            $form->text('name', __('اسم المنطقة'))->required();
-        
+            $form->text('name', __('zone_name'))->required();
+            $managers = AdminModel::where('app_manager_id', '!=', 0)->where('zone_id','=',0)
+            ->get()
+            ->pluck('username', 'id'); 
+          
+    
+            $form->select('manager_id', __('manager'))
+            ->options($managers)
+            ->required();        
             $form->hidden('coordinates')->default('');
 
 
@@ -67,17 +80,17 @@ class ZonesController extends AdminController
              background:  var(--box-background-color);
                 color:  var(--primary-color);
             "
-            ></pre>', __('الإحداثيات الحالية'));
+            ></pre>', __('my_zone'));
 
             $form->html('<div id="map"  style="height: 400px; border: 1px solid #ccc; margin-top: 10px; 
                
-            "></div>', __('حدد المنطقة على الخريطة'));
+            "></div>', __('select_area_on_map'));
         
             $form->saving(function ($form) {
            
                 // التحقق من وجود الإحداثيات
                 if (!$form->coordinates) {
-                    admin_error('خطأ', 'يجب تحديد المنطقة على الخريطة!');
+                    admin_error('error', 'select_area_on_map');
                     return back();
                 }
             
@@ -87,7 +100,7 @@ class ZonesController extends AdminController
                     $coordinates = explode('),(', trim($form->coordinates, '()'));
                     // التأكد من أن الإحداثيات تحتوي على قيم
                     if (count($coordinates) < 3) {
-                        admin_error('خطأ', 'يجب أن تحتوي الإحداثيات على 3 نقاط على الأقل لتشكيل شكل Polygon.');
+                        admin_error('error', 'coordinates_must_have_three_points');
                         return back();
                     }
             
@@ -99,7 +112,7 @@ class ZonesController extends AdminController
                             // إضافة الإحداثيات [lng, lat]
                             $polygonCoordinates[] = new Point(floatval($coords[1]), floatval($coords[0]));
                         } else {
-                            admin_error('خطأ', 'تنسيق الإحداثيات غير صحيح.');
+                            admin_error('error', 'invalid_coordinates_format');
                             return back();
                         }
                     }
@@ -112,9 +125,32 @@ class ZonesController extends AdminController
             
                     // إنشاء كائن Polygon باستخدام LineString
                     $form->coordinates = new Polygon([$lineString]);
+
+
                 }
             });
             
+            $form->saved(function (Form $form) {
+                if (!$form->model()->manager_id) {
+                    return;
+                }
+            
+                $managerDash = AdminModel::find($form->model()->manager_id);
+            
+                if (!$managerDash) {
+                    return; // إذا لم يتم العثور على المدير، لا تكمل العملية
+                }
+            
+                $managerDash->zone_id = $form->model()->id;
+                $managerDash->save();
+            
+                if ($managerDash->app_manager_id) {
+                    Manager::where('id', $managerDash->app_manager_id)
+                        ->update([
+                            'zone_id' => $form->model()->id
+                        ]);
+                }
+            });
             
             return $form;
         }

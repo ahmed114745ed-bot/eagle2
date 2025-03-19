@@ -378,6 +378,8 @@
            "require user_id and owner_id": "requiert user_id et owner_id",
            "The user is already muted, please do not repeat the settings": "l'utilisateur est déjà en sourdine, veuillez ne pas répéter les paramètres",
            "Successfully unmuted": "désactivation de la sourdine réussie",
-           "Unmute failed": "échec de la désactivation de la sourdine"
+           "Unmute failed": "échec de la désactivation de la sourdine",
+           "coordinates": "Koordinatlar"
+         
 }
 

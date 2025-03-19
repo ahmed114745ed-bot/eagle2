@@ -1704,7 +1704,39 @@
     "Max Admin": "Maksimum Yönetici Sayısı",
 
     "type_local" : "Yerel",
-    "type_global" : "Küresel"
+    "type_global" : "Küresel",
+    "zones": "Bölgeler",
+
+    "name": "Ad",
+    "zone_name": "Bölge Adı",
+    "my_zone": "Benim Bölgem",
+    "app_manager": "Uygulama Yöneticisi",
+    "select_area_on_map": "Haritada bölgeyi seçin",
+    "must_select_area_on_map": "Haritada bölgeyi seçmelisiniz!",
+    "coordinates_must_have_three_points": "Koordinatların bir çokgen oluşturmak için en az 3 nokta içermesi gerekir.",
+    "invalid_coordinates_format": "Koordinat formatı yanlış.",
+    "manager":"Yöneticisi",
+    "id": "Kimlik",
+    "username": "Kullanıcı Adı",
+    "name": "Ad",
+    "avatar": "Avatar",
+    "user_info": "Kullanıcı Bilgileri",
+    "app_manager": "Uygulama Yöneticisi",
+    "created": "Oluşturuldu",
+    "created_at": "Oluşturulma Tarihi",
+    "updated_at": "Güncelleme Tarihi",
+    "agency_manager": "Ajans Yöneticisi",
+    "app_id": "Uygulama Kimliği",
+    "is_preview": "Önizleme Mi?",
+    "app_manager_id": "Uygulama Yöneticisi Kimliği",
+    "password": "Şifre",
+    "app_name": "Uygulama Adı",
+    "email": "E-posta",
+    "app_password": "Uygulama Şifresi",
+    "username_taken": "Bu kullanıcı adı zaten alınmış. Lütfen başka bir tane seçin",
+      "manager_zones_dash": "Yönetici Bölge Panosu",
+    "manager_zones_app": "Yönetici Bölge Uygulaması"
+
 
 
 

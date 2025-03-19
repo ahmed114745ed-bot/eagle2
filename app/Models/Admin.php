@@ -10,7 +10,7 @@ class Admin extends \App\Models\Administrator
 {
     protected $table = 'admin_users';
     protected $appends = ['agency_id'];
-    protected $fillable = ['username', 'password', 'name', 'avatar', 'is_preview'];
+    protected $fillable = ['username', 'password', 'name', 'avatar', 'is_preview','app_manager_id'];
 
     protected $guarded = [];
     public function agency(){
