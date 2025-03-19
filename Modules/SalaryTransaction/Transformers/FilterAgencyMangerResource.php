@@ -24,7 +24,7 @@ class FilterAgencyMangerResource extends JsonResource
             'image' => @$this->profile?->avatar,
             'total_member' => $this->ownAgency?->mempers->count(),
             'agency' => [
-                'members' => $this->ownAgency?->mempers,
+                'members' => AgencyMemberResource::collection($this->ownAgency?->mempers),
                 'id' => $this->ownAgency?->id ?? 0,
                 'name' => @$this->ownAgency?->name ?? '',
                 'image' => @$this->ownAgency?->img ?? '',
