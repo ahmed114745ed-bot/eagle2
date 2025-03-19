@@ -171,7 +171,6 @@ class FreeUserController extends MainController
 
         $grid->column('name', __('Name'))
             ->display(function ($name) {
-                $uid = @$this->uuid;
                 $path = @$this->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -187,7 +186,6 @@ class FreeUserController extends MainController
                 $image
                 <div>
                     <strong>$name</strong><br>
-                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                 </div>
             </div>
         ";
@@ -215,17 +213,6 @@ class FreeUserController extends MainController
             ];
 
             return new Table([__('Field Name'), __('Value')], $results);
-        });
-
-
-
-        $grid->column('profile.avatar', __('image'))->display(function ($path) {
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
         $grid->column('phone', __('Phone'));
@@ -407,7 +394,7 @@ class FreeUserController extends MainController
                         $userType = $type; // Keep the original value if no match is found
                         break;
                 }
-                $row->column(12, view('admin.grid.users.show'), compact('user'));
+                $row->column(12, view('admin.grid.users.show', compact('user')));
                 $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
                 $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
                 $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
