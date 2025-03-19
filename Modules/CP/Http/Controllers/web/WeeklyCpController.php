@@ -96,7 +96,7 @@ class WeeklyCpController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column( 'الاجرائات')->display(function () {
+        $grid->column( 'Actions')->display(function () {
             // توليد الروابط
             $url1 = url('admin/weekly-cp-gift/'.$this->id);
 
