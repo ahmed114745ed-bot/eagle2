@@ -6,8 +6,9 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Support\Str;
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Auth;
+use App\Admin\Controllers\MainController;
 
 class PermissionController extends MainController
 {
@@ -55,12 +56,16 @@ class PermissionController extends MainController
     protected function grid()
     {
         $permissionModel = config('admin.database.permissions_model');
-
+        $admin = Auth::user();
         $grid = new Grid(new $permissionModel());
-
+        if ($admin->isRole('manger')) {
+            $grid->model()->where('created_by', $admin->id);
+        }
         $grid->column('id', 'ID')->sortable();
+        
         $grid->column('slug', trans('admin.slug'));
         $grid->column('name', trans('admin.name'));
+       
 
         $grid->column('http_path', trans('admin.route'))->display(function ($path) {
             return collect(explode("\n", $path))->map(function ($path) {
@@ -166,6 +171,7 @@ class PermissionController extends MainController
 
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
+        $form->model()->created_by = auth()->id();
 
         return $form;
     }
