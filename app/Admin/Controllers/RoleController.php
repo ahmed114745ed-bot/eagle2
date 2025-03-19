@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends MainController
 {
@@ -65,8 +66,11 @@ class RoleController extends MainController
     {
         \Admin::js('js/admin/preview.js');
         $roleModel = config('admin.database.roles_model');
-
+        $admin = Auth::user();
         $grid = new Grid(new $roleModel());
+        if ($admin->isRole('manger')) {
+            $grid->model()->where('created_by', $admin->id);
+        }
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
         $grid->column('name', trans('admin.name'));
@@ -151,6 +155,7 @@ class RoleController extends MainController
 
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
+        $form->model()->created_by = auth()->id();
 
         return $form;
     }
