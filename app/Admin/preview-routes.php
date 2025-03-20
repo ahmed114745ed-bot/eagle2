@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\AdminUsersController;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AgencyMangerUsers;

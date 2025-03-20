@@ -61,6 +61,8 @@ use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
+use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
@@ -159,7 +161,7 @@ Route::group(
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
         $router->resource('test-test', 'TestTestController');
-
+        $router->get('profile', [AdminAuthController::class, 'index']);
         $router->resource('payment-with-method', PaymentMethodController::class);
         $router->post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
 
@@ -230,6 +232,7 @@ Route::group(
         $router->resource('home_carousels', 'HomeCarouselController');
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
+        $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
         $router->resource('polices', PoliceController::class);

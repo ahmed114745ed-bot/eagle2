@@ -62,6 +62,8 @@ class VipController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->setResource('vips');
+
         return $grid;
     }
 
@@ -95,6 +97,8 @@ class VipController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->setResource('vips');
+
         return $grid;
     }
     public function cpIndex(Content $content){
@@ -128,6 +132,8 @@ class VipController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->setResource('vips');
+
         return $grid;
     }
 
@@ -163,6 +169,8 @@ class VipController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->setResource('vips');
+
         return $grid;
     }
 
@@ -197,6 +205,8 @@ class VipController extends MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+        $grid->setResource('vips');
+
         return $grid;
     }
 

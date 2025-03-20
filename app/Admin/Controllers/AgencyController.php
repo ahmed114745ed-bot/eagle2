@@ -63,6 +63,11 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
+    public function profile($id, Content $content){
+        $agency = Agency::findOrFail($id);
+        return $content->title(__('agency profile'))->view('agency_profile', compact('agency'));
+    }
+
     public function update($id)
     {
         $data = request()->all();
@@ -262,6 +267,11 @@ class AgencyController extends MainController
         $this->extendGrid($grid);
 
 
+        $grid->column('agency profile', __('agency profile'))->display(function () {
+            $url = route('admin.agency.profile', ['id' => $this->id]);
+            $name = __('agency profile');
+            return "<a href='{$url}' class='btn btn-primary btn-sm'>{$name}</a>";
+        });
 
         return $grid;
     }

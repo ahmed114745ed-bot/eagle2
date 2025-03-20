@@ -14,7 +14,7 @@ class AdminPermission extends Seeder
     public function run(): void
     {
         $permissions = [
-
+            'admin-profile',
             'moment',
             'wares-dedicate',
             'vips-dedicate',
@@ -110,7 +110,7 @@ class AdminPermission extends Seeder
             'updates_family-config',
             'ovip-gift',
             'charge-level'
-            
+
 
 
 
@@ -168,7 +168,7 @@ class AdminPermission extends Seeder
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
             'updates_family-config' => ['updates_family-config'],
-          
+
 
         ];
 
@@ -180,27 +180,27 @@ class AdminPermission extends Seeder
                     return $category;
                 }
             }
-            return 'general'; 
+            return 'general';
         }
 
         foreach ($permissions as $permission) {
             foreach ($methods as $method) {
                 $slug = $method . '-' . $permission;
                 $name = $method . ' ' . str_replace('-', ' ', $permission);
-        
+
                 // Check if the permission already exists
                 $permissionExists = DB::table('admin_permissions')->where('slug', $slug)->first();
-        
+
                 // Get the category for the permission
                 $category = getCategory($permission, $categories);
-        
+
                 if ($permissionExists) {
                     // If the permission exists, update the category
                     DB::table('admin_permissions')->where('slug', $slug)->update([
                         'category'   => $category,
                         'updated_at' => now(),
                     ]);
-                    
+
                 } else {
                     // Insert the new permission with its category
                     DB::table('admin_permissions')->insert([
@@ -215,7 +215,7 @@ class AdminPermission extends Seeder
                 }
             }
         }
-       
+
 
     }
 }
