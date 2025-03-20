@@ -426,10 +426,10 @@ if (!function_exists('convertNumbersToWestern')) {
     function convertNumbersToWestern($string) {
         $newNumbers = range(0, 9);
 
-       if(app()->setLocale('hi'))
+       if(app()->getLocale() =='hi')
        {
         $numbers = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-       }elseif(app()->setLocale('ar'))
+       }elseif(app()->getLocale() =='ar')
        {
         $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
        }
