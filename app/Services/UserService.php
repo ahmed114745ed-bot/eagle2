@@ -170,6 +170,16 @@ class UserService
         return $userWithMedals;
     }
 
+    public function update_user_multi_images($user, $id, $src)
+    {
+
+
+
+        return $this->userRepository->update_user_multi_images($user, $id, $src);
+    }
+
+
+
     public function unlockDressHand($userId)
     {
         $vip = Common::getLevel($userId, 3);
@@ -999,8 +1009,66 @@ class UserService
         if (!$to) return Common::apiResponse(0, 'user not found', null, 404);
         $pack->user_id   = $to->id;
         $pack->sender_id = $user->id;
-            $pack->save();
+        $pack->save();
         CustomNotification::mallSend($user, $to, $pack->type, $ware->show_img);
         return Common::apiResponse(1, 'sent successfully');
+    }
+
+
+    public function userChargeLevel($user)
+    {
+        $expLevel     = $user->total_charge_coins + $user->sub_charger_coins;
+        $currentLevel = $this->vipRepository->findByLevel($user->charge_level, 5);
+        if ($currentLevel) {
+            $secondLevel = $this->vipRepository->nextLevel($currentLevel->level, 5);
+        } else {
+            $secondLevel = $this->vipRepository->findByType(5);
+        }
+
+
+        if ($secondLevel != null && $currentLevel != null) {
+            $remaining       = $secondLevel?->exp - $user->total_charge_coins;
+            $exactlyValue    = @$secondLevel?->exp;
+            $progressCurrent = $expLevel - $currentLevel->exp;
+            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+            $prog = ($progressCurrent / $progressNext);
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } elseif ($currentLevel != null) {
+            $remaining       = $secondLevel?->exp == null ? 0 : $secondLevel?->exp - $user?->total_charge_coins;
+            $exactlyValue    = $secondLevel?->exp ?? 0;
+            $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
+            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
+            $prog = ($progressCurrent / $progressNext);
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            // $progress = $exactlyValue == 0 ? 1 : ($expLevel / $exactlyValue);
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } else {
+            $progress  = 1;
+            $remaining = 0;
+        }
+        $chargeLevel = [
+            'current_level' => $currentLevel->level ?? 0,
+            'current_exp'   => $currentLevel->exp ?? 0,
+            'current_img'   => $currentLevel->img ?? '',
+            'next_level'    => @$secondLevel->level ?? 0,
+            'next_exp'      => @$secondLevel->exp ?? 0,
+            'next_img'      => @$secondLevel->img ?? '',
+            'remaining'     => @$remaining ?? 0,
+            'progress'      => @$progress ?? 0,
+        ];
+
+    return  [
+            'gift_level' => Common::level_center($user->id),
+            'charge_level' => $chargeLevel,
+        ];
     }
 }

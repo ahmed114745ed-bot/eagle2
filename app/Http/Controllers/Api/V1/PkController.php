@@ -86,8 +86,11 @@ class PkController extends Controller
 
     public function closePK(Request $request)
     {
+        
+        if (!$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+     
+        if (!$request->owner_id && !$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
 
-        if (!@$request->owner_id || !@$request->pk_id) Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         try {
             $pk = $this->pkService->closePk($request->pk_id);
         } catch (Exception $e) {
@@ -110,8 +113,8 @@ class PkController extends Controller
 
     public function closePKWithoutZego(Request $request)
     {
-
-        if (!@$request->owner_id || !@$request->pk_id) Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+        if (!$request->pk_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
+        if (!@$request->owner_id || !@$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         try {
             $pk = $this->pkService->closePk($request->pk_id);
         } catch (Exception $e) {
@@ -264,7 +267,7 @@ class PkController extends Controller
     {
         try {
             $data = $this->pkService->roomPk($id, $request->per_page, $request->page);
-            return   Common::apiResponse(true, 'done', PkResource::collection($data) );
+            return   Common::apiResponse(true, 'done', PkResource::collection($data));
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

@@ -261,16 +261,8 @@ class Room extends Model
 
     protected function  getAdminsAttribute()
     {
-        $ids = explode(',', $this->room_admin);
-        $ids = $this->removeOwner($ids);
-        return User::query()->whereIn('id', $ids)->get();
+       return explode(',', $this->room_admin);
+       
     }
 
-    protected function removeOwner($ids)
-    {
-        if (($key = array_search($this->uid, $ids)) !== false) {
-            unset($ids[$key]);
-        }
-        return $ids;
-    }
 }

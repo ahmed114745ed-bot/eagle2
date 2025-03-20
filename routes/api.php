@@ -185,7 +185,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-
+            Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
@@ -377,6 +377,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
+            Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
             Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');

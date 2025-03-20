@@ -81,7 +81,7 @@ class VipController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-        return Common::apiResponse(1, 'success', $data,200);
+        return Common::apiResponse(1, 'success', $data, 200);
     }
 
 
@@ -154,7 +154,7 @@ class VipController extends Controller
     public function badges(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|numeric|min:1|max:4',
+            'type' => 'required|numeric|min:1|max:5',
 
         ]);
         if ($validator->fails()) {
@@ -166,37 +166,47 @@ class VipController extends Controller
     }
 
     private function getLevelGroups()
-{
-    Cache::flush();
-    // Use Cache::remember to cache the results for 1 hour
-    return Cache::remember('levels_chunks', 3600, function () {
-        // Fetch all rows for the given type and order by level
-        $sender_vips = Vip::where('type',2)->orderBy('level','asc')->get();
-        $receiver_vips = Vip::where('type',1)->orderBy('level','asc')->get();
+    {
+        Cache::flush();
+        // Use Cache::remember to cache the results for 1 hour
+        return Cache::remember('levels_chunks', 3600, function () {
+            // Fetch all rows for the given type and order by level
+            $sender_vips = Vip::where('type', 2)->orderBy('level', 'asc')->get();
+            $receiver_vips = Vip::where('type', 1)->orderBy('level', 'asc')->get();
+            $charge_vip = Vip::where('type', 5)->orderBy('level', 'asc')->get();
 
-        // Group rows into chunks of 9
-        $sender_chunks = $sender_vips->chunk(10);
-        $receiver_chunks = $receiver_vips->chunk(10);
+            // Group rows into chunks of 9
+            $sender_chunks = $sender_vips->chunk(10);
+            $receiver_chunks = $receiver_vips->chunk(10);
+            $charge_chunks = $charge_vip->chunk(10);
 
-        // Transform each chunk into the desired structure
-        $sender_levelGroups = $sender_chunks->map(function ($chunk) {
-            return [
-                'minlevel' => $chunk->first()->level, // Minimum level in the chunk
-                'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
-                'badge' => $chunk->last()->img,
-            ];
+            // Transform each chunk into the desired structure
+            $sender_levelGroups = $sender_chunks->map(function ($chunk) {
+                return [
+                    'minlevel' => $chunk->first()->level, // Minimum level in the chunk
+                    'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
+                    'badge' => $chunk->last()->img,
+                ];
+            });
+
+
+            $receiver_levelGroups = $receiver_chunks->map(function ($chunk) {
+                return [
+                    'minlevel' => $chunk->first()->level, // Minimum level in the chunk
+                    'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
+                    'badge' => $chunk->last()->img,
+                ];
+            });
+
+            $charge_levelGroups = $charge_chunks->map(function ($chunk) {
+                return [
+                    'minlevel' => $chunk->first()->level, // Minimum level in the chunk
+                    'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
+                    'badge' => $chunk->last()->img,
+                ];
+            });
+
+            return ['sender' => $sender_levelGroups->toArray(), 'receiver' => $receiver_levelGroups->toArray(), 'charge' => $charge_levelGroups->toArray()]; // Convert collection to array
         });
-
-
-        $receiver_levelGroups = $receiver_chunks->map(function ($chunk) {
-            return [
-                'minlevel' => $chunk->first()->level, // Minimum level in the chunk
-                'maxlevel' => $chunk->last()->level,  // Maximum level in the chunk
-                'badge' => $chunk->last()->img,
-            ];
-        });
-
-        return ['sender' => $sender_levelGroups->toArray(), 'receiver' => $receiver_levelGroups->toArray()]; // Convert collection to array
-    });
-}
+    }
 }

@@ -422,6 +422,24 @@ if (!function_exists('userType')) {
     }
 }
 
+if (!function_exists('convertNumbersToWestern')) {
+    function convertNumbersToWestern($string) {
+        $newNumbers = range(0, 9);
+
+       if(app()->getLocale() =='hi')
+       {
+        $numbers = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+       }elseif(app()->getLocale() =='ar')
+       {
+        $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+       }
+         // Arabic (Eastern)
+      
+
+        return str_replace($numbers, $newNumbers, $string);
+    }
+}
+
 if (!function_exists('showSvgaImage')) {
     /**
      * @param string|null $url
