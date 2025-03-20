@@ -70,6 +70,33 @@ class AgentSalaryTransactionController extends Controller
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($q->paginate()), 200);
     }
 
+    public function chargeCoForUserHistory(Request $request)
+    {
+        $usrAuth = $request->user();
+        $agency = $usrAuth->ownAgency;
+        $search = $request->search;
+        $type = $request->type;
+        if (!$agency) {
+            return Common::apiResponse(0, __("api_responses.agency"));
+        }
+
+        $data = Charge::with( 'receiver', 'sender')->where('is_used_transferred', false)->where("agency_id",$agency->id);
+
+        $data = $data->when($type == 'sender', function($q) use($search, $usrAuth){
+            $q->where("charger_id",$usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
+            ->whereHas('receiver',function($q2)use($search){
+                $q2->where('uuid', 'LIKE', "%$search%" );
+            });
+        })
+        ->when($type == 'receiver', function($q) use($search, $usrAuth){
+            $q->where("user_id",$usrAuth->id)->where('agency_id', $usrAuth->agency_id)
+            ->whereHas('sender',function($q2)use($search){
+                $q2->where('uuid', 'LIKE', "%$search%" );
+            });
+        })->orderByDesc('id')->paginate();
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
+    }
+
     public function send_money_for_the_host(Request $request)
     {
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;

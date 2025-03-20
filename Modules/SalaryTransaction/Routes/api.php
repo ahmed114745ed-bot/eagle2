@@ -38,7 +38,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])
             Route::post('search-agent', [AgentSalaryTransactionController::class, 'searchAgent']);
             Route::post('shipping-agencies', [AgentSalaryTransactionController::class, 'shipping_agencies']);
             Route::post('charge_co_for_users2', [AgentSalaryTransactionController::class, 'send_money_for_the_host']);
-            Route::get('charge-agent-history', [AgentSalaryTransactionController::class, 'charge_co_for_usersHistory']);
+            Route::get('charge-agent-history', [AgentSalaryTransactionController::class, 'chargeCoForUserHistory']);
 
         });
 
