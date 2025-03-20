@@ -75,6 +75,7 @@ class UserResource extends JsonResource
             'age'    => Carbon::parse(@$this->profile->birthday)->age,
             'gender' => @$this->profile->gender ?? 1,
             'is_follow'            => $this->is_follow,
+            'is_friend'            => $this->isFriends(),
             'image_color'          => @$this->color_image ?? '',
             'special_color'    => @$this->color_id ?? '',
             'color_name'   => common::wareUserVip($this->id, 18, 'color') ?? ''
