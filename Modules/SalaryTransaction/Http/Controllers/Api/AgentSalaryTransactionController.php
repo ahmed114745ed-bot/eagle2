@@ -37,11 +37,7 @@ use Modules\SalaryTransaction\Transformers\HostRequestsResource;
 class AgentSalaryTransactionController extends Controller
 {
 
-    public function __construct(private readonly UserRepository         $userRepository,)
-    {
-
-
-    }
+    public function __construct(private readonly UserRepository         $userRepository,) {}
 
     public function charge_co_for_usersHistory(Request $request)
     {
@@ -55,16 +51,17 @@ class AgentSalaryTransactionController extends Controller
         $q = Charge::query()->with([
             'sender'      => function ($query) {
                 $query->withoutAppends();
-            }, 'receiver' => function ($query) {
+            },
+            'receiver' => function ($query) {
                 $query->withoutAppends();
             }
-        ])->where('is_used_transferred', false)->where("agency_id",$agency->id);
+        ])->where('is_used_transferred', false)->where("agency_id", $agency->id);
 
         if ($request->type == 'received') {
-            $q = $q->where("user_id",$me->id)->where('agency_id', $me->agency_id);
+            $q = $q->where("user_id", $me->id)->where('agency_id', $me->agency_id);
         }
         if ($request->type == 'sent') {
-            $q = $q->where("charger_id",$me->id)->where('agency_id', $me->agency_id)->where('charger_type', '!=', 'dash');
+            $q = $q->where("charger_id", $me->id)->where('agency_id', $me->agency_id)->where('charger_type', '!=', 'dash');
         }
 
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($q->paginate()), 200);
@@ -80,20 +77,20 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __("api_responses.agency"));
         }
 
-        $data = Charge::with( 'receiver', 'sender')->where('is_used_transferred', false)->where("agency_id",$agency->id);
+        $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)->where("agency_id", $agency->id);
 
-        $data = $data->when($type == 'sender', function($q) use($search, $usrAuth){
-            $q->where("charger_id",$usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
-            ->whereHas('receiver',function($q2)use($search){
-                $q2->where('uuid', 'LIKE', "%$search%" );
-            });
+        $data = $data->when($type == 'sender', function ($q) use ($search, $usrAuth) {
+            $q->where("charger_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
+                ->whereHas('receiver', function ($q2) use ($search) {
+                    $q2->fitterByUuid($search);
+                });
         })
-        ->when($type == 'receiver', function($q) use($search, $usrAuth){
-            $q->where("user_id",$usrAuth->id)->where('agency_id', $usrAuth->agency_id)
-            ->whereHas('sender',function($q2)use($search){
-                $q2->where('uuid', 'LIKE', "%$search%" );
-            });
-        })->orderByDesc('id')->paginate();
+            ->when($type == 'receiver', function ($q) use ($search, $usrAuth) {
+                $q->where("user_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)
+                    ->whereHas('sender', function ($q2) use ($search) {
+                        $q2->fitterByUuid($search);
+                    });
+            })->orderByDesc('id')->paginate();
         return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($data), 200);
     }
 
@@ -119,7 +116,7 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __('api_responses.this_user_not_found'));
         }
 
-        if ($user_Resve ->id ==  $user->id) {
+        if ($user_Resve->id ==  $user->id) {
             return Common::apiResponse(0, __('salaryTransaction::api_responses.not_this_user'));
         }
         $user_id = $user_Resve->id;
@@ -158,9 +155,13 @@ class AgentSalaryTransactionController extends Controller
 
 
             $charge = Charge::query()->create([
-                'charger_id'  => $user->id, 'charger_type' => 'freight forwarder',
-                'user_id'     => $user_id, 'user_type' => $type, 'amount' => $count,
-                'amount_type' => 2, 'agency_id' => $agency->id
+                'charger_id'  => $user->id,
+                'charger_type' => 'freight forwarder',
+                'user_id'     => $user_id,
+                'user_type' => $type,
+                'amount' => $count,
+                'amount_type' => 2,
+                'agency_id' => $agency->id
                 // 'balance_before'=>$user_id->di
             ]);
             // Increment recipient's coins
@@ -184,32 +185,31 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = Agency::with("Countries","AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function($query) {
+        $agencies = Agency::with("Countries", "AgencypaymentGateways")->has("chargeAgency")->withCount(['salaryRequests' => function ($query) {
             $query->where('status', 3);
         }])->whereHas('owner')
-        ->when($countryId,fn($q)=>$q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
-        ->when($paymentId,fn($q)=>$q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
-        ->paginate(15);
-        return Common::apiResponse(true, 'agencies',TransformersChargeAgentResource::collection($agencies));
+            ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
+            ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
+            ->paginate(15);
+        return Common::apiResponse(true, 'agencies', TransformersChargeAgentResource::collection($agencies));
     }
     public function add_request_salary(Request $request)
     {
         try {
-            if(!$request->amount)
-            {
+            if (!$request->amount) {
                 return Common::apiResponse(0, __('salaryTransaction::api_responses.missing_params'), null, 422);
             }
 
             $agent = $request->user();
             $agency = $agent->ownAgency;
-            $usd =$request->amount;
+            $usd = $request->amount;
 
 
             if ($agency->transfer_salary < $usd) {
                 return Common::apiResponse(0, __('api_responses.balance_not_enough'));
             }
 
-            $coins = Config::where("name","one_usd_value_in_coins")->first();
+            $coins = Config::where("name", "one_usd_value_in_coins")->first();
             $coin_usd = $usd * $coins->value ?? 0;
 
             AgentSalaryRequest::create([
@@ -222,7 +222,7 @@ class AgentSalaryTransactionController extends Controller
                 "coins"                 => $coin_usd,
                 "usd"                   => $usd,
             ]);
-            $this->updatesalaryTransfer($agency->id , $usd);
+            $this->updatesalaryTransfer($agency->id, $usd);
             // $this->updateAgencySalary($agency->id , $request->usd );
 
             // TransactionCustomNotification::sendRequest($agency_owner->id);
@@ -233,7 +233,7 @@ class AgentSalaryTransactionController extends Controller
         return Common::apiResponse(1, __('salaryTransaction::api_responses.request_added_success'));
     }
 
-    public function updateAgencySalary($agentId,$amount)
+    public function updateAgencySalary($agentId, $amount)
     {
         $userSalary = AgencySallary::firstOrNew([
             "agency_id" => $agentId,
@@ -251,11 +251,11 @@ class AgentSalaryTransactionController extends Controller
 
     public function updatesalaryTransfer($agencyId, $usd)
     {
-         AgencyTransferSalary::updateOrCreate([
+        AgencyTransferSalary::updateOrCreate([
             'agency_id' => $agencyId,
             "month" => date("m"),
             "year" => date("Y"),
-        ],[
+        ], [
             'pending_usd' => DB::raw('pending_usd + ' . $usd),
         ]);
     }
@@ -272,14 +272,13 @@ class AgentSalaryTransactionController extends Controller
         $countryId = $request->country_id;
         $paymentId = $request->payment_id;
 
-        $agencies = Agency::with("Countries","AgencypaymentGateways")->withCount(['salaryRequests' => function($query) {
+        $agencies = Agency::with("Countries", "AgencypaymentGateways")->withCount(['salaryRequests' => function ($query) {
             $query->where('status', 3);
         }])->whereHas('owner')
-        ->where('Shipping_agency',true)
-        ->when($countryId,fn($q)=>$q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
-        ->when($paymentId,fn($q)=>$q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
-        ->paginate(15);
-        return Common::apiResponse(true, 'agencies',TransformersChargeAgentResource::collection($agencies));
+            ->where('Shipping_agency', true)
+            ->when($countryId, fn($q) => $q->whereHas('Countries', fn($q) => $q->where('country_id', $countryId)))
+            ->when($paymentId, fn($q) => $q->whereHas('AgencypaymentGateways',  fn($q) => $q->where('payment_gateway_id', $paymentId)))
+            ->paginate(15);
+        return Common::apiResponse(true, 'agencies', TransformersChargeAgentResource::collection($agencies));
     }
-    
 }
