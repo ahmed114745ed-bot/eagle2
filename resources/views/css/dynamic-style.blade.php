@@ -581,6 +581,16 @@
 direction: rtl;
 left: 0px;
 }
+.rtl .breadcrumb {
+    direction: rtl;
+    left: 10px !important;
+    right: auto !important;
+}
+
+
+
+
+
 
 /* أيقونة القائمة المنسدلة */
 .rtl .sidebar-menu > li > a .fa-angle-left {
