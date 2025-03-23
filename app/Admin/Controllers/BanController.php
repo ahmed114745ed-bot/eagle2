@@ -3,11 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ban;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\BanType;
+use App\Admin\Actions\BanUser;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\DeleteBans;
 use Illuminate\Support\Facades\DB;
@@ -30,10 +31,11 @@ class BanController extends MainController
     {
         return $content
             ->title(trans('bans'))
-            ->row(function ($row) {
-                $row->column(10, $this->grid());
-                $row->column(2, view('admin.grid.users.ban'));
-            });
+            ->body($this->grid());
+            // ->row(function ($row) {
+            //     $row->column(10, $this->grid());
+            //     $row->column(2, view('admin.grid.users.ban'));
+            // });
     }
 
     /**
@@ -90,27 +92,27 @@ class BanController extends MainController
         $grid->model()->whereHas('user')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
             ->select('uid', 'duration', 'type', 'device_number', 'staff_id',  'description_ar', 'img', DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy(['uid', 'type', 'duration', 'device_number' ,'description_ar', 'img', 'staff_id',  'ban_type_id'])->orderByDesc('created_at');
-            //    $grid->id(__ ('ID'));
+            ->groupBy(['uid', 'type', 'duration', 'device_number', 'description_ar', 'img', 'staff_id',  'ban_type_id'])->orderByDesc('created_at');
+        //    $grid->id(__ ('ID'));
         // $grid->uid(__('uuid'));
         //        $grid->user_type(__('user_type'));
         $grid->column('user_id', __('User'))->display(function () {
             $user = $this->user; // العلاقة مع المستخدم
             if (!$user) return '-';
-        
+
             $name = $user->name;
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
-            $defaultImage = asset("images/businessman-icon.jpg");   
-            $avatarPath = @$user->avatar;    
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        
-            $userUrl = admin_url('users/' . $user->id);  
-        
+
+            $userUrl = admin_url('users/' . $user->id);
+
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -120,7 +122,7 @@ class BanController extends MainController
                         </div>
                     </div>";
         });
-        
+
         $grid->duration(__('duration'));
         $grid->column('type', __('Type'))->display(function ($type) {
             $types = [
@@ -128,7 +130,7 @@ class BanController extends MainController
                 'ip' => __('ip'),
                 'device' => __('device'),
             ];
-        
+
             return $types[$type] ?? '-';
         });
 
@@ -137,7 +139,7 @@ class BanController extends MainController
             $limitedDescription = mb_substr($description, 0, 40) . (mb_strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
         });
-        
+
         // إضافة سكريبت JavaScript لمعالجة النوافذ المنبثقة
         Admin::script("
             $(document).ready(function () {
@@ -160,7 +162,7 @@ class BanController extends MainController
                 });
             });
         ");
-        
+
         $grid->column('ban_type_id', __('ban_type'))->display(function ($row) {
 
             $banType = BanType::find($this->ban_type_id);
@@ -176,15 +178,15 @@ class BanController extends MainController
         // $grid->staff_id(__('staff_id'));
         $grid->column('staff_id', __('staff'))->display(function () {
             if (!$this->staff) return '-';
-        
+
             $name = $this->staff->name ?? '-';
             $email = $this->staff->email ?? '-';
             $defaultImage = asset("images/admin-icon.png");
             $avatarPath = $this->staff->avatar ?? null;
             $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
-            
+
             $adminUrl = admin_url('admin/auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
-        
+
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -194,9 +196,11 @@ class BanController extends MainController
                     </div>";
         });
 
-        $grid->column('created_at', __('created'))->display(function () {
-            return \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
-                ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
+        $grid->column('created_at', __('expire'))->display(function () {
+            // \Carbon\Carbon::createFromTimestamp(strtotime($this->created_at))
+            //     ->timezone(auth()->user()->time_zone)->format("Y-m-d h:i A");
+            $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
+            return now()->diffForHumans($banExpiration, true);
         });
 
         $grid->column('return', __('delete'))->display(function () {
@@ -213,6 +217,11 @@ class BanController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('uid', __('uuid'));
             });
+        });
+        
+        // $grid->disableTools(); // Disable default tools
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->append((new BanUser())->render());
         });
         $grid->disableExport();
         return $grid;

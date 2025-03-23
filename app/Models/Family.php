@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use http\Env\Request;
+use App\Traits\Families\ResourceTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Family extends Model
 {
+    use ResourceTrait;
     protected $guarded = ['id'];
 
     protected $appends = ['rank'];
     private $cachedLevelMax = null;
+    
 
     public function getCreatedAtAttribute($value)
     {
@@ -41,6 +44,12 @@ class Family extends Model
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/*->where ('user_type',0)*/->count();
         return $fu;
     }
+
+    public function members()
+    {
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 0);
+    }
+
     public function currentLevel()
     {
         return $this->belongsTo(FamilyLevel::class, 'current_level_id');
