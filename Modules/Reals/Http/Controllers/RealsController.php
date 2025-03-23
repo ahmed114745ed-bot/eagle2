@@ -78,6 +78,24 @@ class RealsController extends Controller
         return Common::apiResponse(true, 'success', $collection);
     }
 
+    public function getMyReals()
+    {
+        $user_id=Auth::user()->id;
+        try {
+          
+                $user = User::query()->withoutAppends()->findOrFail($user_id);
+            
+        } catch (\Exception $e) {
+            return Common::apiResponse(false, 'user not found');
+        }
+        $reals = $this->realsService->getUserReals($user, Auth::id());
+        $collection = RealsResource::collection($reals);
+        
+        return Common::apiResponse(true, 'success', $collection);
+    }
+
+
+    
     /**
      * Display a listing of the resource.
      * @return \Illuminate\Http\JsonResponse
