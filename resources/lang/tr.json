@@ -1705,7 +1705,9 @@
 
     "type_local" : "Yerel",
     "type_global" : "Küresel",
-    "charge level": "Şarj seviyesi"
+    "charge level": "Şarj seviyesi",
+    "bans rooms" :"Yasaklamalar Odalar"
+
 
 
 
