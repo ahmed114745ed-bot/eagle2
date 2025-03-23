@@ -1712,7 +1712,13 @@
     "Close room": "Odayı kapat",
     "Special uuid requests": "Özel UUID istekleri",
     "Gift from the store": "Mağazadan hediye",
-    "Gift a medal": "Madalya hediye et"
+    "Gift a medal": "Madalya hediye et",
+    "Duration": "Süre",
+    "Expire": "Sona Erme",
+    "Delete": "Sil",
+    "Room Id": "Oda Kimliği",
+    "Id": "Kimlik",
+    "ID": "Kimlik"
 
 
 
