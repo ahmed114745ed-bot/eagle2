@@ -21,7 +21,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class BanRoomsController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'bans';
+    public $permission_name = 'ban-rooms';
 
     /**
      * Index interface.

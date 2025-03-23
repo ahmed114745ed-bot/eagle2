@@ -109,7 +109,8 @@ class AdminPermission extends Seeder
             'users-family',
             'updates_family-config',
             'ovip-gift',
-            'charge-level'
+            'charge-level',
+            'ban-rooms'
 
 
 
@@ -163,7 +164,7 @@ class AdminPermission extends Seeder
             'carousel' => ['carousel'],
             'user-levels' => ['user-levels'],
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
-            'bans' => ['bans'],
+            'bans' => ['bans','ban-rooms'],
             'update-group-chat' => ['updates_group_chat'],
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
