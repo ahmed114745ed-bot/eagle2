@@ -552,4 +552,53 @@
     }
 
 
+ /* توجيه النصوص والقائمة */
+.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+.rtl .sidebar-menu {
+    text-align: right;
+}
+
+.rtl .main-sidebar {
+    right: 0;
+    left: auto;
+}
+
+.rtl .content-wrapper,
+.rtl .main-footer {
+    margin-left: 0;
+    margin-right: 230px;
+}
+
+.rtl .treeview-menu {
+    padding-right: 10px;
+}
+
+/* أيقونة القائمة المنسدلة */
+.rtl .sidebar-menu > li > a .fa-angle-left {
+    transform: rotate(180deg);
+}
+
+/* إرجاع الاتجاه إلى LTR عندما تكون الإنجليزية */
+.ltr {
+    direction: ltr;
+    text-align: left;
+}
+
+.ltr .main-sidebar {
+    left: 0;
+    right: auto;
+}
+
+.ltr .content-wrapper,
+.ltr .main-footer {
+    margin-right: 0;
+    margin-left: 230px;
+}
+
+
+
 </style>
