@@ -848,7 +848,12 @@
 
     "type_local" : "स्थानीय",
     "type_global" : "वैश्विक",
-    "charge level": "चार्ज स्तर"
+    "charge level": "चार्ज स्तर",
+    "User record": "उपयोगकर्ता रिकॉर्ड",
+    "Close room": "कमरा बंद करें",
+    "Special uuid requests": "विशेष UUID अनुरोध",
+    "Gift from the store": "दुकान से उपहार",
+    "Gift a medal": "एक पदक उपहार में दें"
 
 
 

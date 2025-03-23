@@ -1741,8 +1741,11 @@
     "type_local" : "محلي",
     "type_global" : "عالمي",
     "charge level": "مستوى الشحن",
-    "edit level": "تعديل المستوى"
-
+    "User record":"سجل المستخدم",
+    "Close room":"اغلاق غرفة",
+    "Special uuid requests":"طلبات المعرف المميز",
+    "Gift from the store":"اهداء من المتجر",
+    "Gift a medal":"اهداء وسام"
 
 
 
