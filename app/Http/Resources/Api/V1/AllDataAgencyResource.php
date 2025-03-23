@@ -55,7 +55,8 @@ class AllDataAgencyResource extends JsonResource
                 ]
             ],
             'mempers_count'=>$this->mempers_count,
-            'members'=>MyDataForAgancyResource::collection($this->mempers),
+            // 'mempers'=>$this->mempers ?? (object)[], 
+            'members'=>MyDataForAgancyNewResource::collection($this->mempers),
         ];
     }
 }
