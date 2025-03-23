@@ -438,7 +438,12 @@
      "Box":"Box",
      "type_local" : "Local",
      "type_global" : "Global",
-     "bans rooms" :"Bans Rooms"
+     "bans rooms" :"Bans Rooms",
+     "Duration": "Duration",
+     "Expire": "Expire",
+     "Delete": "Delete",
+     "Room Id": "Room Id",
+     "ID": "ID"
 
 
 
