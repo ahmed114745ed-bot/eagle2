@@ -437,7 +437,8 @@
      "frozen": "Freeze Charging",
      "Box":"Box",
      "type_local" : "Local",
-     "type_global" : "Global"
+     "type_global" : "Global",
+     "bans rooms" :"Bans Rooms"
 
 
 

@@ -1706,6 +1706,8 @@
     "type_local" : "Yerel",
     "type_global" : "Küresel",
     "charge level": "Şarj seviyesi",
+    "bans rooms" :"Yasaklamalar Odalar",
+
     "User record": "Kullanıcı kaydı",
     "Close room": "Odayı kapat",
     "Special uuid requests": "Özel UUID istekleri",

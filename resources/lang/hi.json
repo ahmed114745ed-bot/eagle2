@@ -849,6 +849,7 @@
     "type_local" : "स्थानीय",
     "type_global" : "वैश्विक",
     "charge level": "चार्ज स्तर",
+     "bans rooms" :"प्रतिबंध कमरे",
     "User record": "उपयोगकर्ता रिकॉर्ड",
     "Close room": "कमरा बंद करें",
     "Special uuid requests": "विशेष UUID अनुरोध",

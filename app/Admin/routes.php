@@ -389,6 +389,8 @@ Route::group(
         $router->resource('/uuid_dedicate', 'SpecialWareDedicateController');
         $router->get('/vips_dedicate', 'DedicateVipController@index');
         $router->resource('/bans', 'BanController');
+        $router->resource('/bans-rooms', 'BanRoomsController');
+        
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
