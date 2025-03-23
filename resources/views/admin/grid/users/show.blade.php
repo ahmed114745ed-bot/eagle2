@@ -40,13 +40,19 @@
                 <!-- UUID -->
                 <div class="col-md-2 d-flex align-items-center">
                     <img src="{{ asset('images/uuid.jpg') }}" alt="UUID" width="20" class="me-1">
-                    <span>{{ $user->uuid ?? 'N/A' }}</span>
+                    <span>
+                        @if($user->uuid == $user->original_uuid)
+                            {{ __("uuid") }} : {{ $user->uuid }}
+                        @else
+                            {!! __("uuid") . ' : ' . $user->uuid . '<br>' . __("special uuid") . ' : ' . $user->original_uuid !!}
+                        @endif
+                    </span>
                 </div>
 
                 <!-- Email -->
                 <div class="col-md-2 d-flex align-items-center">
                     <img src="{{ asset('images/email.jpg') }}" alt="Email" width="20" class="me-1">
-                    <a href="mailto:{{ $user->email ?? '' }}" class="text-decoration-none text-muted">{{ $user->email ?? 'N/A' }}</a>
+                    <a href="mailto:{{ $user->email ?? '' }}" class="text-decoration-none text-muted">{{ $user->email ?? '' }}</a>
                 </div>
             </div>
         </div>
