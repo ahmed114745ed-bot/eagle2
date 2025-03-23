@@ -27,7 +27,10 @@ class AgencyRepository extends AbstractRepository
 
     public function findById($id)
     {
-        return $this->model->with('additionalInfo',)->where('id', $id)->first();
+       
+        return $this->model->with(['additionalInfo', 'mempers'])
+        ->withCount('mempers')
+        ->where('id', $id)->first();
     }
     public function findByStatus($id)
     {

@@ -44,7 +44,6 @@ class AllDataAgencyResource extends JsonResource
             // 'url'=>$this->url,
             'img'=>$this->img?:'',
             'num_of_hosts'      => $this->mempers->count(),
-
             // 'contents'=>$this->contents,
             'owner'=>new MyDataForAgancyResource($this->owner)?:[
                 "id" => 0,
@@ -55,7 +54,8 @@ class AllDataAgencyResource extends JsonResource
                 "image" => ''
                 ]
             ],
-            // 'members'=>MyDataForAgancyResource::collection($members),
+            'mempers_count'=>$this->mempers_count,
+            'members'=>MyDataForAgancyResource::collection($this->mempers),
         ];
     }
 }
