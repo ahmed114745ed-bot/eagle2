@@ -52,15 +52,45 @@ class AchievementDedicateController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new AchievementValidImage());
+        $grid = new Grid(new UserAchievementLevel());
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
+           
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
         });
+        $grid->model()->whereNotNull('custom_image')->orWhereNotNull('file');
         $grid->column('id', __('Id'));
-        $grid->column( 'file',__('image'))->display(function ($img) {
+        $grid->column('user.name', __('user'))
+        ->display (function ($recever){
+            $name =  $this->user?->name ?? '';
+             $uid = @$this->user?->uuid ?? 0;
+             $path = @$this->user?->profile?->avatar;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
+
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 $image
+                 <div>
+                     <strong>$name</strong><br>
+                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                 </div>
+             </div>
+         ";
+
+         });
+        $grid->column('file',__('image'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
-            $path = getImagePath($img);
+            $path = getImagePath($img ?? $this->custom_image);
             if (!isImageExists($path)) {
                 $path = $defaultImage;
             }
@@ -96,14 +126,12 @@ class AchievementDedicateController extends MainController
                     </script>
                 ";
         });
+        $states = [
+            'off'=>['value'=>0,'text'=>'no','color'=>'danger'],
+            'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
+        ];
+        $grid->column('is_enable')->switch($states);
 
-
-
-
-        $grid->column ('return',__ ('dedicate'))->display (function (){
-           
-            return (new AchievementDedicate($this->id))->render ();
-          });
           $grid->disableActions();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
