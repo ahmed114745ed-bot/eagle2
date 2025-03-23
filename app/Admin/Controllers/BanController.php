@@ -218,6 +218,8 @@ class BanController extends MainController
                 $filter->equal('uid', __('uuid'));
             });
         });
+        
+        // $grid->disableTools(); // Disable default tools
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append((new BanUser())->render());
         });
