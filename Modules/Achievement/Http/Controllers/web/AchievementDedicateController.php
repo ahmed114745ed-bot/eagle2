@@ -126,6 +126,11 @@ class AchievementDedicateController extends MainController
                     </script>
                 ";
         });
+        $states = [
+            'off'=>['value'=>0,'text'=>'no','color'=>'danger'],
+            'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
+        ];
+        $grid->column('is_enable')->switch($states);
 
           $grid->disableActions();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
