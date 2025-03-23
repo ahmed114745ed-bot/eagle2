@@ -143,8 +143,8 @@ class MyDataResource extends JsonResource
             'phone' => (string)@$this->phone ?: '',
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
-            'intro' => $intro,
-            'intro_type' => $introType,
+            'intro' => $intro ,
+            'intro_type' => $intro !== '' ? ($introType !== '' ? $introType : 'svga') : '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
@@ -247,4 +247,6 @@ class MyDataResource extends JsonResource
             ->first();
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
+
+
 }
