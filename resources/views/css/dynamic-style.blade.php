@@ -577,6 +577,11 @@
     padding-right: 10px;
 }
 
+.rtl .fa-angle-left{
+direction: rtl;
+left: 0px;
+}
+
 /* أيقونة القائمة المنسدلة */
 .rtl .sidebar-menu > li > a .fa-angle-left {
     transform: rotate(180deg);
@@ -598,7 +603,5 @@
     margin-right: 0;
     margin-left: 230px;
 }
-
-
 
 </style>
