@@ -30,15 +30,16 @@ class BanRoomAction extends Action
     public function handle(Request $request)
     {
         $room = Room::find($request->room_id);
+        if (!$room) {
+            return $this->response()->error(__('room not found'))->refresh();
+        }
+      
         $room_id  = $room->id;
         $now = now();
         $messages=[];
         $newBan = false;
 
-        if (!$room) {
-            return $this->response()->error(__('room not found'))->refresh();
-        }
-      
+     
             $haveBan = BanRoom::query()->where('room_id', $room_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
                 ->exists();
             if ($haveBan) {

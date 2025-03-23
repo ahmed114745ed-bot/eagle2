@@ -43,8 +43,9 @@ class AgencyController extends Controller
     }
 
     public function view(Request $request)
-    {
-        $agencyId = $request->user()->agency_id;
+    { 
+        $agencyId = request()->get('id', $request->user()->agency_id);
+
         try {
             $agency = $this->agencyService->find($agencyId);
         } catch (\Exception $exception) {
