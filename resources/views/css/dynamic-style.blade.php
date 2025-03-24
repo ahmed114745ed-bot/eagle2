@@ -567,11 +567,11 @@
                 left: auto;
             }
 
-            .rtl .content-wrapper,
+          .rtl .content-wrapper,
             .rtl .main-footer {
                 margin-left: 0;
                 margin-right: 230px;
-            }
+            } 
 
             .rtl .treeview-menu {
                  padding-right: 10px;
@@ -657,6 +657,11 @@
 }
 
 
+
+.rtl .content-wrapper-rtl{
+    margin-right: 42px !important;
+
+}
 
 
 
