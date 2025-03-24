@@ -33,7 +33,7 @@ class AchievementDedicateController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Gift Badges'))
+            ->title(trans('Custom Badges'))
             ->body($this->grid()));
     }
 
@@ -61,7 +61,7 @@ class AchievementDedicateController extends MainController
                 $filter->equal('user.uuid', __('uuid'));
             });
         });
-        $grid->model()->whereNotNull('custom_image')->orWhereNotNull('file');
+        $grid->model()->whereNotNull('custom_image')->orWhereNotNull('file')->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('user'))
         ->display (function ($recever){
@@ -88,6 +88,37 @@ class AchievementDedicateController extends MainController
          ";
 
          });
+         $grid->column('admin.name', __('admin'))
+         ->display(function ($name) {
+             
+     
+             $path = $this->admin->avatar ?? null;
+             $defaultImage = asset("images/businessman-icon.jpg");
+             $url = getImagePath($path) ?? $defaultImage;
+     
+             // Check if the image exists
+             if (!isImageExists($url)) {
+                 $url = $defaultImage;
+             }
+     
+             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+     
+             // Validate admin existence before accessing id
+             $showUrl = '#'; // Default to prevent broken links
+             if ($this->admin && $this->admin->id) {
+                 $showUrl = url("admin/auth/users/{$this->admin->id}");
+             }
+     
+             return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                     $image
+                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                 </a>
+             </div>
+             ";
+         });
+     
         $grid->column('file',__('image'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img ?? $this->custom_image);
@@ -131,6 +162,7 @@ class AchievementDedicateController extends MainController
             'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
         ];
         $grid->column('is_enable')->switch($states);
+        $grid->column('created_at', trans('admin.created_at'));
 
           $grid->disableActions();
         $grid->actions(function (Grid\Displayers\Actions $actions) {

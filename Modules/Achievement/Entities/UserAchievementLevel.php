@@ -2,21 +2,22 @@
 
 namespace Modules\Achievement\Entities;
 
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Achievement\Entities\Achievement;
+use Modules\Achievement\Enums\AchievementType;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Achievement\Enums\AchievementType;
 use Modules\Achievement\Http\Services\AchievementLevelsService;
 
 class UserAchievementLevel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["id","achievement_level_id","user_id","gift_achievement_id","unique_value","end_at","is_enable","achievement_id","custom_image","picked","file"];
+    protected $fillable = ["id","achievement_level_id","user_id","gift_achievement_id","unique_value","end_at","is_enable","achievement_id","custom_image","picked","file",'admin_id'];
 
     protected $guarded = [];
 
@@ -43,6 +44,10 @@ class UserAchievementLevel extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'admin_id');
     }
 
     public function achievement(): BelongsTo
