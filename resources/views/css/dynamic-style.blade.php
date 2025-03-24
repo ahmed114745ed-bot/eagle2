@@ -605,6 +605,11 @@
 
             }
 
+            .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                position: absolute;
+                right: -238px;
+            }
+
 
 /* @media (max-width: 768px) {
             .rtl .sidebar-toggle {
