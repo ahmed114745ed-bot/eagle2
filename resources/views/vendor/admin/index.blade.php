@@ -57,6 +57,23 @@
     function LA() {}
     LA.token = "{{ csrf_token() }}";
     LA.user = @json($_user_);
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("main-sidebar");
+    const toggleBtn = document.querySelector(".sidebar-toggle");
+
+    toggleBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        sidebar.classList.toggle("active");
+    });
+
+    // إغلاق القائمة عند الضغط خارجها
+    document.addEventListener("click", function (event) {
+        if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+            sidebar.classList.remove("active");
+        }
+    });
+});
 </script>
 
 <!-- REQUIRED JS SCRIPTS -->

@@ -552,43 +552,43 @@
     }
 
 
- /* توجيه النصوص والقائمة */
-.rtl {
-    direction: rtl;
-    text-align: right;
-}
+            /* توجيه النصوص والقائمة */
+            .rtl {
+                direction: rtl;
+                text-align: right;
+            }
 
-.rtl .sidebar-menu {
-    text-align: right;
-}
+            .rtl .sidebar-menu {
+                  text-align: right;
+            }
 
-.rtl .main-sidebar {
-    right: 0;
-    left: auto;
-}
+            .rtl .main-sidebar {
+                right: 0;
+                left: auto;
+            }
 
-.rtl .content-wrapper,
-.rtl .main-footer {
-    margin-left: 0;
-    margin-right: 230px;
-}
+            .rtl .content-wrapper,
+            .rtl .main-footer {
+                margin-left: 0;
+                margin-right: 230px;
+            }
 
-.rtl .treeview-menu {
-    padding-right: 10px;
-}
+            .rtl .treeview-menu {
+                 padding-right: 10px;
+            }
 
-.rtl .fa-angle-left{
-direction: rtl;
-left: 0px;
-}
-.rtl .breadcrumb {
-    direction: rtl;
-    left: 10px !important;
-    right: auto !important;
-}
+            .rtl .fa-angle-left{
+                direction: rtl;
+                left: 0px;
+            }
+            .rtl .breadcrumb {
+                direction: rtl;
+                left: 10px !important;
+                right: auto !important;
+            }
 
-.rtl .sidebar-toggle {
-                direction: rtl !important;
+            .rtl .sidebar-toggle {
+                            direction: rtl !important;
                 float: right !important;
             }
 
@@ -600,7 +600,18 @@ left: 0px;
                 float: right !important;
 
             }
-@media (max-width: 768px) {
+            .rtl .navbar-static-top{
+                margin-left: 16px !important;
+
+            }
+
+            .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                position: absolute;
+                right: -238px;
+            }
+
+
+/* @media (max-width: 768px) {
             .rtl .sidebar-toggle {
                 direction: rtl !important;
                 float: right !important;
@@ -613,7 +624,37 @@ left: 0px;
                 right: auto;
                 left: 0;
             }
- }
+ } */
+
+ /* وضع RTL على الموبايل */
+@media (max-width: 768px) {
+    .rtl .main-sidebar {
+        right: 0 !important;
+        left: auto !important;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .rtl .main-sidebar.active {
+        transform: translateX(0);
+    }
+
+    /* تعديل زر الفتح ليكون في اليمين */
+    .rtl .sidebar-toggle {
+        float: right !important;
+        margin-right: 10px;
+    }
+
+    /* تعديل زر القائمة ليكون في اليسار */
+    .rtl .navbar-custom-menu {
+        float: left !important;
+    }
+
+    .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                position: absolute;
+                right: 0 !important;
+            }
+}
 
 
 
