@@ -610,6 +610,21 @@
                 right: -238px;
             }
 
+            .rtl th{
+                text-align: start;
+            }
+            .rtl .form-horizontal .row {
+                display: grid;
+                direction: rtl !important;
+                flex-direction: row-reverse !important;
+            
+            }
+
+           
+           .rtl .form-horizontal .box-footer .btn-group {
+                float: right !important; /* يجعل الأزرار على اليمين */
+            }
+
 
 /* @media (max-width: 768px) {
             .rtl .sidebar-toggle {
