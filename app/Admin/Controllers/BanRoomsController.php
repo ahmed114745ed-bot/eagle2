@@ -106,7 +106,6 @@ class BanRoomsController extends MainController
             if (!$room) return '-';
             $name = $room->room_name;
             $room_id = $room->id;
-            $uuid = $room->owner->uuid;
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$room->room_cover;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
@@ -122,7 +121,54 @@ class BanRoomsController extends MainController
                         <div>
                             <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
                             <span style='color: var(--uuid-color); font-size: smaller;'>Room Id: $room_id</span><br>
-                            <span style='color: var(--uuid-color); font-size: smaller;'>Owner UUID: $uuid</span><br>
+                           
+                        </div>
+                    </div>";
+        });
+
+        $grid->column('user_id', __('owner'))->display(function () {
+            $user = $this->room->owner; // العلاقة مع المستخدم
+            if (!$user) return '-';
+
+            $name = $user->name;
+            $uuid = $user->uuid;
+            $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$user->avatar;
+            $avatar = getImagePath($avatarPath) ?? $defaultImage;
+
+            if (!isImageExists($avatar)) {
+                $avatar = $defaultImage;
+            }
+
+            $userUrl = admin_url('users/' . $user->id);
+
+            return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <div>
+                            <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
+                            <span style='color: var(--uuid-color); font-size: smaller;'>UUID: $uuid</span><br>
+                            <span style='color: var(--phone-color); font-size: smaller;'>📞 $phone</span>
+                        </div>
+                    </div>";
+        });
+
+        $grid->column('staff_id', __('staff'))->display(function () {
+            if (!$this->staff) return '-';
+
+            $name = $this->staff->name ?? '-';
+            $email = $this->staff->email ?? '-';
+            $defaultImage = asset("images/admin-icon.png");
+            $avatarPath = $this->staff->avatar ?? null;
+            $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
+
+            $adminUrl = admin_url('admin/auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
+
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
+                        <div>
+                            <a href='$adminUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
+                            <span style='color: #aaa; font-size: smaller;'>$email</span>
                         </div>
                     </div>";
         });
