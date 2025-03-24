@@ -12,6 +12,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\DeleteBans;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Actions\RemoveBanUser;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -31,11 +32,11 @@ class BanController extends MainController
     {
         return $content
             ->title(trans('bans'))
-          //  ->body($this->grid());
-            ->row(function ($row) {
-                $row->column(10, $this->grid());
-                $row->column(2, view('admin.grid.users.ban'));
-            });
+          ->body($this->grid());
+            // ->row(function ($row) {
+            //     $row->column(10, $this->grid());
+            //     $row->column(2, view('admin.grid.users.ban'));
+            // });
     }
 
     /**
@@ -221,7 +222,12 @@ class BanController extends MainController
         
         // $grid->disableTools(); // Disable default tools
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append((new BanUser())->render());
+            $buttons = '<span style="display: inline-flex; gap: 10px;">'
+                . (new BanUser())->render()
+                . (new RemoveBanUser())->render()
+                . '</span>';
+        
+            $tools->append($buttons);
         });
         $grid->disableExport();
         return $grid;

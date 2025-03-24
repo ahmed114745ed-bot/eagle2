@@ -45,8 +45,8 @@ class RemoveBanUser extends Action
 
     return <<<HTML
     <li>
-        <a href="javascript:void(0);" class="remove_ban_user_action" style="color: yellow;">
-            <i class="fa fa-dollar" style="color: yellow;"></i> 
+        <a href="javascript:void(0);" class="remove_ban_user_action btn btn-sm  text-white" 
+        style="background-color:rgb(228, 159, 20); border-color:rgb(219, 171, 100); color: white;">
             {$removeBans}
         </a>
     </li>
