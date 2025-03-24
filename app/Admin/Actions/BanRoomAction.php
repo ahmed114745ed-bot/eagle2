@@ -33,33 +33,33 @@ class BanRoomAction extends Action
         if (!$room) {
             return $this->response()->error(__('room not found'))->refresh();
         }
-      
+
         $room_id  = $room->id;
         $now = now();
-        $messages=[];
+        $messages = [];
         $newBan = false;
 
-     
-            $haveBan = BanRoom::query()->where('room_id', $room_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
-                ->exists();
-            if ($haveBan) {
-                $messages[] = __('already have normal ban');
-            } else {
-                $newBan = true;
 
-                BanRoom::query()->create(
-                    [
-                        'room_id' => $room_id,
-                        'duration' => $request->duration,
-                        'staff_id' => Auth::id(),  
-                    ]
-                );
+        $haveBan = BanRoom::query()->where('room_id', $room_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
+            ->exists();
+        if ($haveBan) {
+            $messages[] = __('already have normal ban');
+        } else {
+            $newBan = true;
 
-                 $room->room_status =2;
+            BanRoom::query()->create(
+                [
+                    'room_id' => $room_id,
+                    'duration' => $request->duration,
+                    'staff_id' => Auth::id(),
+                ]
+            );
 
-                 $room->save();
-            }
-        
+            $room->room_status = 2;
+
+            $room->save();
+        }
+
 
 
 
@@ -94,7 +94,8 @@ class BanRoomAction extends Action
     {
         $banText = __('create bans'); // Laravel translation
         return <<<HTML
-    <a href="javascript:void(0);" class="ban_user_action btn btn-sm btn-success">
+    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white" 
+       style="background-color: #28a745; border-color: #28a745; color: white;">
         {$banText}
     </a>
     HTML;
