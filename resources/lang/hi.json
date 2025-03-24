@@ -562,7 +562,7 @@
     "charges reports": "शुल्क रिपोर्टें",
     "dash_repo": "डैशबोर्ड शुल्क",
     "app_repo": "ऐप शुल्क",
-    "coins_repo": "कॉइन द्वार",
+    "payment gateway": "कॉइन द्वार",
     "sendTo": "प्रेषित करें",
     "parent-users": "जनक उपयोगकर्ताओं",
     "use count": "उपयोग की गई बार",
@@ -864,7 +864,10 @@
     "ID": "आईडी",
     "Custom Badges": "कस्टम बैज",
     "creator": "प्रशासक",
-    "balance before": "पहले का बैलेंस"
+    "balance before": "पहले का बैलेंस",
+    "strip": "पट्टी" ,
+    "oPay": "ओपे",
+    "fawry": "फॉरी"
 
 
 

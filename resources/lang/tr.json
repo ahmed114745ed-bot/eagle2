@@ -550,7 +550,7 @@
     "charges reports": "Yükleme raporları",
     "dash_repo": "Dashboard yüklemesi",
     "app_repo": "Uygulama üzerinden yükleme",
-    "coins_repo": "Ödeme geçitleri",
+    "payment gateway": "Ödeme geçitleri",
     "sendTo": "Gönderilen kişi",
     "parent-users": "Katılım davetleri",
     "use count": "Kullanım sayısı",
@@ -1722,7 +1722,9 @@
     "ID": "Kimlik",
     "Custom Badges": "Özel Rozetler",
     "creator": "yönetici",
-    "balance before": "önceki bakiye"
+    "balance before": "önceki bakiye",
+    "strip": "şerit",
+    "oPay": "oPay"
 
 
 

@@ -13,7 +13,7 @@
             </li>
             <li class="{{ request()->name == 'stripe' ? 'active' : '' }}">
                 <a href="?name=stripe" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('coins_repo') }}
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('payment gateway') }}
                 </a>
             </li>
             <li class="{{ request()->name == 'in-app-purchas' ? 'active' : '' }}">
