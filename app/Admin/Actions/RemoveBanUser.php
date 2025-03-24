@@ -40,16 +40,15 @@ class RemoveBanUser extends Action
     }
 
     public function html()
-{
-    $removeBans = __('dashboard.remove_bans'); // Fetch translation
+    {
+        $removeBans = __('dashboard.remove_bans'); // Fetch translation
 
-    return <<<HTML
-    <li>
+        return <<<HTML
+    
         <a href="javascript:void(0);" class="remove_ban_user_action btn btn-sm  text-white" 
-        style="background-color:rgb(228, 159, 20); border-color:rgb(219, 171, 100); color: white;">
+        style="background-color:rgb(228, 159, 20); border-color:rgb(167, 116, 40); color: white;">
             {$removeBans}
         </a>
-    </li>
     HTML;
-}
+    }
 }
