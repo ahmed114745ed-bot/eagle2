@@ -552,43 +552,43 @@
     }
 
 
- /* توجيه النصوص والقائمة */
-.rtl {
-    direction: rtl;
-    text-align: right;
-}
+            /* توجيه النصوص والقائمة */
+            .rtl {
+                direction: rtl;
+                text-align: right;
+            }
 
-.rtl .sidebar-menu {
-    text-align: right;
-}
+            .rtl .sidebar-menu {
+                  text-align: right;
+            }
 
-.rtl .main-sidebar {
-    right: 0;
-    left: auto;
-}
+            .rtl .main-sidebar {
+                right: 0;
+                left: auto;
+            }
 
-.rtl .content-wrapper,
-.rtl .main-footer {
-    margin-left: 0;
-    margin-right: 230px;
-}
+            .rtl .content-wrapper,
+            .rtl .main-footer {
+                margin-left: 0;
+                margin-right: 230px;
+            }
 
-.rtl .treeview-menu {
-    padding-right: 10px;
-}
+            .rtl .treeview-menu {
+                 padding-right: 10px;
+            }
 
-.rtl .fa-angle-left{
-direction: rtl;
-left: 0px;
-}
-.rtl .breadcrumb {
-    direction: rtl;
-    left: 10px !important;
-    right: auto !important;
-}
+            .rtl .fa-angle-left{
+                direction: rtl;
+                left: 0px;
+            }
+            .rtl .breadcrumb {
+                direction: rtl;
+                left: 10px !important;
+                right: auto !important;
+            }
 
-.rtl .sidebar-toggle {
-                direction: rtl !important;
+            .rtl .sidebar-toggle {
+                            direction: rtl !important;
                 float: right !important;
             }
 
@@ -600,6 +600,12 @@ left: 0px;
                 float: right !important;
 
             }
+            .rtl .navbar-static-top{
+                margin-left: 16px !important;
+
+            }
+
+
 @media (max-width: 768px) {
             .rtl .sidebar-toggle {
                 direction: rtl !important;
