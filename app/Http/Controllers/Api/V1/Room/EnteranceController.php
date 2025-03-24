@@ -56,7 +56,7 @@ class EnteranceController extends Controller
     }
     public function updateRoomCountFromPusher_new(Request $request)
     {
-         Log::info('test new shami enter room ', [
+         Log::info('📌 Received Webhook Data:', [
             $request->all()
         ]);
     }
