@@ -2,18 +2,19 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Charge;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
+use App\Admin\Actions\ChargeAction;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Request;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeController extends MainController
 {
@@ -34,10 +35,11 @@ class ChargeController extends MainController
         }
         return $content
             ->title(trans('charges'))
-            ->row(function ($row) {
-                $row->column(10, $this->grid());
-                $row->column(2, view('admin.grid.users.actions'));
-            });
+            ->body($this->grid());
+            // ->row(function ($row) {
+            //     $row->column(10, $this->grid());
+            //     $row->column(2, view('admin.grid.users.actions'));
+            // });
     }
 
 
@@ -98,20 +100,20 @@ class ChargeController extends MainController
                     $path = $this->admin->avatar ?? null;
                     $defaultImage = asset("images/businessman-icon.jpg");
                     $url = getImagePath($path) ?? $defaultImage;
-        
+
                     // Check if the image exists
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
-        
+
                     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-        
+
                     // Validate admin existence before accessing id
                     $showUrl = '#'; // Default to prevent broken links
                     if ($this->admin && $this->admin->id) {
                         $showUrl = url("admin/auth/users/{$this->admin->id}");
                     }
-        
+
                     return "
                      <div style='display: flex; align-items: center; gap: 10px;'>
                          <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
@@ -143,7 +145,7 @@ class ChargeController extends MainController
                     </div>";
         });
 
-        $grid->column('balance_before', __('Balance'))->display(function ($usd) {
+        $grid->column('balance_before', __('balance before'))->display(function ($usd) {
 
             $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
@@ -156,7 +158,13 @@ class ChargeController extends MainController
         // $grid->amount(__('coins'));
         $grid->column('created_at', trans('admin.created_at'));
 
+        $grid->tools(function (Grid\Tools $tools) {
+            $buttons = '<span style="display: inline-flex; gap: 10px;">'
+                . (new ChargeAction())->render()
+                . '</span>';
 
+            $tools->append($buttons);
+        });
 
         $grid->disableActions();
         $grid->disableCreateButton();

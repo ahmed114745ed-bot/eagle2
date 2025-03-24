@@ -1721,7 +1721,8 @@
     "Id": "Kimlik",
     "ID": "Kimlik",
     "Custom Badges": "Özel Rozetler",
-    "creator": "yönetici"
+    "creator": "yönetici",
+    "balance before": "önceki bakiye"
 
 
 
