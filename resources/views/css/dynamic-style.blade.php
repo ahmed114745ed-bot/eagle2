@@ -649,6 +649,11 @@
     .rtl .navbar-custom-menu {
         float: left !important;
     }
+
+    .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                position: absolute;
+                right: 0 !important;
+            }
 }
 
 
