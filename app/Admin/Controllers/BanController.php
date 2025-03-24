@@ -31,11 +31,11 @@ class BanController extends MainController
     {
         return $content
             ->title(trans('bans'))
-            ->body($this->grid());
-            // ->row(function ($row) {
-            //     $row->column(10, $this->grid());
-            //     $row->column(2, view('admin.grid.users.ban'));
-            // });
+          //  ->body($this->grid());
+            ->row(function ($row) {
+                $row->column(10, $this->grid());
+                $row->column(2, view('admin.grid.users.ban'));
+            });
     }
 
     /**

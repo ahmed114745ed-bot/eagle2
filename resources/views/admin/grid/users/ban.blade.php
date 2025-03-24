@@ -8,7 +8,7 @@
     </div>
     <div class="box-body no-padding">
         <ul class="nav nav-pills nav-stacked">
-            {!! (new \App\Admin\Actions\BanUser())->render () !!}
+            {{-- {!! (new \App\Admin\Actions\BanUser())->render () !!} --}}
             {!! (new \App\Admin\Actions\RemoveBanUser())->render () !!}
         </ul>
     </div>

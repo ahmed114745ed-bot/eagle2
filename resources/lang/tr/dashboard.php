@@ -272,5 +272,6 @@ return [
     'kick_out_greater_than_day' => 'Bir müşteriyi ajansdan atmak için izin verilen en geç gün',
     'system_default_manager' => 'Bir müşterinin uygulama yöneticisi olması için UUID değeri',
     'add_coins' => "Madeni para ekle",
+    'remove_bans' => 'Yasakları kaldır',
 
 ];

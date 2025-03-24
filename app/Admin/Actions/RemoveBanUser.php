@@ -25,14 +25,13 @@ class RemoveBanUser extends Action
 
     public function handle(Request $request)
     {
-        $user = User::query ()->where ('uuid',$request->uid)->first();
-        if (!$user){
+        $user = User::query()->where('uuid', $request->uid)->first();
+        if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
-        Ban::query ()->where('uid',$request->uid)->delete();
+        Ban::query()->where('uid', $request->uid)->delete();
         CustomNotification::removeBanUser($user);
         return $this->response()->success('success')->refresh();
-
     }
 
     public function form()
@@ -41,11 +40,16 @@ class RemoveBanUser extends Action
     }
 
     public function html()
-    {
-        return <<<HTML
+{
+    $removeBans = __('dashboard.remove_bans'); // Fetch translation
 
-        <li><a href="javascript:void(0);" class="remove_ban_user_action "><i class="fa fa-dollar text-red"></i> remove bans</a></li>
-    
+    return <<<HTML
+    <li>
+        <a href="javascript:void(0);" class="remove_ban_user_action" style="color: yellow;">
+            <i class="fa fa-dollar" style="color: yellow;"></i> 
+            {$removeBans}
+        </a>
+    </li>
     HTML;
-    }
+}
 }
