@@ -69,7 +69,7 @@ class ChangeLevelHistoryController extends MainController
             ";
         });
 
-        $grid->column('admin.name', __('admin'))
+        $grid->column('admin.name', __('creator'))
             ->display(function ($name) {
                 $path = @$this->admin->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");

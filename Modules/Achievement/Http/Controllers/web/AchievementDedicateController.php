@@ -23,7 +23,7 @@ use Modules\Achievement\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
 {
-/**
+    /**
      * Title for current resource.
      *
      * @var string
@@ -41,8 +41,8 @@ class AchievementDedicateController extends MainController
     {
         $achievementValidImage = AchievementValidImage::get();
         return parent::create($content
-             ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevelDedicate',compact('achievementValidImage'))));
+            ->title(trans('user-achievement-levels'))
+            ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage'))));
     }
 
     /**
@@ -56,7 +56,7 @@ class AchievementDedicateController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-           
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('uuid'));
             });
@@ -64,20 +64,20 @@ class AchievementDedicateController extends MainController
         $grid->model()->whereNotNull('custom_image')->orWhereNotNull('file')->orderByDesc('id');
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('user'))
-        ->display (function ($recever){
-            $name =  $this->user?->name ?? '';
-             $uid = @$this->user?->uuid ?? 0;
-             $path = @$this->user?->profile?->avatar;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($recever) {
+                $name =  $this->user?->name ?? '';
+                $uid = @$this->user?->uuid ?? 0;
+                $path = @$this->user?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-             return "
+                return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  $image
                  <div>
@@ -86,30 +86,33 @@ class AchievementDedicateController extends MainController
                  </div>
              </div>
          ";
+            });
 
-         });
-         $grid->column('admin.name', __('admin'))
-         ->display(function ($name) {
-             
-     
-             $path = $this->admin->avatar ?? null;
-             $defaultImage = asset("images/businessman-icon.jpg");
-             $url = getImagePath($path) ?? $defaultImage;
-     
-             // Check if the image exists
-             if (!isImageExists($url)) {
-                 $url = $defaultImage;
-             }
-     
-             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-     
-             // Validate admin existence before accessing id
-             $showUrl = '#'; // Default to prevent broken links
-             if ($this->admin && $this->admin->id) {
-                 $showUrl = url("admin/auth/users/{$this->admin->id}");
-             }
-     
-             return "
+
+        $grid->column('admin.name', __('creator'))->display(function () {
+
+            // if (!$this->admin) {
+            //     return "<span style='color: red;'>No Admin</span>";
+            // }
+            $name = $this->admin->name ?? '';
+            $path = $this->admin->avatar ?? null;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            // Validate admin existence before accessing id
+            $showUrl = '#'; // Default to prevent broken links
+            if ($this->admin && $this->admin->id) {
+                $showUrl = url("admin/auth/users/{$this->admin->id}");
+            }
+
+            return "
              <div style='display: flex; align-items: center; gap: 10px;'>
                  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                      $image
@@ -117,9 +120,9 @@ class AchievementDedicateController extends MainController
                  </a>
              </div>
              ";
-         });
-     
-        $grid->column('file',__('image'))->display(function ($img) {
+        });
+
+        $grid->column('file', __('image'))->display(function ($img) {
             $defaultImage = asset("images/background_room.jpg");
             $path = getImagePath($img ?? $this->custom_image);
             if (!isImageExists($path)) {
@@ -158,22 +161,21 @@ class AchievementDedicateController extends MainController
                 ";
         });
         $states = [
-            'off'=>['value'=>0,'text'=>'no','color'=>'danger'],
-            'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
+            'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
+            'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
         ];
         $grid->column('is_enable')->switch($states);
         $grid->column('created_at', trans('admin.created_at'));
 
-          $grid->disableActions();
+        $grid->disableActions();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();
             $actions->disableDelete();
-           // $actions->add(new AchievementDedicateAction());
+            // $actions->add(new AchievementDedicateAction());
         });
 
 
         return $grid;
     }
-
 }
