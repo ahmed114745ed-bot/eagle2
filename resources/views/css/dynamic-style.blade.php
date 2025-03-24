@@ -587,6 +587,39 @@ left: 0px;
     right: auto !important;
 }
 
+.rtl .sidebar-toggle {
+                direction: rtl !important;
+                float: right !important;
+            }
+
+            .rtl .navbar-custom-menu {
+                float: left !important;
+            }
+
+            .rtl .main-header .logo{
+                float: right !important;
+
+            }
+@media (max-width: 768px) {
+            .rtl .sidebar-toggle {
+                direction: rtl !important;
+                float: right !important;
+            }
+
+            .rtl .navbar-custom-menu {
+                float: left !important;
+            }
+            .rtl .main-sidebar {
+                right: auto;
+                left: 0;
+            }
+ }
+
+
+
+
+
+
 
 
 
