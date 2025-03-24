@@ -606,7 +606,7 @@
             }
 
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
             .rtl .sidebar-toggle {
                 direction: rtl !important;
                 float: right !important;
@@ -619,7 +619,32 @@
                 right: auto;
                 left: 0;
             }
- }
+ } */
+
+ /* وضع RTL على الموبايل */
+@media (max-width: 768px) {
+    .rtl .main-sidebar {
+        right: 0 !important;
+        left: auto !important;
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .rtl .main-sidebar.active {
+        transform: translateX(0);
+    }
+
+    /* تعديل زر الفتح ليكون في اليمين */
+    .rtl .sidebar-toggle {
+        float: right !important;
+        margin-right: 10px;
+    }
+
+    /* تعديل زر القائمة ليكون في اليسار */
+    .rtl .navbar-custom-menu {
+        float: left !important;
+    }
+}
 
 
 
