@@ -227,7 +227,7 @@ class EnteranceRoomServices
             $user->now_room_uid = $room->uid;
 
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
-                    $room->update(['is_live' => false]);
+                    $room->update(['is_live' => true]);
 
             }
 
