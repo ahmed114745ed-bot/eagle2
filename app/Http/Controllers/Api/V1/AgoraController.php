@@ -80,8 +80,8 @@ class AgoraController extends Controller
         //        "productId":1
         //    }]
         $library = Common::getConfig('library');
-        if ($library == 2)  Common::apiResponse(false, 'you used pusher');
+        if ($library == 2) return  Common::apiResponse(false, 'you used pusher');
 
-            return $this->enteranceRoomService->updateRoomCountFromAgora($request);
+        return $this->enteranceRoomService->updateRoomCountFromAgora($request);
     }
 }
