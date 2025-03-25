@@ -140,13 +140,9 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //     return Broadcast::auth($request);
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
-            
-                if (!$request->has('channel_name')) {
-                    return response()->json(['success' => false, 'message' => 'Missing channel_name'], 400);
-                }
-            
                 try {
                     $authResponse = Broadcast::auth($request);
+                    Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
                     return $authResponse;
                 } catch (\Exception $e) {
                     return response()->json(['success' => false, 'message' => $e->getMessage()],500);
