@@ -13,7 +13,7 @@ use App\Models\Room;
 |
 */
 
-Broadcast::channel('presence-room-{roomId}', function ($user, $roomId) {
+Broadcast::channel('room-{roomId}', function ($user, $roomId) {
     $data = [
         'id' => $user->id,
         'name' => $user->name,
@@ -29,9 +29,9 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 
     return (int) $user->id === (int) $id;
 });
-Broadcast::channel('room-{roomId}', function ($user, $roomId) {
-    return  $roomId;
-});
+// Broadcast::channel('room-{roomId}', function ($user, $roomId) {
+//     return  $roomId;
+// });
 
 Broadcast::channel('room-{roomId}-{userId}', function ($user, $roomId, $userId) {
     // \Illuminate\Support\Facades\Log::info($user->name .' : '. $user->id);

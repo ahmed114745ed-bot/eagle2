@@ -2,25 +2,27 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Forms\CustomForm;
-use Encore\Admin\Show;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\CoinLog;
-use Encore\Admin\Layout\Content;
+use App\Enums\PaymentType;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use App\Admin\Forms\CustomForm;
+use Encore\Admin\Layout\Content;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Actions\SalariesAction;
 use App\Admin\Extensions\UserExporter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
 use App\Admin\Extensions\AgencyExporter;
+use App\Models\PaymentCoin;
 
 class ChargeReportController extends MainController
 {
@@ -213,13 +215,14 @@ class ChargeReportController extends MainController
 
                 $filter->where(function ($query) {
                     if ($this->input != null) {
-                        $query->where('method', $this->input);
+                        $query->where('coin.paymentGateway.title', $this->input);
                     }
                 }, __('Select type'), 'name_for_url_shortcut')->radio([
                     '' => __('All'),
                     'oPay' => __('oPay'),
                     'stripe' => __('stripe'),
-                    'fawry' => __('fawry')
+                    'fawry' => __('fawry'),
+                    'sky_pay' => __('sky pay')
                 ]);
             });
         });
@@ -249,9 +252,18 @@ class ChargeReportController extends MainController
              </div>
          ";
         });
-        // $grid->column ('obtained_coins',__ ('amount'))->display (function ($coin){
-        //     return number_format($coin);
-        //  });
+        
+        
+        $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
         $grid->column('obtained_coins', __('Amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
@@ -262,13 +274,13 @@ class ChargeReportController extends MainController
             ";
         });
         $grid->column('trx', __('trx'));
-        $grid->column('method', __('type'))->select(
-            [
-                'oPay' => __('oPay'),
-                'stripe' => __('stripe'),
-                'fawry' => __('fawry')
-            ]
-        );
+        $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
+            $paymentCoin = PaymentCoin::find($value);
+            if(!$paymentCoin) return '';
+            $options = PaymentType::getTranslatedOptions();
+            
+            return $options[$paymentCoin->title] ?? '';
+        });
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
@@ -301,9 +313,9 @@ class ChargeReportController extends MainController
                 }
             }, __('Select type'), 'name_for_url_shortcut')->radio([
                 '' => __('All'),
-                'huawei_pay' => __('huawei_pay'),
-                'google_pay' => __('google_pay'),
-                'apple_pay' => __('apple_pay'),
+                'huawei_pay' => __('huawei pay'),
+                'google_pay' => __('google pay'),
+                'apple_pay' => __('apple pay'),
             ]);
         });
 
@@ -355,13 +367,15 @@ class ChargeReportController extends MainController
             }
         }); // Allows rendering raw HTML
 
-        $grid->column('method', __('type'))->select(
-            [
-                'huawei_pay' => __('huawei_pay'),
-                'google_pay' => __('google_pay'),
-                'apple_pay' => __('apple_pay'),
-            ]
-        );
+        $grid->column('method', __('type'))->display(function ($value) {
+            $options = [
+                'huawei_pay' => __('huawei pay'),
+                'google_pay' => __('google pay'),
+                'apple_pay' => __('apple pay'),
+            ];
+            
+            return $options[$value] ?? $value;
+        });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';

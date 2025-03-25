@@ -141,6 +141,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
+                    Log::info('📌 Received Webhook Data:', ['request' => $request->all(),'header' => $request->header()]);
                     $authResponse = Broadcast::auth($request);
                     Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
                     return $authResponse;

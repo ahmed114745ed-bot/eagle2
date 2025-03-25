@@ -1724,7 +1724,11 @@
     "creator": "yönetici",
     "balance before": "önceki bakiye",
     "strip": "şerit",
-    "oPay": "oPay"
+    "oPay": "oPay",
+    "huawei pay": "Huawei Ödeme",
+    "google pay": "Google Ödeme",
+    "apple pay": "Apple Ödeme",
+    "sky pay": "Sky Ödeme"
 
 
 
