@@ -27,6 +27,60 @@
 
 @endphp
 <style>
+/* Add this CSS to your stylesheet */
+.radio-options-container {
+    display: flex;
+    gap: 20px; /* Space between options */
+    align-items: center;
+    margin: 15px 0;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between radio and label */
+}
+
+.radio-input {
+    margin: 0; /* Remove default margins */
+}
+
+.radio-label {
+    margin: 0; /* Remove default margins */
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Custom radio button styling */
+.radio-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ff9800;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.radio-input:checked {
+    background-color: #ff9800;
+}
+
+.radio-input:checked::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+    
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -138,7 +192,7 @@
 
         button{
             width: 198px;
-
+        }
     /* تصميم النافذة */
     .modal {
         display: none;
@@ -295,26 +349,25 @@
         </div>
 
         <div id="realTimeSetting" class="settings-section">
-            {{-- <h3>{{ __('Timing settings') }}</h3> --}}
             <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                 @csrf
                 <div class="form">
                     <label class="d-block">{{ __('Real Time system Setting:') }}</label>
                     
-                    <div class="d-flex align-items-center">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="libraryAgora" name="library" value="0" class="custom-control-input library-radio" {{ $library == "0" ? "checked" : "" }}>
-                            <label class="custom-control-label" for="libraryAgora">{{ __('admin.Agora') }}</label>
+                    <div class="radio-options-container">
+                        <div class="radio-option">
+                            <input type="radio" id="libraryAgora" name="library" value="0" class="radio-input" {{ $library == "0" ? "checked" : "" }}>
+                            <label for="libraryAgora" class="radio-label">{{ __('admin.Agora') }}</label>
                         </div>
-            
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="libraryZego" name="library" value="1" class="custom-control-input library-radio" {{ $library == "1" ? "checked" : "" }}>
-                            <label class="custom-control-label" for="libraryZego">{{ __('admin.Zego') }}</label>
+                    
+                        <div class="radio-option">
+                            <input type="radio" id="libraryZego" name="library" value="1" class="radio-input" {{ $library == "1" ? "checked" : "" }}>
+                            <label for="libraryZego" class="radio-label">{{ __('admin.Zego') }}</label>
                         </div>
-        
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" id="libraryPusher" name="library" value="2" class="custom-control-input library-radio" {{ $library == "2" ? "checked" : "" }}>
-                            <label class="custom-control-label" for="libraryPusher">{{ __('pusher') }}</label>
+                    
+                        <div class="radio-option">
+                            <input type="radio" id="libraryPusher" name="library" value="2" class="radio-input" {{ $library == "2" ? "checked" : "" }}>
+                            <label for="libraryPusher" class="radio-label">{{ __('pusher') }}</label>
                         </div>
                     </div>
         
@@ -329,7 +382,7 @@
                                 </div>
                             </div>
                         </div>
-        
+            
                         <!-- Zego Fields -->
                         <div id="zego-fields" class="library-fields" style="display: {{ $library == 1 ? 'flex' : 'none' }};">
                             <div style="flex: 1; margin-left: 10px;">
@@ -348,23 +401,18 @@
                                 </div>
                             </div>
                         </div>
-        
+            
                         <!-- Pusher Fields -->
                         <div id="pusher-fields" class="library-fields" style="display: {{ $library == 2 ? 'flex' : 'none' }};">
                             <div style="flex: 1; margin-left: 10px;">
                                 <h1 class="control-label text-center">{{ __('pusher') }}</h1>
-                                <!-- Add Pusher-specific fields here if needed -->
-                                {{-- <div class="form-group">
-                                    <label for="pusher_key" class="control-label">Pusher Key:</label>
-                                    <input type="text" id="pusher_key" name="pusher_key" placeholder="Pusher Key" value="{{ $pusher_key ?? '' }}" class="form-control">
-                                </div> --}}
+                                <!-- Pusher fields can be added here -->
                             </div>
                         </div>
                     </div>
-        
+            
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
-        
             </form>
         </div>
         
@@ -502,14 +550,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const radioButtons = document.querySelectorAll('.library-radio');
+    // Updated selector to match your new class
+    const radioButtons = document.querySelectorAll('.radio-input');
     const fieldsContainers = {
         '0': document.getElementById('agora-fields'),
         '1': document.getElementById('zego-fields'),
         '2': document.getElementById('pusher-fields')
     };
 
-    // Function to toggle fields visibility
     function toggleFields() {
         const selectedValue = document.querySelector('input[name="library"]:checked').value;
         
