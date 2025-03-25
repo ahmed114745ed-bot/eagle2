@@ -23,13 +23,14 @@ class RecevingReportResource extends JsonResource
         }
 
         return [
-            'id'          => $this->user_id,
+            'id'            => $this->user_id,
             'uuid'          => $uuid,
-            'diamonds'    => numToStringNew($this->amount),
-            'operation_no' => (int)$this->id,
-            'created_at'  => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
-            'name' => $name ?? '',
-            'image' => $image ?? '',
+            'diamonds'      => 0,
+            'coins'         => numToStringNew($this->amount),
+            'operation_no'  => (int)$this->id,
+            'created_at'    => Carbon::parse($this->created_at)->format('Y-m-d h:i:s A'),
+            'name'          => $name ?? '',
+            'image'         => $image ?? '',
         ];
     }
 }
