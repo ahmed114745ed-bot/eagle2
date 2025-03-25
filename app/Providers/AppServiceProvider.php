@@ -127,10 +127,10 @@ class AppServiceProvider extends ServiceProvider
 
         }
 
-        $enabledLanguages = Cache::rememberForever('languages', function () {
-            return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
-        });
-        Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
+        // $enabledLanguages = Cache::rememberForever('languages', function () {
+        //     return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
+        // });
+        // Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
         if (!Cache::has('app_title')) {
             Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
         }
