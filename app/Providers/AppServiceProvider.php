@@ -131,11 +131,11 @@ class AppServiceProvider extends ServiceProvider
         //     return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
         // });
         // Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
-        if (!Cache::has('app_title')) {
-            Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
-        }
-        $appTitle = Cache::get('app_title', 'Default Title');
-        Config::set('admin.logo', $appTitle);
+        // if (!Cache::has('app_title')) {
+        //     // Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
+        // }
+        // $appTitle = Cache::get('app_title', 'Default Title');
+        // Config::set('admin.logo', $appTitle);
 
 
 
