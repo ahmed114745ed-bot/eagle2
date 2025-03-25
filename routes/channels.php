@@ -14,6 +14,13 @@ use App\Models\Room;
 */
 
 Broadcast::channel('presence-room-{roomId}', function ($user, $roomId) {
+    $data = [
+        'id' => $user->id,
+        'name' => $user->name,
+        'avatar' => $user->avatar ?? null,
+    ];
+
+    \Log::info("Broadcast Auth Data:", $data);// Debugging
     return ['id' => $user->id, 'name' => $user->name]; // Must return user details
 });
 
