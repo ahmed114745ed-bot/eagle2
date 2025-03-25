@@ -208,6 +208,7 @@ class EnteranceRoomServices
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
+                    Log::info('Agora data for Room ',[$room ]);
 
         $user = User::find($userId);
 
