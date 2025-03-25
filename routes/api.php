@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LanguageController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -530,4 +531,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
+
 });
+
+
+Route::get('/languages', [LanguageController::class, 'index']);

@@ -1,3 +1,19 @@
+@php
+    use Illuminate\Support\Facades\Schema;
+    use Illuminate\Support\Facades\DB;
+
+    $logo = asset('images/app-logo.png'); // Default logo
+
+    if (Schema::hasTable('settings')) {
+        $logoDb = DB::table('settings')->where('key', 'app_logo')->value('value');
+
+        
+        if ($logoDb) {
+            $logo = getImagePath( $logoDb);
+        }
+    }
+@endphp
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,7 +36,7 @@
 <body class="hold-transition login-page" @if(config('admin.login_background_image'))style="background: url({{config('admin.login_background_image')}}) no-repeat;background-size: cover;"@endif>
 <div class="login-box">
     <div class="login-logo">
-        <img src="{{asset('images/app-logo.png')}}" style="max-width: 160px;">
+        <img src="{{ $logo }}" style="max-width: 160px;">
     </div>
   <!-- /.login-logo -->
   <div class="login-box-body">

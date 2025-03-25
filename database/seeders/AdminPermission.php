@@ -110,8 +110,9 @@ class AdminPermission extends Seeder
             'updates_family-config',
             'ovip-gift',
             'charge-level',
-            'ban-rooms'
-
+            'ban-rooms',
+            'settings',
+            'notification',
 
 
 
@@ -169,7 +170,8 @@ class AdminPermission extends Seeder
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
             'updates_family-config' => ['updates_family-config'],
-
+            'setting' => ['language','settings','notification']
+          
 
         ];
 

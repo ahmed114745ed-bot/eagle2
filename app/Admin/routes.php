@@ -1,5 +1,9 @@
 <?php
 
+use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\SettingController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +77,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\RoomSettingsController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -445,6 +450,12 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
+        $router->resource('languages', LanguageController::class);
+        $router->resource('settings', SettingController::class);
+        $router->resource('room-settings', RoomSettingsController::class);
+
+        $router->resource('notification-templates', NotificationsTemplatesController::class);
+
     }
 
 

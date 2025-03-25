@@ -19,11 +19,25 @@
  */
 
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+
 
 //Encore\Admin\Form::forget( ['map', 'editor']);
 //Admin::js('/packages/customization/js/main.js');
+if (Schema::hasTable('settings')) {
+    $favicon = DB::table('settings')->where('key', 'app_fav_icon')->value('value');
 
-Admin::favicon(asset('images/app-logo.png')); //config('app.appLogo')
+    if ($favicon) {
+        Admin::favicon(getImagePath($favicon)); // Use the correct path
+    } else {
+        Admin::favicon(asset('images/app-logo.png')); // Default favicon
+    }
+} else {
+    Admin::favicon(asset('images/app-logo.png')); // Default favicon
+}
+
 Admin::css ('css/admin.css');
 Admin::js(asset('js/laravel_admin.js'));
 
@@ -42,4 +56,7 @@ view()->composer('admin::partials.js', function (Illuminate\View\View $view) {
 view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/css.blade.php'));
 });
+
+
+
 
