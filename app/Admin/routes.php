@@ -402,7 +402,7 @@ Route::group(
         $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
-        $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
+      //  $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);

@@ -15,33 +15,34 @@ use Log;
 class AgoraController extends Controller
 {
     protected $enteranceRoomService;
-  
-    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository ,EnteranceRoomServices $enteranceRoomService)
+
+    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, EnteranceRoomServices $enteranceRoomService)
     {
         $this->enteranceRoomService = $enteranceRoomService;
-
     }
-    public function RtcToken(Request $request){
+    public function RtcToken(Request $request)
+    {
 
         $request->validate([
             'channel' => 'required',
             'expir' => 'nullable'
         ]);
-        $user =$request->user();
+        $user = $request->user();
 
-        if($request->has('expir')){
+        if ($request->has('expir')) {
 
-            $token = generateRtcToken($request->channel,$user->id, $request->expir);
+            $token = generateRtcToken($request->channel, $user->id, $request->expir);
 
-            return Common::apiResponse(true,'Success',$token);
+            return Common::apiResponse(true, 'Success', $token);
         }
 
-        $token = generateRtcToken($request->channel,$user->id);
+        $token = generateRtcToken($request->channel, $user->id);
 
-        return Common::apiResponse(true,'Success',$token);
+        return Common::apiResponse(true, 'Success', $token);
     }
 
-    public function webhook(Request $request){
+    public function webhook(Request $request)
+    {
 
         // Log::info('agora webhook triggered enter room ', [
         //     $request->all()
@@ -66,20 +67,21 @@ class AgoraController extends Controller
 
         // // تسجيل البيانات
         // Log::info("Event code: $eventType, UID: $uid, Channel: $channelName, ClientSeq: $clientSeq");
-    //     agora webhook triggered
-    //     [{
-    //        "noticeId":"1414157015:2753369:102",
-    //        "notifyMs":1741600266185,
-    //        "eventType":102,
-    //        "sid":"FA7703A9A07A4DC79B0AF37AB066EB30",
-    //        "payload":{
-    //            "lastUid":621,
-    //            "channelName":"922",
-    //            "ts":1741600265},
-    //        "productId":1
-    //    }]
-    
-        return $this->enteranceRoomService->updateRoomCountFromAgora($request);
-    
+        //     agora webhook triggered
+        //     [{
+        //        "noticeId":"1414157015:2753369:102",
+        //        "notifyMs":1741600266185,
+        //        "eventType":102,
+        //        "sid":"FA7703A9A07A4DC79B0AF37AB066EB30",
+        //        "payload":{
+        //            "lastUid":621,
+        //            "channelName":"922",
+        //            "ts":1741600265},
+        //        "productId":1
+        //    }]
+        $library = Common::getConfig('library');
+        if ($library == 2)  Common::apiResponse(false, 'you used pusher');
+
+            return $this->enteranceRoomService->updateRoomCountFromAgora($request);
     }
 }

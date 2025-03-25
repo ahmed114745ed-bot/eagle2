@@ -81,6 +81,9 @@
     .active {
         display: block;
     }
+    .settings-section.active {
+    display: block; /* Show active section */
+}
 
     /* تنسيق النماذج */
     form {
@@ -185,12 +188,13 @@
 <body>
 <div class="all-page">
     <div class="settings-sidebar">
-        <h2>إعدادات</h2>
+        <h2>{{__('setting')}}</h2>
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{  __('Brand settings')}}</button>
             <button onclick="showSection('themeSettings')">{{  __('Theme settings')}}</button>
             <button onclick="showSection('timeSettings')"> {{  __('Timing settings')}}</button>
             <button onclick="showSection('appSettings')"> {{  __('App settings')}}</button>
+            <button onclick="showSection('realTimeSetting')"> {{  __('Real Time system Setting')}}</button>
         </div>
     </div>
 
@@ -290,46 +294,120 @@
             </form>
         </div>
 
+        <div id="realTimeSetting" class="settings-section">
+            {{-- <h3>{{ __('Timing settings') }}</h3> --}}
+            <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                @csrf
+                <div class="form">
+                    <label class="d-block">{{ __('Real Time system Setting:') }}</label>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="libraryAgora" name="library" value="0" class="custom-control-input library-radio" {{ $library == "0" ? "checked" : "" }}>
+                            <label class="custom-control-label" for="libraryAgora">{{ __('admin.Agora') }}</label>
+                        </div>
+            
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="libraryZego" name="library" value="1" class="custom-control-input library-radio" {{ $library == "1" ? "checked" : "" }}>
+                            <label class="custom-control-label" for="libraryZego">{{ __('admin.Zego') }}</label>
+                        </div>
+        
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="libraryPusher" name="library" value="2" class="custom-control-input library-radio" {{ $library == "2" ? "checked" : "" }}>
+                            <label class="custom-control-label" for="libraryPusher">{{ __('pusher') }}</label>
+                        </div>
+                    </div>
+        
+                    <div class="library-fields-container mt-4">
+                        <!-- Agora Fields -->
+                        <div id="agora-fields" class="library-fields" style="display: {{ $library == 0 ? 'flex' : 'none' }};">
+                            <div style="flex: 1; margin-right: 10px;">
+                                <h1 class="control-label text-center">{{ __('admin.Agora') }}</h1>
+                                <div class="form-group">
+                                    <label for="agora_app_id" class="control-label">{{ __('admin.app_id') }}:</label>
+                                    <input type="text" id="agora_app_id" name="app_id" placeholder="app_id" value="{{ $agora_app_id }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+        
+                        <!-- Zego Fields -->
+                        <div id="zego-fields" class="library-fields" style="display: {{ $library == 1 ? 'flex' : 'none' }};">
+                            <div style="flex: 1; margin-left: 10px;">
+                                <h1 class="control-label text-center">{{ __('admin.Zego') }}</h1>
+                                <div class="form-group">
+                                    <label for="zego_server_secret" class="control-label">{{ __('admin.server_secret') }}:</label>
+                                    <input type="text" id="zego_server_secret" name="zego_server_secret" placeholder="server_secret" value="{{ $zego_server_secret }}" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="zego_app_id" class="control-label">{{ __('admin.app_id') }}:</label>
+                                    <input type="text" id="zego_app_id" name="zego_app_id" placeholder="app_id" value="{{ $zego_app_id }}" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="app_sign" class="control-label">{{ __('admin.app_sign') }}:</label>
+                                    <input type="text" id="app_sign" name="app_sign" placeholder="app_sign" value="{{ $app_sign }}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+        
+                        <!-- Pusher Fields -->
+                        <div id="pusher-fields" class="library-fields" style="display: {{ $library == 2 ? 'flex' : 'none' }};">
+                            <div style="flex: 1; margin-left: 10px;">
+                                <h1 class="control-label text-center">{{ __('pusher') }}</h1>
+                                <!-- Add Pusher-specific fields here if needed -->
+                                {{-- <div class="form-group">
+                                    <label for="pusher_key" class="control-label">Pusher Key:</label>
+                                    <input type="text" id="pusher_key" name="pusher_key" placeholder="Pusher Key" value="{{ $pusher_key ?? '' }}" class="form-control">
+                                </div> --}}
+                            </div>
+                        </div>
+                    </div>
+        
+                    <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
+                </div>
+        
+            </form>
+        </div>
+        
         <div id="appSettings" class="settings-section">
             <h3>{{  __('Timing settings')}}</h3>
             <form action="{{ route('admin.settings.update') }}" method="POST">
                 @csrf
-                <div class="form">
+            <div class="form">
                   
                 <div class="form-group">
-                <label for="primary_color">{{ __('Primary Color') }}</label>
-                <input type="color" id="app_primary_color" name="app_primary_color" value="#3498db" class="form-control">
+                    <label for="primary_color">{{ __('Primary Color') }}</label>
+                    <input type="color" id="app_primary_color" name="app_primary_color" value="#3498db" class="form-control">
+                </div>
+
+                <!-- حقل اختيار اللون الثانوي -->
+                <div class="form-group">
+                    <label for="second_color">{{ __('Second Color') }}</label>
+                    <input type="color" id="second_color" name="app_second_color" value="#2ecc71" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="background_type">{{ __('Background Type') }}</label>
+                    <select id="background_type" name="background_type" class="form-control" onchange="toggleBackgroundInput()">
+                        <option value="color">{{ __('Color') }}</option>
+                        <option value="image">{{ __('Image') }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="background_color_group">
+                    <label for="background_color">{{ __('Background Color') }}</label>
+                    <input type="color" id="background_color" class="form-control" onchange="updateBackgroundValue()">
+                </div>
+
+                <div class="form-group" id="background_image_group" style="display: none;">
+                    <label for="background_image">{{ __('Background Image') }}</label>
+                    <input type="file" id="background_image" class="form-control" onchange="updateBackgroundValue()">
+                </div>
+
+                <input type="hidden" id="app_background" name="app_background">
+
+                <button type="submit" class="btn btn-primary mt-3">{{ __('Save Settings') }}</button>
+
             </div>
-
-            <!-- حقل اختيار اللون الثانوي -->
-            <div class="form-group">
-                <label for="second_color">{{ __('Second Color') }}</label>
-                <input type="color" id="second_color" name="app_second_color" value="#2ecc71" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="background_type">{{ __('Background Type') }}</label>
-                <select id="background_type" name="background_type" class="form-control" onchange="toggleBackgroundInput()">
-                    <option value="color">{{ __('Color') }}</option>
-                    <option value="image">{{ __('Image') }}</option>
-                </select>
-            </div>
-
-                  <div class="form-group" id="background_color_group">
-                <label for="background_color">{{ __('Background Color') }}</label>
-                <input type="color" id="background_color" class="form-control" onchange="updateBackgroundValue()">
-            </div>
-
-            <div class="form-group" id="background_image_group" style="display: none;">
-                <label for="background_image">{{ __('Background Image') }}</label>
-                <input type="file" id="background_image" class="form-control" onchange="updateBackgroundValue()">
-            </div>
-
-            <input type="hidden" id="app_background" name="app_background">
-
-            <button type="submit" class="btn btn-primary mt-3">{{ __('Save Settings') }}</button>
-
-        </div>
             </form>
         </div>
 
@@ -423,6 +501,38 @@
     </script>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('.library-radio');
+    const fieldsContainers = {
+        '0': document.getElementById('agora-fields'),
+        '1': document.getElementById('zego-fields'),
+        '2': document.getElementById('pusher-fields')
+    };
+
+    // Function to toggle fields visibility
+    function toggleFields() {
+        const selectedValue = document.querySelector('input[name="library"]:checked').value;
+        
+        // Hide all fields first
+        Object.values(fieldsContainers).forEach(container => {
+            container.style.display = 'none';
+        });
+        
+        // Show the selected one
+        if (fieldsContainers[selectedValue]) {
+            fieldsContainers[selectedValue].style.display = 'flex';
+        }
+    }
+
+    // Add event listeners to radio buttons
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', toggleFields);
+    });
+
+    // Initialize the fields visibility
+    toggleFields();
+});
+
   document.addEventListener("DOMContentLoaded", function () {
         let resetButton = document.getElementById('resetColors');
 

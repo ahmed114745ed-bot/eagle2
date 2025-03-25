@@ -1807,7 +1807,9 @@
     "Background Type": "نوع الخلفية",
     "Background Color": "لون الخلفية",
     "Background Image": "صورة الخلفية",
-    "Save Settings": "حفظ الإعدادات"
+    "Save Settings": "حفظ الإعدادات",
+    "Real Time system Setting": "إعداد نظام الوقت الفعلي",
+    "pusher": "بشر"
 
 
 }
