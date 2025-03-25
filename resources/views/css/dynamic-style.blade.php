@@ -650,6 +650,11 @@
         transition: transform 0.3s ease-in-out;
     }
 
+    .active_hide{
+        transform: translateX(1%) !important;
+
+    }
+
     .rtl .main-sidebar.active {
         transform: translateX(0);
     }
@@ -669,6 +674,12 @@
                 position: absolute;
                 right: 0 !important;
             }
+
+            .rtl .content-wrapper,
+            .rtl .main-footer {
+                margin-left: 0;
+                margin-right: auto;
+            } 
 }
 
 
@@ -691,21 +702,6 @@
     transform: rotate(180deg);
 }
 
-/* إرجاع الاتجاه إلى LTR عندما تكون الإنجليزية */
-.ltr {
-    direction: ltr;
-    text-align: left;
-}
 
-.ltr .main-sidebar {
-    left: 0;
-    right: auto;
-}
-
-.ltr .content-wrapper,
-.ltr .main-footer {
-    margin-right: 0;
-    margin-left: 230px;
-}
 
 </style>

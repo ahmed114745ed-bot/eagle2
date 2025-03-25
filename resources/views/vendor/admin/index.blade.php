@@ -93,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleButton.addEventListener("click", function () {
 
         sidebar.classList.toggle("active");
+        sidebar.classList.toggle("active_hide");
         contentWrapper.classList.toggle("content-wrapper-rtl");
         updateLayout();
     });
