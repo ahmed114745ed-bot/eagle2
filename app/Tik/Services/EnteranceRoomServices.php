@@ -191,7 +191,7 @@ class EnteranceRoomServices
     {
 
         $data = $request->all();
-        // Log::info('Agora data ',[$data ]);
+        Log::info('Agora data for shami ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
