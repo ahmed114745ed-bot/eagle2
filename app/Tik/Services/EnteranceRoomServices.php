@@ -226,12 +226,20 @@ class EnteranceRoomServices
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
 
+            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+                    $room->update(['is_live' => false]);
+
+            }
+
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
-                $room->update(['is_live' => false]);
+                if($room->type !== 'audio'){
+                    $room->update(['is_live' => false]);
+
+                }
 
 
             }
