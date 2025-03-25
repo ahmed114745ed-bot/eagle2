@@ -13,7 +13,7 @@ use App\Models\Room;
 |
 */
 
-Broadcast::channel('presence-room-{roomId}', function ($user, $roomId) {
+Broadcast::channel('room-{roomId}', function ($user, $roomId) {
     $data = [
         'id' => $user->id,
         'name' => $user->name,
