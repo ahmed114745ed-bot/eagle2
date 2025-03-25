@@ -219,10 +219,11 @@ class EnteranceRoomServices
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
 
         if (in_array($eventType, [101, 103])) {
-            // Log::info('enter rooom 101,102', [
-            //     'event_type' => $eventType,
+            Log::info('enter rooom 101,102 for shami', [
+                'room_uid' => $room->uid,
+                'user' => $user->uid,
 
-            // ]);
+            ]);
 
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;

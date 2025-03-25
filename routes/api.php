@@ -142,7 +142,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
                     $authResponse = Broadcast::auth($request);
-                    Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
+                    // Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
                     return $authResponse;
                 } catch (\Exception $e) {
                     return response()->json(['success' => false, 'message' => $e->getMessage()],500);
