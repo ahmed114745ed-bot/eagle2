@@ -522,8 +522,12 @@ class EnteranceRoomServices
             $room->charizma_status = false;
             dispatch(new ResetCharisma($room->id));
         }
-
+        if ($room->uid == $user_id) {
+            $room->is_live = true;
+        }
+   
         $room->save();
+       
     }
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
