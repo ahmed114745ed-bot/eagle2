@@ -95,7 +95,7 @@ class ChargeController extends MainController
         });
         $grid->column('admin.name', __('creator'))
             ->display(function ($name) {
-                if ($this->user_type == "dash") {
+                if ($this->user_type != "dash") {
                     $name = $this->admin->name ?? '';
                     $path = $this->admin->avatar ?? null;
                     $defaultImage = asset("images/businessman-icon.jpg");
