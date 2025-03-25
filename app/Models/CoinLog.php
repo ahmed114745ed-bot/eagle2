@@ -27,4 +27,9 @@ class CoinLog extends Model
     function user(){
         return $this->belongsTo(User::class , 'user_id')->with('profile');
     }
+
+    public function coin()
+    {
+        return $this->belongsTo(Coin::class, 'coin_id');
+    }
 }
