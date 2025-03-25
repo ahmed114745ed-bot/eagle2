@@ -215,7 +215,7 @@ class ChargeReportController extends MainController
 
                 $filter->where(function ($query) {
                     if ($this->input != null) {
-                        $query->where('coin.paymentGateway.title', $this->input);
+                        $query->where('method', $this->input);
                     }
                 }, __('Select type'), 'name_for_url_shortcut')->radio([
                     '' => __('All'),
