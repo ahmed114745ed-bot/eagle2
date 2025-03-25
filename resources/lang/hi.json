@@ -814,7 +814,31 @@
     "rejected": "अस्वीकृत",
     "rejectedAdmin": "प्रशासक द्वारा अस्वीकृत",
     "Message":"संदेश",
-     "notification": "सूचना"
+     "notification": "सूचना",
+     "Brand settings": "ब्रांड सेटिंग्स",
+     "Theme settings": "थीम सेटिंग्स",
+     "Timing settings": "समय सेटिंग्स",
+     "App settings": "ऐप सेटिंग्स",
+     "Application title:": "एप्लिकेशन शीर्षक:",
+     "Application logo:": "एप्लिकेशन लोगो:",
+     "Application Fav Icon:": "एप्लिकेशन पसंदीदा आइकन:",
+     "save": "सहेजें",
+     "Primary Color:": "मुख्य रंग:",
+     "Secondary Color:": "द्वितीयक रंग:",
+     "Text Primary Color:": "प्राथमिक पाठ रंग:",
+     "Text Secondary Color:": "द्वितीयक पाठ रंग:",
+     "Box Background Color:": "बॉक्स पृष्ठभूमि रंग:",
+     "Table Background Color:": "तालिका पृष्ठभूमि रंग:",
+     "Reset Colors": "रंग रीसेट करें",
+     "Time zone:": "समय क्षेत्र:",
+     "Primary Color": "मुख्य रंग",
+     "Second Color": "दूसरा रंग",
+     "Background Type": "पृष्ठभूमि प्रकार",
+     "Color": "रंग",
+     "Image": "छवि",
+     "Background Color": "पृष्ठभूमि का रंग",
+     "Background Image": "पृष्ठभूमि छवि",
+     "Save Settings": "सेटिंग्स सहेजें"
 
 
 

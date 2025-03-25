@@ -434,7 +434,31 @@
 
 
         "available_variables" : "Available Variables",
-        "help_message" : "You can use the following variables in the message: :variables"
+        "help_message" : "You can use the following variables in the message: :variables",
+        "Brand settings": "Brand Settings",
+        "Theme settings": "Theme Settings",
+        "Timing settings": "Timing Settings",
+        "App settings": "App Settings",
+        "Application title:": "Application Title:",
+        "Application logo:": "Application Logo:",
+        "Application Fav Icon:": "Application Fav Icon:",
+        "save": "Save",
+        "Primary Color:": "Primary Color:",
+        "Secondary Color:": "Secondary Color:",
+        "Text Primary Color:": "Text Primary Color:",
+        "Text Secondary Color:": "Text Secondary Color:",
+        "Box Background Color:": "Box Background Color:",
+        "Table Background Color:": "Table Background Color:",
+        "Reset Colors": "Reset Colors",
+        "Time zone:": "Time Zone:",
+        "Primary Color": "Primary Color",
+        "Second Color": "Second Color",
+        "Background Type": "Background Type",
+        "Color": "Color",
+        "Image": "Image",
+        "Background Color": "Background Color",
+        "Background Image": "Background Image",
+        "Save Settings": "Save Settings"
 
 
 

@@ -87,6 +87,8 @@
         background: #222;
         padding: 20px;
         border-radius: 5px;
+        width: 712px;
+
     }
 
     label {
@@ -188,6 +190,7 @@
             <button onclick="showSection('brandSettings')">{{  __('Brand settings')}}</button>
             <button onclick="showSection('themeSettings')">{{  __('Theme settings')}}</button>
             <button onclick="showSection('timeSettings')"> {{  __('Timing settings')}}</button>
+            <button onclick="showSection('appSettings')"> {{  __('App settings')}}</button>
         </div>
     </div>
 
@@ -286,6 +289,52 @@
                 </div>
             </form>
         </div>
+
+        <div id="appSettings" class="settings-section">
+            <h3>{{  __('Timing settings')}}</h3>
+            <form action="{{ route('admin.settings.update') }}" method="POST">
+                @csrf
+                <div class="form">
+                  
+                <div class="form-group">
+                <label for="primary_color">{{ __('Primary Color') }}</label>
+                <input type="color" id="app_primary_color" name="app_primary_color" value="#3498db" class="form-control">
+            </div>
+
+            <!-- حقل اختيار اللون الثانوي -->
+            <div class="form-group">
+                <label for="second_color">{{ __('Second Color') }}</label>
+                <input type="color" id="second_color" name="app_second_color" value="#2ecc71" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="background_type">{{ __('Background Type') }}</label>
+                <select id="background_type" name="background_type" class="form-control" onchange="toggleBackgroundInput()">
+                    <option value="color">{{ __('Color') }}</option>
+                    <option value="image">{{ __('Image') }}</option>
+                </select>
+            </div>
+
+                  <div class="form-group" id="background_color_group">
+                <label for="background_color">{{ __('Background Color') }}</label>
+                <input type="color" id="background_color" class="form-control" onchange="updateBackgroundValue()">
+            </div>
+
+            <div class="form-group" id="background_image_group" style="display: none;">
+                <label for="background_image">{{ __('Background Image') }}</label>
+                <input type="file" id="background_image" class="form-control" onchange="updateBackgroundValue()">
+            </div>
+
+            <input type="hidden" id="app_background" name="app_background">
+
+            <button type="submit" class="btn btn-primary mt-3">{{ __('Save Settings') }}</button>
+
+        </div>
+            </form>
+        </div>
+
+
+        
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
@@ -345,6 +394,31 @@
 
     function closeFullScreen() {
         document.getElementById("imageModal").style.display = "none";
+    }
+
+
+    function toggleBackgroundInput() {
+        var type = document.getElementById("background_type").value;
+        document.getElementById("background_color_group").style.display = (type === "color") ? "block" : "none";
+        document.getElementById("background_image_group").style.display = (type === "image") ? "block" : "none";
+
+        updateBackgroundValue();
+    }
+
+    function updateBackgroundValue() {
+        var type = document.getElementById("background_type").value;
+        var hiddenInput = document.getElementById("app_background");
+
+        if (type === "color") {
+            hiddenInput.value = document.getElementById("background_color").value;
+        } else if (type === "image") {
+            var fileInput = document.getElementById("background_image");
+            if (fileInput.files.length > 0) {
+                hiddenInput.value = fileInput.files[0].name; // حفظ اسم الملف فقط
+            } else {
+                hiddenInput.value = "";
+            }
+        }
     }
     </script>
 
