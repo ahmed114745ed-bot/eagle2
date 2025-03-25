@@ -567,11 +567,11 @@
                 left: auto;
             }
 
-            .rtl .content-wrapper,
+          .rtl .content-wrapper,
             .rtl .main-footer {
                 margin-left: 0;
                 margin-right: 230px;
-            }
+            } 
 
             .rtl .treeview-menu {
                  padding-right: 10px;
@@ -608,6 +608,21 @@
             .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
                 position: absolute;
                 right: -238px;
+            }
+
+            .rtl th{
+                text-align: start;
+            }
+            .rtl .form-horizontal .row {
+                display: grid;
+                direction: rtl !important;
+                flex-direction: row-reverse !important;
+            
+            }
+
+           
+           .rtl .form-horizontal .box-footer .btn-group {
+                float: right !important; /* يجعل الأزرار على اليمين */
             }
 
 
@@ -657,6 +672,11 @@
 }
 
 
+
+.rtl .content-wrapper-rtl{
+    margin-right: 42px !important;
+
+}
 
 
 
