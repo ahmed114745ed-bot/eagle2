@@ -191,7 +191,7 @@ class EnteranceRoomServices
     {
 
         $data = $request->all();
-        // Log::info('Agora data ',[$data ]);
+        Log::info('Agora data for shami ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
@@ -227,7 +227,7 @@ class EnteranceRoomServices
             $user->now_room_uid = $room->uid;
 
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
-                    $room->update(['is_live' => false]);
+                    $room->update(['is_live' => true]);
 
             }
 
@@ -235,13 +235,12 @@ class EnteranceRoomServices
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
-            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
-                if($room->type !== 'audio'){
-                    $room->update(['is_live' => false]);
-
-                }
-
-
+            if (
+                Schema::hasColumn('rooms', 'is_live') &&
+                $room->uid == $user->id &&
+                $room->type !== 'audio'
+            ) {
+                $room->update(['is_live' => false]);
             }
 
 
