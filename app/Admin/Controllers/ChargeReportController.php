@@ -208,7 +208,7 @@ class ChargeReportController extends MainController
             ";
         });
 
-        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+        $grid->column('created_at', __('Created at'));
 
         return $grid;
     }
@@ -298,7 +298,7 @@ class ChargeReportController extends MainController
             }
         });
 
-        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+        $grid->column('created_at', __('Created at'));
         return $grid;
     }
 
@@ -385,7 +385,7 @@ class ChargeReportController extends MainController
 
             return $options[$value] ?? $value;
         });
-        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+        $grid->column('created_at', __('Created at'));
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';
         // });
