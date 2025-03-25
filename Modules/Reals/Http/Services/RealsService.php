@@ -478,4 +478,44 @@ class RealsService extends BaseModelService
             'status' => 200,
         ];
     }
+
+    public function update( $reel_id, array $data)
+    {
+        $reel = Real::find($reel_id);
+
+        if (!$reel) {
+            throw new \Exception('Reel not found');
+        }
+
+        $categoriesIds = $data['categories'] ?? null;
+        $updateData = [];
+
+       
+        if (isset($data['video']) && is_file($data['video'])) {
+            $urlVideo = $this->upload($data['video']);
+            $updateData['url'] = $urlVideo;
+            $updateData['sub_video'] = $this->makeSubVideo($urlVideo, null, 'gcs');
+        
+            
+        } 
+
+
+        if (isset($data['description'])) {
+            $updateData['description'] = $data['description'];
+        }
+
+     
+        if (!empty($updateData)) {
+            $reel->update($updateData);
+        }
+
+        if ($categoriesIds) {
+            $reel->categories()->sync($categoriesIds);
+        }
+
+        return $reel;
+      
+    }
+
+    
 }

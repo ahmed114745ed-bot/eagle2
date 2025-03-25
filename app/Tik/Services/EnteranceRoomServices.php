@@ -235,13 +235,12 @@ class EnteranceRoomServices
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
-            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
-                if($room->type !== 'audio'){
-                    $room->update(['is_live' => false]);
-
-                }
-
-
+            if (
+                Schema::hasColumn('rooms', 'is_live') &&
+                $room->uid == $user->id &&
+                $room->type !== 'audio'
+            ) {
+                $room->update(['is_live' => false]);
             }
 
 
