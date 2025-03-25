@@ -74,6 +74,33 @@
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("main-sidebar");
+    const contentWrapper = document.getElementById("pjax-container");
+    const toggleButton = document.querySelector(".sidebar-toggle");
+
+    function updateLayout() {
+        if (sidebar.classList.contains("active")) {
+            document.body.classList.remove("sidebar-collapsed");
+        } else {
+
+            document.body.classList.add("sidebar-collapsed");
+        }
+    }
+
+    // استدعاء عند النقر على زر التبديل
+    toggleButton.addEventListener("click", function () {
+
+        sidebar.classList.toggle("active");
+        contentWrapper.classList.toggle("content-wrapper-rtl");
+        updateLayout();
+    });
+
+    // تحديث عند تحميل الصفحة
+    updateLayout();
+});
+
 </script>
 
 <!-- REQUIRED JS SCRIPTS -->
