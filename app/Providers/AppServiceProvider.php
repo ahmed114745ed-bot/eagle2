@@ -112,7 +112,7 @@ class AppServiceProvider extends ServiceProvider
         AgencyJoinRequest::observe (AgencyJoinRequestObserver::class);
 
         if (Schema::hasTable('settings')) {
-            $settings = DB::table('settings')->pluck('value', 'key')->toArray();
+            // $settings = DB::table('settings')->pluck('value', 'key')->toArray();
 
             config([
                 'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',
