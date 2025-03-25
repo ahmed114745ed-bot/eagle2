@@ -25,4 +25,9 @@ class Coin extends Model
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+    public function paymentGateway()
+    {
+        return $this->belongsTo(PaymentGateway::class, 'payment_gateway_id');
+    }
 }
