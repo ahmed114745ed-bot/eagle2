@@ -276,6 +276,7 @@ class ChargeReportController extends MainController
         $grid->column('trx', __('trx'));
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
+            if(!$paymentCoin) return '';
             $options = PaymentType::getTranslatedOptions();
             
             return $options[$paymentCoin->title] ?? '';
