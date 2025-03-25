@@ -186,18 +186,27 @@ class ChargeReportController extends MainController
             </div>";
         });
 
-        $grid->column('balance_after', __("Balance After"))->display(function () {
+        // $grid->column('balance_after', __("Balance After"))->display(function () {
 
-            $balance_after = $this->amount + $this->balance_before;
-            $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
+        //     $balance_after = $this->amount + $this->balance_before;
+        //     $icon = asset('images/arrows.png'); // أيقونة صعود أو نزول حسب المبلغ
 
-            return "<div style='display: flex; align-items: center; gap: 5px;'>
-            <span>
-            " . number_format($balance_after) . "</span>
-            <img src='{$icon}' alt='USD' width='20' height='20'>
-            </div>";
+        //     return "<div style='display: flex; align-items: center; gap: 5px;'>
+        //     <span>
+        //     " . number_format($balance_after) . "</span>
+        //     <img src='{$icon}' alt='USD' width='20' height='20'>
+        //     </div>";
+        // });
+        $grid->column('usd', __('dollar'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
         });
-
 
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
@@ -252,8 +261,8 @@ class ChargeReportController extends MainController
              </div>
          ";
         });
-        
-        
+
+
         $grid->column('coin.usd', __('dollar'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
@@ -276,9 +285,9 @@ class ChargeReportController extends MainController
         $grid->column('trx', __('trx'));
         $grid->column('coin.payment_gateway_id', __('type'))->display(function ($value) {
             $paymentCoin = PaymentCoin::find($value);
-            if(!$paymentCoin) return '';
+            if (!$paymentCoin) return '';
             $options = PaymentType::getTranslatedOptions();
-            
+
             return $options[$paymentCoin->title] ?? '';
         });
         $grid->column('status', __('Status'))->display(function () {
@@ -373,7 +382,7 @@ class ChargeReportController extends MainController
                 'google_pay' => __('google pay'),
                 'apple_pay' => __('apple pay'),
             ];
-            
+
             return $options[$value] ?? $value;
         });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
