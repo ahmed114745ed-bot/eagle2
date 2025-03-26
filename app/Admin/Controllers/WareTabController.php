@@ -200,6 +200,10 @@ class WareTabController extends MainController
         )->default(4);
         if ($form->isCreating()) {
             $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+        }else{
+            $form->select('type', trans('type'))->options(
+                translate(TYPE_WARE)
+            )->attribute(['id' => 'type'])->rules('required');
         }
         //        ->rules (function ($form){
         //            if (!$id = $form->model()->id) {
@@ -217,9 +221,7 @@ class WareTabController extends MainController
             }
         }
         if ($form->isEditing()) {
-            $form->select('type', trans('type'))->options(
-                translate(TYPE_WARE)
-            )->attribute(['id' => 'type'])->rules('required');
+            
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
