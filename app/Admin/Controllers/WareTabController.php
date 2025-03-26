@@ -66,13 +66,13 @@ class WareTabController extends MainController
             ->row(function (Row $row) {
                 $row->column(12, $this->form());
             });
-          //  ->body($this->form());
+        //  ->body($this->form());
     }
 
     protected function grid()
     {
         $type = request()->get('type', 1);
-    
+
         $grid = new Grid(new Ware());
         $grid->model()->where('type', $type)->whereNot('get_type', 1);
 
@@ -128,16 +128,16 @@ class WareTabController extends MainController
             }
         ");
         $grid->disableCreateButton();
-        $grid->tools(function (Grid\Tools $tools) use ( $type) {
+        $grid->tools(function (Grid\Tools $tools) use ($type) {
             $url =  url('/admin/ware-managements/create/' . $type); // Use Laravel route helper
             $add = __('add');
-        
+
             $customButtonHTML = <<<HTML
                 <a href="{$url}" class="btn btn-sm btn-success" style="margi    n-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
             HTML;
-        
+
             $tools->append($customButtonHTML);
         });
         return $grid;
@@ -151,7 +151,7 @@ class WareTabController extends MainController
         // Define your type mapping
         $typeMap = TYPE_WARE;
 
-        $types = Ware::whereIn('type',array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
+        $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
             return [$type => $typeMap[$type] ?? "Type $type"];
         });
 
@@ -174,7 +174,7 @@ class WareTabController extends MainController
         // Define your type mapping
         $typeMap = TYPE_WARE;
 
-        $types = Ware::whereIn('type',array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
+        $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
             return [$type => $typeMap[$type] ?? "Type $type"];
         });
 
@@ -194,10 +194,13 @@ class WareTabController extends MainController
     {
         $form = new Form(new Ware());
         $form->display('ID');
+
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE)
         )->default(4);
-        $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+        if ($form->isCreating()) {
+            $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
+        }
         //        ->rules (function ($form){
         //            if (!$id = $form->model()->id) {
         //                return 'required';
@@ -214,6 +217,9 @@ class WareTabController extends MainController
             }
         }
         if ($form->isEditing()) {
+            $form->select('type', trans('type'))->options(
+                translate(TYPE_WARE)
+            )->attribute(['id' => 'type'])->rules('required');
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
@@ -304,7 +310,7 @@ class WareTabController extends MainController
         });
 
         $form->saved(function (Form $form) {
-           
+
             $type = $form->model()->type;
             $url = url('admin/ware-management') . '?type=' . $type;
             return redirect()->to($url);
