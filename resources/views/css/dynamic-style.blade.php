@@ -624,6 +624,9 @@
            .rtl .form-horizontal .box-footer .btn-group {
                 float: right !important; /* يجعل الأزرار على اليمين */
             }
+            .rtl .content-wrapper-rtl{
+    margin-right: 42px !important;
+            }
 
 
 /* @media (max-width: 768px) {
@@ -680,14 +683,35 @@
                 margin-left: 0;
                 margin-right: auto;
             } 
+
+            /* .rtl .content-wrapper-rtl{
+
+                margin-right: 444px !important;
+                width: 277px;
+        } */
+        .rtl .content-wrapper-rtl {
+        transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        margin-right: 444px !important;    width: calc(100% - 0px); /* بدون إزاحة */
+    }
+
+    .rtl.sidebar-open .content-wrapper-rtl {
+        margin-right: 444px !important;
+        width: calc(100% - 444px);
+    }
+
+
+        .sidebar-open .content-wrapper {
+            margin-right: 250px; /* عرض القائمة الجانبية */
+        }
 }
 
 
 
-.rtl .content-wrapper-rtl{
+/* .rtl .content-wrapper-rtl{
     margin-right: 42px !important;
-
-}
+    margin-right: 444px !important;
+    width: 277px;
+} */
 
 
 
