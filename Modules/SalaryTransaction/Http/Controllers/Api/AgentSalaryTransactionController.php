@@ -79,13 +79,13 @@ class AgentSalaryTransactionController extends Controller
 
         $data = Charge::with('receiver', 'sender')->where('is_used_transferred', false)->where("agency_id", $agency->id);
 
-        $data = $data->when($type == 'sender', function ($q) use ($search, $usrAuth) {
+        $data = $data->when($type == 'sent', function ($q) use ($search, $usrAuth) {
             $q->where("charger_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)->where('charger_type', '!=', 'dash')
                 ->whereHas('receiver', function ($q2) use ($search) {
                     $q2->fitterByUuid($search);
                 });
         })
-            ->when($type == 'receiver', function ($q) use ($search, $usrAuth) {
+            ->when($type == 'received', function ($q) use ($search, $usrAuth) {
                 $q->where("user_id", $usrAuth->id)->where('agency_id', $usrAuth->agency_id)
                     ->whereHas('sender', function ($q2) use ($search) {
                         $q2->fitterByUuid($search);
