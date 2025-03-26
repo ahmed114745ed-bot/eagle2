@@ -36,6 +36,10 @@
         background: var(--primary-button) !important;
         border-color: #337ab7
     }
+    .skin-black-light .content-header {
+    background: var(--second-alpha) !important;
+    box-shadow: none;
+   }
 
     input:checked+.slider {
         background: var(--primary-button) !important ;
