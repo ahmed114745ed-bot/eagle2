@@ -1,9 +1,5 @@
 <?php
 
-use App\Admin\Controllers\LanguageController;
-use App\Admin\Controllers\NotificationsTemplatesController;
-use App\Admin\Controllers\SettingController;
-use App\Http\Controllers\SettingsController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +11,7 @@ use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\MomentController;
@@ -24,12 +21,17 @@ use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
+use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
+use App\Http\Controllers\SettingsController;
+use App\Admin\Controllers\LanguageController;
 use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\AdminAuthController;
 use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
@@ -47,6 +49,8 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
+
+use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
@@ -65,8 +69,6 @@ use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
-use App\Admin\Controllers\AdminAuthController;
-use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
@@ -77,7 +79,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\RoomSettingsController;
+use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -455,7 +457,20 @@ Route::group(
         $router->resource('room-settings', RoomSettingsController::class);
 
         $router->resource('notification-templates', NotificationsTemplatesController::class);
-
+       // Route::get('ware-management', [WareTabController::class, 'index']);
+      //  $router->resource('ware-management', WareTabController::class);
+      //Route::post('/ware-management/create/{type?}', [WareTabController::class, 'create']);
+      Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
+      Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::prefix('ware-management')->group(function () {
+            Route::get('/{type?}', [WareTabController::class, 'index']);
+           
+            Route::post('/create', [WareTabController::class, 'store']);
+            Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        
     }
 
 

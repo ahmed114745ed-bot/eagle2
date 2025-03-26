@@ -3,39 +3,35 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ware;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Illuminate\Support\Str;
+use Encore\Admin\Form;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
+use App\Helpers\Common;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
+use Illuminate\Support\Str;
 
-class WareController extends MainController
+
+
+class WareTabController extends MainController
 {
-    use HasResourceActions;
-    public $permission_name = 'wares';
-    public $hiddenColumns = [];
-
     public function index(Content $content)
     {
-        return $content
+        session(['last_ware_type' => request()->get('type', 1)]);
+        return parent::index($content
             ->title(trans('Products'))
-            ->body($this->grid());
+            ->row(function (Row $row) {
+                $row->column(12, $this->tabsComponent());
+            })
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid());
+            }));
     }
 
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function show($id, Content $content)
     {
         return $content
@@ -61,50 +57,27 @@ class WareController extends MainController
     {
         return $content
             ->title(trans('wares'))
-            ->body($this->form());
+            ->row(function (Row $row) {
+                $row->column(12, $this->tabsComponentCreate());
+            })
+            ->row(function (Row $row) {
+                $row->column(12, $this->form());
+            });
+          //  ->body($this->form());
     }
 
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
     protected function grid()
     {
-        $grid = new Grid(new Ware);
-        $grid->model()->whereNot('get_type', 1);
+        $type = request()->get('type', 1);
+    
+        $grid = new Grid(new Ware());
+        $grid->model()->where('type', $type)->whereNot('get_type', 1);
+
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('level', __('level'));
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-
-                $filter->equal('type', __('type'))->select([
-                    1 => trans('Gemstone'),
-                    3 => trans('Card Scroll'),
-                    4 => trans('Avatar Frame'),
-                    5 => trans('Bubble Frame'),
-                    6 => trans('Entering Special Effects'),
-                    7 => trans('Microphone Aperture'),
-                    8 => trans('Badge'),
-                    9 => trans('NoKick'),
-                    10 => trans('Icon'),
-                    11 => trans('intro animation'),
-                    12 => trans('wapel'),
-                    13 => trans('hide country and last login'),
-                    14 => trans('vip gifts'),
-                    15 => trans('no pan'),
-                    16 => trans('hidden room'),
-                    17 => trans('anonymous man'),
-                    18 => trans('colored name'),
-                    19 => trans('profile visitors hide in'),
-                    20 => trans('hide last active'),
-                    28 => trans('profile frame')
-
-
-                ]);
             });
         });
 
@@ -125,26 +98,8 @@ class WareController extends MainController
         });
         $grid->column('get_type', __('get_type'))->select(
             [
-                //  1=>trans ('vip level automatic acquisition'),
-                //               2=>trans ('activity'),
-                //               3=>trans ('treasure box'),
                 4 => trans('purchase'),
-                //               5=>trans ('background modification'),
                 6 => trans('limited time purchase'),
-                //               7=>trans ('treasure box point exchange'),
-                //               8=>trans ('cp level unlock'),
-            ]
-        );
-        $grid->column('type', __('type'))->select(
-            [
-                1 => trans('Gemstone'),
-                3 => trans('Card Scroll'),
-                4 => trans('Avatar Frame'),
-                5 => trans('Bubble Frame'),
-                6 => trans('Entering Special Effects'),
-                28 => trans('profile frame')
-
-
             ]
         );
 
@@ -169,57 +124,77 @@ class WareController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) use ( $type) {
+            $url =  url('/admin/ware-managements/create/' . $type); // Use Laravel route helper
+            $add = __('add');
+        
+            $customButtonHTML = <<<HTML
+                <a href="{$url}" class="btn btn-sm btn-success" style="margi    n-right: 10px;">
+                    <i class="fa fa-plus"></i> {$add}
+                </a>
+            HTML;
+        
+            $tools->append($customButtonHTML);
+        });
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
+
+    private function tabsComponent()
     {
-        $show = new Show(Ware::findOrFail($id));
+        $content = new Row();
 
-        //        $show->id('ID');
-        //        $show->get_type('get_type');
-        //        $show->type('type');
-        //        $show->name('name');
-        //        $show->title('title');
-        //        $show->price('price');
-        //        $show->score('score');
-        //        $show->level('level');
-        //        $show->show_img('show_img');
-        //        $show->img1('img1');
-        //        $show->img2('img2');
-        //        $show->img3('img3');
-        //        $show->color('color');
-        //        $show->expire('expire');
-        //        $show->enable('enable');
-        //        $show->sort('sort');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
+        // Define your type mapping
+        $typeMap = TYPE_WARE;
 
-        return $show;
+        $types = Ware::distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
+            return [$type => $typeMap[$type] ?? "Type $type"];
+        });
+
+        $currentType = request()->get('type', $types->keys()->first());
+
+        $box = new Box(content: view('admin.grid.Form.wareTables', [
+            'types' => $types,
+            'currentType' => $currentType
+        ]));
+
+        $content->column(12, $box);
+
+        return $content;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
+    private function tabsComponentCreate()
+    {
+        $content = new Row();
+
+        // Define your type mapping
+        $typeMap = TYPE_WARE;
+
+        $types = Ware::distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
+            return [$type => $typeMap[$type] ?? "Type $type"];
+        });
+
+        $currentType = request()->get('type', $types->keys()->first());
+
+        $box = new Box(content: view('admin.grid.Form.wareCreate', [
+            'types' => $types,
+            'currentType' => $currentType
+        ]));
+
+        $content->column(12, $box);
+
+        return $content;
+    }
+
     protected function form()
     {
         $form = new Form(new Ware());
-
         $form->display('ID');
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE)
         )->default(4);
-        $form->select('type', trans('type'))->options(
-            translate(TYPE_WARE)
-        )->attribute(['id' => 'type'])->rules('required');
+        $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
         //        ->rules (function ($form){
         //            if (!$id = $form->model()->id) {
         //                return 'required';
@@ -320,12 +295,17 @@ class WareController extends MainController
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
-            
+
 
             (new UserCounterServices)->eventUsers('ware');
         });
 
-
+        $form->saved(function (Form $form) {
+           
+            $type = $form->model()->type;
+            $url = url('admin/ware-management') . '?type=' . $type;
+            return redirect()->to($url);
+        });
         return $form;
     }
 }
