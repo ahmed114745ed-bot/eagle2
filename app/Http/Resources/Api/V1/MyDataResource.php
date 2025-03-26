@@ -183,7 +183,7 @@ class MyDataResource extends JsonResource
             'profile' => new ProfileResource(@$this->profile),
 
             'level' => Common::level_center(@$this),
-          //  'charge_level' => Common::chargeLevel(@$this->id),
+            'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
             $this->merge((new MyStoreResource($this->resource))),
             'family_data' => $f,

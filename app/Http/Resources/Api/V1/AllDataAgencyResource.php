@@ -29,6 +29,7 @@ class AllDataAgencyResource extends JsonResource
 
         $result = (@$minValue->agency_share / 100) * @$target;
         $authUser = request()->user;
+       
         $owner = @$authUser->ownAgency;
         $admin = @$authUser->agencyUserJob;
 
@@ -60,7 +61,7 @@ class AllDataAgencyResource extends JsonResource
             'mempers_count'=>$this->mempers_count,
             // 'mempers'=>$this->mempers ?? (object)[], 
             'members'=>MyDataForAgancyNewResource::collection($this->mempers),
-            'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
+           // 'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
         ];
     }
 }
