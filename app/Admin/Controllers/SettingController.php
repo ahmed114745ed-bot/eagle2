@@ -28,7 +28,7 @@ class SettingController extends MainController
             ->header(__('Settings'))
             ->description('')
 
-            ->body(view('admin.settings', compact('settings','timezones','agora_app_id','zego_server_secret','zego_app_id','app_sign','library')));
+            ->body(view('admin.settings_new', compact('settings','timezones','agora_app_id','zego_server_secret','zego_app_id','app_sign','library')));
     }
 
     public function saveSettings(Request $request)
