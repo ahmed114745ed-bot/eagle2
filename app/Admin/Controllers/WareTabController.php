@@ -19,6 +19,7 @@ use Illuminate\Support\Str;
 
 class WareTabController extends MainController
 {
+    public $permission_name = 'wares';
     public function index(Content $content)
     {
         session(['last_ware_type' => request()->get('type', 1)]);
