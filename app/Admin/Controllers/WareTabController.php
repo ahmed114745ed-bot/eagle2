@@ -3,22 +3,24 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ware;
-use Encore\Admin\Grid;
 use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use App\Helpers\Common;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Helpers\Common;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
-use Illuminate\Support\Str;
 
 
 
 class WareTabController extends MainController
 {
+    use HasResourceActions;
     public $permission_name = 'wares';
     public function index(Content $content)
     {
