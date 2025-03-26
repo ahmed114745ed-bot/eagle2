@@ -24,12 +24,12 @@ class ConfigController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'config';
-    public function __construct()
-    {
-        (new AppFeatureService)->validateStatusEnable("config");
+    // public function __construct()
+    // {
+    //     (new AppFeatureService)->validateStatusEnable("config");
 
-        $this->middleware(['auth.config', 'clear.session'])->only('index');
-    }
+    //     $this->middleware(['auth.config', 'clear.session'])->only('index');
+    // }
 
     /**
      * Index interface.
