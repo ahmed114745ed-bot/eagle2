@@ -6,6 +6,7 @@ use App\Models\Agency;
 use App\Models\Target;
 use App\Models\UserSallary;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class AllDataAgencyResource extends JsonResource
 {
@@ -16,6 +17,7 @@ class AllDataAgencyResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
 
+   
 
     public function toArray($request)
     {
@@ -28,8 +30,9 @@ class AllDataAgencyResource extends JsonResource
             ->first();
 
         $result = (@$minValue->agency_share / 100) * @$target;
-        $authUser = request()->user;
        
+        
+         $authUser = Auth::user();
         $owner = @$authUser->ownAgency;
         $admin = @$authUser->agencyUserJob;
 
@@ -61,7 +64,7 @@ class AllDataAgencyResource extends JsonResource
             'mempers_count'=>$this->mempers_count,
             // 'mempers'=>$this->mempers ?? (object)[], 
             'members'=>MyDataForAgancyNewResource::collection($this->mempers),
-           // 'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
+            'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
         ];
     }
 }
