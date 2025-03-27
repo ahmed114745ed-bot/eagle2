@@ -1756,7 +1756,9 @@
     "Background Image": "Arka Plan Resmi",
     "Save Settings": "Ayarları Kaydet",
     "Real Time system Setting": "Gerçek Zamanlı Sistem Ayarı",
-    "pusher": "İtici"
+    "pusher": "İtici",
+    "file": "dosya",
+    "This level and type combination already exists": "Bu seviye ve tür kombinasyonu zaten mevcut"
 
 
 

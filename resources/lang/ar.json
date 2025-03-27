@@ -1809,7 +1809,9 @@
     "Background Image": "صورة الخلفية",
     "Save Settings": "حفظ الإعدادات",
     "Real Time system Setting": "إعداد نظام الوقت الفعلي",
-    "pusher": "بشر"
+    "pusher": "بشر",
+     "file": "ملف",
+     "This level and type combination already exists":"هذا المستوى والنوع موجودان بالفعل"
 
 
 }

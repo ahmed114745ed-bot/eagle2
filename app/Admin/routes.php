@@ -44,12 +44,13 @@ use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReelSettingsController;
-use App\Admin\Controllers\ReportMomentController;
 
+use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
@@ -326,7 +327,7 @@ Route::group(
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
-            Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
+            Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
