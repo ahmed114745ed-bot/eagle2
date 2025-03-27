@@ -332,11 +332,11 @@ Route::group(
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
 
-                Route::get('/{type}', [OvipGiftController::class, 'create']);
-                Route::post('/', [OvipGiftController::class, 'store']);
-                Route::get('/{id}/edit', [OvipGiftController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftController::class, 'destroy'])->where('id', '[0-9]+');
+                Route::get('/{type}', [OvipGiftTapController::class, 'create']);
+                Route::post('/', [OvipGiftTapController::class, 'store']);
+                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
