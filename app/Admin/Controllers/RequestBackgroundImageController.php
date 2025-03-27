@@ -13,12 +13,13 @@ use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
 use App\Models\RequestBackgroundImage;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RequestBackgroundImageController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'background-image-request';
+  //  public $permission_name = 'background-image-request';
 
     /**
      * Index interface.
@@ -28,9 +29,9 @@ class RequestBackgroundImageController extends MainController
      */
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(trans('request-background-image'))
-            ->body($this->grid()));
+            ->body($this->grid());
     }
 
     /**
