@@ -172,6 +172,7 @@ class CustomNotification
         $firebaseBody = ($receiver->lan === 'ar') ? $body_ar : $body_en;
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
+        dd($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
         Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
         Common::sendOfficialMessage($receiver->id, image: $user->profile->avatar, title: $body_en, content: $user->name, titleAr: $body_ar, fromUserId: $user->id);
         (new UserCounterServices)->eventUser($receiver, 'official-messages');
@@ -382,6 +383,7 @@ class CustomNotification
         Common::sendOfficialMessage($user->id, image: $agencyName->img, title: $body_en, content: $agencyName->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
+
 
     public function chargeAction(User $user, $request)
     {
