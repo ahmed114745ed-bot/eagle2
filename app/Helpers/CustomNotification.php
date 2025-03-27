@@ -173,10 +173,9 @@ class CustomNotification
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
 
+     
 
-        $response = Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, $icon, $data, 'follow');
-    
-        dd($response);
+
 
         Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
         Common::sendOfficialMessage($receiver->id, image: $user->profile->avatar, title: $body_en, content: $user->name, titleAr: $body_ar, fromUserId: $user->id);
