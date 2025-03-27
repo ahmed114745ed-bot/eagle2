@@ -282,6 +282,7 @@ class VipController extends MainController
                 'received' => __('Received'),
                 'cp' => __('cp'),
                 'room' => __('room'),
+                'charge' => __('charge'),
             ]);
         });
 
