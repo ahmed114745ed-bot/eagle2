@@ -50,7 +50,7 @@ class RoomResource extends JsonResource
             'is_pk' => (bool) $pk,
             'is_party' => $isParty,
             'room_background' => $this->final_room_image,
-            'stream_type' => $this->type,
+            'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
             'country' => $this->country
                 ? new CountryResource($this->country)
