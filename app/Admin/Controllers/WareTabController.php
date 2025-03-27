@@ -51,9 +51,20 @@ class WareTabController extends MainController
      */
     public function edit($id, Content $content)
     {
+        // Get the warehouse first to ensure it exists
+        // $ware = Ware::findOrFail($id);
+
+        // // Get type from request or fall back to warehouse's type
+        // $currentType = request('type', $ware->type);
+
         return $content
             ->title(trans('wares'))
-            ->body($this->form()->edit($id));
+            // ->row(function (Row $row) use ($id, $currentType) {
+            //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
+            // })
+            ->row(function (Row $row) use ($id) {
+                $row->column(12, $this->form()->edit($id));
+            });
     }
 
     public function create(Content $content)
@@ -198,14 +209,13 @@ class WareTabController extends MainController
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE)
         )->default(4);
-        if (\Str::contains(request()->fullUrl(), 'create')) {
+        if (\Str::contains(request()->fullUrl(), 'edit')) {
+            $wareType = Ware::find(request('id'))->type;
+            $type = request('type', $wareType);
+            $form->hidden('type', __('type'))->value($type)->attribute(['id' => 'type']);
+        } else {
             $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
-        }else{
-            $form->select('type', trans('type'))->options(
-                translate(TYPE_WARE)
-            )->attribute(['id' => 'type'])->rules('required');
         }
-
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
@@ -217,7 +227,7 @@ class WareTabController extends MainController
             }
         }
         if ($form->isEditing()) {
-            
+
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
@@ -314,5 +324,34 @@ class WareTabController extends MainController
             return redirect()->to($url);
         });
         return $form;
+    }
+
+
+
+
+    private function tabsComponentEdit($id, $currentType)
+    {
+        $content = new Row();
+
+        // Define your type mapping
+        $typeMap = TYPE_WARE;
+
+        $types = Ware::whereIn('type', array_keys($typeMap))
+            ->distinct()
+            ->pluck('type')
+            ->sort()
+            ->mapWithKeys(function ($type) use ($typeMap) {
+                return [$type => $typeMap[$type] ?? "Type $type"];
+            });
+
+        $box = new Box(content: view('admin.grid.Form.wareEdit', [
+            'types' => $types,
+            'currentType' => $currentType,
+            'wareId' => $id
+        ]));
+
+        $content->column(12, $box);
+
+        return $content;
     }
 }
