@@ -13,6 +13,7 @@ use App\Services\AppFeatureService;
 
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use App\Admin\Controllers\MainController;
 
 class VipController extends MainController
 {

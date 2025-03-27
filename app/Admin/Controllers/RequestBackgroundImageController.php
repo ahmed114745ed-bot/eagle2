@@ -12,7 +12,7 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Facades\CustomNotification;
 use App\Models\RequestBackgroundImage;
-use App\Admin\Controllers\MainController;
+
 use Encore\Admin\Controllers\HasResourceActions;
 
 class RequestBackgroundImageController extends MainController
