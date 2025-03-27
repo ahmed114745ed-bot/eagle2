@@ -9,6 +9,54 @@ use Illuminate\Support\Facades\Validator;
 
 class addTOjesonController extends Controller
 {
+
+    public function custom(Request $request){
+        //chat configs
+        $chat_status =  $request->chat_status;
+        $chat_enable_version =  $request->chat_enable_version;
+        $invitation_code_date =  $request->invitation_code_date;
+        $show_welcom_enmation =  $request->show_welcom_enmation;
+        settings()->set("chat_status", $chat_status);
+        settings()->set("chat_enable_version", $chat_enable_version);
+        settings()->set("invitation_code_date", $invitation_code_date);
+        settings()->set("show_welcom_enmation", $show_welcom_enmation);
+
+        return back();
+    }
+    public function ios(Request $request){
+        //ios
+        $ios_min_version =  $request->ios_min_version;
+        $ios_current_version =  $request->ios_current_version;
+        $ios_update_required =  $request->ios_update_required;
+        settings()->set("ios_min_version", $ios_min_version);
+        settings()->set("ios_current_version", $ios_current_version);
+        settings()->set("ios_update_required", $ios_update_required);
+        return back();
+
+    }
+    public function android(Request $request){
+        //android
+        $android_min_version =  $request->android_min_version;
+        $android_current_version =  $request->android_current_version;
+        $android_update_required =  $request->android_update_required;
+        settings()->set("android_min_version", $android_min_version);
+        settings()->set("android_current_version", $android_current_version);
+        settings()->set("android_update_required", $android_update_required);
+        return back();
+
+    }
+    public function hawawi(Request $request){
+        //huawei
+        $huawei_min_version =  $request->huawei_min_version;
+        $huawei_current_version =  $request->huawei_current_version;
+        $huawei_update_required =  $request->huawei_update_required;
+        settings()->set("huawei_min_version", $huawei_min_version);
+        settings()->set("huawei_current_version", $huawei_current_version);
+        settings()->set("huawei_update_required", $huawei_update_required);
+        return Redirect::back();
+        return back();
+
+    }
     public function postAddSitin(Request $request)
     {
         //chat configs

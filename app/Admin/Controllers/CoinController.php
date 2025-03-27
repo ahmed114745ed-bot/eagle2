@@ -46,8 +46,23 @@ class CoinController extends MainOldController
         $grid = new Grid(new Coin);
         $grid->model()->where("payment_gateway_id", $paymentGatwayId);
         $grid->id(__('ID'));
-        $grid->usd(__('usd'));
-        $grid->coin(__('coin'));
+        $grid->column('usd', __('usd'))->display(function ($usd) {
+            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            return "<div style='display: flex; align-items: center; '>
+
+                        <span>{$usd}</span>
+                          <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
+        $grid->column('coin', __('coin'))->display(function ($usd) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$usd}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->actions(function ($actions) {

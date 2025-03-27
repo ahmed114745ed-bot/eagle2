@@ -91,7 +91,7 @@ class BannerController extends MainController
         $grid->column('id', __('Id'));
         // $grid->column('title', __('Title'));
         // $grid->column('button_text', __('Button text'));
-        $grid->column('image_url', __('Image url'))->image('', 100);
+        $grid->column('image_url', __('img'))->image('', 100);
         // $grid->column('redirect_url', __('Redirect url'));
         $grid->column('publish_at', __('Publish at'));
         $grid->column('is_active', __('Is active'))->switch();

@@ -2,6 +2,8 @@
 
 namespace Modules\WhatsappAuth\Entities;
 
+use App\Models\Setting;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,7 +37,15 @@ class WhatsappWebhookValidate extends Model
 
     public function getCreatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
+        $cacheKey = 'timezone';
+
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $setting = Cache::rememberForever($cacheKey, function () {
+            $setting = Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+
+        $timeZone = request()->header('tz') ?? $setting;
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
@@ -43,7 +53,15 @@ class WhatsappWebhookValidate extends Model
     // Convert updated_at to the user's local time zone
     public function getUpdatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
+        $cacheKey = 'timezone';
+
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $setting = Cache::rememberForever($cacheKey, function () {
+            $setting = Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+
+        $timeZone = request()->header('tz') ?? $setting;
         //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
         return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }

@@ -13,7 +13,9 @@ use Encore\Admin\Layout\Content;
 use App\Models\Admin as AdminModel;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
 

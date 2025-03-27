@@ -41,7 +41,7 @@ class  AdminAgencyMangerController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('managers'))
+            ->title(trans('Managers'))
             ->body($this->grid()));
     }
 
@@ -55,7 +55,7 @@ class  AdminAgencyMangerController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('managers'))
+            ->title(trans('Managers'))
             ->body($this->detail($id)));
     }
 
@@ -69,14 +69,14 @@ class  AdminAgencyMangerController extends MainController
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
-            ->title(trans('managers'))
+            ->title(trans('Managers'))
             ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
         return parent::create($content
-            ->title(trans('managers'))
+            ->title(trans('Managers'))
             ->body($this->form()));
     }
 
@@ -90,9 +90,29 @@ class  AdminAgencyMangerController extends MainController
             $query->whereRoleId(13);
         })->withCount('agencies');
 
-        $grid->column('name', 'Agency Manager');
-        $grid->column('username', 'App Username');
-        $grid->column('agencies_count', 'Agencies')->sortable();
+        $grid->column('name', __('Agency Manager'))->display(function ($name) {
+            $uid = @$this->username;
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = $path ?? $defaultImage;
+
+            //  Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
+        $grid->column('agencies_count', __('Agencies'))->sortable();
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             if ($actions->getKey() == 1) {

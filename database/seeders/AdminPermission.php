@@ -14,7 +14,7 @@ class AdminPermission extends Seeder
     public function run(): void
     {
         $permissions = [
-
+            'admin-profile',
             'moment',
             'wares-dedicate',
             'vips-dedicate',
@@ -104,9 +104,15 @@ class AdminPermission extends Seeder
             'agora-zego',
             'uuid-dedicate',
             'agency-setting',
+            'agency-settings',
             'free-users',
             'users-family',
-            
+            'updates_family-config',
+            'ovip-gift',
+            'charge-level',
+            'ban-rooms',
+            'settings',
+            'notification',
 
 
 
@@ -130,12 +136,12 @@ class AdminPermission extends Seeder
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
             'user' => ['users', 'trashed-account-user', 'user-target','free-users'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
-            'level' => ['level', 'ovip','wares-vips'],
+            'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level'],
             'moment' => ['moment',],
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting','agency-settings'],
             'agent' => ['agent-user', 'agent-request', 'agent-target','user-agent-target','charges-agency','agent-home'],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
@@ -159,10 +165,12 @@ class AdminPermission extends Seeder
             'carousel' => ['carousel'],
             'user-levels' => ['user-levels'],
             'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
-            'bans' => ['bans'],
+            'bans' => ['bans','ban-rooms'],
             'update-group-chat' => ['updates_group_chat'],
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
+            'updates_family-config' => ['updates_family-config'],
+            'setting' => ['language','settings','notification']
           
 
         ];
@@ -175,27 +183,27 @@ class AdminPermission extends Seeder
                     return $category;
                 }
             }
-            return 'general'; 
+            return 'general';
         }
 
         foreach ($permissions as $permission) {
             foreach ($methods as $method) {
                 $slug = $method . '-' . $permission;
                 $name = $method . ' ' . str_replace('-', ' ', $permission);
-        
+
                 // Check if the permission already exists
                 $permissionExists = DB::table('admin_permissions')->where('slug', $slug)->first();
-        
+
                 // Get the category for the permission
                 $category = getCategory($permission, $categories);
-        
+
                 if ($permissionExists) {
                     // If the permission exists, update the category
                     DB::table('admin_permissions')->where('slug', $slug)->update([
                         'category'   => $category,
                         'updated_at' => now(),
                     ]);
-                    
+
                 } else {
                     // Insert the new permission with its category
                     DB::table('admin_permissions')->insert([
@@ -210,7 +218,7 @@ class AdminPermission extends Seeder
                 }
             }
         }
-       
+
 
     }
 }

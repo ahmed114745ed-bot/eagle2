@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\DeleteAccount;
+use Encore\Admin\Controllers\AdminController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
@@ -10,6 +11,8 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Models\User;
+use App\Http\Controllers\RoomSettings;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +97,11 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+        Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
+        Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
+        Route::post('ios-setting', [addTOjesonController::class, 'ios'])->name('ios-setting');
+        Route::post('huawi-setting', [addTOjesonController::class, 'hawawi'])->name('huawi-setting');
+
         Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
         Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
         Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');
@@ -101,9 +109,16 @@ Route::group(
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
+        Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
+
+        // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');
+
 
     }
 );
+
 Route::group(
     [
         'prefix' => '',

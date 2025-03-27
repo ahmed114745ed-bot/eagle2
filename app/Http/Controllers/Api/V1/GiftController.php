@@ -21,6 +21,13 @@ class GiftController extends Controller
         $gifts = $this->giftService->index($type);
         return Common::apiResponse(true, '', GiftResource::collection($gifts), 200);
     }
+    public function get_images(Request $request)
+    {
+        
+        $gifts = $this->giftService->get_images();
+        return Common::apiResponse(true, '', $gifts, 200);
+    }
+
 
     public function allGifts(Request $request)
     {

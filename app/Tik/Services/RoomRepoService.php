@@ -157,7 +157,8 @@ class RoomRepoService
 
         $user->now_room_uid = 0;
         $user->save();
-        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
+
             $room->update(['is_live' => false]);
 
           

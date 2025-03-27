@@ -109,18 +109,6 @@ class AgencyJoinRequestController extends MainController
         });
 
         $grid->id(__('ID'));
-        // $grid->column('user_id', __('user id'))->modal('user info', function ($model) {
-        //     if ($model->user_id) {
-        //         return Common::getUserShow($model->user_id);
-        //     }
-        //     return null;
-        // });
-        // $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
-        //     if ($model->agency_id) {
-        //         return Common::getAgencyShow($model->agency_id);
-        //     }
-        //     return null;
-        // });
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
                 $uid = @$this->user->uuid;

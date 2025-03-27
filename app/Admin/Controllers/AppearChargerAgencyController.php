@@ -84,15 +84,75 @@ class AppearChargerAgencyController extends MainController
         });
         $grid->model()->whereIn('type_user', [4, 3]);
         $grid->column('id', __('Id'));
-        $grid->column('uuid', __('Uuid'));
-        $grid->column('name', __('Name'));
-        $grid->column('agency.name', __('agency_name'));
-        $grid->column('agency.coins', __('agency_coins'));
-        $grid->column('agency.img', __('agency_image'));
-        $grid->column('profile.avatar', __('image'))->image('', 50);
-        $grid->column('phone', __('Phone'));
-        $grid->column('agency_id', __('agency_id'));
+        // $grid->column('uuid', __('Uuid'));
+        // $grid->column('name', __('Name'));
+
+        $grid->column('agency.owner_id', __('Owner'))->display(function () {
+          
+        
+            $name = $this->name ?? 'Unknown Owner';
+            $uid = $this->uuid ?? 'N/A';
+            $phone = $this->phone ?? '-';
+            $path = $this->profile->avatar ?? '';
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+        
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+        
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style=' font-size: smaller;'>UID: $uid</span><br>
+                    <span style=' font-size: smaller;'>Phone: $phone</span>
+                </div>
+            </div>
+            ";
+        });
+        
+        $grid->column('agency_id', __('Agency'))->display(function () {
+            if (!$this->agency) {
+                return "<span style='color: #aaa;'>No Agency</span>";
+            }
+        
+            $name = $this->agency->name ?? 'Unknown Agency';
+            $coins = number_format($this->agency->coins ?? 0);
+            $path = $this->agency->img ?? '';
+            $defaultImage = asset("images/agency-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+        
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+        
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: green;'> Coins: $coins</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+                </div>
+            </div>
+            ";
+        });
+        
+        // $grid->column('agency.name', __('agency_name'));
+        // $grid->column('agency.coins', __('agency_coins'));
+        // // $grid->column('agency.img', __('agency_image'));
+        // // $grid->column('profile.avatar', __('image'))->image('', 50);
+        // $grid->column('phone', __('Phone'));
+        // $grid->column('agency_id', __('agency_id'));
         $grid->column('appear_charger_agency', __('Appear charger agency'))->switch(Common::getSwitchStates());
+        $grid->column('is_frozen', __("frozen"))->switch(Common::getSwitchStates());
         $grid->disableCreateButton();
         $grid->disableActions();
 

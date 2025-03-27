@@ -51,7 +51,6 @@ class AllDataAgencyResource extends JsonResource
             // 'url'=>$this->url,
             'img'=>$this->img?:'',
             'num_of_hosts'      => $this->mempers->count(),
-
             // 'contents'=>$this->contents,
             'owner'=>new MyDataForAgancyResource($this->owner)?:[
                 "id" => 0,

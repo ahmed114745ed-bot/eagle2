@@ -164,8 +164,13 @@ if (!function_exists('get_file_details')) {
     }
 
     if (!function_exists('isImageExists')) {
+
         function isImageExists($url)
         {
+            if (empty($url)) {
+                return false; // Prevent empty path error
+            }
+
             $context = stream_context_create([
                 'http' => ['timeout' => 2] // Set a 2-second timeout
             ]);
@@ -414,6 +419,24 @@ if (!function_exists('userType')) {
                 $userType = $type; // Keep the original value if no match is found
                 break;
         }
+    }
+}
+
+if (!function_exists('convertNumbersToWestern')) {
+    function convertNumbersToWestern($string) {
+        $newNumbers = range(0, 9);
+
+       if(app()->getLocale() =='hi')
+       {
+        $numbers = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+       }elseif(app()->getLocale() =='ar')
+       {
+        $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+       }
+         // Arabic (Eastern)
+      
+
+        return str_replace($numbers, $newNumbers, $string);
     }
 }
 

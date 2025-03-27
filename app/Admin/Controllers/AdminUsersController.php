@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 class AdminUsersController extends MainController
 {
     public $permission_name = 'admin-users';
-    
+
     public function show($id, Content $content)
     {
 
@@ -99,13 +99,23 @@ class AdminUsersController extends MainController
 
         $grid->column('id', __('Id'));
 
-        $grid->column('user.name', __('App Owner'))->display(function () {
-            if ($this->user) {
-                $userId = $this->user->uuid;
-                return $this->user->name . ' (UUID: ' . $userId . ')';
-            } else {
-                return '';
+        $grid->column('user.name', __('User'))->display(function () {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
             }
+
+            return '
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
+                    <div>
+                        <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">'.$this->user?->name.'</a>
+                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user?->uuid.'</div>
+                    </div>
+                </div>
+            ';
         });
 
         $grid->column('user.agencies.agencies_count', __('Agency Count'))->display(function ($agencies) {
@@ -118,7 +128,8 @@ class AdminUsersController extends MainController
         });
 
         $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_) {
-            return ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
+            $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
+            return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
         });
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\Common;
 use App\Models\Pk;
 use Modules\Events\Entities\GeneralRole;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -24,10 +25,11 @@ class HomeCarouselResource extends JsonResource
     }
 
     public function toArray($request)
-    {
+    {   
         $roomPass = $this->room?->room_pass ?? '';
         $ownerRoom = $this->user?->ownerRoom;
         $pks = !is_null($ownerRoom?->id) ? $this->getRoomTwoLastPk($ownerRoom?->id) : null;
+        $avatar = Common::switch_events($this->event_type);
 
         $urlEvent = GeneralRole::where('type',$this->event_type)->first();
         $data =  [
@@ -37,7 +39,8 @@ class HomeCarouselResource extends JsonResource
             'url'        => ($this->type == 'link' || $this->event_type == 'event')? ($this->url ?? '') :( ($this->event_type == 'pk_event'||$this->event_type == 'weekly_star' ||$this->event_type == 'charge_event' ||$this->event_type =='event_period')? ($urlEvent->url ?? ''):''),
             'isLocked'   =>   $roomPass != '' || $roomPass != null,
             'owner_id'   =>  $this->owner_id ?? 0,
-
+            'avatar' => $avatar ?? "profile/g0lEsx7Joe.jpg",
+            'event_type' => $this->event_type
         ];
 
         if($this->type == 'room'){

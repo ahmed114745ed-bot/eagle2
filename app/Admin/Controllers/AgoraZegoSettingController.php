@@ -9,6 +9,18 @@ use Encore\Admin\Layout\Content;
 class AgoraZegoSettingController extends MainController
 {
     public $permission_name = 'agora-zego';
+
+    // public function index2(Content $content){
+    //     $agora_app_id = Common::getConfig('app_id');
+    //     $zego_server_secret = Common::getConfig('zego_server_secret');
+    //     $zego_app_id = Common::getConfig('zego_app_id');
+    //     $app_sign = Common::getConfig('app_sign');
+    //     $library = Common::getConfig('library');
+
+    //     return $content->view('agora_zego_settings',compact('agora_app_id',
+    //      'zego_server_secret', 'zego_app_id','app_sign','library'));
+    // }
+
     public function index(Content $content)
     {
         // return view('admin/updatePage');
@@ -110,7 +122,7 @@ class AgoraZegoSettingController extends MainController
         $form .= '</div>';
         $form .= '</div>';
 
-        $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;"> 
+        $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;">
         <button type="submit" class="button_form_cus">' . __('admin.submit') . '</button> </div>';
 
         $form .= '</form>';

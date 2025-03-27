@@ -81,7 +81,9 @@ class User extends Authenticatable
         'user_diamond',
         'total_sender_level',
         'total_received_level',
-        'original_uuid'
+        'original_uuid',
+        'is_frozen',
+        'total_charge_level',
     ];
 
     /* protected $appends = [
@@ -663,14 +665,28 @@ class User extends Authenticatable
         })
             ->orderByDesc('id')
             ->sum(DB::raw('salary - cut_amount'));
-        \Log::info([$userSallary,$roomSalary]);
+        // \Log::info([$userSallary,$roomSalary]);
         return (floor($userSallary + (int)$roomSalary));
         //        } else {
         //            return 0;
         //        }
     }
 
+    public function setTotalChargeLevelAttribute(float $value)
+    {
+        $level = @$this->charge_level  + $this->sub_charger_level;
+        if ($level == $value) return;
 
+        $this->sub_charger_level = $value - @$this->charge_level ?? 0;
+        $diamonds               =
+            (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
+    }
+
+    public function getTotalChargeLevelAttribute()
+    {
+        return $this->charge_level  + $this->sub_charger_level;
+    }
 
     public function setSalaryAttribute()
     {
@@ -1131,4 +1147,38 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserVip::class, 'user_id'); 
     }
+
+    public function getIsFrozenAttribute()
+    {
+        return optional($this->agency)->is_frozen; 
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+
+        static::saving(function ($model) {
+            if (request()->has('is_frozen')) {
+
+                if ($model->agency) {
+                    $model->agency->update(['is_frozen' => request()->is_frozen]);
+                } else {
+                    \Log::warning("User ID {$model->id} does not have an agency.");
+                }
+                request()->request->remove('is_frozen');
+            }
+        });
+        static::updating(function ($user) {
+            $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
+            $newCoins = $user->di;
+    
+            if ($newCoins > $originalCoins) {
+                $user->new_gift = true;
+            }
+        });
+    }
+
+
+   
 }

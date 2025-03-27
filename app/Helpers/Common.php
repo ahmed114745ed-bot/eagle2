@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\NotificationTemplate;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -47,12 +48,67 @@ use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
+use App\Models\ChargeWinner;
 use Illuminate\Support\Facades\Notification;
+use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\PkWinner;
+use Modules\Events\Entities\WeeklyStar;
+use Modules\Events\Entities\Winner;
+use Illuminate\Support\Facades\Cache;
 
 class Common
 {
 
     use CalcsTrait, AdminTrait, MoneyTrait, RoomTrait, AttributesTrait, ZegoTrait, InfoTrait, FilterTrait;
+
+
+    public static function switch_events($event_type){
+
+        $avatar = null;
+
+        if ($event_type == 'pk_event') {
+
+            $event = PkEvent::PreviousEvent()->latest()->first();
+
+            if ($event) {
+                $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
+                    ->where('pk_type', 'pk-king')
+                    ->where('level', 1)
+                    ->first();
+
+                if ($pk_winner) {
+                    $avatar = $pk_winner?->user?->profile?->avatar;
+                }
+            }
+        } else if ($event_type == 'weekly_star') {
+            $event = WeeklyStar::PreviousNewEvent()->first();
+
+            if ($event) {
+                $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
+                    ->where('level', 1)
+                    ->first();
+
+                if ($weekly_star) {
+                    $avatar = $weekly_star->user->profile->avatar;
+                }
+            }
+        } else if ($event_type == 'charge_event') {
+            $now = Carbon::now();
+            $pastMonth = $now->copy()->subMonth(); // Get the past month date
+
+            $charge = ChargeWinner::with('user')
+                ->where('year', $pastMonth->year)
+                ->where('month', $pastMonth->month)
+                ->OrderBy('total_charge', 'desc')
+                ->first();
+
+            if ($charge) {
+                $avatar = $charge->user->profile->avatar;
+            }
+        }
+
+        return $avatar;
+    }
 
     public static function level_center_min($user_id)
     {
@@ -1143,4 +1199,31 @@ class Common
         }
         return true;
     }
+
+
+
+    public static function getNotificationContent(string $key, string $language = 'en', array $variables = []): array
+    {
+        $notificationData = Cache::rememberForever("notification_{$key}", function () use ($key) {
+            $notification = \App\Models\Notification::with('translations')->where('key', $key)->first();
+            return $notification ? $notification->translations->pluck('message', 'language')->toArray() : null;
+        });
+    
+        if (!$notificationData) {
+            return [
+                'title' => __('Notification'),
+                'body'  => __('No content available'),
+            ];
+        }
+    
+        $body = $notificationData[$language] ?? __('No translation available');
+    
+        foreach ($variables as $varKey => $value) {
+            $body = str_replace("{{$varKey}}", '  ' . $value, $body);
+        }
+    
+        return ['title' => __('Notification'), 'body' => $body];
+    }
+    
+
 }

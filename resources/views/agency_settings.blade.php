@@ -192,36 +192,48 @@
         </div>
         <!-- كود JavaScript -->
         <script>
-            function showSection(sectionId) {
-                //     document.querySelectorAll('.settings-section').forEach(section => {
-                //         section.classList.remove('active');
-                //     });
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to get query parameter by name
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
 
-                //     document.getElementById(sectionId).classList.add('active');
-                // }
+    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+    const activeTab = getQueryParam("firsttab") || "PercentageTarget";
 
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
-                    button.style.color = ''; // إرجاع لون النص الافتراضي
-                });
+    // Show the selected tab
+    showSection(activeTab);
+});
 
-                // إخفاء جميع الأقسام
-                document.querySelectorAll('.settings-section').forEach(section => {
-                    section.classList.remove('active');
-                });
+function showSection(sectionId) {
+    // Remove active class from all sections
+    document.querySelectorAll('.settings-section').forEach(section => {
+        section.classList.remove('active');
+    });
 
-                // إظهار القسم المطلوب
-                document.getElementById(sectionId).classList.add('active');
+    // Add active class to the selected section
+    document.getElementById(sectionId).classList.add('active');
 
-                // تحديد الزر المضغوط عليه
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+    // Reset button styles
+    document.querySelectorAll('.settings-menu button').forEach(button => {
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    });
 
-                // تعيين لون الزر من متغير CSS
-                activeButton.style.backgroundColor = 'var(--primary-color)';
-                activeButton.style.color = 'var(--text-primary-color)';
+    // Highlight the active button
+    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+    if (activeButton) {
+        activeButton.style.backgroundColor = 'var(--primary-color)';
+        activeButton.style.color = 'var(--text-primary-color)';
+    }
 
+    // Update the URL with the selected tab without reloading
+    const url = new URL(window.location);
+    url.searchParams.set("firsttab", sectionId);
+    window.history.pushState({}, "", url);
+}
 
-            }
 
             function openFullScreen(imgElement) {
                 var modal = document.getElementById("imageModal");

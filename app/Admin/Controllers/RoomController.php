@@ -37,7 +37,7 @@ class RoomController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Rooms'))
             ->body($this->detail($id)));
     }
@@ -51,7 +51,7 @@ class RoomController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Rooms'))
             ->body($this->form()->edit($id)));
     }
@@ -78,7 +78,8 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->orderByDesc('rooms.pin')
+        $grid->model()->with('owner.profile','owner:uuid,id,name',)
+            ->orderByDesc('rooms.pin')->whereHas('owner')
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
             ->orderByDesc('count_room_socket');
@@ -100,27 +101,114 @@ class RoomController extends MainController
         });
 
         $grid->id(__('ID'));
-        $grid->column('owner.name', __('room owner'))->display(function ($name) {
-            $uid = $this->owner->uuid ?? '';
-            return "$name <br> <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+        $grid->column('room_name', __('room'))->display(function ($name) {
+
+            $path = @$this->room_cover;
+            $defaultImage = asset("images/room.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <span  cursor: pointer;'>$name</span>
+                        </a>
+                    </div>
+
+                </div>
+            ";
         });
-        $grid->column('room_status')->switch(Common::getSwitchStates());
-        $grid->column('top_room')->switch(Common::getSwitchStates());
-        $grid->column('pin', __('pin'))->switch(Common::getSwitchStates());
-        $grid->column('sort_num', __('Sort Num'))->currency();
+        $grid->column('owner.name', __('room owner'))->display(function ($name) {
+            $uid = @$this->owner->uuid;
+            $path = @$this->owner?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
+
+
+        $grid->column(__('status'))->display(function () {
+            return (new \App\Admin\Actions\RoomAction(
+                $this->id,
+                $this->room_status,
+                $this->top_room,
+                $this->is_afk,
+                $this->pin
+            ))->render();
+        });
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
-            return $maxAdmin ?? $maxRoomAdmin;
+            return count($this->admins) . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
-
-        $grid->column('room_name', __('room name'));
-        $grid->column('room_cover', __('room cover'))->image('', 30);
-        $grid->column('room_intro', __('room_intro'));
-        $grid->column('microphone', __('microphone'));
         $grid->column('count_room_socket', __('Number of users'));
-        $grid->column('is_afk', __('owner in'))->switch(Common::getSwitchStates());
-        //        $grid->column('free_mic',__ ('is mic free'))->switch (Common::getSwitchStates ());
+
+        $grid->column(__('microphone'))
+            ->display(function () {
+                $ids = explode(',', $this->microphone);
+                $cachedUsers = \App\Models\User::whereIn('id', $ids)->with(['profile:user_id,avatar'])->take(6)->get(['id']);
+               
+
+                // Check if there are no users
+                if ($cachedUsers->isEmpty()) {
+                    return '';
+                }
+
+                $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+
+                foreach ($cachedUsers->take(5) as $user) {
+                    $path = $user->profile?->avatar;
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+            
+                    $html .= '
+                    <div style="position: relative; margin-left: -20px;">
+                        <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
+                    </div>';
+                }
+            
+                // Show "add" icon if more than 5 users
+                if (count($cachedUsers) > 5) {
+                    $url1 = url('admin/room-mic/' . $this->id);
+                    $arrowIcon = asset('images/add.png');
+            
+                    $html .= '
+                    <div>
+                        <a href="' . $url1 . '" 
+                           style="text-decoration: none; cursor: pointer;">
+                            <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
+                        </a>
+                    </div>';
+                }
+            
+                $html .= '</div>';
+                return $html;
+            });
+
+
+
 
         $grid->actions(function ($action) {
             $action->disableView();

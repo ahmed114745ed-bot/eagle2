@@ -101,7 +101,7 @@ class CoreWalletsController extends MainController
         $form .= '</div>'; // End container
 
         return parent::index($content
-            ->title(trans('Application Wallet'))
+            ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
     }
 

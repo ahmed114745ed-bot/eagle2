@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LanguageController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Api\V1\PackController;
 use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
+use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
@@ -42,20 +44,22 @@ use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\MusicStoreController;
 use App\Http\Controllers\Api\V1\ReportUserController;
 use App\Http\Controllers\Api\V1\UploadLinkController;
+use App\Http\Controllers\Api\V1\ChargeLevelController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
 use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\v1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
+use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
-use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\MallController as ControllersMallController;
-use App\Http\Controllers\NowPaymentsController;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -85,6 +89,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     });
 
     Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
+    Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
 
     Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
     
@@ -133,6 +138,22 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
 
+            // Route::post('/broadcasting/auth', function (Request $request) {
+            //     Log::info('broadcasting: '. json_encode($request->all()));
+            //     return Broadcast::auth($request);
+            // });
+            Route::post('/broadcasting/auth', function (Request $request) {
+                try {
+                    $authResponse = Broadcast::auth($request);
+                    // Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
+                    return $authResponse;
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'message' => $e->getMessage()],500);
+                }
+            });
+
+            Route::get('/user-gifts', [UserController::class, 'userGifts']);
+
             Route::get('user-room', [UserController::class, 'userRoom']);
 
             Route::get('/agora-rtc-token', [AgoraController::class, 'RtcToken']);
@@ -159,7 +180,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-
+            Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
@@ -288,6 +309,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
+                Route::get('/images', [GiftController::class, 'get_images']);
                 // Route::post('/send3', [GiftLogController::class, 'gift_queue_six2']);
 
                 //todo
@@ -350,6 +372,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
+            Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
             Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
@@ -460,6 +483,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
+            Route::get ('/charge-level',[ChargeLevelController::class,'chargeLevel']);
 
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
@@ -504,8 +528,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         }
     );
 
+
     Route::get('/privacy-policy', function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
+
 });
+
+
+Route::get('/languages', [LanguageController::class, 'index']);

@@ -26,6 +26,21 @@ class VipRepository extends AbstractRepository
     {
         return $this->model->where(function ($query) {
             $query->whereRaw('MOD(level + 1, 10) = 1')->orWhere('level', 1);
-        })->where('type',$type)->where('level', "!=", 0)->orderBy('level')->get();
+        })->where('type', $type)->where('level', "!=", 0)->orderBy('level')->get();
+    }
+
+    public function findByLevel($level, $type)
+    {
+        return $this->model->where("level", $level)->where('type', $type)->orderByDesc('level')->first();
+    }
+
+    public function nextLevel($level, $type)
+    {
+        return $this->model->where("type", $type)->where("level", ">", $level)->orderBy('id')->first();
+    }
+
+    public function findByType($type)
+    {
+        return $this->model->where("type", $type)->orderBy('level')->first();
     }
 }

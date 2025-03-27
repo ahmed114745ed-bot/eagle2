@@ -5,12 +5,12 @@ namespace App\Enums;
 enum PaymentType: string
 {
     case FAWRY = 'fawry';
-    case GOOGLE_PAY = 'google_pay';
+        // case GOOGLE_PAY = 'google_pay';
     case SKY_PAY = 'sky_pay';
-    case STRIP = 'strip';
+    case STRIP = 'stripe';
     case OPAY = 'opay';
-   
-    
+
+
 
 
     public static function getOptions(): array
@@ -21,6 +21,13 @@ enum PaymentType: string
     // Method to get translated options
     public static function getTranslatedOptions(): array
     {
-        return translateCategory(self::getOptions());
+        // Preserve original values as keys
+        $formattedOptions = [];
+
+        foreach (self::getOptions() as $value) {
+            $formattedOptions[$value] = str_replace('_', ' ', $value);
+        }
+
+        return translateCategory($formattedOptions);
     }
 }

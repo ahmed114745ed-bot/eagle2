@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\Setting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -52,6 +53,11 @@ class Kernel extends ConsoleKernel
     */
     protected function scheduleTimezone()
     {
-        return 'Africa/Cairo';
+        $timezone = \Cache::rememberForever('timezone', function () {
+            $setting =   Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+        
+        return $timezone;
     }
 }

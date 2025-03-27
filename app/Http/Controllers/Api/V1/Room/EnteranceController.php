@@ -49,6 +49,9 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromPusher(Request $request)
     {
+        Log::info('test old shami enter room ', [
+            $request->all()
+        ]);
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
     public function updateRoomCountFromPusher_new(Request $request)
@@ -57,11 +60,16 @@ class EnteranceController extends Controller
             $request->all()
         ]);
         // return $this->enteranceRoomService->updateRoomCountFromPusher($request);
+        //  Log::info('📌 Received Webhook Data:', [
+        //     $request->all()
+        // ]);
     }
     
 
     public function updateRoomCountFromZego(Request $request)
     {
+        $library = Common::getConfig('library');
+        if ($library == 2) return  Common::apiResponse(false, 'you used pusher');
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
     }
 

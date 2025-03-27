@@ -43,7 +43,8 @@ class CoinService
                 'user_id' => $user->id,
                 'method' => $request->pay_method,
                 'trx' => $trx,
-                'status' => 0
+                'status' => 0,
+                'coin_id' => $request->coin_id,
             ];
             $log = $this->coinLogRepository->create($dataCoinLog);
             //  DB::commit();

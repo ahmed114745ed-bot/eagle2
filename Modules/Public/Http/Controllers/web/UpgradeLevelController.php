@@ -89,7 +89,7 @@ class UpgradeLevelController extends MainController
 
     }
 
-    
+
 
     public function getLevelsRange()
     {

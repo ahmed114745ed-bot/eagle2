@@ -159,6 +159,8 @@ class UserFamilyController extends MainController
                             ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
                 });
+                $filter->equal('familyType.user_type', __('type'))->select([2 =>  __('Owner'), 1 => __('Admin'),0 => __('Member')]);
+
             });
         });
         $grid->column('id', __('Id'));
@@ -173,8 +175,29 @@ class UserFamilyController extends MainController
                 ? __("uuid") . ' : ' . $this->uuid
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
-        $grid->column('name', __('Name')); //->display(function ($value){//attribute
+        $grid->column('name', __('Name'))
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+            });
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
@@ -269,7 +292,7 @@ class UserFamilyController extends MainController
                     $color = 'gray';
                     $label = __('Unknown'); // Default label
             }
-        
+
             // Return styled label
             return "<span style='color: $color; font-weight: bold;'>$label</span>";
         });
@@ -729,6 +752,8 @@ class UserFamilyController extends MainController
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
             $form->number('total_received_level', __('Received Level'))->default(0);
+            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
+
             $form->number('salary', __('salary'))->disable();
         }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);

@@ -35,6 +35,7 @@ class NewProfileResource extends JsonResource
             'has_color_name'=>Common::hasInPack ($this->id,18,true), // both
             'age'       => @Carbon::parse ($this->profile?->birthday)->age ?? 0,
             'vip' => Common::ovip_center($this),
+            'is_friend'            => $this->isFriends(),
 
         ];
     }

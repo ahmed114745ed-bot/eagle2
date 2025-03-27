@@ -8,10 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+
     @if(!is_null($favicon = Admin::favicon()))
         <link rel="shortcut icon" href="{{$favicon}}">
     @endif
-
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/css/bootstrap.min.css") }}">
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/font-awesome/css/font-awesome.min.css") }}">
     <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/dist/css/AdminLTE.min.css") }}">
@@ -29,7 +29,11 @@
 
 <div class="login-box">
     <div class="login-logo">
-        <div><img src="{{asset('images/app-logo.png')}}" style="width: 150px;"></div>
+        @php
+        $logo = App\Models\Setting::where('key', 'app_logo')->first();
+        $logo_url = asset('uploads/settings/'. $logo?->value);
+    @endphp
+        <div><img src="{{ empty($logo)? asset('images/app-logo.png') : $logo_url}}" style="width: 150px;"></div>
         <div class="box-title">
             <a href="{{ admin_url('/') }}" style="color: var(--green-color);">{{__('dashboard.login.title')}}</a>
         </div>

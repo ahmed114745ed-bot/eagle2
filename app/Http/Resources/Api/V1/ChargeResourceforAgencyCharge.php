@@ -23,14 +23,14 @@ class ChargeResourceforAgencyCharge extends JsonResource
             'id'  => @$sender->id ?: 0,
             'uuid' => @$sender->uuid ?: '',
             'name' => @$sender->name ?: "",
-            'img' => @$sender->img ?: "",
+            'img' => @$sender->profile?->avatar?? "",
             'type' => @$this->charger_type
         ];
         $receiver_data = [
             'id'  => $receiver?->id ?: 0,
             'uuid' => @$receiver?->uuid ?: '',
             'name' => $receiver?->name ?: "",
-            'img' => $receiver?->img ?: "",
+            'img' => $receiver?->profile?->avatar?? "",
             'type' => $this->user_type
         ];
 

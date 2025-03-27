@@ -3,24 +3,37 @@
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
+use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
-use App\Admin\Controllers\VipController;
+use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\WareTabController;
+use App\Admin\Controllers\WareVipController;
+use App\Http\Controllers\SettingsController;
+use App\Admin\Controllers\LanguageController;
+use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\ChargeVipController;
+use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\AdminUsersController;
@@ -34,14 +47,20 @@ use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
+
+use App\Admin\Controllers\RoomSettingsController;
+use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\PaymentGetWayController;
 use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
+use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
@@ -58,9 +77,9 @@ use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
+use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
-use App\Admin\Controllers\AgencySettingController;
-use App\Admin\Controllers\AgencySettingsController;
+use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -121,7 +140,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::post('targe-percentage', [AddTargetToJsonController::class,'targetPercentage'])->name('target-percentage');
+        Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
 
         $router->post('ovip-config', [UpgradeLevelController::class, 'ovipConfig'])->name('ovip-config');
@@ -149,7 +168,7 @@ Route::group(
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
         $router->resource('test-test', 'TestTestController');
-
+        $router->get('profile', [AdminAuthController::class, 'index']);
         $router->resource('payment-with-method', PaymentMethodController::class);
         $router->post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
 
@@ -183,6 +202,11 @@ Route::group(
         $router->resource('user-statistics', 'UserStatisticsController');
         $router->resource('profiles', 'ProfileController');
         $router->resource('vips', 'VipController');
+        $router->get('vips-sender', [VipController::class, 'senderIndex']);
+        $router->get('vips-receiver', [VipController::class, 'receiverIndex']);
+        $router->get('vips-cp', [VipController::class, 'cpIndex']);
+        $router->get('vips-room', [VipController::class, 'roomIndex']);
+        $router->get('vips-charge', [VipController::class, 'chargeIndex']);
         $router->resource('rooms', 'RoomController', [
             'names' => [
                 'index' => 'rooms'
@@ -200,6 +224,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+        $router->resource('charge-vips', ChargeVipController::class);
         $router->resource('delete-accounts', DeleteAccountController::class);
         $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         $router->resource('test-pusher', TestPusherController::class);
@@ -214,6 +239,7 @@ Route::group(
         $router->resource('home_carousels', 'HomeCarouselController');
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
+        $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
         $router->resource('polices', PoliceController::class);
@@ -297,6 +323,20 @@ Route::group(
 
 
         $router->resource('ovip', 'OVipController');
+        $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
+
+
+            Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
+
+            Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
+            Route::prefix('ware-gift/{level}')->group(function () {
+
+                Route::get('/{type}', [OvipGiftController::class, 'create']);
+                Route::post('/', [OvipGiftController::class, 'store']);
+                Route::get('/{id}/edit', [OvipGiftController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftController::class, 'destroy'])->where('id', '[0-9]+');
+            });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -317,7 +357,9 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
+        $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
+        $router->resource('reel-settings', ReelSettingsController::class);
         $router->resource('change-level-histories', ChangeLevelHistoryController::class);
         $router->resource('levels/users', UserLevelController::class)->names([
             'index' => 'levels.users.index',
@@ -354,12 +396,17 @@ Route::group(
         $router->resource('/uuid_dedicate', 'SpecialWareDedicateController');
         $router->get('/vips_dedicate', 'DedicateVipController@index');
         $router->resource('/bans', 'BanController');
+        $router->resource('/bans-rooms', 'BanRoomsController');
+        
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
+        $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
+      //  $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+        $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
         $router->resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
@@ -372,13 +419,14 @@ Route::group(
         //             ->icon('fa-file');
         //     }));
 
-       // $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
+        // $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->resource('report-reals', ReportRealsController::class);
         $router->resource('report-moments', ReportMomentController::class);
         $router->resource('admin-users', AdminUsersController::class);
         $router->resource('parent-users', ParentUsersController::class);
         $router->resource('custom-zego-messages', CustomZegoMessageController::class);
         $router->resource('agency-settings', AgencySettingsController::class);
+        $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         $router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         $router->get('convert-is_gold', function () {
@@ -404,6 +452,23 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
+        $router->resource('languages', LanguageController::class);
+        $router->resource('settings', SettingController::class);
+        $router->resource('room-settings', RoomSettingsController::class);
+
+        $router->resource('notification-templates', NotificationsTemplatesController::class);
+       // Route::get('ware-management', [WareTabController::class, 'index']);
+      //  $router->resource('ware-management', WareTabController::class);
+      //Route::post('/ware-management/create/{type?}', [WareTabController::class, 'create']);
+      Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
+      Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::prefix('ware-management')->group(function () {
+            Route::get('/{type?}', [WareTabController::class, 'index']);
+            Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        
     }
 
 

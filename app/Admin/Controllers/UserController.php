@@ -104,6 +104,7 @@ class UserController extends MainController
 
     public function index(Content $content)
     {
+
         if (!Admin::user()->can('*')) {
             Permission::check('browse-users');
         }
@@ -207,7 +208,7 @@ class UserController extends MainController
             return new Table([__('Field Name'), __('Value')], $results);
         });
 
-
+        $grid->column('total_charge_level', __('admin.charge_level'));
 
         $grid->column('profile.avatar', __('image'))->display(function ($path) {
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -755,13 +756,15 @@ class UserController extends MainController
 
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            $form->number('di', __('Coins'))->default(0)->disable();
+            $form->number('di', __('Coins'))->default(0);
             // $form->model();
             // dd($form->getOriginal('di'));
+            // $form->display('di', __('Coins'));
 
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
             $form->number('total_received_level', __('Received Level'))->default(0);
+            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
             $form->number('salary', __('salary'))->disable();
         }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);

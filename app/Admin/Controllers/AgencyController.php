@@ -63,6 +63,11 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
+    public function profile($id, Content $content){
+        $agency = Agency::findOrFail($id);
+        return $content->title(__('agency profile'))->view('agency_profile', compact('agency'));
+    }
+
     public function update($id)
     {
         $data = request()->all();
@@ -169,8 +174,25 @@ class AgencyController extends MainController
             });
         }
         $grid->id(__('ID'));
-        $grid->column('name', trans('name'));
-        $grid->column('notice', trans('notice'));
+        $grid->column('name', __('Agency'))
+        ->display(function ($name) {
+            $path = @$this->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <span>$name</span>
+            </div>
+        ";
+        });
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
@@ -197,7 +219,39 @@ class AgencyController extends MainController
             ";
         });
 
-        $grid->column('phone', trans('phone'));
+        $grid->column('phone', trans('phone'))->display(function ($number) {
+            if (!$number) return '-';
+
+            $iconUrl = asset('images/phone.jpg'); // Adjust the path based on your actual file location
+
+            // Return an image with a WhatsApp link
+            return "<div style='display: flex; align-items: center; '>
+
+            <span>{$number} </span>
+
+              <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+        </div>";
+        });;
+        $grid->column('coins', __('coins'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+        $grid->column('salary', __('salary'))->display(function ($coin) {
+            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
         $grid->column('target', trans('target'))->display(function () {
             $target = $this->getTargetAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
             return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
@@ -249,7 +303,6 @@ class AgencyController extends MainController
             );
         });
 
-        $grid->column('img', trans('img'))->image('', 30);
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action
@@ -262,6 +315,11 @@ class AgencyController extends MainController
         $this->extendGrid($grid);
 
 
+        $grid->column('agency profile', __('agency profile'))->display(function () {
+            $url = route('admin.agency.profile', ['id' => $this->id]);
+            $name = __('agency profile');
+            return "<a href='{$url}' class='btn btn-primary btn-sm'>{$name}</a>";
+        });
 
         return $grid;
     }

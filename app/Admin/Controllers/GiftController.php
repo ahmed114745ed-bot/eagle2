@@ -104,15 +104,40 @@ class GiftController extends MainController
             $filter->expand();
         });
         $grid->id(__('ID'));
-        $grid->column('name', __('name'))->editable();
-        $grid->column('e_name', __('e_name'))->editable();
+        $grid->column('name', __('Name'))
+            ->display(function () {
+                return "ar: {$this->name} <br> en: {$this->e_name}";
+            });
+
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
-            $grid->column('price', __('price'))->editable();
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
-        } else {
-            $grid->column('price', __('price'));
         }
-        $grid->column('img', trans('image'))->image('', '50', 50);
+        $grid->column('price', __('price'))->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+        $grid->column('img', trans('image'))->display(function ($path) {
+            /** @var Gift $this */
+            $img = getImagePath($path);
+            $musicIcon = '';
+
+            if ($this->music_gift == 1) {
+                $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
+                                style='position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; 
+                                background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 5px;'>";
+            }
+
+            return "<div style='position: relative; display: inline-block;'>
+                        <img src='" . $img . "' style='width: 70px; height: 70px;' class='img img-thumbnail' />
+                        $musicIcon
+                    </div>";
+        });
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             /** @var Gift $this */
             $url = getImagePath($path);
@@ -120,9 +145,8 @@ class GiftController extends MainController
         });
         $grid->column("use_count", __('use count'));
         $grid->column('type', __('type'))->select(translate(TYPE_GIFT));
-        $grid->vip_level(__('vip_level'));
-        $grid->column('hot', trans('hot'));
-        $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
+        // $grid->vip_level(__('vip_level'));
+      //  $grid->column('is_play', trans('is_play'))->switch(Common::getSwitchStates());
 
         // $grid->column('show_img2',trans ('show_img2'))->image ('','30');
 
@@ -198,7 +222,7 @@ class GiftController extends MainController
         $form->number('luckyGift.win_probability', __('win probability'))
             ->min(10)
             ->max(100)
-            ->placeholder(__('Enter win probability'));
+            ->placeholder(__('Enter win probability')) ->attribute(['id' => 'win_probability']);
 
         $form->number('luckyGift.min_percentag', __('min percentage'))
             ->min(0)
@@ -238,11 +262,19 @@ class GiftController extends MainController
                          $('#min_percentage').closest('.form-group').show();
                          $('#mid_percentage').closest('.form-group').show();
                          $('#max_percentage').closest('.form-group').show();
-                     } else {
+                     } else if(type == '9'){
+                       $('#vip_level').closest('.form-group').show();
+                        $('#win_probability').closest('.form-group').hide();
+                         $('#min_percentage').closest('.form-group').hide();
+                         $('#mid_percentage').closest('.form-group').hide();
+                         $('#max_percentage').closest('.form-group').hide();
+                      }
+                         else {
                          $('#win_probability').closest('.form-group').hide();
                          $('#min_percentage').closest('.form-group').hide();
                          $('#mid_percentage').closest('.form-group').hide();
                          $('#max_percentage').closest('.form-group').hide();
+                         $('#vip_level').closest('.form-group').hide();
                      }
                  }
                  toggleWinProbability();
@@ -253,7 +285,7 @@ class GiftController extends MainController
              });
              SCRIPT;
         Admin::script($script);
-        $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'));
+        $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_gift_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💎');

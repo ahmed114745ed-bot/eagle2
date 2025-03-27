@@ -151,7 +151,7 @@ class BanUser extends Action
                 ];
                 $json = json_encode($ms);
                 Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
-            }else if ($route == 'rooms/up-microphone' && $user->room) {
+            } else if ($route == 'rooms/up-microphone' && $user->room) {
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
@@ -209,10 +209,12 @@ class BanUser extends Action
 
     public function html()
     {
-          return <<<HTML
-
-         <li><a href="javascript:void(0);" class="ban_user_action "><i class="fa fa-dollar text-red"></i> ban</a></li>
-     
-     HTML;
+        $banText = __('create bans'); // Laravel translation
+        return <<<HTML
+    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white" 
+       style="background-color: #28a745; border-color: #28a745; color: white;">
+        {$banText}
+    </a>
+    HTML;
     }
 }

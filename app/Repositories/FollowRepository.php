@@ -142,4 +142,9 @@ class FollowRepository
     {
         return Follow::query()->where('user_id', $followId)->where('followed_user_id', $authId)->exists();
     }
+
+    public function getFollowedUserIds($userId)
+    {
+        return Follow::where('user_id', $userId)->pluck('followed_user_id')->toArray();
+    }
 }

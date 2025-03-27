@@ -19,7 +19,11 @@ class GiftService
     {
         return $this->giftRepository->all($type);
     }
-
+    public function get_images()
+    {
+        return $this->giftRepository->get_images();
+    }
+    
     public function allGift($page, $perPage)
     {
         return $this->giftRepository->allGifts($page, $perPage);

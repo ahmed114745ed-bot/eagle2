@@ -21,8 +21,7 @@
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
 
-
-
+ 
     .btn-success {
         background: var(--success-button) !important;
         /*background: #FF9428 !important;*/
@@ -36,6 +35,10 @@
         background: var(--primary-button) !important;
         border-color: #337ab7
     }
+    .skin-black-light .content-header {
+    background: var(--second-alpha) !important;
+    box-shadow: none;
+   }
 
     input:checked+.slider {
         background: var(--primary-button) !important ;
@@ -550,6 +553,145 @@
     .dropdown-menu>li>a {
         color: var(--inverse-box-color) !important;
     }
+
+
+            .rtl {
+                direction: rtl;
+                text-align: right;
+            }
+
+            .rtl .sidebar-menu {
+                  text-align: right;
+            }
+
+            .rtl .main-sidebar {
+                right: 0;
+                left: auto;
+            }
+
+          .rtl .content-wrapper,
+            .rtl .main-footer {
+                margin-left: 0;
+                margin-right: 230px;
+            } 
+
+            .rtl .treeview-menu {
+                 padding-right: 10px;
+            }
+
+            .rtl .fa-angle-left{
+                direction: rtl;
+                left: 0px;
+            }
+            .rtl .breadcrumb {
+                direction: rtl;
+                left: 10px !important;
+                right: auto !important;
+            }
+
+            .rtl .sidebar-toggle {
+                            direction: rtl !important;
+                float: right !important;
+            }
+
+            .rtl .navbar-custom-menu {
+                float: left !important;
+            }
+
+            .rtl .main-header .logo{
+                float: right !important;
+
+            }
+            .rtl .navbar-static-top{
+                margin-left: 16px !important;
+
+            }
+
+            .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                position: absolute;
+                right: -238px;
+            }
+
+            .rtl th{
+                text-align: start;
+            }
+            .rtl .form-horizontal .row {
+                display: grid;
+                direction: rtl !important;
+                flex-direction: row-reverse !important;
+            
+            }
+
+           
+           .rtl .form-horizontal .box-footer .btn-group {
+                float: right !important; 
+            }
+            .rtl .content-wrapper-rtl{
+                margin-right: 42px !important;
+                        }
+
+
+
+
+    @media (max-width: 768px) {
+        .rtl .main-sidebar {
+            right: 0 !important;
+            left: auto !important;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .active_hide{
+            transform: translateX(1%) !important;
+
+        }
+
+        .rtl .main-sidebar.active {
+            transform: translateX(0);
+        }
+
+        .rtl .sidebar-toggle {
+            float: right !important;
+            margin-right: 10px;
+        }
+
+        .rtl .navbar-custom-menu {
+            float: left !important;
+        }
+
+        .rtl .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
+                    position: absolute;
+                    right: 0 !important;
+                }
+
+        .rtl .content-wrapper,
+        .rtl .main-footer {
+                    margin-left: 0;
+                    margin-right: auto;
+                } 
+
+            
+        .rtl .content-wrapper-rtl {
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+            margin-right: 444px !important;    width: calc(100% - 0px); 
+        }
+
+        .rtl.sidebar-open .content-wrapper-rtl {
+            margin-right: 444px !important;
+            width: calc(100% - 444px);
+        }
+
+
+            .sidebar-open .content-wrapper {
+                margin-right: 250px; 
+        }
+    }
+
+
+.rtl .sidebar-menu > li > a .fa-angle-left {
+    transform: rotate(180deg);
+}
+
 
 
 </style>

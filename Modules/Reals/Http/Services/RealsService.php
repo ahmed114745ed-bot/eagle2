@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Reals\Entities\ReportReals;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Repositories\FollowRepository;
 
 define('PAGINATION', 10);
 define('REEL_PAGINATION', 10);
@@ -77,7 +78,7 @@ class RealsService extends BaseModelService
         return $allData;
     }
 
-    public function showNew(User $user)
+    public function showNew(User $user, $filter = null)
     {
         $userId        = $user->id;
         $userInterests = $user->interests;
@@ -87,21 +88,22 @@ class RealsService extends BaseModelService
             $user->last_all_reel_id = Real::select('id')->latest()->first()?->id;
         }
         $reals = Real::query()
-        /* ->whereHas('categories', function ($query) use ($interestIds) {
-            return $query->whereIn('category_id', $interestIds);
-        }) */->with([
+   
+        ->with([
             'user' => function ($query) use ($userId) {
                 $query->withoutAppends()->isFollow($userId)->with('profile');
             }
         ])->withCount(['likes', 'comments'])
-            /* ->whereDoesntHave('likes', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
-            }) */
-            //->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
-            ->inRandomOrder($user->real_type);
+        
+        ->inRandomOrder($user->real_type);
 
+        if ($filter === 'following') {
+            
+            $followedUserIds = auth()->user()->friendsFollowedId(); // جلب معرفات الأصدقاء فقط
+            $reals->whereIn('user_id', $followedUserIds);
+        }
 
-            $countInterested   = $reals->count();
+        $countInterested   = $reals->count();
         $currentPage       = request()->page ?? 1;
         $pagination        = 10;
 
@@ -476,4 +478,44 @@ class RealsService extends BaseModelService
             'status' => 200,
         ];
     }
+
+    public function update( $reel_id, array $data)
+    {
+        $reel = Real::find($reel_id);
+
+        if (!$reel) {
+            throw new \Exception('Reel not found');
+        }
+
+        $categoriesIds = $data['categories'] ?? null;
+        $updateData = [];
+
+       
+        if (isset($data['video']) && is_file($data['video'])) {
+            $urlVideo = $this->upload($data['video']);
+            $updateData['url'] = $urlVideo;
+            $updateData['sub_video'] = $this->makeSubVideo($urlVideo, null, 'gcs');
+        
+            
+        } 
+
+
+        if (isset($data['description'])) {
+            $updateData['description'] = $data['description'];
+        }
+
+     
+        if (!empty($updateData)) {
+            $reel->update($updateData);
+        }
+
+        if ($categoriesIds) {
+            $reel->categories()->sync($categoriesIds);
+        }
+
+        return $reel;
+      
+    }
+
+    
 }

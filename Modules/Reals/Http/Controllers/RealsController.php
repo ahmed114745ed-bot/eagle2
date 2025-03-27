@@ -78,6 +78,24 @@ class RealsController extends Controller
         return Common::apiResponse(true, 'success', $collection);
     }
 
+    public function getMyReals()
+    {
+        $user_id=Auth::user()->id;
+        try {
+          
+                $user = User::query()->withoutAppends()->findOrFail($user_id);
+            
+        } catch (\Exception $e) {
+            return Common::apiResponse(false, 'user not found');
+        }
+        $reals = $this->realsService->getUserReals($user, Auth::id());
+        $collection = RealsResource::collection($reals);
+        
+        return Common::apiResponse(true, 'success', $collection);
+    }
+
+
+    
     /**
      * Display a listing of the resource.
      * @return \Illuminate\Http\JsonResponse
@@ -123,16 +141,8 @@ class RealsController extends Controller
     }
 
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+  
+  
 
     /**
      * Remove the specified resource from storage.
@@ -156,5 +166,22 @@ class RealsController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function update($real_id, Request $request)
+    {
+
+        try {
+            $result = $this->realsService->update($real_id, $request->all());
+    
+            if (!$result) {
+                return Common::apiResponse(0, 'Try later');
+            }
+    
+            return Common::apiResponse(1, 'Success', $result);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, 'Error: ' . $e->getMessage());
+        }
+
     }
 }

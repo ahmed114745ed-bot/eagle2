@@ -17,6 +17,23 @@ trait EventModel
         return Carbon::parse($value)->timezone(config('app.owner_timezone'))->copy()->toDateTimeString();
     }
 
+    public function scopePreviousNewEvent(Builder $query)
+    {
+        $timezone = config('app.owner_timezone');
+
+        // Define start and end of the week
+        $nowDate = Carbon::now($timezone)->toDateTimeString();
+
+        // 7 days ago, starting from midnight (00:00:00)
+        $weekStart = Carbon::now($timezone)->subDays(7)->startOfDay()->toDateTimeString();
+
+        return $query->whereRaw("CONVERT_TZ(end_date, '+00:00', ?) BETWEEN ? AND ?", [
+            $timezone,
+            $weekStart,
+            $nowDate
+        ]);
+    }
+
     public function getStartDateLocalAttribute()
     {
         return Carbon::parse($this->attributes['start_date'])->toDateString();

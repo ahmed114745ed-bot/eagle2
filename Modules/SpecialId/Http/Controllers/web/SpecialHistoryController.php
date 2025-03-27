@@ -70,8 +70,24 @@ class SpecialHistoryController extends AdminController
         $grid = new Grid(new SpecialHistory());
 
         $grid->column('id', __('Id'));
-        $grid->column('user.name', __('name'));
-        $grid->column('user.uuid', __('uuid'));
+        $grid->column('user.name', __('User'))->display(function () {
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return '
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="'.$url.'" alt="User Image" style="width: 40px; height: 40px;">
+                    <div>
+                        <a href="/admin/users/'.$this->user_id.'" style="text-decoration: none; color:rgb(253, 253, 253); font-weight: bold;">'.$this->user?->name.'</a>
+                        <div style="font-size: 12px; color: #fff;">' .'Uuid: '.$this->user?->uuid.'</div>
+                    </div>
+                </div>
+            ';
+        });
         $grid->column('ware.show_img', __('image'))->image('', 50);
         $grid->column('status', __('status'))->display(function ($status) {
          // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
@@ -79,7 +95,7 @@ class SpecialHistoryController extends AdminController
                 "></span>" : "<span class='label-warning' " .'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"'.
                 "></span>";
         });
-        
+
         $grid->column('created_at', trans('admin.created_at'))->diffForHumans ();
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();

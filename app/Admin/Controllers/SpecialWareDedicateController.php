@@ -75,7 +75,15 @@ class SpecialWareDedicateController extends MainController
         $grid->model()->whereNotNull('get_type')->where('type', '=', 25);
 
         $grid->id('ID');
-        $grid->column('price', __('price'))->currency();
+        $grid->column('price', __('price'))->currency()->display(function ($coin) {
+            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                  <span>" . number_format((int)$coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+                </div>
+            ";
+        });
         // $grid->column('show_img', __('show_img'))->display(function ($path) {
         //     /** @var Ware $this */
         //     $defaultImage = asset("images/ware-image.jpg");
