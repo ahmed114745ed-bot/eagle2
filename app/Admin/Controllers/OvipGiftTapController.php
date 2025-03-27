@@ -106,6 +106,7 @@ class OvipGiftTapController extends MainController
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
+            $level = $level ?? request('level');
             $url =    url('admin/ware-gift/' . $level . '/' . $type);
             $add = __('add');
 
