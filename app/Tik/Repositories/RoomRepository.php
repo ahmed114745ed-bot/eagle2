@@ -81,6 +81,7 @@ class RoomRepository extends AbstractRepository
 
     public function all($req, $ids = [])
     {
+        $roomType = $req->room_type ?? 'audio';
 
         $user = $req?->user();
         $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
@@ -202,7 +203,9 @@ class RoomRepository extends AbstractRepository
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
-        return $result->paginate(10);
+        return $result->when($roomType, function ($q) use ($roomType) {
+            $q->where('type', $roomType);
+        })->paginate(10);
     }
 
 
