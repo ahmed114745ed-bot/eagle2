@@ -28,9 +28,9 @@ class RequestBackgroundImageController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('request-background-image'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
