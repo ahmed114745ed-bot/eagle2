@@ -105,7 +105,9 @@ class ChargeAction extends Action
 
             $user->di += $amount;
             $user->save();
-
+            if ($request->charge_type == "increment") {
+                CustomNotification::chargeAction($user, $request);
+            }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
