@@ -28,3 +28,13 @@ jobs:
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           docker build -t tempo:${{ github.sha }} .
           docker service update --image tempo:${{ github.sha }} tempo-app
+          # check again
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
