@@ -198,18 +198,14 @@ class WareTabController extends MainController
         $form->select('get_type', trans('get_type'))->options(
             translate(GET_TYPE_WARE)
         )->default(4);
-        if ($form->isCreating()) {
+        if (\Str::contains(request()->fullUrl(), 'create')) {
             $form->hidden('type', __('type'))->value(request('type'))->attribute(['id' => 'type']);
         }else{
             $form->select('type', trans('type'))->options(
                 translate(TYPE_WARE)
             )->attribute(['id' => 'type'])->rules('required');
         }
-        //        ->rules (function ($form){
-        //            if (!$id = $form->model()->id) {
-        //                return 'required';
-        //            }
-        //        });
+
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
