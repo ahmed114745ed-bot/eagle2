@@ -31,12 +31,12 @@ class VipController extends MainController
         (new AppFeatureService)->validateStatusEnable("vips");
     }
 
-    public function index(Content $content)
-    {
-        return $content
-            ->title(trans('charge level'))
-            ->body($this->grid());
-    }
+    // public function index(Content $content)
+    // {
+    //     return $content
+    //         ->title(trans('charge level'))
+    //         ->body($this->grid());
+    // }
     public function senderIndex(Content $content){
         return $content
         ->title(trans('charge level'))
