@@ -95,8 +95,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $appName = Setting::where('key','app_title')->first();
-        config(['app.name' => $appName->value ?? 'Default']);
+        // $appName = Setting::where('key','app_title')->first();
+        // config(['app.name' => $appName->value ?? 'Default']);
 
         Schema::defaultStringLength(191);
         User::observe (UserObserver::class);
@@ -127,12 +127,12 @@ class AppServiceProvider extends ServiceProvider
 
         }
 
-        $enabledLanguages = Cache::rememberForever('languages', function () {
-            return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
-        });
-        Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
+        // $enabledLanguages = Cache::rememberForever('languages', function () {
+        //     return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
+        // });
+        // Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
         if (!Cache::has('app_title')) {
-            Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
+            // Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
         }
         $appTitle = Cache::get('app_title', 'Default Title');
         Config::set('admin.logo', $appTitle);
