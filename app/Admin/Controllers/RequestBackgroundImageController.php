@@ -83,7 +83,7 @@ class RequestBackgroundImageController extends MainController
     {
         $grid = new Grid(new RequestBackgroundImage);
         $grid->model()->orderByDesc('id');
-
+dd($grid->model()->count());
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
