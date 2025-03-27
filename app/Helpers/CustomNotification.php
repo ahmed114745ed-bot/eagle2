@@ -397,7 +397,7 @@ class CustomNotification
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['coins'] = $request->amount;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'charge-action-notifaction');
-        Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
+        Common::sendOfficialMessage($user->id,  title:$body_en,  titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
