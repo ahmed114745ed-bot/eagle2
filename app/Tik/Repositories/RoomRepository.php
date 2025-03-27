@@ -203,7 +203,7 @@ class RoomRepository extends AbstractRepository
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
-        return $result->when($roomType, function ($q) use ($roomType) {
+        return $result->when($roomType != 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
         })->when($roomType == 'live', function ($q) use ($roomType) {
              $q->whereIn('type', ['single_live', 'multi_live']);
