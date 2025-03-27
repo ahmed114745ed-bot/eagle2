@@ -41,6 +41,7 @@ class OvipGiftTapController extends MainController
 
         return parent::index($content
             ->title(trans('Privileges'))
+            ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->tabsComponent($ovip->privilegs));
             })
