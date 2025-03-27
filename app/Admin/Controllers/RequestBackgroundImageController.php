@@ -19,7 +19,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class RequestBackgroundImageController extends MainController
 {
     use HasResourceActions;
-  //  public $permission_name = 'background-image-request';
+    public $permission_name = 'background-image-request';
 
     /**
      * Index interface.
@@ -27,12 +27,12 @@ class RequestBackgroundImageController extends MainController
      * @param Content $content
      * @return Content
      */
-    // public function index(Content $content)
-    // {
-    //     return $content
-    //         ->title(trans('request-background-image'))
-    //         ->body($this->grid());
-    // }
+    public function index(Content $content)
+    {
+        return $content
+            ->title(trans('request-background-image'))
+            ->body($this->grid());
+    }
 
     /**
      * Show interface.
