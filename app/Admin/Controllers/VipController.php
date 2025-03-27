@@ -257,6 +257,7 @@ class VipController extends MainController
         $grid->model()->orderByDesc('type')->orderBy('exp');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
+            $filter->expand();
             $filter->where(function ($query) {
                 switch ($this->input) {
                     case 'sender':
