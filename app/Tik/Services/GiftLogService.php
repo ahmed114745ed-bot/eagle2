@@ -249,7 +249,7 @@ class GiftLogService
                 'room_id'          => $room->id,
                 'from_name'        => $user->name,
                 'to_name'          => $toName,
-                'gift_price'       => $gift->price,
+                'gift_price'       => $totalPrice,
                 'owner_id'         => $ownerId,
                 'number'           => $number,
                 'coins'            => $user->coins_string,
