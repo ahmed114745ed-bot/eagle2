@@ -715,10 +715,7 @@
                 <img class="modal-content" id="fullImage">
             </div>
             <script>
-
-
-                $(document).ready(function() {
-
+                $(document).ready(function () {
                     function updateLibrary(selectedLibrary) {
                         $.ajax({
                             url: "{{ route('admin.update-agora-zego') }}",
@@ -727,47 +724,49 @@
                                 _token: "{{ csrf_token() }}",
                                 library: selectedLibrary
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 console.log("Library updated via AJAX:", response);
                                 toastr.success('Library preference saved!');
                             },
-                            error: function(xhr) {
+                            error: function (xhr) {
                                 console.error("AJAX Error:", xhr.responseText);
                                 toastr.error('Failed to update library');
                             }
                         });
                     }
 
-                    // Event listener for radio button changes
-                    $(document).on('change', '.libraryRealTime', function() {
+                    function updateSwitches() {
+                        $(".custom-radio").each(function () {
+                            if ($(this).prop("checked")) {
+                                $(this).next(".switch").addClass("active");
+                            } else {
+                                $(this).next(".switch").removeClass("active");
+                            }
+                        });
+                    }
+
+                    // عند تغيير الراديو، نحدث الواجهة
+                    $(document).on("change", ".libraryRealTime", function () {
                         let selectedLibrary = $(this).val();
                         console.log("Selected library:", selectedLibrary);
                         updateLibrary(selectedLibrary);
+                        updateSwitches();
                     });
 
-                    $(".custom-radio").each(function() {
-                        if ($(this).prop("checked")) {
-                            $(this).next(".switch").addClass("active");
-                        }
-                    });
-
-                    $(".switch").click(function() {
+                    $(".switch").click(function () {
                         let radio = $(this).prev(".custom-radio");
 
                         if (!radio.prop("checked")) {
                             $(".custom-radio").prop("checked", false);
                             $(".switch").removeClass("active");
 
-                            radio.prop("checked", true);
-                            $(this).addClass("active");
+                            radio.prop("checked", true).trigger("change");
                         }
                     });
 
-                    $(".custom-radio").change(function() {
-                        $(".switch").removeClass("active");
-                        $(this).next(".switch").addClass("active");
-                    });
+                    updateSwitches(); 
                 });
+
             </script>
 
             <!-- كود JavaScript -->
