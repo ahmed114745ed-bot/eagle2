@@ -15,7 +15,10 @@ class RecevingReportResource extends JsonResource
         if ($this->charger_type == 'dash') {
             $name = $this->admin->name ?? '';
             $image = $this->admin->avatar ?? '';
-            $uuid = $this->sender->uuid ?? '';
+            // $uuid = $this->sender->uuid ?? '';
+            $uuid ='';
+            // dd($uuid);
+
         } else {
             $name = $this->sender->name ?? '';
             $image = $this->sender->profile->avatar ?? '';
