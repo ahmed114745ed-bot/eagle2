@@ -683,8 +683,9 @@
                         <div class="col-md-6">
                             <div class="form-group" id="background_color_group">
                                 <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" class="form-control" 
-                                    onchange="updateBackgroundValue()">
+                                <input type="color" id="background_color" name="background_color" class="form-control" 
+                                value="{{ $settings['background_color'] ?? '#ffffff' }}"
+                                onchange="updateBackgroundValue()">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -893,7 +894,7 @@
                         resetAppButton.addEventListener('click', function() {
             // Reset color inputs
             document.getElementById('app_primary_color').value = "#32e5ac";
-            document.getElementById('second_color').value = "#32e5ac";
+            document.getElementById('second_color').value = "#003FA6";
             
             // Reset background (assuming you want color background)
             document.getElementById('background_type').value = "color";
