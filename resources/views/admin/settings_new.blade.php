@@ -567,7 +567,7 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="agoraRadio" class="custom-radio" name="library" value="0"
+                                            <input type="radio" id="agoraRadio" class="custom-radio libraryRealTime" name="library" value="0"
                                                 {{ $library == '0' ? 'checked' : '' }}>
                                             <label for="agoraRadio" class="switch"></label>
                                         </div>
@@ -591,7 +591,7 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="zegoRadio" class="custom-radio" name="library" value="1"
+                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime" name="library" value="1"
                                                 {{ $library == '1' ? 'checked' : '' }}>
                                             <label for="zegoRadio" class="switch"></label>
                                         </div>
@@ -625,7 +625,7 @@
 
 
                         </div>
-                        <div class="row">
+                        {{-- <div class="row">
                             <!-- Pusher Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto" >
                                 <div class="card p-3 shadow" style="height: 200px;">
@@ -640,7 +640,7 @@
                                     <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                 </form>
             </div>
@@ -711,7 +711,36 @@
                 <img class="modal-content" id="fullImage">
             </div>
             <script>
+
+
                 $(document).ready(function() {
+
+                    function updateLibrary(selectedLibrary) {
+                        $.ajax({
+                            url: "{{ route('admin.update-agora-zego') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                library: selectedLibrary
+                            },
+                            success: function(response) {
+                                console.log("Library updated via AJAX:", response);
+                                toastr.success('Library preference saved!');
+                            },
+                            error: function(xhr) {
+                                console.error("AJAX Error:", xhr.responseText);
+                                toastr.error('Failed to update library');
+                            }
+                        });
+                    }
+
+                    // Event listener for radio button changes
+                    $(document).on('change', '.libraryRealTime', function() {
+                        let selectedLibrary = $(this).val();
+                        console.log("Selected library:", selectedLibrary);
+                        updateLibrary(selectedLibrary);
+                    });
+
                     $(".custom-radio").each(function() {
                         if ($(this).prop("checked")) {
                             $(this).next(".switch").addClass("active");
