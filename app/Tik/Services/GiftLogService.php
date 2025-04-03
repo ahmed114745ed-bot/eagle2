@@ -311,6 +311,8 @@ class GiftLogService
 
                 ]
             ];
+            Log::info('this is wares : ' . json_encode( $d));
+            Log::info('123');
             $json = json_encode($d);
             $jsons[] = $json;
         }
