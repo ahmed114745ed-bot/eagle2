@@ -31,7 +31,7 @@
     <div class="login-logo">
         @php
         $logo = App\Models\Setting::where('key', 'app_logo')->first();
-        $logo_url = asset('uploads/settings/'. $logo?->value);
+        $logo_url = $logo?->value;
     @endphp
         <div><img src="{{ empty($logo)? asset('images/app-logo.png') : getImagePath($logo_url)}}" style="width: 150px;"></div>
         <div class="box-title">
