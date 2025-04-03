@@ -432,22 +432,28 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label> {{ __('Application logo:') }}</label>
-                                <input type="file" name="app_logo" class="form-control">
-                                @if (!empty($settings['app_logo']))
-                                    <img src="{{ getImagePath($settings['app_logo']) }}" width="100" class="mt-2"
-                                        onclick="openFullScreen(this)">
-                                @endif
+                                <label>{{ __('Application logo:') }}</label>
+                                <input type="file" name="app_logo" class="form-control" onchange="previewImage(event)">
+                        
+                                <!-- Image Preview -->
+                                <img id="imagePreview" 
+                                     src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}" 
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label> {{ __('Application Fav Icon:') }}</label>
-                                <input type="file" name="app_fav_icon" class="form-control">
-                                @if (!empty($settings['app_fav_icon']))
-                                    <img src="{{ getImagePath($settings['app_fav_icon']) }}" width="100"
-                                        class="mt-2" onclick="openFullScreen(this)">
-                                @endif
+                                <label>{{ __('Application Fav Icon:') }}</label>
+                                <input type="file" name="app_fav_icon" class="form-control" onchange="previewFavIcon(event)">
+                        
+                                <!-- Image Preview -->
+                                <img id="favIconPreview" 
+                                     src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}" 
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
                             </div>
                         </div>
 
@@ -772,6 +778,33 @@
 
             <!-- كود JavaScript -->
             <script>
+
+                function previewImage(event) {
+                    let file = event.target.files[0];
+                    if (file) {
+                        let reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('imagePreview');
+                            preview.src = e.target.result; // Update preview with new image
+                            preview.style.display = 'block'; // Show image
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                function previewFavIcon(event) {
+                    let file = event.target.files[0];
+                    if (file) {
+                        let reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('favIconPreview');
+                            preview.src = e.target.result; // Update preview with new image
+                            preview.style.display = 'block'; // Show image
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+
                 document.addEventListener("DOMContentLoaded", function() {
                     // Function to get query parameter by name
                     function getQueryParam(name) {
