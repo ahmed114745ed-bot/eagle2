@@ -75,6 +75,24 @@ if (!function_exists('check')) {
     }
 }
 
+if (!function_exists('checkStoredProcedureExists')) {
+    function checkStoredProcedureExists($procedureName)
+    {
+        $databaseName = config('database.connections.mysql.database'); // Get the database name from the environment file
+
+        $result = \DB::select(
+            'SELECT COUNT(*) as count
+        FROM information_schema.ROUTINES
+        WHERE ROUTINE_TYPE = ?
+        AND ROUTINE_SCHEMA = ?
+        AND ROUTINE_NAME = ?',
+            ['PROCEDURE', $databaseName, $procedureName]
+        );
+
+        return $result[0]->count > 0;
+    }
+}
+
 if (!function_exists('human_file_size')) {
     function human_file_size($bytes, $decimals = 2)
     {
