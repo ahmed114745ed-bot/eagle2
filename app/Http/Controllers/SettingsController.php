@@ -32,7 +32,7 @@ class SettingsController extends Controller
                 $image = Common::upload('images', $request->file($key));
                 $value = $image;
             }
-          
+        //  dd($request->app_primary_color,$request->app_second_color);
             
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);

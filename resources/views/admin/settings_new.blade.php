@@ -659,14 +659,14 @@
                             <div class="form-group">
                                 <label for="primary_color">{{ __('Primary Color') }}</label>
                                 <input type="color" id="app_primary_color" name="app_primary_color"
-                                    value="#3498db" class="form-control">
+                                    value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="second_color">{{ __('Second Color') }}</label>
-                                <input type="color" id="second_color" name="app_second_color" value="#2ecc71"
+                                <input type="color" id="second_color" name="app_second_color" value="{{ $settings['app_second_color'] ?? '#2ecc71' }}"
                                     class="form-control">
                             </div>
                         </div>
@@ -683,7 +683,7 @@
                         <div class="col-md-6">
                             <div class="form-group" id="background_color_group">
                                 <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" class="form-control"
+                                <input type="color" id="background_color" class="form-control" 
                                     onchange="updateBackgroundValue()">
                             </div>
                         </div>
@@ -698,7 +698,11 @@
 
                         <input type="hidden" id="app_background" name="app_background">
 
-                        <button type="submit" class="btn btn-primary mt-3">{{ __('Save Settings') }}</button>
+                        <div class="col-12 d-flex gap-3 mt-3">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                            <button type="button" id="resetAppColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                        </div>
 
                     </div>
                 </form>
@@ -884,6 +888,27 @@
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');
+                    let resetAppButton = document.getElementById('resetAppColors');
+
+                    if (resetAppButton) {
+                        resetAppButton.addEventListener('click', function() {
+            // Reset color inputs
+            document.getElementById('app_primary_color').value = "#32e5ac";
+            document.getElementById('second_color').value = "#32e5ac";
+            
+            // Reset background (assuming you want color background)
+            document.getElementById('background_type').value = "color";
+            document.getElementById('background_color').value = "#32e5ac";
+            document.getElementById('app_background').value = "#32e5ac";
+            
+            // Show the correct background input group
+            document.getElementById('background_color_group').style.display = 'block';
+            document.getElementById('background_image_group').style.display = 'none';
+            
+            // Submit the form
+            document.querySelector('#appSettings form').submit();
+                        });
+                    }
 
                     if (resetButton) {
                         resetButton.addEventListener('click', function() {
