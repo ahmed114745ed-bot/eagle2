@@ -62,7 +62,7 @@ class SendGiftToZegoJob implements ShouldQueue
                     'isExpensive' => $this->totalPrice >= 2000,
                     'num_gift'    => $zigoData['number'],
                     "plural"      => $zigoData['plural'],
-                    'gift_price'  => $zigoData['room_session'],
+                    'gift_price'  => $this->totalPrice,
                     'coins'  => @$zigoData['coins'] ?? '0',
 
                 ]
