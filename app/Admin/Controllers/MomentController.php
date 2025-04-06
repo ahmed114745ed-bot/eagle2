@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\MomentGallery;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -107,14 +108,21 @@ class MomentController extends MainController
     $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
     // 🔹 **عرض الصورة في مودال**
+    // $grid->column('img', __('Image'))->display(function () {
+    //     $img = $this->img;
+    //     if (!$img) return 'No image found';
+
+    //     $imgUrl = getDriverUrl() . '/' . $img;
+    //     return "<a href='#' class='view-image' data-img='$imgUrl'><img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'></a>";
+    // });
     $grid->column('img', __('Image'))->display(function () {
-        $img = $this->img;
-        if (!$img) return 'No image found';
-
-        $imgUrl = getDriverUrl() . '/' . $img;
-        return "<a href='#' class='view-image' data-img='$imgUrl'><img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'></a>";
+        $imgUrl = asset("images/moment.jpg"); // Image from public directory or storage
+        $viewUrl = url('admin/moment-gallery/' . $this->id); // The route for viewing the image
+    
+        return "<a href='$viewUrl'>
+                    <img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'>
+                </a>";
     });
-
     return $grid;
 }
 
@@ -206,5 +214,15 @@ class MomentController extends MainController
         $form->image('img', __('Img'));
 
         return $form;
+    }
+
+    public function momentGallery(Content $content,$id)
+    {
+       $galleries = MomentGallery::where('moment_id',$id)->get();
+        return $content
+            ->header(__('images'))
+            ->description('')
+
+            ->body(view('momentGallery', compact('galleries')));
     }
 }

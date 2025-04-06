@@ -357,6 +357,7 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
+        $router->get('moment-gallery/{id}', [MomentController::class,'momentGallery']);
         $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
         $router->resource('reel-settings', ReelSettingsController::class);
