@@ -290,6 +290,10 @@
                             flipHorizontal: true,
                             flipVertical: true,
                         },
+                        // Disable fullscreen
+                        fullscreen: false,
+                        transition: false,
+                    });
                         viewed() {
                             viewer.toolbar.querySelector('.viewer-play').click();
                         },
