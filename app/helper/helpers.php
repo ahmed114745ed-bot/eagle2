@@ -377,7 +377,7 @@ if (!function_exists('handleShowImageWithTypes')) {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
-
+return $model;
             return "<div id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
