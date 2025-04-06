@@ -651,8 +651,12 @@
                 left: 107px;
 
             }
+            .rtl .wallet_posation{
+                position: absolute;
 
+            }
 
+            
 
     @media (max-width: 768px) {
         .rtl .main-sidebar {
