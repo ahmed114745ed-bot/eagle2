@@ -152,7 +152,6 @@ class UserController extends MainController
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
-                $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
                 $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
@@ -160,6 +159,7 @@ class UserController extends MainController
                         $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+                    $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
                 });
             });
         });
