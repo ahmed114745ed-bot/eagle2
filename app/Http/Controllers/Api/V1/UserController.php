@@ -15,6 +15,7 @@ use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
@@ -1067,6 +1068,13 @@ class UserController extends Controller
     {
         $data = $this->userService->online();
         return Common::apiResponse(true, 'done', OnlineResource::collection($data));
+    }
+
+    public function friends(): JsonResponse
+    {
+        $friends = $this->userService->friends();
+
+        return Common::apiResponse(true, 'done', UserResource::collection($friends));
     }
 
     public function sendPack(Request $request)
