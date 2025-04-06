@@ -451,23 +451,7 @@ if (!function_exists('showSvgaImage')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-        Admin::script("
-        document.addEventListener('DOMContentLoaded', function() {
-            var modelElement = document.getElementById('$model');
-            modelElement.style.width = '50px !important'; // Set div width to 50px with !important
-            modelElement.style.height = '50px !important'; // Set div height to 50px with !important
-
-            // Select the canvas element inside the div
-            var canvasElement = modelElement.querySelector('canvas');
-            if (canvasElement) {
-                canvasElement.width = 50; // Set canvas width to 50px
-                canvasElement.height = 50; // Set canvas height to 50px
-                canvasElement.style.width = '50px !important'; // Ensure canvas width is 50px
-                canvasElement.style.height = '50px !important'; // Ensure canvas height is 50px
-                canvasElement.style.transform = 'none !important'; // Remove any transform scaling with !important
-            }
-        });
-    ");
+    
         Admin::script("
                     var $model = new SVGA.Player('#$model');
                     $model.loops = 100;
@@ -490,7 +474,13 @@ if (!function_exists('showSvgaImage')) {
                         $model2.load('$url', function(videoItem) {
                             $model.setVideoItem(videoItem);
                             $model.startAnimation();
-
+                              var canvasElement = document.querySelector('#$model canvas');
+                                
+                                if (canvasElement) {
+                                    canvasElement.style.width = '50px !important'; // Force width to 50px
+                                    canvasElement.style.height = '50px !important'; // Force height to 50px
+                                    canvasElement.style.transform = 'none !important'; // Remove any scaling transform
+                                }
                             $model.onFinished(function() {
                                 // Code for when the animation finishes
                             });
