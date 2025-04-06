@@ -1937,5 +1937,19 @@
     "moments": "اللحظات",
     "Reels": "المقاطع",
     "Submit": "إرسال",
-    "Salary Distribution Ratio": "نسبة توزيع الرواتب"
+    "Salary Distribution Ratio": "نسبة توزيع الرواتب",
+    "Change Status Admin": "تغيير حالة المشرف",
+    "agency join requests": "طلبات انضمام الوكالة",
+    "request-agencies": "وكالات الطلبات",
+    "Reel": "مقطع قصير",
+    "Payment Methods for Charging Agentsadmin-users": "طرق الدفع لوكلاء الشحن - مستخدمو لوحة التحكم",
+    "Photo": "صورة",
+    "Agency Count": "عدد الوكالات",
+    "admin-users": "مستخدمو لوحة التحكم",
+    "managers": "المديرون",
+    "Gifts": "الهدايا",
+    "exchanges": "التحويلات",
+    "custom-page": "صفحة مخصصة",
+    "daily-gift-types": "أنواع الهدايا اليومية"
+
 }

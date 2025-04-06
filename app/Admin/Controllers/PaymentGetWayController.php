@@ -23,7 +23,7 @@ class PaymentGetWayController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('Payment Methods for Charging Agentsadmin-users'))
+            ->title(__('Payment Methods for Charging Agentsadmin-users'))
             ->body($this->grid());
     }
 
