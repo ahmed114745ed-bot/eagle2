@@ -1660,6 +1660,14 @@ class RoomController extends Controller
         }
     }
 
+    public function commentStatus($roomId): JsonResponse
+    {
+        $result = $this->roomService->commentStatus($roomId);
+
+        $message = ($result == 1) ? 'comment_opened' : 'comment_closed';
+
+        return Common::apiResponse(true, "messages.$message", [], 200);
+    }
     protected function addBlock(Request $request)
     {
         $validator = Validator::make($request->all(), [

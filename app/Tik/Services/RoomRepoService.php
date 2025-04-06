@@ -161,7 +161,7 @@ class RoomRepoService
 
             $room->update(['is_live' => false]);
 
-          
+
         }
         /* if ($room->count_room_socket > 0) {
             $room->count_room_socket -= 1;
@@ -343,6 +343,11 @@ class RoomRepoService
     public function userRooms($userId)
     {
         return  $this->repository->roomUsers($userId);
+    }
+
+    public function commentStatus($roomId): bool
+    {
+        return  $this->repository->commentStatus($roomId);
     }
 
     public function index2()
