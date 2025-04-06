@@ -17,6 +17,7 @@ use App\Models\Background;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class EnteranceController extends Controller
         //     $request->all()
         // ]);
     }
-    
+
 
     public function updateRoomCountFromZego(Request $request)
     {
@@ -241,7 +242,7 @@ class EnteranceController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function enter_room(Request $request)
+    public function enter_room(Request $request): JsonResponse
     {
         $room_pass = $request['room_pass'];
         $owner_id  = $request['owner_id'];
@@ -495,7 +496,7 @@ class EnteranceController extends Controller
             if ($request->mode) {
                 $room->mode = $request->mode;
             }
-            
+
             if ($request->room_type) {
                 if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
                 $room->room_type = $request->room_type;

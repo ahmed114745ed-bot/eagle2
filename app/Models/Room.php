@@ -25,6 +25,7 @@ class Room extends Model
     protected $appends = ['lang', 'country'];
     protected $casts = [
         'is_pk' => 'boolean',
+        'is_comment_closed'=> 'boolean',
     ];
     //    protected $attributes = ['room_background'];
 
@@ -282,7 +283,7 @@ class Room extends Model
     protected function  getAdminsAttribute()
     {
        return explode(',', $this->room_admin);
-       
+
     }
 
 }
