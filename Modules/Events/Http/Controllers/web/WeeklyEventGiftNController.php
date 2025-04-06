@@ -40,11 +40,12 @@ class WeeklyEventGiftNController extends MainOldController
     {
         $url = url('/admin/weekly-events-new'); // Define your button URL
         $translation = __(' back');
+
         $buttonHTML = <<<HTML
-    <a href="{{ $url }}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
-         <i class="fa fa-arrow-left"></i>{$translation}
-       </a>
-    HTML;
+        <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
+            <i class="fa fa-arrow-left"></i> {$translation}
+        </a>
+        HTML;
         return $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
