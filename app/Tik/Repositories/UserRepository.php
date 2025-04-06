@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 
@@ -376,6 +377,13 @@ class UserRepository extends AbstractRepository
     public function allUsersPlay()
     {
         return $this->model->whereNotNull('game_id')->where('online', 1)->with('nowGame')->paginate(10);
+    }
+
+    public function friends(): LengthAwarePaginator
+    {
+        $user = $this->model->where('id', auth()->id())->firstOrFail();
+
+        return $user->friends()->where('online', 1)->paginate(request('per_page'));
     }
 
     public function online()

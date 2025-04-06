@@ -246,6 +246,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
+                Route::get('/friends', [UserController::class, 'friends']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);

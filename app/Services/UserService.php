@@ -14,6 +14,7 @@ use App\Facades\UserHandling;
 use App\Http\Services\WhatsappOtp;
 use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
@@ -997,6 +998,11 @@ class UserService
     public function online()
     {
         return $this->userRepository->online();
+    }
+
+    public function friends(): LengthAwarePaginator
+    {
+        return $this->userRepository->friends();
     }
 
     public function sendPack($user, $request)
