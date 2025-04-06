@@ -454,11 +454,18 @@ if (!function_exists('showSvgaImage')) {
         Admin::script("
         document.addEventListener('DOMContentLoaded', function() {
             var modelElement = document.getElementById('$model');
-            modelElement.style.width = '50px'; // Set width to 50px
-            modelElement.style.height = '50px'; // Set height to 50px
+            modelElement.style.width = '50px !important'; // Set div width to 50px with !important
+            modelElement.style.height = '50px !important'; // Set div height to 50px with !important
+
+            // Select the canvas element inside the div
             var canvasElement = modelElement.querySelector('canvas');
-            canvasElement.width = 50; // Set canvas width to match the container
-            canvasElement.height = 50; // Set canvas height to match the container
+            if (canvasElement) {
+                canvasElement.width = 50; // Set canvas width to 50px
+                canvasElement.height = 50; // Set canvas height to 50px
+                canvasElement.style.width = '50px !important'; // Ensure canvas width is 50px
+                canvasElement.style.height = '50px !important'; // Ensure canvas height is 50px
+                canvasElement.style.transform = 'none !important'; // Remove any transform scaling with !important
+            }
         });
     ");
         Admin::script("
