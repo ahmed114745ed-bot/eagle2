@@ -1832,5 +1832,6 @@
     "tickets":"الشكاوي",
     "Enter the reason for the ban(arabic)": "أدخل سبب الحظر (بالعربية)",
     "Enter the reason for the ban(english)": "أدخل سبب الحظر (بالإنجليزية)",
-    "duration(hours)": "المدة (بالساعات)"
+    "duration(hours)": "المدة (بالساعات)",
+    "charges-reports":"تقارير الشحن"
 }
