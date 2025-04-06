@@ -551,7 +551,7 @@
                             @foreach ($timezones as $timezone)
                                 <option value="{{ $timezone->name }}"
                                     {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
-                                    {{ $timezone->name }}
+                                    {{ $timezone->name }} ({{ $timezone->offset }})
                                 </option>
                             @endforeach
                         </select>
