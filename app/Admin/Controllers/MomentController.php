@@ -158,7 +158,7 @@ class MomentController extends MainController
         $html .= '</div>';
     
         // Show only the first image
-        $firstImageUrl = getDriverUrl() . '/' . $galleries->first()->image;
+        $firstImageUrl = asset("images/moment.jpg");
     
         $html .= '<img src="' . $firstImageUrl . '" 
                       style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
