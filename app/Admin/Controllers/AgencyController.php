@@ -253,9 +253,9 @@ class AgencyController extends MainController
             ";
         });
         $grid->column('target', trans('target'))->display(function () {
-            $target = $this->getTargetAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
+            $target = $this->getTargetsAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
            
-            return (@$target?->sallary >= 1) ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
+            return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>" : "";
         });
         $grid->column('members', __('members'))->expand(function ($model) {
