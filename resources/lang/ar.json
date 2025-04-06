@@ -188,6 +188,7 @@
     "coin": "كوينز",
     "contact": "التواصل",
     "price": "السعر",
+    "Price": "السعر",
     "expire": "الصلاحية",
     "users": "المستخدمين",
     "has_label": "يملك فقرة نصية؟",
@@ -1745,6 +1746,7 @@
     "Unknown": "غير معروف",
     "family": "العائلة",
    "Publish at": "النشر في",
+   "Publish Now": "النشر الان",
     "Is active": "نشط",
     "frozen" :"تجميد الشحن",
     "Max Admin": "أعلى عدد للمديرين",
@@ -1833,5 +1835,7 @@
     "Enter the reason for the ban(arabic)": "أدخل سبب الحظر (بالعربية)",
     "Enter the reason for the ban(english)": "أدخل سبب الحظر (بالإنجليزية)",
     "duration(hours)": "المدة (بالساعات)",
-    "charges-reports":"تقارير الشحن"
+    "charges-reports":"تقارير الشحن",
+    "form":"الهيكل",
+    "Image url":"الصورة "
 }
