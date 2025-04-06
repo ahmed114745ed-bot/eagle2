@@ -149,14 +149,9 @@ class UserController extends MainController
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
 
-                $filter->equal('is_host', __('is host'))->select([0 => 'normal', 1 => 'host']);
-            });
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
                 $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
-                $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
 
                 $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
@@ -164,6 +159,7 @@ class UserController extends MainController
                         $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+                    $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
                 });
             });
         });

@@ -23,7 +23,8 @@ class DatabaseSeeder extends Seeder
         // $this->call(AdminRoleUserSeeder::class);
         // $this->call(ConfigsSeeder::class);
         // $this->call(ConfigsSeeder::class);
-        $this->call(BanTypeSeeder::class);
-        $this->call(FriendsSeeder::class);
+//        $this->call(BanTypeSeeder::class);
+//        $this->call(FriendsSeeder::class);
+        $this->call(LanguageSeeder::class);
     }
 }

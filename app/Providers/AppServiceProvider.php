@@ -95,23 +95,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $appName = Setting::where('key','app_title')->first();
-        config(['app.name' => $appName->value ?? 'Default']);
-
         Schema::defaultStringLength(191);
-        User::observe (UserObserver::class);
-        Gift::observe (GiftObserver::class);
-        Emoji::observe (EmojiObserver::class);
-        Ware::observe (WareObserver::class);
-        Room::observe(RoomObserver::class);
-        UserSallary::observe(UserSallaryObserver::class);
-        Family::observe (FamilyObserver::class);
-        FamilyUser::observe (FamilyUserObserver::class);
-        Pk::observe (PKObserver::class);
-        Agency::observe (AgencyObserver::class);
-        AgencyJoinRequest::observe (AgencyJoinRequestObserver::class);
 
         if (Schema::hasTable('settings')) {
+            $appName = Setting::where('key', 'app_title')->value('value') ?? 'Default';
+            config(['app.name' => $appName]);
+
             $settings = DB::table('settings')->pluck('value', 'key')->toArray();
 
             config([
@@ -124,20 +113,34 @@ class AppServiceProvider extends ServiceProvider
                 'themes.tableBackGroundColor' => $settings['table_background_color'] ?? '#c88213',
             ]);
 
-
+            if (!Cache::has('app_title')) {
+                Cache::put('app_title', $appName, now()->addHours(24));
+            }
+        } else {
+            config(['app.name' => 'Default']);
+            Cache::put('app_title', 'Default Title', now()->addHours(24));
         }
 
-        $enabledLanguages = Cache::rememberForever('languages', function () {
-            return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
-        });
-        Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
-        if (!Cache::has('app_title')) {
-            Cache::put('app_title', Setting::where('key', 'app_title')->value('value'), now()->addHours(24));
+        if (Schema::hasTable('languages')) {
+            $enabledLanguages = Cache::rememberForever('languages', function () {
+                return Language::where('is_enabled', true)->pluck('name', 'code')->toArray();
+            });
+            Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
         }
-        $appTitle = Cache::get('app_title', 'Default Title');
-        Config::set('admin.logo', $appTitle);
 
+        Config::set('admin.logo', Cache::get('app_title', 'Default Title'));
 
-
+        // تسجيل الـ Observers
+        User::observe(UserObserver::class);
+        Gift::observe(GiftObserver::class);
+        Emoji::observe(EmojiObserver::class);
+        Ware::observe(WareObserver::class);
+        Room::observe(RoomObserver::class);
+        UserSallary::observe(UserSallaryObserver::class);
+        Family::observe(FamilyObserver::class);
+        FamilyUser::observe(FamilyUserObserver::class);
+        Pk::observe(PKObserver::class);
+        Agency::observe(AgencyObserver::class);
+        AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
     }
 }
