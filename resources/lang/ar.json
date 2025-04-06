@@ -807,7 +807,7 @@
     "Manger" :" المدير",
     "App Owner" :"مالك التطبيق",
     "agency_count" : "عدد الوكالات",
-    "owner":"ماليك",
+    "owner":"مالك",
     "Users Count" :"عدد المستخدمين",
     "Gift type" : " نوع الهديه",
     "order" : "طلب",
@@ -1822,6 +1822,10 @@
     "emojis":"الرموز التعبيرية",
     "vips":"المستويات ",
     "blacks":"القائمة السوداء",
-    "codes":"الاكواد"
-
+    "codes":"الاكواد" ,
+    "vips_dedicate":"اهداء الارستقراطية",
+    "tickets":"الشكاوي",
+    "Enter the reason for the ban(arabic)": "أدخل سبب الحظر (بالعربية)",
+    "Enter the reason for the ban(english)": "أدخل سبب الحظر (بالإنجليزية)",
+    "duration(hours)": "المدة (بالساعات)"
 }

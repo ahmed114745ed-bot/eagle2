@@ -590,8 +590,6 @@
                 display: flex;
                 justify-content: flex-start; 
             }
-         
-       
             /* .rtl .content-header {
                 display: flex ;
                  height: 56px;
@@ -653,8 +651,12 @@
                 left: 107px;
 
             }
+            .rtl .wallet_posation{
+                position: absolute;
 
+            }
 
+            
 
     @media (max-width: 768px) {
         .rtl .main-sidebar {
