@@ -399,7 +399,7 @@ class UserController extends MainController
     {
         return $content->row(
             function ($row) use ($id) {
-                $user = User::find($id);
+                $user = User::withTrashed()->find($id);
                 if ($user) {
                     $user->flowers = 0;
                     $user->save();

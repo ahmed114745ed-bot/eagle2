@@ -41,7 +41,7 @@ class TrashedUserAccountController extends  MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            
+
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('uuid', __('uuid'));
             });
@@ -56,13 +56,13 @@ class TrashedUserAccountController extends  MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$this->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-    
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-    
+
             $userUrl = admin_url('users/' . $this->id);
-    
+
             return "<div style='display: flex; align-items: center; gap: 10px; background: var(--bg-color); padding: 10px; border-radius: 8px;'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -72,18 +72,18 @@ class TrashedUserAccountController extends  MainController
                         </div>
                     </div>";
         });
-    
+
         // $grid->column('phone', __('Phone'));
         $grid->column('deleted_at', __('Deleted at'))->diffForHumans();
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->add(new RestoreUserAccount($model->id));
-            $actions->add(new SoftDeleteUserAccount($model->id)); 
+            $actions->add(new SoftDeleteUserAccount($model->id));
             $actions->disableEdit();
             $actions->disableView();
             $actions->disableDelete();
         });
-    
+
         $grid->disableCreateButton();
 
         return $grid;
@@ -99,7 +99,7 @@ class TrashedUserAccountController extends  MainController
     {
         $show = new Show(User::findOrFail($id));
 
-       
+
         return $show;
     }
 
@@ -112,7 +112,7 @@ class TrashedUserAccountController extends  MainController
     {
         $form = new Form(new User());
 
-        
+
         return $form;
     }
 }
