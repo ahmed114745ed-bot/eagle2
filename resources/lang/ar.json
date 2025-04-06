@@ -1854,7 +1854,9 @@
     "room-vips": "نخبة الغرفة",
     "hosts": "المضيفون",
     "UserTarget": "هدف المستخدم",
+    "userTarget": "هدف المستخدم",
     "Report_user": "الإبلاغ عن المستخدم",
+    "report_user": "الإبلاغ عن المستخدم",
 
     "Email verified at": "تأكيد البريد الإلكتروني في",
     "Remember token": "رمز التذكير",
