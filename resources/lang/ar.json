@@ -1811,7 +1811,17 @@
     "Real Time system Setting": "إعداد نظام الوقت الفعلي",
     "pusher": "بشر",
      "file": "ملف",
-     "This level and type combination already exists":"هذا المستوى والنوع موجودان بالفعل"
-
+     "This level and type combination already exists":"هذا المستوى والنوع موجودان بالفعل",
+    "Home":"الصفحة الرئيسية",
+    "agency_join_requests":"طلبات الانضمام للوكالات",
+    "profiles":"الملفات الشخصية",
+    "family_levels":"مستويات العائلات",
+    "official_msgs":"الرسائل الرسمية",
+    "home_carousels":"شريط التمرير",
+    "vip_prev":"امتيازات كبار الشخصيات",
+    "emojis":"الرموز التعبيرية",
+    "vips":"المستويات ",
+    "blacks":"القائمة السوداء",
+    "codes":"الاكواد"
 
 }

@@ -584,11 +584,22 @@
                 left: 0px;
             }
             .rtl .breadcrumb {
-                direction: rtl;
                 left: 10px !important;
-                right: auto !important;
+                right: auto !important; 
+                direction: rtl;          
+                display: flex;
+                justify-content: flex-start; 
             }
-
+         
+       
+            /* .rtl .content-header {
+                display: flex ;
+                 height: 56px;
+            }
+            .rtl .content-header h1{
+                left: 0px;
+                position: absolute;
+            } */
             .rtl .sidebar-toggle {
                             direction: rtl !important;
                 float: right !important;
@@ -628,8 +639,20 @@
             }
             .rtl .content-wrapper-rtl{
                 margin-right: 42px !important;
-                        }
+            }
 
+            .rtl .fields-group .form-group{
+
+                display: flex !important;
+            }
+                   
+            .rtl .box-header .box-tools {
+                float: left;
+                top: -8px;
+                position: relative;
+                left: 107px;
+
+            }
 
 
 
