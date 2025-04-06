@@ -378,7 +378,7 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
 
-       return "<div id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
+       return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         
     } elseif ($imageType == 'mp4') {
             return "
@@ -474,13 +474,7 @@ if (!function_exists('showSvgaImage')) {
                         $model2.load('$url', function(videoItem) {
                             $model.setVideoItem(videoItem);
                             $model.startAnimation();
-                              var canvasElement = document.querySelector('#$model canvas');
-                                
-                                if (canvasElement) {
-                                    canvasElement.style.width = '50px !important'; // Force width to 50px
-                                    canvasElement.style.height = '50px !important'; // Force height to 50px
-                                    canvasElement.style.transform = 'none !important'; // Remove any scaling transform
-                                }
+                
                             $model.onFinished(function() {
                                 // Code for when the animation finishes
                             });
