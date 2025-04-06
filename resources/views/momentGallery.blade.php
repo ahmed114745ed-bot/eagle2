@@ -158,7 +158,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.css" />
 </head>
 
-<body>
+{{-- <body>
     <div class="all-page">
         <div class="settings-content">
             <div>
@@ -222,6 +222,83 @@
                 
                 // Optional: Add hover effect
                 const images = gallery.querySelectorAll('img');
+                images.forEach(img => {
+                    img.parentElement.addEventListener('mouseenter', () => {
+                        img.parentElement.style.transform = 'scale(1.03)';
+                    });
+                    img.parentElement.addEventListener('mouseleave', () => {
+                        img.parentElement.style.transform = 'scale(1)';
+                    });
+                });
+            });
+        </script>
+    </div>
+</body> --}}
+
+<body>
+    <div class="all-page">
+        <div class="settings-content">
+            <div>
+                @php
+                    $url = url('admin/moments');
+                @endphp
+                <a href="{{ $url }}" 
+                    style="display: block; text-align: center; margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">
+                    {{__('back')}}
+                </a>
+            </div>        
+            <div id="image-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+                @foreach($galleries as $image)
+                    @php
+                        $imgUrl = getDriverUrl() . '/' . $image->image;
+                    @endphp
+                    <div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                        <img src="{{ $imgUrl }}" 
+                             style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
+                             data-original="{{ $imgUrl }}"  
+                             loading="lazy">
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Viewer.js CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.css" />
+
+        <!-- Viewer.js JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.js"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const gallery = document.getElementById('image-gallery');
+                if (gallery) {
+                    const viewer = new Viewer(gallery, {
+                        inline: false,
+                        button: true,
+                        navbar: true,
+                        title: false,
+                        toolbar: {
+                            zoomIn: true,
+                            zoomOut: true,
+                            oneToOne: true,
+                            reset: true,
+                            prev: true,
+                            play: true,
+                            next: true,
+                            rotateLeft: true,
+                            rotateRight: true,
+                            flipHorizontal: true,
+                            flipVertical: true,
+                        },
+                        viewed() {
+                            viewer.toolbar.querySelector('.viewer-play').click();
+                        },
+                        transition: false,
+                    });
+                }
+
+                // Optional: Add hover effect
+                const images = gallery ? gallery.querySelectorAll('img') : [];
                 images.forEach(img => {
                     img.parentElement.addEventListener('mouseenter', () => {
                         img.parentElement.style.transform = 'scale(1.03)';
