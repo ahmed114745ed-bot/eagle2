@@ -848,6 +848,7 @@
  "cost_request_background"  :"تكلفة طلب الخلفية",
  "family_price"    :"سعر العائلة",
  "dollar_to_egp"  : "تحويل الدولار إلى الجنيه المصري" ,
+ "dollar"  : " الدولار" ,
  "special_bar_coin"    :"عملة الشريط الخاص" ,
  "agency_manager_percentage"     : "نسبة مدير الوكالة",
  "exp_received_percentage"  :"نسبة الخبرة المستلمة",
