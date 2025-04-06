@@ -590,8 +590,6 @@
                 display: flex;
                 justify-content: flex-start; 
             }
-         
-       
             /* .rtl .content-header {
                 display: flex ;
                  height: 56px;

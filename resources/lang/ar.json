@@ -1824,5 +1824,8 @@
     "blacks":"القائمة السوداء",
     "codes":"الاكواد" ,
     "vips_dedicate":"اهداء الارستقراطية",
-    "tickets":"الشكاوي"
+    "tickets":"الشكاوي",
+    "Enter the reason for the ban(arabic)": "أدخل سبب الحظر (بالعربية)",
+    "Enter the reason for the ban(english)": "أدخل سبب الحظر (بالإنجليزية)",
+    "duration(hours)": "المدة (بالساعات)"
 }
