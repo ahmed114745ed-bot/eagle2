@@ -450,11 +450,15 @@ if (!function_exists('showSvgaImage')) {
     {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
+
         Admin::script("
         document.addEventListener('DOMContentLoaded', function() {
             var modelElement = document.getElementById('$model');
             modelElement.style.width = '50px'; // Set width to 50px
-            modelElement.style.height = '50px'; // Optionally set height to keep it proportional
+            modelElement.style.height = '50px'; // Set height to 50px
+            var canvasElement = modelElement.querySelector('canvas');
+            canvasElement.width = 50; // Set canvas width to match the container
+            canvasElement.height = 50; // Set canvas height to match the container
         });
     ");
         Admin::script("
