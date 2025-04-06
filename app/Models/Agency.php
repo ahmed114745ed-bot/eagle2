@@ -143,6 +143,21 @@ class Agency extends Model
             ->first();
     }
 
+    public function getTargetsAttribute($month = null, $year = null)
+    {
+        if (!$month) {
+            $month = date('m');
+        }
+        if (!$year) {
+            $year = date('Y');
+        }
+
+        return $this->hasMany(UserTarget::class)
+            ->where('add_month', $month)
+            ->where('add_year', $year)
+            ->first();
+    }
+
     public function getSalaryAttribute(){
         $salary = AgencySallary::query ()->where ('agency_id',$this->id)->where ('is_paid',0)->sum (\DB::raw('sallary - cut_amount'));
         return $salary;
