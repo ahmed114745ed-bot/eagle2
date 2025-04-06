@@ -272,32 +272,20 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const gallery = document.getElementById('image-gallery');
                 if (gallery) {
-                    const viewer = new Viewer(gallery, {
-                        inline: false,
-                        button: true,
-                        navbar: true,
-                        title: false,
+                    const viewer = new Viewer(document.getElementById('image-gallery'), {
                         toolbar: {
-                            zoomIn: true,
-                            zoomOut: true,
-                            oneToOne: true,
-                            reset: true,
-                            prev: true,
-                            play: true,
-                            next: true,
-                            rotateLeft: true,
-                            rotateRight: true,
-                            flipHorizontal: true,
-                            flipVertical: true,
-                        },
-                        // Disable fullscreen
-                        fullscreen: false,
-                        transition: false,
-                    });
-                        viewed() {
-                            viewer.toolbar.querySelector('.viewer-play').click();
-                        },
-                        transition: false,
+                            zoomIn: 1,
+                            zoomOut: 1,
+                            oneToOne: 1,
+                            reset: 1,
+                            prev: 1,
+                            play: { show: 1, size: 'large' },
+                            next: 1,
+                            rotateLeft: 1,
+                            rotateRight: 1,
+                            flipHorizontal: 1,
+                            flipVertical: 1,
+                        }
                     });
                 }
 
