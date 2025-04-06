@@ -2,19 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\MomentGallery;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use Encore\Admin\Layout\Row;
+use App\Models\MomentGallery;
 use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Modules\Moment\Entities\Moment;
 use Encore\Admin\Grid\Displayers\Table;
 use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Form\Field\Table as FieldTable;
 use Encore\Admin\Widgets\Table as WidgetsTable;
+use Encore\Admin\Form\Field\Table as FieldTable;
 
 class MomentController extends MainController
 {
@@ -107,23 +108,71 @@ class MomentController extends MainController
     // 🔹 **عرض تاريخ الإنشاء**
     $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
-    // 🔹 **عرض الصورة في مودال**
     // $grid->column('img', __('Image'))->display(function () {
-    //     $img = $this->img;
-    //     if (!$img) return 'No image found';
-
-    //     $imgUrl = getDriverUrl() . '/' . $img;
-    //     return "<a href='#' class='view-image' data-img='$imgUrl'><img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'></a>";
-    // });
-    $grid->column('img', __('Image'))->display(function () {
-        $imgUrl = asset("images/moment.jpg"); // Image from public directory or storage
-        $viewUrl = url('admin/moment-gallery/' . $this->id); // The route for viewing the image
+    //     $id = $this->id;
+    //     $galleries = MomentGallery::where('moment_id', $id)->get();
     
-        return "<a href='$viewUrl'>
-                    <img src='$imgUrl' style='width: 50px; height: 50px; border-radius: 5px;'>
-                </a>";
+    //     $html = '<div id="image-gallery-' . $id . '" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">';
+    
+    //     foreach ($galleries as $image) {
+    //         $imgUrl = getDriverUrl() . '/' . $image->image;
+    
+    //         $html .= '<div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+    //                     <img src="' . $imgUrl . '" 
+    //                          style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
+    //                          data-original="' . $imgUrl . '"  
+    //                          loading="lazy"
+    //                          class="gallery-image">
+    //                  </div>';
+    //     }
+    
+    //     $html .= '</div>';
+    
+    //     Admin::script("
+    //         new Viewer(document.getElementById('image-gallery-$id'));
+    //     ");
+    
+    //     return $html;
+    // });
+
+    $grid->column('img', __('Image'))->display(function () {
+        $id = $this->id;
+        $galleries = MomentGallery::where('moment_id', $id)->get();
+    
+        if ($galleries->isEmpty()) {
+            return 'No Image';
+        }
+    
+        $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
+    
+        foreach ($galleries as $image) {
+            $imgUrl = getDriverUrl() . '/' . $image->image;
+    
+            $html .= '<img src="' . $imgUrl . '" 
+                         style="width: 100%; height: 200px; object-fit: cover;"
+                         data-original="' . $imgUrl . '"  
+                         loading="lazy"
+                         class="gallery-image">';
+        }
+    
+        $html .= '</div>';
+    
+        // Show only the first image
+        $firstImageUrl = getDriverUrl() . '/' . $galleries->first()->image;
+    
+        $html .= '<img src="' . $firstImageUrl . '" 
+                      style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+                      onclick="document.querySelector(`#image-gallery-' . $id . ' img`).click()">';
+    
+        Admin::script("
+            new Viewer(document.getElementById('image-gallery-$id'));
+        ");
+    
+        return $html;
     });
     return $grid;
+
+    
 }
 
     // protected function grid()
