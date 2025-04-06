@@ -656,7 +656,7 @@
 
             }
             .rtl .column-show_img .rtlSvga{
-                overflow:hidden;
+                overflow:scroll;
             }
 
             
