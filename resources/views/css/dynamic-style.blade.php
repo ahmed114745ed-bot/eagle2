@@ -655,9 +655,8 @@
                 position: absolute;
 
             }
-            .rtl .column-show_img .rtlSvga canvas{
-                width: 50px !important;
-                height: 50px !important;
+            .rtl .column-show_img .rtlSvga{
+                overflow:scroll;
             }
 
             
