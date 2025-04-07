@@ -80,7 +80,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-    
+
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -353,24 +353,24 @@
                 @csrf
                 <div class="form">
                     <label class="d-block">{{ __('Real Time system Setting:') }}</label>
-                    
+
                     <div class="radio-options-container">
                         <div class="radio-option">
                             <input type="radio" id="libraryAgora" name="library" value="0" class="radio-input" {{ $library == "0" ? "checked" : "" }}>
                             <label for="libraryAgora" class="radio-label">{{ __('admin.Agora') }}</label>
                         </div>
-                    
+
                         <div class="radio-option">
                             <input type="radio" id="libraryZego" name="library" value="1" class="radio-input" {{ $library == "1" ? "checked" : "" }}>
                             <label for="libraryZego" class="radio-label">{{ __('admin.Zego') }}</label>
                         </div>
-                    
+
                         <div class="radio-option">
                             <input type="radio" id="libraryPusher" name="library" value="2" class="radio-input" {{ $library == "2" ? "checked" : "" }}>
                             <label for="libraryPusher" class="radio-label">{{ __('pusher') }}</label>
                         </div>
                     </div>
-        
+
                     <div class="library-fields-container mt-4">
                         <!-- Agora Fields -->
                         <div id="agora-fields" class="library-fields" style="display: {{ $library == 0 ? 'flex' : 'none' }};">
@@ -382,7 +382,7 @@
                                 </div>
                             </div>
                         </div>
-            
+
                         <!-- Zego Fields -->
                         <div id="zego-fields" class="library-fields" style="display: {{ $library == 1 ? 'flex' : 'none' }};">
                             <div style="flex: 1; margin-left: 10px;">
@@ -401,7 +401,7 @@
                                 </div>
                             </div>
                         </div>
-            
+
                         <!-- Pusher Fields -->
                         <div id="pusher-fields" class="library-fields" style="display: {{ $library == 2 ? 'flex' : 'none' }};">
                             <div style="flex: 1; margin-left: 10px;">
@@ -410,18 +410,18 @@
                             </div>
                         </div>
                     </div>
-            
+
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
             </form>
         </div>
-        
+
         <div id="appSettings" class="settings-section">
             <h3>{{  __('Timing settings')}}</h3>
             <form action="{{ route('admin.settings.update') }}" method="POST">
                 @csrf
             <div class="form">
-                  
+
                 <div class="form-group">
                     <label for="primary_color">{{ __('Primary Color') }}</label>
                     <input type="color" id="app_primary_color" name="app_primary_color" value="#3498db" class="form-control">
@@ -460,7 +460,7 @@
         </div>
 
 
-        
+
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
@@ -560,12 +560,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleFields() {
         const selectedValue = document.querySelector('input[name="library"]:checked').value;
-        
+
         // Hide all fields first
         Object.values(fieldsContainers).forEach(container => {
             container.style.display = 'none';
         });
-        
+
         // Show the selected one
         if (fieldsContainers[selectedValue]) {
             fieldsContainers[selectedValue].style.display = 'flex';

@@ -313,7 +313,50 @@
     <div class="settings-content">
         <div id="brandSettings" class="settings-section active">
 
-            <h3> {{  __('Brand settings')}}</h3>
+        <div class="settings-content">
+            <div id="brandSettings" class="settings-section active">
+
+                <h3> {{ __('Brand settings') }}</h3>
+
+                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Application title:') }} </label>
+                                <input type="text" name="app_title" value="{{ $settings['app_title'] ?? '' }}"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Application logo:') }}</label>
+                                <input type="file" name="app_logo" class="form-control" onchange="previewImage(event)">
+
+                                <!-- Image Preview -->
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>{{ __('Application Fav Icon:') }}</label>
+                                <input type="file" name="app_fav_icon" class="form-control" onchange="previewFavIcon(event)">
+
+                                <!-- Image Preview -->
+                                <img id="favIconPreview"
+                                     src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+
+                        <button type="submit">{{ __('save') }}</button>
 
             <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -346,8 +389,443 @@
              
                        <button type="submit">{{ __('save') }}</button>
 
-                    
-                </div>
+            <div id="timeSettings" class="settings-section">
+                <h3>{{ __('Timing settings') }}</h3>
+                <form action="{{ route('admin.settings.update') }}" method="POST">
+                    @csrf
+                    <div class="form">
+
+                        <label>{{ __('Time zone:') }}</label>
+                        <select name="timezone">
+                            @foreach ($timezones as $timezone)
+                                <option value="{{ $timezone->name }}"
+                                    {{ $timezone->name == ($settings['timezone'] ?? '') ? 'selected' : '' }}>
+                                    {{ $timezone->name }} ({{ $timezone->offset }})
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="submit">{{ __('save') }}</button>
+                    </div>
+                </form>
+            </div>
+            <div id="realTimeSetting" class="settings-section">
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Real Time system Setting:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- Agora Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                                <div class="card p-3 shadow" style="height: 300px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="agoraRadio" class="custom-radio libraryRealTime" name="library" value="0"
+                                                {{ $library == '0' ? 'checked' : '' }}>
+                                            <label for="agoraRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="agora_app_id" name="app_id" placeholder="app_id"
+                                                    value="{{ $agora_app_id }}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+                            <!-- Zego Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                                <div class="card p-3 shadow" style="height: 300px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime" name="library" value="1"
+                                                {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="zegoRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="zego_server_secret" name="zego_server_secret"
+                                                    placeholder="server_secret" value="{{ $zego_server_secret }}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="zego_app_id" name="zego_app_id" placeholder="app_id"
+                                                    value="{{ $zego_app_id }}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                <input type="text" id="app_sign" name="app_sign" placeholder="app_sign"
+                                                    value="{{ $app_sign }}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        {{-- <div class="row">
+                            <!-- Pusher Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                                <div class="card p-3 shadow" style="height: 200px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('pusher') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="pusherRadio" class="custom-radio" name="library" value="2"
+                                                {{ $library == '2' ? 'checked' : '' }}>
+                                            <label for="pusherRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+                        </div> --}}
+                    </div>
+                </form>
+            </div>
+
+
+
+
+            <div id="appSettings" class="settings-section">
+                <h3>{{ __('Timing settings') }}</h3>
+                <form action="{{ route('admin.settings.update') }}" method="POST">
+                    @csrf
+                    <div class="form row">
+                        @csrf
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="primary_color">{{ __('Primary Color') }}</label>
+                                <input type="color" id="app_primary_color" name="app_primary_color"
+                                    value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="second_color">{{ __('Second Color') }}</label>
+                                <input type="color" id="second_color" name="app_second_color" value="{{ $settings['app_second_color'] ?? '#2ecc71' }}"
+                                    class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="background_type">{{ __('Background Type') }}</label>
+                                <select id="background_type" name="background_type" class="form-control"
+                                    onchange="toggleBackgroundInput()">
+                                    <option value="color">{{ __('Color') }}</option>
+                                    <option value="image">{{ __('Image') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" id="background_color_group">
+                                <label for="background_color">{{ __('Background Color') }}</label>
+                                <input type="color" id="background_color" name="background_color" class="form-control"
+                                value="{{ $settings['background_color'] ?? '#ffffff' }}"
+                                onchange="updateBackgroundValue()">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group" id="background_image_group" style="display: none;">
+                                <label for="background_image">{{ __('Background Image') }}</label>
+                                <input type="file" id="background_image" class="form-control"
+                                    onchange="updateBackgroundValue()">
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="app_background" name="app_background">
+
+                        <div class="col-12 d-flex gap-3 mt-3">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                            <button type="button" id="resetAppColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+
+
+            <div id="imageModal" class="modal" onclick="closeFullScreen()">
+                <span class="close">&times;</span>
+                <img class="modal-content" id="fullImage">
+            </div>
+            <script>
+                $(document).ready(function () {
+                    function updateLibrary(selectedLibrary) {
+                        $.ajax({
+                            url: "{{ route('admin.update-agora-zego') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                library: selectedLibrary
+                            },
+                            success: function (response) {
+                                console.log("Library updated via AJAX:", response);
+                                toastr.success('Library preference saved!');
+                            },
+                            error: function (xhr) {
+                                console.error("AJAX Error:", xhr.responseText);
+                                toastr.error('Failed to update library');
+                            }
+                        });
+                    }
+
+                    function updateSwitches() {
+                        $(".custom-radio").each(function () {
+                            if ($(this).prop("checked")) {
+                                $(this).next(".switch").addClass("active");
+                            } else {
+                                $(this).next(".switch").removeClass("active");
+                            }
+                        });
+                    }
+
+                    // عند تغيير الراديو، نحدث الواجهة
+                    $(document).on("change", ".libraryRealTime", function () {
+                        let selectedLibrary = $(this).val();
+                        console.log("Selected library:", selectedLibrary);
+                        updateLibrary(selectedLibrary);
+                        updateSwitches();
+                    });
+
+                    $(".switch").click(function () {
+                        let radio = $(this).prev(".custom-radio");
+
+                        if (!radio.prop("checked")) {
+                            $(".custom-radio").prop("checked", false);
+                            $(".switch").removeClass("active");
+
+                            radio.prop("checked", true).trigger("change");
+                        }
+                    });
+
+                    updateSwitches();
+                });
+
+            </script>
+
+            <!-- كود JavaScript -->
+            <script>
+
+                function previewImage(event) {
+                    let file = event.target.files[0];
+                    if (file) {
+                        let reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('imagePreview');
+                            preview.src = e.target.result; // Update preview with new image
+                            preview.style.display = 'block'; // Show image
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                function previewFavIcon(event) {
+                    let file = event.target.files[0];
+                    if (file) {
+                        let reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('favIconPreview');
+                            preview.src = e.target.result; // Update preview with new image
+                            preview.style.display = 'block'; // Show image
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Function to get query parameter by name
+                    function getQueryParam(name) {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get(name);
+                    }
+
+                    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+                    const activeTab = getQueryParam("firsttab") || "brandSettings";
+
+                    // Show the selected tab
+                    showSection(activeTab);
+                });
+
+                function showSection(sectionId) {
+                    // Remove active class from all sections
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+
+                    // Add active class to the selected section
+                    document.getElementById(sectionId).classList.add('active');
+
+                    // Reset button styles
+                    document.querySelectorAll('.settings-menu button').forEach(button => {
+                        button.style.backgroundColor = '';
+                        button.style.color = '';
+                    });
+
+                    // Highlight the active button
+                    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                    if (activeButton) {
+                        activeButton.style.backgroundColor = 'var(--primary-color)';
+                        activeButton.style.color = 'var(--text-primary-color)';
+                    }
+
+                    // Update the URL with the selected tab without reloading
+                    const url = new URL(window.location);
+                    url.searchParams.set("firsttab", sectionId);
+                    window.history.pushState({}, "", url);
+                }
+
+
+                function openFullScreen(imgElement) {
+                    var modal = document.getElementById("imageModal");
+                    var modalImg = document.getElementById("fullImage");
+
+                    modal.style.display = "block";
+                    modalImg.src = imgElement.src;
+                }
+
+                function closeFullScreen() {
+                    document.getElementById("imageModal").style.display = "none";
+                }
+
+
+                function toggleBackgroundInput() {
+                    var type = document.getElementById("background_type").value;
+                    document.getElementById("background_color_group").style.display = (type === "color") ? "block" : "none";
+                    document.getElementById("background_image_group").style.display = (type === "image") ? "block" : "none";
+
+                    updateBackgroundValue();
+                }
+
+                function updateBackgroundValue() {
+                    var type = document.getElementById("background_type").value;
+                    var hiddenInput = document.getElementById("app_background");
+
+                    if (type === "color") {
+                        hiddenInput.value = document.getElementById("background_color").value;
+                    } else if (type === "image") {
+                        var fileInput = document.getElementById("background_image");
+                        if (fileInput.files.length > 0) {
+                            hiddenInput.value = fileInput.files[0].name; // حفظ اسم الملف فقط
+                        } else {
+                            hiddenInput.value = "";
+                        }
+                    }
+                }
+            </script>
+
+            <script>
+                /*document.addEventListener('DOMContentLoaded', function() {
+                                        // Updated selector to match your new class
+                                        const radioButtons = document.querySelectorAll('.radio-input');
+                                        const fieldsContainers = {
+                                            '0': document.getElementById('agora-fields'),
+                                            '1': document.getElementById('zego-fields'),
+                                            '2': document.getElementById('pusher-fields')
+                                        };
+
+                                        function toggleFields() {
+                                            const selectedValue = document.querySelector('input[name="library"]:checked').value;
+
+                                            // Hide all fields first
+                                            Object.values(fieldsContainers).forEach(container => {
+                                                container.style.display = 'none';
+                                            });
+
+                                            // Show the selected one
+                                            if (fieldsContainers[selectedValue]) {
+                                                fieldsContainers[selectedValue].style.display = 'flex';
+                                            }
+                                        }
+
+                                        // Add event listeners to radio buttons
+                                        radioButtons.forEach(radio => {
+                                            radio.addEventListener('change', toggleFields);
+                                        });
+
+                                        // Initialize the fields visibility
+                                        toggleFields();
+                                    });*/
+
+                document.addEventListener("DOMContentLoaded", function() {
+                    let resetButton = document.getElementById('resetColors');
+                    let resetAppButton = document.getElementById('resetAppColors');
+
+                    if (resetAppButton) {
+                        resetAppButton.addEventListener('click', function() {
+            // Reset color inputs
+            document.getElementById('app_primary_color').value = "#32e5ac";
+            document.getElementById('second_color').value = "#003FA6";
+
+            // Reset background (assuming you want color background)
+            document.getElementById('background_type').value = "color";
+            document.getElementById('background_color').value = "#32e5ac";
+            document.getElementById('app_background').value = "#32e5ac";
+
+            // Show the correct background input group
+            document.getElementById('background_color_group').style.display = 'block';
+            document.getElementById('background_image_group').style.display = 'none';
+
+            // Submit the form
+            document.querySelector('#appSettings form').submit();
+                        });
+                    }
+
+                    if (resetButton) {
+                        resetButton.addEventListener('click', function() {
+                            let colorInputs = {
+                                'primary_color': "#FF9428",
+                                'secondary_color': "#1A1A1A",
+                                'text_primary_color': "#fdf8f8",
+                                'text_secondary_color': "#c1b9b9",
+                                'box_background_color': "#222222",
+                                'table_background_color': "#c88213"
+                            };
+
+                            Object.keys(colorInputs).forEach(id => {
+                                let input = document.getElementById(id);
+                                if (input) {
+                                    input.value = colorInputs[id];
+                                }
+                            });
+
+                            // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
+                            document.getElementById('themeSettingsForm').submit();
+                        });
+                    }
+                });
+
+
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.querySelectorAll('input[type="color"]').forEach(input => {
+                        input.addEventListener("input", function() {
+                            this.style.background = this.value; // تحديث الخلفية
+                            this.value = this.value; // تأكيد تحديث القيمة
+                        });
+                    });
+                });
+            </script>
 
             </form>
         </div>

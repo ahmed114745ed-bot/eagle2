@@ -42,14 +42,21 @@ class VersionController extends Controller
         $isFrameUpdated = $this->isUpdated('frame_updated_at', @$request->frame_time);
         $isEmojiUpdated = $this->isUpdated('emoji_updated_at', @$request->emoji_time);
         $isExtraUpdated = $this->isUpdated('extra_updated_at', @$request->extra_time);
+        $isColorUpdated = $this->isUpdated('colors_updated_at', @$request->color_time);
         $ProfileFrameUpdated = $this->isUpdated('profile_frame_updated', @$request->profile_frame_updated);
 
         $data = [
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (integer)$version && (integer)$version <= 40,
-            'is_force'        => $this->isForce($version, $request->OS ), 'cache_update' => [
-                'gifts'  => $isGiftUpdated, 'intro' => $isIntroUpdated, 'emoji' => $isEmojiUpdated,
-                'frames' => $isFrameUpdated, 'extras' => $isExtraUpdated,'profile_frame_updated' => $ProfileFrameUpdated,
+            'is_force'        => $this->isForce($version, $request->OS ),
+            'cache_update' => [
+                'gifts'  => $isGiftUpdated,
+                'intro' => $isIntroUpdated,
+                'emoji' => $isEmojiUpdated,
+                'frames' => $isFrameUpdated,
+                'extras' => $isExtraUpdated,
+                'profile_frame_updated' => $ProfileFrameUpdated,
+                'colors' => $isColorUpdated,
                 //intro - frames - extradata - emoji
             ], 'enable_chat'  => settings()->get('chat_status') == "on"
         ];
