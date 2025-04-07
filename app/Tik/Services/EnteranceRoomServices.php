@@ -577,7 +577,7 @@ class EnteranceRoomServices
 
         $data = [
             'title' => __('I invite you to enter my room'),
-            'room_id' => $request->room_id,
+            'room_id' => intval($request->room_id),
             'status' => 0
         ];
 
@@ -588,7 +588,7 @@ class EnteranceRoomServices
         $chatMessageData = [
             'chat_room_id' => $chatRoom->id,
             'user_id' => $user->id,
-            'room_id' => $request->room_id,
+            'room_id' => intval($request->room_id),
             'message' => __('I invite you to enter my room'),
             'type' => 'invite_room'
         ];
