@@ -608,10 +608,9 @@ class EnteranceRoomServices
             $type = $message->type ?? 'text';
             Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
         }
-
+        
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource =  new ChatRoomResourcePusher($chatRoom);
-
         if ($chatRoom->user_id == $user->id) {
             $chatuser = User::find($chatRoom->user_id2);
         } else {
@@ -623,7 +622,12 @@ class EnteranceRoomServices
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
-
+        Log::info('Preparing to fire OpenChat event', [
+            'message_resource' => $message_resource->toArray(request()),
+            'room_resource' => $room_resource->toArray(request()),
+            'chat_user' => $chatuser,
+            'chat_room' => $chatRoom,
+        ]);
         event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
 
         event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
