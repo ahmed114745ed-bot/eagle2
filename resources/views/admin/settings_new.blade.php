@@ -67,6 +67,8 @@
 
 .radio-input:checked {
     background-color: #ff9800;
+   
+   
 }
 
 .radio-input:checked::after {
@@ -74,7 +76,7 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    background: white;
+    background:  var(--primary-color);
     border-radius: 50%;
     top: 50%;
     left: 50%;
