@@ -615,5 +615,8 @@ class EnteranceController extends Controller
         
         }
     }
+
+   
+
     
 }
