@@ -28,7 +28,7 @@
     .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
     border-top-color:var(--primary-color);
 
-
+    }
     .nav-pills {
         display: inline-flex;
         padding: 10px 0;
