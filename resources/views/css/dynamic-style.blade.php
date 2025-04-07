@@ -663,6 +663,11 @@
                 direction: ltr;
 
             }
+            .rtl .column-img .rtlSvga{
+                direction: ltr;
+
+            }
+            
             .rtl .colorpicker-element .color{
                 float: right !important;
             }
