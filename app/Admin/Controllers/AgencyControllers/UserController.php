@@ -12,7 +12,6 @@ use App\Helpers\Common;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\App;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Controllers\MainController;
 use Modules\SwitchAccount\Entities\UserAccount;
@@ -195,8 +194,11 @@ class UserController extends MainController
                  if (!isImageExists($url)) {
                      $url = $defaultImage;
                  }
+            $showUrl = $agency ? url("admin/agencies/profile/{$agency->id}") : 0;
             $results = [
-             __('name') => @$agency->owner->name ??'',
+             __('name') => "  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>@$agency->name</span>
+                        </a>",
              __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
 
          ];
@@ -226,7 +228,7 @@ class UserController extends MainController
                 return $target;
             });
 
-            return new Table(
+            return new \App\Admin\Widgets\Table(
                 [
                     'ID',
                     __('month') .'/'.__('year') ,
@@ -252,11 +254,39 @@ class UserController extends MainController
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $device_token  = $this->device_token;
             $users         =
-                User::select("name", 'uuid', 'phone')->where('device_token', $device_token)->where('device_token', '!=', null)->get();
-            $filteredUsers = $users->map(function ($user) {
-                return $user->only(["name", "uuid", "phone"]);
+                User::select(['id', 'name', 'uuid', 'phone'])->where('device_token', $device_token)->where('device_token', '!=', null)->get();
+
+            $rows = $users->map(function ($user) {
+                $path = $user->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+                $showUrl = $user ? url("admin/users/{$user->id}") : 0;
+
+                $nameColumn = "
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div>
+                            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
+                            </a>
+                            <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
+                        </div>
+                    </div>
+                ";
+
+                return [
+                    'name' => $nameColumn,
+                    'phone' => $user->phone,
+                ];
             });
-            return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
+
+            return new Table([__('Name'), __('phone')], $rows->toArray());
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
@@ -300,7 +330,7 @@ class UserController extends MainController
 
         $grid->actions(function ($actions) {
             $model = $actions->row;
-           
+
             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
