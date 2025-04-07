@@ -77,7 +77,7 @@
     <div class="settings-content">
         <div class="container">
             <div class="avatar">
-                <img src="{{ asset($agency->img) }}" alt="Agency Logo">
+                <img src="{{ asset(@$agency->img) }}" alt="Agency Logo">
             </div>
             <h2>{{ $agency->name }}</h2>
             <div class="details">
