@@ -82,9 +82,9 @@
             <h2>{{ $agency->name }}</h2>
             <div class="details">
                 <p><strong>ID:</strong> {{ $agency->id }}</p>
-                <p><strong>Phone:</strong> {{ $agency->phone }}</p>
-                <p><strong>Owner:</strong> {{ $agency->owner->name }}, UUID: {{ $agency->owner->uuid }}</p>
-                <p><strong>Notice:</strong> {{ $agency->notice }}</p>
+                <p><strong>Phone:</strong> {{ @$agency->phone ?? '' }}</p>
+                <p><strong>Owner:</strong> {{ @$agency?->owner?->name ?? '' }}, UUID: {{ @$agency?->owner?->uuid ?? '' }}</p>
+                <p><strong>Notice:</strong> {{ @$agency->notice ?? '' }}</p>
             </div>
             <button onclick="window.history.back()">Go Back</button>
         </div>
