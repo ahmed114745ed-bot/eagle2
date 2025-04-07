@@ -288,7 +288,7 @@
         /* تقليل عرض شريط التمرير */
 
     }
-
+ 
     .settings-menu button {
         background-color: var(--box-background-color);
         border: none;
@@ -334,7 +334,7 @@
     }
 
     .card-header {
-        background: #f8f9fa;
+        background: var(--primary-color);
         /* Light gray background */
         padding: 12px 15px;
         border-bottom: 1px solid #ddd;
@@ -570,7 +570,7 @@
                             <!-- Agora Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto" >
                                 <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div class="card-header d-flex justify-content-between align-items-center  ">
                                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="agoraRadio" class="custom-radio libraryRealTime" name="library" value="0"
