@@ -903,10 +903,20 @@
      "Background Image": "पृष्ठभूमि छवि",
      "Save Settings": "सेटिंग्स सहेजें",
      "Real Time system Setting": "रियल टाइम सिस्टम सेटिंग",
-     "pusher": "पुशर",
      "No members found.": "कोई सदस्य नहीं मिला",
      "I invite you to enter my room": "मैं आपको अपने कमरे में प्रवेश करने के लिए आमंत्रित करता हूँ",
-     "pusher": "पुशर"
+     "pusher": "पुशर",
+    "Additional settings" : "अतिरिक्त सेटिंग्स",
+    "Live Stream settings" : "लाइव स्ट्रीम सेटिंग्स",
+    "Cost of background request:" : "पृष्ठभूमि अनुरोध की लागत:",
+    "Rooms Bacground:" : "कमरों की पृष्ठभूमि:",
+    "Background expiration in days:" : "पृष्ठभूमि समाप्ति (दिनों में):",
+    "Room Rule:" : "कमरे का नियम:",
+    "Room Rule en:" : "कमरे का नियम अंग्रेजी में:",
+    "Youtube Key:" : "यूट्यूब कुंजी:",
+    "Pk Background:" : "पीके पृष्ठभूमि:",
+    "Private Comment Price:" : "निजी टिप्पणी की कीमत:",
+    "Custom Background settings" : "कस्टम पृष्ठभूमि सेटिंग्स"
 
 
 

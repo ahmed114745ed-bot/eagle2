@@ -1761,7 +1761,20 @@
     "pusher": "İtici",
     "No members found.": "Üye bulunamadı",
     "I invite you to enter my room": "Sizi odamıma girmeye davet ediyorum",
-    "pusher": "İtici"
+    
+    "Cost of background request:" : "Arka plan isteği maliyeti:",
+    "Custom Background settings" : "Özel Arka Plan Ayarları",
+    "Background expiration in days:" : "Arka planın son kullanma tarihi (gün olarak):",
+    "Additional settings" : "Ek ayarlar",
+    "Live Stream settings" : "Canlı yayın ayarları",
+   
+    "Rooms Bacground:" : "Odalar Arka Planı:",
+    "Room Rule:" : "Oda Kuralı:",
+    "Room Rule en:" : "Oda Kuralı İngilizce:",
+    "Youtube Key:" : "YouTube Anahtarı:",
+    "Pk Background:" : "PK Arka Planı:",
+    "Private Comment Price:" : "Özel Yorum Fiyatı:"
+    
 
 
 

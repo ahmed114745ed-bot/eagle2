@@ -157,7 +157,7 @@
 <body>
     <div class="all-page">
         <div class="settings-sidebar">
-            <h2>إعدادات</h2>
+            <h2>{{__("setting")}}</h2>
             <div class="settings-menu">
                 <button
                     onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
@@ -174,7 +174,7 @@
                 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form">
-                        <label>{{ __('Cost request background:') }} </label>
+                        <label>{{ __('Cost of background request:') }} </label>
                         <input type="text" name="cost_request_background"
                             value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
 
