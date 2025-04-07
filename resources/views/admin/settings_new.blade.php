@@ -572,7 +572,7 @@
                             <input type="file" id="image1" name="image1" class="form-control" onchange="updatePreview('image1')">
                             @if($image1)
                                 <div class="mt-2">
-                                    <label>{{ __('Old Image') }}</label><br>
+                                    <!-- <label>{{ __('Old Image') }}</label><br> -->
                                     <img src="{{ getImagePath(  $image1) }}" alt="Old Image 1" width="100">
                                 </div>
                             @endif
@@ -582,7 +582,7 @@
                     <!-- Image 2 -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="image2">{{ __('Image 2') }}</label>
+                            <!-- <label for="image2">{{ __('Image 2') }}</label> -->
                             <input type="file" id="image2" name="image2" class="form-control" onchange="updatePreview('image2')">
                             @if($image2)
                                 <div class="mt-2">
@@ -596,7 +596,7 @@
                     <!-- Image 3 -->
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="image3">{{ __('Image 3') }}</label>
+                            <!-- <label for="image3">{{ __('Image 3') }}</label> -->
                             <input type="file" id="image3" name="image3" class="form-control" onchange="updatePreview('image3')">
                             @if($image3)
                                 <div class="mt-2">
