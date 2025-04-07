@@ -515,7 +515,7 @@
         
         <div id="appSettings" class="settings-section">
             <h3>{{  __('Timing settings')}}</h3>
-            <form action="{{ route('admin.settings.update') }}" method="POST">
+            <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form row">
                 @csrf
@@ -555,6 +555,57 @@
                     <input type="file" id="background_image" class="form-control" onchange="updateBackgroundValue()">
                 </div>
                 </div>
+
+                @php
+                    $image1 = Cache::get('image1');
+                    $image2 = Cache::get('image2');
+                    $image3 = Cache::get('image3');
+                @endphp
+
+                <div class=" col-md-12 row">
+                    <!-- Image 1 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="image1">{{ __('Image 1') }}</label>
+                            <input type="file" id="image1" name="image1" class="form-control" onchange="updatePreview('image1')">
+                            @if($image1)
+                                <div class="mt-2">
+                                    <label>{{ __('Old Image') }}</label><br>
+                                    <img src="{{ getImagePath(  $image1) }}" alt="Old Image 1" width="100">
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Image 2 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="image2">{{ __('Image 2') }}</label>
+                            <input type="file" id="image2" name="image2" class="form-control" onchange="updatePreview('image2')">
+                            @if($image2)
+                                <div class="mt-2">
+                                    <label>{{ __('Old Image') }}</label><br>
+                                    <img src="{{ getImagePath(  $image2) }}" alt="Old Image 2" width="100">
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Image 3 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="image3">{{ __('Image 3') }}</label>
+                            <input type="file" id="image3" name="image3" class="form-control" onchange="updatePreview('image3')">
+                            @if($image3)
+                                <div class="mt-2">
+                                    <label>{{ __('Old Image') }}</label><br>
+                                    <img src="{{ getImagePath(  $image3) }}" alt="Old Image 3" width="100">
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
 
                 <input type="hidden" id="app_background" name="app_background">
 
@@ -723,7 +774,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
+    <script>
+        function updatePreview(inputId) {
+            const input = document.getElementById(inputId);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = input.parentElement.querySelector('img');
+                if (img) img.src = e.target.result;
+            }
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
     </div>
 </body>
 

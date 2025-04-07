@@ -26,16 +26,20 @@ class SettingsController extends Controller
 
 
         $data = $request->except('_token');
+
         unset($data['background_type']);
         foreach ($data as $key => $value) {
             if ($request->hasFile($key)) {
                 $image = Common::upload('images', $request->file($key));
                 $value = $image;
+              
             }
-          
-            
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            Cache::put($key, $value);
+
+            if ($value != null) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                Cache::put($key, $value);
+
+            }
         }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
