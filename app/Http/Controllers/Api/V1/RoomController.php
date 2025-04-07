@@ -1769,7 +1769,6 @@ class RoomController extends Controller
 
     public function check_room(Request $request){
 
-        dd('sdsd');
         $request['show'] = true;
         $id = $request->room_id;
         $room = $this->roomService->findRoom($id);
