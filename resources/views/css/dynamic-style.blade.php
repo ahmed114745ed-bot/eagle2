@@ -656,12 +656,15 @@
 
             }
             .rtl .column-show_img .rtlSvga{
-                /* overflow:scroll; */
+                direction: ltr;
+
+            }
+            .rtl .column-img2 .rtlSvga{
                 direction: ltr;
 
             }
 
-            
+ 
 
     @media (max-width: 768px) {
         .rtl .main-sidebar {
