@@ -39,6 +39,36 @@
             width: 800px;
             text-align: center;
         }
+        .agency-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            width: 1200px;
+            justify-content: center;
+            align-items: center;
+        }
+        .charge-container {
+            background: #222;
+            padding: 20px;
+            border-radius: 5px;
+            width: 1100px;
+            text-align: center;
+        }
+        .settings-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            width: 1200px;
+            justify-content: center;
+            align-items: center;
+        }
+        .agency-container {
+            background: #222;
+            padding: 20px;
+            border-radius: 5px;
+            width:1100px;
+            text-align: center;
+        }
         .avatar img {
             width: 120px;
             height: 120px;
@@ -91,8 +121,8 @@
         </div>
     </div>
 
-    <div class="settings-content">
-        <div class="container">
+    <div class="member-content">
+        <div class="container agency-container">
             <div class="card">
                 <div class="card-body">
                     <!-- Align h4 to the left -->
@@ -100,8 +130,8 @@
     
                     @if($members && $members->count())
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead class="thead-dark">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="member">
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">{{ __('Name') }}</th>
@@ -137,17 +167,17 @@
     </div>
     
     
-
-    <div class="settings-content">
-        <div class="container">
+ <br>
+    <div class="charge-content">
+        <div class="container charge-container">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
             
                     @if($charges && $charges->count())
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead class="thead-dark">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="charge">
                                     <tr>
                                         <th style="text-align: center;">#</th>
                                         <th style="text-align: center;">{{ __('Name') }}</th>
