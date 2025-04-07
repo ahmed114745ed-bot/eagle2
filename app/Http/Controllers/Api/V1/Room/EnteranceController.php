@@ -594,7 +594,7 @@ class EnteranceController extends Controller
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
-            'room_id' => 'required|exists:rooms,id',
+            'owner_id' => 'required|exists:rooms,uid',
         ]);
 
         if ($validator->fails()) {
@@ -609,11 +609,10 @@ class EnteranceController extends Controller
             $send = $this->enteranceRoomService->makeRequestInviteRoom($user, $request);
             return $send;
         } catch (\Exception $th) {
-            \Log::error('Error inviting to room: ' . $th->getMessage());
+            // \Log::error('Error inviting to room: ' . $th->getMessage());
         
             return response()->json([
                 'status' => false,
-                'message1' => $th->getMessage(),
                 'message' => 'حدث خطأ أثناء إرسال الدعوة، حاول مرة أخرى لاحقًا.',
             ], 500);
         }
