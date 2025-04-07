@@ -16,6 +16,10 @@
 </div>
 
 <style>
+    .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+   
+    background-color:  var(--primary-color);;
+}
     .nav-scroll-container {
         overflow-x: auto;
         white-space: nowrap;
