@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -278,11 +279,11 @@ Route::group(
         $router->get('/', 'AllStatisticController@index')->name('home');
         $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
         $router->get('/custom-export-users', [
-            \App\Admin\Controllers\ExportController::class,
+            ExportController::class,
             'usersSallaryTargets'
         ])->name('custom-export-users');
         $router->get('/agency-export-report', [
-            \App\Admin\Controllers\ExportController::class,
+            ExportController::class,
             'usersAgencyTargets'
         ])->name('agency-export-report');
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');

@@ -70,7 +70,6 @@ class MainController extends AdminController
 
     public function show ( $id , Content $content )
     {
-        info($id);
         if (!Admin::user()->can('*')){
             Permission::check('show-'.$this->permission_name);
         }

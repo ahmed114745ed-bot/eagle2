@@ -162,7 +162,6 @@
                 <button
                     onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
-                <button onclick="showSection('live_stream_settings')"> {{ __('Live Stream settings') }}</button>
             </div>
         </div>
 
@@ -222,17 +221,6 @@
                 </form>
             </div>
 
-            <div id="live_stream_settings" class="settings-section">
-                <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.room-settings.store') }}" method="POST">
-                    @csrf
-                    <div class="form">
-
-
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
         </div>
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
