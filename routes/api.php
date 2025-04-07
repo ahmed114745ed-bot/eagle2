@@ -185,6 +185,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [RoomController::class, 'index']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
                 Route::post('/create', [RoomController::class, 'store']);
+                Route::post('/check-room', [RoomController::class, 'check_room']);
                 Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
                 Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
@@ -236,8 +237,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Invite user to room
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
 
-                //Check the room
-                Route::post('/check-room', [RoomController::class, 'check_room']);
 
 
             });
