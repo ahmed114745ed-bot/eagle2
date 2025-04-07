@@ -299,11 +299,41 @@ class UserController extends MainController
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $device_token  = $this->device_token;
             $users         =
-                User::select("name", 'uuid', 'phone')->where('device_token', $device_token)->where('device_token', '!=', null)->get();
-            $filteredUsers = $users->map(function ($user) {
-                return $user->only(["name", "uuid", "phone"]);
+                User::select(['id', 'name', 'uuid', 'phone'])->where('device_token', $device_token)->where('device_token', '!=', null)->get();
+//            $filteredUsers = $users->map(function ($user) {
+//                return $user->only(["name", "uuid", "phone"]);
+//            });
+            $rows = $users->map(function ($user) {
+                $path = $user->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                $image = handleShowImageWithTypes($user->id, $url, 40, 40);
+                $showUrl = $user ? url("admin/users/{$user->id}") : 0;
+
+                $nameColumn = "
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        $image
+                        <div>
+                            <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
+                            </a>
+                            <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
+                        </div>
+                    </div>
+                ";
+
+                return [
+                    'name' => $nameColumn,
+                    'phone' => $user->phone,
+                ];
             });
-            return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
+
+            return new Table([__('Name'), __('phone')], $rows->toArray());
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
