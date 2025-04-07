@@ -33,7 +33,7 @@ class SettingsController extends Controller
                 $value = $image;
             }
         //  dd($request->app_primary_color,$request->app_second_color);
-            
+
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
         }

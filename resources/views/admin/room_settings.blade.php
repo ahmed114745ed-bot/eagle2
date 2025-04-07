@@ -171,7 +171,7 @@
 
                 <h3> {{ __('Custom Background settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.room-settings.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form">
                         <label>{{ __('Cost request background:') }} </label>
@@ -190,7 +190,7 @@
 
             <div id="additional_settings" class="settings-section">
                 <h3>{{ __('Additional settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
+                <form action="{{ route('admin.room-settings.store') }}" method="POST">
                     <div class="form">
                         @csrf
 
@@ -224,7 +224,7 @@
 
             <div id="live_stream_settings" class="settings-section">
                 <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
+                <form action="{{ route('admin.room-settings.store') }}" method="POST">
                     @csrf
                     <div class="form">
 
