@@ -240,7 +240,7 @@ class UserController extends MainController
                     __('user days'),
                     __('user obtain'),
                     __('at time'),
-
+                    __('updated at'),
                 ],
                 $targets->toArray()
             );
