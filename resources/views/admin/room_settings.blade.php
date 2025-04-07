@@ -240,6 +240,7 @@
         </div>
         <!-- كود JavaScript -->
         <script>
+            showSection('custom_background_settings');
             document.addEventListener("DOMContentLoaded", function() {
                 // Function to get query parameter by name
                 function getQueryParam(name) {

@@ -191,7 +191,7 @@ class OvipGiftTapController extends MainController
                      } else {
                          $('#profile_frame').closest('.form-group').hide();
                          $('#image_type1').closest('.form-group').show();
-                         
+
                      }
                  }
                  toggleWinProbability();
