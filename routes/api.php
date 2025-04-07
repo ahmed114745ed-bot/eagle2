@@ -180,8 +180,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
             Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
-            Route::post('/check-room', [RoomController::class, 'check_room']);
             Route::prefix('rooms')->group(function () {
+                Route::post('/check-room', [RoomController::class, 'check_room']);
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/', [RoomController::class, 'index']);
                 Route::get('/game-rooms', [RoomController::class, 'gameRoom']);

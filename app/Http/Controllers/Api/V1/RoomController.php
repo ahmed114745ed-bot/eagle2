@@ -94,7 +94,7 @@ class RoomController extends Controller
     public function index(Request $request)
     {
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
-
+Log::info('shami Log');
         $rooms = $this->roomService->getAllRooms($request);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200, Common::getPaginates($rooms));
     }
