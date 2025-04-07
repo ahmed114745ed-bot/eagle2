@@ -677,7 +677,7 @@
                 text-align: center;
             }
             .rtl .asterisk:before {
-                content: none;
+                content: none !important;
             }
             .rtl .asterisk:after {
                 content: "* ";
