@@ -8,6 +8,7 @@ use App\Helpers\Common;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomVisitor;
+use Exception;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,13 @@ use App\Tik\Repositories\EnteranceRoomRepository;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Illuminate\Support\Facades\Schema;
 use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\Chat\Entities\ChatMessage;
+use Modules\Chat\Entities\ChatRoom;
+use Modules\Chat\Events\Chat;
+use Modules\Chat\Events\Conversation;
+use Modules\Chat\Events\OpenChat;
+use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Entities\CpRoomHistory;
 
 class EnteranceRoomServices
@@ -542,4 +550,86 @@ class EnteranceRoomServices
             ]
         );
     }
+
+
+    public function makeRequestInviteRoom($user, $request)
+    {
+        $room = Room::find($request->room_id);
+        if (!$room) throw new Exception('room not found');
+
+        $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
+
+
+        if (!$chatRoom) {
+
+            $chatRoom = ChatRoom::create([
+                'user_id' => $user->id,
+                'user_id2' => $request->user_id
+            ]);
+
+            $user->current_room_chat = $chatRoom->id;
+        }
+
+
+        $user2 = User::find($request->user_id);
+        if (!$user2) throw new Exception('user not found');
+
+
+        $data = [
+            'title' => __('I invite you to enter my room'),
+            'room_id' => $request->id,
+            'status' => 0
+        ];
+
+        $key = env('MESSAGE_KEY');
+
+        $message = json_encode($data);
+
+        $chatMessageData = [
+            'chat_room_id' => $chatRoom->id,
+            'user_id' => $user->id,
+            'message' => $message,
+            'type' => 'message'
+        ];
+
+        if ($user2->online == 1 && $user2->current_room_chat == $chatRoom->id) {
+
+            $chatMessageData['status'] = 'seen';
+        } else if ($user2->online == 1) {
+            $chatMessageData['status'] = 'received';
+        }
+        $chatMessage = ChatMessage::create($chatMessageData);
+
+        if ($user2->is_logout != 1) {
+            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
+            $title = $user->name;
+            $body = $message;
+            $type = $message->type ?? 'text';
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+        }
+
+        $message_resource = new ChatMessageResource($chatMessage);
+        $room_resource =  new ChatRoomResourcePusher($chatRoom);
+
+        if ($chatRoom->user_id == $user->id) {
+            $chatuser = User::find($chatRoom->user_id2);
+        } else {
+            $chatuser = User::find($chatRoom->user_id);
+        }
+
+        try {
+            event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
+
+        event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
+
+        event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
+
+        return Common::apiResponse(1, 'تم الارسال  بنجاح');
+    
+
+    }
+    
 }

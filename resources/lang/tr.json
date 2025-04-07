@@ -91,6 +91,8 @@
   "days": "Günler",
   "introduce": "Tanıtım",
   "notice": "Duyuru",
+  "Notice": "Duyuru",
+  "Go Back": "Geri Dön",
   "number of people": "Kişi Sayısı",
   "user id": "Kullanıcı Kimliği",
   "speak switch": "Konuşma Anahtarı",
@@ -1756,6 +1758,7 @@
     "Background Image": "Arka Plan Resmi",
     "Save Settings": "Ayarları Kaydet",
     "Real Time system Setting": "Gerçek Zamanlı Sistem Ayarı",
+    "I invite you to enter my room": "Sizi odamıma girmeye davet ediyorum",
     "pusher": "İtici"
 
 

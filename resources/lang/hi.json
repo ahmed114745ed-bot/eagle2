@@ -89,6 +89,8 @@
     "days": "दिन",
     "introduce": "परिचय",
     "notice": "सूचना",
+    "Notice": "सूचना",
+    "Go Back": "वापस जाएँ",
     "number of people": "लोगों की संख्या",
     "user id": "उपयोगकर्ता आईडी",
     "speak switch": "बोलने की स्विच",
@@ -895,12 +897,7 @@
      "Primary Color": "मुख्य रंग",
      "Second Color": "दूसरा रंग",
      "Background Type": "पृष्ठभूमि प्रकार",
-     "Color": "रंग",
-     "Image": "छवि",
-     "Background Color": "पृष्ठभूमि का रंग",
-     "Background Image": "पृष्ठभूमि छवि",
-     "Save Settings": "सेटिंग्स सहेजें",
-     "Real Time system Setting": "रियल टाइम सिस्टम सेटिंग",
+     "I invite you to enter my room": "मैं आपको अपने कमरे में प्रवेश करने के लिए आमंत्रित करता हूँ",
      "pusher": "पुशर"
 
 

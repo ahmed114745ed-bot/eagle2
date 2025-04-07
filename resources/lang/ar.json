@@ -87,6 +87,9 @@
     "days": "الايام",
     "introduce": "تعريف",
     "notice": "تنويه",
+    "Notice": "تنويه",
+    "Go Back":"رجوع",
+
     "number of people": "عدد الاشخاص",
     "user id": "معرف المستخدم",
     "speak switch": "حظر الاعضاء",
@@ -1809,7 +1812,8 @@
     "Background Image": "صورة الخلفية",
     "Save Settings": "حفظ الإعدادات",
     "Real Time system Setting": "إعداد نظام الوقت الفعلي",
-    "pusher": "بشر"
+    "pusher": "بشر",
+    "I invite you to enter my room": "أدعوكم لدخول غرفتي"
 
 
 }
