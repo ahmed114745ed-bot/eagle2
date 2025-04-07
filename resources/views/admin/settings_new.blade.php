@@ -334,7 +334,7 @@
     }
 
     .card-header {
-        background: var(--primary-color);
+        background: {{ $settings['primary_color'] ?? '#000000' }};
         /* Light gray background */
         padding: 12px 15px;
         border-bottom: 1px solid #ddd;
