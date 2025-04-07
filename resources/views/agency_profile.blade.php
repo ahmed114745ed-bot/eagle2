@@ -83,7 +83,9 @@
             <div class="details">
                 <p><strong>ID:</strong> {{ $agency->id }}</p>
                 <p><strong>Phone:</strong> {{ $agency->phone }}</p>
-                <p><strong>Owner:</strong> {{ $agency->owner->name }}, UUID: {{ $agency->owner->uuid }}</p>
+                @if($agency->owner)
+                    <p><strong>Owner:</strong> {{ $agency->owner->name }}, UUID: {{ $agency->owner->uuid }}</p>
+                @endif
                 <p><strong>Notice:</strong> {{ $agency->notice }}</p>
             </div>
             <button onclick="window.history.back()">Go Back</button>
