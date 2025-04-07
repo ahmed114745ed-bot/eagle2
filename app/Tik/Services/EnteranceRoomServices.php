@@ -623,10 +623,7 @@ class EnteranceRoomServices
             return $th->getMessage();
         }
         Log::info('Preparing to fire OpenChat event', [
-            'message_resource' => $message_resource->toArray(request()),
-            'room_resource' => $room_resource->toArray(request()),
-            'chat_user' => $chatuser,
-            'chat_room' => $chatRoom,
+            'message_resource' => $message_resource->toArray(request())
         ]);
         event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
 
@@ -638,3 +635,18 @@ class EnteranceRoomServices
     }
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+Preparing to fire OpenChat event {
+    "message_resource":{
+        "replay":null,"id":3863,"user_id":444,"message":"I invite you to enter my room","status":"received","room_id":"50","type":"invite_room","duration":"","chat_room_id ":1612,"sender_deleted":false,"receiver_deleted":false,"reacts":null,"albums":null,"created_at":"10:13:29 AM"},"room_resource":{"user_id":444,"name":"jackline kamel","img":"profile/r4Ue9Q9HqT.jpg","chat_id":1612,"unread_message":2,"last_message":{"Modules\\Chat\\Http\\Resources\\ChatMessageResource":{"replay":null,"id":3863,"user_id":444,"message":"I invite you to enter my room","status":"received","room_id":50,"type":"invite_room","duration":"","chat_room_id ":1612,"sender_deleted":false,"receiver_deleted":false,"reacts":null,"albums":null,"created_at":"10:13:29 AM"}}},"chat_user":{"App\\Models\\User":{"id":50,"online":1,"name":"بيلا","email":null,"email_verified_at":null,"created_at":"2023-09-09T10:17:08.000000Z","updated_at":"2025-03-02T09:41:35.000000Z","phone":null,"google_id":"111668685078005482423","huawei_id":null,"facebook_id":null,"di":0,"coins":0.0,"room_coins":0.0,"flowers":0.0,"flowers_value":0.0,"gold":0.0,"is_leader":0,"is_sign":0,"isOnline":0,"status":1,"is_points_first":0,"locktime":null,"online_time":1694255105,"dress_1":null,"dress_2":null,"dress_3":null,"dress_4":null,"cp_card":null,"keys_num":null,"nickname":"","idno":null,"mykeep":null,"system":"normal","channel":"normal","img_1":null,"img_2":null,"img_3":null,"points":0,"login_ip":null,"device_token":null,"scale":0,"is_idcard":0,"now_room_uid":null,"bio":null,"agency_id":145,"family_id":null,"is_host":0,"whatsapp":null,"old_usd":0.0,"target_usd":0.0,"target_token_usd":0.0,"uuid":"5600993","is_gold_id":0,"chat_id":null,"notification_id":null,"vip":0,"sub_sender_level":0,"sub_receiver_level":0,"sub_sender_num":0,"sub_receiver_num":0,"salary":0.0,"monthly_diamond_send":0,"total_diamond_send":0,"monthly_diamond_received":0,"exchange_diamonds":0.0,"total_diamond_received":0,"sender_level":0,"received_level":0,"type_user":0,"is_manger":0,"dashboard_manager_id":0,"apple_id":null,"today_days":0,"monthly_days":0,"total_days":2,"lang":"en","lan":"en","unread_count_message":430,"country_id":null,"image_color_id":0,"deleted_at":null,"current_app_version":null,"can_play":0,"stopshow_gift":0,"manger_type_id":null,"reel_following_type":"0","charge_status":true,"android_version":0,"ios_version":0,"huawei_version":0,"appear_charger_agency":1,"special_id":null,"current_room_chat":null,"game_id":null,"type":"app","transfer_salary":false,"join_agency_date":null,"salary_is_updated":0,"is_logout":1,"lat":null,"long":null,"total_points":0,"moment_type":"0","total_charge_coins":null,"charge_level":null,"color_id":null,"following":3,"follower":4,"friend":3,"new_gift":0,"sub_charger_level":null,"sub_charger_coins":null,"user_diamond":0,"total_sender_level":0,"total_received_level":0,"original_uuid":"5600993","is_frozen":0,"total_charge_level":0,"agency":{"id":145,"owner_id":0,"name":"jako","notice":"g","status":1,"phone":"+201234567896","url":"https://test.tik-chat.com/admin/agencies/create","img":"images/WhatsApp Image 2025-02-26 at 10.33.56 AM.jpeg","contents":"262","created_at":"2025-03-02 09:23:34","updated_at":"2025-04-03 11:53:27","old_usd":null,"target_usd":1200.0,"target_token_usd":null,"app_owner_id":444,"salary":12875.7,"Shipping_agency":1,"Host_agency":1,"agency_manger_id":null,"agency_dash_manger_id":null,"deleted_at":null,"monthly_target":1000000.0,"coins":8000,"is_frozen":0}}},"chat_room":{"Modules\\Chat\\Entities\\ChatRoom":{"id":1612,"user_id":444,"user_id2":50,"type":"friends","user_1_deleted":null,"user_2_deleted":null,"created_at":"2025-04-07 10:07:05","updated_at":"2025-04-07 10:07:05","messages":[{"id":3863,"chat_room_id":1612,"user_id":444,"message":"I invite you to enter my room","type":"invite_room","file":null,"status":"received","user_1_deleted":null,"user_2_deleted":null,"created_at":"2025-04-07 10:13:29","updated_at":"2025-04-07 10:13:29","duration":null,"room_id":50},{"id":3862,"chat_room_id":1612,"user_id":444,"message":"I invite you to enter my room","type":"invite_room","file":null,"status":"received","user_1_deleted":null,"user_2_deleted":null,"created_at":"2025-04-07 10:07:05","updated_at":"2025-04-07 10:07:05","duration":null,"room_id":50}]}}}
