@@ -86,7 +86,7 @@
                 <p><strong>{{__("Owner")}}:</strong> {{ @$agency?->owner?->name ?? '' }}, UUID: {{ @$agency?->owner?->uuid ?? '' }}</p>
                 <p><strong>{{__("Notice")}}:</strong> {{ @$agency->notice ?? '' }}</p>
             </div>
-            <button onclick="window.history.back()">Go Back</button>
+            <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
     </div>
 </body>
