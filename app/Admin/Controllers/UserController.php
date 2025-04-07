@@ -300,9 +300,7 @@ class UserController extends MainController
             $device_token  = $this->device_token;
             $users         =
                 User::select(['id', 'name', 'uuid', 'phone'])->where('device_token', $device_token)->where('device_token', '!=', null)->get();
-//            $filteredUsers = $users->map(function ($user) {
-//                return $user->only(["name", "uuid", "phone"]);
-//            });
+
             $rows = $users->map(function ($user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
