@@ -64,7 +64,7 @@ class AgencyController extends MainController
     }
 
     public function profile($id, Content $content){
-        $agency = Agency::findOrFail($id);
+        $agency = Agency::with('charges','mempers')->findOrFail($id);
         return $content->title(__('agency profile'))->view('agency_profile', compact('agency'));
     }
 
