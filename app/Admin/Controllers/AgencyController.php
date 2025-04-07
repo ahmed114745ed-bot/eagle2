@@ -63,9 +63,11 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content){
-        $agency = Agency::findOrFail($id);
-        return $content->title(__('agency profile'))->view('agency_profile', compact('agency'));
+    public function profile($id, Content $content) {
+        $agency = Agency::with('charges','mempers')->findOrFail($id);
+        $members = $agency->mempers()->paginate(10, ['*'], 'members_page'); // Custom page name
+        $charges = $agency->charges()->paginate(10, ['*'], 'charges_page'); // Custom page name
+        return $content->title(__('agency profile'))->view('agency_profile', compact('agency','members','charges'));
     }
 
     public function update($id)

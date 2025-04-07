@@ -79,15 +79,102 @@
             <div class="avatar">
                 <img src="{{ getImagePath(@$agency->img) }}" alt="Agency Logo">
             </div>
-            <h2>{{ $agency->name }}</h2>
+            <h2>{{ @$agency?->name ?? ''}}</h2>
             <div class="details">
                 <p><strong>{{__("ID")}}:</strong> {{ $agency->id }}</p>
                 <p><strong>{{__("Phone")}}:</strong> {{ @$agency->phone ?? '' }}</p>
                 <p><strong>{{__("Owner")}}:</strong> {{ @$agency?->owner?->name ?? '' }}, UUID: {{ @$agency?->owner?->uuid ?? '' }}</p>
                 <p><strong>{{__("Notice")}}:</strong> {{ @$agency->notice ?? '' }}</p>
+                <p><strong>{{__("coins")}}:</strong> {{ number_format(@$agency->coins) ?? 0 }}</p>
+                <p><strong>{{__("salary")}}:</strong> {{ number_format(@$agency->salary) ?? 0 }}</p>
             </div>
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
     </div>
+
+    <div class="settings-content">
+        <div class="container">
+            <h2>{{ __('members') }}</h2>
+    
+            @if($members && $members->count())
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">#</th>
+                                <th style="text-align: center;">{{ __('Name') }}</th>
+                                <th style="text-align: center;">{{ __('uuid') }}</th>
+                                <th style="text-align: center;">{{ __('image') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($members as $index => $member)
+                                <tr>
+                                    <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                    <td>{{ @$member->name ?? '' }}</td>
+                                    <td>{{ @$member->uuid ?? '' }}</td>
+                                    <td>
+                                        <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+    
+                    <!-- Pagination Links -->
+                    <div class="pagination-container">
+                        {{ $members->appends(['charges_page' => $charges->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                </div>
+            @else
+                <p>{{ __('No members found.') }}</p>
+            @endif
+        </div>
+    </div>
+    
+
+    <div class="settings-content">
+        <div class="container">
+            <h2>{{ __('charge') }}</h2>
+    
+            @if($charges && $charges->count())
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th style="text-align: center;">#</th>
+                                <th style="text-align: center;">{{ __('Name') }}</th>
+                                <th style="text-align: center;">{{ __('coin') }}</th>
+                                <th style="text-align: center;">{{ __('created') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($charges as $index => $charge)
+                                <tr>
+                                    <td>{{ $charges->firstItem() + $index }}</td> <!-- To correctly show the index based on pagination -->
+                                    <td>
+                                        <img src="{{ getImagePath(@$charge->admin->avatar) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                        {{ @$charge->admin->name ?? '' }}
+                                    </td>
+                                    <td>{{ number_format(@$charge->amount ?? 0) }}</td>
+                                    <td>{{ @$charge->created_at ?? '' }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+    
+                <!-- Pagination Links -->
+                <div class="pagination-container">
+                    {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                </div>
+    
+            @else
+                {{-- <p>{{ __('No charges found.') }}</p> --}}
+            @endif
+        </div>
+    </div>
+    
+    
 </body>
 </html>
