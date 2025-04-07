@@ -610,11 +610,9 @@ class EnteranceController extends Controller
             return $send;
         } catch (\Exception $th) {
             // \Log::error('Error inviting to room: ' . $th->getMessage());
+            return Common::apiResponse(0,     $th->getMessage(),[],500);
+
         
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage(),
-            ], 500);
         }
     }
     
