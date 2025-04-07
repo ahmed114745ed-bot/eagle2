@@ -237,8 +237,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
 
                 //Check the room
-
-                Route::post('check-room', [RoomController::class, 'check_room']);
+                Route::post('/check-room', [RoomController::class, 'check_room']);
 
 
             });
