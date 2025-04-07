@@ -613,7 +613,7 @@ class EnteranceController extends Controller
         
             return response()->json([
                 'status' => false,
-                'message' => 'حدث خطأ أثناء إرسال الدعوة، حاول مرة أخرى لاحقًا.',
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
