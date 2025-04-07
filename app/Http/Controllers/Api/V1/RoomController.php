@@ -1766,4 +1766,23 @@ class RoomController extends Controller
         $result = Room::where('uid',$id)->first()?->gifts()->paginate($perPage);
         return Common::apiResponse(true, 'done',GiftRoomResource::collection($result) );
     }
+
+
+    public function check_room(Request $request){
+
+        $request['show'] = true;
+        $id = $request->room_id;
+        $room = $this->roomService->findRoom($id);
+        if (!$room) {
+            return Common::apiResponse(0, 'not found', null, 404);
+         
+        }
+
+        $data = [
+            'is_live' => $room->is_live ? true : false,  
+            'room_status' => $room->room_status == 2 ? 'locked' : 'unlocked'  
+        ];
+            return Common::apiResponse(true, '', $data, 200);
+        
+    }
 }
