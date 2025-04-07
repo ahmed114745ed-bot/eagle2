@@ -9,6 +9,7 @@ use App\Models\Timezone;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\NotificationTranslation;
+use Illuminate\Support\Facades\File;
 
 class SettingsController extends Controller
 {
@@ -36,6 +37,10 @@ class SettingsController extends Controller
 
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
+
+            $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
+
+            settings()->set($key, time());
         }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');

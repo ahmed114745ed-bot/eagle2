@@ -434,10 +434,10 @@
                             <div class="form-group">
                                 <label>{{ __('Application logo:') }}</label>
                                 <input type="file" name="app_logo" class="form-control" onchange="previewImage(event)">
-                        
+
                                 <!-- Image Preview -->
-                                <img id="imagePreview" 
-                                     src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}" 
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
                                      width="100" class="mt-2"
                                      style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
                                      onclick="openFullScreen(this)">
@@ -447,10 +447,10 @@
                             <div class="form-group">
                                 <label>{{ __('Application Fav Icon:') }}</label>
                                 <input type="file" name="app_fav_icon" class="form-control" onchange="previewFavIcon(event)">
-                        
+
                                 <!-- Image Preview -->
-                                <img id="favIconPreview" 
-                                     src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}" 
+                                <img id="favIconPreview"
+                                     src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
                                      width="100" class="mt-2"
                                      style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
                                      onclick="openFullScreen(this)">
@@ -689,7 +689,7 @@
                         <div class="col-md-6">
                             <div class="form-group" id="background_color_group">
                                 <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" name="background_color" class="form-control" 
+                                <input type="color" id="background_color" name="background_color" class="form-control"
                                 value="{{ $settings['background_color'] ?? '#ffffff' }}"
                                 onchange="updateBackgroundValue()">
                             </div>
@@ -771,7 +771,7 @@
                         }
                     });
 
-                    updateSwitches(); 
+                    updateSwitches();
                 });
 
             </script>
@@ -928,16 +928,16 @@
             // Reset color inputs
             document.getElementById('app_primary_color').value = "#32e5ac";
             document.getElementById('second_color').value = "#003FA6";
-            
+
             // Reset background (assuming you want color background)
             document.getElementById('background_type').value = "color";
             document.getElementById('background_color').value = "#32e5ac";
             document.getElementById('app_background').value = "#32e5ac";
-            
+
             // Show the correct background input group
             document.getElementById('background_color_group').style.display = 'block';
             document.getElementById('background_image_group').style.display = 'none';
-            
+
             // Submit the form
             document.querySelector('#appSettings form').submit();
                         });
