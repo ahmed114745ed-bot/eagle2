@@ -554,7 +554,7 @@ class EnteranceRoomServices
 
     public function makeRequestInviteRoom($user, $request)
     {
-        $room = Room::find($request->room_id);
+        $room = Room::where('uid','=',$request->owner_id);
         if (!$room) throw new Exception('room not found');
 
         $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
@@ -577,7 +577,7 @@ class EnteranceRoomServices
 
         $data = [
             'title' => __('I invite you to enter my room'),
-            'room_id' => intval($request->room_id),
+            'room_owner_id' => intval($request->owner_id),
             'status' => 0
         ];
 
@@ -588,7 +588,7 @@ class EnteranceRoomServices
         $chatMessageData = [
             'chat_room_id' => $chatRoom->id,
             'user_id' => $user->id,
-            'room_id' => intval($request->room_id),
+            'room_owner_id' => intval($request->owner_id),
             'message' => __('I invite you to enter my room'),
             'type' => 'invite_room'
         ];
