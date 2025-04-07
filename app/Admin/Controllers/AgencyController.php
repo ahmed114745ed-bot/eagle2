@@ -254,7 +254,7 @@ class AgencyController extends MainController
         });
         $grid->column('target', trans('target'))->display(function () {
             $target = $this->getTargetsAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
-           
+
             return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>" : "";
         });

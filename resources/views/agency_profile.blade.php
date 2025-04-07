@@ -77,16 +77,16 @@
     <div class="settings-content">
         <div class="container">
             <div class="avatar">
-                <img src="{{ asset($agency->img) }}" alt="Agency Logo">
+                <img src="{{ getImagePath(@$agency->img) }}" alt="Agency Logo">
             </div>
             <h2>{{ $agency->name }}</h2>
             <div class="details">
-                <p><strong>ID:</strong> {{ $agency->id }}</p>
-                <p><strong>Phone:</strong> {{ $agency->phone }}</p>
-                <p><strong>Owner:</strong> {{ $agency->owner->name }}, UUID: {{ $agency->owner->uuid }}</p>
-                <p><strong>Notice:</strong> {{ $agency->notice }}</p>
+                <p><strong>{{__("ID")}}:</strong> {{ $agency->id }}</p>
+                <p><strong>{{__("Phone")}}:</strong> {{ @$agency->phone ?? '' }}</p>
+                <p><strong>{{__("Owner")}}:</strong> {{ @$agency?->owner?->name ?? '' }}, UUID: {{ @$agency?->owner?->uuid ?? '' }}</p>
+                <p><strong>{{__("Notice")}}:</strong> {{ @$agency->notice ?? '' }}</p>
             </div>
-            <button onclick="window.history.back()">Go Back</button>
+            <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
     </div>
 </body>

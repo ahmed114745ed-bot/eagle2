@@ -129,7 +129,8 @@ class UserController extends MainController
         return (new Box(
             title: __('admin.Actions'),
             content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary',])),
-        ))->collapsable()->class('box collapsed-box');
+        ));
+       // ->collapsable()->class('box collapsed-box');
     }
     protected function grid()
     {
