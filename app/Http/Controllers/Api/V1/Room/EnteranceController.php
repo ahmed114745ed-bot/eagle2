@@ -34,6 +34,7 @@ use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Tik\Services\EnteranceRoomServices;
+use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
 
@@ -588,4 +589,34 @@ class EnteranceController extends Controller
         //        }
 
     }
+
+    public function invite_user(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'room_id' => 'required|exists:rooms,id',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = implode(',', $validator->errors()->all());
+            return Common::apiResponse(0, $errors);
+        }
+
+
+
+        $user = $request->user();
+        try {
+            $send = $this->enteranceRoomService->makeRequestInviteRoom($user, $request);
+            return $send;
+        } catch (\Exception $th) {
+            \Log::error('Error inviting to room: ' . $th->getMessage());
+        
+            return response()->json([
+                'status' => false,
+                'message1' => $th->getMessage(),
+                'message' => 'حدث خطأ أثناء إرسال الدعوة، حاول مرة أخرى لاحقًا.',
+            ], 500);
+        }
+    }
+    
 }
