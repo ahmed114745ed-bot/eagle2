@@ -130,6 +130,7 @@ class ChatMessageResource extends JsonResource
             'user_id' => $this->user_id,
             'message' => $this->message,
             'status' => $this->status,
+            'room_id' => $this->room_id ?? '',
             'type' => $this->type,
             'duration' => $this->duration ?? '',
             'chat_room_id ' => $this->chat_room_id,

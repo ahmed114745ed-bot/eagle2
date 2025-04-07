@@ -897,6 +897,14 @@
      "Primary Color": "मुख्य रंग",
      "Second Color": "दूसरा रंग",
      "Background Type": "पृष्ठभूमि प्रकार",
+     "Color": "रंग",
+     "Image": "छवि",
+     "Background Color": "पृष्ठभूमि का रंग",
+     "Background Image": "पृष्ठभूमि छवि",
+     "Save Settings": "सेटिंग्स सहेजें",
+     "Real Time system Setting": "रियल टाइम सिस्टम सेटिंग",
+     "pusher": "पुशर",
+     "No members found.": "कोई सदस्य नहीं मिला",
      "I invite you to enter my room": "मैं आपको अपने कमरे में प्रवेश करने के लिए आमंत्रित करता हूँ",
      "pusher": "पुशर"
 

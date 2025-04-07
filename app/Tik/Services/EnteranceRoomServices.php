@@ -588,8 +588,9 @@ class EnteranceRoomServices
         $chatMessageData = [
             'chat_room_id' => $chatRoom->id,
             'user_id' => $user->id,
-            'message' => $message,
-            'type' => 'message'
+            'room_id' => $request->room_id,
+            'message' => __('I invite you to enter my room'),
+            'type' => 'invite_room'
         ];
 
         if ($user2->online == 1 && $user2->current_room_chat == $chatRoom->id) {
