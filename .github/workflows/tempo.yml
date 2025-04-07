@@ -13,6 +13,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
+        command_timeout: 22m
         script: |
           threshold=75
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
