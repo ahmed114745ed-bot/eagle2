@@ -197,7 +197,7 @@ class UserController extends MainController
             $showUrl = $agency ? url("admin/agencies/profile/{$agency->id}") : 0;
             $results = [
              __('name') => "  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>@$agency->name</span>
+                         <span style='text-decoration: underline; cursor: pointer;'>@$agency?->name</span>
                         </a>",
              __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
 
