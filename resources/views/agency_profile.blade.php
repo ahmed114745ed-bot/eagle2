@@ -96,7 +96,7 @@
         <div class="container">
             <h2>{{ __('members') }}</h2>
     
-            @if($agency->mempers && $agency->mempers->count())
+            @if($members && $members->count())
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="thead-dark">
@@ -107,10 +107,10 @@
                                 <th style="text-align: center;">{{ __('image') }}</th>
                             </tr>
                         </thead>
-                        <tbody style=" color: rgb(208, 115, 43);">
-                            @foreach($agency->mempers as $index => $member)
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($members as $index => $member)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                     <td>{{ @$member->name ?? '' }}</td>
                                     <td>{{ @$member->uuid ?? '' }}</td>
                                     <td>
@@ -120,19 +120,24 @@
                             @endforeach
                         </tbody>
                     </table>
+    
+                    <!-- Pagination Links -->
+                    <div class="pagination-container">
+                        {{ $members->appends(['charges_page' => $charges->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
                 </div>
             @else
                 <p>{{ __('No members found.') }}</p>
             @endif
-    
         </div>
     </div>
+    
 
     <div class="settings-content">
         <div class="container">
             <h2>{{ __('charge') }}</h2>
     
-            @if($agency->charges && $agency->charges->count())
+            @if($charges && $charges->count())
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="thead-dark">
@@ -143,29 +148,33 @@
                                 <th style="text-align: center;">{{ __('created') }}</th>
                             </tr>
                         </thead>
-                        <tbody style=" color: rgb(208, 115, 43);">
-                            @foreach($agency->charges as $index => $charge)
+                        <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($charges as $index => $charge)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $charges->firstItem() + $index }}</td> <!-- To correctly show the index based on pagination -->
                                     <td>
                                         <img src="{{ getImagePath(@$charge->admin->avatar) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                         {{ @$charge->admin->name ?? '' }}
                                     </td>
                                     <td>{{ number_format(@$charge->amount ?? 0) }}</td>
-                                    <td>
-                                        {{ @$charge->created_at ?? '' }}
-                                    </td>
+                                    <td>{{ @$charge->created_at ?? '' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            @else
-                {{-- <p>{{ __('No  found') }}</p> --}}
-            @endif
     
+                <!-- Pagination Links -->
+                <div class="pagination-container">
+                    {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                </div>
+    
+            @else
+                {{-- <p>{{ __('No charges found.') }}</p> --}}
+            @endif
         </div>
     </div>
+    
     
 </body>
 </html>
