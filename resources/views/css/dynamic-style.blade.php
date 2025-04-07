@@ -663,6 +663,21 @@
                 direction: ltr;
 
             }
+            .rtl .colorpicker-element .color{
+                float: right !important;
+            }
+           .rtl .form-horizontal .control-label {
+                padding-top: 7px;
+                margin-bottom: 0;
+                text-align: center;
+            }
+            .rtl .asterisk:before {
+                content: none;
+            }
+            .rtl .asterisk:after {
+                content: "* ";
+                color: red;
+            }
 
  
 
@@ -719,7 +734,7 @@
                 margin-right: 250px; 
         }
     }
-
+  
 
 .rtl .sidebar-menu > li > a .fa-angle-left {
     transform: rotate(180deg);
