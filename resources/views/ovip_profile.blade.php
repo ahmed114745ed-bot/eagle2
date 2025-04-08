@@ -262,7 +262,7 @@
                 @php
                     $url = getImagePath($oVip->img);
                 @endphp
-                {!! handleShowImageWithTypes($oVip->id, $url, 100, 100) !!}
+                {!! handleShowImageWithTypes($oVip->id, $url, 200, 200) !!}
             </div>
 
             {{-- <button onclick="window.history.back()">{{ __("Go Back") }}</button> --}}
