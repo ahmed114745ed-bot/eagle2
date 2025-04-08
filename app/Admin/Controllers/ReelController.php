@@ -92,13 +92,13 @@ class ReelController extends MainController
         });
 
 
-        $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
+        $grid->column('comment_num', __('status'))->display(function ($commentNum) {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
             return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
         });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
-        $grid->column('video', __('Video'))->display(function () {
+        $grid->column('video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
             $videoPath = getDriverUrl().'/'.$this->url;
 
