@@ -73,7 +73,7 @@ class SpecialHistoryController extends AdminController
         $grid->column('user.name', __('User'))->display(function () {
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($this->user?->profile?->avatar) ?? $defaultImage;
-            $name =$this->user?->name ?? '';
+            $name = @$this->user?->name ?? '';
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
