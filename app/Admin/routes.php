@@ -400,7 +400,7 @@ Route::group(
         $router->get('/vips_dedicate', 'DedicateVipController@index');
         $router->resource('/bans', 'BanController');
         $router->resource('/bans-rooms', 'BanRoomsController');
-        
+
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
@@ -471,7 +471,7 @@ Route::group(
             Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
-        
+
     }
 
 
