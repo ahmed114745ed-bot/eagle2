@@ -625,7 +625,7 @@
                 text-align: start;
             }
             .rtl .form-horizontal .row {
-                display: grid;
+                /* display: grid; */
                 direction: rtl !important;
                 flex-direction: row-reverse !important;
 
