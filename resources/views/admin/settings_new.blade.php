@@ -554,7 +554,7 @@
 
                 <div class="form-group" id="background_image_group" style="display: none;">
                     <label for="background_image">{{ __('Background Image') }}</label>
-                    <input type="file" id="background_image" class="form-control" onchange="updateBackgroundValue()">
+                    <input type="file" id="background_image"  name="app_background_image" class="form-control" onchange="updateBackgroundValue()">
                 </div>
                 </div>
 
@@ -573,7 +573,7 @@
                             @if($image1)
                                 <div class="mt-2">
                                     <!-- <label>{{ __('Old Image') }}</label><br> -->
-                                    <img src="{{ getImagePath(  $image1) }}" alt="Old Image 1" width="100">
+                                    <img src="{{ getImagePath(  $image1) }}" alt="Image" width="100">
                                 </div>
                             @endif
                         </div>
@@ -587,7 +587,7 @@
                             @if($image2)
                                 <div class="mt-2">
                                     <!-- <label>{{ __('Old Image') }}</label><br> -->
-                                    <img src="{{ getImagePath(  $image2) }}" alt="Old Image 2" width="100">
+                                    <img src="{{ getImagePath(  $image2) }}" alt="Image" width="100">
                                 </div>
                             @endif
                         </div>
@@ -600,8 +600,7 @@
                             <input type="file" id="image3" name="image3" class="form-control" onchange="updatePreview('image3')">
                             @if($image3)
                                 <div class="mt-2">
-                                    <!-- <label>{{ __('Old Image') }}</label><br> -->
-                                    <img src="{{ getImagePath(  $image3) }}" alt="Old Image 3" width="100">
+                                    <img src="{{ getImagePath(  $image3) }}" alt="Image" width="100">
                                 </div>
                             @endif
                         </div>
