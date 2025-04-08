@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Config;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -31,8 +32,8 @@ class OVipController extends MainController
     }
 
     public function vip_settings(Content $content){
-        return $content
-        ->view('vip_settings');
+        $config = Config::pluck('value', 'name')->toArray();
+        return $content->view('vip_settings', compact('config'));
     }
 
     public function index(Content $content)

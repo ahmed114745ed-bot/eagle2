@@ -20,16 +20,10 @@ class UpgradeLevelController extends MainController
 
     public function ovipConfig(Request $request)
     {
-        $conf = Config::where('name','buy_aristocracy')->first();
-        if(!$conf)
-        {
-            config::create([
-                'name'  => 'buy_aristocracy',
-                'value' => $request->number,
-            ]);
-        }else{
-            $conf->value = $request->number;
-            $conf->save();
+        $data = $request->except('_token');
+
+        foreach ($data as $key => $value) {
+            Config::updateOrCreate(['name' => $key], ['value' => $value]);
         }
 
         return redirect()->back()->with('message', __('dashboard.update'));

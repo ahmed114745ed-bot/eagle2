@@ -159,8 +159,8 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('VipSettings')"
-                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('vip Settings') }}</button>
+                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('vip Settings') }}</button>
+                <button onclick="showSection('enable_vip_auto')">{{ __('Enable Vip Auto') }}</button>
             </div>
         </div>
 
@@ -170,12 +170,30 @@
 
                 <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    @php
-                        $vip=DB::table('configs')->where('name','buy_aristocracy')->first();
-                    @endphp
                     <div class="form">
-                        <label for="number">{{ __('admin.user_exp') }}</label>
-                        <input type="number" id="number" name="number" min="1"  value="{{$vip->value ?? ''}}"/>
+                        <label for="buy_aristocracy">{{ __('admin.user_exp') }}</label>
+                        <input type="number" id="buy_aristocracy" name="buy_aristocracy" min="1"  value="{{$config['buy_aristocracy'] ?? ''}}"/>
+                        <button type="submit">{{ __('Save') }}</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <div id="enable_vip_auto" class="settings-section">
+                <h3> {{ __('Enable Vip Auto') }}</h3>
+
+                <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form">
+                        <label for="enable_vip_auto">{{ __('admin.user_exp') }}</label>
+                        <select name="enable_vip_auto" id="enable_vip_auto">
+                            <option value="1" {{ (isset($config['enable_vip_auto']) && $config['enable_vip_auto']) ? 'selected' : '' }}>
+                                {{ __('True') }}
+                            </option>
+                            <option value="0" {{ (isset($config['enable_vip_auto']) && !$config['enable_vip_auto']) ? 'selected' : '' }}>
+                                {{ __('False') }}
+                            </option>
+                        </select>
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
 
