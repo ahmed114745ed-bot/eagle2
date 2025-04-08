@@ -269,7 +269,7 @@
                     @foreach($oVip->privilegs as $privilege)
                         <div class="privilege-item">
                             <div class="image-container">
-                                <img src="{{ asset($privilege->image) }}"  class="privilege-img">
+                                <img src="{{ getImagePath($privilege->img1) }}"  class="privilege-img">
                             </div>
                             <div class="privilege-name text-center">{{ $privilege->name }}</div>
                         </div>
