@@ -135,47 +135,115 @@
             }
         }
 
-        .privileges-grid {
+        /* Main Container */
+/* .agency-container {
+    width: 100%;
+    padding: 20px;
+} */
+
+/* Card Styling */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(187, 109, 7, 0.1);
+    padding: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 3rem;
+    color: #da7116;
+}
+
+.privileges-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px; /* Increased gap between items */
+    justify-items: center;
 }
 
 .privilege-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    gap: 15px; /* This creates consistent space between image and name */
 }
 
-.privilege-item img {
+.image-container {
+    width: 150px; /* Fixed size for circular container */
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.privilege-img {
     width: 100%;
-    aspect-ratio: 1;
+    height: 100%;
     object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    border: 3px solid #ff9800;
+    transition: transform 0.3s ease;
+}
+
+.privilege-item:hover .privilege-img {
+    transform: scale(1.05);
 }
 
 .privilege-name {
     text-align: center;
-    font-size: 14px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #c87121;
+    width: 100%;
+    margin-top: 10px; /* Additional spacing control */
+    padding: 0 10px; /* Prevents text from touching edges */
 }
 
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media (max-width: 992px) {
     .privileges-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .image-container {
+        width: 130px;
+        height: 130px;
     }
 }
 
 @media (max-width: 768px) {
     .privileges-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 25px;
+    }
+    .image-container {
+        width: 120px;
+        height: 120px;
+    }
+    .privilege-name {
+        font-size: 1.3rem;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .privileges-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card {
+        padding: 15px;
+    }
+    .image-container {
+        width: 100px;
+        height: 100px;
+    }
+    .privilege-name {
+        font-size: 1.1rem;
     }
 }
     </style>
@@ -192,15 +260,18 @@
 
             <button onclick="window.history.back()">{{ __("Go Back") }}</button>
         </div>
-
+     <br>
 
         <div class="agency-container">
             <div class="card">
+                <h4 class="card-title text-center">{{ __('ovip Privileges') }}</h4>
                 <div class="privileges-grid">
                     @foreach($oVip->privilegs as $privilege)
                         <div class="privilege-item">
-                            <img src="{{ asset($privilege->image) }}" alt="{{ $privilege->name }}">
-                            <div class="privilege-name">{{ $privilege->name }}</div>
+                            <div class="image-container">
+                                <img src="{{ asset($privilege->image) }}"  class="privilege-img">
+                            </div>
+                            <div class="privilege-name text-center">{{ $privilege->name }}</div>
                         </div>
                     @endforeach
                 </div>
