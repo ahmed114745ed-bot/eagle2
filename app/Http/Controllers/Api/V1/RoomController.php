@@ -1779,8 +1779,8 @@ class RoomController extends Controller
 
         $data = [
             'is_live' => $room->is_live ? true : false,  
-            'room_status' => is_null($room->room_pass) ? 'unlocked' : 'locked',
-
+            'is_locked' => empty($room->room_pass) ? false : true  ,
+   
         ];
             return Common::apiResponse(true, '', $data, 200);
         
