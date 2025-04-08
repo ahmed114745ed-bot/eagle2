@@ -32,7 +32,7 @@
         .main-content {
             display: flex;
             flex-direction: column;
-            width: 100%;
+            width: 90%;
             padding: 20px;
             box-sizing: border-box;
         }
@@ -50,14 +50,14 @@
             background: #222;
             padding: 20px;
             border-radius: 5px;
-            width: 100%;
-            max-width: 1100px;
+            width: 200%;
+            max-width: 1300px;
             margin: 0 auto 20px;
             text-align: center;
         }
         .avatar img {
-            width: 120px;
-            height: 120px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             border: 3px solid #ff9800;
           
@@ -261,14 +261,14 @@
 <body>
     <div class="main-content">
         <div class="container">
-            <div class="avatar-wrapper">
+            <div class="avatar">
                 @php
                     $url = getImagePath($oVip->img);
                 @endphp
                 {!! handleShowImageWithTypes($oVip->id, $url, 300, 300) !!}
             </div>
 
-            <button onclick="window.history.back()">{{ __("Go Back") }}</button>
+            {{-- <button onclick="window.history.back()">{{ __("Go Back") }}</button> --}}
         </div>
      <br>
 
