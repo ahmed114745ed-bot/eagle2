@@ -683,7 +683,10 @@
                 content: "* ";
                 color: red;
             }
-
+            .rtl .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 28px;
+                left: 3px;
+            }
  
 
     @media (max-width: 768px) {
