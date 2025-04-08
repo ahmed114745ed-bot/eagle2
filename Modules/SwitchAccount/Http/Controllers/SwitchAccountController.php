@@ -92,7 +92,7 @@ class SwitchAccountController extends Controller
         if (strpos($bearerToken, '|') !== false) {
             [$id, $bearerToken] = explode('|', $bearerToken, 2);
         }
-        $token = hash('sha256', $bearerToken);
+        $token = $request->token_new_account;
         $token = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $token)->first();
 
         $otherUser = User::find($token->tokenable_id);
