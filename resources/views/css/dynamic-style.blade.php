@@ -703,7 +703,7 @@
             }
 
            .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
-             left: 43px !important;
+             left: 29px !important;
            }
 
             
