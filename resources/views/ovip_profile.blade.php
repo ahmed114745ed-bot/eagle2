@@ -41,6 +41,7 @@
             padding: 20px;
             border-radius: 5px;
             width: 80%;
+            height: 80%;
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
