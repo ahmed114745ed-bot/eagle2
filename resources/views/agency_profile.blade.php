@@ -210,48 +210,58 @@
         </div>
     
         @if($agency->chargeAgency()->exists())
-            <div class="charge-container">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
-                
-                        @if($charges && $charges->count())
-                            <div class="table-responsive">
-                                <div class="box-body table-responsive no-padding">
-                                    <table class="table table-hover grid-table" id="charge">
-                                        <thead>
+        <div class="charge-container">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
+            
+                    @if($charges && $charges->count())
+                        <div class="table-responsive">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="charge">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('coin') }}</th>
+                                            <th>{{ __('created') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($charges as $index => $charge)
+                                            @php
+                                                if ($charge->charger_type == 'dash' && $charge->user_type == 'dash') {
+                                                    $user = $charge->admin;
+                                                    $image = $user->avatar;
+                                                } else {
+                                                    $user = $charge->sender;
+                                                    $image = $user->profile->avatar ?? null;
+                                                }
+                                            @endphp
                                             <tr>
-                                                <th>#</th>
-                                                <th>{{ __('Name') }}</th>
-                                                <th>{{ __('coin') }}</th>
-                                                <th>{{ __('created') }}</th>
+                                                <td>{{ $charges->firstItem() + $index }}</td>
+                                                <td>
+                                                    <img src="{{ getImagePath($image) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                    {{ $user->name ?? '' }}
+                                                </td>
+                                                <td>{{ number_format($charge->amount ?? 0) }}</td>
+                                                <td>{{ $charge->created_at ?? '' }}</td>
                                             </tr>
-                                        </thead>
-                                        <tbody style="color: rgb(208, 115, 43);">
-                                            @foreach($charges as $index => $charge)
-                                                <tr>
-                                                    <td>{{ $charges->firstItem() + $index }}</td>
-                                                    <td>
-                                                        <img src="{{ getImagePath(@$charge->admin->avatar) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                        {{ @$charge->admin->name ?? '' }}
-                                                    </td>
-                                                    <td>{{ number_format(@$charge->amount ?? 0) }}</td>
-                                                    <td>{{ @$charge->created_at ?? '' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                    
-                            <div class="pagination-container">
-                                {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
-                            </div>
-                        @endif
-                    </div>
+                        </div>
+    
+                        <div class="pagination-container">
+                            {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    @endif
                 </div>
             </div>
-        @endif  
+        </div>
+    @endif
+    
     </div>
 </body>
 </html>
