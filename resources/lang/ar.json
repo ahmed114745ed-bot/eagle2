@@ -1838,7 +1838,9 @@
     "soon:": " :قريباً",
     "helper": "مساعد",
     "charge_agents": "وكلاء الشحن",
-    "Users Permissions": "أذونات المستخدمين"
+    "Users Permissions": "أذونات المستخدمين",
+    "min": "الحد الأدنى",
+    "max": "الحد الأقصى"
 
 
 

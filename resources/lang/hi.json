@@ -935,7 +935,9 @@
     "soon": "जल्द ही",
     "charge_agents": "चार्ज एजेंट",
     "users_permissions": "उपयोगकर्ता अनुमतियाँ",
-    "is enabled": "सक्रिय है"
+    "is enabled": "सक्रिय है",
+    "min": "न्यूनतम",
+    "max": "अधिकतम"
 
 
 
