@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        canvas {
+            background-color: transparent !important;
+            transform: none !important;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -55,8 +59,13 @@
             height: 120px;
             border-radius: 50%;
             border: 3px solid #ff9800;
+          
             margin-bottom: 15px;
         }
+        .canvas {
+    background-color: transparent;
+    /* Apply only needed styles */
+}
         .details {
             text-align: left;
             margin-top: 10px;
