@@ -38,7 +38,7 @@
             border-radius: 5px;
             width: 100%;
             max-width: 800px;
-            margin: 0 auto 20px;
+            margin: 0 auto;
             text-align: center;
         }
         .agency-container, .charge-container {
@@ -139,13 +139,13 @@
 <body>
     <div class="main-content">
         <div class="container">
-            
+            <div class="avatar-wrapper">
                 @php
                     $url = getImagePath($oVip->img);
                 @endphp
                 {!! handleShowImageWithTypes($oVip->id, $url, 300, 300) !!}
-            
-    
+            </div>
+
             <button onclick="window.history.back()">{{ __("Go Back") }}</button>
         </div>
 
