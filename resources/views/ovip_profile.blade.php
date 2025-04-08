@@ -119,8 +119,8 @@
                 padding: 15px;
             }
             .avatar img {
-                width: 80px;
-                height: 80px;
+                width: 800px;
+                height: 800px;
             }
             table {
                 font-size: 14px;
