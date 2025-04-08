@@ -12,66 +12,36 @@
             background-color: #121212;
             color: white;
             display: flex;
+            flex-direction: column;
         }
         .settings-sidebar {
-            width: 250px;
+            width: 100%;
             background: #222;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
         }
         .settings-sidebar h2 {
             text-align: center;
             color: #ff9800;
+            margin: 0;
+            padding: 10px 0;
         }
-        .settings-content {
-            flex-grow: 1;
-            padding: 20px;
-            display: flex;
-            width: 1200px;
-            justify-content: center;
-            align-items: center;
+        .settings-content, .member-content, .charge-content {
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
         }
-        .container {
+        .container, .agency-container, .charge-container {
             background: #222;
-            padding: 20px;
+            padding: 15px;
             border-radius: 5px;
-            width: 800px;
-            text-align: center;
-        }
-        .agency-content {
-            flex-grow: 1;
-            padding: 20px;
-            display: flex;
-            width: 1200px;
-            justify-content: center;
-            align-items: center;
-        }
-        .charge-container {
-            background: #222;
-            padding: 20px;
-            border-radius: 5px;
-            width: 1100px;
-            text-align: center;
-        }
-        .settings-content {
-            flex-grow: 1;
-            padding: 20px;
-            display: flex;
-            width: 1200px;
-            justify-content: center;
-            align-items: center;
-        }
-        .agency-container {
-            background: #222;
-            padding: 20px;
-            border-radius: 5px;
-            width:1100px;
-            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
         .avatar img {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             border: 3px solid #ff9800;
             margin-bottom: 15px;
@@ -82,7 +52,8 @@
         }
         .details p {
             margin: 5px 0;
-            font-size: 16px;
+            font-size: 14px;
+            word-break: break-word;
         }
         .details strong {
             color: #ff9800;
@@ -99,6 +70,61 @@
         }
         button:hover {
             background: #e68900;
+        }
+        .card-title {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #444;
+            font-size: 12px;
+        }
+        th {
+            background-color: #333;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .pagination-container {
+            margin-top: 15px;
+        }
+        
+        /* Media queries for responsive adjustments */
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .settings-sidebar {
+                width: 250px;
+                min-height: 100vh;
+            }
+            .settings-content, .member-content, .charge-content {
+                width: calc(100% - 250px);
+            }
+            .container {
+                width: 90%;
+                max-width: 800px;
+            }
+            .agency-container, .charge-container {
+                width: 90%;
+                max-width: 1100px;
+            }
+            th, td {
+                font-size: 14px;
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -125,37 +151,49 @@
         <div class="container agency-container">
             <div class="card">
                 <div class="card-body">
-                    <!-- Align h4 to the left -->
-                    <h4 class="card-title" style="text-align: left;">{{ __('members') }}</h4> <!-- Aligning to the left -->
+                    <h4 class="card-title">{{ __('members') }}</h4>
     
                     @if($members && $members->count())
                         <div class="table-responsive">
                             <div class="box-body table-responsive no-padding">
                                 <table class="table table-hover grid-table" id="member">
-                                    <tr>
-                                        <th style="text-align: center;">#</th>
-                                        <th style="text-align: center;">{{ __('Name') }}</th>
-                                        <th style="text-align: center;">{{ __('uuid') }}</th>
-                                        <th style="text-align: center;">{{ __('image') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="color: rgb(208, 115, 43);">
-                                    @foreach($members as $index => $member)
+                                    <thead>
                                         <tr>
-                                            <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
-                                            <td>{{ @$member->name ?? '' }}</td>
-                                            <td>{{ @$member->uuid ?? '' }}</td>
-                                            <td>
-                                                <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
-                                            </td>
+                                            <th>#</th>
+                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('uuid') }}</th>
+                                            <th>{{ __('image') }}</th>
+                                            <th>{{ __('reals_count') }}</th>
+                                            <th>{{ __('total_days') }}</th>
+                                            <th>{{ __('total_hours') }}</th>
+                                            <th>{{ __('Monthly DI') }}</th>
+                                            <th>{{ __('salary') }}</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($members as $index => $member)
+                                            <tr>
+                                                <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                                <td>{{ @$member->name ?? '' }}</td>
+                                                <td>{{ @$member->uuid ?? '' }}</td>
+                                                
+                                                <td>
+                                                    <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
+                                                </td>
+                                                <td>{{count($member->reals) ?? 0 }}</td>
+                                                <td>{{ $member->total_days ?? 0 }}</td>
+                                                <td>{{ $member->liveTime->sum("hours") }}</td>
+                                                <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
+                                                <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
     
-                            <!-- Pagination Links -->
-                            <div class="pagination-container">
-                                {{ $members->appends(['charges_page' => $charges->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                <!-- Pagination Links -->
+                                <div class="pagination-container">
+                                    {{ $members->appends(['charges_page' => $charges->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                </div>
                             </div>
                         </div>
                     @else
@@ -166,54 +204,52 @@
         </div>
     </div>
     
-    
- <br>
-    <div class="charge-content">
-        <div class="container charge-container">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
-            
-                    @if($charges && $charges->count())
-                        <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="charge">
-                                    <tr>
-                                        <th style="text-align: center;">#</th>
-                                        <th style="text-align: center;">{{ __('Name') }}</th>
-                                        <th style="text-align: center;">{{ __('coin') }}</th>
-                                        <th style="text-align: center;">{{ __('created') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="color: rgb(208, 115, 43);">
-                                    @foreach($charges as $index => $charge)
-                                        <tr>
-                                            <td>{{ $charges->firstItem() + $index }}</td> <!-- To correctly show the index based on pagination -->
-                                            <td>
-                                                <img src="{{ getImagePath(@$charge->admin->avatar) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                {{ @$charge->admin->name ?? '' }}
-                                            </td>
-                                            <td>{{ number_format(@$charge->amount ?? 0) }}</td>
-                                            <td>{{ @$charge->created_at ?? '' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-            
-                        <!-- Pagination Links -->
-                        <div class="pagination-container">
-                            {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-            
-                    @else
-                        {{-- <p>{{ __('No charges found.') }}</p> --}}
-                    @endif
+    <br>
+    @if($agency->chargeAgency)
+        <div class="charge-content">
+            <div class="container charge-container">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ __('charge') }}</h4>
+                
+                        @if($charges && $charges->count())
+                            <div class="table-responsive">
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-hover grid-table" id="charge">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{ __('Name') }}</th>
+                                                <th>{{ __('coin') }}</th>
+                                                <th>{{ __('created') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody style="color: rgb(208, 115, 43);">
+                                            @foreach($charges as $index => $charge)
+                                                <tr>
+                                                    <td>{{ $charges->firstItem() + $index }}</td>
+                                                    <td>
+                                                        <img src="{{ getImagePath(@$charge->admin->avatar) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                        {{ @$charge->admin->name ?? '' }}
+                                                    </td>
+                                                    <td>{{ number_format(@$charge->amount ?? 0) }}</td>
+                                                    <td>{{ @$charge->created_at ?? '' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                    
+                            <div class="pagination-container">
+                                {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    
+    @endif  
 </body>
 </html>
