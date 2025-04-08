@@ -1709,6 +1709,8 @@
     "Languages" : "اللغات",
     "Code" : "كود اللغة",
     "Is enabled" : "حالة التفعيل",
+    "is enabled" : "حالة التفعيل",
+
     "Direction" : "الاتجاه",
     "Left to Right (LTR)" : "من اليسار إلى اليمين (LTR)",
     "Right to Left (RTL)" : "من اليمين إلى اليسار (RTL)",
