@@ -685,8 +685,13 @@
             }
             .rtl .select2-container--default .select2-selection--single .select2-selection__arrow {
                 height: 28px;
-                left: 3px;
+                left: 3px !important;
             }
+            .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
+                    cursor: pointer;
+                    float: left !important;
+                    left: 9px !important;
+                }
  
 
     @media (max-width: 768px) {
