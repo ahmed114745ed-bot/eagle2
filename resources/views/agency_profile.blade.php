@@ -209,7 +209,7 @@
             </div>
         </div>
     
-        @if($agency->chargeAgency)
+        @if($agency->chargeAgency()->exists())
             <div class="charge-container">
                 <div class="card">
                     <div class="card-body">
