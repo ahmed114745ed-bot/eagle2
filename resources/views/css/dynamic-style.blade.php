@@ -683,15 +683,7 @@
                 content: "* ";
                 color: red;
             }
-            .rtl .select2-container--default .select2-selection--single .select2-selection__arrow {
-                height: 28px;
-                left: 3px !important;
-            }
-            .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
-                    cursor: pointer;
-                    float: left !important;
-                    left: 10px !important;
-                }
+
 
 
     @media (max-width: 768px) {
@@ -753,10 +745,6 @@
     transform: rotate(180deg);
 }
 
-.rtl .sidebar-menu > li.active > a .fa-angle-left {
-    transform: rotate(-90deg);
-    top: 23px;
-    right: 207px;
-}
+
 
 </style>
