@@ -694,19 +694,19 @@
             }
             .rtl .box-header .box-tools {
                 float: left !important;
-               
+
             }
 
             .rtl .box-header .pull-right {
                 float: left !important;
-               
+
             }
 
            .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
              left: 29px !important;
            }
 
-            
+
 
 
     @media (max-width: 768px) {
@@ -768,10 +768,6 @@
     transform: rotate(180deg);
 }
 
-.rtl .sidebar-menu > li.active > a .fa-angle-left {
-    transform: rotate(-90deg);
-    top: 23px;
-    right: 207px;
-}
+
 
 </style>
