@@ -49,7 +49,7 @@ class TrashedUserAccountController extends  MainController
         $grid->column('id', __('Id'));
         // $grid->column('name', __('Name'));
         // $grid->column('uuid', __('uuid'));
-        $grid->column('name', __('User Info'))->display(function () {
+        $grid->column('name', __('user'))->display(function () {
             $name = $this->name;
             $uuid = $this->uuid;
             $phone = $this->phone ?: '-'; // إذا لم يكن هناك رقم هاتف، عرض "-"
