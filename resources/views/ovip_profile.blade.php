@@ -63,10 +63,7 @@
           
             margin-bottom: 15px;
         }
-        /* .canvas {
-    background-color: transparent;
-    /* Apply only needed styles */
-} */
+   
         .details {
             text-align: left;
             margin-top: 10px;
