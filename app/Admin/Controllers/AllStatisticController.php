@@ -138,6 +138,6 @@ class AllStatisticController extends MainController
 
     public function index2(Content $content)
     {
-        return parent::index($content->body('<div style="text-align: center; font-size: 24px;">' . __('soon') . '</div>'));
+        return parent::index($content->body('<div style="text-align: center; font-size: 48px; font-weight: bold;">' . __('soon:') . '</div>'));
     }
 }
