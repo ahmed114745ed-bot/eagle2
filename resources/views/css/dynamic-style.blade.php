@@ -683,6 +683,29 @@
                 content: "* ";
                 color: red;
             }
+            .rtl .select2-container--default .select2-selection--single .select2-selection__arrow {
+                height: 28px;
+                left: 3px !important;
+            }
+            .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
+                    cursor: pointer;
+                    float: left !important;
+                    left: 10px !important;
+            }
+            .rtl .box-header .box-tools {
+                float: left !important;
+
+            }
+
+            .rtl .box-header .pull-right {
+                float: left !important;
+
+            }
+
+           .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
+             left: 29px !important;
+           }
+
 
 
 
