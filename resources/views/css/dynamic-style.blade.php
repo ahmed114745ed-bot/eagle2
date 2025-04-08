@@ -691,7 +691,22 @@
                     cursor: pointer;
                     float: left !important;
                     left: 10px !important;
-                }
+            }
+            .rtl .box-header .box-tools {
+                float: left !important;
+               
+            }
+
+            .rtl .box-header .pull-right {
+                float: left !important;
+               
+            }
+
+           .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
+             left: 43px !important;
+           }
+
+            
 
 
     @media (max-width: 768px) {
