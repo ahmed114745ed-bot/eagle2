@@ -690,7 +690,7 @@
             .rtl .select2-container--default .select2-selection--single .select2-selection__clear {
                     cursor: pointer;
                     float: left !important;
-                    left: 9px !important;
+                    left: 10px !important;
                 }
  
 
