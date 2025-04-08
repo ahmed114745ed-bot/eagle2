@@ -275,6 +275,8 @@ Route::group(
         ]);
         // $router->get('/', 'HomeController@infoBox')->name('home');
         $router->get('/', 'AllStatisticController@index')->name('home');
+
+        $router->get('/soon', 'AllStatisticController@index2');
         $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
         $router->get('/custom-export-users', [
             \App\Admin\Controllers\ExportController::class,

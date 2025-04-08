@@ -20,7 +20,7 @@ class ChargeAgencyController extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Verified Charging Agentspayment-gateways'))
+            ->title(trans('Verified Charging Agents'))
             ->body($this->grid()));
     }
 

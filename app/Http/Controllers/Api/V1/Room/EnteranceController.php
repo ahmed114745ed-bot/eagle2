@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Room;
 
 use App\Facades\UserHandling;
+use App\Models\AllGame;
 use App\Models\Pk;
 use App\Models\Room;
 use App\Models\RoomVisitor;
@@ -17,6 +18,7 @@ use App\Models\Background;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
+use App\Services\RoomService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Jobs\EnterRoomZigoRequest;
@@ -43,6 +45,7 @@ class EnteranceController extends Controller
 
     protected $repo;
     protected $enteranceRoomService;
+
     public function __construct(RoomRepoInterface $repo, EnteranceRoomServices $enteranceRoomService)
     {
         $this->repo = $repo;
@@ -56,6 +59,7 @@ class EnteranceController extends Controller
         ]);
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
+
     public function updateRoomCountFromPusher_new(Request $request)
     {
          Log::info(' webhook triggered enter room ', [
@@ -71,7 +75,7 @@ class EnteranceController extends Controller
     public function updateRoomCountFromZego(Request $request)
     {
         $library = Common::getConfig('library');
-        if ($library == 2) return  Common::apiResponse(false, 'you used pusher');
+        if ($library == 2) return Common::apiResponse(false, 'you used pusher');
         return $this->enteranceRoomService->updateRoomCountFromZego($request);
     }
 
@@ -122,7 +126,7 @@ class EnteranceController extends Controller
     {
         $user = User::query()->find($user_id);
         if (!$user) return;
-        $result  = Common::go_microphone_hand($room_uid, $user_id);
+        $result = Common::go_microphone_hand($room_uid, $user_id);
 
         $room = Room::query()->where('uid', $room_uid)->first();
 
@@ -208,7 +212,7 @@ class EnteranceController extends Controller
     {
         //        $user_id  = Auth::id();
         $usersIds = (array)$request->users_ids;
-        $users    = User::withoutAppends()->with([
+        $users = User::withoutAppends()->with([
             'packs' => function ($query) {
                 return $query->whereIn('type', [5, 18]);
             },
@@ -230,12 +234,12 @@ class EnteranceController extends Controller
         //        $user_id  = Auth::id();
         $ownerId = @$request->owner_id;
         if (!$ownerId) return Common::apiResponse(false, __('room not found'));
-        $room        = Room::withoutAppends()->where('uid', $ownerId)->first();
+        $room = Room::withoutAppends()->where('uid', $ownerId)->first();
         if (!$room) return Common::apiResponse(false, __('room not found'));
         $roomVisitors = $room->room_visitor;
 
         $usersIds = explode(',', $roomVisitors);
-        $users    = User::withoutAppends()->with([
+        $users = User::withoutAppends()->with([
             'packs' => function ($query) {
                 return $query->whereIn('type', [5, 18]);
             },
@@ -255,8 +259,8 @@ class EnteranceController extends Controller
     public function enter_room(Request $request): JsonResponse
     {
         $room_pass = $request['room_pass'];
-        $owner_id  = $request['owner_id'];
-        $user   = $request->user();
+        $owner_id = $request['owner_id'];
+        $user = $request->user();
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
         // Log::info('here');
@@ -267,7 +271,7 @@ class EnteranceController extends Controller
     {
         $this->updateRoomVisitors($user_id, $owner_id, $room);
 
-        if ($room->charizma_status && ($room->charizma_timestamp  + 86400) < now()->timestamp) {
+        if ($room->charizma_status && ($room->charizma_timestamp + 86400) < now()->timestamp) {
             $room->charizma_timestamp = null;
             $room->charizma_status = false;
             dispatch(new ResetCharisma($room->id));
@@ -298,7 +302,7 @@ class EnteranceController extends Controller
     public function quit_room(Request $request)
     {
 
-        if (!$request->owner_id)   Common::apiResponse(false, __('api_responses.missing_owner_id'), null, 422);
+        if (!$request->owner_id) Common::apiResponse(false, __('api_responses.missing_owner_id'), null, 422);
         $user_id = $request->user()->id;
         $room = Room::query()->where('uid', $request->owner_id)->first();
         if ($room) {
@@ -357,6 +361,7 @@ class EnteranceController extends Controller
         $json = json_encode($ms);
         return $json;
     }
+
     public function sendCpLovelyMessage($room, $user)
     {
         $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
@@ -368,6 +373,7 @@ class EnteranceController extends Controller
 
         Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
     }
+
     public function removeUserCpInRoom(mixed $userId): void
     {
         CpRoomHistory::where("user_one_id", $userId)
@@ -494,7 +500,7 @@ class EnteranceController extends Controller
 
             if ($request->type) {
                 $room->type = $request->type;
-                if ($request->type == 'single_live' || $request->type == 'multi_live' ) {
+                if ($request->type == 'single_live' || $request->type == 'multi_live') {
                     $room->is_live = true;
                 }
             }
@@ -503,8 +509,8 @@ class EnteranceController extends Controller
                 $room->room_pass = $request->room_pass;
             }
 
-            if ($request->mode) {
-                $room->mode = $request->mode;
+            if (!is_null($request->mode)) {
+                $this->changeMode($request, $request->mode, $room);
             }
 
             if ($request->room_type) {
@@ -563,7 +569,7 @@ class EnteranceController extends Controller
                     "room_name" => @$room->room_name ?: "",
                     "is_locked" => @$is_locked ?: false,
                     "type_room" => @$room->type_room ?: "",
-                    "is_live"   => @$room->is_live ?: false,
+                    "is_live" => @$room->is_live ?: false,
                 ]
             ];
             $json = json_encode($data);
@@ -583,7 +589,62 @@ class EnteranceController extends Controller
         }
     }
 
+    public function changeMode($request, $currentMode, Room $room){
+        $lastMode = $room->mode;
 
+        $room->mode = $currentMode;
+        $jsons = [];
+        $map = [];
+        if ($currentMode == '1') {
+            $mode = 'party';
+        } elseif ($currentMode == '2') {
+            $mode = 'seats12';
+        } elseif ($currentMode == '5') {
+            $mode = 'cinema';
+        } elseif ($currentMode == '4') {
+            $mode = 'game';
+            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+            $game = AllGame::find($request->game_id);
+            if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+            $room->game_id = $request->game_id;
+            $map['game_url'] = $game->mini_url;
+        } else {
+            $mode = 'topCenter';
+        }
+        $ms = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+        if ($lastMode == '3' && $currentMode != '3') {
+            $jsons[] = $this->changeBackground($room, $room->uid, $this->getRoomBackground($room));
+        }
+        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+    }
+
+    public function changeBackground(Room $room, int $owner_id, string $image = ''): string|false
+    {
+        $data = [
+            "messageContent" => [
+                "message"       => "changeBackground",
+                "imgbackground" => $image ?: "",
+                "roomIntro"     => $room->room_intro ?: "",
+                "roomImg"       => $room->room_cover ?: "",
+                "room_type"     => @$room->myType->name ?: "",
+                "room_name"     => @$room->room_name ?: ""
+            ]
+        ];
+        $json = json_encode($data);
+        return $json;
+    }
+
+    public function getRoomBackground(?Room $room)
+    {
+        if ($room == null) return '';
+        return $room->final_room_image;
+
+    }
 
     public function updateRoomVisitors($user_id, $owner_id, Room &$room): void
     {
@@ -621,11 +682,11 @@ class EnteranceController extends Controller
             // \Log::error('Error inviting to room: ' . $th->getMessage());
             return Common::apiResponse(0,     $th->getMessage(),[],500);
 
-        
+
         }
     }
 
-   
 
-    
+
+
 }

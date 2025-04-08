@@ -164,7 +164,7 @@ class AchievementDedicateController extends MainController
             'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
             'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
         ];
-        $grid->column('is_enable')->switch($states);
+        $grid->column('is_enable',__('is enabled'))->switch($states);
         $grid->column('created_at', trans('admin.created_at'));
 
         $grid->disableActions();

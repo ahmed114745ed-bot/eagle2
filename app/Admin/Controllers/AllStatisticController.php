@@ -135,4 +135,9 @@ class AllStatisticController extends MainController
         ];
         return Common::apiResponse(1, '', $data);
     }
+
+    public function index2(Content $content)
+    {
+        return parent::index($content->body('<div style="text-align: center; font-size: 48px; font-weight: bold;">' . __('soon:') . '</div>'));
+    }
 }
