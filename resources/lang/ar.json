@@ -1819,7 +1819,21 @@
     "Image 1":"الصورة 1",
     "Image 2":"2 الصورة",
     "Image 3":"لصورة 3",
-    "Old Image": "الصورة القديمة"
+    "Old Image": "الصورة القديمة",
+
+
+    "App Wallets":"محافظ التطبيق",
+    "Revenues":"الإيرادات",
+    "Expenses":"المصاريف",
+    "Wallet Settings":"اعدادات المحفظة",
+    "Coin Recharge":"شحن العملات",
+    "User Log":"سجل المستخدم",
+    "User Settings":"اعدادات المستخدمين",
+    "Regions":"المناطق",
+    "Region Settings":"اعدادات المناطق",
+    "Store":"المتجر",
+    "Store Settings":"اعدادات المتجر"
+
 
 
 }
