@@ -4,28 +4,51 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use http\Env\Request;
+use App\Traits\Families\ResourceTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Family extends Model
 {
+    use ResourceTrait;
     protected $guarded = ['id'];
 
     protected $appends = ['rank'];
     private $cachedLevelMax = null;
+    
 
     public function getCreatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        $cacheKey = 'timezone';
+
+    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+    $timezone = \Cache::rememberForever($cacheKey, function () {
+        $setting = \App\Models\Setting::where('key', 'timezone')->first();
+        return $setting?->value ?? 'UTC';
+    });
+
+    // Get the timezone from the request header or use the cached setting
+    $timeZone = request()->header('tz') ?? $timezone;
+
+    // Parse the date and set the timezone
+    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
     // Convert updated_at to the user's local time zone
     public function getUpdatedAtAttribute($value)
     {
-        $timeZone = request()->header('tz') ?? 'UTC';
-        //$timeZone = 'Asia/Dhaka'; // Get the user's time zone from the session
-        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        $cacheKey = 'timezone';
+
+    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+    $timezone = \Cache::rememberForever($cacheKey, function () {
+        $setting = \App\Models\Setting::where('key', 'timezone')->first();
+        return $setting?->value ?? 'UTC';
+    });
+
+    // Get the timezone from the request header or use the cached setting
+    $timeZone = request()->header('tz') ?? $timezone;
+
+    // Parse the date and set the timezone
+    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
     public function users()
     {
@@ -41,6 +64,12 @@ class Family extends Model
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/*->where ('user_type',0)*/->count();
         return $fu;
     }
+
+    public function members()
+    {
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 0);
+    }
+
     public function currentLevel()
     {
         return $this->belongsTo(FamilyLevel::class, 'current_level_id');

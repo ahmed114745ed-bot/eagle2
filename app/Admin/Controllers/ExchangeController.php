@@ -79,7 +79,7 @@ class ExchangeController extends MainController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('diamonds', __('diamonds'))->display(function ($usd) {
 
-            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+            $image = asset('images/diamond.jpg'); // تأكد من أن الصورة موجودة
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <span>{$usd}</span>
@@ -87,7 +87,7 @@ class ExchangeController extends MainController
                     </div>";
         });
         $grid->column('value', __('value'))->display(function ($value) {
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
+            $image = asset('images/coin.png'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$value}</span>

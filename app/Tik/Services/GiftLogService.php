@@ -249,7 +249,7 @@ class GiftLogService
                 'room_id'          => $room->id,
                 'from_name'        => $user->name,
                 'to_name'          => $toName,
-                'gift_price'       => $gift->price,
+                'gift_price'       => $totalPrice,
                 'owner_id'         => $ownerId,
                 'number'           => $number,
                 'coins'            => $user->coins_string,
@@ -304,13 +304,15 @@ class GiftLogService
                     'isExpensive' => $totalPrice >= 2000,
                     'num_gift'    => $zigoData['number'],
                     "plural"      => $zigoData['plural'],
-                    'gift_price'  => $zigoData['room_session'],
+                   'gift_price'  =>$totalPrice,// $zigoData['room_session'],,
                     'giftTP' =>  $totalPrice,
                     'coins'  => @$zigoData['coins'] ?? '0',
                     'type'  => @$zigoData['gift_image_type'] ?? 'mp4',
 
                 ]
             ];
+            Log::info('this is wares : ' . json_encode( $d));
+            Log::info('123');
             $json = json_encode($d);
             $jsons[] = $json;
         }

@@ -11,9 +11,10 @@ use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Session;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
-use Illuminate\Support\Facades\Session;
 
 class WareController extends MainController
 {

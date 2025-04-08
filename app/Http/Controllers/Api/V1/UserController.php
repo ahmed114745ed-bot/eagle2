@@ -15,6 +15,7 @@ use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
@@ -62,7 +63,8 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function userGifts(){
+    public function userGifts()
+    {
         $user = auth()->user();
 
         if (!$user) {
@@ -71,7 +73,7 @@ class UserController extends Controller
         $user->update(['new_gift' => false]);
 
         $gifts = Gift::where('price', '<=', $user->di)->paginate(10);
-        return Common::apiResponse(true,'', $gifts);
+        return Common::apiResponse(true, '', $gifts);
     }
 
     public function chargerAgency(Request $request, ProfileRelationsService $profileRelationsService)
@@ -290,6 +292,31 @@ class UserController extends Controller
 
         return Common::apiResponse(true, '', $data, 200);
     }
+
+    public function update_user_multi_images($id, Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'new_multi_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        try {
+            if ($request->hasFile('new_multi_image')) {
+                $imagePath = Common::upload('profile', $request->file('new_multi_image'));
+            } else {
+                return Common::apiResponse(false, 'image required ', [], 422);
+            }
+
+            $userWithMedals = $this->userService->update_user_multi_images($user, $id, $imagePath);
+
+            return Common::apiResponse(true, 'successful', [], 200);
+        } catch (\Exception $exception) {
+            return Common::apiResponse(false, $exception->getMessage(), null, 400);
+        }
+    }
+
+
 
     public function userFriend(Request $request)
     {
@@ -1043,9 +1070,23 @@ class UserController extends Controller
         return Common::apiResponse(true, 'done', OnlineResource::collection($data));
     }
 
+    public function friends(): JsonResponse
+    {
+        $friends = $this->userService->friends();
+
+        return Common::apiResponse(true, 'done', UserResource::collection($friends));
+    }
+
     public function sendPack(Request $request)
     {
         $user = $request->user();
         return $this->userService->sendPack($user, $request);
+    }
+
+    public function userLevels(Request $request)
+    {
+        $user         = $request->user();
+        $data = $this->userService->userChargeLevel($user);
+        return Common::apiResponse(true, 'success', $data);
     }
 }

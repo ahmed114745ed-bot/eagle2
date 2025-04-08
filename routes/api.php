@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\LanguageController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
@@ -58,6 +59,7 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -134,9 +136,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
 
+            // Route::post('/broadcasting/auth', function (Request $request) {
+            //     Log::info('broadcasting: '. json_encode($request->all()));
+            //     return Broadcast::auth($request);
+            // });
             Route::post('/broadcasting/auth', function (Request $request) {
-                Log::info('broadcasting: '.json_decode(Broadcast::auth($request)));
-                return Broadcast::auth($request);
+                try {
+                    $authResponse = Broadcast::auth($request);
+                    // Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
+                    return $authResponse;
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'message' => $e->getMessage()],500);
+                }
             });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
@@ -167,8 +178,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-
+            Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
+            Route::post('check-room', [RoomController::class, 'check_room']);
+
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/', [RoomController::class, 'index']);
@@ -194,6 +207,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
+                Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
@@ -219,6 +233,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
+
+
+                // Invite user to room
+                Route::post('invite-user', [EnteranceController::class, 'invite_user']);
+
+
+
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
@@ -235,6 +256,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
+                Route::get('/friends', [UserController::class, 'friends']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);
@@ -359,6 +381,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             // user api
             Route::get('my-data', [UserController::class, 'my_data']);
+            Route::post('update-user-image/{image_id}', [UserController::class, 'update_user_multi_images']);
 
 
             Route::get('explain-invitation', [\App\Http\Controllers\Api\V1\UserController::class, 'explain_invitation'])->name('create-code-invitation');
@@ -519,4 +542,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
+
 });
+
+
+Route::get('/languages', [LanguageController::class, 'index']);

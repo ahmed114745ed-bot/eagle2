@@ -157,10 +157,11 @@ class RoomRepoService
 
         $user->now_room_uid = 0;
         $user->save();
-        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
+
             $room->update(['is_live' => false]);
 
-          
+
         }
         /* if ($room->count_room_socket > 0) {
             $room->count_room_socket -= 1;
@@ -342,6 +343,11 @@ class RoomRepoService
     public function userRooms($userId)
     {
         return  $this->repository->roomUsers($userId);
+    }
+
+    public function commentStatus($roomId): bool
+    {
+        return  $this->repository->commentStatus($roomId);
     }
 
     public function index2()

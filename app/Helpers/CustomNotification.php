@@ -13,7 +13,6 @@ use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
 use App\Models\OfficialMessageAdmin;
-use Carbon\Carbon;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class CustomNotification
@@ -171,9 +170,13 @@ class CustomNotification
         $body_ar = __('api.followed_you', ['name' => $user->name], 'ar');
         $body_en = __('api.followed_you', ['name' => $user->name], 'en');
         $firebaseBody = ($receiver->lan === 'ar') ? $body_ar : $body_en;
-
         $data['image'] = getImagePath($user->profile->avatar);
         $icon = $data['image'];
+
+     
+
+
+
         Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'follow');
         Common::sendOfficialMessage($receiver->id, image: $user->profile->avatar, title: $body_en, content: $user->name, titleAr: $body_ar, fromUserId: $user->id);
         (new UserCounterServices)->eventUser($receiver, 'official-messages');
@@ -235,7 +238,7 @@ class CustomNotification
 
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
-
+               
               Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
             // dd($data);
             }
@@ -385,6 +388,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+
     public function chargeAction(User $user, $request)
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -393,7 +397,7 @@ class CustomNotification
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['coins'] = $request->amount;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'charge-action-notifaction');
-        Common::sendOfficialMessage($user->id, $body_en, '', titleAr: $body_ar);
+        Common::sendOfficialMessage($user->id,  title:$body_en,  titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 

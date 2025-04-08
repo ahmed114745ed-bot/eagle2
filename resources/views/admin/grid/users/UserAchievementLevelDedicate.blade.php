@@ -19,13 +19,6 @@
             {{ session('success') }}
         </div>
         @endif
-        @php
-
-                    $achievements=DB::table('achievements')->get();
-                  //  $users=DB::table('users')->get();
-                  $gifts = \Modules\Achievement\Entities\GiftAchievement::with('gift')->get();
-
-        @endphp
        <form method="POST" action="{{ route('admin.store-user-achievement') }}" enctype="multipart/form-data">
         @csrf
 

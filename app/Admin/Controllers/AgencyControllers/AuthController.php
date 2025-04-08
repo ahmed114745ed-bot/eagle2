@@ -125,6 +125,7 @@ class AuthController extends Controller
      */
     protected function settingForm()
     {
+
         $class = config('admin.database.users_model');
 
         $form = new Form(new $class());

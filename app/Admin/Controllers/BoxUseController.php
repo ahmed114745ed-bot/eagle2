@@ -102,26 +102,26 @@ class BoxUseController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BoxUse);
-    
+
         $grid->id(__('ID'));
-        
+
         $grid->column('user_id', __('User'))->display(function () {
             $user = $this->user;
             if (!$user) return '-';
-        
+
             $name = $user->name;
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-';
-            $defaultImage = asset("images/businessman-icon.jpg");   
-            $avatarPath = @$user->avatar;    
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $avatarPath = @$user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        
-            $userUrl = admin_url('users/' . $user->id);  
-        
+
+            $userUrl = admin_url('users/' . $user->id);
+
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -131,22 +131,22 @@ class BoxUseController extends MainController
                         </div>
                     </div>";
         });
-        
+
         $grid->column('box_id', __('Box'))->display(function () {
             $box = $this->box;
             if (!$box) return '-';
-        
+
             $name = $box->name ?? 'Unknown Box';
             $boxUrl = admin_url('boxes/' . $box->id);
-        
+
             $defaultImage = asset("images/box-icon.jpg");
             $avatarPath = $box->image ?? null;
             $avatar = $avatarPath ? getImagePath($avatarPath) : $defaultImage;
-        
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-        
+
             return "<a href='$boxUrl' style='text-decoration: none;'>
                         <div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                             <img src='$avatar' alt='Box Image' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -154,22 +154,22 @@ class BoxUseController extends MainController
                         </div>
                     </a>";
         });
-        
+
         $grid->column('room_id', __('Room'))->display(function () {
             $room = $this->room;
             if (!$room) return '-';
-        
+
             $name = $room->room_name ?? 'Unknown Room';
             $roomUrl = admin_url('rooms/' . $room->id);
-        
+
             $defaultImage = asset("images/default-room.jpg");
             $roomImagePath = $room->room_cover ?? null;
             $roomImage = $roomImagePath ? getImagePath($roomImagePath) : $defaultImage;
-        
+
             if (!isImageExists($roomImage)) {
                 $roomImage = $defaultImage;
             }
-        
+
             return "<a href='$roomUrl' style='text-decoration: none;'>
                         <div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                             <img src='$roomImage' alt='Room Image' style='width: 40px; height: 40px; border-radius: 8px;'>
@@ -177,10 +177,18 @@ class BoxUseController extends MainController
                         </div>
                     </a>";
         });
-        
-        
-        
-        $grid->coins(__('coins'));
+
+
+
+        $grid->column('coins', __('coins'))->display(function ($coins) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coins}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $grid->end_at(__('end_at'));
         $grid->users_num(__('users_num'));
         $grid->column('type', __('Type'))->display(function ($value) {
@@ -188,13 +196,13 @@ class BoxUseController extends MainController
         });        $grid->label(__('label'));
         $grid->used_num(__('used_num'));
         $grid->not_used_num(__('not_used_num'));
-        
+
         $grid->disableCreateButton();
         $grid->disableExport();
-        
+
         return $grid;
     }
-    
+
 
     /**
      * Make a show builder.

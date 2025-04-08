@@ -19,9 +19,9 @@ class RealsController extends Controller
 
     public $realsService;
 
-    public function __construct(RealsService $realsService) {
+    public function __construct(RealsService $realsService)
+    {
         $this->realsService = $realsService;
-
     }
 
     /**
@@ -31,15 +31,14 @@ class RealsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $filter=request('filter');
-        if (!request("page")  || request("page") == 1 ) {
-            $user->real_type = $user->id . random_int(1000,9999);
-
+        $filter = request('filter');
+        if (!request("page")  || request("page") == 1) {
+            $user->real_type = $user->id . random_int(1000, 9999);
         }
-        $reals = $this->realsService->showNew($user,$filter);
+        $reals = $this->realsService->showNew($user, $filter);
         //return $reals;
 
-/*         return response()->json([
+        /*         return response()->json([
             'status' => true,
             'message' => 'success',
             'data' => RealsResource::collection($reals)->resolve(),
@@ -51,7 +50,7 @@ class RealsController extends Controller
             ]
             ],200); */
 
-        return Common::apiResponse(1, 'success',RealsResource::collection($reals));
+        return Common::apiResponse(1, 'success', RealsResource::collection($reals));
     }
 
     /**
@@ -79,6 +78,24 @@ class RealsController extends Controller
         return Common::apiResponse(true, 'success', $collection);
     }
 
+    public function getMyReals()
+    {
+        $user_id=Auth::user()->id;
+        try {
+          
+                $user = User::query()->withoutAppends()->findOrFail($user_id);
+            
+        } catch (\Exception $e) {
+            return Common::apiResponse(false, 'user not found');
+        }
+        $reals = $this->realsService->getUserReals($user, Auth::id());
+        $collection = RealsResource::collection($reals);
+        
+        return Common::apiResponse(true, 'success', $collection);
+    }
+
+
+    
     /**
      * Display a listing of the resource.
      * @return \Illuminate\Http\JsonResponse
@@ -86,8 +103,8 @@ class RealsController extends Controller
     public function getUserFollowersReals(): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
-        if (!request("page")  || request("page") == 1 ) {
-            $user->following_unique_value =$user->id . random_int(10000,99999);
+        if (!request("page")  || request("page") == 1) {
+            $user->following_unique_value = $user->id . random_int(10000, 99999);
         }
         $reals = $this->realsService->getUserFollowersReals($user);
 
@@ -104,9 +121,9 @@ class RealsController extends Controller
     public function store(RealStore $request)
     {
         $user = $request->user();
-        $this->realsService->create($request->all(), Auth::id());
+        $real = $this->realsService->create($request->all(), Auth::id());
         (new UpgradeLevelServices())->uploadReel($user);
-        return Common::apiResponse(1, 'success');
+        return Common::apiResponse(1, 'success', new RealsResource($real));
     }
 
     public function oldReal()
@@ -121,20 +138,11 @@ class RealsController extends Controller
         $real = $this->realsService->showReal($real_id, Auth::id());
         if (!$real) return Common::apiResponse(false, 'No real founded');
         return Common::apiResponse(true, 'success', new  RealsResource($real));
-
     }
 
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+  
+  
 
     /**
      * Remove the specified resource from storage.
@@ -146,7 +154,6 @@ class RealsController extends Controller
         $value = $this->realsService->delete($id);
         if (!$value) return Common::apiResponse(0, 'Not allow', null, 402);
         return Common::apiResponse(1, 'success');
-
     }
 
     public function destroy_dash($real_id, $id)
@@ -159,5 +166,22 @@ class RealsController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function update($real_id, Request $request)
+    {
+
+        try {
+            $result = $this->realsService->update($real_id, $request->all());
+    
+            if (!$result) {
+                return Common::apiResponse(0, 'Try later');
+            }
+    
+            return Common::apiResponse(1, 'Success', $result);
+        } catch (\Exception $e) {
+            return Common::apiResponse(0, 'Error: ' . $e->getMessage());
+        }
+
     }
 }

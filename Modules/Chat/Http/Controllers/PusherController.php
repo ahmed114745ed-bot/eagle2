@@ -19,9 +19,9 @@ class PusherController extends Controller
 
     }
     public function edit_user(Request $request) {
-        Log::info(' edit_user pusher', [
-            $request->all()
-        ]);
+        // Log::info(' edit_user pusher', [
+        //     $request->all()
+        // ]);
 
         if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
             // Log::info('Pusher error');

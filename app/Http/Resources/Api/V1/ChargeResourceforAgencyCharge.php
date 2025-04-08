@@ -19,20 +19,33 @@ class ChargeResourceforAgencyCharge extends JsonResource
     {
         $sender = $this->sender;
         $receiver = $this->receiver;
-        $sender_data   = [
-            'id'  => @$sender->id ?: 0,
-            'uuid' => @$sender->uuid ?: '',
-            'name' => @$sender->name ?: "",
-            'img' => @$sender->img ?: "",
-            'type' => @$this->charger_type
-        ];
+        if ($this->charger_type == 'dash' && $this->user_type == 'dash') {
+            $sender_data = [
+                'id'  => $this->admin?->id ?: 0,
+                'uuid' =>  '',
+                'name' => $this->admin?->name ?: "",
+                'img' => $this->admin?->avatar ?? "",
+                'type' => $this->user_type
+            ];
+        } else {
+            $sender_data   = [
+                'id'  => @$sender->id ?: 0,
+                'uuid' => @$sender->uuid ?: '',
+                'name' => @$sender->name ?: "",
+                'img' => @$sender->profile?->avatar ?? "",
+                'type' => @$this->charger_type
+            ];
+        }
+
         $receiver_data = [
             'id'  => $receiver?->id ?: 0,
             'uuid' => @$receiver?->uuid ?: '',
             'name' => $receiver?->name ?: "",
-            'img' => $receiver?->img ?: "",
+            'img' => $receiver?->profile?->avatar ?? "",
             'type' => $this->user_type
         ];
+
+
 
         return [
             'id'   => $this->id ?: 0,

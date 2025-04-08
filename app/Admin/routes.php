@@ -11,6 +11,7 @@ use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\MomentController;
@@ -20,12 +21,18 @@ use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
+use App\Admin\Controllers\SettingController;
+use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
+use App\Http\Controllers\SettingsController;
+use App\Admin\Controllers\LanguageController;
 use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
 use App\Admin\Controllers\WithdrawController;
+use App\Admin\Controllers\AdminAuthController;
+use App\Admin\Controllers\ChargeVipController;
 use App\Admin\Controllers\GroupChatController;
 use App\Admin\Controllers\InterestsController;
 use App\Admin\Controllers\UserLevelController;
@@ -42,6 +49,8 @@ use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
+
+use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
@@ -70,6 +79,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -158,7 +168,7 @@ Route::group(
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
         $router->resource('test-test', 'TestTestController');
-
+        $router->get('profile', [AdminAuthController::class, 'index']);
         $router->resource('payment-with-method', PaymentMethodController::class);
         $router->post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
 
@@ -192,6 +202,11 @@ Route::group(
         $router->resource('user-statistics', 'UserStatisticsController');
         $router->resource('profiles', 'ProfileController');
         $router->resource('vips', 'VipController');
+        $router->get('vips-sender', [VipController::class, 'senderIndex']);
+        $router->get('vips-receiver', [VipController::class, 'receiverIndex']);
+        $router->get('vips-cp', [VipController::class, 'cpIndex']);
+        $router->get('vips-room', [VipController::class, 'roomIndex']);
+        $router->get('vips-charge', [VipController::class, 'chargeIndex']);
         $router->resource('rooms', 'RoomController', [
             'names' => [
                 'index' => 'rooms'
@@ -209,6 +224,7 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+        $router->resource('charge-vips', ChargeVipController::class);
         $router->resource('delete-accounts', DeleteAccountController::class);
         $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
         $router->resource('test-pusher', TestPusherController::class);
@@ -223,6 +239,7 @@ Route::group(
         $router->resource('home_carousels', 'HomeCarouselController');
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
+        $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
         $router->resource('polices', PoliceController::class);
@@ -258,6 +275,8 @@ Route::group(
         ]);
         // $router->get('/', 'HomeController@infoBox')->name('home');
         $router->get('/', 'AllStatisticController@index')->name('home');
+
+        $router->get('/soon', 'AllStatisticController@index2');
         $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
         $router->get('/custom-export-users', [
             \App\Admin\Controllers\ExportController::class,
@@ -340,6 +359,7 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
+        $router->get('moment-gallery/{id}', [MomentController::class,'momentGallery']);
         $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
         $router->resource('reel-settings', ReelSettingsController::class);
@@ -379,13 +399,15 @@ Route::group(
         $router->resource('/uuid_dedicate', 'SpecialWareDedicateController');
         $router->get('/vips_dedicate', 'DedicateVipController@index');
         $router->resource('/bans', 'BanController');
+        $router->resource('/bans-rooms', 'BanRoomsController');
+
         $router->resource('/request-background-image', 'RequestBackgroundImageController');
         $router->resource('/group-chat', 'GroupChatController');
         $router->resource('interests', InterestsController::class);
         $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
-        $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
+      //  $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
@@ -433,6 +455,23 @@ Route::group(
 
 
         $router->resource('banners', BannerController::class);
+        $router->resource('languages', LanguageController::class);
+        $router->resource('settings', SettingController::class);
+        $router->resource('room-settings', RoomSettingsController::class);
+
+        $router->resource('notification-templates', NotificationsTemplatesController::class);
+       // Route::get('ware-management', [WareTabController::class, 'index']);
+      //  $router->resource('ware-management', WareTabController::class);
+      //Route::post('/ware-management/create/{type?}', [WareTabController::class, 'create']);
+      Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
+      Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::prefix('ware-management')->group(function () {
+            Route::get('/{type?}', [WareTabController::class, 'index']);
+            Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+
     }
 
 

@@ -143,8 +143,8 @@ class MyDataResource extends JsonResource
             'phone' => (string)@$this->phone ?: '',
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
-            'intro' => $intro,
-            'intro_type' => $introType,
+            'intro' => $intro ,
+            'intro_type' => $intro !== '' ? ($introType !== '' ? $introType : 'svga') : '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
             'frame_id' => $frame ? @$this->dress_1 : 0,
@@ -201,7 +201,7 @@ class MyDataResource extends JsonResource
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
-            "multi_images" => $this->images?->select("img"),
+            "multi_images" => $this->images?->select('id',"img"),
             "family_price" =>  Common::getConfig('family_price') ?? 0,
             'image_color'          => @$this->color_image,
             $this->mergeWhen($request->show_counter == true, [
@@ -247,4 +247,6 @@ class MyDataResource extends JsonResource
             ->first();
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
+
+
 }

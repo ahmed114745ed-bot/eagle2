@@ -105,7 +105,9 @@ class ChargeAction extends Action
 
             $user->di += $amount;
             $user->save();
-
+            if ($request->charge_type == "increment") {
+                CustomNotification::chargeAction($user, $request);
+            }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
@@ -127,8 +129,7 @@ class ChargeAction extends Action
         //dd($charge);
         $charge->save();
 
-        UserCommon::UserEarnedInvitation($user->id,$amount);
-
+        UserCommon::UserEarnedInvitation($user->id, $amount);
     }
 
     public function form()
@@ -139,7 +140,7 @@ class ChargeAction extends Action
         $this->text('user_id', __('User ID / Agency ID'));
         $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash');//dashdash
+        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
         $this->text('amount', __('Amount'));
         $this->hidden('amount_type')->value(1);
     }
@@ -148,7 +149,10 @@ class ChargeAction extends Action
     {
         $title = __('dashboard.add_coins');
         return <<<HTML
-            <li><a href="javascript:void(0);" class="charge_action"><i class="fa fa-dollar text-red"></i> $title</a></li>
+            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" 
+       style="background-color: #28a745; border-color: #28a745; color: white;">
+        {$title}
+    </a>
 HTML;
     }
 }

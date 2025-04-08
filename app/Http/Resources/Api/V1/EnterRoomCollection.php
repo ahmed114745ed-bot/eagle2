@@ -75,7 +75,7 @@ class EnterRoomCollection extends JsonResource
             'owner_name'          => @$owner->name ?? '',
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
-            'owner_vip_img'     => $vip_level_img == 0 ? "" : $vip_level_img,
+            'owner_vip_img'     => $vip_level_img  ,
             'vip' => Common::ovip_center(@$owner->id),
             'owner_country'        =>        $owner && $owner->country
                 ? [
@@ -100,7 +100,7 @@ class EnterRoomCollection extends JsonResource
             'muted_users'         => $this->muted_users,
             'youtube_key'         => configesModel::query()->where("name", "youtube_key")->first()?->value ?? "",
             'cp_indexs'         => $indices,
-            'stream_type'         =>  $this->type ?? '',
+            'stream_type'         =>  $this->type ?? 'audio',
              'is_live' => (bool) ($this->is_live ?? false),
             'room_keys' => [
                 "comment_room_key" => (string)(Common::getConfig('comment_room_key') ?? 13456489535)
@@ -117,7 +117,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
-
+            'is_comment_closed' => $this->is_comment_closed,
         ];
     }
 

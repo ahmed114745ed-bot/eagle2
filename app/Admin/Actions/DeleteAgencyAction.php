@@ -14,7 +14,7 @@ class DeleteAgencyAction extends RowAction
     public $name;
 
 
-       
+
         // User::where('agency_id', $model->id)->update([
         //     'agency_id' => 0,
         //     'type_user' => 0,
@@ -23,7 +23,7 @@ class DeleteAgencyAction extends RowAction
         // // Delete the agency
         // $model->delete();
 
-        
+
             public function __construct($id = 0)
             {
                 $this->name = __("dashboard.delete");
@@ -33,11 +33,11 @@ class DeleteAgencyAction extends RowAction
             {
                 try{
                     DB::beginTransaction ();
-                    $model->delete ();
                     User::where('agency_id', $model->id)->update([
                         'agency_id' => 0,
                         'type_user' => 0,
                     ]);
+                    $model->delete ();
                     DB::commit ();
                     return $this->response()->success (__('dashboard.successful'))->refresh ();
                 }catch (\Exception $exception){
@@ -45,7 +45,7 @@ class DeleteAgencyAction extends RowAction
                     return $this->response()->error($exception->getMessage ())->refresh();
                 }
             }
-        
+
             public function dialog()
             {
                 $this->confirm(__('dashboard.chickDelete'),'',[]);

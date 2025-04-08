@@ -81,7 +81,15 @@ class BoxController extends MainController
 
         $grid->id(__('ID'));
         $grid->column('type', __('type'))->using([0 => __('normal'), 1 => __('super')]);
-        $grid->column('coins', __('coins'));
+        $grid->column('coins', __('coins'))->display(function ($coins) {
+
+            $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+            return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>{$coins}</span>
+                        <img src='{$image}' alt='USD' width='20' height='20'>
+                    </div>";
+        });
         $grid->column('users', __('users'));
         $grid->column('image', __('image'))->image('', 30);
         $grid->column('has_label', __('has_label'));

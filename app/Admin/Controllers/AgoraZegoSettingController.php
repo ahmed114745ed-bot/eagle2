@@ -10,16 +10,16 @@ class AgoraZegoSettingController extends MainController
 {
     public $permission_name = 'agora-zego';
 
-    public function index2(Content $content){
-        $agora_app_id = Common::getConfig('app_id');
-        $zego_server_secret = Common::getConfig('zego_server_secret');
-        $zego_app_id = Common::getConfig('zego_app_id');
-        $app_sign = Common::getConfig('app_sign');
-        $library = Common::getConfig('library');
+    // public function index2(Content $content){
+    //     $agora_app_id = Common::getConfig('app_id');
+    //     $zego_server_secret = Common::getConfig('zego_server_secret');
+    //     $zego_app_id = Common::getConfig('zego_app_id');
+    //     $app_sign = Common::getConfig('app_sign');
+    //     $library = Common::getConfig('library');
 
-        return $content->view('agora_zego_settings',compact('agora_app_id',
-         'zego_server_secret', 'zego_app_id','app_sign','library'));
-    }
+    //     return $content->view('agora_zego_settings',compact('agora_app_id',
+    //      'zego_server_secret', 'zego_app_id','app_sign','library'));
+    // }
 
     public function index(Content $content)
     {

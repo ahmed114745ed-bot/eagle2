@@ -76,7 +76,8 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->orderByDesc('rooms.pin')->whereHas('owner')
+        $grid->model()->with('owner.profile','owner:uuid,id,name',)
+            ->orderByDesc('rooms.pin')->whereHas('owner')
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
             ->orderByDesc('count_room_socket');
@@ -91,7 +92,7 @@ class RoomController extends MainController
 
                     $query->whereHas('owner', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")->orWhere('id', 'like', "%$input%");
+                            ->orWhere('uuid', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or numId'));
             });
@@ -158,85 +159,53 @@ class RoomController extends MainController
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) {
             $maxRoomAdmin = Common::getConfig('max_room_admin');
-            return $this->admins->count() . '/' . ($maxAdmin ?? $maxRoomAdmin);
+            return count($this->admins) . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
         $grid->column('count_room_socket', __('Number of users'));
-        // $grid->column(__('microphone'))
-        //     ->display(function () {
-        //         if (!$this->microphone) return '';
-
-        //         // Fetch the users only once and store them in a property
-        //         if (!isset($this->cachedUsers)) {
-        //             $ids = explode(',', $this->microphone);
-        //             $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-        //         }
-
-        //         $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-
-        //         foreach ($this->cachedUsers as $user) {
-        //             $path = @$user->profile?->avatar;
-        //             $defaultImage = asset("images/businessman-icon.jpg");
-        //             $url = $path ? getImagePath($path) : $defaultImage;
-
-        //             // Check if the image exists
-        //             if (!isImageExists($url)) {
-        //                 $url = $defaultImage;
-        //             }
-
-        //             $html .= '
-        //         <div style="text-align: center;">
-        //             <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
-        //             <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
-        //         </div>';
-        //         }
-
-        //         $html .= '</div>';
-        //         return $html;
-        //     });
 
         $grid->column(__('microphone'))
             ->display(function () {
                 $ids = explode(',', $this->microphone);
-                $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-                if (!$this->cachedUsers) {
+                $cachedUsers = \App\Models\User::whereIn('id', $ids)->with(['profile:user_id,avatar'])->take(6)->get(['id']);
+               
+
+                // Check if there are no users
+                if ($cachedUsers->isEmpty()) {
                     return '';
-                } else {
-
-                    $ids = explode(',', $this->microphone);
-                    $this->cachedUsers = \App\Models\User::whereIn('id', $ids)->take(5)->get();
-
-
-                    $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-
-                    foreach ($this->cachedUsers as $user) {
-                        $path = @$user->profile?->avatar;
-                        $defaultImage = asset("images/businessman-icon.jpg");
-                        $url = $path ? getImagePath($path) : $defaultImage;
-
-                        if (!isImageExists($url)) {
-                            $url = $defaultImage;
-                        }
-
-                        $html .= '
-                <div style="text-align: center;">
-                    <img src="' . $url . '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"/>
-                    <div style="font-size: 12px; margin-top: 5px;">' . $user->uuid . '</div>
-                </div>';
-                    }
-                    $url1 = url('admin/room-mic/' . $this->id);
-                    // Add arrow button
-                    $html .= '
-            <div>
-                <a href="' . $url1 . '" 
-                   style="text-decoration: none; color: black; font-size: 20px; cursor: pointer;">
-                    ⬇️
-                </a>
-            </div>';
-
-                    $html .= '</div>';
-                    return $html;
                 }
+
+                $html = '<div style="display: flex; gap: 10px; align-items: center;">';
+
+                foreach ($cachedUsers->take(5) as $user) {
+                    $path = $user->profile?->avatar;
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+            
+                    $html .= '
+                    <div style="position: relative; margin-left: -20px;">
+                        <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
+                    </div>';
+                }
+            
+                // Show "add" icon if more than 5 users
+                if (count($cachedUsers) > 5) {
+                    $url1 = url('admin/room-mic/' . $this->id);
+                    $arrowIcon = asset('images/add.png');
+            
+                    $html .= '
+                    <div>
+                        <a href="' . $url1 . '" 
+                           style="text-decoration: none; cursor: pointer;">
+                            <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
+                        </a>
+                    </div>';
+                }
+            
+                $html .= '</div>';
+                return $html;
             });
+
+
 
 
         $grid->actions(function ($action) {

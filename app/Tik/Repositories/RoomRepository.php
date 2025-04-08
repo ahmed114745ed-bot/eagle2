@@ -81,10 +81,11 @@ class RoomRepository extends AbstractRepository
 
     public function all($req, $ids = [])
     {
+        $roomType = $req->room_type ?? 'audio';
 
         $user = $req?->user();
         $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-        
+
 
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
@@ -202,7 +203,11 @@ class RoomRepository extends AbstractRepository
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
         }
-        return $result->paginate(10);
+        return $result->when($roomType != 'live', function ($q) use ($roomType) {
+            $q->where('type', $roomType);
+        })->when($roomType == 'live', function ($q) use ($roomType) {
+             $q->whereIn('type', ['single_live', 'multi_live']);
+        })->paginate(10);
     }
 
 
@@ -230,6 +235,15 @@ class RoomRepository extends AbstractRepository
     {
         $room->room_black = trim($roomBlack, ',');
         $this->updateRoomUser($room);
+    }
+
+    public function commentStatus($roomId): bool
+    {
+        $room = $this->model->where('id', $roomId)->first();
+
+        $room->update(['is_comment_closed' => !$room->is_comment_closed]);
+
+        return $room->is_comment_closed;
     }
 
     public function roomUsers($userId)

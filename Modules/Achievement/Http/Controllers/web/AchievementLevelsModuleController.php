@@ -29,15 +29,18 @@ class AchievementLevelsModuleController extends Controller
         $userId = request('user_id');
         $gift = request('gift_achievement_id');
 
-
+        $adminId = Auth::user()->id;
+       
 
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
-        if ($achievementLevel_id == null && $request->hasFile('custom_image') ) {
+        if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
+            dd( $adminId,11);
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
                 'user_id'       => $userId,
                 'custom_image' => $customImage,
                 'achievement_id' => $request->input('achievement_id'),
+                'admin_id' =>  $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -46,13 +49,14 @@ class AchievementLevelsModuleController extends Controller
                 'user_id' => Auth::user()->id,
                 'type' => 'user',
             ]);
-        }elseif ($achievementLevel_id == null && $request->hasFile('custom_file') ) {
-
+        } elseif ($achievementLevel_id == null && $request->hasFile('custom_file')) {
+            dd( $adminId,22);
             $custom_file = Common::upload('custom_file', $request->file('custom_file'));
             $attributes = [
                 'user_id'       => $userId,
                 'file' => $custom_file,
                 'achievement_id' => $request->input('achievement_id'),
+                'admin_id' =>  $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -61,16 +65,18 @@ class AchievementLevelsModuleController extends Controller
                 'user_id' => Auth::user()->id,
                 'type' => 'user',
             ]);
-        }elseif ($achievementLevel_id == null && request('custom_image') ) {
+        } elseif ($achievementLevel_id == null && request('custom_image')) {
+         //   dd( $adminId,33);
             $customImagepath = request('custom_image');
             $attributes = [
                 'user_id'       => $userId,
                 'custom_image' => $customImagepath,
                 'achievement_id' => $request->input('achievement_id'),
+                'admin_id' =>  $adminId,
             ];
 
-            UserAchievementLevel::create($attributes);
-        }elseif ($achievementLevel != null) {
+           UserAchievementLevel::create($attributes);
+        } elseif ($achievementLevel != null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
                 $error = new MessageBag([
@@ -80,7 +86,7 @@ class AchievementLevelsModuleController extends Controller
 
                 return redirect()->route(nameRoute('admin.get-view-page'), compact('error')); // Error message added
             }
-        }elseif($achievementLevel_id == null && $gift){
+        } elseif ($achievementLevel_id == null && $gift) {
             $attributes = [
                 'user_id'       => $userId,
                 'gift_achievement_id' => $gift,

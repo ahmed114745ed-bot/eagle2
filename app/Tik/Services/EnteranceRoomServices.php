@@ -8,6 +8,7 @@ use App\Helpers\Common;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomVisitor;
+use Exception;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,13 @@ use App\Tik\Repositories\EnteranceRoomRepository;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use Illuminate\Support\Facades\Schema;
 use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\Chat\Entities\ChatMessage;
+use Modules\Chat\Entities\ChatRoom;
+use Modules\Chat\Events\Chat;
+use Modules\Chat\Events\Conversation;
+use Modules\Chat\Events\OpenChat;
+use Modules\Chat\Http\Resources\ChatMessageResource;
+use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Entities\CpRoomHistory;
 
 class EnteranceRoomServices
@@ -191,7 +199,7 @@ class EnteranceRoomServices
     {
 
         $data = $request->all();
-        // Log::info('Agora data ',[$data ]);
+        Log::info('Agora data for shami ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
@@ -208,6 +216,7 @@ class EnteranceRoomServices
 
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
+                    Log::info('Agora data for Room ',[$room ]);
 
         $user = User::find($userId);
 
@@ -218,22 +227,30 @@ class EnteranceRoomServices
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
 
         if (in_array($eventType, [101, 103])) {
-            // Log::info('enter rooom 101,102', [
-            //     'event_type' => $eventType,
+            Log::info('enter rooom 101,102 for shami', [
+                'room_uid' => $room->uid,
+                'user' => $user->uid,
 
-            // ]);
+            ]);
 
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
+
+            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+                    $room->update(['is_live' => true]);
+
+            }
 
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
-            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+            if (
+                Schema::hasColumn('rooms', 'is_live') &&
+                $room->uid == $user->id &&
+                $room->type !== 'audio'
+            ) {
                 $room->update(['is_live' => false]);
-
-
             }
 
 
@@ -513,8 +530,12 @@ class EnteranceRoomServices
             $room->charizma_status = false;
             dispatch(new ResetCharisma($room->id));
         }
-
+        if ($room->uid == $user_id) {
+            $room->is_live = true;
+        }
+   
         $room->save();
+       
     }
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
@@ -529,4 +550,100 @@ class EnteranceRoomServices
             ]
         );
     }
+
+
+    public function makeRequestInviteRoom($user, $request)
+    {
+        $room = Room::where('uid','=',$request->owner_id)->first();
+        if (!$room) throw new Exception('room not found');
+
+        $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
+
+
+        if (!$chatRoom) {
+
+            $chatRoom = ChatRoom::create([
+                'user_id' => $user->id,
+                'user_id2' => $request->user_id
+            ]);
+
+            $user->current_room_chat = $chatRoom->id;
+        }
+
+
+        $user2 = User::find($request->user_id);
+        if (!$user2) throw new Exception('user not found');
+
+
+        $data = [
+            'title' => __('I invite you to enter my room'),
+            'room_owner_id' => intval($request->owner_id),
+            'room_id' => intval($room->id),
+            'status' => 0
+        ];
+
+        $key = env('MESSAGE_KEY');
+
+        $message = json_encode($data);
+
+        $chatMessageData = [
+            'chat_room_id' => $chatRoom->id,
+            'user_id' => $user->id,
+            'room_owner_id' => intval($request->owner_id),
+            'room_id' => intval($room->id),
+            'message' => __('I invite you to enter my room'),
+            'type' => 'invite_room'
+        ];
+
+        if ($user2->online == 1 && $user2->current_room_chat == $chatRoom->id) {
+
+            $chatMessageData['status'] = 'seen';
+        } else if ($user2->online == 1) {
+            $chatMessageData['status'] = 'received';
+        }
+        $chatMessage = ChatMessage::create($chatMessageData);
+
+        if ($user2->is_logout != 1) {
+            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
+            $title = $user->name;
+            $body = $message;
+            $type = $message->type ?? 'text';
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
+        }
+        
+        $message_resource = new ChatMessageResource($chatMessage);
+        $room_resource =  new ChatRoomResourcePusher($chatRoom);
+        if ($chatRoom->user_id == $user->id) {
+            $chatuser = User::find($chatRoom->user_id2);
+        } else {
+            $chatuser = User::find($chatRoom->user_id);
+        }
+
+        try {
+            event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
+        Log::info('Preparing to fire OpenChat event', [
+            'message_resource' => $message_resource->toArray(request())
+        ]);
+        event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
+
+        event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
+
+        return Common::apiResponse(1, 'تم الارسال  بنجاح');
+    
+
+    }
+    
 }
+
+
+
+
+
+
+
+
+
+

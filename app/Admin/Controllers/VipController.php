@@ -29,8 +29,185 @@ class VipController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->grid());
+    }
+    public function senderIndex(Content $content){
+        return $content
+        ->title(trans('charge level'))
+        ->body($this->senderGrid());
+    }
+    protected function senderGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 2)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select(
+            [
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
+            ]
+        );
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+            return number_format($value);
+        })->editable();
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    public function receiverIndex(Content $content){
+        return $content
+        ->title(trans('charge level'))
+        ->body($this->receiverGrid());
+    }
+    protected function receiverGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 1)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select(
+            [
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
+            ]
+        );
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+            return number_format($value);
+        })->editable();
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+    public function cpIndex(Content $content){
+        return $content
+        ->title(trans('charge level'))
+        ->body($this->cpGrid());
+    }
+
+    protected function cpGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 3)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select(
+            [
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
+            ]
+        );
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+            return number_format($value);
+        })->editable();
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+
+    public function roomIndex(Content $content){
+        return $content
+        ->title(trans('charge level'))
+        ->body($this->roomGrid());
+    }
+
+    protected function roomGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 4)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select(
+            [
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
+            ]
+        );
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+            return number_format($value);
+        })->editable();
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    public function chargeIndex(Content $content){
+        return $content
+        ->title(trans('charge level'))
+        ->body($this->chargeGrid());
+    }
+
+    protected function chargeGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 5)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select(
+            [
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5=>__ ('charge'),
+            ]
+        );
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+            return number_format($value);
+        })->editable();
+        //        $grid->column('di', __('Diamonds'));
+        //        $grid->column('co', __('Coins'));
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
     }
 
     /**
@@ -43,7 +220,7 @@ class VipController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->detail($id));
     }
 
@@ -57,14 +234,14 @@ class VipController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->title(trans('level'))
+            ->title(trans('charge level'))
             ->body($this->form());
     }
 
@@ -80,6 +257,7 @@ class VipController extends MainController
         $grid->model()->orderByDesc('type')->orderBy('exp');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
+            $filter->expand();
             $filter->where(function ($query) {
                 switch ($this->input) {
                     case 'sender':
@@ -105,6 +283,7 @@ class VipController extends MainController
                 'received' => __('Received'),
                 'cp' => __('cp'),
                 'room' => __('room'),
+                'charge' => __('charge'),
             ]);
         });
 

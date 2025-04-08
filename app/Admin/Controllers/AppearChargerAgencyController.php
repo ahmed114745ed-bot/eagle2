@@ -82,7 +82,7 @@ class AppearChargerAgencyController extends MainController
                 }, __('User'))->placeholder(__('Search by name , UUID , phone'));
             });
         });
-        $grid->model()->whereIn('type_user', [4, 3]);
+        $grid->model()->whereIn('type_user', [4, 3])->whereHas('agency');
         $grid->column('id', __('Id'));
         // $grid->column('uuid', __('Uuid'));
         // $grid->column('name', __('Name'));

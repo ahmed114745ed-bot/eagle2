@@ -19,7 +19,7 @@ class ColorController extends MainController
      *
      * @var string
      */
-   
+
     public $permission_name = 'color';
 
     public function __construct()
@@ -74,17 +74,23 @@ class ColorController extends MainController
      * Make a grid builder.
      *
      * @return Grid
-     */ 
+     */
     protected function grid()
     {
         $grid = new Grid(new Color());
 
         $grid->column('id', __('Id'));
         $grid->column('color', __('Color'));
-        $grid->column('status', __('status'))->display(function ($status){
-            return $status== 0?__('main colors'):__('button colors');
-        });
-        
+        $grid->column('status', __('status'))->select(
+            [
+                0 => trans('main colors'),
+                1 => trans('button colors'),
+                2 => trans('second colors'),
+
+            ]
+        );
+
+
         $grid->footer(function ($query) {
             return view('admin.dashboard.app-setting', ['color' => $query]);
         });
@@ -121,10 +127,11 @@ class ColorController extends MainController
         $form = new Form(new Color());
 
         $form->color('color', __('Color'));
-        $form->select('status', __('Status'))->options (
+        $form->select('status', __('Status'))->options(
             [
-                0=>__('main colors'),
-                1=>__('button colors')
+                0 => __('main colors'),
+                1 => __('button colors'),
+                2 => __('second colors')
             ]
         );
 
@@ -141,10 +148,12 @@ class ColorController extends MainController
             $imagePath = Common::upload('images', $request->file('logo'));
             $data->logo = $imagePath;
         }
-    
+
         $data->footer_description = $request->input('desc');
         $data->save();
-    
-        return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');
+
+        admin_toastr('تم تحديث الصورة والوصف بنجاح', 'success');
+        return back();
+        // return redirect()->back()->with('success', 'تم تحديث الصورة والوصف بنجاح');
     }
 }
