@@ -91,6 +91,8 @@
   "days": "Günler",
   "introduce": "Tanıtım",
   "notice": "Duyuru",
+  "Notice": "Duyuru",
+  "Go Back": "Geri Dön",
   "number of people": "Kişi Sayısı",
   "user id": "Kullanıcı Kimliği",
   "speak switch": "Konuşma Anahtarı",
@@ -1756,7 +1758,39 @@
     "Background Image": "Arka Plan Resmi",
     "Save Settings": "Ayarları Kaydet",
     "Real Time system Setting": "Gerçek Zamanlı Sistem Ayarı",
-    "pusher": "İtici"
+    "pusher": "İtici",
+    "No members found.": "Üye bulunamadı",
+    "I invite you to enter my room": "Sizi odamıma girmeye davet ediyorum",
+    
+    "Cost of background request:" : "Arka plan isteği maliyeti:",
+    "Custom Background settings" : "Özel Arka Plan Ayarları",
+    "Background expiration in days:" : "Arka planın son kullanma tarihi (gün olarak):",
+    "Additional settings" : "Ek ayarlar",
+    "Live Stream settings" : "Canlı yayın ayarları",
+   
+    "Rooms Bacground:" : "Odalar Arka Planı:",
+    "Room Rule:" : "Oda Kuralı:",
+    "Room Rule en:" : "Oda Kuralı İngilizce:",
+    "Youtube Key:" : "YouTube Anahtarı:",
+    "Pk Background:" : "PK Arka Planı:",
+    "Private Comment Price:" : "Özel Yorum Fiyatı:",
+    "Image 1": "Resim 1",
+    "Image 2": "Resim 2",
+    "Image 3": "Resim 3",
+    "Old Image": "Eski Resim",
+    "App Wallets": "Uygulama Cüzdanları",
+    "Revenues": "Gelirler",
+    "Expenses": "Giderler",
+    "Wallet Settings": "Cüzdan Ayarları",
+    "Coin Recharge": "Coin Yükleme",
+    "User Log": "Kullanıcı Kaydı",
+    "User Settings": "Kullanıcı Ayarları",
+    "Regions": "Bölgeler",
+    "Region Settings": "Bölge Ayarları",
+    "Store": "Mağaza",
+    "Store Settings": "Mağaza Ayarları"
+
+    
 
 
 

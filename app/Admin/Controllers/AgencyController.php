@@ -63,9 +63,11 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content){
-        $agency = Agency::findOrFail($id);
-        return $content->title(__('agency profile'))->view('agency_profile', compact('agency'));
+    public function profile($id, Content $content) {
+        $agency = Agency::with('charges','mempers')->findOrFail($id);
+        $members = $agency->mempers()->paginate(10, ['*'], 'members_page'); // Custom page name
+        $charges = $agency->charges()->paginate(10, ['*'], 'charges_page'); // Custom page name
+        return $content->title(__('agency profile'))->view('agency_profile', compact('agency','members','charges'));
     }
 
     public function update($id)
@@ -231,7 +233,7 @@ class AgencyController extends MainController
 
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
-        });;
+        });
         $grid->column('coins', __('coins'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
@@ -253,7 +255,8 @@ class AgencyController extends MainController
             ";
         });
         $grid->column('target', trans('target'))->display(function () {
-            $target = $this->getTargetAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
+            $target = $this->getTargetsAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
+
             return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
                 "></span>" : "";
         });

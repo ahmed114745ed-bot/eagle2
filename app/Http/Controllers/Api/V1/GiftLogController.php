@@ -412,7 +412,7 @@ class GiftLogController extends Controller
                     'isExpensive'   => $totalPrice >= 2000,
                     'num_gift'      => $zigoData['number'],
                     "plural"        => $zigoData['plural'],
-                    'gift_price'    => $zigoData['room_session'],
+                    'gift_price'    =>$totalPrice,// $zigoData['room_session'],
                     'coins'         => @$zigoData['coins'] ?? '0',
                     'is_lucky_gift' => (bool)$zigoData['is_lucky_gift'],
                     'type' => @$zigoData['gift_image_type'] ?? 'mp4'

@@ -87,6 +87,9 @@
     "days": "الايام",
     "introduce": "تعريف",
     "notice": "تنويه",
+    "Notice": "تنويه",
+    "Go Back":"رجوع",
+
     "number of people": "عدد الاشخاص",
     "user id": "معرف المستخدم",
     "speak switch": "حظر الاعضاء",
@@ -101,6 +104,7 @@
     "Diamonds": "الماس",
     "Password": "كلمة السر",
     "agency share": "نصيب الوكالة",
+    "updated at": "تم التحديث في",
     "level list": "قائمة المستويات",
     "NickName": "الاسم المستعار",
     "coins": "الكوينز",
@@ -1778,7 +1782,7 @@
     "Custom Background settings" : "إعدادات الخلفية المخصصة",
     "Additional settings" : "الإعدادات الإضافية",
     "Live Stream settings" : "إعدادات البث المباشر",
-    "Cost request background:" : "خلفية طلب التكلفة:",
+    "Cost of background request:" : "تكلفه طلب الخلفيه:",
     "Rooms Bacground:" : "خلفية الغرف:",
     "Background expiration in days:" : "انتهاء صلاحية الخلفية بالأيام:",
     "Room Rule:" : "قواعد الغرفة:",
@@ -1809,7 +1813,27 @@
     "Background Image": "صورة الخلفية",
     "Save Settings": "حفظ الإعدادات",
     "Real Time system Setting": "إعداد نظام الوقت الفعلي",
-    "pusher": "بشر"
+    "pusher": "بشر",
+    "No members found.": "لم يتم العثور على أعضاء",
+    "I invite you to enter my room": "أدعوكم لدخول غرفتي",
+    "Image 1":"الصورة 1",
+    "Image 2":"2 الصورة",
+    "Image 3":"لصورة 3",
+    "Old Image": "الصورة القديمة",
+
+
+    "App Wallets":"محافظ التطبيق",
+    "Revenues":"الإيرادات",
+    "Expenses":"المصاريف",
+    "Wallet Settings":"اعدادات المحفظة",
+    "Coin Recharge":"شحن العملات",
+    "User Log":"سجل المستخدم",
+    "User Settings":"اعدادات المستخدمين",
+    "Regions":"المناطق",
+    "Region Settings":"اعدادات المناطق",
+    "Store":"المتجر",
+    "Store Settings":"اعدادات المتجر"
+
 
 
 }

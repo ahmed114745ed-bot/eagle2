@@ -117,7 +117,7 @@ class EnterRoomCollection extends JsonResource
                 'exp' => @$this->exp ?? 0,
                 'level_num' => @$this->level->level ?? 0,
             ],
-
+            'is_comment_closed' => $this->is_comment_closed,
         ];
     }
 

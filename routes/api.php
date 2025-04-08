@@ -182,6 +182,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
             Route::get ('user-levels',[UserController::class,'userLevels']);
             // rooms api
+            Route::post('check-room', [RoomController::class, 'check_room']);
+
             Route::prefix('rooms')->group(function () {
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/', [RoomController::class, 'index']);
@@ -207,6 +209,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('black-list', [RoomController::class, 'blackList']);
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
+                Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
@@ -232,6 +235,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
+
+
+                // Invite user to room
+                Route::post('invite-user', [EnteranceController::class, 'invite_user']);
+
+
+
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
@@ -248,6 +258,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
                 Route::get('/stop-play', [UserController::class, 'updateGame']);
                 Route::get('/online', [UserController::class, 'online']);
+                Route::get('/friends', [UserController::class, 'friends']);
             });
 
             Route::get('/room-countries', [RoomController::class, 'room_countries']);

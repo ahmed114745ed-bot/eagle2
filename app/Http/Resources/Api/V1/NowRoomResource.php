@@ -33,7 +33,7 @@ class NowRoomResource extends JsonResource
             "mode"            => @$now_room->mode,
             'giftPrice'       => @$now_room->session_string,
             'room_type'       => @$now_room->type ?? '',
-            'is_live'       => @$now_room->is_live ?? 0,
+            'is_live'       => (boolean)@$now_room->is_live ?? 0,
         ];
 
         // return [

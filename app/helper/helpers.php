@@ -75,6 +75,38 @@ if (!function_exists('check')) {
     }
 }
 
+if (!function_exists('checkStoredProcedureExists')) {
+    function checkStoredProcedureExists($procedureName)
+    {
+        $databaseName = config('database.connections.mysql.database'); // Get the database name from the environment file
+
+        $result = \DB::select(
+            'SELECT COUNT(*) as count
+        FROM information_schema.ROUTINES
+        WHERE ROUTINE_TYPE = ?
+        AND ROUTINE_SCHEMA = ?
+        AND ROUTINE_NAME = ?',
+            ['PROCEDURE', $databaseName, $procedureName]
+        );
+
+        return $result[0]->count > 0;
+    }
+
+
+    function generatesignatureNonces()
+    {
+        $tempByte = random_bytes(8);
+        $signatureNonce = bin2hex($tempByte);
+        return $signatureNonce;
+    }
+
+    function generateSignatures($nonce, $appKey, $timestamp)
+    {
+        $data = sprintf("%s%s%d", $nonce, $appKey, $timestamp);
+        return md5($data);
+    }
+}
+
 if (!function_exists('human_file_size')) {
     function human_file_size($bytes, $decimals = 2)
     {
@@ -423,18 +455,17 @@ if (!function_exists('userType')) {
 }
 
 if (!function_exists('convertNumbersToWestern')) {
-    function convertNumbersToWestern($string) {
+    function convertNumbersToWestern($string)
+    {
         $newNumbers = range(0, 9);
 
-       if(app()->getLocale() =='hi')
-       {
-        $numbers = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
-       }elseif(app()->getLocale() =='ar')
-       {
-        $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-       }
-         // Arabic (Eastern)
-      
+        if (app()->getLocale() == 'hi') {
+            $numbers = ['०', '१', '२', '३', '४', '५', '६', '७', '८', '९'];
+        } elseif (app()->getLocale() == 'ar') {
+            $numbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        }
+        // Arabic (Eastern)
+
 
         return str_replace($numbers, $newNumbers, $string);
     }

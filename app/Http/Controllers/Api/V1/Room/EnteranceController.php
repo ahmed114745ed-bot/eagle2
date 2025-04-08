@@ -17,6 +17,7 @@ use App\Models\Background;
 use App\Jobs\ResetCharisma;
 use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Tik\Services\EnteranceRoomServices;
+use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
 
@@ -64,7 +66,7 @@ class EnteranceController extends Controller
         //     $request->all()
         // ]);
     }
-    
+
 
     public function updateRoomCountFromZego(Request $request)
     {
@@ -250,7 +252,7 @@ class EnteranceController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function enter_room(Request $request)
+    public function enter_room(Request $request): JsonResponse
     {
         $room_pass = $request['room_pass'];
         $owner_id  = $request['owner_id'];
@@ -504,7 +506,7 @@ class EnteranceController extends Controller
             if ($request->mode) {
                 $room->mode = $request->mode;
             }
-            
+
             if ($request->room_type) {
                 if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
                 $room->room_type = $request->room_type;
@@ -596,4 +598,34 @@ class EnteranceController extends Controller
         //        }
 
     }
+
+    public function invite_user(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'owner_id' => 'required|exists:rooms,uid',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = implode(',', $validator->errors()->all());
+            return Common::apiResponse(0, $errors);
+        }
+
+
+
+        $user = $request->user();
+        try {
+            $send = $this->enteranceRoomService->makeRequestInviteRoom($user, $request);
+            return $send;
+        } catch (\Exception $th) {
+            // \Log::error('Error inviting to room: ' . $th->getMessage());
+            return Common::apiResponse(0,     $th->getMessage(),[],500);
+
+        
+        }
+    }
+
+   
+
+    
 }

@@ -94,7 +94,6 @@ class RoomController extends Controller
     public function index(Request $request)
     {
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
-
         $rooms = $this->roomService->getAllRooms($request);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200, Common::getPaginates($rooms));
     }
@@ -1660,6 +1659,14 @@ class RoomController extends Controller
         }
     }
 
+    public function commentStatus($roomId): JsonResponse
+    {
+        $result = $this->roomService->commentStatus($roomId);
+
+        $message = ($result == 1) ? 'comment_opened' : 'comment_closed';
+
+        return Common::apiResponse(true, "messages.$message", [], 200);
+    }
     protected function addBlock(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1757,5 +1764,25 @@ class RoomController extends Controller
 
         $result = Room::where('uid',$id)->first()?->gifts()->paginate($perPage);
         return Common::apiResponse(true, 'done',GiftRoomResource::collection($result) );
+    }
+
+
+    public function check_room(Request $request){
+
+        $request['show'] = true;
+        $id = $request->room_id;
+        $room = $this->roomService->findRoom($id);
+        if (!$room) {
+            return Common::apiResponse(0, 'Room not found', null, 404);
+         
+        }
+
+        $data = [
+            'is_live' => $room->is_live ? true : false,  
+            'is_locked' => empty($room->room_pass) ? false : true  ,
+   
+        ];
+            return Common::apiResponse(true, '', $data, 200);
+        
     }
 }

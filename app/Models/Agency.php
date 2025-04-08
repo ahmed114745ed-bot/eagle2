@@ -16,7 +16,7 @@ use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
 class Agency extends Model
 {
-    use SoftDeletes,AgencyAdditionalInfoTraits, PaymentGetWayTrait,SalaryTransferTrait;
+    use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait;
     protected $guarded = [];
 
     protected $hidden = [
@@ -27,17 +27,17 @@ class Agency extends Model
     {
         $cacheKey = 'timezone';
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
 
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
+        // Get the timezone from the request header or use the cached setting
+        $timeZone = request()->header('tz') ?? $timezone;
 
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        // Parse the date and set the timezone
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
     // Convert updated_at to the user's local time zone
@@ -45,21 +45,26 @@ class Agency extends Model
     {
         $cacheKey = 'timezone';
 
-    // Retrieve the timezone setting from cache, or fetch it from the database if not cached
-    $timezone = \Cache::rememberForever($cacheKey, function () {
-        $setting = \App\Models\Setting::where('key', 'timezone')->first();
-        return $setting?->value ?? 'UTC';
-    });
+        // Retrieve the timezone setting from cache, or fetch it from the database if not cached
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
 
-    // Get the timezone from the request header or use the cached setting
-    $timeZone = request()->header('tz') ?? $timezone;
+        // Get the timezone from the request header or use the cached setting
+        $timeZone = request()->header('tz') ?? $timezone;
 
-    // Parse the date and set the timezone
-    return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
+        // Parse the date and set the timezone
+        return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
-    Public function chargeAgency()
+    public function chargeAgency()
     {
-        return $this->hasMany(ChargeAgency::class ,'agency_id');
+        return $this->hasMany(ChargeAgency::class, 'agency_id');
+    }
+
+    public function charges()
+    {
+        return $this->hasMany(Charge::class, 'agency_id')->whereNotNull('agency_id');
     }
 
     public function Countries()
@@ -76,8 +81,9 @@ class Agency extends Model
     {
         return $this->hasMany(User::class, 'agency_id');
     }
-    public function users(){
-        return $this->hasMany (User::class);
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 
     public function scopeOfOwner($query, $owner_id)
@@ -85,13 +91,14 @@ class Agency extends Model
         return $query->where('owner_id', $owner_id);
     }
 
-    public function owner(){
-        return $this->belongsTo (User::class,'app_owner_id','id');
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'app_owner_id', 'id');
     }
 
     public function agencyManger()
     {
-        return $this->belongsTo (User::class,'agency_manger_id','id');
+        return $this->belongsTo(User::class, 'agency_manger_id', 'id');
     }
 
     public function setPasswordAttribute($value)
@@ -102,31 +109,35 @@ class Agency extends Model
     }
 
 
-    public function dashOwner(){
-        return $this->belongsTo (Admin::class,'owner_id','id');
+    public function dashOwner()
+    {
+        return $this->belongsTo(Admin::class, 'owner_id', 'id');
     }
 
-    public function getUrlAttribute($val){
+    public function getUrlAttribute($val)
+    {
         if (!$val) {
             return "";
         }
         return $val;
     }
-    public function getContentsAttribute($val){
+    public function getContentsAttribute($val)
+    {
         if (!$val) {
             return "";
         }
         return $val;
     }
 
-    public function target($month = null,$year = null){
-        if (!$month){
-            $month = date ('m');
+    public function target($month = null, $year = null)
+    {
+        if (!$month) {
+            $month = date('m');
         }
-        if (!$year){
-            $year = date ('Y');
+        if (!$year) {
+            $year = date('Y');
         }
-        return $this->hasMany (AgencySallary::class)->where ('month',$month)->where ('year',$year)->first ();
+        return $this->hasMany(AgencySallary::class)->where('month', $month)->where('year', $year)->first();
     }
     public function getTargetAttribute($month = null, $year = null)
     {
@@ -143,19 +154,37 @@ class Agency extends Model
             ->first();
     }
 
-    public function getSalaryAttribute(){
-        $salary = AgencySallary::query ()->where ('agency_id',$this->id)->where ('is_paid',0)->sum (\DB::raw('sallary - cut_amount'));
+    public function getTargetsAttribute($month = null, $year = null)
+    {
+        if (!$month) {
+            $month = date('m');
+        }
+        if (!$year) {
+            $year = date('Y');
+        }
+
+        return $this->hasMany(UserTarget::class)
+            ->where('add_month', $month)
+            ->where('add_year', $year)
+            ->first();
+    }
+
+    public function getSalaryAttribute()
+    {
+        $salary = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(\DB::raw('sallary - cut_amount'));
         return $salary;
     }
 
-    public function setSalaryAttribute(){
-        $salary = AgencySallary::query ()->where ('agency_id',$this->id)->where ('is_paid',0)->sum (\DB::raw('sallary - cut_amount'));
+    public function setSalaryAttribute()
+    {
+        $salary = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(\DB::raw('sallary - cut_amount'));
         $this->attributes['salary'] = $salary;
         return $salary;
     }
 
-    public function getSalaryAttributeAgencyManger(){
-        $salaryAgency = AgencySallary::query ()->where ('agency_id',$this->id)->where ('is_paid',0)->sum (\DB::raw('sallary - cut_amount'));
+    public function getSalaryAttributeAgencyManger()
+    {
+        $salaryAgency = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(\DB::raw('sallary - cut_amount'));
         $attributes['salaryAgency'] = $salaryAgency;
         return $attributes;
     }
@@ -173,9 +202,8 @@ class Agency extends Model
                     $user->type_user = 0;
                     $user->save();
                     $users = User::where('agency_id', $agency->id)->update([
-                        'type_user'=> 0
+                        'type_user' => 0
                     ]);
-
                 }
             }
         });
@@ -192,7 +220,7 @@ class Agency extends Model
 
     public function UserTarget()
     {
-        return $this->hasMany(UserTarget::class,'agency_id');
+        return $this->hasMany(UserTarget::class, 'agency_id');
     }
 
     public function agencySalary()
@@ -204,7 +232,7 @@ class Agency extends Model
     public function getLastMonthSalaryAttribute()
     {
         return $this->hasOne(AgencySallary::class, 'agency_id')->orderByDesc('id')
-            ->where('month', now()->subMonth()->month)->where('year', now()->subMonth()->year)->where ('is_paid',0)->sum (\DB::raw('sallary - cut_amount'));
+            ->where('month', now()->subMonth()->month)->where('year', now()->subMonth()->year)->where('is_paid', 0)->sum(\DB::raw('sallary - cut_amount'));
     }
 
     public function salaries()
@@ -226,15 +254,15 @@ class Agency extends Model
         if ($year == null) {
             $year = now()->year;
         }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
-            })->where('is_paid', 0)
-                ->where('agency_id', $this->id)
-                ->orderByDesc('id')
-                ->sum(DB::raw('sallary'));
+        $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+        })->where('is_paid', 0)
+            ->where('agency_id', $this->id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary'));
 
 
-            return floor($agencySallary ?? 0);
+        return floor($agencySallary ?? 0);
     }
 
     public function getTotalCutAmountAgency($month = null, $year = null)
@@ -246,14 +274,13 @@ class Agency extends Model
         if ($year == null) {
             $year = now()->year;
         }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
-            }) ->where('is_paid', 0)
-                ->where('agency_id', $this->id)
-                ->orderByDesc('id')
-                ->sum(DB::raw('cut_amount'));
-            return floor($agencySallary ?? 0);
-
+        $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+        })->where('is_paid', 0)
+            ->where('agency_id', $this->id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('cut_amount'));
+        return floor($agencySallary ?? 0);
     }
 
     public function getOldAgency($month = null, $year = null)
@@ -278,18 +305,18 @@ class Agency extends Model
         if ($year == null) {
             $year = now()->year;
         }
-            $agencySallary = AgencySallary::query()->where( function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
-            })->where('is_paid', 0)
-                ->where('agency_id', $this->id)
-                ->orderByDesc('id')
-                ->sum(DB::raw('sallary - cut_amount'));
+        $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+        })->where('is_paid', 0)
+            ->where('agency_id', $this->id)
+            ->orderByDesc('id')
+            ->sum(DB::raw('sallary - cut_amount'));
 
 
-            return floor($agencySallary ?? 0);
+        return floor($agencySallary ?? 0);
     }
 
-    public function getSalary($month = null, $year = null, )
+    public function getSalary($month = null, $year = null,)
     {
         if ($month == null) {
             $month = now()->month;
@@ -298,18 +325,17 @@ class Agency extends Model
         if ($year == null) {
             $year = now()->year;
         }
-            $agencySallary = AgencySallary::query()
-            ->where( function ($query) use ($year) {
+        $agencySallary = AgencySallary::query()
+            ->where(function ($query) use ($year) {
                 $query->where('year', $year);
-            })->where( function ($query) use ( $month) {
-                $query->where('month',$month);
+            })->where(function ($query) use ($month) {
+                $query->where('month', $month);
             })->where('agency_id', $this->id)->sum(DB::raw('sallary - cut_amount'));
-            return floor( $agencySallary ?? 0);
+        return floor($agencySallary ?? 0);
     }
 
     public function joinRequests()
     {
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
-
 }
