@@ -99,7 +99,7 @@ class MomentController extends MainController
 
 
     // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
-    $grid->column('comment_num', __('Stats'))->display(function () {
+    $grid->column('comment_num', __('status'))->display(function () {
         $likeCount = count(@$this->likes);
         $commentCount = count(@$this->comments);
         return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";

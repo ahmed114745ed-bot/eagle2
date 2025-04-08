@@ -47,9 +47,8 @@ class OVipController extends MainController
 
     public function show($id, Content $content)
     {
-        return $content
-            ->title(trans('vip'))
-            ->body($this->detail($id));
+        $oVip = OVip::findOrFail($id);
+        return $content->title(__('OVip'))->view('ovip_profile', compact('oVip'));
     }
 
     /**
@@ -113,12 +112,14 @@ class OVipController extends MainController
 
                 </div>
             ";
-        });        $grid->column('expire', __('expire'));
+        });
+        $grid->column('expire', __('expire'));
         $grid->column(__('gifts'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/ovip-gift/' . $this->id);
 
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gifts') . "</a>";            return $button1;
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gifts') . "</a>";
+            return $button1;
         });
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -151,6 +152,8 @@ class OVipController extends MainController
         $this->extendShow($show);
         return $show;
     }
+
+
 
     /**
      * Make a form builder.

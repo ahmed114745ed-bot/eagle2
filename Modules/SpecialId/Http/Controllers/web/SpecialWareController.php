@@ -87,7 +87,7 @@ class SpecialWareController extends  MainController
             $icon = asset('images/coin.png'); // Ensure this path is correct
             return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
         });
-        $grid->column('price', __('Price'))->display(function ($coin) {
+        $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
             return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
         });
