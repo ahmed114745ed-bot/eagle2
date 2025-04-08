@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Config;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -30,10 +31,9 @@ class OVipController extends MainController
         (new AppFeatureService)->validateStatusEnable("vips");
     }
 
-    public function vip_settings(Content $content)
-    {
-        return $content
-            ->view('vip_settings');
+    public function vip_settings(Content $content){
+        $config = Config::pluck('value', 'name')->toArray();
+        return $content->view('vip_settings', compact('config'));
     }
 
     public function index(Content $content)
@@ -153,7 +153,7 @@ class OVipController extends MainController
         return $show;
     }
 
-    
+
 
     /**
      * Make a form builder.

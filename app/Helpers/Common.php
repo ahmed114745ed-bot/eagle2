@@ -1208,22 +1208,22 @@ class Common
             $notification = \App\Models\Notification::with('translations')->where('key', $key)->first();
             return $notification ? $notification->translations->pluck('message', 'language')->toArray() : null;
         });
-    
+
         if (!$notificationData) {
             return [
                 'title' => __('Notification'),
                 'body'  => __('No content available'),
             ];
         }
-    
+
         $body = $notificationData[$language] ?? __('No translation available');
-    
+
         foreach ($variables as $varKey => $value) {
             $body = str_replace("{{$varKey}}", '  ' . $value, $body);
         }
-    
+
         return ['title' => __('Notification'), 'body' => $body];
     }
-    
+
 
 }

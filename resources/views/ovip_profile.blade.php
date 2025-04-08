@@ -38,7 +38,7 @@
             border-radius: 5px;
             width: 100%;
             max-width: 800px;
-            margin: 0 auto 20px;
+            margin: 0 auto;
             text-align: center;
         }
         .agency-container, .charge-container {
@@ -134,27 +134,80 @@
                 padding: 4px 2px;
             }
         }
+
+        .privileges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.privilege-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.privilege-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.privilege-name {
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .privileges-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .privileges-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .privileges-grid {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 <body>
     <div class="main-content">
         <div class="container">
-            
+            <div class="avatar-wrapper">
                 @php
                     $url = getImagePath($oVip->img);
                 @endphp
                 {!! handleShowImageWithTypes($oVip->id, $url, 300, 300) !!}
-            
-    
+            </div>
+
             <button onclick="window.history.back()">{{ __("Go Back") }}</button>
         </div>
 
 
         <div class="agency-container">
             <div class="card">
-               
+                <div class="privileges-grid">
+                    @foreach($oVip->privilegs as $privilege)
+                        <div class="privilege-item">
+                            <img src="{{ asset($privilege->image) }}" alt="{{ $privilege->name }}">
+                            <div class="privilege-name">{{ $privilege->name }}</div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
+        
+        
     </div>
 </body>
 </html>
