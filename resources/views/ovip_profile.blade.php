@@ -345,7 +345,7 @@
                     if (isSvga) {
                         // Render SVGA animation
                         showImageContent = `
-                <canvas id="${canvasId}"  width="50" height="100"></canvas>
+                <canvas id="${canvasId}"  width="2000" height="150"></canvas>
                 `;
                     } else if (show_img.endsWith('.mp4')) {
                         // Render MP4 video
