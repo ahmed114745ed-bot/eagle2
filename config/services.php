@@ -44,4 +44,9 @@ return [
         "fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
     ],
 
+    'agora' => [
+        'app_id' => env('AGORA_APP_ID'),
+        'app_certificate' => env('AGORA_APP_CERTIFICATE'),
+    ],
+
 ];

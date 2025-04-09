@@ -37,8 +37,14 @@ class AgoraController extends Controller
         }
 
         $token = generateRtcToken($request->channel, $user->id);
+        $rtmToken = generateAgoraRtmToken( $user->id);
+        
 
-        return Common::apiResponse(true, 'Success', $token);
+        return Common::apiResponse(true, 'Success', [
+            'rtc_token' => $token,
+            'rtm_token' => $rtmToken,
+        ]);
+    
     }
 
     public function webhook(Request $request)
@@ -84,4 +90,7 @@ class AgoraController extends Controller
 
         return $this->enteranceRoomService->updateRoomCountFromAgora($request);
     }
+
+
+
 }
