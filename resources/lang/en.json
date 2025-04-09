@@ -618,9 +618,14 @@
         "Search by name , UUID , nickname and email": "Search by name, UUID, nickname and email",
         "pending": "Pending",
         "accepted": "Accepted",
-        "denied": "Denied"
-
+        "denied": "Denied",
+        "admin owner room id":"admin owner room id",
+        "expair":"Expair",
+        "User Info":"",
+        "days":"",
+        "user_uuid":"",
+        "Normal":""
       
-
+      
 
 }
