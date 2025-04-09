@@ -37,7 +37,7 @@ function generateAgoraRtmToken( $rtmUid)
 
     $appId = config('services.agora.app_id');
     $appCertificate = config('services.agora.app_certificate');
-    $expireTimeInSeconds = 3600;
+    $expireTimeInSeconds = 86400;
     $expireTimestamp = time() + $expireTimeInSeconds;
 
     $token = AgoraRtmTokenBuilder::buildToken(
