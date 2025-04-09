@@ -258,11 +258,8 @@
 <body>
     <div class="main-content">
         <div class="container">
-            <div class="avatar">
-                @php
-                    $url = getImagePath($oVip->img);
-                @endphp
-                {!! handleShowImageWithTypes($oVip->id, $url, 350, 350) !!}
+            <div class="avatar text-center">
+                <div id="imageContainer{{ $oVip->id }}"></div>
             </div>
 
             {{-- <button onclick="window.history.back()">{{ __("Go Back") }}</button> --}}
@@ -285,7 +282,102 @@
             </div>
         </div>
         
-        
+        <script>
+            class SVGAPlayerWrapper {
+            constructor(elementId, imageUrl) {
+                this.elementId = elementId;
+                this.imageUrl = imageUrl;
+                this.player = null;
+                this.parser = null;
+                this.initPlayer();
+            }
+
+            initPlayer() {
+                console.log(this.elementId)
+                // Initialize the player and parser
+                this.player = new SVGA.Player('#' + this.elementId);
+                this.player.loops = 100;
+                this.player.clearsAfterStop = false;
+
+                this.parser = new SVGA.Parser('#' + this.elementId);
+
+                try {
+                    // Use an arrow function to retain the context of `this`
+                    this.parser.load(this.imageUrl, (videoItem) => {
+                        this.player.setVideoItem(videoItem);
+                        this.player.startAnimation();
+
+                        this.player.onFinished(() => {
+                            // Code for when the animation finishes
+                            console.log("Animation finished.");
+                        });
+                    });
+                } catch (error) {
+                    console.error('An error occurred:', error.message);
+                } finally {
+                    console.log('Try...catch has finished executing.');
+                }
+            }
+
+            pauseAnimation() {
+                this.player.pauseAnimation();
+            }
+
+            stopAnimation() {
+                this.player.stopAnimation();
+            }
+        }
+
+
+        function getFileExtension(url) {
+            // Use URL constructor to handle cases with query strings and hashes
+            const pathname = new URL(url).pathname;
+            // Extract the file extension
+            const extension = pathname.split('.').pop();
+            // Check if there is a valid extension
+            return extension && extension !== pathname ? extension : null;
+        }
+
+        function showImage(show_img, canvasId, width = '1000px', height = '1000px') {
+                    const isSvga = ['svga', 'zz'].includes(getFileExtension(show_img));
+                    let showImageContent = '';
+
+                    if (isSvga) {
+                        // Render SVGA animation
+                        showImageContent = `
+                <canvas id="${canvasId}"  width="50" height="100"></canvas>
+                `;
+                    } else if (show_img.endsWith('.mp4')) {
+                        // Render MP4 video
+                        showImageContent = `
+                    <div class="avatar text-center avatar-3xl">
+                        <video width="100" controls>
+                            <source src="${show_img}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                   </div>
+                `;
+                    } else {
+                        // Render standard image
+                        showImageContent = `
+                    <img src="${show_img}" alt="" width="100"/>
+                `;
+                    }
+
+                    return { showImageContent, isSvga };
+        }
+
+        const url = @json(getImagePath($oVip->img));
+        const canvasId = 'svgaCanvas{{ $oVip->id }}';
+        const { showImageContent, isSvga } = showImage(url, canvasId);
+
+        const container = document.getElementById('imageContainer{{ $oVip->id }}');
+        container.innerHTML = showImageContent;
+
+        if (isSvga) {
+            new SVGAPlayerWrapper(canvasId, url);
+        }
+            </script>
     </div>
 </body>
 </html>
