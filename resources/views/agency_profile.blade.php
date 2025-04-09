@@ -339,7 +339,7 @@
             </div>
 
             <!-- salary Section -->
-            <div id="showSalary" class="settings-section active">
+            <div id="showSalary" class="settings-section ">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
