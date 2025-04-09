@@ -326,6 +326,10 @@
     </div>
   
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+          <!-- Load jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Then Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
  <script>
 
@@ -430,19 +434,27 @@
         const type = imgElement.getAttribute('data-type');
 
         fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 if (data && data.image_url) {
                     showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas');
                     const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     modal.show();
                 } else {
-                    alert("No image found.");
+                    throw new Error("No image URL in response");
                 }
             })
             .catch(error => {
                 console.error("Error fetching image:", error);
-                alert("Something went wrong.");
+                alert(`Failed to load gift: ${error.message}`);
             });
     }
 

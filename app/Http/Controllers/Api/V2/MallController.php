@@ -72,10 +72,22 @@ class MallController extends Controller
 
     public function giftOVip(Request $request)
     {
-        $ware = $this->mallService->giftOVip($request->level, $request->type);
+        try {
+            $ware = $this->mallService->giftOVip($request->level, $request->type);
 
-        return response()->json([
-            'image_url' => getImagePath($ware->show_img), 
-        ]);
+            if (!$ware) {
+                return response()->json([
+                    'error' => 'No gift found for the specified level and type'
+                ], 404);
+            }
+
+            return response()->json([
+                'image_url' => getImagePath($ware->show_img),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
