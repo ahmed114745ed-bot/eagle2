@@ -345,7 +345,7 @@
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
         
-                        @if($salaries && $salaries->count())
+                        
                             <div class="table-responsive">
                                 <div class="box-body table-responsive no-padding">
                                     <table class="table table-hover grid-table" id="salary">
@@ -359,18 +359,20 @@
                                                
                                             </tr>
                                         </thead>
-                                        <tbody style="color: rgb(208, 115, 43);">
-                                            @foreach($salaries as $index => $salary)
-                                                <tr>
-                                                    <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
-                                                    <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
-                                                    <td>{{ @$salary->month?? '' }}</td>
-                                                    <td>{{ @$salary->year ?? '' }}</td>
+                                        @if($salaries && $salaries->count())
+                                            <tbody style="color: rgb(208, 115, 43);">
+                                                @foreach($salaries as $index => $salary)
+                                                    <tr>
+                                                        <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
+                                                        <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
+                                                        <td>{{ @$salary->month?? '' }}</td>
+                                                        <td>{{ @$salary->year ?? '' }}</td>
+                                                        
                                                     
-                                                   
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        @endif
                                     </table>
         
                                     <!-- Pagination Links -->
@@ -379,9 +381,8 @@
                                     </div>
                                 </div>
                             </div>
-                        @else
-                            {{-- <p>{{ __('No members found.') }}</p> --}}
-                        @endif
+                       
+                       
                     </div>
                 </div>
             </div>
