@@ -447,7 +447,7 @@
                 if (data && data.image_url) {
                     showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas');
                     const modal = new bootstrap.Modal(document.getElementById('giftModal'));
-                    modal.show();
+                    $('#giftModal').modal('show');
                 } else {
                     throw new Error("No image URL in response");
                 }
