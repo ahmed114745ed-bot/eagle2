@@ -286,7 +286,6 @@
         
             <!-- Charges Section -->
             <div id="showCharges" class="settings-section">
-                @if($agency->chargeAgency()->exists())
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
@@ -303,6 +302,7 @@
                                                 <th>{{ __('created') }}</th>
                                             </tr>
                                         </thead>
+                                        @if($agency->Shipping_agency == 1)
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($charges as $index => $charge)
                                                 @php
@@ -325,6 +325,7 @@
                                                 </tr>
                                             @endforeach
                                         </tbody>
+                                        @endif
                                     </table>
                                 </div>
                             </div>
@@ -335,7 +336,7 @@
                         @endif
                     </div>
                 </div>
-                @endif
+              
             </div>
 
             <!-- salary Section -->
