@@ -54,7 +54,7 @@ class GetSalaryRequestFilterationController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->equal('status', __('Status'))->radio([
-                ''   => 'All',
+                ''   => __('All'),
                 1    => __("accept"),
                 2    => __("denied"),
             ]);
