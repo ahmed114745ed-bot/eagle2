@@ -128,6 +128,7 @@ class OVipController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+      
         return $grid;
     }
 
