@@ -74,9 +74,10 @@ class VipPrivilegeController extends MainController
         $grid->column('title',__ ('title'));
         $grid->column('type');
         $grid->column('img1',__ ('img'))->image ('',30);
-//        $grid->img2('img2');
-//        $grid->created_at(trans('admin.created_at'));
-//        $grid->updated_at(trans('admin.updated_at'));
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+
         $this->extendGrid ($grid);
         return $grid;
     }

@@ -54,6 +54,24 @@ const TYPE_WARE =
 
 ];
 
+const MORE_Used_WARE =
+[
+  
+    4 => 'Avatar Frame',
+    5 => 'Bubble Frame',
+    6 => 'Entering Special Effects',
+    7 => 'Microphone Aperture',
+    8 => 'Badge',
+    13 => 'hide country',
+    16 => 'hidden room',
+    17 => 'anonymous man',
+    18 => 'colored name',
+    19 => 'profile visitors hide in',
+    20 => 'hide last active',
+    28 => 'profile frame',
+
+];
+
 const WARE_DEDICATE =
 [
     1 => 'Gemstone',
