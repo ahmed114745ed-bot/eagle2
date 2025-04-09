@@ -128,15 +128,7 @@ class OVipController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
-        Admin::js('https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js');
-
-        Admin::script("
-            if (typeof SVGAPlayer !== 'undefined') {
-                console.log('✅ SVGA script loaded successfully!');
-            } else {
-                console.log('❌ Failed to load SVGA script.');
-            }
-        ");
+      
         return $grid;
     }
 

@@ -284,6 +284,16 @@
         <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 
         <script>
+                $(document).on('pjax:complete', function () {
+                    
+                        var script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+                        script.onload = function() {
+                            console.log('✅ SVGA Loaded after PJAX!');
+                        };
+                        document.head.appendChild(script);
+                    
+                });
             document.addEventListener('DOMContentLoaded', function() {
                 const imageUrl = @json(getImagePath($oVip->img));
                 const containerId = 'imageContainer{{ $oVip->id }}';
