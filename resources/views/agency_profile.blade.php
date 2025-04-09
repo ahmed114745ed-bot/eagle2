@@ -5,6 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+.settings-sidebar {
+    background-color: var(--table-background-color);
+    display: block;
+    padding: 10px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: var(--text-primary-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    width: 100%;
+}
+
+.settings-menu {
+    display: flex;
+    gap: 4px;
+    color: var(--text-primary-color);
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    margin-bottom: 20px;
+}
+
+.settings-menu button {
+    background-color: var(--box-background-color);
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary-color) !important;
+    border-radius: 4px;
+}
+
+.settings-menu button:hover {
+    background-color: #ff9800;
+}
+
+.settings-menu button.active {
+    background-color: var(--primary-color);
+    color: var(--text-primary-color) !important;
+}
+
+.settings-content {
+    width: 100%;
+}
+
+.settings-section {
+    display: none;
+    width: 100%;
+}
+
+.settings-section.active {
+    display: block;
+}
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -14,7 +68,7 @@
             display: flex;
             flex-direction: column;
         }
-        .settings-sidebar {
+        /* .settings-sidebar {
             width: 250px;
             background: #222;
             min-height: 100vh;
@@ -24,7 +78,7 @@
         .settings-sidebar h2 {
             text-align: center;
             color: #ff9800;
-        }
+        } */
         .main-content {
             display: flex;
             flex-direction: column;
@@ -104,10 +158,9 @@
             body {
                 flex-direction: column;
             }
-            .settings-sidebar {
-                width: 100%;
-                min-height: auto;
-            }
+            
+
+            
             .container, .agency-container, .charge-container {
                 padding: 15px;
             }
@@ -134,6 +187,16 @@
                 padding: 4px 2px;
             }
         }
+        @media (max-width: 768px) {
+            .settings-menu {
+                flex-wrap: wrap;
+            }
+            
+            .settings-menu button {
+                flex: 1 0 50%; /* Two buttons per row on small screens */
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -154,114 +217,222 @@
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
 
-        <div class="agency-container">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title" style="text-align: left;">{{ __('members') }}</h4>
-    
-                    @if($members && $members->count())
-                        <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="member">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>{{ __('Name') }}</th>
-                                            <th>{{ __('uuid') }}</th>
-                                            <th>{{ __('image') }}</th>
-                                            <th>{{ __('reals_count') }}</th>
-                                            <th>{{ __('total_days') }}</th>
-                                            <th>{{ __('total_hours') }}</th>
-                                            <th>{{ __('Monthly DI') }}</th>
-                                            <th>{{ __('salary') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="color: rgb(208, 115, 43);">
-                                        @foreach($members as $index => $member)
+        
+
+        <div class="settings-sidebar">
+            <div class="settings-menu">
+                <button onclick="showSection('showMembers')" class="active">{{ __('members') }}</button>
+                <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
+                <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
+            </div>
+        </div>
+        
+        <div class="settings-content">
+            <!-- Members Section -->
+            <div id="showMembers" class="settings-section active">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="text-align: left;">{{ __('members') }}</h4>
+        
+                        @if($members && $members->count())
+                            <div class="table-responsive">
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-hover grid-table" id="member">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
-                                                <td>{{ @$member->name ?? '' }}</td>
-                                                <td>{{ @$member->uuid ?? '' }}</td>
-                                                
-                                                <td>
-                                                    <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
-                                                </td>
-                                                <td>{{count($member->reals) ?? 0 }}</td>
-                                                <td>{{ $member->total_days ?? 0 }}</td>
-                                                <td>{{ $member->liveTime->sum("hours") }}</td>
-                                                <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                                <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                                <th>#</th>
+                                                <th>{{ __('Name') }}</th>
+                                                <th>{{ __('uuid') }}</th>
+                                                <th>{{ __('image') }}</th>
+                                                <th>{{ __('reals_count') }}</th>
+                                                <th>{{ __('total_days') }}</th>
+                                                <th>{{ __('total_hours') }}</th>
+                                                <th>{{ __('Monthly DI') }}</th>
+                                                <th>{{ __('salary') }}</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-    
-                                <!-- Pagination Links -->
-                                <div class="pagination-container">
-                                    {{ $members->appends(['charges_page' => $charges->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        </thead>
+                                        <tbody style="color: rgb(208, 115, 43);">
+                                            @foreach($members as $index => $member)
+                                                <tr>
+                                                    <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                                    <td>{{ @$member->name ?? '' }}</td>
+                                                    <td>{{ @$member->uuid ?? '' }}</td>
+                                                    
+                                                    <td>
+                                                        <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
+                                                    </td>
+                                                    <td>{{count($member->reals) ?? 0 }}</td>
+                                                    <td>{{ $member->total_days ?? 0 }}</td>
+                                                    <td>{{ $member->liveTime->sum("hours") }}</td>
+                                                    <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
+                                                    <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+        
+                                    <!-- Pagination Links -->
+                                    <div class="pagination-container">
+                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @else
-                        <p>{{ __('No members found.') }}</p>
-                    @endif
+                        @else
+                            <p>{{ __('No members found.') }}</p>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </div>
-    
-        @if($agency->chargeAgency()->exists())
-        <div class="charge-container">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
-            
-                    @if($charges && $charges->count())
-                        <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="charge">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>{{ __('Name') }}</th>
-                                            <th>{{ __('coin') }}</th>
-                                            <th>{{ __('created') }}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="color: rgb(208, 115, 43);">
-                                        @foreach($charges as $index => $charge)
-                                            @php
-                                                if ($charge->charger_type == 'dash' && $charge->user_type == 'dash') {
-                                                    $user = $charge->admin;
-                                                    $image = $user->avatar;
-                                                } else {
-                                                    $user = $charge->sender;
-                                                    $image = $user->profile->avatar ?? null;
-                                                }
-                                            @endphp
+        
+            <!-- Charges Section -->
+            <div id="showCharges" class="settings-section">
+                @if($agency->chargeAgency()->exists())
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
+                
+                        @if($charges && $charges->count())
+                            <div class="table-responsive">
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-hover grid-table" id="charge">
+                                        <thead>
                                             <tr>
-                                                <td>{{ $charges->firstItem() + $index }}</td>
-                                                <td>
-                                                    <img src="{{ getImagePath($image) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                                    {{ $user->name ?? '' }}
-                                                </td>
-                                                <td>{{ number_format($charge->amount ?? 0) }}</td>
-                                                <td>{{ $charge->created_at ?? '' }}</td>
+                                                <th>#</th>
+                                                <th>{{ __('Name') }}</th>
+                                                <th>{{ __('coin') }}</th>
+                                                <th>{{ __('created') }}</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody style="color: rgb(208, 115, 43);">
+                                            @foreach($charges as $index => $charge)
+                                                @php
+                                                    if ($charge->charger_type == 'dash' && $charge->user_type == 'dash') {
+                                                        $user = $charge->admin;
+                                                        $image = $user->avatar;
+                                                    } else {
+                                                        $user = $charge->sender;
+                                                        $image = $user->profile->avatar ?? null;
+                                                    }
+                                                @endphp
+                                                <tr>
+                                                    <td>{{ $charges->firstItem() + $index }}</td>
+                                                    <td>
+                                                        <img src="{{ getImagePath($image) }}" width="30" height="30" style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                        {{ $user->name ?? '' }}
+                                                    </td>
+                                                    <td>{{ number_format($charge->amount ?? 0) }}</td>
+                                                    <td>{{ $charge->created_at ?? '' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-    
-                        <div class="pagination-container">
-                            {{ $charges->appends(['members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+        
+                            <div class="pagination-container">
+                                {{ $charges->appends(['members_page' => $members->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            <!-- salary Section -->
+            <div id="showSalary" class="settings-section active">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
+        
+                        @if($salaries && $salaries->count())
+                            <div class="table-responsive">
+                                <div class="box-body table-responsive no-padding">
+                                    <table class="table table-hover grid-table" id="salary">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{ __('salary') }}</th>
+                                                <th>{{ __('month') }}</th>
+                                                <th>{{ __('year') }}</th>
+                                              
+                                               
+                                            </tr>
+                                        </thead>
+                                        <tbody style="color: rgb(208, 115, 43);">
+                                            @foreach($salaries as $index => $salary)
+                                                <tr>
+                                                    <td>{{ $index + 1 + (($salaries->currentPage() - 1) * $salaries->perPage()) }}</td>
+                                                    <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
+                                                    <td>{{ @$salary->month?? '' }}</td>
+                                                    <td>{{ @$salary->year ?? '' }}</td>
+                                                    
+                                                   
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+        
+                                    <!-- Pagination Links -->
+                                    <div class="pagination-container">
+                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            {{-- <p>{{ __('No members found.') }}</p> --}}
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
-    @endif
     
     </div>
+
+
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+  
+    document.addEventListener("DOMContentLoaded", function() {
+        // Show members tab by default
+        showSection('showMembers');
+        
+        // Check URL for active tab
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+        if (activeTab) {
+            showSection(activeTab);
+        }
+    });
+
+    function showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.settings-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Show selected section
+        document.getElementById(sectionId).classList.add('active');
+        
+        // Update button styles
+        document.querySelectorAll('.settings-menu button').forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+        
+        // Update URL with active tab
+        const url = new URL(window.location);
+        url.searchParams.set('tab', sectionId);
+        window.history.pushState({}, '', url);
+    }
+
+
+   
+    </script>
 </body>
-</html>
+
