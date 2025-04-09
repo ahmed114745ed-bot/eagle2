@@ -114,7 +114,7 @@ class OVipController extends MainController
             ";
         });
         $grid->column('expire', __('expire'));
-        $grid->column(__('gifts'))->display(function () {
+        $grid->column(__('file'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/ovip-gift/' . $this->id);
 
