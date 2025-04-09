@@ -48,6 +48,7 @@ class SalariesAction extends Action
             DB::beginTransaction();
             $type = \request('type') ?? 'user';
             if (\request('id') && $type == 'agency') {
+                info('yes');
                 $agency = Agency::query()->find(\request('id'));
                 if ($agency) {
                     if ($request->select_type == 'decrement') {
@@ -141,9 +142,9 @@ class SalariesAction extends Action
                             }
                         }
 
-                        // if ($request->select_type == 'decrement') {
-                        //     $amount = -$amount;
-                        // }
+                         if ($request->select_type == 'decrement') {
+                             $amount = -$amount;
+                         }
                         SalaryTrx::query()->create(
                             [
                                 'type' => 0,
