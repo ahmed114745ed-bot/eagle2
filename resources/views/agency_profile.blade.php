@@ -290,7 +290,7 @@
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
                 
-                        @if($charges && $charges->count())
+                       
                             <div class="table-responsive">
                                 <div class="box-body table-responsive no-padding">
                                     <table class="table table-hover grid-table" id="charge">
@@ -302,6 +302,7 @@
                                                 <th>{{ __('created') }}</th>
                                             </tr>
                                         </thead>
+                                        @if($charges && $charges->count())
                                         @if($agency->Shipping_agency == 1)
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($charges as $index => $charge)
@@ -326,6 +327,7 @@
                                             @endforeach
                                         </tbody>
                                         @endif
+                                        @endif
                                     </table>
                                 </div>
                             </div>
@@ -333,7 +335,7 @@
                             <div class="pagination-container">
                                 {{ $charges->appends(['members_page' => $members->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
                             </div>
-                        @endif
+                       
                     </div>
                 </div>
               
@@ -344,8 +346,6 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
-        
-                        
                             <div class="table-responsive">
                                 <div class="box-body table-responsive no-padding">
                                     <table class="table table-hover grid-table" id="salary">
@@ -381,7 +381,6 @@
                                     </div>
                                 </div>
                             </div>
-                       
                        
                     </div>
                 </div>
