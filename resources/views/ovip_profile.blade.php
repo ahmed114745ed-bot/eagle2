@@ -433,8 +433,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.image_url) {
-                    document.getElementById('giftImage').src = data.image_url;
-                    const modal = new bootstrap.Modal(document.getElementById('giftModal'));
+                    // document.getElementById('giftImage').src = data.image_url;
+                    // const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     modal.show();
                 } else {
                     alert("No image found.");
