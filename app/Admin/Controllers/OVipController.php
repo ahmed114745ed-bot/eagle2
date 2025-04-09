@@ -118,7 +118,7 @@ class OVipController extends MainController
             // توليد الروابط
             $url1 = url('admin/ovip-gift/' . $this->id);
 
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gifts') . "</a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('file') . "</a>";
             return $button1;
         });
         $this->extendGrid($grid);
