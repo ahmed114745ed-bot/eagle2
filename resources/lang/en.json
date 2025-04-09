@@ -614,7 +614,12 @@
         "custom-page": "Custom Page",
         "daily-gift-types": "Daily Gift Types",
         "Video": "Video",
-        "REELS": "Videos"
+        "REELS": "Videos",
+        "Search by name , UUID , nickname and email": "Search by name, UUID, nickname and email",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "denied": "Denied"
+
       
 
 

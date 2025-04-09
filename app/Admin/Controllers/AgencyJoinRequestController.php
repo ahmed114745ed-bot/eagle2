@@ -101,7 +101,7 @@ class AgencyJoinRequestController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('status', __('status'))->select([0 => 'pending', 1 => 'accepted', 2 => 'denied']);
+                $filter->equal('status', __('status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
             });
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency.id', __('agency id'));
