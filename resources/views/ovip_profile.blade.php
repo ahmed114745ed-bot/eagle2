@@ -309,25 +309,25 @@
     </div>
 
     <!-- Modal -->
-<div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="giftModalLabel">{{ __('Gift Image') }}</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
-            <span aria-hidden="true">&times;</span>
-          </button>
+    <div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="giftModalLabel">{{ __('Gift Image') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div id="giftImageContainer"></div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body text-center">
-          <img id="giftImage" src="" alt="Gift" style="max-width: 100%; height: auto;">
-        </div>
-      </div>
     </div>
-  </div>
   
-         <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+          <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
 
-        <script>
+ <script>
 
    
   
@@ -433,8 +433,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data && data.image_url) {
-                    // document.getElementById('giftImage').src = data.image_url;
-                    // const modal = new bootstrap.Modal(document.getElementById('giftModal'));
+                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas');
+                    const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     modal.show();
                 } else {
                     alert("No image found.");
@@ -445,6 +445,20 @@
                 alert("Something went wrong.");
             });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize modals if needed
+        var modalEl = document.getElementById('giftModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                // Clear the container when modal is closed
+                const container = document.getElementById('giftImageContainer');
+                if (container) {
+                    container.innerHTML = '';
+                }
+            });
+        }
+    });
 
 
 
