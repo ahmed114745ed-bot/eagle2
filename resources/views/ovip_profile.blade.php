@@ -65,7 +65,7 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            border: 3px solid #ff9800;
+            border: 3px solid var(--primary-color);
           
             margin-bottom: 15px;
         }
