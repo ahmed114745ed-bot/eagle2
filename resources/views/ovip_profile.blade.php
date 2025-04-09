@@ -281,7 +281,8 @@
                 </div>
             </div>
         </div>
-        
+        <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const imageUrl = @json(getImagePath($oVip->img));
