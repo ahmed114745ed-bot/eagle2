@@ -32,7 +32,7 @@
         .main-content {
             display: flex;
             flex-direction: column;
-            width: 90%;
+            width: 100%;
             padding: 20px;
             box-sizing: border-box;
         }
