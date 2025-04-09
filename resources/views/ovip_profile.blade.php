@@ -284,84 +284,73 @@
         
         <script>
             LA.ready(function () {
-                class SVGAPlayerWrapper {
-                    constructor(elementId, imageUrl) {
-                        this.elementId = elementId;
-                        this.imageUrl = imageUrl;
-                        this.player = null;
-                        this.parser = null;
-                        this.initPlayer();
-                    }
+                function initSVGAPlayer(elementId, imageUrl) {
+                    class SVGAPlayerWrapper {
+                        constructor(elementId, imageUrl) {
+                            this.elementId = elementId;
+                            this.imageUrl = imageUrl;
+                            this.player = null;
+                            this.parser = null;
+                            this.initPlayer();
+                        }
         
-                    initPlayer() {
-                        this.player = new SVGA.Player('#' + this.elementId);
-                        this.player.loops = 100;
-                        this.player.clearsAfterStop = false;
+                        initPlayer() {
+                            this.player = new SVGA.Player('#' + this.elementId);
+                            this.player.loops = 100;
+                            this.player.clearsAfterStop = false;
         
-                        this.parser = new SVGA.Parser('#' + this.elementId);
+                            this.parser = new SVGA.Parser('#' + this.elementId);
         
-                        try {
                             this.parser.load(this.imageUrl, (videoItem) => {
                                 this.player.setVideoItem(videoItem);
                                 this.player.startAnimation();
-        
-                                this.player.onFinished(() => {
-                                    console.log("Animation finished.");
-                                });
                             });
-                        } catch (error) {
-                            console.error('An error occurred:', error.message);
-                        } finally {
-                            console.log('Try...catch has finished executing.');
                         }
                     }
         
-                    pauseAnimation() {
-                        this.player.pauseAnimation();
-                    }
-        
-                    stopAnimation() {
-                        this.player.stopAnimation();
-                    }
+                    return new SVGAPlayerWrapper(elementId, imageUrl);
                 }
         
                 function getFileExtension(url) {
                     const pathname = new URL(url).pathname;
-                    const extension = pathname.split('.').pop();
-                    return extension && extension !== pathname ? extension : null;
+                    return pathname.split('.').pop();
                 }
         
-                function showImage(show_img, canvasId, width = '1000px', height = '1000px') {
+                function showImage(show_img, canvasId) {
                     const isSvga = ['svga', 'zz'].includes(getFileExtension(show_img));
-                    let showImageContent = '';
+                    let content = '';
         
                     if (isSvga) {
-                        showImageContent = `<canvas id="${canvasId}"  width="350" height="200"></canvas>`;
+                        content = `<canvas id="${canvasId}" width="350" height="200"></canvas>`;
                     } else if (show_img.endsWith('.mp4')) {
-                        showImageContent = `
-                            <div class="avatar text-center avatar-3xl">
-                                <video width="100" controls>
+                        content = `<video width="100" controls>
                                     <source src="${show_img}" type="video/mp4">
                                     Your browser does not support the video tag.
-                                </video>
-                            </div>
-                        `;
+                                </video>`;
                     } else {
-                        showImageContent = `<img src="${show_img}" alt="" width="100"/>`;
+                        content = `<img src="${show_img}" alt="" width="100"/>`;
                     }
         
-                    return { showImageContent, isSvga };
+                    return { content, isSvga };
                 }
         
-                const url = @json(getImagePath($oVip->img));
+                const imageUrl = @json(getImagePath($oVip->img));
                 const canvasId = 'svgaCanvas{{ $oVip->id }}';
-                const { showImageContent, isSvga } = showImage(url, canvasId);
+                const containerId = 'imageContainer{{ $oVip->id }}';
         
-                const container = document.getElementById('imageContainer{{ $oVip->id }}');
-                container.innerHTML = showImageContent;
+                const container = document.getElementById(containerId);
+                const { content, isSvga } = showImage(imageUrl, canvasId);
         
+                container.innerHTML = content;
+        
+                // ننتظر لما الكانفاس فعلاً يتضاف للـ DOM ثم نبدأ اللود
                 if (isSvga) {
-                    new SVGAPlayerWrapper(canvasId, url);
+                    const checkCanvasExist = setInterval(() => {
+                        if (document.getElementById(canvasId)) {
+                            clearInterval(checkCanvasExist);
+                            initSVGAPlayer(canvasId, imageUrl);
+                        }
+                    }, 100);
                 }
             });
         </script>
