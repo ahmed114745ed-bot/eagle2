@@ -101,7 +101,7 @@ class OVipController extends MainController
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 350, 350);
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
