@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\DeleteAgencyAction;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
@@ -13,9 +12,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
+use App\Models\AgencySallary;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
@@ -26,7 +25,9 @@ use Illuminate\Support\Facades\DB;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
+use App\Admin\Widgets\Table as TableWidget;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
@@ -67,7 +68,8 @@ class AgencyController extends MainController
         $agency = Agency::with('charges','mempers')->findOrFail($id);
         $members = $agency->mempers()->paginate(10, ['*'], 'members_page'); // Custom page name
         $charges = $agency->charges()->paginate(10, ['*'], 'charges_page'); // Custom page name
-        return $content->title(__('agency profile'))->view('agency_profile', compact('agency','members','charges'));
+        $salaries = AgencySallary::where('agency_id',$id)->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
+        return $content->title(__('agency profile'))->view('agency_profile', compact('agency','members','charges','salaries'));
     }
 
     public function update($id)

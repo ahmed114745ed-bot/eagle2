@@ -32,12 +32,12 @@
         .main-content {
             display: flex;
             flex-direction: column;
-            width: 90%;
+            width: 100%;
             padding: 20px;
             box-sizing: border-box;
         }
         .container {
-            background: #222;
+            /* background: #222; */
             padding: 20px;
             border-radius: 5px;
             width: 80%;
@@ -55,15 +55,21 @@
             margin: 0 auto 20px;
             text-align: center;
         }
+        .avatar  {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
         .avatar img {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            border: 3px solid #ff9800;
+            border: 3px solid var(--primary-color);
           
             margin-bottom: 15px;
         }
-   
+
         .details {
             text-align: left;
             margin-top: 10px;
@@ -105,6 +111,11 @@
         th {
             background-color: #333;
         }
+        .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: 50%;
+        }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -128,6 +139,11 @@
             th, td {
                 padding: 6px 4px;
             }
+            .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: auto;
+             }
         }
         
         @media (max-width: 480px) {
@@ -140,6 +156,12 @@
             th, td {
                 padding: 4px 2px;
             }
+
+            .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: auto;
+             }
         }
 
         /* Main Container */
@@ -258,11 +280,8 @@
 <body>
     <div class="main-content">
         <div class="container">
-            <div class="avatar">
-                @php
-                    $url = getImagePath($oVip->img);
-                @endphp
-                {!! handleShowImageWithTypes($oVip->id, $url, 350, 350) !!}
+            <div class="avatar text-center">
+                <div class="imageContainer" id="imageContainer{{ $oVip->id }}"></div>
             </div>
 
             {{-- <button onclick="window.history.back()">{{ __("Go Back") }}</button> --}}
@@ -284,6 +303,103 @@
                 </div>
             </div>
         </div>
+         <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+
+        <script>
+
+   
+  
+    function getFileExtension(url) {
+        try {
+            const pathname = new URL(url).pathname;
+            return pathname.split('.').pop().toLowerCase();
+        } catch (e) {
+            return url.split('.').pop().toLowerCase();
+        }
+    }
+
+    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const extension = getFileExtension(imageUrl);
+        const isSvga = extension === 'svga';
+        let content = '';
+
+        if (isSvga) {
+            content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
+        } else if (extension === 'mp4') {
+            content = `<video width="350" controls style="margin: 0 auto;">
+                            <source src="${imageUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>`;
+        } else {
+            content = `<img src="${imageUrl}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+        }
+
+        container.innerHTML = content;
+
+        if (isSvga) {
+            function initializeSvgaPlayer() {
+                const checkCanvasExist = setInterval(() => {
+                    const canvas = document.getElementById(canvasId);
+                    if (canvas) {
+                        clearInterval(checkCanvasExist);
+                        try {
+                            const player = new SVGA.Player('#' + canvasId);
+                            const parser = new SVGA.Parser('#' + canvasId);
+                            player.loops = 100;
+                            player.clearsAfterStop = false;
+
+                            parser.load(imageUrl, function(videoItem) {
+                                player.setVideoItem(videoItem);
+                                player.startAnimation();
+                            });
+                        } catch (error) {
+                            console.error('SVGA Player Error:', error);
+                            container.innerHTML = `<img src="${imageUrl.replace('.svga', '.png')}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+                        }
+                    }
+                }, 100);
+            }
+
+            if (typeof SVGA === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+                script.onload = function () {
+                    console.log('✅ SVGA Loaded!');
+                    initializeSvgaPlayer();
+                };
+                document.head.appendChild(script);
+            } else {
+                initializeSvgaPlayer();
+            }
+        }
+    }
+
+    function renderAnimation() {
+        const imageUrl = @json(getImagePath($oVip->img));
+        const containerId = 'imageContainer{{ $oVip->id }}';
+        const canvasId = 'svgaCanvas{{ $oVip->id }}';
+
+        // تأكد من توفر العنصر قبل المتابعة
+        const waitForContainer = setInterval(() => {
+            if (document.getElementById(containerId)) {
+                clearInterval(waitForContainer);
+                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId);
+            }
+        }, 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderAnimation();
+    });
+
+    $(document).on('pjax:complete', function () {
+        renderAnimation();
+    });
+
+        </script>
         
         
     </div>

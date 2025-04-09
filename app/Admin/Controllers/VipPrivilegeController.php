@@ -74,9 +74,10 @@ class VipPrivilegeController extends MainController
         $grid->column('title',__ ('title'));
         $grid->column('type');
         $grid->column('img1',__ ('img'))->image ('',30);
-//        $grid->img2('img2');
-//        $grid->created_at(trans('admin.created_at'));
-//        $grid->updated_at(trans('admin.updated_at'));
+        $grid->actions(function ($actions) {
+            $actions->disableView();
+        });
+
         $this->extendGrid ($grid);
         return $grid;
     }
@@ -111,22 +112,22 @@ class VipPrivilegeController extends MainController
     {
         $form = new Form(new VipPrivilege);
 
-        $form->display(__('admin.ID'));
+        // $form->display(__('admin.ID'));
         $form->text('name', __('name'));
         $form->text('en_name', __('en_name'));
         $form->text('title', __('title'));
         $form->select('type', __('type'))->options (
             [
-                1=>trans ('Gemstone'),
-                3=>trans ('Card Scroll'),
+                // 1=>trans ('Gemstone'),=========
+                // 3=>trans ('Card Scroll'),
                 4=>trans ('Avatar Frame'),
                 5=>trans ('Bubble Frame'),
                 6=>trans ('Entering Special Effects'),
-                7=>trans ('Microphone Aperture'),
+                // 7=>trans ('Microphone Aperture'),============
                 8=>trans ('Badge'),
                 9=>trans ('NoKick'),
                 10=>trans ('Icon'),
-                11=>trans ('intro animation'),
+                // 11=>trans ('intro animation'),======
                 12=>trans ('wapel'),
                 13=>trans ('hide country'),
                 14=>trans ('vip gifts'),
@@ -138,7 +139,8 @@ class VipPrivilegeController extends MainController
                 20=>trans ('last login'),
                 21=>trans ('sound effect'),
                 22=>trans('upload GIF image'),
-                28=> trans('profile frame')            ]
+                28=> trans('profile frame')            
+            ]
         );
         $form->file('img1', __('admin.img'));
         $form->file('img2', __('admin.img2'));
