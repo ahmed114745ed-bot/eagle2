@@ -37,7 +37,7 @@
             box-sizing: border-box;
         }
         .container {
-            background: #222;
+            /* background: #222; */
             padding: 20px;
             border-radius: 5px;
             width: 80%;
@@ -55,15 +55,21 @@
             margin: 0 auto 20px;
             text-align: center;
         }
+        .avatar  {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
         .avatar img {
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            border: 3px solid #ff9800;
+            border: 3px solid var(--primary-color);
           
             margin-bottom: 15px;
         }
-   
+
         .details {
             text-align: left;
             margin-top: 10px;
@@ -105,6 +111,11 @@
         th {
             background-color: #333;
         }
+        .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: 50%;
+        }
         
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -128,6 +139,11 @@
             th, td {
                 padding: 6px 4px;
             }
+            .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: auto;
+             }
         }
         
         @media (max-width: 480px) {
@@ -140,6 +156,12 @@
             th, td {
                 padding: 4px 2px;
             }
+
+            .imageContainer{
+            border: 2px solid;
+            border-radius: 50%;
+            width: auto;
+             }
         }
 
         /* Main Container */
@@ -259,7 +281,7 @@
     <div class="main-content">
         <div class="container">
             <div class="avatar text-center">
-                <div id="imageContainer{{ $oVip->id }}"></div>
+                <div class="imageContainer" id="imageContainer{{ $oVip->id }}"></div>
             </div>
 
             {{-- <button onclick="window.history.back()">{{ __("Go Back") }}</button> --}}
