@@ -148,4 +148,9 @@ class MallService
     {
         return $this->packRepository->bestSale();
     }
+
+    public function giftOVip($level, $type)
+    {
+        return $this->wareRepository->giftOVip($level, $type);
+    }
 }

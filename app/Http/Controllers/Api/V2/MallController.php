@@ -58,7 +58,7 @@ class MallController extends Controller
         $wares = Ware::whereNotNull('img2')->get();
         foreach ($wares as $wares) {
             $ImageType =     pathinfo($wares->img2, PATHINFO_EXTENSION);
-            $wares->image_type = $ImageType =='alpha'? 'mp4':$ImageType;
+            $wares->image_type = $ImageType == 'alpha' ? 'mp4' : $ImageType;
             $wares->save();
         }
         return $wares;
@@ -70,4 +70,12 @@ class MallController extends Controller
         return Common::apiResponse(true, '', BestWareSaleResource::collection($pestSaleProduct), 200);
     }
 
+    public function giftOVip(Request $request)
+    {
+        $ware = $this->mallService->giftOVip($request->level, $request->type);
+
+        return response()->json([
+            'image_url' => getImagePath($ware->show_img), 
+        ]);
+    }
 }

@@ -107,13 +107,16 @@ class WareRepository extends AbstractRepository
         return $this->model->where(['type' => $typePrivilege, 'get_type' => 1, 'level' => $levelOvip])->first();
     }
 
-    public function allWares($page,$perPage )
+    public function allWares($page, $perPage)
     {
         return $this->model->whereNot('get_type', 1)->paginate($perPage, ['*'], 'page', $page);
     }
-    public function profile_frame_wares($page,$perPage )
+    public function profile_frame_wares($page, $perPage)
     {
-        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id','img2','level','image_type') ->paginate($perPage, ['*'], 'page', $page);
+        return $this->model->where('get_type', 1)->where('type', 28)->orderByDesc('is_active_for_vip')->select('id', 'img2', 'level', 'image_type')->paginate($perPage, ['*'], 'page', $page);
     }
-    
+    public function giftOVip($level, $type)
+    {
+        return $this->model->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1)->first();
+    }
 }

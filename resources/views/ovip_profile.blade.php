@@ -288,21 +288,43 @@
         </div>
      <br>
 
-        <div class="agency-container">
-            <div class="card">
-                <h4 class="card-title text-center">{{ __('ovip Privileges') }}</h4>
-                <div class="privileges-grid">
-                    @foreach($oVip->privilegs as $privilege)
-                        <div class="privilege-item">
-                            <div class="image-container">
-                                <img src="{{ getImagePath($privilege->img1) }}"  class="privilege-img">
-                            </div>
-                            <div class="privilege-name text-center">{{ $privilege->name }}</div>
+     <div class="agency-container">
+        <div class="card">
+            <h4 class="card-title text-center">{{ __('ovip Privileges') }}</h4>
+            <div class="privileges-grid">
+                @foreach($oVip->privilegs as $privilege)
+                    <div class="privilege-item">
+                        <div class="image-container">
+                            <img src="{{ getImagePath($privilege->img1) }}"  
+                            class="privilege-img"
+                            data-level="{{ $oVip->level }}"
+                            data-type="{{ $privilege->type }}"
+                            onclick="fetchGiftOvip(this)"  class="privilege-img">
                         </div>
-                    @endforeach
-                </div>
+                        <div class="privilege-name text-center">{{ $privilege->name }}</div>
+                    </div>
+                @endforeach
             </div>
         </div>
+    </div>
+
+    <!-- Modal -->
+<div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="giftModalLabel">{{ __('Gift Image') }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="giftImage" src="" alt="Gift" style="max-width: 100%; height: auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+  
          <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
 
         <script>
@@ -399,7 +421,35 @@
         renderAnimation();
     });
 
-        </script>
+
+
+ 
+    
+    function fetchGiftOvip(imgElement) {
+        const level = imgElement.getAttribute('data-level');
+        const type = imgElement.getAttribute('data-type');
+
+        fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.image_url) {
+                    document.getElementById('giftImage').src = data.image_url;
+                    const modal = new bootstrap.Modal(document.getElementById('giftModal'));
+                    modal.show();
+                } else {
+                    alert("No image found.");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching image:", error);
+                alert("Something went wrong.");
+            });
+    }
+
+
+
+
+ </script>
         
         
     </div>
