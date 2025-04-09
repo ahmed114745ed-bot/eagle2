@@ -281,11 +281,96 @@
                 </div>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+         <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 
         <script>
+
+            function loadSvgaAndInitialize(canvasId, imageUrl, container) {
+        if (typeof SVGA === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+            script.onload = function () {
+                initializeSvgaPlayer(canvasId, imageUrl, container);
+                console.log('✅ SVGA Loaded!');
+            };
+            document.head.appendChild(script);
+        } else {
+            initializeSvgaPlayer(canvasId, imageUrl, container);
+        }
+    }
+
+    function getFileExtension(url) {
+        try {
+            const pathname = new URL(url).pathname;
+            return pathname.split('.').pop().toLowerCase();
+        } catch (e) {
+            return url.split('.').pop().toLowerCase();
+        }
+    }
+
+    function showImageAndMaybeInitSVGA(imageUrl, canvasId, container) {
+        const extension = getFileExtension(imageUrl);
+        const isSvga = extension === 'svga';
+        let content = '';
+
+        if (isSvga) {
+            content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
+        } else if (extension === 'mp4') {
+            content = `<video width="350" controls style="margin: 0 auto;">
+                        <source src="${imageUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>`;
+        } else {
+            content = `<img src="${imageUrl}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+        }
+
+        container.innerHTML = content;
+
+        if (isSvga) {
+            loadSvgaAndInitialize(canvasId, imageUrl, container);
+        }
+    }
+
+    function initializeSvgaPlayer(canvasId, imageUrl, container) {
+        const checkCanvasExist = setInterval(() => {
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                clearInterval(checkCanvasExist);
+                try {
+                    const player = new SVGA.Player('#' + canvasId);
+                    const parser = new SVGA.Parser('#' + canvasId);
+
+                    player.loops = 100;
+                    player.clearsAfterStop = false;
+
+                    parser.load(imageUrl, function (videoItem) {
+                        player.setVideoItem(videoItem);
+                        player.startAnimation();
+                    });
+                } catch (error) {
+                    console.error('SVGA Player Error:', error);
+                    container.innerHTML = `<img src="${imageUrl.replace('.svga', '.png')}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+                }
+            }
+        }, 100);
+    }
+
+    function renderVipImage() {
+        const imageUrl = @json(getImagePath($oVip->img));
+        const containerId = 'imageContainer{{ $oVip->id }}';
+        const canvasId = 'svgaCanvas{{ $oVip->id }}';
+        const container = document.getElementById(containerId);
+        if (container) {
+            showImageAndMaybeInitSVGA(imageUrl, canvasId, container);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', renderVipImage);
+    $(document).on('pjax:complete', renderVipImage);
+
+   /*
                 $(document).on('pjax:complete', function () {
-                    
+
                         var script = document.createElement('script');
                         script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
                         script.onload = function() {
@@ -370,7 +455,7 @@
                         }
                     }, 100);
                 }
-            });
+            }); 
         </script>
         
         

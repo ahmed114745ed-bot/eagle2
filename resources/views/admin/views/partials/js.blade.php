@@ -15,7 +15,6 @@
 
 <script>
     $(document).ready(function () {
-        console.log('done');
         $('.view-lang').click(function (e) {
             e.preventDefault();
 
