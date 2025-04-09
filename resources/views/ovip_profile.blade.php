@@ -287,101 +287,96 @@
 
    
   
-                $(document).on('pjax:complete', function () {
+    function getFileExtension(url) {
+        try {
+            const pathname = new URL(url).pathname;
+            return pathname.split('.').pop().toLowerCase();
+        } catch (e) {
+            return url.split('.').pop().toLowerCase();
+        }
+    }
 
-                        var script = document.createElement('script');
-                        script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
-                        script.onload = function() {
-                            console.log('✅ SVGA Loaded after PJAX!');
-                        };
-                        document.head.appendChild(script);
-                    
-                });
-            document.addEventListener('DOMContentLoaded', function() {
-                const imageUrl = @json(getImagePath($oVip->img));
-                const containerId = 'imageContainer{{ $oVip->id }}';
-                const container = document.getElementById(containerId);
-                
-                function getFileExtension(url) {
-                    try {
-                        const pathname = new URL(url).pathname;
-                        return pathname.split('.').pop().toLowerCase();
-                    } catch (e) {
-                        return url.split('.').pop().toLowerCase();
-                    }
-                }
-                
-                function showImage(show_img, canvasId) {
-                    const extension = getFileExtension(show_img);
-                    const isSvga = extension === 'svga';
-                    let content = '';
-                    
-                    if (isSvga) {
-                        content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
-                    } else if (extension === 'mp4') {
-                        content = `<video width="350" controls style="margin: 0 auto;">
-                                    <source src="${show_img}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>`;
-                    } else {
-                        content = `<img src="${show_img}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
-                    }
-                    
-                    return { content, isSvga };
-                }
-                
-                const canvasId = 'svgaCanvas{{ $oVip->id }}';
-                const { content, isSvga } = showImage(imageUrl, canvasId);
-                container.innerHTML = content;
-                
-                if (isSvga) {
-                    // Load SVGA library dynamically if not already loaded
-                    if (typeof SVGA === 'undefined') {
-                        const script = document.createElement('script');
-                        // script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
-                        // script.onload = function() {
-                        //     initializeSvgaPlayer();
-                        // };
-                        // document.head.appendChild(script);
+    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
 
-                        script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
-                        script.onload = function() {
-                            console.log('✅ SVGA Loaded after PJAX!');
-                            initializeSvgaPlayer();
+        const extension = getFileExtension(imageUrl);
+        const isSvga = extension === 'svga';
+        let content = '';
 
-                        };
-                        document.head.appendChild(script);
-                    } else {
-                        initializeSvgaPlayer();
-                    }
-                }
-                
-                function initializeSvgaPlayer() {
-                    const checkCanvasExist = setInterval(() => {
-                        const canvas = document.getElementById(canvasId);
-                        if (canvas) {
-                            clearInterval(checkCanvasExist);
-                            
-                            try {
-                                const player = new SVGA.Player('#' + canvasId);
-                                const parser = new SVGA.Parser('#' + canvasId);
-                                
-                                player.loops = 100;
-                                player.clearsAfterStop = false;
-                                
-                                parser.load(imageUrl, function(videoItem) {
-                                    player.setVideoItem(videoItem);
-                                    player.startAnimation();
-                                });
-                            } catch (error) {
-                                console.error('SVGA Player Error:', error);
-                                // Fallback to image if SVGA fails
-                                container.innerHTML = `<img src="${imageUrl.replace('.svga', '.png')}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
-                            }
+        if (isSvga) {
+            content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
+        } else if (extension === 'mp4') {
+            content = `<video width="350" controls style="margin: 0 auto;">
+                            <source src="${imageUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>`;
+        } else {
+            content = `<img src="${imageUrl}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+        }
+
+        container.innerHTML = content;
+
+        if (isSvga) {
+            function initializeSvgaPlayer() {
+                const checkCanvasExist = setInterval(() => {
+                    const canvas = document.getElementById(canvasId);
+                    if (canvas) {
+                        clearInterval(checkCanvasExist);
+                        try {
+                            const player = new SVGA.Player('#' + canvasId);
+                            const parser = new SVGA.Parser('#' + canvasId);
+                            player.loops = 100;
+                            player.clearsAfterStop = false;
+
+                            parser.load(imageUrl, function(videoItem) {
+                                player.setVideoItem(videoItem);
+                                player.startAnimation();
+                            });
+                        } catch (error) {
+                            console.error('SVGA Player Error:', error);
+                            container.innerHTML = `<img src="${imageUrl.replace('.svga', '.png')}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
                         }
-                    }, 100);
-                }
-            }); 
+                    }
+                }, 100);
+            }
+
+            if (typeof SVGA === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+                script.onload = function () {
+                    console.log('✅ SVGA Loaded!');
+                    initializeSvgaPlayer();
+                };
+                document.head.appendChild(script);
+            } else {
+                initializeSvgaPlayer();
+            }
+        }
+    }
+
+    function renderAnimation() {
+        const imageUrl = @json(getImagePath($oVip->img));
+        const containerId = 'imageContainer{{ $oVip->id }}';
+        const canvasId = 'svgaCanvas{{ $oVip->id }}';
+
+        // تأكد من توفر العنصر قبل المتابعة
+        const waitForContainer = setInterval(() => {
+            if (document.getElementById(containerId)) {
+                clearInterval(waitForContainer);
+                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId);
+            }
+        }, 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderAnimation();
+    });
+
+    $(document).on('pjax:complete', function () {
+        renderAnimation();
+    });
+
         </script>
         
         
