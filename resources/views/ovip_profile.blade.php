@@ -142,7 +142,7 @@
             .imageContainer{
             border: 2px solid;
             border-radius: 50%;
-            width: 100%;
+            width: auto;
              }
         }
         
@@ -160,7 +160,7 @@
             .imageContainer{
             border: 2px solid;
             border-radius: 50%;
-            width: 100%;
+            width: auto;
              }
         }
 
