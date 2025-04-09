@@ -83,6 +83,7 @@ class MallController extends Controller
 
             return response()->json([
                 'image_url' => getImagePath($ware->show_img),
+                'title' => $ware->title
             ]);
         } catch (\Exception $e) {
             return response()->json([
