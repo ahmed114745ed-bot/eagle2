@@ -1983,7 +1983,11 @@
     "Video":"فديو",
     "REELS":"فديوهات",
     "Search by name , UUID , nickname and email": "البحث بالاسم أو UUID أو اللقب أو البريد الإلكتروني",
-    "admin owner room id": "  admin owner room id"
+    "admin owner room id": "  admin owner room id",
+    "transaction id": "معرف العملية", 
+  "recipient": "االمستلم",
+  "amount usd": "المبلغ $",
+  "shipping date": "تاريخ الشحن"
 
 
 

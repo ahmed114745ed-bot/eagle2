@@ -103,8 +103,8 @@ class ChargeReportController extends MainController
         });
 
 
-        $grid->column('id', __('id'));
-        $grid->column('charger_id', __("receiver"))->display(function () use ($charger_type) {
+        $grid->column('id', __('transaction id'));
+        $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
             if ($charger_type == "dash") {
                 $name = @$this->admin_user->name ?? '';
                 $uuid = @$this->admin_user->id;
@@ -134,7 +134,7 @@ class ChargeReportController extends MainController
                 </div>
             ";
         });
-        $grid->column('user_id', __('sendTo'))->display(function ($recever) {
+        $grid->column('user_id', __('recipient'))->display(function ($recever) {
             $name =  $this->receiver->name ?? '';
             $uid = @$this->receiver->uuid ?? 0;
             $path = @$this->receiver?->profile?->avatar;
@@ -166,7 +166,7 @@ class ChargeReportController extends MainController
         // $grid->column ('balance_after',__("balance_after"))->display (function (){
         //    return number_format($this->amount + $this->balance_before);
         // });
-        $grid->column('amount', __("Amount"))->display(function ($coin) {
+        $grid->column('amount', __("amount_usd"))->display(function ($coin) {
             $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
@@ -175,9 +175,9 @@ class ChargeReportController extends MainController
                     </div>";
         });
 
-        $grid->column('balance_before', __("Balance Before"))->display(function ($coin) {
+        $grid->column('balance_before', __("amount"))->display(function ($coin) {
             $balance_after = $this->amount + $this->balance_before;
-            $icon = asset('images/arrowdown.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
+            $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
 
             return "<div style='display: flex; align-items: center; gap: 5px;'>
             <span>
@@ -208,7 +208,7 @@ class ChargeReportController extends MainController
             ";
         });
 
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('hipping date'));
 
         return $grid;
     }
@@ -237,7 +237,7 @@ class ChargeReportController extends MainController
         });
 
 
-        $grid->column('id', __('id'));
+        $grid->column('id', __('transaction id'));
         $grid->column('user_id', __('charger'))->display(function ($recever) {
             $name =  $this->user->name ?? '';
             $uid = @$this->user->uuid ?? 0;
@@ -298,7 +298,7 @@ class ChargeReportController extends MainController
             }
         });
 
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('hipping date'));
         return $grid;
     }
 
@@ -385,7 +385,7 @@ class ChargeReportController extends MainController
 
             return $options[$value] ?? $value;
         });
-        $grid->column('created_at', __('Created at'));
+        $grid->column('created_at', __('hipping date'));
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';
         // });
