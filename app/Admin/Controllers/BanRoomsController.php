@@ -32,7 +32,7 @@ class BanRoomsController extends MainController
     public function index(Content $content)
     {
         return $content
-            ->title(trans('bans rooms'))
+            ->title(trans('Close room'))
             ->body($this->grid());
             // ->row(function ($row) {
             //     $row->column(10, $this->grid());
