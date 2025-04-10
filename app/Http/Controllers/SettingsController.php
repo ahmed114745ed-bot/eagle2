@@ -27,16 +27,20 @@ class SettingsController extends Controller
 
 
         $data = $request->except('_token');
-        unset($data['background_type']);
-
-        if (!empty($data['app_background_image'])) {
-            $data['app_background'] = $request->file('app_background_image');
-            unset($data['app_background_image']);
+        if ($request->background_type === 'color') {
+            $data['app_background'] = $request->background_color;
+        } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
+            $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
         }
+        
+        unset($data['background_type'], $data['app_background_image']);
 
         foreach ($data as $key => $value) {
+            
             if ($value instanceof \Illuminate\Http\UploadedFile) {
+                
                 $value = Common::upload('images', $value);
+               
             }
 
             if (!is_null($value)) {
