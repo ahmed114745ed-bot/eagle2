@@ -43,6 +43,9 @@ class AgoraController extends Controller
         return Common::apiResponse(true, 'Success', [
             'rtc_token' => $token,
             'rtm_token' => $rtmToken,
+            'appId' => config('services.agora.app_id'),
+            'appCertificate' =>  config('services.agora.app_certificate'),
+           
         ]);
     
     }
