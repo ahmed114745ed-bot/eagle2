@@ -99,7 +99,7 @@ class CoreWalletsController extends MainController
         $form .= '</div>'; // End row
         $form .= '</div>'; // End container
         $data =new HtmlString($form);
-        
+        dd($data);
         return parent::index($content
             ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
