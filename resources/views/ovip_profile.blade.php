@@ -309,21 +309,23 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="giftModalLabel">{{ __('gift') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <div id="giftImageContainer"></div>
-                </div>
+    <!-- Modal HTML -->
+<div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="giftModalTitle">{{ __('gifts') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="giftImageContainer"></div>
+                <h4 id="giftTitle" class="mb-3"></h4>
             </div>
         </div>
     </div>
+</div>
   
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
@@ -344,7 +346,7 @@
         }
     }
 
-    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId) {
+    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId,width,height) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
@@ -353,14 +355,14 @@
         let content = '';
 
         if (isSvga) {
-            content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
+            content = `<canvas id="${canvasId}" width="${width}" height="${height}" style="margin: 0 auto;"></canvas>`;
         } else if (extension === 'mp4') {
-            content = `<video width="350" controls style="margin: 0 auto;">
+            content = `<video width="${width}" controls style="margin: 0 auto;">
                             <source src="${imageUrl}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>`;
         } else {
-            content = `<img src="${imageUrl}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+            content = `<img src="${imageUrl}" alt="" style="width: ${width}px; height: ${height}px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
         }
 
         container.innerHTML = content;
@@ -412,7 +414,7 @@
         const waitForContainer = setInterval(() => {
             if (document.getElementById(containerId)) {
                 clearInterval(waitForContainer);
-                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId);
+                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId,350,350);
             }
         }, 100);
     }
@@ -429,6 +431,7 @@
 
  
     
+    // JavaScript
     function fetchGiftOvip(imgElement) {
         const level = imgElement.getAttribute('data-level');
         const type = imgElement.getAttribute('data-type');
@@ -445,7 +448,15 @@
                     throw new Error(data.error);
                 }
                 if (data && data.image_url) {
-                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas');
+                    // Set the title
+                    if (data.title) {
+                        document.getElementById('giftTitle').textContent = data.title;
+                    }
+                    
+                    // Show image
+                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas',200,200);
+                    
+                    // Show modal
                     const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     $('#giftModal').modal('show');
                 } else {
@@ -463,15 +474,15 @@
         var modalEl = document.getElementById('giftModal');
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', function () {
-                // Clear the container when modal is closed
+                // Clear the container and title when modal is closed
                 const container = document.getElementById('giftImageContainer');
                 if (container) {
                     container.innerHTML = '';
                 }
+                document.getElementById('giftTitle').textContent = '';
             });
         }
     });
-
 
 
 
