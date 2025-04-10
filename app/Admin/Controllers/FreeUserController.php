@@ -552,27 +552,6 @@ class FreeUserController extends MainController
 
         $grid->model()->where('user_id', $userId)->orderByDesc('created_at');
 
-        $grid->column('user.name', __('User'))->display(function ($name) {
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->user->avatar;
-            $userId = @$this->user->id;
-            $uid = @$this->user->uuid;
-
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-
-            return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
-                    <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
-                    <div>
-                        <span style='color: #3498db; font-weight: bold;'>$name</span><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                    </div>
-                </div>";
-        });
-
         $grid->column('comment_num', __('Status'))->display(function () {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
@@ -626,26 +605,6 @@ class FreeUserController extends MainController
         $grid->column('description', __('Description'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-        });
-
-        // Display user information
-        $grid->column('user.name', __('User'))->display(function ($name) {
-            $uid = @$this->user->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->user->avatar;
-            $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
-                $avatar = $defaultImage;
-            }
-            $userUrl = admin_url('users/' . $this->user_id);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
-                    <div>
-                        <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
-                    </div>
-                </div>";
         });
 
         // Display comments and likes
