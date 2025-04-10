@@ -1,10 +1,13 @@
 <?php
 
+use App\Services\AgoraRtmTokenBuilder;
 use Illuminate\Support\Facades\Http;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Illuminate\Support\Facades\Redis;
+use Carbon\Carbon;
+
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
@@ -24,6 +27,33 @@ function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
 
     return $token;
 }
+
+function generateAgoraRtmToken( $rtmUid)
+{
+
+    if (!$rtmUid) {
+        return null;
+    }
+
+    $appId = config('services.agora.app_id');
+    $appCertificate = config('services.agora.app_certificate');
+    $expireTimeInSeconds = 86400;
+    $expireTimestamp = time() + $expireTimeInSeconds;
+
+    $token = AgoraRtmTokenBuilder::buildToken(
+        $appId,
+        $appCertificate,
+        $rtmUid,
+        $expireTimestamp
+    );
+
+
+    return $token;
+    
+    
+}
+
+
 
 function translate($typeArray)
 {

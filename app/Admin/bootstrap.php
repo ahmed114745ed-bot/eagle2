@@ -52,6 +52,9 @@ view()->composer('admin::partials.footer', function (Illuminate\View\View $view)
 view()->composer('admin::partials.js', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/js.blade.php'));
 });
+view()->composer('admin::partials.cdn', function (Illuminate\View\View $view) {
+    $view->setPath(resource_path('views/admin/views/partials/cdn.blade.php'));
+});
 
 view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/css.blade.php'));

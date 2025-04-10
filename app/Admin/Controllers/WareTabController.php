@@ -160,7 +160,7 @@ class WareTabController extends MainController
         $content = new Row();
 
         // Define your type mapping
-        $typeMap = TYPE_WARE;
+        $typeMap = MORE_Used_WARE;
 
         $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
             return [$type => $typeMap[$type] ?? "Type $type"];

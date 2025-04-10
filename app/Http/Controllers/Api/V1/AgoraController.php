@@ -37,17 +37,23 @@ class AgoraController extends Controller
         }
 
         $token = generateRtcToken($request->channel, $user->id);
+        $rtmToken = generateAgoraRtmToken( $user->id);
+        
 
-        return Common::apiResponse(true, 'Success', $token);
+        return Common::apiResponse(true, 'Success', [
+            'rtc_token' => $token,
+            'rtm_token' => $rtmToken,
+        ]);
+    
     }
 
     public function webhook(Request $request)
     {
 
-        // Log::info('agora webhook triggered enter room ', [
-        //     $request->all()
-        // ]);
-        // return ;
+        Log::info('agora webhook triggered enter room ', [
+            $request->all()
+        ]);
+        return ;
         // $agoraSignature = $request->header('Agora-Signature');
         // Log::info("Agora-Signature: " . $agoraSignature);
 
@@ -84,4 +90,7 @@ class AgoraController extends Controller
 
         return $this->enteranceRoomService->updateRoomCountFromAgora($request);
     }
+
+
+
 }

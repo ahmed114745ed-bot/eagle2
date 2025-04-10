@@ -67,7 +67,15 @@ class RoomObserver
             $mics = explode (',',$room->getAttributeValue('microphone'));
 
             $count = count($mics);
-            if ($room->mode == '1'){//16 seats
+            if ($room->mode == '0'){
+                if ($count <= 10){
+                    $m = array_merge ($mics, array_fill(0, 10 - $count, '0'));
+                    $room->microphone = implode (',',$m);
+                }else {
+                    $m = array_slice ($mics,0,10);
+                    $room->microphone = implode (',',$m);
+                }
+            }elseif ($room->mode == '1'){//16 seats
                 if ($count <= 17){
                     $m = array_merge ($mics, array_fill(0, 17 - $count, '0'));
                     $room->microphone = implode (',',$m);
