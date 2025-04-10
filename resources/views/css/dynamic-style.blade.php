@@ -652,7 +652,13 @@
 
             }
             .rtl .wallet_posation{
-                position: absolute;
+                /* position: absolute; */
+
+            }
+            .rtl .wallet_div{
+                width: 82%;
+                margin-right: -14px !important;
+
 
             }
             .rtl .column-show_img .rtlSvga{
