@@ -49,7 +49,7 @@ class CoreWalletsController extends MainController
         ];
 
         $form = '<div class="container mt-4">';
-        $form .= '<div class="row justify-content-center g-4">'; // Added Bootstrap gutter space
+        $form .= '<div class="row justify-content-center g-4 wallet_div">'; // Added Bootstrap gutter space
 
         foreach ($coreWallets as $index => $wallet) {
             $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
