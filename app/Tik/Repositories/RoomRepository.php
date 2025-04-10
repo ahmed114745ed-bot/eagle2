@@ -180,6 +180,14 @@ class RoomRepository extends AbstractRepository
                   
                 break;
 
+                case 'friends':
+                   
+                    $result->whereIn('uid', $user->friends_ids())
+                         ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
+                         ->orderByDesc('session');
+                       
+                     break;
+
             case 'nearby':
                 $userLat  = $user->lat;
                 $userLong = $user->long;
@@ -199,7 +207,7 @@ class RoomRepository extends AbstractRepository
                 $result->orderByDesc('hour_hot');
                 break;
         }
-       
+      
         // Paginate the results with 10 items per page
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);
