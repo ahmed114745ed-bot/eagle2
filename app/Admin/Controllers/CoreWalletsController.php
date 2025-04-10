@@ -41,7 +41,6 @@ class CoreWalletsController extends MainController
     public function index(Content $content)
     {
         $coreWallets = \App\Models\CoreWallets::whereIn('name', ['app_wallet', 'owner_wallet', 'game_wallet', 'lucky_box'])->get();
-
         $icons = [
             'app_wallet' => 'fa-solid fa-coins',       // Coins icon
             'owner_wallet' => 'fa-solid fa-user-tie',  // Business user icon
@@ -99,7 +98,8 @@ class CoreWalletsController extends MainController
 
         $form .= '</div>'; // End row
         $form .= '</div>'; // End container
-
+        $data =new HtmlString($form);
+        
         return parent::index($content
             ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
