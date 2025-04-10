@@ -764,10 +764,15 @@
     }
 
 
-.rtl .sidebar-menu > li > a .fa-angle-left {
-    transform: rotate(180deg);
-}
+    .rtl .sidebar-menu > li > a .fa-angle-left {
+        transform: rotate(180deg);
+    }
 
+    .rtl .sidebar-menu > li.active > a .fa-angle-left {
+        transform: rotate(-90deg);
+        top: 23px;
+        right: 207px;
+    }
 
 
 </style>

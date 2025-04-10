@@ -56,7 +56,7 @@ class VersionController extends Controller
                 'frames' => $isFrameUpdated,
                 'extras' => $isExtraUpdated,
                 'profile_frame_updated' => $ProfileFrameUpdated,
-                'colors' => $isColorUpdated,
+                'colors' => settings()->get('colors_updated_at'),
                 //intro - frames - extradata - emoji
             ], 'enable_chat'  => settings()->get('chat_status') == "on"
         ];

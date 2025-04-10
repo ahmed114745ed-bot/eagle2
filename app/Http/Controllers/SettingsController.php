@@ -49,8 +49,7 @@ class SettingsController extends Controller
             Cache::put($key, $value);
 
             $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
-
-            settings()->set($key, time());
+            settings()->set($key, true);
         }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
