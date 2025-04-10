@@ -37,7 +37,7 @@ class SpecialIdRequestController extends MainController
      public function index(Content $content)
     {
         return $content
-            ->title(trans('special-id-request'))
+            ->title(trans('Special uuid requests'))
             ->body($this->grid());
     }
 
@@ -51,7 +51,7 @@ class SpecialIdRequestController extends MainController
     public function show($id, Content $content)
     {
         return $content
-            ->title(trans('special-id-request'))
+            ->title(trans('Special uuid requests'))
             ->body($this->detail($id));
     }
 
@@ -65,14 +65,14 @@ class SpecialIdRequestController extends MainController
     public function edit($id, Content $content)
     {
         return $content
-            ->title(trans('special-id-request'))
+            ->title(trans('Special uuid requests'))
             ->body($this->form()->edit($id));
     }
 
     public function create(Content $content)
     {
         return $content
-            ->title(trans('special-id-request'))
+            ->title(trans('Special uuid requests'))
             ->body($this->form());
     }
 
