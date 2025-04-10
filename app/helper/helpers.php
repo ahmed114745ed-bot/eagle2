@@ -7,6 +7,8 @@ use App\Classes\AppSetting;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
 use Illuminate\Support\Facades\Redis;
 use Carbon\Carbon;
+use Yasser\AgoraToken\RtmTokenBuilder;
+;
 
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
@@ -35,18 +37,26 @@ function generateAgoraRtmToken( $rtmUid)
         return null;
     }
 
+   
     $appId = config('services.agora.app_id');
     $appCertificate = config('services.agora.app_certificate');
+    $user = $rtmUid;
     $expireTimeInSeconds = 86400;
-    $expireTimestamp = time() + $expireTimeInSeconds;
+    // $currentTimestamp = now()->timestamp;
+    // $expireTimestamp = $currentTimestamp + $expireTimeInSeconds;
 
-    $token = AgoraRtmTokenBuilder::buildToken(
-        $appId,
-        $appCertificate,
+    // $appID = config('agora.app_id');
+    // $appCertificate = config('agora.app_certificate');
+    // $user = $request->uid;
+    $expireTimeInSeconds = 86400;
+
+
+    $token = AgoraRtmTokenBuilder::generateRtmToken(
         $rtmUid,
-        $expireTimestamp
+        $request->expire_seconds ?? 86400
     );
-
+  
+    // $token = AgoraRtmTokenBuilder::buildRtmToken($appId, $appCertificate, $rtmUid, $expireTimeInSeconds);
 
     return $token;
     
