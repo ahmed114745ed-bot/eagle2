@@ -329,9 +329,7 @@
   
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Then Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
  <script>
 
@@ -431,63 +429,123 @@
 
  
     
-    // JavaScript
+    // function fetchGiftOvip(imgElement) {
+    //     const level = imgElement.getAttribute('data-level');
+    //     const type = imgElement.getAttribute('data-type');
+
+    //     fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error(`HTTP error! status: ${response.status}`);
+    //             }
+    //             return response.json();
+    //         })
+    //         .then(data => {
+    //             if (data.error) {
+    //                 throw new Error(data.error);
+    //             }
+    //             if (data && data.image_url) {
+    //                 // Set the title
+    //                 if (data.title) {
+    //                     document.getElementById('giftTitle').textContent = data.title;
+    //                 }
+                    
+    //                 // Show image
+    //                 showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas',200,200);
+                    
+    //                 // Show modal
+    //                 const modal = new bootstrap.Modal(document.getElementById('giftModal'));
+    //                 $('#giftModal').modal('show');
+    //             } else {
+    //                 throw new Error("No image URL in response");
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error("Error fetching image:", error);
+    //             alert(`Failed to load gift: ${error.message}`);
+    //         });
+    // }
+
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Initialize modals if needed
+    //     var modalEl = document.getElementById('giftModal');
+    //     if (modalEl) {
+    //         modalEl.addEventListener('hidden.bs.modal', function () {
+    //             // Clear the container and title when modal is closed
+    //             const container = document.getElementById('giftImageContainer');
+    //             if (container) {
+    //                 container.innerHTML = '';
+    //             }
+    //             document.getElementById('giftTitle').textContent = '';
+    //         });
+    //     }
+    // });
+
+
+
+   
+
     function fetchGiftOvip(imgElement) {
         const level = imgElement.getAttribute('data-level');
         const type = imgElement.getAttribute('data-type');
 
-        fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                if (data && data.image_url) {
-                    // Set the title
-                    if (data.title) {
-                        document.getElementById('giftTitle').textContent = data.title;
+        setTimeout(() => {
+            fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+
+                    if (data.image_url) {
+                        if (data.title) {
+                            document.getElementById('giftTitle').textContent = data.title;
+                        }
+
+                        showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas', 200, 200);
+                        $('#giftModal').modal('show');
+                    } else {
+                        throw new Error("No image URL in response");
                     }
-                    
-                    // Show image
-                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas',200,200);
-                    
-                    // Show modal
-                    const modal = new bootstrap.Modal(document.getElementById('giftModal'));
-                    $('#giftModal').modal('show');
-                } else {
-                    throw new Error("No image URL in response");
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching image:", error);
-                alert(`Failed to load gift: ${error.message}`);
-            });
+                })
+                .catch(error => {
+                    console.error("Error fetching image:", error);
+                    alert(`فشل تحميل الهدية: ${error.message}`);
+                });
+        }, 100); // تأخير بسيط لتفادي مشاكل DOM
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize modals if needed
-        var modalEl = document.getElementById('giftModal');
+    function initializeGiftModalCleanup() {
+        const modalEl = document.getElementById('giftModal');
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', function () {
-                // Clear the container and title when modal is closed
                 const container = document.getElementById('giftImageContainer');
-                if (container) {
-                    container.innerHTML = '';
-                }
+                if (container) container.innerHTML = '';
                 document.getElementById('giftTitle').textContent = '';
             });
         }
+    }
+
+    function initGiftModalHandler() {
+        initializeGiftModalCleanup();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(initGiftModalHandler, 200);
+    });
+
+    $(document).on('pjax:complete', function () {
+        setTimeout(initGiftModalHandler, 200);
     });
 
 
 
  </script>
         
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
         
     </div>
 </body>
