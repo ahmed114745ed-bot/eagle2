@@ -429,7 +429,29 @@
 
  
     
-    // JavaScript
+    const script1 = document.createElement('script');
+    const script2 = document.createElement('script');
+
+    script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    script2.src = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js';
+
+    // Append jQuery script first, and then Bootstrap script
+    script1.onload = function () {
+        console.log('✅ jQuery Loaded!');
+        // Now Bootstrap can be safely loaded after jQuery
+        document.body.appendChild(script2);
+    };
+
+    script2.onload = function () {
+        console.log('✅ Bootstrap Loaded!');
+        // Initialize your SVGA player or any functionality that depends on Bootstrap
+        initializeSvgaPlayer(); // Ensure SVGA is loaded after Bootstrap
+    };
+
+    // Add the first script to the document
+    document.body.appendChild(script1);
+
+    // Function to fetch and display the gift (image or animation)
     function fetchGiftOvip(imgElement) {
         const level = imgElement.getAttribute('data-level');
         const type = imgElement.getAttribute('data-type');
@@ -446,15 +468,15 @@
                     throw new Error(data.error);
                 }
                 if (data && data.image_url) {
-                    // Set the title
+                    // Set the title if available
                     if (data.title) {
                         document.getElementById('giftTitle').textContent = data.title;
                     }
-                    
-                    // Show image
-                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas',200,200);
-                    
-                    // Show modal
+
+                    // Show the image or animation
+                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas', 200, 200);
+
+                    // Show the modal using Bootstrap
                     const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     $('#giftModal').modal('show');
                 } else {
@@ -467,12 +489,27 @@
             });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize modals if needed
+    // Initialize modal cleanup when the modal is hidden
+    document.addEventListener('DOMContentLoaded', function () {
         var modalEl = document.getElementById('giftModal');
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', function () {
                 // Clear the container and title when modal is closed
+                const container = document.getElementById('giftImageContainer');
+                if (container) {
+                    container.innerHTML = '';
+                }
+                document.getElementById('giftTitle').textContent = '';
+            });
+        }
+    });
+
+    // Ensure the above logic works with PJAX (if you're using PJAX in Laravel Admin)
+    $(document).on('pjax:complete', function () {
+        // Reinitialize modals after page change or PJAX refresh
+        var modalEl = document.getElementById('giftModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
                 const container = document.getElementById('giftImageContainer');
                 if (container) {
                     container.innerHTML = '';
