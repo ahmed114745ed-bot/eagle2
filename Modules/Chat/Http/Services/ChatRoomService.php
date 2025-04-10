@@ -341,6 +341,8 @@ class ChatRoomService
                 'mode' => @$room->mode ?? 0,
                 'room_background' => @$room->final_room_image ?? '',
                 'exp' => @$room?->session_string,
+                "is_live" => @$room->is_live ?: false,
+                'stream_type'         =>  @$room->type ?? 'audio',
             ],
 
 
