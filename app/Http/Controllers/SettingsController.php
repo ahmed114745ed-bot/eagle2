@@ -30,13 +30,14 @@ class SettingsController extends Controller
         unset($data['background_type']);
 
         if (!empty($data['app_background_image'])) {
-            $data['app_background'] = $data['app_background_image'];
+            $data['app_background'] = $request->file('app_background_image');
             unset($data['app_background_image']);
         }
 
         foreach ($data as $key => $value) {
             if ($value instanceof \Illuminate\Http\UploadedFile) {
                 $value = Common::upload('images', $value);
+                dd($value);
             }
 
             if (!is_null($value)) {
