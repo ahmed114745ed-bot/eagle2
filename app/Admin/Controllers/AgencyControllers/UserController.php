@@ -184,7 +184,7 @@ class UserController extends MainController
 
         $grid->column('phone', __('Phone'));
 
-        $grid->column('agency_id', __('agency id'))->modal('admin info', function () {
+        $grid->column('agency_id', __('agency id'))->modal(__('admin info'), function () {
             $agency =  Agency::query()->find(@$this->agency_id);
             $path = @$agency?->img;
                 $defaultImage = asset("images/icon-agency.jpg");

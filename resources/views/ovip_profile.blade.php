@@ -277,6 +277,7 @@
 }
     </style>
 </head>
+
 <body>
     <div class="main-content">
         <div class="container">
@@ -288,24 +289,49 @@
         </div>
      <br>
 
-        <div class="agency-container">
-            <div class="card">
-                <h4 class="card-title text-center">{{ __('ovip Privileges') }}</h4>
-                <div class="privileges-grid">
-                    @foreach($oVip->privilegs as $privilege)
-                        <div class="privilege-item">
-                            <div class="image-container">
-                                <img src="{{ getImagePath($privilege->img1) }}"  class="privilege-img">
-                            </div>
-                            <div class="privilege-name text-center">{{ $privilege->name }}</div>
+     <div class="agency-container">
+        <div class="card">
+            <h4 class="card-title text-center">{{ __('ovip Privileges') }}</h4>
+            <div class="privileges-grid">
+                @foreach($oVip->privilegs as $privilege)
+                    <div class="privilege-item">
+                        <div class="image-container">
+                            <img src="{{ getImagePath($privilege->img1) }}"  
+                            class="privilege-img"
+                            data-level="{{ $oVip->level }}"
+                            data-type="{{ $privilege->type }}"
+                            onclick="fetchGiftOvip(this)"  class="privilege-img">
                         </div>
-                    @endforeach
-                </div>
+                        <div class="privilege-name text-center">{{ $privilege->name }}</div>
+                    </div>
+                @endforeach
             </div>
         </div>
-         <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+    </div>
 
-        <script>
+    <!-- Modal -->
+    <!-- Modal HTML -->
+<div class="modal fade" id="giftModal" tabindex="-1" role="dialog" aria-labelledby="giftModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="giftModalTitle">{{ __('gifts') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('Close') }}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="giftImageContainer"></div>
+                <h4 id="giftTitle" class="mb-3"></h4>
+            </div>
+        </div>
+    </div>
+</div>
+  
+          <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+          <!-- Load jQuery first -->
+
+ <script>
 
    
   
@@ -318,7 +344,7 @@
         }
     }
 
-    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId) {
+    function showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId,width,height) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
@@ -327,14 +353,14 @@
         let content = '';
 
         if (isSvga) {
-            content = `<canvas id="${canvasId}" width="350" height="350" style="margin: 0 auto;"></canvas>`;
+            content = `<canvas id="${canvasId}" width="${width}" height="${height}" style="margin: 0 auto;"></canvas>`;
         } else if (extension === 'mp4') {
-            content = `<video width="350" controls style="margin: 0 auto;">
+            content = `<video width="${width}" controls style="margin: 0 auto;">
                             <source src="${imageUrl}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>`;
         } else {
-            content = `<img src="${imageUrl}" alt="" style="width: 350px; height: 350px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
+            content = `<img src="${imageUrl}" alt="" style="width: ${width}px; height: ${height}px; object-fit: cover; margin: 0 auto; border-radius: 50%; border: 3px solid #ff9800;"/>`;
         }
 
         container.innerHTML = content;
@@ -386,7 +412,7 @@
         const waitForContainer = setInterval(() => {
             if (document.getElementById(containerId)) {
                 clearInterval(waitForContainer);
-                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId);
+                showImageAndMaybeInitSVGA(imageUrl, containerId, canvasId,350,350);
             }
         }, 100);
     }
@@ -399,7 +425,103 @@
         renderAnimation();
     });
 
-        </script>
+
+
+ 
+    
+    const script1 = document.createElement('script');
+    const script2 = document.createElement('script');
+
+    script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    script2.src = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js';
+
+    // Append jQuery script first, and then Bootstrap script
+    script1.onload = function () {
+        console.log('✅ jQuery Loaded!');
+        // Now Bootstrap can be safely loaded after jQuery
+        document.body.appendChild(script2);
+    };
+
+    script2.onload = function () {
+        console.log('✅ Bootstrap Loaded!');
+        // Initialize your SVGA player or any functionality that depends on Bootstrap
+        initializeSvgaPlayer(); // Ensure SVGA is loaded after Bootstrap
+    };
+
+    // Add the first script to the document
+    document.body.appendChild(script1);
+
+    // Function to fetch and display the gift (image or animation)
+    function fetchGiftOvip(imgElement) {
+        const level = imgElement.getAttribute('data-level');
+        const type = imgElement.getAttribute('data-type');
+
+        fetch(`/admin/gift-ovip?level=${level}&type=${type}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                if (data && data.image_url) {
+                    // Set the title if available
+                    if (data.title) {
+                        document.getElementById('giftTitle').textContent = data.title;
+                    }
+
+                    // Show the image or animation
+                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas', 200, 200);
+
+                    // Show the modal using Bootstrap
+                    const modal = new bootstrap.Modal(document.getElementById('giftModal'));
+                    $('#giftModal').modal('show');
+                } else {
+                    throw new Error("No image URL in response");
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching image:", error);
+                alert(`Failed to load gift: ${error.message}`);
+            });
+    }
+
+    // Initialize modal cleanup when the modal is hidden
+    document.addEventListener('DOMContentLoaded', function () {
+        var modalEl = document.getElementById('giftModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                // Clear the container and title when modal is closed
+                const container = document.getElementById('giftImageContainer');
+                if (container) {
+                    container.innerHTML = '';
+                }
+                document.getElementById('giftTitle').textContent = '';
+            });
+        }
+    });
+
+    // Ensure the above logic works with PJAX (if you're using PJAX in Laravel Admin)
+    $(document).on('pjax:complete', function () {
+        // Reinitialize modals after page change or PJAX refresh
+        var modalEl = document.getElementById('giftModal');
+        if (modalEl) {
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                const container = document.getElementById('giftImageContainer');
+                if (container) {
+                    container.innerHTML = '';
+                }
+                document.getElementById('giftTitle').textContent = '';
+            });
+        }
+    });
+
+
+
+ </script>
         
         
     </div>

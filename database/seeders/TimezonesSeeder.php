@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Timezone;
 use DateTimeZone;
+use DateTime;
 use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -22,8 +23,12 @@ class TimezonesSeeder extends Seeder
 
         // Insert timezones
         foreach ($timezones as $index => $timezone) {
+            $datetime = new DateTime("now", new DateTimeZone($timezone));
+            $offsetInHours = $datetime->getOffset() / 3600;
+            $formattedOffset =  ($offsetInHours < 0 ? $offsetInHours : '+' . $offsetInHours);
             Timezone::create([
                 'name' => $timezone,
+                'offset' => $formattedOffset
             ]);
         }
     }

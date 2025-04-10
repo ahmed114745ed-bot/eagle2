@@ -162,7 +162,6 @@
                 <button
                     onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
-                <button onclick="showSection('live_stream_settings')"> {{ __('Live Stream settings') }}</button>
             </div>
         </div>
 
@@ -171,7 +170,7 @@
 
                 <h3> {{ __('Custom Background settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.room-settings.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form">
                         <label>{{ __('Cost of background request:') }} </label>
@@ -190,7 +189,7 @@
 
             <div id="additional_settings" class="settings-section">
                 <h3>{{ __('Additional settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
+                <form action="{{ route('admin.room-settings.store') }}" method="POST">
                     <div class="form">
                         @csrf
 
@@ -222,17 +221,6 @@
                 </form>
             </div>
 
-            <div id="live_stream_settings" class="settings-section">
-                <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    @csrf
-                    <div class="form">
-
-
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
         </div>
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
@@ -240,6 +228,7 @@
         </div>
         <!-- كود JavaScript -->
         <script>
+            showSection('custom_background_settings');
             document.addEventListener("DOMContentLoaded", function() {
                 // Function to get query parameter by name
                 function getQueryParam(name) {

@@ -80,7 +80,7 @@
 
     <div class="row justify-content-center">
         @foreach($coreWallets as $wallet)
-            <div class="col-md-6 col-lg-6 mb-4">
+            <div class="col-md-6 col-lg-6 mb-4 wallet_posation">
                 <div class="card shadow-lg position-relative border-0" style="border-radius: 15px; overflow: hidden;">
                     <!-- Edit Button -->
                     <a href="{{ admin_url('core-wallets/' . $wallet->id . '/edit') }}" 

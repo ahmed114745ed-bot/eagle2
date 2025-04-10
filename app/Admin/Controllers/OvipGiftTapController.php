@@ -10,11 +10,14 @@ use App\Helpers\Common;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
+use Encore\Admin\Widgets\Box;
 
-class OvipGiftController extends MainController
+
+class OvipGiftTapController extends MainController
 {
 
     use HasResourceActions;
@@ -36,17 +39,25 @@ class OvipGiftController extends MainController
         }
 
 
-        // Add the back button
+        return parent::index($content
+            ->title(trans('Privileges'))
+            ->row($buttonHTML)
+            ->row(function (Row $row) use ($ovip) {
+                $row->column(12, $this->tabsComponent($ovip->privilegs));
+            })
+            ->row(function (Row $row) use ($ovip) {
+                $row->column(12, $this->gridDynamic($ovip->level, $ovip->privilegs->first()->type));
+            }));
 
 
         // Dynamically add rows for each level
-        foreach ($ovip->privilegs as $privileg) {
-            $content = $content
-                ->header(trans('admin.index'))
+        // foreach ($ovip->privilegs as $privileg) {
+        //     $content = $content
+        //         ->header(trans('admin.index'))
 
-                ->row($buttonHTML);
-            $content->row($this->gridDynamic($ovip->level, $privileg->type, $privileg->name));
-        }
+        //         ->row($buttonHTML);
+        //     $content->row($this->gridDynamic($ovip->level, $privileg->type));
+        // }
 
         return $content;
     }
@@ -65,8 +76,9 @@ class OvipGiftController extends MainController
             ->body($this->form()->edit($id));
     }
 
-    protected function gridDynamic($level, $type, $name)
+    protected function gridDynamic($level, $firstType)
     {
+        $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
@@ -93,7 +105,8 @@ class OvipGiftController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->tools(function (Grid\Tools $tools) use ($level, $type, $name) {
+        $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
+            $level = $level ?? request('level');
             $url =    url('admin/ware-gift/' . $level . '/' . $type);
             $add = __('add');
 
@@ -102,7 +115,6 @@ class OvipGiftController extends MainController
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
-                <h3 style="margin-right: 10px;">{ $name}</h3>
 
             HTML;
             $tools->append($customButtonHTML);
@@ -206,6 +218,19 @@ class OvipGiftController extends MainController
         $form->number('num', __('num'));
 
         $form->saving(function (Form $form) {
+
+            $exists = Ware::where('level', $form->level)
+                ->where('type', $form->type)
+                ->exists();
+
+            if ($exists) {
+                $error = new \Illuminate\Support\MessageBag([
+                    'title' => 'Error',
+                    'message' => __('This level and type combination already exists'),
+                ]);
+
+                return back()->with(compact('error'));
+            }
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -221,13 +246,35 @@ class OvipGiftController extends MainController
         });
 
         $form->saved(function (Form $form) {
-            $level = $form->model()->level; // Get the saved model's ID
+            $level = $form->model()->level;
+            $type = $form->model()->type; // Get the saved model's ID
             $ovip = Ovip::where('level', $level)->first();
-            $url = url('admin/ovip-gift/' . $ovip->id);
+            $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
             return redirect()->to($url);
         });
 
 
         return $form;
+    }
+
+
+    private function tabsComponent($privileges)
+    {
+        $content = new Row();
+
+        // Fetch distinct privilege types and names
+        $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+
+        // Default to the first type if none is selected
+        $currentType = request()->get('type', $privilegeTypes->keys()->first());
+
+        $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
+            'types' => $privilegeTypes,
+            'currentType' => $currentType
+        ]));
+
+        $content->column(12, $box);
+
+        return $content;
     }
 }

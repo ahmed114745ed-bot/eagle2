@@ -55,7 +55,7 @@ class CoreWalletsController extends MainController
         foreach ($coreWallets as $index => $wallet) {
             $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
 
-            $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3">'; // Added padding for space
+            $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">'; // Added padding for space
             $form .= '<div class="card shadow-lg position-relative border-0" 
           style="border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
 

@@ -94,8 +94,8 @@ class VipDedicateAction extends Action
     public function form()
     {
         $this->hidden('id', __('id'))->attribute('id', 'vid');
-        $this->integer('days', 'days');
-        $this->text('user_uuid', 'user uuid');
+        $this->integer('days', __('days'));
+        $this->text('user_uuid', __('user uuid'));
     }
 
     public function html()

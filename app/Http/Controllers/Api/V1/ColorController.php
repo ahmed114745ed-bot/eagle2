@@ -27,6 +27,7 @@ class ColorController extends Controller
             // 'app_primary_color'=>Cache::get('app_primary_color', 'Default app_primary_color') ??'',
             // 'app_second_color'=>Cache::get('app_second_color', 'Default app_second_color')??'',
         ];
+        settings()->set('colors_updated_at', false);
         return Common::apiResponse (true,'',$data,200);
     }
 }

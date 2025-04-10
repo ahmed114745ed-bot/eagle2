@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\MomentGallery;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -35,6 +36,8 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use Encore\Admin\Auth\Permission;
+use Modules\Moment\Entities\Moment;
+use Modules\Reals\Entities\Real;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
@@ -362,52 +365,80 @@ class FreeUserController extends MainController
 
     public function show($id, Content $content)
     {
-        return $content->row(
-            function ($row) use ($id) {
-                $user = User::find($id);
-                if ($user) {
-                    $user->flowers = 0;
-                    $user->save();
-                }
-
-                $type = $user->type_user;
-                switch ($type) {
-                    case 0:
-                        $userType = __("User");
-                        break;
-                    case 1:
-                        $userType = __("Host");
-                        break;
-                    case 2:
-                        $userType = __("Host Agent");
-                        break;
-                    case 3:
-                        $userType = __("Shipping Agent");
-                        break;
-                    case 4:
-                        $userType = __("Resort & Shipping Agent");
-                        break;
-                    case 5:
-                        $userType = __("Admin");
-                        break;
-                    default:
-                        $userType = $type; // Keep the original value if no match is found
-                        break;
-                }
-                $row->column(12, view('admin.grid.users.show', compact('user')));
-                $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
-                $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
-                $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
-                $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
-                $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
-                $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
+        return $content->row(function ($row) use ($id) {
+            $user = User::find($id);
+            if ($user) {
+                $user->flowers = 0;
+                $user->save();
             }
-        )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
-            $row->column(12, $this->packList($id));
-        })
-            ->row("<h3>" . __('vips') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->vipList($id));
+
+            $type = $user->type_user;
+            $userType = match ($type) {
+                0 => __("User"),
+                1 => __("Host"),
+                2 => __("Host Agent"),
+                3 => __("Shipping Agent"),
+                4 => __("Resort & Shipping Agent"),
+                5 => __("Admin"),
+                default => $type,
+            };
+
+            // Info Boxes
+            $row->column(12, function ($column) use ($user, $userType) {
+                $column->row(view('admin.grid.users.show', compact('user')));
+
+                $column->row(function ($row) use ($user, $userType) {
+                    $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
+                    $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+                    $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('Worth')));
+                    $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('Diamonds')));
+                    $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('Coins')));
+                    $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('Type')));
+                });
             });
+
+            $row->column(12, function ($column) use ($id) {
+                $tab = new Tab();
+
+                Admin::style('
+                     .nav-tabs-custom>.tab-content {
+                         background-color: var(--box-background-color);
+                         border-color: var(--box-background-color);
+                     }
+                     .nav-tabs-custom>.nav-tabs {
+                        background-color: var(--box-background-color);
+                        border-color: var(--box-background-color);
+                     }
+                     .nav-tabs-custom > .nav-tabs > li {
+                        border: none;
+                        margin-right: 4px;
+                     }
+                     .nav-tabs-custom > .nav-tabs > li > a {
+                         color: white;
+                         padding: 10px 15px;
+                         left: 15px;
+                         transition: all 0.3s ease;
+                         border: none;
+                         outline: none;
+                     }
+                     .nav-tabs-custom > .nav-tabs > li.active > a {
+                         background-color: #ff9800;
+                         color: black !important;
+                         border: none;
+                     }
+                     .nav-tabs-custom > .nav-tabs > li > a:hover {
+                         background-color: #e68900;
+                         color: black !important;
+                     }
+                ');
+                $tab->add(__('Packs'), $this->packList($id)->render());
+                $tab->add(__('vips'), $this->vipList($id)->render());
+                $tab->add(__('Reals'), $this->realList($id)->render());
+                $tab->add(__('moments'), $this->momentList($id)->render());
+
+                $column->append($tab);
+            });
+        });
     }
 
     protected function packList($id)
@@ -511,6 +542,123 @@ class FreeUserController extends MainController
         $grid->disableFilter();
         $grid->disableRowSelector();
         $grid->disableExport();
+
+        return $grid;
+    }
+
+    protected function realList($userId): Grid
+    {
+        $grid = new Grid(new Real());
+
+        $grid->model()->where('user_id', $userId)->orderByDesc('created_at');
+
+        $grid->column('comment_num', __('Status'))->display(function () {
+            $like = count(@$this->likes);
+            $commentNum = count(@$this->comments);
+            return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
+        });
+
+        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+
+        $grid->column('video', __('Video'))->display(function () {
+            $videoPath = getDriverUrl().'/'.$this->url;
+            return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
+        });
+
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
+
+        Admin::script("
+    $(document).ready(function () {
+        $('.view-description').click(function (e) {
+            e.preventDefault();
+
+            var description = $(this).data('description');
+
+            $('#modalDescriptionTitle').text('Full Description');
+            $('#modalDescriptionContent').text(description);
+
+            $('#descriptionModal').modal('show');
+        });
+    });");
+
+        $grid->disableCreateButton();
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
+        $grid->disableExport();
+        $grid->disableFilter();
+
+        return $grid;
+    }
+
+    protected function momentList($userId): Grid
+    {
+        $grid = new Grid(new Moment());
+
+        // Filter the Moment records by the given user ID
+        $grid->model()->where('user_id', $userId)->orderByDesc('created_at');
+
+        // Display description with modal
+        $grid->column('description', __('Description'))->display(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
+            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+        });
+
+        // Display comments and likes
+        $grid->column('comment_num', __('Status'))->display(function () {
+            $likeCount = count(@$this->likes);
+            $commentCount = count(@$this->comments);
+            return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
+        });
+
+        // Display creation date
+        $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+
+        // Display images
+        $grid->column('img', __('Image'))->display(function () {
+            $id = $this->id;
+            $galleries = MomentGallery::where('moment_id', $id)->get();
+
+            if ($galleries->isEmpty()) {
+                return 'No Image';
+            }
+
+            $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
+
+            foreach ($galleries as $image) {
+                $imgUrl = getDriverUrl() . '/' . $image->image;
+
+                $html .= '<img src="' . $imgUrl . '"
+                         style="width: 100%; height: 200px; object-fit: cover;"
+                         data-original="' . $imgUrl . '"
+                         loading="lazy"
+                         class="gallery-image">';
+            }
+
+            $html .= '</div>';
+
+            // Show only the first image
+            $firstImageUrl = asset("images/moment.jpg");
+
+            $html .= '<img src="' . $firstImageUrl . '"
+                      style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
+                      onclick="document.querySelector(`#image-gallery-' . $id . ' img`).click()">';
+
+            Admin::script("
+            new Viewer(document.getElementById('image-gallery-$id'));
+        ");
+
+            return $html;
+        });
+        $grid->disableCreateButton();
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+        });
+        $grid->disableExport();
+        $grid->disableFilter();
 
         return $grid;
     }
