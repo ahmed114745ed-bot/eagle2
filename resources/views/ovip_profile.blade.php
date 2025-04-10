@@ -277,6 +277,10 @@
 }
     </style>
 </head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Then Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <body>
     <div class="main-content">
         <div class="container">
@@ -329,9 +333,6 @@
   
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Then Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
  <script>
 
@@ -431,6 +432,7 @@
 
  
     
+    // JavaScript
     function fetchGiftOvip(imgElement) {
         const level = imgElement.getAttribute('data-level');
         const type = imgElement.getAttribute('data-type');
