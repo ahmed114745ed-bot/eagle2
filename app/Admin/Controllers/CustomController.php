@@ -15,7 +15,11 @@ class CustomController extends MainController
      *
      * @var string
      */
-    protected $title = 'custom_page';
+    public function title()
+    {
+        return __('custom-page');
+    }
+    
     public  $permission_name = 'custom-page';
 
 

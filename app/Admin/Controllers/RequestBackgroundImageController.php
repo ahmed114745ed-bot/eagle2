@@ -253,9 +253,9 @@ class RequestBackgroundImageController extends MainController
     protected function form()
     {
         $form = new Form(new RequestBackgroundImage);
-        $form->display('ID');
+        $form->display(__('ID'));
         // $form->display('owner_room_id', 'owner_room_id');
-        $form->select('owner_room_id', __('admin.owner_room_id'))->options(function () {
+        $form->select('owner_room_id', __('owner room id'))->options(function () {
             $options = [];
             $users = User::query()->where('id', $this->owner_room_id)->get();
             foreach ($users as $cat) {
@@ -265,16 +265,16 @@ class RequestBackgroundImageController extends MainController
         })->ajax('/api/search/users2', 'id', 'name')->default(2)->creationRules('required');
         // $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
 
-        $form->image('img', 'img')->creationRules('required');
-        $form->select('status', 'status')->options(
+        $form->image('img', __('img'))->creationRules('required');
+        $form->select('status', __('status'))->options(
             [
                 0 => __('pending'),
                 1 => __('accepted'),
                 2 => __('denied')
             ]
         )->default(1);
-        $form->number("expair")->default(30);
-        $form->hidden("type")->default("admin");
+        $form->number(__('expair'))->default(30);
+        $form->hidden('type')->default("admin");
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 

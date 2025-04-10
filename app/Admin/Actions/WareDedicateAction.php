@@ -24,13 +24,14 @@ use Modules\Public\Http\Services\UpgradeServices;
 
 class WareDedicateAction extends Action
 {
-    public $name = 'Dedicate';
+    public $name;
     protected $selector = '.salary_action';
     public $id;
 
 
     public function __construct($id = 0)
     {
+        $this->name = __('dedicate');
         $this->id = $id;
         parent::__construct();
     }
@@ -114,8 +115,8 @@ class WareDedicateAction extends Action
     public function form()
     {
         $this->hidden('id', __('id'))->attribute('id', 'vid');
-        $this->integer('days', 'days');
-        $this->text('user_uuid', 'user uuid');
+        $this->integer('days', __('days'));
+        $this->text('user_uuid', __('user uuid'));
 
     }
 
