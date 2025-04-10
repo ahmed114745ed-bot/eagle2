@@ -37,6 +37,7 @@ class SettingsController extends Controller
         foreach ($data as $key => $value) {
             if ($value instanceof \Illuminate\Http\UploadedFile) {
                 $value = Common::upload('images', $value);
+                dd( $value);
             }
 
             if (!is_null($value)) {
