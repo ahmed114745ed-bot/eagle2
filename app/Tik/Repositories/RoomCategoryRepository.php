@@ -7,7 +7,7 @@ use App\Models\RoomCategory;
 class RoomCategoryRepository extends AbstractRepository
 {
 
-  
+
     /**
      * @param Model $model
      */
