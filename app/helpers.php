@@ -1,6 +1,7 @@
 <?php
 
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
+use \Firebase\JWT\JWT;
 
 if (!function_exists('agency_base_path')) {
     /**
@@ -46,16 +47,13 @@ if (!function_exists('agency_base_path')) {
 
     function generateRtmToken($userId, $expireTimeInSeconds = 3600) {
         $currentTime = time();
-        $privileges = [
-            "login" => $currentTime + $expireTimeInSeconds,
-        ];
-
+    
+        
         $payload = [
             "app_id" => env('AGORA_APP_ID'),
-            "user_id" => $userId,
+            "user_id" => 'user-' . 237,
             "iat" => $currentTime,
             "exp" => $currentTime + $expireTimeInSeconds,
-            "privileges" => $privileges,
         ];
 
         return JWT::encode($payload, env('AGORA_APP_CERTIFICATE'), 'HS256');

@@ -401,36 +401,66 @@ class FreeUserController extends MainController
                 $tab = new Tab();
 
                 Admin::style('
-                     .nav-tabs-custom>.tab-content {
-                         background-color: var(--box-background-color);
-                         border-color: var(--box-background-color);
-                     }
-                     .nav-tabs-custom>.nav-tabs {
-                        background-color: var(--box-background-color);
-                        border-color: var(--box-background-color);
-                     }
-                     .nav-tabs-custom > .nav-tabs > li {
-                        border: none;
-                        margin-right: 4px;
-                     }
-                     .nav-tabs-custom > .nav-tabs > li > a {
-                         color: white;
-                         padding: 10px 15px;
-                         left: 15px;
-                         transition: all 0.3s ease;
-                         border: none;
-                         outline: none;
-                     }
-                     .nav-tabs-custom > .nav-tabs > li.active > a {
-                         background-color: #ff9800;
-                         color: black !important;
-                         border: none;
-                     }
-                     .nav-tabs-custom > .nav-tabs > li > a:hover {
-                         background-color: #e68900;
-                         color: black !important;
-                     }
-                ');
+                            .nav-tabs-custom {
+                                background: transparent !important;
+                                box-shadow: none !important;
+                                border: none !important;
+                            }
+                            .nav-tabs-custom>.nav-tabs {
+                                background: transparent;
+                                border: none;
+                                display: flex;
+                                padding: 0;
+                                margin: 0;
+                                width: 100%;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li {
+                                flex: 1;
+                                border: none;
+                                margin: 0;
+                                padding: 0 2px;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li:first-child {
+                                padding-left: 0;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li:last-child {
+                                padding-right: 0;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li > a {
+                                background: #1e1e1e;
+                                color: white;
+                                padding: 8px 24px;
+                                border-radius: 4px;
+                                margin: 0;
+                                border: none;
+                                font-size: 14px;
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li.active > a {
+                                background: #ff9800;
+                                color: white;
+                                border: none;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li > a:hover {
+                                background: #ff9800;
+                                color: white;
+                                border: none;
+                            }
+                            .nav-tabs-custom>.tab-content {
+                                background: transparent;
+                                border: none;
+                                padding: 10px 0;
+                            }
+                           .nav-tabs-custom > .nav-tabs > li.pull-right.header {
+                                display: none !important;
+                            }
+
+                            .nav-tabs-custom > .nav-tabs > li.pull-right {
+                                display: none !important;
+                            }
+                        ');
                 $tab->add(__('Packs'), $this->packList($id)->render());
                 $tab->add(__('vips'), $this->vipList($id)->render());
                 $tab->add(__('Reals'), $this->realList($id)->render());
