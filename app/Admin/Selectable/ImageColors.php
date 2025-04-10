@@ -14,15 +14,15 @@ class ImageColors extends Selectable
 
     public function make()
     {
-        $this->column('id', 'ID');
-        $this->column('name', 'Name');
-        $this->column('image', 'image')->image('', 50);
-        $this->column('color', 'color')->display(function ($color) {
+        $this->column('id', __('ID'));
+        $this->column('name', __('Name'));
+        $this->column('image', __('image'))->image('', 50);
+        $this->column('color', __('color'))->display(function ($color) {
             return "<div style='width: 20px; height: 20px; background-color: {$color}; border: 1px solid #ccc;'></div>";
         });
 
         $this->filter(function (Filter $filter) {
-            $filter->like('name', 'Name');
+            $filter->like('name', __('Name'));
         });
     }
 }

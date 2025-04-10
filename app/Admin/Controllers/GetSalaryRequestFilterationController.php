@@ -54,11 +54,11 @@ class GetSalaryRequestFilterationController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->equal('status', __('Status'))->radio([
-                ''   => 'All',
+                ''   => __('All'),
                 1    => __("accept"),
                 2    => __("denied"),
             ]);
-        
+
         });
         $grid->id(__ ('ID'));
         $grid->column ('user.name',__ ('name'));
@@ -69,14 +69,14 @@ class GetSalaryRequestFilterationController extends MainController
         $grid->column ('country',__ ('country'));
         $grid->column('paymentWithDraw.name', 'طرق الدفع')->modal('البيانات', function ($model) {
             $data =$this->paymentWithDraw?->userWithdrawFields->where("user_id",$model->user_id);
-            $results = [];  
+            $results = [];
             if ($data != null) {
                 foreach ($data as $da) {
                     $key = $da->payment_withdraw_field->name ?? null;
                     $value = $da->value ?? null;
-            
-                    if ($key) {  
-                        $results[$key] = $value; 
+
+                    if ($key) {
+                        $results[$key] = $value;
                     }
                 }
             }
@@ -91,7 +91,7 @@ class GetSalaryRequestFilterationController extends MainController
                 2=>__ ('denied')
             ]
         );
-     
+
         $grid->column('created_at',trans('time'));
         $this->extendGrid ($grid);
         $grid->disableCreateButton();
@@ -198,7 +198,7 @@ class GetSalaryRequestFilterationController extends MainController
               $reason= $form->reason_rejected;
               $value=$form->model()->amount;
                 CustomNotification::acceptRequestToGetMony($user,2,$reason,$value);
-               
+
             }elseif ($form->status == 1) {
                 $value = $form->model()->amount;
                 UserSallary::updateOrCreate(
@@ -213,7 +213,7 @@ class GetSalaryRequestFilterationController extends MainController
                 );
                 CustomNotification::acceptRequestToGetMony($user,1,'',$value);
                 if($form->gmail) Notification::route('mail',  $form->gmail)->notify(new AcceptRequestToGetSalary());
-            }   
+            }
         });
 
 

@@ -25,21 +25,25 @@ class TargetPercentageController extends MainController
 
         $form = '<form method="POST" action="' . route($route) . '"  >';
         $form .= csrf_field();
-        $form .= '<h1  class="control-label text-center">Target Percentage</h1>';
+        $form .= '<h1  class="control-label text-center">' . __('Target Percentage') . '</h1>';
+
         if ($errorMessage) {
             $form .= '<div class="error-message" style="color: red; font-size: 20px; text-align: center;">' . $errorMessage . '</div>';
-             }
-        $form .= '<label for="hours" class="control-label">Hours:</label>';
-        $form .= '<input type="text" id="hours" name="hours" placeholder="hours" value="' . $hours .'"  class="inputs_cus_form">';
-        $form .= '<label for="days" class="control-label">Days:</label>';
-        $form .= '<input type="text" id="days" name="days" placeholder="days"  value="' . $days .'" class="inputs_cus_form">';
-        $form .= '<label for="moments" class="control-label">Moments:</label>';
-        $form .= '<input type="text" id="moments" name="moments" placeholder="moments" value="' . $moments .'" class="inputs_cus_form">';
-        $form .= '<label for="reels" class="control-label">Reels:</label>';
-        $form .= '<input type="text" id="reels" name="reels" placeholder="reels" value="' . $reels .'" class="inputs_cus_form">';
-
-        $form .= '<button type="submit" class="button_form_cus">Submit</button>';
-
+        }
+    
+        $form .= '<label for="hours" class="control-label">' . __('Hours') . ':</label>';
+        $form .= '<input type="text" id="hours" name="hours" placeholder="' . __('Hours') . '" value="' . $hours . '" class="inputs_cus_form">';
+    
+        $form .= '<label for="days" class="control-label">' . __('Days') . ':</label>';
+        $form .= '<input type="text" id="days" name="days" placeholder="' . __('Days') . '" value="' . $days . '" class="inputs_cus_form">';
+    
+        $form .= '<label for="moments" class="control-label">' . __('Moments') . ':</label>';
+        $form .= '<input type="text" id="moments" name="moments" placeholder="' . __('Moments') . '" value="' . $moments . '" class="inputs_cus_form">';
+    
+        $form .= '<label for="reels" class="control-label">' . __('Reels') . ':</label>';
+        $form .= '<input type="text" id="reels" name="reels" placeholder="' . __('Reels') . '" value="' . $reels . '" class="inputs_cus_form">';
+    
+        $form .= '<button type="submit" class="button_form_cus">' . __('Submit') . '</button>';
         $form .= '</form>';
 
 

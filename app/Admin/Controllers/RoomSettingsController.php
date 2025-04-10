@@ -2,15 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Setting;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
+use App\Http\Controllers\Controller;
+use App\Models\Config;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
-use Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
-class RoomSettingsController extends AdminController
+class RoomSettingsController extends Controller
 {
     /**
      * Title for current resource.
@@ -21,7 +19,7 @@ class RoomSettingsController extends AdminController
 
     public function index(Content $content)
     {
-        $settings = Setting::pluck('value', 'key')->toArray();
+        $settings = Config::pluck('value', 'name')->toArray();
         return $content
             ->header(__('Settings'))
             ->description('')
@@ -29,4 +27,16 @@ class RoomSettingsController extends AdminController
             ->body(view('admin.room_settings', compact('settings')));
     }
 
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->except('_token');
+
+        foreach ($data as $key => $value) {
+            Config::updateOrCreate(['name' => $key], ['value' => $value]);
+        }
+
+        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
+
+        return back();
+    }
 }

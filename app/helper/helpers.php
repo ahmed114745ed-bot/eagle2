@@ -440,8 +440,9 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
 
-            return "<div id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
-        } elseif ($imageType == 'mp4') {
+       return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
+        
+    } elseif ($imageType == 'mp4') {
             return "
                 <video width='$width' height='$height' controls autoplay muted loop>
                     <source src='$url' type='video/mp4'>
@@ -511,6 +512,7 @@ if (!function_exists('showSvgaImage')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
+    
         Admin::script("
                     var $model = new SVGA.Player('#$model');
                     $model.loops = 100;
@@ -533,7 +535,7 @@ if (!function_exists('showSvgaImage')) {
                         $model2.load('$url', function(videoItem) {
                             $model.setVideoItem(videoItem);
                             $model.startAnimation();
-
+                
                             $model.onFinished(function() {
                                 // Code for when the animation finishes
                             });

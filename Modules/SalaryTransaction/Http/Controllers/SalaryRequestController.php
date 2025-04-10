@@ -19,7 +19,7 @@ class SalaryRequestController extends MainController
      *
      * @var string
      */
-    
+
     public $permission_name = 'salary-request';
 
     public function index(Content $content)
@@ -106,7 +106,7 @@ class SalaryRequestController extends MainController
             } else {
                 $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
             }
-            
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -189,16 +189,16 @@ class SalaryRequestController extends MainController
         $grid->column('usd', __('Usd'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        
+
         $grid->column('coins', __('Coins'))->display(function ($coins) {
             $image = asset('images/coin.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center;'>
-                       
+
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
                     </div>";
@@ -214,12 +214,12 @@ class SalaryRequestController extends MainController
 
         //     return "
         //             <img src='$correctUrl' style='width: 80px; height: 80px; border-radius: 5px; cursor: pointer;' onclick='openModal(\"$correctUrl\")' />
-                    
+
         //             <div id='imageModal' class='modal' style='display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); text-align:center;'>
         //                 <span onclick='closeModal()' style='position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;'>&times;</span>
         //                 <img id='modalImage' style='display:block; margin:auto; max-width:90%; max-height:90%; margin-top:50px; border-radius:5px;' />
         //             </div>
-            
+
         //             <script>
         //                 function openModal(src) {
         //                     let modal = document.getElementById('imageModal');
@@ -227,11 +227,11 @@ class SalaryRequestController extends MainController
         //                     modal.style.display = 'block';
         //                     modalImage.src = src;
         //                 }
-            
+
         //                 function closeModal() {
         //                     document.getElementById('imageModal').style.display = 'none';
         //                 }
-            
+
         //                 // Close modal when clicking outside the image
         //                 document.getElementById('imageModal').addEventListener('click', function(event) {
         //                     if (event.target === this) {
@@ -261,6 +261,7 @@ class SalaryRequestController extends MainController
         });
 
         $grid->disableActions ();
+        $grid->disableCreateButton();
         return $grid;
     }
 

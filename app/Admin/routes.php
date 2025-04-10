@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -44,12 +45,13 @@ use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\CoreWalletsController;
+use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ReelSettingsController;
-use App\Admin\Controllers\ReportMomentController;
 
+use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
@@ -279,11 +281,11 @@ Route::group(
         $router->get('/soon', 'AllStatisticController@index2');
         $router->get('app-earned', 'AppEarnedController@index')->name('app-earned');
         $router->get('/custom-export-users', [
-            \App\Admin\Controllers\ExportController::class,
+            ExportController::class,
             'usersSallaryTargets'
         ])->name('custom-export-users');
         $router->get('/agency-export-report', [
-            \App\Admin\Controllers\ExportController::class,
+            ExportController::class,
             'usersAgencyTargets'
         ])->name('agency-export-report');
         $router->get('/dev', 'HomeController@devindex')->name('dev-home');
@@ -328,16 +330,16 @@ Route::group(
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
-            Route::get('ovip-gift/{ovip_id}/', [OvipGiftController::class, 'index']);
+            Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
 
-                Route::get('/{type}', [OvipGiftController::class, 'create']);
-                Route::post('/', [OvipGiftController::class, 'store']);
-                Route::get('/{id}/edit', [OvipGiftController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftController::class, 'destroy'])->where('id', '[0-9]+');
+                Route::get('/{type}', [OvipGiftTapController::class, 'create']);
+                Route::post('/', [OvipGiftTapController::class, 'store']);
+                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
