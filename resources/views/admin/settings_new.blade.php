@@ -698,7 +698,7 @@
 
                             <div class="form-group" id="background_image_group" style="display: none;">
                                 <label for="background_image">{{ __('Background Image') }}</label>
-                                <input type="file" id="background_image" class="form-control"
+                                <input type="file" id="background_image"name="app_background_image" class="form-control"
                                     onchange="updateBackgroundValue()">
                             </div>
                         </div>
