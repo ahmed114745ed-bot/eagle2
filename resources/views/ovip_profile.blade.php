@@ -277,9 +277,6 @@
 }
     </style>
 </head>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Then Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <body>
     <div class="main-content">
@@ -334,6 +331,7 @@
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
 
+  
  <script>
 
    
@@ -394,12 +392,18 @@
 
             if (typeof SVGA === 'undefined') {
                 const script = document.createElement('script');
+                const script1 = document.createElement('script');
+                const script2 = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+                script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+                script2.src = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js';
                 script.onload = function () {
                     console.log('✅ SVGA Loaded!');
                     initializeSvgaPlayer();
                 };
                 document.head.appendChild(script);
+                document.head.appendChild(script1);
+                document.head.appendChild(script2);
             } else {
                 initializeSvgaPlayer();
             }
