@@ -169,12 +169,14 @@ class RoomRepository extends AbstractRepository
                 ;
                 break;
             case 'following':
-               $result->whereIn('uid', function ($query) use ($user) {
-                    /* @var Builder $query*/
-                    $query->select('followed_user_id')
-                        ->from('follows')
-                        ->where('user_id', $user->id);
-                })
+            //    $result->whereIn('uid', function ($query) use ($user) {
+            //         /* @var Builder $query*/
+            //         $query->select('followed_user_id')
+            //             ->from('follows')
+            //             ->where('user_id', $user->id);
+            //     })
+                    $result->whereIn('uid', $user->followeds_ids())
+
                     ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session');
                   
@@ -182,10 +184,10 @@ class RoomRepository extends AbstractRepository
 
                 case 'friends':
                    
+
                     $result->whereIn('uid', $user->friends_ids())
                          ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                          ->orderByDesc('session');
-                       
                      break;
 
             case 'nearby':

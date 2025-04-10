@@ -41,7 +41,6 @@ class CoreWalletsController extends MainController
     public function index(Content $content)
     {
         $coreWallets = \App\Models\CoreWallets::whereIn('name', ['app_wallet', 'owner_wallet', 'game_wallet', 'lucky_box'])->get();
-
         $icons = [
             'app_wallet' => 'fa-solid fa-coins',       // Coins icon
             'owner_wallet' => 'fa-solid fa-user-tie',  // Business user icon
@@ -50,7 +49,7 @@ class CoreWalletsController extends MainController
         ];
 
         $form = '<div class="container mt-4">';
-        $form .= '<div class="row justify-content-center g-4">'; // Added Bootstrap gutter space
+        $form .= '<div class="row justify-content-center g-4 wallet_div">'; // Added Bootstrap gutter space
 
         foreach ($coreWallets as $index => $wallet) {
             $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
@@ -99,7 +98,7 @@ class CoreWalletsController extends MainController
 
         $form .= '</div>'; // End row
         $form .= '</div>'; // End container
-
+     
         return parent::index($content
             ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
