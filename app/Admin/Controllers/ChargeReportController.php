@@ -208,7 +208,7 @@ class ChargeReportController extends MainController
             ";
         });
 
-        $grid->column('created_at', __('hipping date'));
+        $grid->column('created_at', __('shipping date'));
 
         return $grid;
     }
@@ -298,7 +298,7 @@ class ChargeReportController extends MainController
             }
         });
 
-        $grid->column('created_at', __('hipping date'));
+        $grid->column('created_at', __('shipping date'));
         return $grid;
     }
 
@@ -385,7 +385,7 @@ class ChargeReportController extends MainController
 
             return $options[$value] ?? $value;
         });
-        $grid->column('created_at', __('hipping date'));
+        $grid->column('created_at', __('shipping date'));
         // $grid->column('action', __('action'))->display (function (){
         //     return '<a href="?name=in-app-purchas&id='.@$this->id.'" class="btn btn-xs btn-danger">'.__("Return").'</a>';
         // });
