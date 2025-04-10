@@ -28,6 +28,7 @@ class AgoraController extends Controller
             'expir' => 'nullable'
         ]);
         $user = $request->user();
+        $userId = 'user-' .  $user->id;
 
         if ($request->has('expir')) {
 
@@ -37,7 +38,7 @@ class AgoraController extends Controller
         }
 
         $token = generateRtcToken($request->channel, $user->id);
-        $rtmToken = generateRtmToken( $user->id);
+        $rtmToken = generateAgoraRtmToken( $request->channe ,$user->id);
         
 
         return Common::apiResponse(true, 'Success', [
