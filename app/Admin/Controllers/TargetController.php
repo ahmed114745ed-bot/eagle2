@@ -186,7 +186,8 @@ class TargetController extends MainController
         $form->number('days', __('days'));
         //        $form->text('img', 'img');
         $form->decimal('agency_share', __('agency share') . '(%)');
-        $form->html('', ('<h1>Reel</h1>'));
+        $form->html('<h1>' . __('Reel') . '</h1>');
+
         $form->hidden('reel', 'reel');
         $form->number('reel1', __('uploadReel'))->default(function ($form) {
             $reel = $form->model()->reel;
@@ -203,7 +204,7 @@ class TargetController extends MainController
 
             return @explode(',', $reel)[2] ?? 0;
         });
-        $form->html('', ('<h1>Moment</h1>'));
+        $form->html('<h1>' . __('Moment') . '</h1>');
         $form->hidden('moment', 'moment');
 
         $form->number('moment1', __('uploadMoment'))->default(function ($form) {

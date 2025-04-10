@@ -94,14 +94,13 @@ class AgencyJoinRequestController extends MainController
      */
     protected function grid()
     {
-
         $agency = Agency::query ()->where ('owner_id',Auth::id ())->first ();
         $grid = new Grid(new AgencyJoinRequest);
         $grid->model ()->where ('agency_id',@$agency->id)->orderByDesc ('id');
         $grid->filter (function (Grid\Filter $filter){
             $filter->expand();
             $filter->column(1/2, function ($filter) {
-                $filter->equal('status',__('status'))->select([0=>'pending',1=>'accepted',2=>'denied']);
+                $filter->equal('status', __( 'status'))->select([0 => __('pending'), 1 => __('accepted'), 2 => __('denied')]);
 
             });
         });

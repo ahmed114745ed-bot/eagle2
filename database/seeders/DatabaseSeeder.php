@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,7 +24,9 @@ class DatabaseSeeder extends Seeder
         // $this->call(AdminRoleUserSeeder::class);
         // $this->call(ConfigsSeeder::class);
         // $this->call(ConfigsSeeder::class);
-        $this->call(BanTypeSeeder::class);
-        $this->call(FriendsSeeder::class);
+//        $this->call(BanTypeSeeder::class);
+//        $this->call(FriendsSeeder::class);
+//        $this->call(LanguageSeeder::class);
+        $this->call(UserSeeder::class);
     }
 }

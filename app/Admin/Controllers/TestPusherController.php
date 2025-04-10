@@ -75,7 +75,7 @@ class TestPusherController extends MainController
                 2=>__ ('denied')
             ]
         );
-        $grid->column('change_status_admin_id',__('change status admin id'))->modal ('admin info',function ($model){
+        $grid->column('change_status_admin_id',__('change status admin id'))->modal (__('admin info'),function ($model){
             if ($model->change_status_admin_id){
                 return Common::getAdminShow ($model->change_status_admin_id);
             }

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!-- <html lang="{{ config('app.locale') }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"> -->
-<html lang="{{ config('app.locale') }}" >
+<html lang="{{ config('app.locale') }}" class="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
