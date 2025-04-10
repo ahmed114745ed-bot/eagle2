@@ -329,7 +329,9 @@
   
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
-    
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Then Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
  <script>
 
@@ -483,22 +485,8 @@
 
 
 
-   
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(initGiftModalHandler, 200);
-    });
-
-    $(document).on('pjax:complete', function () {
-        setTimeout(initGiftModalHandler, 200);
-    });
-
-
-
  </script>
         
-    
         
     </div>
 </body>
