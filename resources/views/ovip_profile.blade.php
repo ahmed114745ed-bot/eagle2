@@ -392,11 +392,8 @@
 
             if (typeof SVGA === 'undefined') {
                 const script = document.createElement('script');
-                const script1 = document.createElement('script');
-                const script2 = document.createElement('script');
+             
                 script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
-                script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
-                script2.src = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js';
                 script.onload = function () {
                     console.log('✅ SVGA Loaded!');
                     initializeSvgaPlayer();
@@ -434,9 +431,30 @@
 
 
 
- 
-    
-    // JavaScript
+    const script1 = document.createElement('script');
+    const script2 = document.createElement('script');
+
+    script1.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    script2.src = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js';
+
+    // Wait for jQuery and Bootstrap to load
+    script2.onload = function () {
+        console.log('✅ Bootstrap Loaded!');
+        // Now you can safely initialize any functionality depending on Bootstrap
+        initializeSvgaPlayer(); // Initialize SVGA player (this can also be triggered after SVGA script loads)
+    };
+
+    // Load the first script (jQuery)
+    script1.onload = function () {
+        console.log('✅ jQuery Loaded!');
+        // Now jQuery is available
+        document.body.appendChild(script2); // Now append Bootstrap after jQuery is loaded
+    };
+
+    // Append jQuery first
+    document.body.appendChild(script1);
+
+    // Function to fetch and display the gift (image or animation)
     function fetchGiftOvip(imgElement) {
         const level = imgElement.getAttribute('data-level');
         const type = imgElement.getAttribute('data-type');
@@ -453,15 +471,15 @@
                     throw new Error(data.error);
                 }
                 if (data && data.image_url) {
-                    // Set the title
+                    // Set the title if available
                     if (data.title) {
                         document.getElementById('giftTitle').textContent = data.title;
                     }
-                    
-                    // Show image
-                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas',200,200);
-                    
-                    // Show modal
+
+                    // Show the image or animation
+                    showImageAndMaybeInitSVGA(data.image_url, 'giftImageContainer', 'giftSvgaCanvas', 200, 200);
+
+                    // Show the modal using Bootstrap
                     const modal = new bootstrap.Modal(document.getElementById('giftModal'));
                     $('#giftModal').modal('show');
                 } else {
@@ -474,8 +492,8 @@
             });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize modals if needed
+    // Initialize modal cleanup when the modal is hidden
+    document.addEventListener('DOMContentLoaded', function () {
         var modalEl = document.getElementById('giftModal');
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', function () {
