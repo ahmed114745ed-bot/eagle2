@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Column;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\CoinLog;
@@ -33,11 +34,31 @@ class ChargeReportController extends MainController
         return parent::index($content
             ->title(trans("Reports"))
             ->row(function (Row $row) {
-                $row->column(12, $this->tabsComponent());
-            })
-            ->row(function (Row $row) {
-                $row->column(12, $this->grid());
+                $row->column(12, function (Column $column) {
+                    $box = new Box();
+                    $box->title(__('Fields'));
+                    $box->content($this->combinedContent());
+                    $column->append($box);
+                });
             }));
+
+
+//        return parent::index($content
+//            ->title(trans("Reports"))
+//            ->row(function (Row $row) {
+//                $row->column(12, $this->tabsComponent());
+//            })
+//            ->row(function (Row $row) {
+//                $row->column(12, $this->grid());
+//            }));
+    }
+
+    private function combinedContent()
+    {
+        $tabs = $this->tabsComponent();
+        $grid = $this->grid()->render(); // Ensure the grid is rendered
+
+        return "<div style='margin-bottom: 20px;'>{$tabs}</div>{$grid}";
     }
 
     protected function grid()
@@ -402,21 +423,24 @@ class ChargeReportController extends MainController
 
     private function tabsComponent()
     {
+        return view('admin.grid.common.report.charge')->render();
+
         $content = new Row();
 
         $box = (new Box(
             title: __('Fields'),
             content: view('admin.grid.common.report.charge')
-        ));
-        $content->column(12, $box);
-        $box = (new Box(
-            title: __('Details'),
-            content: view('admin.grid.common.report.show-statistics-for-charge')
         ))->collapsable();
-        $content->column(12, $box);
+//        $content->column(12, $box);
+//        $content->column(12, $box);
+//        $box = (new Box(
+//            title: __('Details'),
+//            content: view('admin.grid.common.report.show-statistics-for-charge')
+//        ))->collapsable();
+//        $content->column(12, $box);
 
 
-        return $content;
+        return $box;
     }
 }
 
