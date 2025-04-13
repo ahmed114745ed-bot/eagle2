@@ -22,39 +22,39 @@ class ChargeAction extends Action
 
     public function handle(Request $request)
     {
-        if ($request->user_type != 'dash') {
-            $user = $this->getUser($request);
-            if (!$user) {
-                return $this->response()->error(__('user not found'))->refresh();
-            }
+//        if ($request->user_type != 'dash') {
+//            $user = $this->getUser($request);
+//            if (!$user) {
+//                return $this->response()->error(__('user not found'))->refresh();
+//            }
+//
+//            if ($this->isInvalidAmount($request->amount)) {
+//                return $this->response()->error(__('amount must be more than 10'))->refresh();
+//            }
+//        }
 
-            if ($this->isInvalidAmount($request->amount)) {
-                return $this->response()->error(__('amount must be more than 10'))->refresh();
-            }
-        }
-
-        if ($request->user_type == 'dash') {
+//        if ($request->user_type == 'dash') {
             $agency = $this->getAgency($request->user_id);
-            if (!$agency) {
-                return $this->response()->error(__('api_responses.agency'))->refresh();
-            }
-            if ($agency->is_frozen == 1) {
-                return $this->response()->error(__('api_responses.frozen'))->refresh();
-            }
-            $user = $agency->owner;
-            return $this->handleAgencyCharge($request, $agency, $user);
+        if (!$agency) {
+            return $this->response()->error(__('api_responses.agency'))->refresh();
         }
+        if ($agency->is_frozen == 1) {
+            return $this->response()->error(__('api_responses.frozen'))->refresh();
+        }
+        $user = $agency->owner;
+        return $this->handleAgencyCharge($request, $agency, $user);
+//        }
 
-        return $this->handleUserCharge($request, $user);
+//        return $this->handleUserCharge($request, $user);
     }
 
     private function getUser(Request $request)
     {
-        if ($request->user_type == 'dashdash') {
-            return $request->id_type == '1'
-                ? User::query()->searchByUuid($request->user_id)->first()
-                : User::query()->find($request->user_id);
-        }
+//        if ($request->user_type == 'dashdash') {
+//            return $request->id_type == '1'
+//                ? User::query()->searchByUuid($request->user_id)->first()
+//                : User::query()->find($request->user_id);
+//        }
 
         return $request->id_type == '1'
             ? User::query()->where('uuid', $request->user_id)->first()
@@ -135,12 +135,12 @@ class ChargeAction extends Action
     public function form()
     {
         $this->name = __('Charge');
-        $this->hidden('charger_id')->value(Auth::id());
+        $this->hidden('user_id')->value(Auth::id());
         // $this->hidden('charger_type')->value('dash');
-        $this->text('user_id', __('User ID / Agency ID'));
-        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
+//        $this->text('user_id', __('User ID / Agency ID'));
+//        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
+//        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
         $this->text('amount', __('Amount'));
         $this->hidden('amount_type')->value(1);
     }
@@ -149,7 +149,7 @@ class ChargeAction extends Action
     {
         $title = __('dashboard.add_coins');
         return <<<HTML
-            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" 
+            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white"
        style="background-color: #28a745; border-color: #28a745; color: white;">
         {$title}
     </a>

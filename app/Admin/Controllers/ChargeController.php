@@ -179,38 +179,38 @@ class ChargeController extends MainController
     {
         $grid = new Grid(new Agency());
         $grid->model()->where("shipping_agency", 1)->orderByDesc('id');
-        
+
         $grid->id(__('ID'));
-        
+
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
                 $path = @$this->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-    
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-    
+
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <span>$name</span>
                 </div>";
             });
-        
+
         $grid->column('owner.name', trans('owner'))
             ->display(function ($name) {
                 $uid = @$this->owner->uuid;
                 $path = @$this->owner->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-    
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
-    
+
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
                 $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
                 return "
@@ -226,7 +226,8 @@ class ChargeController extends MainController
             });
             $grid->column('actions', __('Actions'))
             ->display(function () {
-                return (new ChargeAction())->render();
+                $agency_id = $this->id;
+                return (new ChargeAction())->render(['agency_id' => $agency_id]);
             })
             ->style('white-space: nowrap; width: 100px;');
         $grid->disableCreateButton();
