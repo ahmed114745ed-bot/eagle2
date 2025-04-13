@@ -30,7 +30,7 @@ class SettingsController extends Controller
         $data = $request->except('_token');
         
         // Check for active targets before updating shipping coins
-        if ($request->has('shipping_coins')) {
+        if ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) {
             $target = Target::first();
             $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
             
