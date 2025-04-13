@@ -1485,7 +1485,7 @@
   "update wares dedicate": "Eşyaların Özelleştirmesini Güncelle",
   "update wares vips": "VIP Eşyalarını Güncelle",
   "update weekly star": "Haftalık Yıldızı Güncelle",
-  "update weekly_cp": "Haftalık CP'yi Güncelle",
+  "update weekly_cp": "Haftalık CP 'yi Güncelle",
   "update weekly_star_rewards": "Haftalık Yıldız Ödüllerini Güncelle",
   "update withdraw type": "Çekim Türünü Güncelle",
   "User setting": "Kullanıcı Ayarları",
@@ -1938,8 +1938,16 @@
   "shipping date": "gönderim tarihi",
   "Agency Coins": "Nakliye Jetonları",
   "User Coins": "Kullanıcı Jetonları",
-  "Charges settings": "Şarj Ayarları",
-  "charges-settings": "Şarj Ayarları"
+  "Charges settings": "Ücret Ayarları",
+  "Brand settings": "Marka Ayarları",
+  "Agency Coins": "Ajans Parası",
+  "User Coins": "Kullanıcı Parası",
+  "save": "Kaydet",
+  "Confirm Update": "Güncellemeyi Onayla",
+  "Are you sure you want to update the target settings? This action cannot be undone.": "Hedef ayarlarını güncellemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+  "Cancel": "İptal",
+  "Yes, update": "Evet, güncelle",
+  "We can`t update the target system right now because some users still have active targets.": "Bazı kullanıcıların hala aktif hedefleri olduğu için hedef sistemini şu anda güncelleyemiyoruz"
 
 
 }
