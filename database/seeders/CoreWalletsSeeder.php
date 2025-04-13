@@ -13,12 +13,27 @@ class CoreWalletsSeeder extends Seeder
      */
     public function run(): void
     {
-        $walletNames = ['app_wallet', 'owner_wallet', 'game_wallet', 'lucky_box'];
+        $walletNames = [
+            'app_wallet',
+            'owner_wallet',
+            'game_wallet',
+            'lucky_box',
+            'agency',
+            'host_agency',
+            'lucky_gifts',
+            'chinese_games',
+            'games',
+            'shipping_agents',
+            'payment_gateways',
+            'mall',
+            'vip',
+            'ads'
+        ];
 
         foreach ($walletNames as $name) {
             CoreWallets::firstOrCreate(
-                ['name' => $name], 
-                ['name' => $name]  
+                ['name' => $name],
+                ['name' => $name]
             );
         }
     }
