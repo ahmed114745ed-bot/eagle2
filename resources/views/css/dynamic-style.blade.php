@@ -155,6 +155,10 @@
         background-color: var(--second-alpha) !important;
     }
 
+    .rtl .input-group .form-control {
+        float: right;
+    }
+
     .box-footer {
         background-color: var(--second-color) !important;
         border-top: 1px solid var(--second-alpha) !important;
@@ -631,9 +635,8 @@
 
             }
 
-
            .rtl .form-horizontal .box-footer .btn-group {
-                float: right !important;
+                float: right;
             }
             .rtl .content-wrapper-rtl{
                 margin-right: 42px !important;

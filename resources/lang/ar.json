@@ -571,8 +571,8 @@
     "user_count": "عدد المستخدين",
     "percentage-target": "النسبة المستهدفة",
     "charges reports": "تقارير الشحن",
-    "dash_repo": "شحن داشبورد",
-    "app_repo": "شحن عبر التطبيق",
+    "dash_repo": "شحن النظام",
+    "app_repo": "شحن وكالات الشحن",
     "payment gateway": "بوابات دفع",
     "sendTo": "المرسل اليه",
     "parent-users": "دعوات الانضمام",
@@ -1985,9 +1985,9 @@
     "Search by name , UUID , nickname and email": "البحث بالاسم أو UUID أو اللقب أو البريد الإلكتروني",
     "admin owner room id": "  admin owner room id",
     "transaction id": "معرف العملية",
-  "recipient": "االمستلم",
-  "amount $": "المبلغ $",
-  "shipping date": "تاريخ الشحن"
+    "recipient": "االمستلم",
+    "amount $": "المبلغ $",
+    "shipping date": "تاريخ الشحن"
 
 
 
