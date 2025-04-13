@@ -171,42 +171,45 @@ class TargetController extends MainController
         $form->decimal('usd', __('Percentage'))
             ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
         $form->html('
-        <div class="form-group form-horizontal">
-            <div class="col-sm-8 box box-solid box-default no-margin">
-                <input type="hidden" id="agency_share_input" name="agency_share" value="">
-                <div id="agency_share_display" class="box-body">0.00</div>
+    <div class="form-group form-horizontal">
+        <div class="col-sm-8 no-margin">
+            <input type="hidden" id="agency_share_input" name="agency_share" value="">
+            <div id="agency_share_display" class="input-group">
+                <input type="text" class="form-control usd" value="0.00" readonly>
             </div>
-                <span id="agency_amount">' . __('Amount will be: ')  .' USD</span>
+            <span id="agency_amount" class="help-block">
+                <i class="fa fa-info-circle"></i> ' . __('Amount will be: ') . ' USD
+            </span>
         </div>
-        <script>
-            $(document).ready(function() {
-                var coins = ' . $coins . ';
-                
-                function calculateUsdAmount() {
-                    var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
-                    var percentage = parseFloat($("input[name=\'usd\']").val()) || 0;
-                    var totalUsd = diamonds / coins;
+    </div>
+    <script>
+        $(document).ready(function() {
+            var coins = ' . $coins . ';
 
-                    var userAmount = (totalUsd * percentage / 100).toFixed(2);
-                    var agencyAmount = (totalUsd - userAmount).toFixed(2);
-                    $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
-                    $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
-                }
-                
-                $("input[name=\'diamonds\']").on("input", function() {
-                    calculateUsdAmount();
-                });
-                
-                $("input[name=\'usd\']").on("input", function() {
-                    var percentage = parseFloat($(this).val()) || 0;
-                    var agencyShare = 100 - percentage;
-                    $("#agency_share_display").text(agencyShare.toFixed(2));
-                    $("#agency_share_input").val(agencyShare.toFixed(2));
-                    calculateUsdAmount();
-                });
+            function calculateUsdAmount() {
+                var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
+                var percentage = parseFloat($("input[name=\'usd\']").val()) || 0;
+                var totalUsd = diamonds / coins;
+
+                var userAmount = (totalUsd * percentage / 100).toFixed(2);
+                var agencyAmount = (totalUsd - userAmount).toFixed(2);
+                $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
+                $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
+            }
+
+            $("input[name=\'diamonds\']").on("input", function() {
+                calculateUsdAmount();
             });
-        </script>', __('agency share') . '(%)' );
-        
+
+            $("input[name=\'usd\']").on("input", function() {
+                var percentage = parseFloat($(this).val()) || 0;
+                var agencyShare = 100 - percentage;
+                $("#agency_share_display").text(agencyShare.toFixed(2));
+                $("#agency_share_input").val(agencyShare.toFixed(2));
+                calculateUsdAmount();
+            });
+        });
+    </script>', __('agency share') . '(%)' );
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');
