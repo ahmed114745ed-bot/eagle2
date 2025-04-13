@@ -208,7 +208,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
                 Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
-                Route::post('/yellow-banner', [RoomController::class, 'sendComment',]);
+                Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {
