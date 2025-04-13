@@ -928,7 +928,7 @@
     "Browse Coin Logs": "استعراض سجلات العملات",
     "Browse Coins": "استعراض العملات",
     "browse color": "استعراض الألوان",
-    "Browse Config": "استعراض الإعدادات",
+    "browse Config": "استعراض الإعدادات",
     "browse core wallets": "استعراض المحافظ الأساسية",
     "Browse Country": "استعراض الدول",
     "Browse CP": "استعراض CP",
@@ -1987,7 +1987,12 @@
     "transaction id": "معرف العملية", 
   "recipient": "االمستلم",
   "amount usd": "المبلغ $",
-  "shipping date": "تاريخ الشحن"
+  "shipping date": "تاريخ الشحن",
+  "Agency Coins": "عملات الوكالة",
+  "User Coins": "عملات المستخدم",
+  "Charges settings": "إعدادات الشحنات",
+  "charges-settings": "إعدادات الشحنات"
+
 
 
 

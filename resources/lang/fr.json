@@ -1,4 +1,3 @@
-
 {
     "Id": "Id",
     "ID": "ID",
@@ -217,6 +216,7 @@
     "cashing": "Encaissement",
     "agent": "Agent",
     "image Id": "ID de l'image",
+    "Charges settings": "Paramètres de charges",
 
 
   

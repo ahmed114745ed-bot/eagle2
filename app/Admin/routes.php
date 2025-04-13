@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -460,6 +461,8 @@ Route::group(
         $router->resource('languages', LanguageController::class);
         $router->resource('settings', SettingController::class);
         $router->resource('room-settings', RoomSettingsController::class);
+        $router->resource('charges-settings', ChargesSettingController::class);
+
 
         $router->resource('notification-templates', NotificationsTemplatesController::class);
        // Route::get('ware-management', [WareTabController::class, 'index']);
