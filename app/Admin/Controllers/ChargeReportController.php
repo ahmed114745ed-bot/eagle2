@@ -167,7 +167,7 @@ class ChargeReportController extends MainController
         //    return number_format($this->amount + $this->balance_before);
         // });
 
-        $grid->column('usd', __('amount usd'))->display(function ($coin) {
+        $grid->column('usd', __('amount $'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>

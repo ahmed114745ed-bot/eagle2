@@ -1986,7 +1986,7 @@
     "admin owner room id": "  admin owner room id",
     "transaction id": "معرف العملية",
   "recipient": "االمستلم",
-  "amount usd": "المبلغ $",
+  "amount $": "المبلغ $",
   "shipping date": "تاريخ الشحن"
 
 
