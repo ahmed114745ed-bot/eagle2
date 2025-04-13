@@ -625,6 +625,15 @@
      "User Info":"User Info",
      "user_uuid":"user uuid",
      "Normal":"Normal",
-     "charges-settings": "Charges Settings"
-
+     "charges-settings": "Charges Settings",
+     "Charges settings": "Charges Settings",
+     "Brand settings": "Brand Settings",
+     "Agency Coins": "Agency Coins",
+     "User Coins": "User Coins",
+     "save": "Save",
+     "Confirm Update": "Confirm Update",
+     "Are you sure you want to update the target settings? This action cannot be undone.": "Are you sure you want to update the target settings? This action cannot be undone.",
+     "Cancel": "Cancel",
+     "Yes, update": "Yes, update",
+     "We can`t update the target system right now because some users still have active targets.": "We can't update the target system right now because some users still have active targets."
 }

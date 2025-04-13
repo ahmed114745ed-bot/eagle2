@@ -928,7 +928,7 @@
     "Browse Coin Logs": "استعراض سجلات العملات",
     "Browse Coins": "استعراض العملات",
     "browse color": "استعراض الألوان",
-    "Browse Config": "استعراض الإعدادات",
+    "browse Config": "استعراض الإعدادات",
     "browse core wallets": "استعراض المحافظ الأساسية",
     "Browse Country": "استعراض الدول",
     "Browse CP": "استعراض CP",
@@ -1987,7 +1987,17 @@
     "transaction id": "معرف العملية",
   "recipient": "االمستلم",
   "amount $": "المبلغ $",
-  "shipping date": "تاريخ الشحن"
+  "shipping date": "تاريخ الشحن",
+  "Charges settings": "إعدادات الرسوم",
+  "Brand settings": "إعدادات العلامة التجارية",
+  "Agency Coins": "عملات الوكالة",
+  "User Coins": "عملات المستخدم",
+  "save": "حفظ",
+  "Confirm Update": "تأكيد التحديث",
+  "Are you sure you want to update the target settings? This action cannot be undone.": "هل أنت متأكد أنك تريد تحديث إعدادات الهدف؟ لا يمكن التراجع عن هذا الإجراء.",
+  "Cancel": "إلغاء",
+  "Yes, update": "نعم، قم بالتحديث",
+  "We can`t update the target system right now because some users still have active targets.": "لا يمكن تحديث نظام الأهداف الآن لأن بعض المستخدمين لا يزال لديهم أهداف نشطة"
 
 
 
