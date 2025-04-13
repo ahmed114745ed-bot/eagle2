@@ -175,7 +175,8 @@ class ChargeReportController extends MainController
                     </div>";
         });
 
-        $grid->column('balance_before', __("amount"))->display(function ($coin) {
+        $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+        $grid->column('balance_before', __('Amount').' '."<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")->display(function () {
             $balance_after = $this->amount + $this->balance_before;
             $icon = asset('images/coin.png'); // أيقونة نزول إذا كان الرصيد بعد أقل من قبل
 
@@ -197,16 +198,16 @@ class ChargeReportController extends MainController
         //     <img src='{$icon}' alt='USD' width='20' height='20'>
         //     </div>";
         // });
-        $grid->column('usd', __('dollar'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
-        });
+//        $grid->column('usd', __('dollar'))->display(function ($coin) {
+//            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+//            return "
+//                <div style='display: flex; align-items: center; gap: 5px;'>
+//                    <span>" . number_format($coin) . "</span>
+//                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+//
+//                </div>
+//            ";
+//        });
 
         $grid->column('created_at', __('shipping date'));
 
