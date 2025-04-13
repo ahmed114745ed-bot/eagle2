@@ -1,6 +1,9 @@
 @php
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
+    $user_coinsConfig = App\Models\Config::where ('name', '=','one_usd_value_in_coins')->first();
+    $shipping_coins = cache()->get('shipping_coins', $settings['shipping_coins'] ?? '');
+    $user_coins = cache()->get('user_coins', $user_coinsConfig['value'] ?? '');
 
 @endphp
 
@@ -480,7 +483,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Agency Coins') }} </label>
-                                <input type="text" name="shipping_coins" value="{{ $settings['shipping_coins'] ?? '' }}"
+                                <input type="text" name="shipping_coins" value="{{ $shipping_coins }}"
                                     class="form-control">
                             </div>
                         </div>
@@ -488,7 +491,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('User Coins') }} </label>
-                                <input type="text" name="user_coins" value="{{ $settings['user_coins'] ?? '' }}"
+                                <input type="text" name="user_coins" value="{{ $user_coins }}"
                                     class="form-control">
                             </div>
                         </div>
