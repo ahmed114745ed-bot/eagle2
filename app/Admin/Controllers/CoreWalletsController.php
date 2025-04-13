@@ -40,7 +40,7 @@ class CoreWalletsController extends MainController
 
     public function index(Content $content)
     {
-        $coreWallets = \App\Models\CoreWallets::whereIn('name', ['app_wallet', 'owner_wallet', 'game_wallet', 'lucky_box'])->get();
+        $coreWallets = CoreWallets::get();
         $icons = [
             'app_wallet' => 'fa-solid fa-coins',       // Coins icon
             'owner_wallet' => 'fa-solid fa-user-tie',  // Business user icon
@@ -55,7 +55,7 @@ class CoreWalletsController extends MainController
             $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
 
             $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">'; // Added padding for space
-            $form .= '<div class="card shadow-lg position-relative border-0" 
+            $form .= '<div class="card shadow-lg position-relative border-0"
           style="border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
 
 
@@ -65,11 +65,11 @@ class CoreWalletsController extends MainController
               </style>';
 
             // Edit Button
-            $form .= '<a  href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '" 
-            class="btn btn-primary bg-primary position-absolute top-0 end-0 m-2 rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+            $form .= '<a  href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '"
+            class="btn btn-primary bg-primary position-absolute top-0 end-0 m-2 rounded-circle shadow-lg d-flex align-items-center justify-content-center"
             style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color:rgb(255, 255, 255); font-size: 2rem;"
             data-bs-toggle="tooltip" data-bs-placement="top" title="' . __('Edit') . '">
-            <span class="fa-solid">' . __('Edit') . '</span> 
+            <span class="fa-solid">' . __('Edit') . '</span>
             </a>';
 
             // Card Body
@@ -98,7 +98,7 @@ class CoreWalletsController extends MainController
 
         $form .= '</div>'; // End row
         $form .= '</div>'; // End container
-     
+
         return parent::index($content
             ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
