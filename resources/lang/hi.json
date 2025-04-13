@@ -1080,7 +1080,11 @@
      "transaction id": "लेनदेन आईडी",
   "recipient": "प्राप्तकर्ता",
   "amount usd": "राशि (USD)",
-  "shipping date": "शिपिंग तिथि"
+  "shipping date": "शिपिंग तिथि",
+  "Agency Coins": "शिपिंग सिक्के",
+  "User Coins": "उपयोगकर्ता सिक्के",
+  "Charges settings": "शुल्क सेटिंग्स",
+  "charges-settings": "शुल्क सेटिंग्स"
 
 
 

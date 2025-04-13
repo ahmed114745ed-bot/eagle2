@@ -903,7 +903,7 @@
     "Browse Coin Logs": "Coin Kayıtlarını Gözden Geçir",
     "Browse Coins": "Coin'leri Gözden Geçir",
     "browse color": "Renkleri Gözden Geçir",
-    "Browse Config": "Yapılandırmaları Gözden Geçir",
+    "browse Config": "Yapılandırmaları Gözden Geçir",
     "browse core wallets": "Ana Cüzdanları Gözden Geçir",
     "Browse Country": "Ülkeleri Gözden Geçir",
     "Browse CP": "CP'yi Gözden Geçir",
@@ -1935,7 +1935,11 @@
     "Search by name , UUID , nickname and email": "İsim, UUID, takma ad ve e-posta ile ara","transaction id": "işlem kimliği",
   "recipient": "alıcı",
   "amount usd": "tutar (USD)",
-  "shipping date": "gönderim tarihi"
+  "shipping date": "gönderim tarihi",
+  "Agency Coins": "Nakliye Jetonları",
+  "User Coins": "Kullanıcı Jetonları",
+  "Charges settings": "Şarj Ayarları",
+  "charges-settings": "Şarj Ayarları"
 
 
 }
