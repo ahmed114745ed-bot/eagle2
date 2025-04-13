@@ -51,6 +51,7 @@
             @endphp
             @for($i = 1; $i < count($segments); $i++)
                 @php
+                dd("dsdsds");
                     $segment = is_array($segments[$i]) ? implode('/', $segments[$i]) : $segments[$i];
                     $formatted = Str::of($segment)->replace('-', ' ')->ucfirst();
                 @endphp
