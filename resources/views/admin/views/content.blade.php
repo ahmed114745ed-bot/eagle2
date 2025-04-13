@@ -47,11 +47,14 @@
             </li>
             @php
                 use Illuminate\Support\Str;
+                $segments = Request::segments();
             @endphp
-            @for($i = 2; $i <= count(Request::segments()); $i++)
-                <li>
-                    {{ ucfirst(Str::of(Request::segment($i))->replace('-', ' ')) }}
-                </li>
+            @for($i = 1; $i < count($segments); $i++)
+                @php
+                    $segment = is_array($segments[$i]) ? implode('/', $segments[$i]) : $segments[$i];
+                    $formatted = Str::of($segment)->replace('-', ' ')->ucfirst();
+                @endphp
+                <li>{{ $formatted }}</li>
             @endfor
         </ol>
         @endif
