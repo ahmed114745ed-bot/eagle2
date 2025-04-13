@@ -56,7 +56,7 @@ class ChargeReportController extends MainController
     private function combinedContent()
     {
         $tabs = $this->tabsComponent();
-        $grid = $this->grid()->render(); // Ensure the grid is rendered
+        $grid = $this->grid()->render();
 
         return "<div style='margin-bottom: 20px;'>{$tabs}</div>{$grid}";
     }
