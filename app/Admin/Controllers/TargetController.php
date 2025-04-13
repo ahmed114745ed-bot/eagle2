@@ -204,7 +204,7 @@ class TargetController extends MainController
             $("input[name=\'usd\']").on("input", function() {
                 var percentage = parseFloat($(this).val()) || 0;
                 var agencyShare = 100 - percentage;
-                $("#agency_share_display").text(agencyShare.toFixed(2));
+                $("#agency_share_display input").val(agencyShare.toFixed(2));
                 $("#agency_share_input").val(agencyShare.toFixed(2));
                 calculateUsdAmount();
             });
