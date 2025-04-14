@@ -132,7 +132,7 @@ class ChargeReportController extends MainController
 
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
-            if ($charger_type == "dash") {
+            if (request("name") == "dash") {
                 $name = @$this->admin_user->name ?? '';
                 $uuid = @$this->admin_user->id;
                 $path = @$this->admin_user->avatar;
