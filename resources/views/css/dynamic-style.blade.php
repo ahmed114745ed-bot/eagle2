@@ -772,6 +772,10 @@
         }
     }
 
+    .rtl [class*="col-md-"] {
+        float: right;
+    }
+
 
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);

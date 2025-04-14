@@ -1,24 +1,40 @@
 <style>
-.nav-pills .active {
-    background-color: #fe9127 !important;
-    color: white !important;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
+    .nav-pills .active {
+        background-color: #fe9127 !important;
+        color: white !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
 
-.nav-pills .active::before {
-    content: none !important;
-}
+    .nav-pills .active::before {
+        content: none !important;
+    }
 
-.nav-pills > li.active > a {
-    border-left: none !important;
-}
+    .nav-pills > li.active > a {
+        border-left: none !important;
+    }
+
+    [dir="rtl"] .fa-arrow-right {
+        transform: rotate(180deg);
+    }
+
+    [dir="rtl"] .nav-pills > li > a {
+        text-align: right;
+    }
+
+    [dir="rtl"] .fa {
+        float: left;
+        margin-left: 5px;
+    }
+
+    [dir="ltr"] .fa {
+        float: right;
+        margin-right: 5px;
+    }
 </style>
 
-
-
-<div class="box box-solid">
+<div class="box box-solid" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <div class="box-header with-border">
         <h3 class="box-title">{{ __('admin.fields') }}</h3>
         <div class="box-tools">
@@ -45,4 +61,3 @@
         </ul>
     </div>
 </div>
-
