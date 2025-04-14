@@ -589,7 +589,7 @@ class ChargeReportController extends MainController
             }, __('to_date'), 'to_date')->date();
         });
 
-        $grid->model()->where('user_id', $agency_id);
+        $grid->model()->where('user_id', $agency_id)->orderByDesc('created_at');
 
         $grid->column('id', __('ID'));
         $grid->column('admin.name', __('creator'))->display(function () {
