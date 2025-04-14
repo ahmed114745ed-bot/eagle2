@@ -128,9 +128,9 @@ class ChargeAction extends Action
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
-        $charge->user_id = $user->id;
+        $charge->user_id = $agency->id;
         $charge->agency_id = $agency->id ?? null;
-        $charge->user_type = $request->user_type ?? 'app';
+        $charge->user_type = 'agency';
         $charge->amount = $amount;
         $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
