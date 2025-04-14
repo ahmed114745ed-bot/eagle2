@@ -11,6 +11,11 @@
                     <i class="fa fa-arrow-right text-red"></i> {{ __('app_repo') }}
                 </a>
             </li>
+            <li class="{{ request()->name == 'host' ? 'active' : '' }}">
+                <a href="?name=host" class="charge_action">
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('charge host agent') }}
+                </a>
+            </li>
             <li class="{{ request()->name == 'stripe' ? 'active' : '' }}">
                 <a href="?name=stripe" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('payment gateway') }}
@@ -18,7 +23,12 @@
             </li>
             <li class="{{ request()->name == 'in-app-purchas' ? 'active' : '' }}">
                 <a href="?name=in-app-purchas" class="charge_action">
-                    <i class="fa fa-arrow-right text-red"></i> {{ __('in_app_purchas') }}
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('Recharge for self') }}
+                </a>
+            </li>
+            <li class="{{ request()->name == 'exchange' ? 'active' : '' }}">
+                <a href="?name=exchange" class="charge_action">
+                    <i class="fa fa-arrow-right text-red"></i> {{ __('Convert diamonds to coins') }}
                 </a>
             </li>
         </ul>
