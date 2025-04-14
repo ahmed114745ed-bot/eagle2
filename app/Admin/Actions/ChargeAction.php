@@ -42,7 +42,7 @@ class ChargeAction extends Action
 
 //        if ($request->user_type == 'dash') {
 
-        $agency = $this->getAgency($request->user_id);
+        $agency = $this->getAgency($this->agencyId);
         if (!$agency) {
             return $this->response()->error(__('api_responses.agency'))->refresh();
         }
@@ -143,7 +143,7 @@ class ChargeAction extends Action
     public function form()
     {
         $this->name = __('Charge');
-        $this->hidden('user_id')->value(Auth::id());
+//        $this->hidden('user_id')->value(Auth::id());
         // $this->hidden('charger_type')->value('dash');
 //        $this->text('user_id', __('User ID / Agency ID'));
 //        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);

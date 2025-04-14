@@ -563,8 +563,7 @@ class ChargeReportController extends MainController
     public function showChargeReports(Content $content, $agency_id)
     {
         return $content
-            ->title('Charge Reports')
-            ->description('List of all charge reports')
+            ->title(__('Charge Reports'))
             ->body($this->customGrid($agency_id));
     }
 
@@ -579,7 +578,7 @@ class ChargeReportController extends MainController
             return $this->user->name ?? 'N/A';
         });
         $grid->column('amount', __('Amount'));
-        $grid->column('created_at', __('Created At'));
+        $grid->column('created_at', __('Created at'));
 
         $grid->disableCreateButton();
         $grid->disableExport();

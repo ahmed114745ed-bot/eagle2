@@ -11,7 +11,11 @@
   "Admin": "Yönetici",
   "Users": "Kullanıcılar",
   "URI": "URI",
-  "Achievement Id" : "Başarı Kimliği",
+    "Charge reports": "Şarj raporları",
+    "Charge Reports": "Şarj Raporları",
+    "Agency name": "Ajans adı",
+    "charge-reports": "Şarj raporları",
+    "Achievement Id" : "Başarı Kimliği",
   "Roles": "Roller",
   "Permission": "İzin",
   "Menu": "Menü",
@@ -1762,13 +1766,13 @@
     "pusher": "İtici",
     "No members found.": "Üye bulunamadı",
     "I invite you to enter my room": "Sizi odamıma girmeye davet ediyorum",
-    
+
     "Cost of background request:" : "Arka plan isteği maliyeti:",
     "Custom Background settings" : "Özel Arka Plan Ayarları",
     "Background expiration in days:" : "Arka planın son kullanma tarihi (gün olarak):",
     "Additional settings" : "Ek ayarlar",
     "Live Stream settings" : "Canlı yayın ayarları",
-   
+
     "Rooms Bacground:" : "Odalar Arka Planı:",
     "Room Rule:" : "Oda Kuralı:",
     "Room Rule en:" : "Oda Kuralı İngilizce:",

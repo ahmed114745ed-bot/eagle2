@@ -183,9 +183,12 @@ class ChargeController extends MainController
 
             $filter->expand();
 
+            $filter->disableIdFilter();
+            $filter->equal('ID', __('ID'));
+
             $filter->where(function ($query) {
                 $query->where('name', 'like', "%{$this->input}%");
-            }, __('Agency Name'));
+            }, __('Agency name'));
 
         });
 
