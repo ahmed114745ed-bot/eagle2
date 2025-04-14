@@ -160,7 +160,7 @@ class ChargeAction extends Action
         $url = url('admin/charge-reports/' . $this->agencyId);
         return <<<HTML
             <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" style="background-color: #28a745; border-color: #28a745; color: white;">{$title} </a>
-            <a href="{$url}" class="shipping_report btn btn-sm  text-white" style="background-color: #28a745; border-color: #28a745; color: white;">{$shippingReports} </a>
+            <a href="{$url}" class="shipping_report btn btn-sm  text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">{$shippingReports} </a>
 HTML;
     }
 
