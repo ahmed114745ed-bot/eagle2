@@ -40,9 +40,10 @@ class RoomComments
                     'oid' => @$room->uid,
                     'ps' => @$room->room_pass != null || @$room->room_pass != '', // password_status
                     'room' => [
+                        'id' => @$room->id ?? 0,
                         'name' => @$room->room_name ?? '',
                         'cover' => @$room->room_cover ?? '',
-                        'background' => @$room->room_background ?? 0,
+                        'background' => @$room->final_room_image ?? 0,
                         'mode' => @$room->mode ?? 0,
                         'stream_type' => @$room->is_live ?? false,
                         'gift_price' => @$room->gifts->sum('giftPrice'),
