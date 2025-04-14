@@ -776,6 +776,23 @@
         float: right;
     }
 
+    .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-left,
+    .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-down {
+        transform: rotate(180deg);
+        text-align: left;
+        top: 13px;
+        right: 190px;
+    }
+
+    .rtl .sidebar-menu .treeview.active > a > .fa-angle-left,
+    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,
+    .rtl .sidebar-menu .treeview.active > a > .fa-angle-down,
+    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
+    .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,
+    .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-down {
+        transform: rotate(-90deg);
+    }
+
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);
     }
