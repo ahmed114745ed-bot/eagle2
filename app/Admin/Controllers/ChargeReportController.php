@@ -583,10 +583,10 @@ class ChargeReportController extends MainController
             }, __('from_date'), 'from_date')->date();
         });
 
-        $grid->model()->where('charger_id', $agency_id);
+        $grid->model()->where('user_id', $agency_id);
 
         $grid->column('id', __('ID'));
-        $grid->column('user_id', __('admin'))->display(function($userId) {
+        $grid->column('charger_id', __('admin'))->display(function($userId) {
             return $this->user->name ?? 'N/A';
         });
         $grid->column('amount', __('Amount'));
