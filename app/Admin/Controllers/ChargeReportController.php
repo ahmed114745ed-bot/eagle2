@@ -105,12 +105,10 @@ class ChargeReportController extends MainController
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash")->where('agency_id', '!=', null);
-        }elseif(request("name") == "host")
-        {
-            $grid->model()->where('charger_type', "!=", "dash")->where('charger_type','Host agent');
-        }
-         else {
-            $grid->model()->where('charger_type', "!=", "dash")->where('charger_type','freight forwarder');
+        } elseif (request("name") == "host") {
+            $grid->model()->where('charger_type', "!=", "dash")->where('charger_type', 'Host agent');
+        } else {
+            $grid->model()->where('charger_type', "!=", "dash")->where('charger_type', 'freight forwarder');
         }
 
         $grid->filter(function (Grid\Filter $filter) use ($charger_type) {
@@ -191,20 +189,20 @@ class ChargeReportController extends MainController
                 if (!$this->agency) {
                     return "<span style='color: #aaa;'>No Agency</span>";
                 }
-            
+
                 $name = $this->agency->name ?? 'Unknown Agency';
                 $coins = number_format($this->agency->coins ?? 0);
                 $path = $this->agency->img ?? '';
                 $defaultImage = asset("images/agency-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-                
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
-            
+
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            
+
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -462,10 +460,10 @@ class ChargeReportController extends MainController
 
     protected function exchange()
     {
-       
+
 
         $grid = new Grid(new ExchangeLog());
-        $grid->model()->orderByDesc('created_at')->where('status',1);
+        $grid->model()->orderByDesc('created_at')->where('status', 1);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -474,7 +472,6 @@ class ChargeReportController extends MainController
             });
 
             $filter->disableIdFilter();
-            
         });
 
         $grid->quickSearch();
@@ -511,7 +508,7 @@ class ChargeReportController extends MainController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        
+
         $grid->column('value', __('amount'))->display(function ($coin) {
             $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
@@ -522,7 +519,7 @@ class ChargeReportController extends MainController
                 </div>
             ";
         });
-       
+
         $grid->column('status', __('Status'))->display(function () {
             if ($this->status == 1) {
                 return '<span style="display:inline-block; padding:5px 10px; font-size:12px; font-weight:bold; border-radius:4px; background-color:#28a745; color:white;">Success</span>';
@@ -531,8 +528,8 @@ class ChargeReportController extends MainController
             }
         });
         $grid->column('created_at', __('shipping date'));
-       
-        
+
+
         return $grid;
     }
 
