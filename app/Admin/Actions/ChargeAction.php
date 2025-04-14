@@ -29,18 +29,18 @@ class ChargeAction extends Action
 
     public function handle(Request $request)
     {
-//        if ($request->user_type != 'dash') {
-//            $user = $this->getUser($request);
-//            if (!$user) {
-//                return $this->response()->error(__('user not found'))->refresh();
-//            }
-//
-//            if ($this->isInvalidAmount($request->amount)) {
-//                return $this->response()->error(__('amount must be more than 10'))->refresh();
-//            }
-//        }
+        //        if ($request->user_type != 'dash') {
+        //            $user = $this->getUser($request);
+        //            if (!$user) {
+        //                return $this->response()->error(__('user not found'))->refresh();
+        //            }
+        //
+        //            if ($this->isInvalidAmount($request->amount)) {
+        //                return $this->response()->error(__('amount must be more than 10'))->refresh();
+        //            }
+        //        }
 
-//        if ($request->user_type == 'dash') {
+        //        if ($request->user_type == 'dash') {
 
         $agency = $this->getAgency($request->agency_id);
         if (!$agency) {
@@ -52,17 +52,17 @@ class ChargeAction extends Action
         $user = $agency->owner;
         return $this->handleAgencyCharge($request, $agency, $user);
 
-//        }
-//        return $this->handleUserCharge($request, $user);
+        //        }
+        //        return $this->handleUserCharge($request, $user);
     }
 
     private function getUser(Request $request)
     {
-//        if ($request->user_type == 'dashdash') {
-//            return $request->id_type == '1'
-//                ? User::query()->searchByUuid($request->user_id)->first()
-//                : User::query()->find($request->user_id);
-//        }
+        //        if ($request->user_type == 'dashdash') {
+        //            return $request->id_type == '1'
+        //                ? User::query()->searchByUuid($request->user_id)->first()
+        //                : User::query()->find($request->user_id);
+        //        }
 
         return $request->id_type == '1'
             ? User::query()->where('uuid', $request->user_id)->first()
@@ -125,6 +125,7 @@ class ChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
     {
+        $shippingCoins = cache()->get('shipping_coins');
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -132,11 +133,10 @@ class ChargeAction extends Action
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = 'agency';
         $charge->amount = $amount;
-        $charge->usd = $usdAmount;
+        $charge->usd = $amount / $shippingCoins;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
         //dd($charge);
         $charge->save();
-
         UserCommon::UserEarnedInvitation($user->id, $amount);
     }
 
@@ -145,10 +145,10 @@ class ChargeAction extends Action
         $this->name = __('Charge');
         $this->hidden('agency_id')->value($this->agencyId);
         // $this->hidden('charger_type')->value('dash');
-//        $this->text('user_id', __('User ID / Agency ID'));
-//        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
+        //        $this->text('user_id', __('User ID / Agency ID'));
+        //        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
-//        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
+        //        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
         $this->text('amount', __('Amount'));
         $this->hidden('amount_type')->value(1);
     }
@@ -163,5 +163,4 @@ class ChargeAction extends Action
             <a href="{$url}" class="shipping_report btn btn-sm  text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">{$shippingReports} </a>
 HTML;
     }
-
 }
