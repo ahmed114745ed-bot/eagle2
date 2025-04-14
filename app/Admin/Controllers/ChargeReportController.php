@@ -586,7 +586,7 @@ class ChargeReportController extends MainController
         $grid->model()->where('charger_id', $agency_id);
 
         $grid->column('id', __('ID'));
-        $grid->column('user_id', __('User'))->display(function($userId) {
+        $grid->column('user_id', __('admin'))->display(function($userId) {
             return $this->user->name ?? 'N/A';
         });
         $grid->column('amount', __('Amount'));
