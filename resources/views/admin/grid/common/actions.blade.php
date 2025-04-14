@@ -1,6 +1,6 @@
 <style>
     .nav-pills .active {
-        background-color: #fe9127 !important;
+        background-color: var(--primary-color) !important;
         color: white !important;
         border: none !important;
         outline: none !important;
@@ -43,17 +43,17 @@
     </div>
     <div class="box-body no-padding">
         <ul class="nav nav-pills nav-stacked">
-            <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' || empty(request('name')) ? 'background-color: orange;' : '' }}">
+            <li class="{{ request('name') == 'users' ? 'active' : '' }}" style="{{ request('name') == 'users' || empty(request('name')) ? 'background-color: var(--primary-color);' : '' }}">
                 <a href="?name=users" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('users report') }}
                 </a>
             </li>
-            <li class="{{ request('name') == 'agencies' ? 'active' : '' }}" style="{{ request('name') == 'agencies' ? 'background-color: orange;' : '' }}">
+            <li class="{{ request('name') == 'agencies' ? 'active' : '' }}" style="{{ request('name') == 'agencies' ? 'background-color: var(--primary-color);' : '' }}">
                 <a href="?name=agencies" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('agencies report') }}
                 </a>
             </li>
-            <li class="{{ request('name') == 'agencies_manger' ? 'active' : '' }}" style="{{ request('name') == 'agencies_manger' ? 'background-color: orange;' : '' }}">
+            <li class="{{ request('name') == 'agencies_manger' ? 'active' : '' }}" style="{{ request('name') == 'agencies_manger' ? 'background-color: var(--primary-color);' : '' }}">
                 <a href="?name=agencies_manger" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('admin.manger') }}
                 </a>
