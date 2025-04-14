@@ -86,9 +86,9 @@ class PkController extends Controller
 
     public function closePK(Request $request)
     {
-        
+
         if (!$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-     
+
         if (!$request->owner_id && !$request->pk_id)  return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
 
         try {
@@ -189,7 +189,6 @@ class PkController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        // \Log::info($room->id . ' rooms');
         if ($isPkCustom) {
             $jsons[] = $this->changeBackground($room, $request->owner_id, PK_IMAGE);
         }
@@ -218,7 +217,6 @@ class PkController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        // \Log::info($room->id . ' rooms');
         if ($isPkCustom) {
             $data = $this->changeBackgroundResponse($room, $request->owner_id, PK_IMAGE);
         }

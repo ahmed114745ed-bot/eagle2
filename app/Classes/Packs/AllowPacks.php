@@ -76,7 +76,6 @@ class AllowPacks
         ->where('is_active_for_vip', true)
         ->groupBy('type')
         ->get();
-        // Log::info('this is wares : ' . json_encode($this->wares));
 
         $this->vipPrices = $this->getVipPrices();
     }
@@ -103,7 +102,6 @@ class AllowPacks
         foreach ($this->data as $key => $value) {
             $ware      = $this->getWare($value);
             if ($value == 16) {
-                // Log::info("ware before is:" . json_encode($ware ));
             }
             $isAllow   = $this->isAllowToUser($ware) ?? false;
             $minLevel = @$ware->min_level;

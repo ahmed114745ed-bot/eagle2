@@ -66,7 +66,6 @@ class ProfileService
             $imagesToDelete = array_diff($existingImages, $newImages);
 
             foreach ($imagesToDelete as $image) {
-                // Log::info([1]);
                 Storage::delete('profile/' . $image);
                 $user->images()->where('img', $image)->delete();
             }

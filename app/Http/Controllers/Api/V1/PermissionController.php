@@ -93,10 +93,8 @@ class PermissionController extends Controller
 
             return Common::apiResponse(1, ' updated successfully');
         } catch (ValidationException $e) {
-            // Log::info('Validation Error:', $e->errors());
             return Common::apiResponse(0, 'Validation failed', $e->errors());
         } catch (\Throwable $th) {
-            // Log::info('Unexpected Error: ' . $th->getMessage());
             return Common::apiResponse(0, 'An unexpected error occurred');
         }
     }
@@ -109,7 +107,7 @@ class PermissionController extends Controller
             $permission->delete();
             return Common::apiResponse(1, 'Role deleted successfully');
         } catch (ValidationException $e) {
-            
+
             return Common::apiResponse(0, 'Validation failed', $e->errors());
         }
     }

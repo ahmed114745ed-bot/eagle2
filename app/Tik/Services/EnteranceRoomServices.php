@@ -75,11 +75,8 @@ class EnteranceRoomServices
         $user = $this->userRepository->findById($userId);
 
         if ($room === null || $user === null) {
-            // Log::info("Room or User not found");
             return response()->json(['status' => 'Webhook received']);
         }
-
-        // Log::info($name . '---' . $room->count_room_socket . '---' . $room->room_visitor . '---' . $user->now_room_uid);
 
         if ($name == 'channel_occupied' || $name == 'member_added') {
             $this->handleMemberAdded($room, $userId);
@@ -109,7 +106,6 @@ class EnteranceRoomServices
     {
         $userId = $user->id;
         if (@$room->charizma_status) {
-            // Log::info('charizma status' . $userId . '----' . $room->id);
 
             $userCharismaService = new UserCharismaService();
             $userCharismaService->resetUserCharisma($userId, $room->id);
@@ -144,10 +140,8 @@ class EnteranceRoomServices
     //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
-                // Log::info('goooooooooooooood');
         //        $app_secert='a23b121a64ee9fab4567a2d75d00269d';
         //        if (!$this->checkSignature($app_secert,$request->signature, $request->timestamp, $request->nonce)) {
-        //            Log::info('Invalid signature');
         //            return response()->json(['status' => 'success'], 200);
         //        }
         $event = $request->event;
@@ -160,7 +154,6 @@ class EnteranceRoomServices
         $user = User::find($userId);
 
         if (!$room || !$user) {
-            // Log::info("Either room $roomId or user $userId not found.");
             return response()->json(['status' => 'Webhook received but room or user not found']);
         }
 
@@ -168,14 +161,12 @@ class EnteranceRoomServices
 
 
         if ($event == 'room_login'){
-            Log::info('room login : ' );
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
         }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
             $user->now_room_uid = 0;
         }
         if ($event == 'room_logout' ){
-            Log::info('room logout : ' );
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
 
@@ -192,14 +183,12 @@ class EnteranceRoomServices
 //        $room->room_visitor = implode(",", $visitors);
 //        $room->save();
 
-        // Log::info(json_encode(['userId'=>$userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
     }
     public function updateRoomCountFromAgora(Request $request)
     {
 
         $data = $request->all();
-        Log::info('Agora data for shami ',[$data ]);
         if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
@@ -208,15 +197,8 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
 
-        // Log::info('Agora data received', [
-        //     'event_type' => $eventType,
-        //     'user_id' => $userId,
-        //     'room_id' => $roomId,
-        // ]);
-
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
                     ->find($roomId);
-                    Log::info('Agora data for Room ',[$room ]);
 
         $user = User::find($userId);
 
@@ -227,11 +209,6 @@ class EnteranceRoomServices
         $this->updateRoomVisitorsBasedOnEvent($eventType, $room, $user->id);
 
         if (in_array($eventType, [101, 103])) {
-            Log::info('enter rooom 101,102 for shami', [
-                'room_uid' => $room->uid,
-                'user' => $user->uid,
-
-            ]);
 
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->uid;
@@ -313,7 +290,6 @@ class EnteranceRoomServices
         $user = $this->userRepository->findById($userId);
 
         if (!$room || !$user) {
-            Log::info("Either room $roomId or user $userId not found.");
             return response()->json(['status' => 'Webhook received but room or user not found']);
         }
 
@@ -342,7 +318,6 @@ class EnteranceRoomServices
             'room_visitor' => implode(",", $visitors)
         ]);
 
-        Log::info(json_encode(['userId' => $userId, 'roomId' => $room->id, 'event' => $event]));
         return response()->json(['status' => 'Webhook processed successfully']);
     }*/
 
@@ -387,8 +362,6 @@ class EnteranceRoomServices
 
     private function handleCharismaStatusOnLogout($room, $user, $ownerId)
     {
-        // Log::info('charizma status' . $user->id . '----' . $room->id);
-
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
         $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
@@ -533,9 +506,9 @@ class EnteranceRoomServices
         if ($room->uid == $user_id) {
             $room->is_live = true;
         }
-   
+
         $room->save();
-       
+
     }
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
@@ -610,7 +583,7 @@ class EnteranceRoomServices
             $type = $message->type ?? 'text';
             Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type);
         }
-        
+
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource =  new ChatRoomResourcePusher($chatRoom);
         if ($chatRoom->user_id == $user->id) {
@@ -624,18 +597,16 @@ class EnteranceRoomServices
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
-        Log::info('Preparing to fire OpenChat event', [
-            'message_resource' => $message_resource->toArray(request())
-        ]);
+
         event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
 
         event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
 
         return Common::apiResponse(1, 'تم الارسال  بنجاح');
-    
+
 
     }
-    
+
 }
 
 

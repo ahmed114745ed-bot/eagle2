@@ -26,7 +26,6 @@ class TestEvent
      */
     public function broadcastOn(): array
     {
-       // log::info("gooooooooooooood");
         return [
             new Channel('room-{roomId}-{userId}'),
         ];

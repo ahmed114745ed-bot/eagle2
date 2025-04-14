@@ -18,10 +18,8 @@ class ClientService
         $messageType = $data['message_type'];
         $messageBody = $data['message_body'];
 
-       // Log::info($messageBody);
         $verificationCode = $this->getVerificationCodeFromMessage((string)$messageType, (string)$messageBody);
 
-      //  Log::info('this is verification code ' . $verificationCode);
         if (!$verificationCode) return null;
         $model  = $this->getVerificationCode($verificationCode);
         $status = 'validated';
@@ -65,7 +63,6 @@ class ClientService
         if ($data['status'] == 'validated') {
             WhatsappWebhookValidate::create($data);
         }
-      //  Log::info(json_encode($data));
     }
 
     public function getRedirectLinks($data)

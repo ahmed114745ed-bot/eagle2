@@ -19,12 +19,8 @@ class PusherController extends Controller
 
     }
     public function edit_user(Request $request) {
-        // Log::info(' edit_user pusher', [
-        //     $request->all()
-        // ]);
 
         if (getallheaders()['X-Pusher-Key'] != config('broadcasting.connections.pusher.key')) {
-            // Log::info('Pusher error');
             abort(403, 'Invalid Pusher webhook request');
         }
 
@@ -32,7 +28,7 @@ class PusherController extends Controller
         foreach ($request->events as $event) {
             $channel = $event['channel'];
             $eventName = $event['name'];
-    
+
             // Delegate handling user status to the service
             $this->pusherService->handleUserStatusChange($channel, $eventName);
         }

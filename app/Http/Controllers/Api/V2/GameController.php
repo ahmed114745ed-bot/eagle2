@@ -17,8 +17,8 @@ use function Laravel\Prompts\confirm;
 
 class GameController extends Controller
 {
-    
-    
+
+
     // Function to decrypt the data
     function decryptData($data, $key, $secret) {
         [$encryptedData, $iv] = explode('::', base64_decode($data), 2);
@@ -31,7 +31,6 @@ class GameController extends Controller
         $app_key = \config('games.app_key');
         $app_screet = \config('games.app_secret');
 
-       // Log::info($app_screet . $app_key);
         //check if encryption if valid or not
         $decryptedData = $this->decryptData($encryptedData, $app_key, $app_screet);
         if (!json_decode($decryptedData, true)) {
@@ -57,7 +56,6 @@ class GameController extends Controller
             'coins' => $user1->di,
             'name'  => $user1->name,
         ];
-       // Log::info(implode(',', array_values($user)));
 
         return response()->json( $user);
 

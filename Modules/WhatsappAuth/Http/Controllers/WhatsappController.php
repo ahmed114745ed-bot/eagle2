@@ -46,7 +46,6 @@ class WhatsappController extends Controller
         }
 
         $phone = $request->phone;
-        // Log::info('this is the phone '. $phone);
 
         if (User::query()->where('phone', $phone)->exists()) {
             return Common::apiResponse(0, __('whatsappauth::whatsapp.exists'), null, 405);
@@ -111,7 +110,6 @@ class WhatsappController extends Controller
             WhatsappWebhookValidate::create($request->all());
             //create user
         }
-        // Log::info(json_encode($data));
         return response()->json();
     }
 

@@ -94,7 +94,7 @@ class RoleController extends Controller
                 // 'permissions.*' => 'exists:admin_permissions,id',
             ]);
 
-            
+
 
             $role->slug = $request->input('slug');
             $role->name = $request->input('name');
@@ -109,10 +109,8 @@ class RoleController extends Controller
 
             return Common::apiResponse(1, 'Role updated successfully', $role);
         } catch (ValidationException $e) {
-            // Log::info('Validation Error:', $e->errors());
             return Common::apiResponse(0, 'Validation failed', $e->errors());
         } catch (\Throwable $th) {
-            // Log::info('Unexpected Error: ' . $th->getMessage());
             return Common::apiResponse(0, 'An unexpected error occurred');
         }
     }

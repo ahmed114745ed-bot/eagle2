@@ -127,7 +127,6 @@ class GiftLogRepository extends AbstractRepository
             ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
                 $formattedStartDate = Carbon::parse($startDate)->startOfDay();
                 $formattedEndDate = Carbon::parse($endDate)->endOfDay();
-                \Log::info("Filtering from {$formattedStartDate} to {$formattedEndDate}"); // Debugging log
                 $q->whereBetween('created_at', [$formattedStartDate, $formattedEndDate]);
             })->groupBy('giftId', 'sender_id', 'receiver_id')->paginate($perPage, ['*'], 'page', $page);
     }

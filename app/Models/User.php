@@ -665,7 +665,6 @@ class User extends Authenticatable
         })
             ->orderByDesc('id')
             ->sum(DB::raw('salary - cut_amount'));
-        // \Log::info([$userSallary,$roomSalary]);
         return (floor($userSallary + (int)$roomSalary));
         //        } else {
         //            return 0;
@@ -1145,12 +1144,12 @@ class User extends Authenticatable
 
     public function userVips()
     {
-        return $this->hasMany(UserVip::class, 'user_id'); 
+        return $this->hasMany(UserVip::class, 'user_id');
     }
 
     public function getIsFrozenAttribute()
     {
-        return optional($this->agency)->is_frozen; 
+        return optional($this->agency)->is_frozen;
     }
 
     protected static function boot()
@@ -1172,7 +1171,7 @@ class User extends Authenticatable
         static::updating(function ($user) {
             $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
             $newCoins = $user->di;
-    
+
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
@@ -1180,5 +1179,5 @@ class User extends Authenticatable
     }
 
 
-   
+
 }
