@@ -19,6 +19,13 @@ class ChargeAction extends Action
 {
     public $name;
     protected $selector = '.charge_action';
+    protected $agencyId;
+
+    public function setAgencyId($agencyId): static
+    {
+        $this->agencyId = $agencyId;
+        return $this;
+    }
 
     public function handle(Request $request)
     {
@@ -34,7 +41,8 @@ class ChargeAction extends Action
 //        }
 
 //        if ($request->user_type == 'dash') {
-            $agency = $this->getAgency($request->user_id);
+
+        $agency = $this->getAgency($request->user_id);
         if (!$agency) {
             return $this->response()->error(__('api_responses.agency'))->refresh();
         }
@@ -43,8 +51,8 @@ class ChargeAction extends Action
         }
         $user = $agency->owner;
         return $this->handleAgencyCharge($request, $agency, $user);
-//        }
 
+//        }
 //        return $this->handleUserCharge($request, $user);
     }
 
@@ -148,11 +156,12 @@ class ChargeAction extends Action
     public function html()
     {
         $title = __('dashboard.add_coins');
+        $shippingReports = __('Charge reports');
+        $url = url('admin/charge-reports/' . $this->agencyId);
         return <<<HTML
-            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white"
-       style="background-color: #28a745; border-color: #28a745; color: white;">
-        {$title}
-    </a>
+            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" style="background-color: #28a745; border-color: #28a745; color: white;">{$title} </a>
+            <a href="{$url}" class="shipping_report btn btn-sm  text-white" style="background-color: #28a745; border-color: #28a745; color: white;">{$shippingReports} </a>
 HTML;
     }
+
 }

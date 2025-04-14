@@ -108,6 +108,7 @@ class ChargeReportController extends MainController
         $grid->filter(function (Grid\Filter $filter) use ($charger_type) {
 
             $filter->expand();
+
             if ($charger_type == "dash") {
                 $filter->column(1 / 2, function ($filter) {
                     $filter->equal('receiver.uuid', __("receiver"));
@@ -441,6 +442,33 @@ class ChargeReportController extends MainController
 
 
         return $box;
+    }
+
+    public function showChargeReports(Content $content, $agency_id)
+    {
+        return $content
+            ->title('Charge Reports')
+            ->description('List of all charge reports')
+            ->body($this->customGrid($agency_id));
+    }
+
+    protected function customGrid($agency_id)
+    {
+        $grid = new Grid(new Charge());
+
+        $grid->model()->where('charger_id', $agency_id);
+
+        $grid->column('id', __('ID'));
+        $grid->column('user_id', __('User'))->display(function($userId) {
+            return $this->user->name ?? 'N/A';
+        });
+        $grid->column('amount', __('Amount'));
+        $grid->column('created_at', __('Created At'));
+
+        $grid->disableCreateButton();
+        $grid->disableExport();
+
+        return $grid;
     }
 }
 
