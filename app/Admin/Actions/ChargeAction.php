@@ -127,7 +127,7 @@ class ChargeAction extends Action
     {
         $charge = new Charge();
         $charge->charger_id = Auth::id();
-        $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
+        $charge->charger_type = 'agency';
         $charge->user_id = $agency->id;
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = $request->user_type ?? 'app';
