@@ -223,7 +223,7 @@ class ChargeReportController extends MainController
                     <div style='display: flex; align-items: center; gap: 5px;'>
                         <span>" . number_format($coin) . "</span>
                         <img src='{$icon}' alt='Coin' width='20' height='20'>
-    
+
                     </div>
                 ";
             });
@@ -245,7 +245,7 @@ class ChargeReportController extends MainController
                     <div style='display: flex; align-items: center; gap: 5px;'>
                         <span>" . number_format($coin) . "</span>
                         <img src='{$icon}' alt='Coin' width='20' height='20'>
-    
+
                     </div>
                 ";
             });
@@ -583,6 +583,7 @@ class ChargeReportController extends MainController
 
         $grid->disableCreateButton();
         $grid->disableExport();
+        $grid->disableActions();
 
         return $grid;
     }
