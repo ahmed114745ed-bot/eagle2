@@ -20,7 +20,7 @@
 
     .settings-sidebar h2 {
         text-align: center;
-        color: #ff9800;
+        color: var(--primary-color);
     }
 
     .settings-menu button {
@@ -37,7 +37,7 @@
     }
 
     .settings-menu button:hover {
-        background: #ff9800;
+        background: var(--primary-color);
     }
 
     /* محتوى الصفحة */
@@ -77,7 +77,7 @@
     }
 
     button {
-        background: #ff9800;
+        background: var(--primary-color);
         padding: 10px;
         border: none;
         cursor: pointer;
@@ -86,7 +86,7 @@
     }
 
     button:hover {
-        background: #e68900;
+        background: var(--primary-color);
     }
 
     .all-page {
