@@ -215,37 +215,41 @@ class ChargeReportController extends MainController
                 ";
             });
         }
-        // $grid->column ('amount',__("amount"))->display (function ($coin){
-        //     return number_format($coin);
-        //  });
-        // $grid->column ('balance_before',__("balance_before"))->display (function ($coin){
-        //     return number_format($coin);
-        //  });
-        // $grid->column ('balance_after',__("balance_after"))->display (function (){
-        //    return number_format($this->amount + $this->balance_before);
-        // });
-
-        $grid->column('usd', __('amount $'))->display(function ($coin) {
-            $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
-        });
-
-        $image = asset('images/coin.png');
-        $grid->column('balance_before', __('Amount') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
-            ->display(function ($coin) {
-                $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
-
-                return "<div style='display: flex; align-items: center; gap: 5px;'>
-                        <span>{$coin}</span>
-                        <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
+        if (request("name") == "dash") {
+            $grid->column('usd', __('amount $'))->display(function ($coin) {
+                $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
+                    <div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>" . number_format($coin) . "</span>
+                        <img src='{$icon}' alt='Coin' width='20' height='20'>
+    
+                    </div>
+                ";
             });
+
+            $image = asset('images/coin.png');
+            $grid->column('balance_before', __('Amount') . ' ' . "<img src='{$image}' alt='USD' width='20' height='20' style='vertical-align: middle;'> ")
+                ->display(function ($coin) {
+                    $image = asset('images/coin.png'); // تأكد من أن الصورة موجودة
+
+                    return "<div style='display: flex; align-items: center; gap: 5px;'>
+                            <span>{$coin}</span>
+                            <img src='{$image}' alt='USD' width='20' height='20'>
+                        </div>";
+                });
+        } elseif ((request("name") == "host") || (request("name") == "app")) {
+            $grid->column('amount', __('amount $'))->display(function ($coin) {
+                $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+                return "
+                    <div style='display: flex; align-items: center; gap: 5px;'>
+                        <span>" . number_format($coin) . "</span>
+                        <img src='{$icon}' alt='Coin' width='20' height='20'>
+    
+                    </div>
+                ";
+            });
+        }
+
 
         //        $grid->column('balance_before', __("amount"))->display(function ($coin) {
         //            $balance_after = $this->amount + $this->balance_before;
