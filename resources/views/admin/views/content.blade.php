@@ -1,8 +1,6 @@
 @extends('admin::index', ['header' => strip_tags($header)])
 
 @section('content')
-@dd("dsdsds");
-
     <section class="content-header">
         <h1>
             {!! $header ?: trans('admin.title') !!}
@@ -42,21 +40,11 @@
         </ol>
         @elseif(config('admin.enable_default_breadcrumb'))
         <ol class="breadcrumb" style="margin-right: 30px;">
-            <li>
-                <a href="{{ admin_url('/') }}">
-                    <i class="fa fa-dashboard"></i> {{ __('admin.home') }}
-                </a>
-            </li>
-            @php
-                use Illuminate\Support\Str;
-                $segments = Request::segments();
-            @endphp
-            @for($i = 1; $i < count($segments); $i++)
-                @php
-                    $segment = is_array($segments[$i]) ? implode('/', $segments[$i]) : $segments[$i];
-                    $formatted = Str::of($segment)->replace('-', ' ')->ucfirst();
-                @endphp
-                <li>{{ $formatted }}</li>
+            <li><a href="{{ admin_url('/') }}"><i class="fa fa-dashboard"></i> {{__('admin.home')}}</a></li>
+            @for($i = 2; $i <= count(Request::segments()); $i++)
+                <li>
+                {{ucfirst(Request::segment($i))}}
+                </li>
             @endfor
         </ol>
         @endif

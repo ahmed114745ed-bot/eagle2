@@ -31,6 +31,7 @@ use App\Admin\Widgets\Table as TableWidget;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
+use Illuminate\Support\Facades\Cache;
 
 class AgencyController extends MainController
 {
@@ -65,11 +66,43 @@ class AgencyController extends MainController
     }
 
     public function profile($id, Content $content) {
-        $agency = Agency::with('charges','mempers')->findOrFail($id);
-        $members = $agency->mempers()->paginate(10, ['*'], 'members_page'); // Custom page name
-        $charges = $agency->charges()->paginate(10, ['*'], 'charges_page'); // Custom page name
-        $salaries = AgencySallary::where('agency_id',$id)->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
-        return $content->title(__('agency profile'))->view('agency_profile', compact('agency','members','charges','salaries'));
+        $cacheKey = "agency_profile_{$id}";
+        $data = Cache::remember($cacheKey, 3600, function() use ($id) {
+            $agency = Agency::with([
+                'charges' => function($query) {
+                    $query->select('id', 'agency_id', 'amount', 'created_at')
+                        ->latest()
+                        ->take(10);
+                }, 
+                'mempers' => function($query) {
+                    $query->select('id', 'agency_id', 'name', 'created_at')
+                        ->latest()
+                        ->take(10);
+                },
+                'owner' => function($query) {
+                    $query->select('id', 'name', 'uuid');
+                }
+            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
+              ->findOrFail($id);
+            
+            $members = $agency->mempers()
+                ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
+                ->paginate(10, ['*'], 'members_page');
+                
+            $charges = $agency->charges()
+                ->select('id', 'amount', 'created_at')
+                ->paginate(10, ['*'], 'charges_page');
+                
+            $salaries = AgencySallary::where('agency_id', $id)
+                ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
+                ->orderByDesc('id')
+                ->paginate(10, ['*'], 'salary_page');
+                
+            return compact('agency', 'members', 'charges', 'salaries');
+        });
+        
+        return $content->title(__('agency profile'))
+            ->view('agency_profile', $data);
     }
 
     public function update($id)
@@ -162,40 +195,48 @@ class AgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency);
-
-
-        $grid->model()->where(function ($query) {
-            $query->WhereDoesntHave('additionalInfo')->orWhereHas(
-                'additionalInfo',
-                function ($query) {
-                    $query->where('status', 1);
-                }
-            );
-        })->orderByDesc('id');
+        
+        $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
+        $grid->model()->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+            ->where(function ($query) {
+                $query->WhereDoesntHave('additionalInfo')
+                    ->orWhereHas('additionalInfo', function ($query) {
+                        $query->where('status', 1);
+                    });
+            })
+            ->with(['owner' => function($query) {
+                $query->select('id', 'name', 'uuid');
+            }])
+            ->orderByDesc('id');
+        
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
-                $q->where('month', now()->month)->where('year', now()->year);
+                $q->where('month', now()->month)
+                  ->where('year', now()->year);
             });
         }
+        
         $grid->id(__('ID'));
         $grid->column('name', __('Agency'))
         ->display(function ($name) {
-            $path = @$this->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
+            $cacheKey = "agency_image_{$this->id}";
+            $image = Cache::remember($cacheKey, 3600, function() {
+                $path = @$this->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+                
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                return handleShowImageWithTypes($this->id, $url, 40, 40);
+            });
+            
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <span>$name</span>
             </div>
-        ";
+            ";
         });
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
