@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Charge;
 use Encore\Admin\Form;
@@ -578,18 +579,55 @@ class ChargeReportController extends MainController
             $filter->disableIdFilter();
 
             $filter->where(function ($query) {
-                $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-                $query->whereDate('created_at', '>=', $datt);
+                $date = UserCommon::arabicToEnglishNumbers($this->input);
+                $query->whereDate('created_at', '>=', $date);
             }, __('from_date'), 'from_date')->date();
+
+            $filter->where(function ($query) {
+                $date = UserCommon::arabicToEnglishNumbers($this->input);
+                $query->whereDate('created_at', '<=', $date);
+            }, __('to_date'), 'to_date')->date();
         });
 
         $grid->model()->where('user_id', $agency_id);
 
         $grid->column('id', __('ID'));
-        $grid->column('charger_id', __('admin'))->display(function($userId) {
-            return $this->user->name ?? 'N/A';
+        $grid->column('admin.name', __('creator'))->display(function () {
+
+            $name = $this->admin->name ?? '';
+            $path = $this->admin->avatar ?? null;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            $showUrl = '#';
+            if ($this->admin && $this->admin->id) {
+                $showUrl = url("admin/auth/users/{$this->admin->id}");
+            }
+
+            return "
+             <div style='display: flex; align-items: center; gap: 10px;'>
+                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                     $image
+                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                 </a>
+             </div>
+             ";
         });
+
         $grid->column('amount', __('Amount'));
+        $grid->column('amount_type', __('Amount'))->display(function (){
+            if ($this->amount < 0){
+                return __('decrement');
+            }else{
+                return __('increment');
+            }
+        });
         $grid->column('created_at', __('Created at'));
 
         $grid->disableCreateButton();
