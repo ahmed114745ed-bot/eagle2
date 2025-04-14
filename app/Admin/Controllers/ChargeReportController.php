@@ -238,8 +238,8 @@ class ChargeReportController extends MainController
                         </div>";
                 });
         } elseif ((request("name") == "host") || (request("name") == "app")) {
-            $grid->column('amount', __('amount $'))->display(function ($coin) {
-                $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
+            $grid->column('amount', __('amount'))->display(function ($coin) {
+                $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
                 return "
                     <div style='display: flex; align-items: center; gap: 5px;'>
                         <span>" . number_format($coin) . "</span>
