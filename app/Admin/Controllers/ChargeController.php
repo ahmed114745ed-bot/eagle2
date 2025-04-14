@@ -178,6 +178,17 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
+
+        $grid->filter(function (Grid\Filter $filter){
+
+            $filter->expand();
+
+            $filter->where(function ($query) {
+                $query->where('name', 'like', "%{$this->input}%");
+            }, __('Agency Name'));
+
+        });
+
         $grid->model()->where("shipping_agency", 1)->orderByDesc('id');
 
         $grid->id(__('ID'));
@@ -227,7 +238,7 @@ class ChargeController extends MainController
             $grid->column('actions', __('Actions'))
             ->display(function () {
                 $agency_id = $this->id;
-                return (new ChargeAction())->render(['agency_id' => $agency_id]);
+                return (new ChargeAction())->setAgencyId($agency_id)->render();
             })
             ->style('white-space: nowrap; width: 100px;');
         $grid->disableCreateButton();

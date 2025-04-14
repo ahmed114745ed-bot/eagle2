@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
@@ -350,6 +351,7 @@ Route::group(
         $router->resource('thrown_boxes', 'BoxUseController');
         $router->resource('reports', 'ReportController');
         $router->resource('charges-reports', 'ChargeReportController');
+        $router->get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         $router->resource('sallaries', 'SallariesController')->name('index', 'sallaries');
         $router->resource('total-statistics', 'AllStatisticController');
         $router->resource('coin-reports', 'CoinReportController');
