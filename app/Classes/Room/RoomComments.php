@@ -43,7 +43,7 @@ class RoomComments
                         'id' => @$room->id ?? 0,
                         'name' => @$room->room_name ?? '',
                         'cover' => @$room->room_cover ?? '',
-                        'background' => @$room->final_room_image ?? 0,
+                        'background' => @$room->final_room_image ?? '',
                         'mode' => @$room->mode ?? 0,
                         'stream_type' => @$room->is_live ?? false,
                         'gift_price' => @$room->gifts->sum('giftPrice'),
