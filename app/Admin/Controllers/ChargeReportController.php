@@ -571,6 +571,18 @@ class ChargeReportController extends MainController
     {
         $grid = new Grid(new Charge());
 
+        $grid->filter(function (Grid\Filter $filter){
+
+            $filter->expand();
+
+            $filter->disableIdFilter();
+
+            $filter->where(function ($query) {
+                $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
+                $query->whereDate('created_at', '>=', $datt);
+            }, __('from_date'), 'from_date')->date();
+        });
+
         $grid->model()->where('charger_id', $agency_id);
 
         $grid->column('id', __('ID'));
