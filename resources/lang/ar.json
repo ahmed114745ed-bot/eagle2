@@ -1795,6 +1795,7 @@
     "Charge Reports" : "تقارير الشحن",
     "Agency name": "اسم الوكيل",
     "charge-reports": "تقارير الشحن",
+    "Owner uuid": "معرف المالك المميز",
 
     "Timing settings" : "إعدادات التوقيت",
     "Custom Background settings" : "إعدادات الخلفية المخصصة",

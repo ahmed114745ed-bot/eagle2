@@ -190,6 +190,11 @@ class ChargeController extends MainController
                 $query->where('name', 'like', "%{$this->input}%");
             }, __('Agency name'));
 
+            $filter->where(function ($query) {
+                $query->whereHas('owner', function ($q) {
+                    $q->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, __('Owner uuid'));
         });
 
         $grid->model()->where("shipping_agency", 1)->orderByDesc('id');
