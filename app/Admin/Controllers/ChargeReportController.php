@@ -186,7 +186,7 @@ class ChargeReportController extends MainController
             </div>
         ";
         });
-        if ($charger_type == "dash") {
+        if (request("name") == "dash") {
             $grid->column('agency_id', __('Agency'))->display(function () {
                 if (!$this->agency) {
                     return "<span style='color: #aaa;'>No Agency</span>";
