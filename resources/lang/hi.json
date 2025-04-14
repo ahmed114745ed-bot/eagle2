@@ -1094,7 +1094,10 @@
   "Are you sure you want to update the target settings? This action cannot be undone.": "क्या आप वाकई लक्ष्य सेटिंग्स अपडेट करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती.",
   "Cancel": "रद्द करें",
   "Yes, update": "हाँ, अपडेट करें",
-  "We can`t update the target system right now because some users still have active targets.": "हम अभी लक्ष्य प्रणाली को अपडेट नहीं कर सकते क्योंकि कुछ उपयोगकर्ताओं के पास अभी भी सक्रिय लक्ष्य हैं"
+  "We can`t update the target system right now because some users still have active targets.": "हम अभी लक्ष्य प्रणाली को अपडेट नहीं कर सकते क्योंकि कुछ उपयोगकर्ताओं के पास अभी भी सक्रिय लक्ष्य हैं",
+  "charge host agent": "मेज़बान एजेंट को चार्ज करें",
+  "Recharge for self": "स्वयं के लिए रिचार्ज",
+  "Convert diamonds to coins": "हीरे को सिक्कों में बदलें"
 
 
 

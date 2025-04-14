@@ -136,12 +136,32 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->with("ownerRoom");
-
-        $grid->model();
+        
+        // Optimize eager loading
+        $grid->model()->with([
+            'ownerRoom',
+            'profile',
+            'userSetting',
+            'agency',
+            'reals' => function($q) {
+                $q->select('id', 'user_id');
+            },
+            'moments' => function($q) {
+                $q->select('id', 'user_id');
+            },
+            'liveTime' => function($q) {
+                $q->select('id', 'uid', 'hours');
+            },
+            'targets' => function($q) {
+                $q->select('id', 'user_id', 'add_month', 'add_year', 'target_usd', 'target_agency_share', 
+                          'user_diamonds', 'user_hours', 'user_days', 'user_obtain', 'updated_at')
+                  ->orderBy('created_at', 'desc');
+            }
+        ]);
 
         if (request()->online == 1) {
-            $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp);
+            $grid->model()->where('online_time', '>=', now()->startOfDay()->timestamp)
+                          ->where('online_time', '<=', now()->timestamp);
         } else if ($haveCoins) {
             $grid->model()->where('di', '>', 0)->orderByDesc('di');
         } else {
@@ -157,9 +177,15 @@ class UserController extends MainController
                 $filter->column(1/2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
-                        $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
+                        $query->where(function($q) use ($input) {
+                            $q->where('name', 'like', "%$input%")
+                              ->orWhere('uuid', 'like', "%$input%")
+                              ->orWhere('special_id', 'like', "%$input%")
+                              ->orWhere('nickname', 'like', "%$input%")
+                              ->orWhere('email', 'like', "%$input%");
+                        });
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+                    
                     $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
                 });
             });
@@ -331,40 +357,47 @@ class UserController extends MainController
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
-            $achivement      = new UserAchievementService();
+            $achivement = new UserAchievementService();
             $data_achivement = $achivement->getUserAchievement($model);
 
             $filtered = $data_achivement->map(function ($user) {
-
                 $img = $user["valid_image"] ?? $user["custom_image"];
                 $img = getDriverUrl() . '/' . $img;
                 $img = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail'$ />";
-                //                $user->only(["user_achievement_levels.id","achievement_levels.valid_image"]);
                 return [
-                    'id'     => $user['id'],
+                    'id' => $user['id'],
                     'target' => $user['target'],
-                    'image'  => $img,
+                    'image' => $img,
                 ];
             });
             return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
         });
 
         $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
-            $device_token  = $this->device_token;
-            $users = UserAccount::where('device_token', $device_token)->get();
+            $device_token = $this->device_token;
+            $users = UserAccount::where('device_token', $device_token)
+                ->select(['parent_user_id', 'child_user_id'])
+                ->get();
+            
             $parentUserIds = $users->pluck('parent_user_id');
             $childUserIds = $users->pluck('child_user_id');
-
             $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
+            
             $userId = $this->id;
             $filteredIds = array_filter($allIds, function ($id) use ($userId) {
                 return $id != $userId;
             });
+            
             $filteredIds = array_values($filteredIds);
-            $users = User::query()->whereIn('id', $filteredIds)->select("name", 'uuid', 'phone')->get();
+            $users = User::query()
+                ->whereIn('id', $filteredIds)
+                ->select(['name', 'uuid', 'phone'])
+                ->get();
+                
             $filteredUsers = $users->map(function ($user) {
-                return $user->only(["name", "uuid", "phone"]);
+                return $user->only(['name', 'uuid', 'phone']);
             });
+            
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });
 
@@ -475,55 +508,58 @@ class UserController extends MainController
 
     protected function packList($id)
     {
-        Pack::query()->where('expire', '!=', 0)->where('expire', '<', time())->delete();
+        Pack::query()
+            ->where('expire', '!=', 0)
+            ->where('expire', '<', time())
+            ->delete();
+        
         $grid = new Grid(new Pack);
-        $grid->model()->where('user_id', $id);
+        $grid->model()
+            ->where('user_id', $id)
+            ->with(['ware' => function($q) {
+                $q->select('id', 'show_img');
+            }]);
+        
         $grid->id('ID');
         $grid->column('user_id', __('user id'));
-        $grid->column('get_type', __('get type'))->using(
-            [
-                1 => __('vip level automatic acquisition'),
-                2 => __('activities'),
-                3 => __('treasure box'),
-                4 => __('purchase'),
-                5 => __('background addition'),
-            ]
-        );
-        $grid->column('type', __('type'))->using(
-            [
-                1  => trans('Gemstone'),
-                3  => trans('Card Scroll'),
-                4  => trans('Avatar Frame'),
-                5  => trans('Bubble Frame'),
-                6  => trans('Entering Special Effects'),
-                7  => trans('Microphone Aperture'),
-                8  => trans('Badge'),
-                9  => trans('NoKick'),
-                10 => trans('Icon'),
-                11 => trans('intro animation'),
-                12 => trans('wapel'),
-                13 => trans('hide country'),
-                14 => trans('vip gifts'),
-                15 => trans('no pan'),
-                16 => trans('hidden room'),
-                17 => trans('anonymous man'),
-                18 => trans('colored name'),
-                19 => trans('profile visitors hide in'),
-                20 => trans('hide last active'),
-                21 => trans('sound effect'),
-                22 => trans('upload GIF image'),
-            ]
-        );
+        $grid->column('get_type', __('get type'))->using([
+            1 => __('vip level automatic acquisition'),
+            2 => __('activities'),
+            3 => __('treasure box'),
+            4 => __('purchase'),
+            5 => __('background addition'),
+        ]);
+        
+        $grid->column('type', __('type'))->using([
+            1 => trans('Gemstone'),
+            3 => trans('Card Scroll'),
+            4 => trans('Avatar Frame'),
+            5 => trans('Bubble Frame'),
+            6 => trans('Entering Special Effects'),
+            7 => trans('Microphone Aperture'),
+            8 => trans('Badge'),
+            9 => trans('NoKick'),
+            10 => trans('Icon'),
+            11 => trans('intro animation'),
+            12 => trans('wapel'),
+            13 => trans('hide country'),
+            14 => trans('vip gifts'),
+            15 => trans('no pan'),
+            16 => trans('hidden room'),
+            17 => trans('anonymous man'),
+            18 => trans('colored name'),
+            19 => trans('profile visitors hide in'),
+            20 => trans('hide last active'),
+            21 => trans('sound effect'),
+            22 => trans('upload GIF image'),
+        ]);
+        
         $grid->column('target_id', __('img'))->display(function () {
-            $ware = Ware::query()->where('id', $this->target_id)->value('show_img');
-            $src  = getDriverUrl() . '/' . $ware;
-            return "<img width='30' src='$src'>";
+            return $this->ware ? "<img width='30' src='" . getDriverUrl() . '/' . $this->ware->show_img . "'>" : '';
         });
+        
         $grid->column('expire', __('expire'))->display(function ($row) {
-            if ($this->expire) {
-                return Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s');
-            }
-            return __('no time');
+            return $this->expire ? Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s') : __('no time');
         });
 
         $grid->actions(function ($actions) {
@@ -545,28 +581,25 @@ class UserController extends MainController
 
     protected function vipList($id)
     {
-        // UserVip::query ()->where ('expire','!=',0)->where ('expire','<',time ())->delete ();
-
         $grid = new Grid(new UserVip());
-        $grid->model()->where('user_id', $id);
+        $grid->model()
+            ->where('user_id', $id)
+            ->select(['id', 'user_id', 'level', 'expire', 'qty', 'total']);
+        
         $grid->id('ID');
         $grid->column('user_id', __('user id'));
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'))->display(function ($row) {
-            if ($this->expire) {
-                return Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s');
-            }
-            return __('no time');
+            return $this->expire ? Carbon::createFromTimestamp($this->expire)->format('Y-m-d H:i:s') : __('no time');
         });
         $grid->column('qty', __('qty'));
         $grid->column('total', __('total Price'));
-        // $grid->column('price', __('price'));
+        
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
             $actions->add(new DeleteUserVipAction());
-            //            $actions->add(new EditPackExpireAction());
         });
 
         $grid->disablePagination();

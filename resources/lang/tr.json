@@ -1947,7 +1947,9 @@
   "Are you sure you want to update the target settings? This action cannot be undone.": "Hedef ayarlarını güncellemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
   "Cancel": "İptal",
   "Yes, update": "Evet, güncelle",
-  "We can`t update the target system right now because some users still have active targets.": "Bazı kullanıcıların hala aktif hedefleri olduğu için hedef sistemini şu anda güncelleyemiyoruz"
-
+  "We can`t update the target system right now because some users still have active targets.": "Bazı kullanıcıların hala aktif hedefleri olduğu için hedef sistemini şu anda güncelleyemiyoruz",
+  "charge host agent": "Ev sahibi temsilcisini şarj et",
+  "Recharge for self": "Kendin için yeniden şarj",
+  "Convert diamonds to coins": "Elmasları paraya çevir"
 
 }

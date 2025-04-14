@@ -1998,7 +1998,10 @@
   "Are you sure you want to update the target settings? This action cannot be undone.": "هل أنت متأكد أنك تريد تحديث إعدادات الهدف؟ لا يمكن التراجع عن هذا الإجراء.",
   "Cancel": "إلغاء",
   "Yes, update": "نعم، قم بالتحديث",
-  "We can`t update the target system right now because some users still have active targets.": "لا يمكن تحديث نظام الأهداف الآن لأن بعض المستخدمين لا يزال لديهم أهداف نشطة"
+  "We can`t update the target system right now because some users still have active targets.": "لا يمكن تحديث نظام الأهداف الآن لأن بعض المستخدمين لا يزال لديهم أهداف نشطة",
+  "charge host agent":"شحن وكالات المضيفين",
+  "Recharge for self":"اعادة الشحن للنفس",
+  "Convert diamonds to coins":"تحويل الماس الى كوين"
 
 
 
