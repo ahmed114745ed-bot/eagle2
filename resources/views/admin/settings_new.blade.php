@@ -467,7 +467,7 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST">
+                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
 
@@ -513,9 +513,9 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="background_type">{{ __('Background Type') }}</label>
-                                <select id="background_type" name="background_type" class="form-control"
-                                        onchange="toggleBackgroundInput()">
+                                <label for="background_type_app">{{ __('Background Type') }}</label>
+                                <select id="background_type_app" name="background_type" class="form-control"
+                                        onchange="toggleBackgroundInput('app')">
                                     <option value="color" {{ ($settings['background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
                                     <option value="image" {{ ($settings['background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
                                 </select>
@@ -523,20 +523,17 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group" id="background_color_group">
-                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>
-                                <input type="color" id="box_background_color" name="box_background_color"
-                                       value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                                       style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
-                                       title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
+                            <div class="form-group" id="background_color_group_app" style="display: none;">
+                                <label for="background_color_app">{{ __('Background Color') }}</label>
+                                <input type="color" id="background_color_app" name="background_color" class="form-control"
+                                       value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group" id="background_image_group"
-                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
-                                <label for="background_image">{{ __('Background Image') }}</label>
-                                <input type="file" id="background_image" name="app_background_image" class="form-control">
+                            <div class="form-group" id="background_image_group_app" style="display: none;">
+                                <label for="background_image_app">{{ __('Background Image') }}</label>
+                                <input type="file" id="background_image_app" name="app_background_image" class="form-control">
                                 @if(!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
                                     <div class="mt-2">
                                         <img src="{{ asset($settings['app_background']) }}" width="100" class="img-thumbnail">
@@ -712,30 +709,30 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="background_type">{{ __('Background Type') }}</label>
-                                <select id="background_type" name="background_type" class="form-control"
-                                    onchange="toggleBackgroundInput()">
-                                    <option value="color" {{ ($settings['background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
-                                    <option value="image" {{ ($settings['background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
+                                <label for="app_background_type">{{ __('Background Type') }}</label>
+                                <select id="app_background_type" name="app_background_type" class="form-control"
+                                        onchange="toggleAppBackgroundInput()">
+                                    <option value="color" {{ ($settings['app_background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
+                                    <option value="image" {{ ($settings['app_background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group" id="background_color_group"
-                                style="display: {{ ($settings['background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
-                                <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" name="background_color" class="form-control"
-                                    value="{{ $settings['background_color'] ?? '#ffffff' }}">
+                            <div class="form-group" id="app_background_color_group"
+                                 style="display: {{ ($settings['app_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
+                                <label for="app_background_color">{{ __('Background Color') }}</label>
+                                <input type="color" id="app_background_color" name="app_background_color" class="form-control"
+                                       value="{{ $settings['app_background_color'] ?? '#ffffff' }}">
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group" id="background_image_group"
-                                style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
-                                <label for="background_image">{{ __('Background Image') }}</label>
-                                <input type="file" id="background_image" name="app_background_image" class="form-control">
-                                @if(!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
+                            <div class="form-group" id="app_background_image_group"
+                                 style="display: {{ ($settings['app_background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
+                                <label for="app_background_image">{{ __('Background Image') }}</label>
+                                <input type="file" id="app_background_image" name="app_background_image" class="form-control">
+                                @if(!empty($settings['app_background']) && ($settings['app_background_type'] ?? '') === 'image')
                                     <div class="mt-2">
                                         <img src="{{ asset($settings['app_background']) }}" width="100" class="img-thumbnail">
                                     </div>
@@ -898,10 +895,16 @@
                 }
 
 
-                function toggleBackgroundInput() {
-                    const type = document.getElementById("background_type").value;
-                    document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
-                    document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
+                function toggleBackgroundInput(section) {
+                    const type = document.getElementById(`background_type_${section}`).value;
+                    document.getElementById(`background_color_group_${section}`).style.display = type === "color" ? "block" : "none";
+                    document.getElementById(`background_image_group_${section}`).style.display = type === "image" ? "block" : "none";
+                }
+
+                function toggleAppBackgroundInput() {
+                    const type = document.getElementById('app_background_type').value;
+                    document.getElementById('app_background_color_group').style.display = type === "color" ? "block" : "none";
+                    document.getElementById('app_background_image_group').style.display = type === "image" ? "block" : "none";
                 }
 
     async function updateBackgroundValue() {
