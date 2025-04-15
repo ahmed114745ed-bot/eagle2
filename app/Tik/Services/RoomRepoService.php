@@ -63,7 +63,7 @@ class RoomRepoService
             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
         }
         if (!is_null($request->mode)) {
-            $this->changeMode($request, $request->mode, $userId);
+            $this->changeMode($request, $request->mode, $room);
         }
         $this->repository->updateRoomUser($room);
         return $room;
