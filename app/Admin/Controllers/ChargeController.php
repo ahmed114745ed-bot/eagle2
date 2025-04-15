@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Charge;
@@ -248,6 +249,21 @@ class ChargeController extends MainController
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
+                    <img src='{$icon}' alt='Coin' width='20' height='20'>
+
+                </div>
+            ";
+        });
+        $grid->column('usd', __('usd'))->display(function ($coin) {
+            $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+                $setting =   Setting::where('key', 'shipping_coins')->first();
+                return $setting?->value;
+            });
+            $dollars = $this->coins / $shippingCoins;
+            $icon = asset('images/dollar.jpg');
+            return "
+                <div style='display: flex; align-items: center; gap: 5px;'>
+                    <span>" . number_format($dollars) . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>

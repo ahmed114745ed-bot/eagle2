@@ -86,13 +86,21 @@ class ChargeAction extends Action
         if ($amount < 0 && $agency->coins < abs($amount)) {
             return $this->response()->error(__('Insufficient agency balance'))->refresh();
         }
-        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
-        if (! $oneUsdValueForOneCoin || $oneUsdValueForOneCoin == 0){
-            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
+//        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+//        if (! $oneUsdValueForOneCoin || $oneUsdValueForOneCoin == 0){
+//            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
+//        }
+
+        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+            $setting =   Setting::where('key', 'shipping_coins')->first();
+            return $setting?->value;
+        });
+        if (! $shippingCoins || $shippingCoins == 0){
+            return $this->response()->error(__('please set shipping_coins in configs'))->refresh();
         }
 
-        DB::transaction(function () use ($request, $agency, $user, $amount, $oneUsdValueForOneCoin) {
-            $coins = $request->amount * $oneUsdValueForOneCoin;
+        DB::transaction(function () use ($request, $agency, $user, $amount, $shippingCoins) {
+            $coins = $request->amount * $shippingCoins;
             $agency->coins += $coins;
             $agency->save();
 
@@ -111,8 +119,12 @@ class ChargeAction extends Action
 //        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
 //        $usdAmount = $request->amount / $percentage;
 
-        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
-        $usdAmount = $request->amount * $oneUsdValueForOneCoin;
+        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+            $setting =   Setting::where('key', 'shipping_coins')->first();
+            return $setting?->value;
+        });
+//        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+        $usdAmount = $request->amount * $shippingCoins;
 
         DB::transaction(function () use ($request, $user, $usdAmount) {
             $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
@@ -159,7 +171,9 @@ class ChargeAction extends Action
         //        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
         $this->select('charge_type', __('Charge Type'))->options(['increment' => __('increment'), 'decrement' => __('decrement')])->default('increment');
         //        $this->select('user_type', __('User Type'))->options(['dashdash' => __('App'), 'dash' => __('Agencies')])->default('dashdash'); //dashdash
-        $this->text('amount', __('Amount'));
+        $this->text('amount', __('Amount'))
+            ->addElementClass('price-input')
+            ->help(__('Enter amount in dollars'));
         $this->hidden('amount_type')->value(1);
     }
 
