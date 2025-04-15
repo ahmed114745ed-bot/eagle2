@@ -144,6 +144,7 @@ return [
     'reserved'                                                   => 'Telefon rezerve edilmiştir',
     'notSend'                                                    => 'Kendinize gönderemezsiniz',
     'notFound'                                                   => 'Kullanıcı bulunamadı',
+    'ownerNotFound' => 'Sahip bulunamadı',
 
 
 ];

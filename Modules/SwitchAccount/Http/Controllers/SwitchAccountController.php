@@ -93,13 +93,15 @@ class SwitchAccountController extends Controller
     {
         $bearerToken = $request->token_new_account;
 
-        //        if (strpos($bearerToken, '|') !== false) {
-        //            [$id, $bearerToken] = explode('|', $bearerToken, 2);
-        //        }
-        //        $token = hash('sha256', $bearerToken);
-        $token = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $bearerToken)->first();
-        if (! $token) throw new \Exception( 'user token not found');
-        $otherUser = User::find($token->tokenable_id);
+               if (strpos($bearerToken, '|') !== false) {
+                   [$id, $bearerToken] = explode('|', $bearerToken, 2);
+               }
+               $token = hash('sha256', $bearerToken);
+               
+        $tokenAccount = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $token)->first();
+       // dd($token,$tokenAccount);
+        if (!$tokenAccount) throw new \Exception( 'user token not found');
+        $otherUser = User::find($tokenAccount->tokenable_id);
         return $otherUser;
     }
 
