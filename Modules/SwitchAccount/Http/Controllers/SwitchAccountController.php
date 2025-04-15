@@ -100,7 +100,7 @@ class SwitchAccountController extends Controller
                
         $tokenAccount = DB::table('personal_access_tokens')->where('tokenable_type', "App\Models\User")->where('token', $token)->first();
        // dd($token,$tokenAccount);
-        if (! $token) throw new \Exception( 'user token not found');
+        if (!$tokenAccount) throw new \Exception( 'user token not found');
         $otherUser = User::find($tokenAccount->tokenable_id);
         return $otherUser;
     }
