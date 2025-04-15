@@ -277,9 +277,9 @@ class ChargeController extends MainController
             ";
         });
         $grid->column('actions', __('Actions'))
-            ->display(function () {
-                return (new ChargeAction())->setAgencyId($this->id)->render();
-            })
+            ->display(function () { 
+                
+                 return (new ChargeAction())->setAgencyId($this->id)->render(); })
             ->style('white-space: nowrap; width: 100px;');
         $grid->disableCreateButton();
         $grid->disableExport();

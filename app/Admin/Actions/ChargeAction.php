@@ -42,7 +42,6 @@ class ChargeAction extends Action
         //        }
 
         //        if ($request->user_type == 'dash') {
-
         $agency = $this->getAgency($request->agency_id);
         if (!$agency) {
             return $this->response()->error(__('api_responses.agency'))->refresh();
@@ -86,16 +85,16 @@ class ChargeAction extends Action
         if ($amount < 0 && $agency->coins < abs($amount)) {
             return $this->response()->error(__('Insufficient agency balance'))->refresh();
         }
-//        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
-//        if (! $oneUsdValueForOneCoin || $oneUsdValueForOneCoin == 0){
-//            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
-//        }
+        //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+        //        if (! $oneUsdValueForOneCoin || $oneUsdValueForOneCoin == 0){
+        //            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
+        //        }
 
         $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
             $setting =   Setting::where('key', 'shipping_coins')->first();
             return $setting?->value;
         });
-        if (! $shippingCoins || $shippingCoins == 0){
+        if (! $shippingCoins || $shippingCoins == 0) {
             return $this->response()->error(__('please set agency coins in configs'))->refresh();
         }
 
@@ -116,14 +115,14 @@ class ChargeAction extends Action
 
     private function handleUserCharge(Request $request, User $user)
     {
-//        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
-//        $usdAmount = $request->amount / $percentage;
+        //        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
+        //        $usdAmount = $request->amount / $percentage;
 
         $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
             $setting =   Setting::where('key', 'shipping_coins')->first();
             return $setting?->value;
         });
-//        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+        //        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
         $usdAmount = $request->amount * $shippingCoins;
 
         DB::transaction(function () use ($request, $user, $usdAmount) {
@@ -147,7 +146,7 @@ class ChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0)
     {
-//        $shippingCoins = cache()->get('shipping_coins');
+        //        $shippingCoins = cache()->get('shipping_coins');
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
@@ -165,7 +164,7 @@ class ChargeAction extends Action
     public function form()
     {
         $this->name = __('Charge');
-        $this->hidden('agency_id')->value($this->agencyId);
+        $this->hidden('agency_id')->attribute('id', 'vid');
         // $this->hidden('charger_type')->value('dash');
         //        $this->text('user_id', __('User ID / Agency ID'));
         //        $this->select('id_type', __('ID Type'))->options([0 => __('Normal'), 1 => __('Uuid')]);
@@ -182,9 +181,23 @@ class ChargeAction extends Action
         $title = __('dashboard.add_coins');
         $shippingReports = __('Charge reports');
         $url = url('admin/charge-reports/' . $this->agencyId);
+
         return <<<HTML
-            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" style="background-color: #28a745; border-color: #28a745; color: white;">{$title} </a>
-            <a href="{$url}" class="shipping_report btn btn-sm  text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">{$shippingReports} </a>
+<a href="javascript:void(0);" onclick="pu({$this->agencyId})" class="charge_action btn btn-sm text-white" style="background-color: #28a745; border-color: #28a745; color: white;">
+    {$title}
+</a>
+
+<a href="{$url}" class="shipping_report btn btn-sm text-white" style="background-color: #b93a0f; border-color: #b93a0f; color: white;">
+    {$shippingReports}
+</a>
+
+<script>
+function pu(val) {
+    $("#vid").val(val);
+}
+</script>
 HTML;
     }
+
+   
 }
