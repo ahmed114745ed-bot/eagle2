@@ -264,7 +264,7 @@ class ChargeController extends MainController
                 $dollars = $this->coins / $shippingCoins;
                 $numberFormatDollars = number_format($dollars);
             }else{
-                $numberFormatDollars = __('please set shipping_coins in configs');
+                $numberFormatDollars = __('please set agency coins in configs');
             }
 
             $icon = asset('images/dollar.jpg');

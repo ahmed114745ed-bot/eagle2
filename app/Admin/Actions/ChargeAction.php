@@ -96,7 +96,7 @@ class ChargeAction extends Action
             return $setting?->value;
         });
         if (! $shippingCoins || $shippingCoins == 0){
-            return $this->response()->error(__('please set shipping_coins in configs'))->refresh();
+            return $this->response()->error(__('please set agency coins in configs'))->refresh();
         }
 
         DB::transaction(function () use ($request, $agency, $user, $amount, $shippingCoins) {

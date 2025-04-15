@@ -20,7 +20,7 @@
     "Roles": "Roller",
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
-    "Please set shipping_coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",
+    "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",
     "Charged by app": "Uygulama üzerinden şarj",
   "Permission": "İzin",
   "Menu": "Menü",

@@ -143,7 +143,7 @@
     "Charged by dash": "الشحن من النظام",
     "Charged by app": "الشحن عبر التطبيق",
     "Enter amount in dollars": "ادخل المبلغ بالدولار",
-    "please set shipping_coins in configs": "من فضلك ادخل عملات الوكالة في اعدادات الشحن",
+    "please set agency coins in configs": "من فضلك ادخل عملات الوكالة في اعدادات الشحن",
 
     "Type": "النوع",
     "Level": "المستوى",
