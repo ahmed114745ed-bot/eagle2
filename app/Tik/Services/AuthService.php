@@ -116,10 +116,7 @@ class AuthService
     public function loginWithGoogle($request)
     {
 
-        $checkValidation = $this->verifyGoogleToken($request['google_id']);
-        if (!$checkValidation || $checkValidation['sub'] != $request['google_id']) {
-            throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
-        }
+
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
         if (!$user) {
@@ -138,6 +135,10 @@ class AuthService
                 /*return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
+                $checkValidation = $this->verifyGoogleToken($request['id_token']);
+                if (!$checkValidation || $checkValidation['sub'] != $request['google_id']) {
+                    throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
+                }
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
                     'name' => $request['name'],
