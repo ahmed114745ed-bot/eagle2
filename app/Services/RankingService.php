@@ -101,6 +101,7 @@ class RankingService
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
         } elseif ($class == 6) {
             $data = $this->rankingRepo->getUserGameCoins($type, $limit);
+            $this->transformData($data, $class, 'user_id', 'user');
             return $this->prepareResponse($data, $user, $type, 'user_id', $user->id, $class, $limit);
         }
 
@@ -310,6 +311,7 @@ class RankingService
 
 
         $toArray = $data->toArray();
+       
         $countData = count($data);
         $arr['top'] = $countData < 4 ? $data : array_slice($toArray, 0, 3);
         $arr['other'] = $countData < 4 ? [] : array_slice($toArray, 3);

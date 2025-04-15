@@ -34,7 +34,7 @@ class RankingRepository
         return   $query->select(
             'user_id',
             DB::raw(" SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp")
-        )->groupBy('user_id')->orderByRaw("exp desc")->limit($limit)->get();
+        )->groupBy('user_id')->orderByRaw("exp desc")->with('user')->limit($limit)->get();
     }
 
     public function getGiftLogs($class, $rel, $type, $limit, $keywords)
