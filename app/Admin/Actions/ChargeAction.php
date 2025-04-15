@@ -7,13 +7,14 @@ use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use App\Helpers\Common;
+use App\Models\Setting;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use App\Facades\CustomNotification;
 
 class ChargeAction extends Action
 {
@@ -125,7 +126,11 @@ class ChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
     {
-        $shippingCoins = cache()->get('shipping_coins');
+       // $shippingCoins = cache()->get('shipping_coins');
+        $shippingCoins = \Cache::rememberForever('shipping_coins', function () {
+            $setting =   Setting::where('key', 'shipping_coins')->first();
+            return $setting?->value;
+        });
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
