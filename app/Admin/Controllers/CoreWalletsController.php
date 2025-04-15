@@ -35,61 +35,85 @@ class CoreWalletsController extends MainController
     //     );
     // }
 
-
-
-
     public function index(Content $content)
     {
-        $coreWallets = \App\Models\CoreWallets::whereIn('name', ['app_wallet', 'owner_wallet', 'game_wallet', 'lucky_box'])->get();
+        $coreWallets = CoreWallets::get();
         $icons = [
-            'app_wallet' => 'fa-solid fa-coins',       // Coins icon
-            'owner_wallet' => 'fa-solid fa-user-tie',  // Business user icon
-            'game_wallet' => 'fa-solid fa-dice',       // Dice for gaming
-            'lucky_box' => 'fa-solid fa-box-open'      // Open gift box
+            'app_wallet' => 'fa-solid fa-coins',
+            'owner_wallet' => 'fa-solid fa-user-tie',
+            'game_wallet' => 'fa-solid fa-dice',
+            'lucky_box' => 'fa-solid fa-box-open',
+            'host_agency' => 'fa-solid fa-building',
+            'agency' => 'fa-solid fa-briefcase',
+            'lucky_gifts' => 'fa-solid fa-gift',
+            'chinese_games' => 'fa-solid fa-dragon',
+            'games' => 'fa-solid fa-gamepad',
+            'shipping_agents' => 'fa-solid fa-truck',
+            'payment_gateways' => 'fa-solid fa-credit-card',
+            'mall' => 'fa-solid fa-store',
+            'vip' => 'fa-solid fa-crown',
+            'ads' => 'fa-solid fa-rectangle-ad'
         ];
 
-        $form = '<div class="container mt-4">';
-        $form .= '<div class="row justify-content-center g-4 wallet_div">'; // Added Bootstrap gutter space
+        $form = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
+
+        $form .= '<div class="container mt-4">';
+        $form .= '<div class="row justify-content-center g-4 wallet_div">';
 
         foreach ($coreWallets as $index => $wallet) {
             $icon = $icons[$wallet->name] ?? 'fa-solid fa-wallet';
 
-            $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">'; // Added padding for space
-            $form .= '<div class="card shadow-lg position-relative border-0" 
-          style="border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
-
+            $form .= '<div class="col-md-4 col-lg-4 mb-4 px-3 wallet_posation">';
+            $form .= '<div class="card shadow-lg position-relative border-0"
+  style="border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
 
             // Card hover effect
             $form .= '<style>
-                .card:hover { transform: scale(1.05); }
-              </style>';
+    .card:hover { transform: scale(1.05); }
+  </style>';
 
-            // Edit Button
-            $form .= '<a  href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '" 
-            class="btn btn-primary bg-primary position-absolute top-0 end-0 m-2 rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
-            style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color:rgb(255, 255, 255); font-size: 2rem;"
-            data-bs-toggle="tooltip" data-bs-placement="top" title="' . __('Edit') . '">
-            <span class="fa-solid">' . __('Edit') . '</span> 
-            </a>';
+            // Edit Button - Circle taking all card edges
+            $form .= '<a href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '"
+        class="btn position-absolute top-0 start-0 w-100 h-100 rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+        style="
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 2px solid #fff;
+            border-radius: 50%;
+        "
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="' . __('Edit') . '">
+        <i class="fas fa-pen"></i>
+    </a>';
+
+            // Add hover effect with CSS
+            $form .= '<style>
+        .btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 1);
+        }
+    </style>';
 
             // Card Body
             $form .= '<div class="card-body text-center p-4">';
 
-            // Icon at the top
+            // Icon at the top - Fixed icon display
             $form .= '<div class="mb-3">';
-            $form .= '<i class="' . $icon . ' text-primary fs-1"></i>';
+            $form .= '<i class="' . $icon . ' text-primary" style="font-size: 2.5rem;"></i>';
             $form .= '</div>';
 
             // Wallet Name & Coins
-            $form .= '<h5 class="fw-bold mb-2" style="color: #000000;">' . ucfirst($wallet->name) . '</h5>';
+            $form .= '<h5 class="fw-bold mb-2" style="color: #000000;">' . ucfirst(str_replace('_', ' ', $wallet->name)) . '</h5>';
             $form .= '<p class="fs-5 fw-semibold" style="color: #000000;">' . __('Coins') . ' : ' . number_format($wallet->coins) . '</p>';
-
 
             $form .= '</div>'; // End card-body
 
             // Last Updated in Bottom-Left Corner
             $form .= '<div class="position-absolute bottom-0 start-0 p-6 m-5">';
-            $form .= '<h5 class="text-muted">' . $wallet->update_for_human . '</h5>';
+            $form .= '<h5 class="text-muted" style="padding-right: 5px;">' . $wallet->update_for_human . '</h5>';
             $form .= '</div>';
 
             $form .= '</div>'; // End card
@@ -98,16 +122,11 @@ class CoreWalletsController extends MainController
 
         $form .= '</div>'; // End row
         $form .= '</div>'; // End container
-     
+
         return parent::index($content
             ->title(trans('Application wallet'))
             ->body(new HtmlString($form)));
     }
-
-
-
-
-
 
 
     /**

@@ -5,12 +5,12 @@ namespace App\Tik\Services;
 use App\Exceptions\CValidationException;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
-use App\Models\User;
+use Google_Client;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
-use Encore\Admin\Tree;
+
 use Mockery\Exception;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
@@ -51,6 +51,12 @@ class AuthService
             return false;
         }
     }
+    public function verifyGoogleTokenLogin($idToken)
+    {
+        $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]); // replace with your real client ID
+        $payload = $client->verifyIdToken($idToken);
+        return $payload ? $payload : false;
+    }
 
 
     public function registration($request)
@@ -58,11 +64,11 @@ class AuthService
         if ($this->userRepository->findByPhoneUser($request->phone))  throw new \Exception('already exists');
         if ($this->userRepository->findByPhoneUserTrashed($request->phone))  throw new \Exception(__('api_responses.reserved'));
 
-     
-            $phone = str_replace([' ', '-','/','{','}','_','(',')'], '', $request->phone);
 
-        
-     
+        $phone = str_replace([' ', '-', '/', '{', '}', '_', '(', ')'], '', $request->phone);
+
+
+
 
         $data = [
             'phone' => $phone,
@@ -110,6 +116,8 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
+
+
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
         if (!$user) {
@@ -117,7 +125,7 @@ class AuthService
             if ($trashedEmail) {
                 $trashedEmail->deleted_at = null;
                 $trashedEmail->Save();
-                $user= $trashedEmail;
+                $user = $trashedEmail;
                 $resource = [
                     'google_id' => $request['google_id'],
                     'status' => true,
@@ -128,6 +136,13 @@ class AuthService
                 /*return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
+                // if ($request['id_token']) {
+                //     $checkValidation = $this->verifyGoogleToken($request['id_token']);
+                //     if (!$checkValidation /*|| $checkValidation['sub'] != $request['google_id']*/) {
+                //         throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
+                //     }
+                // }
+
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
                     'name' => $request['name'],
@@ -139,10 +154,10 @@ class AuthService
                     'di' => 1000000,
 
                 ];
-//                $checkValidation = $this->verifyGoogleToken($request['id_token']);
-//                if (!$checkValidation) {
-//                    throw new CValidationException('some thing wrong');
-//                }
+                //                $checkValidation = $this->verifyGoogleToken($request['id_token']);
+                //                if (!$checkValidation) {
+                //                    throw new CValidationException('some thing wrong');
+                //                }
                 $is_new = true;
                 $user = $this->userRepository->create($data);
                 if (\request('tags') && is_array(\request('tags'))) {

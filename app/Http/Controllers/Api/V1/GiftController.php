@@ -23,7 +23,7 @@ class GiftController extends Controller
     }
     public function get_images(Request $request)
     {
-        
+
         $gifts = $this->giftService->get_images();
         return Common::apiResponse(true, '', $gifts, 200);
     }
@@ -69,7 +69,6 @@ class GiftController extends Controller
 
     public function storeList(Request $request)
     {
-        // Log::info(json_encode($request->all()));
         $validator = Validator::make($request->all(), [
             'name'         => 'nullable|string|max:255',
             'e_name'         => 'nullable|string|max:255',
@@ -105,7 +104,7 @@ class GiftController extends Controller
         }
     }
 
-   
+
 
 
 

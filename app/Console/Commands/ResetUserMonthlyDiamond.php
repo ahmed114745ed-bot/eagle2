@@ -67,7 +67,6 @@ class ResetUserMonthlyDiamond extends Command
 //                }
 //            });
 //        } catch (\Exception $e) {
-//            Log::info($e->getMessage());
 //        }
 
 

@@ -82,7 +82,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 "gImage"  => @$user->nowGame?->image
             ]
         ];
-        Log::info('game image ' . ' ' . @$user->nowGame?->image);
         $json = json_encode($d);
         dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         return "gooooooooooooooooooooooooooooood";
@@ -139,13 +138,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         function () {
 
             // Route::post('/broadcasting/auth', function (Request $request) {
-            //     Log::info('broadcasting: '. json_encode($request->all()));
             //     return Broadcast::auth($request);
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
                     $authResponse = Broadcast::auth($request);
-                    // Log::info('✅ Broadcast Auth Successful:', (array) $authResponse);
                     return $authResponse;
                 } catch (\Exception $e) {
                     return response()->json(['success' => false, 'message' => $e->getMessage()],500);
@@ -210,6 +207,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('remove-block', [RoomController::class, 'removeBlock']);
                 Route::post('add-block', [RoomController::class, 'addBlock']);
                 Route::patch('{Room}/comment_status', [RoomController::class, 'commentStatus']);
+                Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
 
                 //Pk
                 Route::middleware(['appFeatureEnable:pk'])->group(function () {

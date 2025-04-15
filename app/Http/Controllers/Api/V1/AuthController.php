@@ -31,10 +31,6 @@ class AuthController extends Controller
         $whatsappOtpService = new WhatsappOtp();
         $phone              = $request->phone;
 
-
-        // \Log::info('Phone:', ['phone' => $phone]);
-        // \Log::info('Code:', ['code' => $request->code]);
-
         // error_log('Phone: ' . $phone);
         // error_log('Code: ' . $request->code);
 
@@ -44,7 +40,6 @@ class AuthController extends Controller
         }
         $isValid  = $whatsappOtpService->isValidate($phone, $request->code);
 
-        // \Log::info('isValid:', ['isValid' => $isValid]);
         // error_log('isValid: ' . ($isValid ? 'true' : 'false'));
 
         if (!$isValid) {
@@ -137,7 +132,6 @@ class AuthController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        // \Log::info('This is login from google :  ' . gettype($user). ' '. json_encode($user));
 
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 408);

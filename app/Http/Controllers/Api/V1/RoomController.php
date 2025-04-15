@@ -124,7 +124,6 @@ class RoomController extends Controller
             $room = $this->roomService->create($request, $user->id);
             return Common::apiResponse(true, 'created', new RoomResource($room), 200);
         } catch (Exception $exception) {
-            // Log::info($exception->getMessage());
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
@@ -1774,15 +1773,15 @@ class RoomController extends Controller
         $room = $this->roomService->findRoom($id);
         if (!$room) {
             return Common::apiResponse(0, 'Room not found', null, 404);
-         
+
         }
 
         $data = [
-            'is_live' => $room->is_live ? true : false,  
+            'is_live' => $room->is_live ? true : false,
             'is_locked' => empty($room->room_pass) ? false : true  ,
-   
+
         ];
             return Common::apiResponse(true, '', $data, 200);
-        
+
     }
 }

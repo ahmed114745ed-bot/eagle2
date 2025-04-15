@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
 //        $this->call(BanTypeSeeder::class);
 //        $this->call(FriendsSeeder::class);
 //        $this->call(LanguageSeeder::class);
-        $this->call(UserSeeder::class);
+//        $this->call(UserSeeder::class);
+        $this->call([
+            CoreWalletsSeeder::class,
+        ]);
     }
 }

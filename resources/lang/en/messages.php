@@ -10,5 +10,6 @@ return[
 'days_ago' => ':days days ago',
 "coins"=> "Sorry, the user does not have this amount",
 'denyDelete' => 'You can use this feature after owning the application.',
+'We can`t update the target system right now because some users still have active targets.' => 'We can\'t update the target system right now because some users still have active targets.',
 
 ];

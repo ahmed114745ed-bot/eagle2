@@ -22,7 +22,6 @@ trait LuckyGiftProbability
         $newProperties = $this->calculateCumulativeSums($newProperties);
 
         $rowIndexWin = $this->getWinRowIndex($newProperties);
-        //        Log::info ('this is lucky array -- '. implode(":", $newProperties) . ' row index = '. $rowIndexWin . ' new items ' . $newItems->count() );
 
         if ($rowIndexWin == -1) return 0;
 

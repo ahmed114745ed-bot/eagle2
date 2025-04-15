@@ -49,7 +49,7 @@ class RoomResource extends JsonResource
             'lang' => $this->lang ?: '',
             'is_pk' => (bool) $pk,
             'is_party' => $isParty,
-            'room_background' => $this->final_room_image,
+            'room_background' => $this->_room_imagfinale,
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
             'country' => $this->country

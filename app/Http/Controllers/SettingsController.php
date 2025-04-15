@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Config;
+use App\Models\Target;
+use App\Models\User;
 use Cache;
 use App\Helpers\Common;
 use App\Models\Setting;
@@ -24,9 +27,20 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-
-
         $data = $request->except('_token');
+        
+        // Check for active targets before updating shipping coins
+        if ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) {
+            $target = Target::first();
+            $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
+            
+            if ($hasActiveTargets) {
+                admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
+                return back();
+            }
+        }
+
+        // Handle background settings
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
@@ -35,12 +49,10 @@ class SettingsController extends Controller
         
         unset($data['background_type'], $data['app_background_image']);
 
+        // Process and save settings
         foreach ($data as $key => $value) {
-            
             if ($value instanceof \Illuminate\Http\UploadedFile) {
-                
                 $value = Common::upload('images', $value);
-               
             }
 
             if (!is_null($value)) {
@@ -52,9 +64,16 @@ class SettingsController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
+        
             $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
             settings()->set($key, true);
         }
+
+        if( $request->has('user_coins')){
+            Config::query()->where('name', '=','one_usd_value_in_coins')->update(['value' => $request->user_coins]);
+   
+       }
+    
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
@@ -121,5 +140,18 @@ class SettingsController extends Controller
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
         return back();
+    }
+
+    public function checkActiveTargets(Request $request)
+    {
+        $target = Target::first();
+        $hasActiveTargets = false;
+        
+        if ($target) {
+            $users = User::where('monthly_diamond_received', '>=', $target->diamonds)->get();
+            $hasActiveTargets = $users->count() > 0;
+        }
+        
+        return response()->json(['hasActiveTargets' => $hasActiveTargets]);
     }
 }

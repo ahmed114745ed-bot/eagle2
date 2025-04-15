@@ -73,4 +73,9 @@ class Charge extends Model
     {
         return $this->belongsTo(AdminUser::class, 'charger_id');
     }
+
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
 }

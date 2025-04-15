@@ -39,27 +39,22 @@ class AgoraController extends Controller
 
         $token = generateRtcToken($request->channel, $user->id);
         $rtmToken = generateAgoraRtmToken( $request->channe ,$user->id);
-        
+
 
         return Common::apiResponse(true, 'Success', [
             'rtc_token' => $token,
             'rtm_token' => $rtmToken,
             'appId' => config('services.agora.app_id'),
             'appCertificate' =>  config('services.agora.app_certificate'),
-           
+
         ]);
-    
+
     }
 
     public function webhook(Request $request)
     {
-
-        Log::info('agora webhook triggered enter room ', [
-            $request->all()
-        ]);
         return ;
         // $agoraSignature = $request->header('Agora-Signature');
-        // Log::info("Agora-Signature: " . $agoraSignature);
 
         // // التحقق من أن الطلب يحتوي على JSON صحيح
         // $data = $request->json()->all();
@@ -76,7 +71,6 @@ class AgoraController extends Controller
         // $clientSeq = $data['payload']['clientSeq'] ?? '';
 
         // // تسجيل البيانات
-        // Log::info("Event code: $eventType, UID: $uid, Channel: $channelName, ClientSeq: $clientSeq");
         //     agora webhook triggered
         //     [{
         //        "noticeId":"1414157015:2753369:102",

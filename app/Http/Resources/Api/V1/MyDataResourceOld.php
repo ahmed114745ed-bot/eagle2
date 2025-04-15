@@ -142,7 +142,6 @@ class MyDataResourceOld extends JsonResource
         $owner = Agency::where('app_owner_id', $this->id)->first();
         $admin = AgencyUserJob::where('user_id', $this->id)->where('type', 'requestManger')->first();
 
-       // \Log::info('counter '. $counters);
         $data               = [
             'id'                   => @$this->id, // both
             'notification_id'      => @$this->notification_id ?: "", // both

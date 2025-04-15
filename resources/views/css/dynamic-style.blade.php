@@ -155,6 +155,10 @@
         background-color: var(--second-alpha) !important;
     }
 
+    .rtl .input-group .form-control {
+        float: right;
+    }
+
     .box-footer {
         background-color: var(--second-color) !important;
         border-top: 1px solid var(--second-alpha) !important;
@@ -631,9 +635,8 @@
 
             }
 
-
            .rtl .form-horizontal .box-footer .btn-group {
-                float: right !important;
+                float: right;
             }
             .rtl .content-wrapper-rtl{
                 margin-right: 42px !important;
@@ -769,6 +772,54 @@
         }
     }
 
+    .rtl [class*="col-md-"] {
+        float: right;
+    }
+
+    .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-left,
+    .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-down {
+        transform: rotate(180deg);
+        text-align: left;
+        top: 13px;
+        right: 190px;
+    }
+
+    .rtl .sidebar-menu .treeview.active > a > .fa-angle-left,
+    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-left,
+    .rtl .sidebar-menu .treeview.active > a > .fa-angle-down,
+    .rtl .sidebar-menu .treeview.menu-open > a > .fa-angle-down,
+    .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-left,
+    .rtl .sidebar-menu .treeview-menu>li.active>a>.fa-angle-down {
+        transform: rotate(-90deg);
+    }
+
+    .tab-buttons {
+        display: flex;
+        width: 100%;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .tab-button {
+        background-color: var(--secondary-color);
+        flex: 1;
+        padding: 5px;
+        text-align: center;
+        font-size: 18px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .tab-button:hover {
+        opacity: 0.8;
+    }
+
+    .tab-button.active {
+        background-color: var(--primary-color);
+        border: 2px solid #fff;
+        opacity: 1;
+    }
 
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);

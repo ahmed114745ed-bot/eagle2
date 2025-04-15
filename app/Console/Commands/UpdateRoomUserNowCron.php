@@ -41,8 +41,6 @@ class UpdateRoomUserNowCron extends Command
     public function handle()
     {
 
-        //\Log::info("Testing Cron is Running ... !");
-
         $rooms_now_live = self::getIdRoomCountUserFromPresenceChannel();
 
         $rooms_now_live = collect($rooms_now_live)->sortBy(function($item, $key) {

@@ -45,8 +45,7 @@ class MyStoreResource extends JsonResource
         });
 
         $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
-        \Log::info(['salary'=>$sallary]);
-       
+
         $data = [
 
             'my_store' => [

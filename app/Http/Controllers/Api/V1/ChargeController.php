@@ -99,7 +99,6 @@ class ChargeController extends Controller
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
-            // Log::info('this from charge to - ' . $exception->getMessage());
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }

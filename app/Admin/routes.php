@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\ChargeReportController;
+use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -349,6 +351,7 @@ Route::group(
         $router->resource('thrown_boxes', 'BoxUseController');
         $router->resource('reports', 'ReportController');
         $router->resource('charges-reports', 'ChargeReportController');
+        $router->get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         $router->resource('sallaries', 'SallariesController')->name('index', 'sallaries');
         $router->resource('total-statistics', 'AllStatisticController');
         $router->resource('coin-reports', 'CoinReportController');
@@ -460,6 +463,8 @@ Route::group(
         $router->resource('languages', LanguageController::class);
         $router->resource('settings', SettingController::class);
         $router->resource('room-settings', RoomSettingsController::class);
+        $router->resource('charges-settings', ChargesSettingController::class);
+
 
         $router->resource('notification-templates', NotificationsTemplatesController::class);
        // Route::get('ware-management', [WareTabController::class, 'index']);
