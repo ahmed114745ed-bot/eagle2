@@ -793,6 +793,34 @@
         transform: rotate(-90deg);
     }
 
+    .tab-buttons {
+        display: flex;
+        width: 100%;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .tab-button {
+        background-color: var(--secondary-color);
+        flex: 1;
+        padding: 5px;
+        text-align: center;
+        font-size: 18px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .tab-button:hover {
+        opacity: 0.8;
+    }
+
+    .tab-button.active {
+        background-color: var(--primary-color);
+        border: 2px solid #fff;
+        opacity: 1;
+    }
+
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);
     }

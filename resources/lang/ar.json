@@ -139,6 +139,10 @@
     "sender: 1 coin = 10 exp -- receiver: 1 coin = 1 exp": "المرسل : 1 كوين = 10 نقاط خبرة و المتلقى 1 كوين = 1 نقاط خبرة",
     "broadcaster": "متلقي",
     "honor": "مرسل",
+
+    "Charged by dash": "الشحن من النظام",
+    "Charged by app": "الشحن عبر التطبيق",
+
     "Type": "النوع",
     "Level": "المستوى",
     "Exp": "نقاط الخبرة",
