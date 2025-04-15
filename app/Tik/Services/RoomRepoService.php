@@ -51,10 +51,19 @@ class RoomRepoService
     {
         $data = array_merge($request->all(), ['uid' => $userId]);
         $room = $this->repository->create($data);
+        
+        if ($request->type) {
+            $room->type = $request->type;
+            if ($request->type == 'single_live' || $request->type == 'multi_live') {
+                $room->is_live = true;
+            }
+        }
+        
         if ($request->hasFile('room_cover')) {
             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
-            $this->repository->updateRoomUser($room);
+           
         }
+        $this->repository->updateRoomUser($room);
         return $room;
     }
 
