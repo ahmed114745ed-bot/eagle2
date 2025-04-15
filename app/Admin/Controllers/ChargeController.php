@@ -259,11 +259,18 @@ class ChargeController extends MainController
                 $setting =   Setting::where('key', 'shipping_coins')->first();
                 return $setting?->value;
             });
-            $dollars = $this->coins / $shippingCoins;
+
+            if ($shippingCoins){
+                $dollars = $this->coins / $shippingCoins;
+                $numberFormatDollars = number_format($dollars);
+            }else{
+                $numberFormatDollars = __('please set shipping_coins in configs');
+            }
+
             $icon = asset('images/dollar.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($dollars) . "</span>
+                    <span>" . $numberFormatDollars . "</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
