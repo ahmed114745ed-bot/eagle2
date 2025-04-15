@@ -288,7 +288,7 @@
         /* تقليل عرض شريط التمرير */
 
     }
- 
+
     .settings-menu button {
         background-color: var(--box-background-color);
         border: none;
@@ -513,13 +513,48 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>
-                                <input type="color" id="box_background_color" name="box_background_color"
-                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
-                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
+                                <label for="background_type">{{ __('Background Type') }}</label>
+                                <select id="background_type" name="background_type" class="form-control"
+                                        onchange="toggleBackgroundInput()">
+                                    <option value="color" {{ ($settings['background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
+                                    <option value="image" {{ ($settings['background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
+                                </select>
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="background_color_group">
+                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>
+                                <input type="color" id="box_background_color" name="box_background_color"
+                                       value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                                       style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
+                                       title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="background_image_group"
+                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
+                                <label for="background_image">{{ __('Background Image') }}</label>
+                                <input type="file" id="background_image" name="app_background_image" class="form-control">
+                                @if(!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
+                                    <div class="mt-2">
+                                        <img src="{{ asset($settings['app_background']) }}" width="100" class="img-thumbnail">
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
+{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
+{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
+{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
+{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -666,15 +701,15 @@
                                     value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
                             </div>
                         </div>
-            
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="second_color">{{ __('Second Color') }}</label>
-                                <input type="color" id="second_color" name="app_second_color" 
+                                <input type="color" id="second_color" name="app_second_color"
                                     value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
@@ -685,18 +720,18 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
-                            <div class="form-group" id="background_color_group" 
+                            <div class="form-group" id="background_color_group"
                                 style="display: {{ ($settings['background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="background_color">{{ __('Background Color') }}</label>
                                 <input type="color" id="background_color" name="background_color" class="form-control"
                                     value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
-                            <div class="form-group" id="background_image_group" 
+                            <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
                                 <input type="file" id="background_image" name="app_background_image" class="form-control">
@@ -707,7 +742,7 @@
                                 @endif
                             </div>
                         </div>
-            
+
                         <div class="col-12 d-flex gap-3 mt-3">
                             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             <button type="button" id="resetAppColors"
@@ -872,7 +907,7 @@
     async function updateBackgroundValue() {
         const type = document.getElementById("background_type").value;
         const hiddenInput = document.getElementById("app_background");
-        
+
         if (type === "color") {
             hiddenInput.value = document.getElementById("background_color").value;
         } else if (type === "image") {

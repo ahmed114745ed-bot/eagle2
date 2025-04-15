@@ -387,7 +387,7 @@ class Common
     {
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
-        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, \config('filesystems.default'));
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
 

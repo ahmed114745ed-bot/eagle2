@@ -11,7 +11,7 @@
         --background-image: {{ config('themes.backgroundImage') }};
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-        --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
         --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
 
@@ -36,7 +36,7 @@
         border-color: #337ab7
     }
     .skin-black-light .content-header {
-    background: var(--second-alpha) !important;
+    background: var(--secondary-color) !important;
     box-shadow: none;
    }
 
@@ -55,6 +55,10 @@
     .skin-black-light .wrapper,
     .skin-black-light .main-sidebar,
     .skin-black-light .left-side {
+        background-color: var(--box-background-color) !important;
+    }
+
+    .skin-black-light .main-sidebar{
         background-color: var(--secondary-color) !important;
     }
 
@@ -65,13 +69,13 @@
 
     body {
         color: var(--primary-color) !important;
-        background-color: var(--secondary-color) !important;
+        background-color: var(--box-background-color) !important;
     }
 
     .skin-black-light .content-wrapper,
     .skin-black-light .main-footer {
         border-left: 1px solid var(--second-alpha) !important;
-        background-color: var(--secondary-color) !important;
+        background-color: var(--box-background-color) !important;
         background-image: var(--background-image) !important;
     }
 
@@ -133,7 +137,7 @@
 
 
     .sidebar-menu > li > .treeview-menu {
-        background: var(--secondary-color) !important;
+        background: var(--box-background-color) !important;
     }
 
     .table.table-hover tbody tr:hover {
@@ -208,7 +212,7 @@
 
     .skin-black-light .main-header > .navbar {
         color: var(--primary-color) !important;
-        background-color: var(--secondary-color) a !important;
+        background-color: var(--box-background-color) a !important;
 
     }
 
