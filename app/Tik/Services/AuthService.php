@@ -135,12 +135,12 @@ class AuthService
                 /*return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
-                if ($request['id_token']) {
-                    $checkValidation = $this->verifyGoogleToken($request['id_token']);
-                    if (!$checkValidation /*|| $checkValidation['sub'] != $request['google_id']*/) {
-                        throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
-                    }
-                }
+                // if ($request['id_token']) {
+                //     $checkValidation = $this->verifyGoogleToken($request['id_token']);
+                //     if (!$checkValidation /*|| $checkValidation['sub'] != $request['google_id']*/) {
+                //         throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
+                //     }
+                // }
 
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
