@@ -547,7 +547,13 @@
                                 <input type="file" id="brand_background_image" name="brand_background_image" class="form-control">
                                 @if(!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
                                     <div class="mt-2">
-                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">
+                                        <img id="imagePreview"
+                                             src="{{ !empty($settings['brand_background_image']) ? getImagePath($settings['brand_background_image']) : '' }}"
+                                             width="100" class="mt-2"
+                                             style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                             onclick="openFullScreen(this)">
+
+{{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
                                     </div>
                                 @endif
                             </div>
