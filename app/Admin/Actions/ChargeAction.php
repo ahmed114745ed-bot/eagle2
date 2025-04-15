@@ -47,9 +47,10 @@ class ChargeAction extends Action
             return $this->response()->error(__('api_responses.agency'))->refresh();
         }
         if ($agency->is_frozen == 1) {
-            return $this->response()->error(__('api_responses.frozen'))->refresh();
+            return $this->response()->error(__('frozen'))->refresh();
         }
         $user = $agency->owner;
+        if(!$user)  return $this->response()->error(__('api_responses.ownerNotFound'))->refresh();
         return $this->handleAgencyCharge($request, $agency, $user);
 
         //        }
