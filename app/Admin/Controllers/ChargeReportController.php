@@ -563,6 +563,10 @@ class ChargeReportController extends MainController
 
     public function showChargeReports(Content $content, $agency_id)
     {
+        if (!request()->has('scope')) {
+            return redirect()->to(url()->current() . '?scope=dash');
+        }
+
         return $content
             ->title(__('Charge Reports'))
             ->body($this->customGrid($agency_id));
@@ -572,10 +576,28 @@ class ChargeReportController extends MainController
     {
         $grid = new Grid(new Charge());
 
-        $grid->filter(function (Grid\Filter $filter){
+        // Add tabs to the header
+        $grid->header(function () {
+            $scope = request('scope', 'dash');
+            return '
+        <div class="tab-buttons">
+            <a href="?scope=dash" class="tab-button btn-dash ' . ($scope === 'dash' ? 'active' : '') . '">' . __('Charged by dash') . '</a>
+            <a href="?scope=not_dash" class="tab-button btn-agency ' . ($scope === 'not_dash' ? 'active' : '') . '">' . __('Charged by app') . '</a>
+        </div>
+    ';
+        });
 
+        // Apply scope based on query parameter
+        $scope = request('scope');
+        if ($scope === 'dash') {
+            $grid->model()->where('charger_type', 'dash');
+        } else {
+            $grid->model()->where('charger_type', '!=', 'dash');
+        }
+
+        // Add filters
+        $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
             $filter->disableIdFilter();
 
             $filter->where(function ($query) {
@@ -589,47 +611,95 @@ class ChargeReportController extends MainController
             }, __('to_date'), 'to_date')->date();
         });
 
-        $grid->model()->where('user_id', $agency_id)->orderByDesc('created_at');
-
+        // Define columns
         $grid->column('id', __('ID'));
-        $grid->column('admin.name', __('creator'))->display(function () {
+        if ($scope === 'dash') {
+            $grid->column('admin.name', __('creator'))->display(function () {
+                $name = $this->admin->name ?? '';
+                $path = $this->admin->avatar ?? null;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            $name = $this->admin->name ?? '';
-            $path = $this->admin->avatar ?? null;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = '#';
+                if ($this->admin && $this->admin->id) {
+                    $showUrl = url("admin/auth/users/{$this->admin->id}");
+                }
 
-            $showUrl = '#';
-            if ($this->admin && $this->admin->id) {
-                $showUrl = url("admin/auth/users/{$this->admin->id}");
-            }
+                return "
+                 <div style='display: flex; align-items: center; gap: 10px;'>
+                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         $image
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                     </a>
+                 </div>
+                ";
+            });
+        }
 
-            return "
-             <div style='display: flex; align-items: center; gap: 10px;'>
-                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                     $image
-                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                 </a>
-             </div>
-             ";
-        });
+        if ($scope !== 'dash') {
+            $grid->column('charger_id', __('charger'))->display(function () {
+                if ($this->charger_type == 'agency') {
+                    $name = $this->agency->name ?? 'No Agency';
+                    $path = $this->agency->img ?? null;
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                    $showUrl = $this->agency ? url("admin/agencies/{$this->agency->id}") : '#';
+                    $link = $this->agency ? "
+                                                <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                                    <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                                                </a>
+                                            " : "<span style='color: gray;'>No Agency</span>";
+
+                    return "
+                                <div style='display: flex; align-items: center; gap: 10px;'>
+                                    $image
+                                    $link
+                                </div>
+                            ";
+                } else {
+                    $name = $this->user->name ?? 'No User';
+                    $uid = $this->user->uuid ?? 'N/A';
+                    $path = $this->user->profile->avatar ?? null;
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+                    $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                    return "
+                                <div style='display: flex; align-items: center; gap: 10px;'>
+                                    $image
+                                    <div>
+                                        <strong>$name</strong><br>
+                                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                                    </div>
+                                </div>
+                            ";
+                }
+            });
+        }
 
         $grid->column('amount', __('Amount'));
-        $grid->column('amount_type', __('Amount'))->display(function (){
-            if ($this->amount < 0){
-                return __('decrement');
-            }else{
-                return __('increment');
-            }
+        $grid->column('amount_type', __('Amount'))->display(function () {
+            return $this->amount < 0 ? __('decrement') : __('increment');
         });
         $grid->column('created_at', __('Created at'));
 
+        // Disable unnecessary buttons
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();
