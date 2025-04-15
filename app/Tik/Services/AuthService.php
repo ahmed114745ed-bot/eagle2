@@ -116,7 +116,7 @@ class AuthService
     public function loginWithGoogle($request)
     {
 
-        $checkValidation = $this->verifyGoogleTokenLogin($request['google_id']);
+        $checkValidation = $this->verifyGoogleToken($request['google_id']);
         if (!$checkValidation || $checkValidation['sub'] != $request['google_id']) {
             throw new \App\Exceptions\CValidationException('Invalid Google ID Token');
         }
