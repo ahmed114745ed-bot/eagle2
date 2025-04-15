@@ -9,6 +9,7 @@
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
         --table-background-color: {{ config('themes.tableBackGroundColor')}}
         --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image:: {{ config('themes.brandBackgroundImage') }};
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
         --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
@@ -76,7 +77,7 @@
     .skin-black-light .main-footer {
         border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--box-background-color) !important;
-        background-image: var(--background-image) !important;
+        background-image: var(--brand_background-image) !important;
     }
 
     .content-header {

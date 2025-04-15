@@ -45,6 +45,8 @@ class SettingsController extends Controller
             $data['app_background'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
+        } elseif ($request->brand_background_type === 'image' && $request->hasFile('brand_background_image')) {
+            $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
         }
 
         unset($data['background_type'], $data['app_background_image']);
