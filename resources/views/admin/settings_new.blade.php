@@ -467,7 +467,7 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST">
+                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
 
