@@ -85,12 +85,17 @@ class ChargeAction extends Action
         if ($amount < 0 && $agency->coins < abs($amount)) {
             return $this->response()->error(__('Insufficient agency balance'))->refresh();
         }
+        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+        if (! $oneUsdValueForOneCoin || $oneUsdValueForOneCoin == 0){
+            return $this->response()->error(__('please set usd_value_in_coins in configs'))->refresh();
+        }
 
-        DB::transaction(function () use ($request, $agency, $user, $amount) {
-            $agency->coins += $amount;
+        DB::transaction(function () use ($request, $agency, $user, $amount, $oneUsdValueForOneCoin) {
+            $coins = $request->amount * $oneUsdValueForOneCoin;
+            $agency->coins += $coins;
             $agency->save();
 
-            $this->createChargeRecord($request, $user, $agency, $amount);
+            $this->createChargeRecord($request, $user, $agency, $amount, $coins);
 
             if ($request->charge_type == "increment") {
                 CustomNotification::chargeAction($user, $request);
@@ -102,8 +107,11 @@ class ChargeAction extends Action
 
     private function handleUserCharge(Request $request, User $user)
     {
-        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
-        $usdAmount = $request->amount / $percentage;
+//        $percentage = Common::getConf("special_transfer_to_usd") ?? 1;
+//        $usdAmount = $request->amount / $percentage;
+
+        $oneUsdValueForOneCoin = Common::getConf('one_usd_value_in_coins');
+        $usdAmount = $request->amount * $oneUsdValueForOneCoin;
 
         DB::transaction(function () use ($request, $user, $usdAmount) {
             $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
@@ -117,23 +125,24 @@ class ChargeAction extends Action
                 CustomNotification::chargeAction($user, $request);
             }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
+
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
 
         return $this->response()->success('Success')->refresh();
     }
 
-    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $usdAmount = 0)
+    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0)
     {
-        $shippingCoins = cache()->get('shipping_coins');
+//        $shippingCoins = cache()->get('shipping_coins');
         $charge = new Charge();
         $charge->charger_id = Auth::id();
         $charge->charger_type = $request->user_type == 'dash' ? 'dash' : 'dash';
         $charge->user_id = $agency->id;
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = 'agency';
-        $charge->amount = $amount;
-        $charge->usd = $amount / $shippingCoins;
+        $charge->amount = $coins;
+        $charge->usd = $amount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
         //dd($charge);
         $charge->save();
