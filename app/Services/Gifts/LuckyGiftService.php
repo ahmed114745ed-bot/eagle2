@@ -171,6 +171,7 @@ class LuckyGiftService
 
         //new user coins
         $responseData['user_coins'] = $userCoins;
+        $responseData['gift_num'] = $receiversCount * $number * $count;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;
