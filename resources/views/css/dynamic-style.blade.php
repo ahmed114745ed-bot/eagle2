@@ -198,7 +198,7 @@
     select,
     .select2-container .select2-selection--single,
     .select2-container .select2-selection--multiple {
-        background-color: var(--box-background-color) !important;
+        background-color: var(--secondary-color) !important;
         color: var(--text-primary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
