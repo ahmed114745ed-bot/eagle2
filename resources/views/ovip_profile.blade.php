@@ -66,7 +66,7 @@
             height: 200px;
             border-radius: 50%;
             border: 3px solid var(--primary-color);
-          
+
             margin-bottom: 15px;
         }
 
@@ -86,7 +86,6 @@
             padding: 10px;
             border: none;
             cursor: pointer;
-            color: black;
             font-weight: bold;
             width: 100%;
             margin-top: 15px;
@@ -94,7 +93,7 @@
         button:hover {
             background: #e68900;
         }
-        
+
         /* Table styles */
         .table-responsive {
             overflow-x: auto;
@@ -116,7 +115,7 @@
             border-radius: 50%;
             width: 50%;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
@@ -145,7 +144,7 @@
             width: auto;
              }
         }
-        
+
         @media (max-width: 480px) {
             .details p {
                 font-size: 14px;
@@ -296,7 +295,7 @@
                 @foreach($oVip->privilegs as $privilege)
                     <div class="privilege-item">
                         <div class="image-container">
-                            <img src="{{ getImagePath($privilege->img1) }}"  
+                            <img src="{{ getImagePath($privilege->img1) }}"
                             class="privilege-img"
                             data-level="{{ $oVip->level }}"
                             data-type="{{ $privilege->type }}"
@@ -327,14 +326,14 @@
         </div>
     </div>
 </div>
-  
+
           <!-- <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
           <!-- Load jQuery first -->
 
  <script>
 
-   
-  
+
+
     function getFileExtension(url) {
         try {
             const pathname = new URL(url).pathname;
@@ -427,8 +426,8 @@
 
 
 
- 
-    
+
+
     const script1 = document.createElement('script');
     const script2 = document.createElement('script');
 
@@ -522,8 +521,8 @@
 
 
  </script>
-        
-        
+
+
     </div>
 </body>
 </html>

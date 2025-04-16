@@ -188,7 +188,6 @@
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
     }
 
