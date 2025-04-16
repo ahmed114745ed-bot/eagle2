@@ -49,6 +49,10 @@ class SettingsController extends Controller
             $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
         }
 
+        if ($request->has('brand_background_image_reset') && $request->brand_background_image_reset == '1') {
+            $data['brand_background'] = null;
+        }
+
         unset($data['background_type'], $data['app_background_image'], $data['brand_background_image']);
 
         // Process and save settings
