@@ -401,6 +401,10 @@
         border: 1px solid transparent !important;
     }
 
+    .box{
+        background-color: var(--secondary-color) !important
+    }
+
     .btn-default {
         background-color: var(--primary-hover-alpha) !important;
         color: var(--inverse-box-color) !important;
