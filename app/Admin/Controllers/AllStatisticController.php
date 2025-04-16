@@ -88,7 +88,7 @@ class AllStatisticController extends MainController
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($remainingDiamond) {
 
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Remaining diamond') );
-                    $row->column(6, new InfoBox(__('totalDiamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), number_format(@$remainingDiamond ?? 0)));
+                    $row->column(6, new InfoBox(__('total remaining diamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), number_format(@$remainingDiamond ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user_sallaries, $agency_sallaries) {
                     $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('salaries') );
