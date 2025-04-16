@@ -148,32 +148,10 @@ class AgencyController extends MainController
             ->title(__("agency details"))
             ->row(function ($row) use ($id) {
                 $agency = Agency::find($id);
-                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', User::query()->where('agency_id', $id)->count()));
+                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users',$agency->users()->count()));
                 $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
                 $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-                    ->groupByRaw('agency_id,add_month,add_year')->get()->count()));
-                //                $row->column(3, new InfoBox(__('Store'), 'shopping-cart', 'red', route ('admin.wares'), Ware::query ()->count ()));
-            })
-            ->row(function ($row) use ($id) {
-
-                //     if (request ('type') == 'users'){
-                //         $row->column(12,__ ('Users'));
-                //         $row->column(12, $this->usersGrid($id));
-                //     }elseif(request ('type') == 'target'){
-                //         $row->column(12,__ ('target'));
-                //         $row->column(12, $this->targetGrid($id));
-                //     }elseif (request ('type') == 'balance_details'){
-                //         $row->column(12,__ ('balance details'));
-                //         $row->column(12, $this->balance_details($id));
-                //     }else{
-                //         $row->column(12,__ ('target'));
-                //         $row->column(12, $this->targetGrid($id));
-                //     }
-
-                // })
-
-                // ;
-
+                    ->groupByRaw('agency_id,add_month,add_year')->count()));
             }));
     }
 
@@ -322,7 +300,7 @@ class AgencyController extends MainController
                         'id' => $memper->id ?? 0,
                         'uuid' => $memper->uuid ?? 0,
                         'name' => $memper->name ?? '',
-                        'reals_count' => count($memper->reals) ?? 0,
+                        'reals_count' => $memper->reals()->count() ?? 0,
                         'total_days' => $memper->total_days ?? 0,
                         'total_hours' => $memper->liveTime->sum("hours"),
                         'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
@@ -375,11 +353,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $grid->model()->where('id', $id)->orderByDesc('id');
-
         $grid->id('ID');
-        // $grid->column('owner_id',trans ('owner id'))->modal ('owner info',function ($model){
-        //     return Common::getAdminShow ($model->owner_id);
-        // });
         $grid->column('name', trans('name'));
         $grid->column('salary', trans('salary'));
         $grid->column('img', trans('img'))->image('', 30);
@@ -447,9 +421,7 @@ class AgencyController extends MainController
                 return $ops2;
             })->ajax('/api/search/users3', 'id', 'name');
             if ($form->isEditing()) {
-                //            $form->hidden('app_owner_id', __('app owner id'));
                 $form->hidden('agency_manger_id', __('app manger id'));
-                // $form->hidden('agency_dash_manger_id', __('dash owner id'));
             }
 
             $form->text('name', __('name'))->rules('required');
@@ -460,19 +432,9 @@ class AgencyController extends MainController
             $form->url('url', __('url'));
             $form->image('img', __('img'))->rules('required');
             $form->textarea('contents', __('contents'));
-            $form->switch('Host_agency', trans('Host agency'))->default(true)->rules(function ($form) {
-                // $shippingAgency = $form->input('Shipping_agency');
-                // return [
-                //     Rule::requiredIf(!$shippingAgency && !$form->input('at_least_one_selected'))
-                // ];
-            });
+            $form->switch('Host_agency', trans('Host agency'))->default(true);
             if (!Auth::user()->isRole('Agencies Managers')) {
-                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)->rules(function ($form) {
-                    // $hostAgency = $form->input('Host_agency');
-                    // return [
-                    //     Rule::requiredIf(!$hostAgency && !$form->input('at_least_one_selected'))
-                    // ];
-                });
+                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)
             }
         } else {
 
@@ -483,45 +445,21 @@ class AgencyController extends MainController
                 }
                 return $ops2;
             })->ajax('/api/search/users3', 'id', 'name');
-            if (!$form->isEditing()) {
-                //$form->select('agency_manger_id', __('Agency Manger app Id'))->options($opsAgencyManger)->required();
-                // $form->select('agency_dash_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerDash)->required();
-            }
-
+            
             if ($form->isEditing()) {
-                //            $form->hidden('app_owner_id', __('app owner id'));
                 $form->hidden('agency_manger_id', __('app manger id'));
-                // $form->hidden('agency_dash_manger_id', __('dash owner id'));
             }
 
             $form->text('name', __('name'))->rules('required');
-            // $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
             $form->text('notice', __('notice'))->rules('required');
             $form->switch('status', __('status'));
             $form->text('phone', __('phone'))->rules('required');
             $form->url('url', __('url'));
             $form->image('img', __('img'))->rules('required');
             $form->textarea('contents', __('contents'));
-
-
-            // $form->switch('Shipping_agency', trans('Shipping agency'))->default(true);
-            // $form->switch('Host_agency', trans('Host agency'))->default(false);
-
-            // $form->switch('at_least_one_selected', __('At least one selected'))->default(false)->readonly();
-
-            $form->switch('Host_agency', trans('Host agency'))->default(true)->rules(function ($form) {
-                // $shippingAgency = $form->input('Shipping_agency');
-                // return [
-                //     Rule::requiredIf(!$shippingAgency && !$form->input('at_least_one_selected'))
-                // ];
-            });
+            $form->switch('Host_agency', trans('Host agency'))->default(true);
             if (!Auth::user()->isRole('Agencies Managers')) {
-                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)->rules(function ($form) {
-                    // $hostAgency = $form->input('Host_agency');
-                    // return [
-                    //     Rule::requiredIf(!$hostAgency && !$form->input('at_least_one_selected'))
-                    // ];
-                });
+                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false);
             }
         }
 
@@ -533,30 +471,7 @@ class AgencyController extends MainController
          </script>');
         }
 
-        /*$form->html('
-                <script>
-                    $(document).ready(function() {
-                        $("#app_owner_id").on("change", function() {
-                            var selectedValue = $(this).val();
-                            if (selectedValue) {
-                                alert("يجب على مالك الوكالة تعديل معلومات الوكالة من التطبيق.\n\n" +
-                                    "مع العلم أنه يمكن للوكيل تسجيل الدخول من خلال لوحة التحكم باستخدام البيانات التالية:\n\n" +
-                                    "اسم المستخدم: uuid\nكلمة المرور: *******");
-                            }
-                        });
-                    });
-                </script>
-            ');*/
-
         $form->saving(function (Form $form) {
-
-
-            // $shippingAgency = $form->input('Shipping_agency');
-            // $hostAgency = $form->input('Host_agency');
-
-            // $atLeastOneSelected = $shippingAgency || $hostAgency;
-
-            // $form->input('at_least_one_selected', $atLeastOneSelected);
 
             $appOwnerId = $form->input('app_owner_id');
             $Host_agency = $form->input('Host_agency');
