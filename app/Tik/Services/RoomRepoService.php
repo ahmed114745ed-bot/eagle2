@@ -61,15 +61,19 @@ class RoomRepoService
 
         if ($request->hasFile('room_cover')) {
             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+        } else {
+            $room->room_cover = $request->room_cover;
         }
+
         if (!is_null($request->mode)) {
             $this->changeMode($request, $request->mode, $room);
         }
+        
         $this->repository->updateRoomUser($room);
         return $room;
     }
 
-    
+
     public function findRoomUser($userId)
     {
         return $this->repository->findRoomUser($userId);
@@ -257,7 +261,8 @@ class RoomRepoService
         return $this->repository->getRoomsByGameId(gameId: $gameId, with: ['game', 'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1), 'backgroundImage']);
     }
 
-    public function changeMode($request, $currentMode, Room $room){
+    public function changeMode($request, $currentMode, Room $room)
+    {
         $lastMode = $room->mode;
 
         $room->mode = $currentMode;
@@ -294,7 +299,6 @@ class RoomRepoService
     {
         if ($room == null) return '';
         return $room->final_room_image;
-
     }
 
     // public function changeMode($request, $currentMode, $userId = null)
