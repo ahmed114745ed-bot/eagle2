@@ -90,5 +90,4 @@
 </div>
 
 
-    <strong>Powered by <a href="https://github.com/z-song/laravel-admin" target="_blank">{{config('admin.company_name')}}</a></strong>
 </footer>
