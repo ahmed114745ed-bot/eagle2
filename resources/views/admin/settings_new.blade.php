@@ -267,7 +267,7 @@
         align-items: center;
         padding: 10px 0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
         overflow-x: auto;
         /* يجعل الشريط قابلاً للتمرير عند الحاجة */
         white-space: nowrap;
@@ -279,7 +279,7 @@
     .settings-menu {
         display: flex;
         gap: 4px;
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
         overflow-x: auto;
         /* يجعل الشريط قابلاً للتمرير عند الحاجة */
         white-space: nowrap;
@@ -296,7 +296,7 @@
         font-size: 16px;
         cursor: pointer;
         transition: color 0.3s ease-in-out;
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
@@ -932,7 +932,7 @@
                     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
                     if (activeButton) {
                         activeButton.style.backgroundColor = 'var(--primary-color)';
-                        activeButton.style.color = 'var(--text-primary-color)';
+                        activeButton.style.color = 'var(--text-secondary-color)';
                     }
 
                     // Update the URL with the selected tab without reloading
