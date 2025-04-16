@@ -158,7 +158,7 @@
     }
 
     .form-control, select, .select2-container .select2-selection--single, .select2-container .select2-selection--multiple{
-        background: var(--secondary-color) !important;
+        background: none !important;
     }
 
     .table.table-hover tbody tr:hover {
