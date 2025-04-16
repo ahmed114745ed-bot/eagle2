@@ -67,6 +67,10 @@
         background: var(--second-alpha) !important;
     }
 
+    * {
+        color: var(--text-secondary-color)
+    }
+
     body {
         color: var(--text-secondary-color) !important;
         background-color: var(--box-background-color) !important;
@@ -192,6 +196,7 @@
 
     .btn-primary {
         background-color: var(--primary-color) !important;
+        color: var(--text-secondary-color);
     }
 
     .form-control,
