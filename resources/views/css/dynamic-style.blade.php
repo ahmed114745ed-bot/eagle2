@@ -199,6 +199,10 @@
         color: var(--text-secondary-color);
     }
 
+    .btn-primary:hover{
+        color: var(--secondary-color); !important;
+    }
+
     .form-control,
     select,
     .select2-container .select2-selection--single,
