@@ -568,23 +568,26 @@
 {{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
 {{--                            </div>--}}
 {{--                        </div>--}}
+                    </div>
 
+                    <div class="form row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="table_background_color">{{ __('Table Background Color:') }}</label>
                                 <input type="color" id="table_background_color" name="table_background_color"
-                                    value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                                    style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
-                                    title="لون خلفية الجداول في التقارير أو البيانات.">
+                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
+                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
+                                       title="لون خلفية الجداول في التقارير أو البيانات.">
                             </div>
                         </div>
-
-                        <div class="col-12 d-flex gap-3 mt-3">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                            <button type="button" id="resetColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
-                        </div>
                     </div>
+
+                    <div class="col-12 d-flex gap-3 mt-3">
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        <button type="button" id="resetColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                    </div>
+
                 </form>
             </div>
 
@@ -756,12 +759,14 @@
                             </div>
                         </div>
 
-                        <div class="col-12 d-flex gap-3 mt-3">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                            <button type="button" id="resetAppColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
-                        </div>
                     </div>
+
+                    <div class="col-12 d-flex gap-3 mt-3">
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        <button type="button" id="resetAppColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                    </div>
+
                 </form>
             </div>
 
@@ -995,21 +1000,23 @@ function getBase64(file) {
 
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
-            // Reset color inputs
-            document.getElementById('app_primary_color').value = "#32e5ac";
-            document.getElementById('second_color').value = "#003FA6";
+                        // Reset color inputs
+                        document.getElementById('app_primary_color').value = "#32e5ac";
+                        document.getElementById('second_color').value = "#003FA6";
 
-            // Reset background (assuming you want color background)
-            document.getElementById('background_type').value = "color";
-            document.getElementById('background_color').value = "#32e5ac";
-            document.getElementById('app_background').value = "#32e5ac";
+                        // Reset background (assuming you want color background)
+                        document.getElementById('background_type').value = "color";
+                        document.getElementById('background_color').value = "#32e5ac";
+                        document.getElementById('app_background').value = "#32e5ac";
 
-            // Show the correct background input group
-            document.getElementById('background_color_group').style.display = 'block';
-            document.getElementById('background_image_group').style.display = 'none';
+                        // Show the correct background input group
+                        document.getElementById('background_color_group').style.display = 'block';
+                        document.getElementById('background_image_group').style.display = 'none';
 
-            // Submit the form
-            document.querySelector('#appSettings form').submit();
+                        document.getElementById('brand_background_image_group').style.display = 'none';
+
+                        // Submit the form
+                        document.querySelector('#appSettings form').submit();
                         });
                     }
 
