@@ -581,6 +581,9 @@
         background:  var(--box-background-color) !important;
     }
 
+    a {
+        color: var(--text-secondary-color); !important;
+    }
     .dropdown-menu>li>a {
         color: var(--inverse-box-color) !important;
     }
