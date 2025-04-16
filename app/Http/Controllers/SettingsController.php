@@ -13,6 +13,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\NotificationTranslation;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
@@ -72,9 +73,10 @@ class SettingsController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
-
-            $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
+          //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
+            $key = Str::contains($key, ['color', 'app_background']) ? 'colors_updated_at' : $key.'_updated_at';
             settings()->set($key, true);
+          
         }
 
         if( $request->has('user_coins')){
