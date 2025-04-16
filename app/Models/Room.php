@@ -26,6 +26,7 @@ class Room extends Model
     protected $casts = [
         'is_pk' => 'boolean',
         'is_comment_closed'=> 'boolean',
+        'is_live' => 'boolean',
     ];
     //    protected $attributes = ['room_background'];
 
