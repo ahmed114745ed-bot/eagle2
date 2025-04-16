@@ -68,7 +68,7 @@
     }
 
     body {
-        color: var(--primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
     }
