@@ -1,19 +1,19 @@
 <style>
     table.custom-table {
         width: 100%;
-        background-color: #c98b39; /* Brownish background */
+        background-color: var(--primary-color); /* Brownish background */
         color: #fff; /* Dark text for body */
         border-collapse: collapse;
     }
 
     table.custom-table th, table.custom-table td {
-        border: 1px solid #694413;
+        border: 1px solid var(--secondary-color);
         padding: 10px;
     }
 
     /* Fix: Improved header visibility */
     table.custom-table thead {
-        background-color: #482808; /* Dark brown */
+        background-color: var(--secondary-color); /* Dark brown */
         color: #fff; /* White text for better contrast */
         font-weight: bold;
     }
