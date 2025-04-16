@@ -758,7 +758,46 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
+                    <div class="form row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 1') }}</label>
+                                <input type="file" name="image1" class="form-control" onchange="previewImage(event)">
 
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 2') }}</label>
+                                <input type="file" name="image2" class="form-control" onchange="previewImage(event)">
+
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 3') }}</label>
+                                <input type="file" name="image3" class="form-control" onchange="previewImage(event)">
+
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
