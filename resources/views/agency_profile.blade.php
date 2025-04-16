@@ -87,7 +87,7 @@
             box-sizing: border-box;
         }
         .container {
-            background: #222;
+            background: var(--secondary-color);
             padding: 20px;
             border-radius: 5px;
             width: 100%;
@@ -150,7 +150,7 @@
             border-bottom: 1px solid #444;
         }
         th {
-            background-color: #333;
+            background-color: var(--secondary-color);
         }
 
         /* Responsive adjustments */

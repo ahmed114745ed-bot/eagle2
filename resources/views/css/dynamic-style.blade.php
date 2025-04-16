@@ -119,7 +119,8 @@
     }
 
     .box {
-        background: var(--box-background-color) !important;
+        background: var(--secondary-color) !important;
+        filter: brightness(0.85);
         color: var(--text-secondary-color) !important;
         border-top: 3px solid var(--second-alpha) !important;
         border-radius: 20px!important;
@@ -130,8 +131,6 @@
     .table .table {
         background: var(--table-background-color) !important;
         color: var(--table-background-color) !important;
-
-
     }
 
     .skin-black-light .sidebar-menu > li:hover > a,
@@ -185,7 +184,7 @@
     }
 
     .box-footer {
-        background-color: var(--second-color) !important;
+        background-color: var(--secondary-color) !important;
         border-top: 1px solid var(--second-alpha) !important;
 
     }
@@ -403,10 +402,6 @@
         background-color: var(--primary-hover-alpha) !important;
         color: var(--inverse-box-color) !important;
         border: 1px solid transparent !important;
-    }
-
-    .box{
-        background-color: var(--secondary-color) !important
     }
 
     .btn-default {
