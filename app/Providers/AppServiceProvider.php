@@ -89,7 +89,8 @@ class AppServiceProvider extends ServiceProvider
                 'themes.textPrimaryColor' => $settings['text_primary_color'] ?? '#fdf8f8',
                 'themes.textSecondaryColor' => $settings['text_secondary_color'] ?? '#c1b9b9',
                 'themes.boxBackgroundColor' => $settings['box_background_color'] ?? '#222222',
-                'themes.backgroundImage' => $settings['background_image'] ?? '',
+                'themes.backgroundImage' => $settings['app_background'] ?? '',
+                'themes.brandBackgroundImage' => $settings['brand_background_image'] ?? '',
                 'themes.tableBackGroundColor' => $settings['table_background_color'] ?? '#c88213',
             ]);
 

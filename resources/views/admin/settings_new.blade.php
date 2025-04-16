@@ -288,9 +288,9 @@
         /* تقليل عرض شريط التمرير */
 
     }
- 
+
     .settings-menu button {
-        background-color: var(--box-background-color);
+        background-color: var(--secondary-color);
         border: none;
         padding: 10px 15px;
         font-size: 16px;
@@ -301,7 +301,7 @@
     }
 
     .settings-menu button:hover {
-        background: #ff9800;
+        background: var(--primary-color);
     }
 
 
@@ -467,27 +467,27 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST">
+                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="primary_color">{{ __('Primary Color:') }}</label>
-                                <input type="color" id="primary_color" name="primary_color"
-                                    value="{{ $settings['primary_color'] ?? '#000000' }}"
-                                    style="background: {{ $settings['primary_color'] ?? '#000000' }};"
-                                    title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
+                                <label for="secondary_color">{{ __('Primary Color:') }}</label>
+                                <input type="color" id="secondary_color" name="secondary_color"
+                                       value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                                       style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
+                                       title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="secondary_color">{{ __('Secondary Color:') }}</label>
-                                <input type="color" id="secondary_color" name="secondary_color"
-                                    value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                                    style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
-                                    title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
+                                <label for="primary_color">{{ __('Secondary Color:') }}</label>
+                                <input type="color" id="primary_color" name="primary_color"
+                                    value="{{ $settings['primary_color'] ?? '#000000' }}"
+                                    style="background: {{ $settings['primary_color'] ?? '#000000' }};"
+                                    title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
                             </div>
                         </div>
 
@@ -511,32 +511,83 @@
                             </div>
                         </div>
 
+                        <!-- New Background Type Selection -->
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label for="brand_background_type">{{ __('Brand Background Type') }}</label>
+                                <select id="brand_background_type" name="brand_background_type" class="form-control"
+                                        onchange="toggleBrandBackgroundInput()">
+                                    <option value="color" {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>
+                                        {{ __('Color') }}
+                                    </option>
+                                    <option value="image" {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'selected' : '' }}>
+                                        {{ __('Image') }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Background Color Input -->
+                        <div class="col-md-6">
+                            <div class="form-group" id="brand_background_color_group"
+                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
                                 <input type="color" id="box_background_color" name="box_background_color"
-                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
-                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
+                                       value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                                       style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
+                                       title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
                             </div>
                         </div>
 
+                        <!-- Background Image Input -->
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>
-                                <input type="color" id="table_background_color" name="table_background_color"
-                                    value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                                    style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
-                                    title="لون خلفية الجداول في التقارير أو البيانات.">
+                            <div class="form-group" id="brand_background_image_group"
+                                 style="display: {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
+                                <label for="brand_background_image">{{ __('Brand Background Image') }}</label>
+                                <input type="file" id="brand_background_image" name="brand_background_image" class="form-control">
+                                @if(!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
+                                    <div class="mt-2">
+                                        <img id="imagePreview"
+                                             src="{{ !empty($settings['brand_background_image']) ? getImagePath($settings['brand_background_image']) : '' }}"
+                                             width="100" class="mt-2"
+                                             style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                             onclick="openFullScreen(this)">
+
+{{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
-                        <div class="col-12 d-flex gap-3 mt-3">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                            <button type="button" id="resetColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
-                        </div>
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
+{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
+{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
+{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
+{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
                     </div>
+
+{{--                    <div class="form row">--}}
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
+{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
+{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
+{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
+{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+
+                    <div class="col-12 d-flex gap-3 mt-3">
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        <button type="button" id="resetColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                    </div>
+
                 </form>
             </div>
 
@@ -666,15 +717,15 @@
                                     value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
                             </div>
                         </div>
-            
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="second_color">{{ __('Second Color') }}</label>
-                                <input type="color" id="second_color" name="app_second_color" 
+                                <input type="color" id="second_color" name="app_second_color"
                                     value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
@@ -685,18 +736,18 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
-                            <div class="form-group" id="background_color_group" 
+                            <div class="form-group" id="background_color_group"
                                 style="display: {{ ($settings['background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="background_color">{{ __('Background Color') }}</label>
                                 <input type="color" id="background_color" name="background_color" class="form-control"
                                     value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
                         </div>
-                        
+
                         <div class="col-md-6">
-                            <div class="form-group" id="background_image_group" 
+                            <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
                                 <input type="file" id="background_image" name="app_background_image" class="form-control">
@@ -707,13 +758,15 @@
                                 @endif
                             </div>
                         </div>
-            
-                        <div class="col-12 d-flex gap-3 mt-3">
-                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                            <button type="button" id="resetAppColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
-                        </div>
+
                     </div>
+
+                    <div class="col-12 d-flex gap-3 mt-3">
+                        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        <button type="button" id="resetAppColors"
+                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                    </div>
+
                 </form>
             </div>
 
@@ -869,10 +922,16 @@
                     document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
                 }
 
+                function toggleBrandBackgroundInput() {
+                    const type = document.getElementById("brand_background_type").value;
+                    document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
+                    document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
+                }
+
     async function updateBackgroundValue() {
         const type = document.getElementById("background_type").value;
         const hiddenInput = document.getElementById("app_background");
-        
+
         if (type === "color") {
             hiddenInput.value = document.getElementById("background_color").value;
         } else if (type === "image") {
@@ -941,21 +1000,23 @@ function getBase64(file) {
 
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
-            // Reset color inputs
-            document.getElementById('app_primary_color').value = "#32e5ac";
-            document.getElementById('second_color').value = "#003FA6";
+                            // Reset color inputs
+                            document.getElementById('app_primary_color').value = "#32e5ac";
+                            document.getElementById('second_color').value = "#003FA6";
 
-            // Reset background (assuming you want color background)
-            document.getElementById('background_type').value = "color";
-            document.getElementById('background_color').value = "#32e5ac";
-            document.getElementById('app_background').value = "#32e5ac";
+                            // Reset background (assuming you want color background)
+                            document.getElementById('background_type').value = "color";
+                            document.getElementById('background_color').value = "#32e5ac";
+                            document.getElementById('app_background').value = "#32e5ac";
 
-            // Show the correct background input group
-            document.getElementById('background_color_group').style.display = 'block';
-            document.getElementById('background_image_group').style.display = 'none';
+                            // Show the correct background input group
+                            document.getElementById('background_color_group').style.display = 'block';
+                            document.getElementById('background_image_group').style.display = 'none';
 
-            // Submit the form
-            document.querySelector('#appSettings form').submit();
+                            document.getElementById('brand_background_image_group').style.display = 'none';
+
+                            // Submit the form
+                            document.querySelector('#appSettings form').submit();
                         });
                     }
 
@@ -977,12 +1038,31 @@ function getBase64(file) {
                                 }
                             });
 
-                            // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
+                            // Reset background type to color
+                            document.getElementById('brand_background_type').value = "color";
+
+                            // Show color input, hide image input
+                            document.getElementById('brand_background_color_group').style.display = 'block';
+                            document.getElementById('brand_background_image_group').style.display = 'none';
+
+                            // Add a hidden input to explicitly set the background image to null
+                            let hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'brand_background_image_reset';
+                            hiddenInput.value = '1';
+                            document.getElementById('themeSettingsForm').appendChild(hiddenInput);
+
+                            // Remove any preview images
+                            const imagePreviewContainer = document.querySelector('#brand_background_image_group .mt-2');
+                            if (imagePreviewContainer) {
+                                imagePreviewContainer.style.display = 'none';
+                            }
+
+                            // Submit the form to save changes and reload the page
                             document.getElementById('themeSettingsForm').submit();
                         });
                     }
                 });
-
 
                 document.addEventListener("DOMContentLoaded", function() {
                     document.querySelectorAll('input[type="color"]').forEach(input => {

@@ -9,9 +9,10 @@
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
         --table-background-color: {{ config('themes.tableBackGroundColor')}}
         --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-        --scroll-second-color: {{ config('themes.secondaryColor') }}cc;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
         --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
 
@@ -36,7 +37,7 @@
         border-color: #337ab7
     }
     .skin-black-light .content-header {
-    background: var(--second-alpha) !important;
+    background: var(--secondary-color) !important;
     box-shadow: none;
    }
 
@@ -52,9 +53,12 @@
     }
 
     /* Dynamic CSS */
-    .skin-black-light .wrapper,
     .skin-black-light .main-sidebar,
     .skin-black-light .left-side {
+        background-color: var(--box-background-color) !important;
+    }
+
+    .skin-black-light .main-sidebar{
         background-color: var(--secondary-color) !important;
     }
 
@@ -65,14 +69,31 @@
 
     body {
         color: var(--primary-color) !important;
-        background-color: var(--secondary-color) !important;
+        background-color: var(--box-background-color) !important;
+        background-image: var(--brand_background-image) !important;
     }
 
     .skin-black-light .content-wrapper,
-    .skin-black-light .main-footer {
+    /*.skin-black-light .main-footer ,*/
+    /*.skin-black-light .main-header > .navbar,*/
+    .skin-black-light .wrapper
+    {
         border-left: 1px solid var(--second-alpha) !important;
+        background-color: var(--box-background-color) !important;
+        background-image: var(--brand_background-image) !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
+    form {
         background-color: var(--secondary-color) !important;
-        background-image: var(--background-image) !important;
+    }
+
+    .skin-black-light .main-header > .navbar {
+        color: var(--primary-color) !important;
+        background-color: transparent !important;
+        /*background-color: var(--box-background-color) a !important;*/
     }
 
     .content-header {
@@ -133,7 +154,7 @@
 
 
     .sidebar-menu > li > .treeview-menu {
-        background: var(--secondary-color) !important;
+        background: var(--box-background-color) !important;
     }
 
     .table.table-hover tbody tr:hover {
@@ -204,12 +225,6 @@
 
     .content-header > .breadcrumb > li > a {
         color: var(--text-primary-color) !important;
-    }
-
-    .skin-black-light .main-header > .navbar {
-        color: var(--primary-color) !important;
-        background-color: var(--secondary-color) a !important;
-
     }
 
     .skin-black-light .main-header > .navbar > .sidebar-toggle {
@@ -370,10 +385,14 @@
     }
 
     .main-footer {
-        background: #fff;
+        background: transparent; !important;
         padding: 15px;
         color: #444;
         border-top: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .skin-black-light .content-wrapper, .skin-black-light .main-footer{
+        background-image: none; !important;
     }
 
     .dropdown-toggle {

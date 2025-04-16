@@ -318,7 +318,7 @@
         /* تقليل عرض شريط التمرير */
 
     }
- 
+
     .settings-menu button {
         background-color: var(--box-background-color);
         border: none;
@@ -433,20 +433,20 @@
         background: var(--box-background-color) !important;
         color: var(--text-primary-color) !important;
     }
-    
+
     .swal2-title {
         color: var(--text-primary-color) !important;
     }
-    
+
     .swal2-content {
         color: var(--text-primary-color) !important;
     }
-    
+
     .swal2-confirm {
         background-color: #ff9800 !important;
         border: none !important;
     }
-    
+
     .swal2-cancel {
         background-color: #dc3545 !important;
         border: none !important;
@@ -495,7 +495,7 @@
                                     class="form-control">
                             </div>
                         </div>
-                       
+
                         <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
 
                     </div>
@@ -681,10 +681,10 @@
                     document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
                 }
 
- 
+
             </script>
 
-            
+
 
         </div>
 </body>
