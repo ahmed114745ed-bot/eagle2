@@ -116,13 +116,16 @@
             text-align: left;
             margin-top: 10px;
         }
+        .rtl .details {
+            text-align: right;
+        }
         .details p {
             margin: 5px 0;
             font-size: 16px;
         }
-        .details strong {
-            color: #ff9800;
-        }
+        /*.details strong {*/
+        /*    color: #ff9800;*/
+        /*}*/
         button {
             background: #ff9800;
             padding: 10px;
