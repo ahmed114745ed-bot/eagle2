@@ -40,6 +40,8 @@ class SettingsController extends Controller
             }
         }
 
+        info($request);
+
         // Handle background settings
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
@@ -50,10 +52,10 @@ class SettingsController extends Controller
         }
 
         if ($request->has('brand_background_image_reset') && $request->brand_background_image_reset == '1') {
-            $data['brand_background'] = null;
+            $data['brand_background_image'] = null;
         }
 
-        unset($data['background_type'], $data['app_background_image'], $data['brand_background_image']);
+        unset($data['background_type'], $data['app_background_image'], $data['brand_background_image_reset']);
 
         // Process and save settings
         foreach ($data as $key => $value) {
