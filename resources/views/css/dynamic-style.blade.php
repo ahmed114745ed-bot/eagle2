@@ -267,7 +267,6 @@
 
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-        color: #fff;
         background: var(--primary-color) !important;
     }
 
