@@ -1000,23 +1000,34 @@ function getBase64(file) {
 
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
-                        // Reset color inputs
-                        document.getElementById('app_primary_color').value = "#32e5ac";
-                        document.getElementById('second_color').value = "#003FA6";
+                            // Reset color inputs
+                            document.getElementById('app_primary_color').value = "#32e5ac";
+                            document.getElementById('second_color').value = "#003FA6";
 
-                        // Reset background (assuming you want color background)
-                        document.getElementById('background_type').value = "color";
-                        document.getElementById('background_color').value = "#32e5ac";
-                        document.getElementById('app_background').value = "#32e5ac";
+                            // Reset background (assuming you want color background)
+                            document.getElementById('background_type').value = "color";
+                            document.getElementById('background_color').value = "#32e5ac";
+                            document.getElementById('app_background').value = "#32e5ac";
 
-                        // Show the correct background input group
-                        document.getElementById('background_color_group').style.display = 'block';
-                        document.getElementById('background_image_group').style.display = 'none';
+                            // Show the correct background input group
+                            document.getElementById('background_color_group').style.display = 'block';
+                            document.getElementById('background_image_group').style.display = 'none';
 
-                        document.getElementById('brand_background_image_group').style.display = 'none';
+                            document.getElementById('brand_background_image_group').style.display = 'none';
 
-                        // Submit the form
-                        document.querySelector('#appSettings form').submit();
+                            // Clear brand image input and preview
+                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
+                            if (brandImageInput) {
+                                brandImageInput.value = ''; // Clear the input
+                            }
+                            const brandImagePreview = document.getElementById('imagePreview');
+                            if (brandImagePreview) {
+                                brandImagePreview.src = ''; // Clear the preview
+                                brandImagePreview.style.display = 'none'; // Hide the preview
+                            }
+
+                            // Submit the form
+                            document.querySelector('#appSettings form').submit();
                         });
                     }
 
@@ -1038,12 +1049,22 @@ function getBase64(file) {
                                 }
                             });
 
-                            // إرسال النموذج لحفظ التغييرات وإعادة تحميل الصفحة
+                            // Clear brand image input and preview
+                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
+                            if (brandImageInput) {
+                                brandImageInput.value = ''; // Clear the input
+                            }
+                            const brandImagePreview = document.getElementById('imagePreview');
+                            if (brandImagePreview) {
+                                brandImagePreview.src = ''; // Clear the preview
+                                brandImagePreview.style.display = 'none'; // Hide the preview
+                            }
+
+                            // Submit the form
                             document.getElementById('themeSettingsForm').submit();
                         });
                     }
                 });
-
 
                 document.addEventListener("DOMContentLoaded", function() {
                     document.querySelectorAll('input[type="color"]').forEach(input => {
