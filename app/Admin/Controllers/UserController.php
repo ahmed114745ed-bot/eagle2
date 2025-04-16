@@ -204,17 +204,17 @@ class UserController extends MainController
         });
         $grid->column('name', __('Name')); //->display(function ($value){//attribute
 
-        $grid->column('return', __('status user'))->display(function () {
-            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-            return (new \App\Admin\Actions\UserAction(
-                $this->id,
-                $this->charge_status,
-                $this->transfer_salary,
-                $userSetting->show_invite_code,
-                $userSetting->hide_chat,
-                $this->can_play
-            ))->render();
-        });
+            $grid->column('return', __('status user'))->display(function () {
+                $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+                return (new \App\Admin\Actions\UserAction(
+                    $this->id,
+                    $this->charge_status,
+                    $this->transfer_salary,
+                    $userSetting->show_invite_code ?? 0,  // Extra fallback
+                    $userSetting->hide_chat ?? 0,        // Extra fallback
+                    $this->can_play
+                ))->render();
+            });
 
 
         $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
