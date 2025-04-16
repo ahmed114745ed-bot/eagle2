@@ -491,15 +491,15 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>
-                                <input type="color" id="text_primary_color" name="text_primary_color"
-                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}"
-                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"
-                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">
-                            </div>
-                        </div>
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>--}}
+{{--                                <input type="color" id="text_primary_color" name="text_primary_color"--}}
+{{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}"--}}
+{{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"--}}
+{{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -511,6 +511,29 @@
                             </div>
                         </div>
 
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
+{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
+{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
+{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
+{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+                    </div>
+
+{{--                    <div class="form row">--}}
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
+{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
+{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
+{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
+{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+                    <div class="form row">
                         <!-- New Background Type Selection -->
                         <div class="col-md-6">
                             <div class="form-group">
@@ -553,34 +576,13 @@
                                              style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
                                              onclick="openFullScreen(this)">
 
-{{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
+                                        {{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
                                     </div>
                                 @endif
                             </div>
                         </div>
 
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
-{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
-{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
-{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
-{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
                     </div>
-
-{{--                    <div class="form row">--}}
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
-{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
-{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
-{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
-{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
 
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
