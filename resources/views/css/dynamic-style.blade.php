@@ -84,6 +84,14 @@
         background-position: center;
     }
 
+    /*.settings-menu button{*/
+    /*    background-color: var(--secondary-color) !important;*/
+    /*}*/
+
+    form {
+        background-color: var(--secondary-color) !important;
+    }
+
     .skin-black-light .main-header > .navbar {
         color: var(--primary-color) !important;
         /*background-color: var(--box-background-color) a !important;*/

@@ -290,7 +290,7 @@
     }
 
     .settings-menu button {
-        background-color: var(--box-background-color);
+        background-color: var(--secondary-color);
         border: none;
         padding: 10px 15px;
         font-size: 16px;
@@ -301,7 +301,7 @@
     }
 
     .settings-menu button:hover {
-        background: #ff9800;
+        background: var(--primary-color);
     }
 
 
@@ -473,21 +473,21 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="primary_color">{{ __('Primary Color:') }}</label>
-                                <input type="color" id="primary_color" name="primary_color"
-                                    value="{{ $settings['primary_color'] ?? '#000000' }}"
-                                    style="background: {{ $settings['primary_color'] ?? '#000000' }};"
-                                    title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
+                                <label for="secondary_color">{{ __('Primary Color:') }}</label>
+                                <input type="color" id="secondary_color" name="secondary_color"
+                                       value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                                       style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
+                                       title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="secondary_color">{{ __('Secondary Color:') }}</label>
-                                <input type="color" id="secondary_color" name="secondary_color"
-                                    value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                                    style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
-                                    title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
+                                <label for="primary_color">{{ __('Secondary Color:') }}</label>
+                                <input type="color" id="primary_color" name="primary_color"
+                                    value="{{ $settings['primary_color'] ?? '#000000' }}"
+                                    style="background: {{ $settings['primary_color'] ?? '#000000' }};"
+                                    title="لون الواجهة الرئيسي، يتم استخدامه في الأزرار والخلفيات الأساسية.">
                             </div>
                         </div>
 
@@ -570,17 +570,17 @@
 {{--                        </div>--}}
                     </div>
 
-                    <div class="form row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>
-                                <input type="color" id="table_background_color" name="table_background_color"
-                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"
-                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"
-                                       title="لون خلفية الجداول في التقارير أو البيانات.">
-                            </div>
-                        </div>
-                    </div>
+{{--                    <div class="form row">--}}
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
+{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
+{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
+{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
+{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
@@ -1015,17 +1015,6 @@ function getBase64(file) {
 
                             document.getElementById('brand_background_image_group').style.display = 'none';
 
-                            // Clear brand image input and preview
-                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
-                            if (brandImageInput) {
-                                brandImageInput.value = ''; // Clear the input
-                            }
-                            const brandImagePreview = document.getElementById('imagePreview');
-                            if (brandImagePreview) {
-                                brandImagePreview.src = ''; // Clear the preview
-                                brandImagePreview.style.display = 'none'; // Hide the preview
-                            }
-
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });
@@ -1049,18 +1038,27 @@ function getBase64(file) {
                                 }
                             });
 
-                            // Clear brand image input and preview
-                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
-                            if (brandImageInput) {
-                                brandImageInput.value = ''; // Clear the input
-                            }
-                            const brandImagePreview = document.getElementById('imagePreview');
-                            if (brandImagePreview) {
-                                brandImagePreview.src = ''; // Clear the preview
-                                brandImagePreview.style.display = 'none'; // Hide the preview
+                            // Reset background type to color
+                            document.getElementById('brand_background_type').value = "color";
+
+                            // Show color input, hide image input
+                            document.getElementById('brand_background_color_group').style.display = 'block';
+                            document.getElementById('brand_background_image_group').style.display = 'none';
+
+                            // Add a hidden input to explicitly set the background image to null
+                            let hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'brand_background_image_reset';
+                            hiddenInput.value = '1';
+                            document.getElementById('themeSettingsForm').appendChild(hiddenInput);
+
+                            // Remove any preview images
+                            const imagePreviewContainer = document.querySelector('#brand_background_image_group .mt-2');
+                            if (imagePreviewContainer) {
+                                imagePreviewContainer.style.display = 'none';
                             }
 
-                            // Submit the form
+                            // Submit the form to save changes and reload the page
                             document.getElementById('themeSettingsForm').submit();
                         });
                     }
