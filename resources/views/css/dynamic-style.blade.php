@@ -385,18 +385,14 @@
     }
 
     .main-footer {
-        /*background: #fff;*/
+        background: transparent; !important;
         padding: 15px;
         color: #444;
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
-    .main-footer{
-
-    }
-
     .skin-black-light .content-wrapper, .skin-black-light .main-footer{
-
+        background-image: none; !important;
     }
 
     .dropdown-toggle {

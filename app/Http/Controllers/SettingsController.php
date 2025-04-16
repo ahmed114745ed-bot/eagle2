@@ -49,7 +49,7 @@ class SettingsController extends Controller
             $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
         }
 
-        unset($data['background_type'], $data['app_background_image']);
+        unset($data['background_type'], $data['app_background_image'], $data['brand_background_image']);
 
         // Process and save settings
         foreach ($data as $key => $value) {
