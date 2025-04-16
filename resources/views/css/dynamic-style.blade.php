@@ -154,7 +154,7 @@
 
 
     .sidebar-menu > li > .treeview-menu {
-        background: var(--box-background-color) !important;
+        background: var(--secondary-color) !important;
     }
 
     .table.table-hover tbody tr:hover {
