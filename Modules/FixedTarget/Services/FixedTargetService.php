@@ -80,11 +80,13 @@ class FixedTargetService
             }
 
             $countMoments  = Moment::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth()
             ])->count();
 
             $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth()
             ])->count();
 
 
@@ -131,10 +133,13 @@ class FixedTargetService
     {
         try {
             $values = [
-                'user_id'             => $user->id, 'add_month' => Carbon::now()->month,
+                'user_id'             => $user->id,
+                'add_month' => Carbon::now()->month,
                 'add_year'            => Carbon::now()->year,
-                'agency_id'           => $user->agency_id, 'target_id' => @$target->id,
-                'target_diamonds'     => @$target->diamonds ?? 0, 'target_usd' => @$target->usd ?? 0,
+                'agency_id'           => $user->agency_id,
+                'target_id' => @$target->id,
+                'target_diamonds'     => @$target->diamonds ?? 0,
+                'target_usd' => @$target->usd ?? 0,
                 'target_hours'        => @$target->hours ?? 0,
                 'target_days'         => @$target->days ?? 0,
                 'target_agency_share' => @$target->agency_share ?? 0,
@@ -143,51 +148,61 @@ class FixedTargetService
                 'user_days'           => $days,
                 'extras'              => $extra !== null ? json_encode($extra) : 0,
 
+
             ];
             if (0.0 <= $t) {
                 $values['user_obtain']   = $t;
                 $values['agency_obtain'] = $t * $ap;
             }
             UserTarget::query()->updateOrCreate([
-                                                    'user_id' => $user->id, 'add_month' => Carbon::now()->month,
-                                                                                                                                                                                                                   'add_year' => Carbon::now()->year,
-                                                    'type'    => $targetType,
-                                                ], $values)->lock('user-'.$user->id);
+                'user_id' => $user->id,
+                'add_month' => Carbon::now()->month,
+                'add_year' => Carbon::now()->year,
+                'type'    => $targetType,
+            ], $values)->lock('user-' . $user->id);
         } catch (\Exception $e) {
         }
 
         $values = [
-            'agency_sallary' => $t * $ap,  'hours' => $hours . ' / ' . (@$target->hours ?? 0),
+            'agency_sallary' => $t * $ap,
+            'hours' => $hours . ' / ' . (@$target->hours ?? 0),
             'days' => $days . ' / ' . ($target->days ?? 0),
             'diamond' => $month_received . ' / ' . @$target->diamonds ?? 0,
+            'target_id' =>  @$target->id,
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
         ];
         if (0 < $t) $values['sallary'] = $t;
 
         $userSalary = UserSallary::query()->where([
-                                                      'user_id' => $user->id,
-                                                      'month' => Carbon::now()->month,
-                                                      'year' => Carbon::now()->year,
-                                                      'user_agency_id' => $user->agency_id,
-                                                  ])->lock()->first();
-        if ($userSalary){
+            'user_id' => $user->id,
+            'month' => Carbon::now()->month,
+            'year' => Carbon::now()->year,
+            'user_agency_id' => $user->agency_id,
+        ])->lock()->first();
+        if ($userSalary) {
+            if ($userSalary->target_id == $target->id) {
+                $values['remaining_diamond'] = $userSalary->remaining_diamond;
+            } else {
+                $values['remaining_diamond'] = $userSalary->remaining_diamond + ($month_received - (@$target->diamonds ?? 0));
+            }
             $userSalary->update($values);
-        }else{
+        } else {
             $userSalary = UserSallary::query()->create([
-                                                           'user_id' => $user->id,
-                                                           'month' => Carbon::now()->month,
-                                                           'year' => Carbon::now()->year,
-                                                           'user_agency_id' => $user->agency_id,
-                                                           ...$values
-                                                       ])->lock();
-           /* UserSallary::query()->where([
+                'user_id' => $user->id,
+                'month' => Carbon::now()->month,
+                'year' => Carbon::now()->year,
+                'user_agency_id' => $user->agency_id,
+                'remaining_diamond'   => ($month_received - (@$target->diamonds ?? 0)),
+                'target_id' =>  @$target->id,
+                ...$values
+            ])->lock();
+            /* UserSallary::query()->where([
                                             'user_id' => $user->id,
                                             'month' => Carbon::now()->month,
                                             'year' => Carbon::now()->year,
                                             'user_agency_id' => $user->agency_id,
 
                                         ])->where('id','!=', $userSalary->id)->delete();*/
-
         }
     }
 
