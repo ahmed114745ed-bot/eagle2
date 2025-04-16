@@ -73,7 +73,7 @@ class AgencyController extends MainController
                     $query->select('id', 'agency_id', 'amount', 'created_at')
                         ->latest()
                         ->take(10);
-                }, 
+                },
                 'mempers' => function($query) {
                     $query->select('id', 'agency_id', 'name', 'created_at')
                         ->latest()
@@ -84,23 +84,23 @@ class AgencyController extends MainController
                 }
             ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
               ->findOrFail($id);
-            
+
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
                 ->paginate(10, ['*'], 'members_page');
-                
+
             $charges = $agency->charges()
                 ->select('id', 'amount', 'created_at')
                 ->paginate(10, ['*'], 'charges_page');
-                
+
             $salaries = AgencySallary::where('agency_id', $id)
                 ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                 ->orderByDesc('id')
                 ->paginate(10, ['*'], 'salary_page');
-                
+
             return compact('agency', 'members', 'charges', 'salaries');
         });
-        
+
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
     }
@@ -173,7 +173,7 @@ class AgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency);
-        
+
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
         $grid->model()->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
             ->where(function ($query) {
@@ -186,14 +186,14 @@ class AgencyController extends MainController
                 $query->select('id', 'name', 'uuid');
             }])
             ->orderByDesc('id');
-        
+
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
                   ->where('year', now()->year);
             });
         }
-        
+
         $grid->id(__('ID'));
         $grid->column('name', __('Agency'))
         ->display(function ($name) {
@@ -202,13 +202,13 @@ class AgencyController extends MainController
                 $path = @$this->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-                
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 return handleShowImageWithTypes($this->id, $url, 40, 40);
             });
-            
+
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
@@ -434,7 +434,7 @@ class AgencyController extends MainController
             $form->textarea('contents', __('contents'));
             $form->switch('Host_agency', trans('Host agency'))->default(true);
             if (!Auth::user()->isRole('Agencies Managers')) {
-                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false)
+                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false);
             }
         } else {
 
@@ -445,7 +445,7 @@ class AgencyController extends MainController
                 }
                 return $ops2;
             })->ajax('/api/search/users3', 'id', 'name');
-            
+
             if ($form->isEditing()) {
                 $form->hidden('agency_manger_id', __('app manger id'));
             }
