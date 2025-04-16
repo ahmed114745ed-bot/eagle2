@@ -180,11 +180,7 @@ class FixedTargetService
             'user_agency_id' => $user->agency_id,
         ])->lock()->first();
         if ($userSalary) {
-            if ($userSalary->target_id == $target->id) {
-                $values['remaining_diamond'] = $userSalary->remaining_diamond;
-            } else {
-                $values['remaining_diamond'] = $userSalary->remaining_diamond + ($month_received - (@$target->diamonds ?? 0));
-            }
+            $values['remaining_diamond'] =  ($month_received - (@$target->diamonds ?? 0));
             $userSalary->update($values);
         } else {
             $userSalary = UserSallary::query()->create([
