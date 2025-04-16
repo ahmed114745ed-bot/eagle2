@@ -1016,7 +1016,7 @@ function getBase64(file) {
                             document.getElementById('brand_background_image_group').style.display = 'none';
 
                             // Clear brand image input and preview
-                            const brandImageInput = document.getElementById('brand_background_image');
+                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
                             if (brandImageInput) {
                                 brandImageInput.value = ''; // Clear the input
                             }
@@ -1050,7 +1050,7 @@ function getBase64(file) {
                             });
 
                             // Clear brand image input and preview
-                            const brandImageInput = document.getElementById('brand_background_image');
+                            const brandImageInput = document.querySelector('input[name="brand_background_image"]');
                             if (brandImageInput) {
                                 brandImageInput.value = ''; // Clear the input
                             }
