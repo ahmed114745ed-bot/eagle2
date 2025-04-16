@@ -56,6 +56,10 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
+        if ($request->brand_background_type == 'color'){
+            $data['brand_background_image'] = null;
+        }
+
         unset($data['background_type'], $data['app_background_image'], $data['brand_background_image_reset']);
 
         // Process and save settings
