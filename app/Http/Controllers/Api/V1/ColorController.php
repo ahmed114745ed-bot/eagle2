@@ -13,9 +13,9 @@ class ColorController extends Controller
     {
         $data =[
 
-            'main_color' => Cache::get('app_primary_color', 'Default app_primary_color') ??'',
-            'secondary_colors' => Cache::get('app_second_color', 'Default app_second_color')??'',
-            'app_background'=>Cache::get('app_background', 'Default app_background') ??'',
+            'main_color' => Cache::get('app_primary_color') ??'',
+            'secondary_colors' => Cache::get('app_second_color')??'',
+            'app_background'=>Cache::get('app_background') ??'',
             'image1'=>Cache::get('image1') ??'',
             'image2'=>Cache::get('image2') ??'',
             'image3'=>Cache::get('image3') ??'',
