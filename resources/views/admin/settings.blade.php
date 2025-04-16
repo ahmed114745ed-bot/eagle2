@@ -500,7 +500,7 @@
                 const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
                 if (activeButton) {
                     activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-primary-color)';
+                    activeButton.style.color = 'var(--text-secondary-color)';
                 }
 
                 // Update the URL with the selected tab without reloading

@@ -160,7 +160,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('CustomSettings')"
-                    style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('Custom Settings') }}
+                    style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Custom Settings') }}
                 </button>
                 <button onclick="showSection('AndroidSettings')"
                     >{{ __('admin.android') }}
@@ -328,7 +328,7 @@ function showSection(sectionId) {
     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
     if (activeButton) {
         activeButton.style.backgroundColor = 'var(--primary-color)';
-        activeButton.style.color = 'var(--text-primary-color)';
+        activeButton.style.color = 'var(--text-secondary-color)';
     }
 
     // Update the URL with the selected tab without reloading

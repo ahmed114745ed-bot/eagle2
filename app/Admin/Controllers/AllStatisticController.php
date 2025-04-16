@@ -31,6 +31,7 @@ class AllStatisticController extends MainController
             $user_sallaries   = UserSallary::query()->whereHas('user', function ($q) {
                 $q->where('agency_id', '!=', 0);
             })->sum(DB::raw('sallary - cut_amount'));
+            $remainingDiamond   = UserSallary::query()->sum('remaining_diamond');
             $agency_sallaries = AgencySallary::query()->sum(DB::raw('sallary - cut_amount'));
             $onlineUsers = DB::table('users')->selectRaw('device_token')->where('online_time', '>=', now()->startOfDay()->timestamp)->where('online_time', '<=', now()->timestamp)->groupBy(['device_token'])->get()->count() ?? 0;
             $allUsersCount = User::query()->count();
@@ -73,28 +74,33 @@ class AllStatisticController extends MainController
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($onlineUsers, $allUsersCount) {
 
-                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Users') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Users') );
                     $row->column(6, new InfoBox(__('Number of users'), 'dollar', 'green', route('admin.users'), number_format(@$allUsersCount ?? 0)));
                     $row->column(6, new InfoBox(__('Online Users'), 'dollar', 'green', route('admin.users', ['online' => 1]), number_format(@$onlineUsers ?? 0)));
                 })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($coins, $total_monthly_di_recieved) {
 
-                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('Total Coins') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Total Coins') );
 
                     $row->column(6, new InfoBox(__('total coins'), 'dollar', 'green', route('admin.users', ['have_coins' => 1]), number_format(@$coins ?? 0)));
                     $row->column(6, new InfoBox(__('totalDiamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), number_format(@$total_monthly_di_recieved ?? 0)));
                 })
+                ->row(function (\Encore\Admin\Layout\Row $row) use ($remainingDiamond) {
+
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('Remaining diamond') );
+                    $row->column(6, new InfoBox(__('total remaining diamond'), 'dollar', 'yellow', route('admin.users', ['have_coins' => 1]), number_format(@$remainingDiamond ?? 0)));
+                })
                 ->row(function (\Encore\Admin\Layout\Row $row) use ($user_sallaries, $agency_sallaries) {
-                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('salaries') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('salaries') );
 
                     $row->column(6, new InfoBox(__('users sallaries'), 'dollar', 'blue', route('admin.sallaries', ['name' => 'users', 'salary_only' => 1]), @$user_sallaries ?? 0));
                     $row->column(6, new InfoBox(__('agency sallaries'), 'dollar', 'yellow', route('admin.sallaries', ['name' => 'agencies', 'salary_only' => 1]), @$agency_sallaries ?? 0));
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($total_sallary) {
-                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('total salaries') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('total salaries') );
 
                     $row->column(6, new InfoBox(__('total salaries'), 'dollar', 'black', '', @$total_sallary ?? 0));
                 })->row(function (\Encore\Admin\Layout\Row $row) use ($app_earned_charge) {
-                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;"><i class="fa fa-star"></i> ' . __('app earned') . ' <i class="fa fa-star"></i></h3>');
+                    $row->column(12, '<h3 style="color: var(--inverse-box-color); font-family: \'Arial\', sans-serif;">' . __('app earned') );
 
                     $row->column(6, new InfoBox(__('app earned'), 'dollar', 'yellow', route('admin.app-earned'), @$app_earned_charge ?? 0));
                 });

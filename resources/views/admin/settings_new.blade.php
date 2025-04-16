@@ -267,7 +267,7 @@
         align-items: center;
         padding: 10px 0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
         overflow-x: auto;
         /* يجعل الشريط قابلاً للتمرير عند الحاجة */
         white-space: nowrap;
@@ -279,7 +279,7 @@
     .settings-menu {
         display: flex;
         gap: 4px;
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
         overflow-x: auto;
         /* يجعل الشريط قابلاً للتمرير عند الحاجة */
         white-space: nowrap;
@@ -296,7 +296,7 @@
         font-size: 16px;
         cursor: pointer;
         transition: color 0.3s ease-in-out;
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
@@ -491,15 +491,15 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>
-                                <input type="color" id="text_primary_color" name="text_primary_color"
-                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}"
-                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"
-                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">
-                            </div>
-                        </div>
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>--}}
+{{--                                <input type="color" id="text_primary_color" name="text_primary_color"--}}
+{{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}"--}}
+{{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"--}}
+{{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -511,6 +511,29 @@
                             </div>
                         </div>
 
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
+{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
+{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
+{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
+{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+                    </div>
+
+{{--                    <div class="form row">--}}
+{{--                        <div class="col-md-6">--}}
+{{--                            <div class="form-group">--}}
+{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
+{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
+{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
+{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
+{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+                    <div class="form row">
                         <!-- New Background Type Selection -->
                         <div class="col-md-6">
                             <div class="form-group">
@@ -553,34 +576,13 @@
                                              style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
                                              onclick="openFullScreen(this)">
 
-{{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
+                                        {{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
                                     </div>
                                 @endif
                             </div>
                         </div>
 
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
-{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
-{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
-{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
-{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
                     </div>
-
-{{--                    <div class="form row">--}}
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
-{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
-{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
-{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
-{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
 
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
@@ -758,7 +760,46 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
+                    <div class="form row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 1') }}</label>
+                                <input type="file" name="image1" class="form-control" onchange="previewImage(event)">
 
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 2') }}</label>
+                                <input type="file" name="image2" class="form-control" onchange="previewImage(event)">
+
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Image 3') }}</label>
+                                <input type="file" name="image3" class="form-control" onchange="previewImage(event)">
+
+                                <img id="imagePreview"
+                                     src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
+                                     width="100" class="mt-2"
+                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                     onclick="openFullScreen(this)">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
@@ -893,7 +934,7 @@
                     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
                     if (activeButton) {
                         activeButton.style.backgroundColor = 'var(--primary-color)';
-                        activeButton.style.color = 'var(--text-primary-color)';
+                        activeButton.style.color = 'var(--text-secondary-color)';
                     }
 
                     // Update the URL with the selected tab without reloading

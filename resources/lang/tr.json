@@ -1960,6 +1960,8 @@
   "charge host agent": "Ev sahibi temsilcisini şarj et",
   "Recharge for self": "Kendin için yeniden şarj",
   "Convert diamonds to coins": "Elmasları paraya çevir",
-  "Other accounts on the same device": "Aynı cihazdaki diğer hesaplar"
+  "Other accounts on the same device": "Aynı cihazdaki diğer hesaplar",
+  "Remaining diamond": "Kalan elmas",
+  "Total Remaining Diamond": "Toplam Kalan Elmas"
 
 }

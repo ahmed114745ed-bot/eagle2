@@ -1,10 +1,11 @@
 <?php
 
-use App\Http\Controllers\Api\LanguageController;
 use App\Models\Room;
 use App\Models\User;
 use App\Enums\UserType;
 use App\Helpers\Common;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Admin\Controllers\WareController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\V1\PkController;
+use App\Http\Controllers\Api\V1\BoxController;
 use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
@@ -22,6 +24,7 @@ use App\Http\Controllers\Api\V1\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
+use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
@@ -58,8 +61,6 @@ use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
 
 Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payment-callback', [NowPaymentsController::class, 'paymentCallback']);
@@ -310,7 +311,11 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
             });
 
-
+            Route::prefix('box')->group(function () {
+                Route::get('list', [BoxController::class, 'index']);
+                Route::post('send', [BoxController::class, 'send']);
+                Route::post('pickup', [BoxController::class, 'pick3']);
+            });
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
