@@ -128,6 +128,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function sameDeviceUsers()
+    {
+        return $this->hasMany(User::class, 'device_token', 'device_token');
+    }
+
     public function likes()
     {
         return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
@@ -228,7 +233,8 @@ class User extends Authenticatable
         return $this->belongsTo(MangerType::class, 'manger_type_id');
     }
 
-    public function manager(){
+    public function manager()
+    {
         return $this->hasOne(Admin::class, 'app_id');
     }
 
@@ -1177,7 +1183,4 @@ class User extends Authenticatable
             }
         });
     }
-
-
-
 }
