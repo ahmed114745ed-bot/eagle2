@@ -157,6 +157,10 @@
         background: var(--secondary-color) !important;
     }
 
+    .form-control, select, .select2-container .select2-selection--single, .select2-container .select2-selection--multiple{
+        background: var(--secondary-color) !important;
+    }
+
     .table.table-hover tbody tr:hover {
         color: var(--text-primary-color) !important;
         background-color: var(--primary-hover-alpha) !important;
