@@ -53,7 +53,6 @@
     }
 
     /* Dynamic CSS */
-    .skin-black-light .wrapper,
     .skin-black-light .main-sidebar,
     .skin-black-light .left-side {
         background-color: var(--box-background-color) !important;
@@ -74,13 +73,20 @@
     }
 
     .skin-black-light .content-wrapper,
-    .skin-black-light .main-footer {
+    .skin-black-light .main-footer ,
+    .skin-black-light .main-header > .navbar,
+    .skin-black-light .wrapper{
         border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
         background-repeat: no-repeat;
-        background-size: contain; /* or cover depending on your need */
+        background-size: cover;
         background-position: center;
+    }
+
+    .skin-black-light .main-header > .navbar {
+        color: var(--primary-color) !important;
+        /*background-color: var(--box-background-color) a !important;*/
     }
 
     .content-header {
@@ -212,12 +218,6 @@
 
     .content-header > .breadcrumb > li > a {
         color: var(--text-primary-color) !important;
-    }
-
-    .skin-black-light .main-header > .navbar {
-        color: var(--primary-color) !important;
-        background-color: var(--box-background-color) a !important;
-
     }
 
     .skin-black-light .main-header > .navbar > .sidebar-toggle {
