@@ -11,7 +11,7 @@
         --background-image: {{ config('themes.backgroundImage') }};
         {{----brand_background-image: {{ config('themes.brandBackgroundImage') }};--}}
         {{----brand_background-image: "{{ getImagePath(config('themes.brandBackgroundImage')) }}";--}}
-        --brand_background-image: url({{ asset(config('themes.brandBackgroundImage')) }});
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
         --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
         --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
