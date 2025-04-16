@@ -63,7 +63,7 @@
     }
 
     .skin-black-light .sidebar-menu > li.header {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background: var(--second-alpha) !important;
     }
 
@@ -136,29 +136,33 @@
 
     .skin-black-light .sidebar-menu > li:hover > a,
     .skin-black-light .sidebar-menu > li.active > a {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background: var(--primary-hover-alpha) !important;
     }
 
     .skin-black-light .sidebar-menu > li:hover > a i,
     .skin-black-light .sidebar-menu > li.active > a i {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background: transparent !important;
 
     }
 
     .skin-black-light .treeview-menu > li.active > a,
     .skin-black-light .treeview-menu > li > a:hover {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
 
     .sidebar-menu > li > .treeview-menu {
-        background: var(--box-background-color) !important;
+        background: var(--secondary-color) !important;
+    }
+
+    .form-control, select, .select2-container .select2-selection--single, .select2-container .select2-selection--multiple{
+        background: none !important;
     }
 
     .table.table-hover tbody tr:hover {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background-color: var(--primary-hover-alpha) !important;
     }
 
@@ -172,7 +176,7 @@
     }
 
     .input-group .input-group-addon {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
         background-color: var(--second-alpha) !important;
     }
 
@@ -194,14 +198,14 @@
     select,
     .select2-container .select2-selection--single,
     .select2-container .select2-selection--multiple {
-        background-color: var(--box-background-color) !important;
-        color: var(--text-primary-color) !important;
+        background-color: var(--secondary-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
 
     .bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
         background-color: var(--primary-color) !important;
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
     }
 
     .box-header > .fa,
@@ -224,7 +228,7 @@
     }
 
     .content-header > .breadcrumb > li > a {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
     .skin-black-light .main-header > .navbar > .sidebar-toggle {
@@ -343,12 +347,12 @@
 
     .select2-container--default .select2-results__option[aria-selected=true] {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: var(--text-primary-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
@@ -399,6 +403,10 @@
         background-color: var(--primary-hover-alpha) !important;
         color: var(--inverse-box-color) !important;
         border: 1px solid transparent !important;
+    }
+
+    .box{
+        background-color: var(--secondary-color) !important
     }
 
     .btn-default {
@@ -559,7 +567,7 @@
     }
 
     .inputs_cus_form {
-        color: var( --text-primary-color)!important;
+        color: var( --text-secondary-color)!important;
         background-color: var(--box-background-color) !important;
     }
 
@@ -567,7 +575,7 @@
         display: block;
         margin: 1px 0;
         padding: 8px 10px;
-        color: var( --text-primary-color)!important;
+        color: var( --text-secondary-color)!important;
         text-decoration: none;
         border: 1px solid #ddd;
         background:  var(--box-background-color) !important;

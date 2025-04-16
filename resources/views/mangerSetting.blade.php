@@ -160,7 +160,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
-                style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('Manger') }}</button>
+                style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Manger') }}</button>
             </div>
         </div>
 
@@ -178,7 +178,7 @@
 
                         <input type="text" id="android_min_version" name="value"  placeholder="android_min_version" value="{{ $configValue }}"  min="1" class="inputs_cus_form">
                         <button type="submit">{{ __('Save') }}</button>
-                        
+
                     </div>
 
                 </form>
@@ -216,7 +216,7 @@
 
                 // تعيين لون الزر من متغير CSS
                 activeButton.style.backgroundColor = 'var(--primary-color)';
-                activeButton.style.color = 'var(--text-primary-color)';
+                activeButton.style.color = 'var(--text-secondary-color)';
 
 
             }

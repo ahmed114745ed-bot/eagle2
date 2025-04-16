@@ -67,8 +67,8 @@ class TrashedUserAccountController extends  MainController
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
                             <a href='$userUrl' style='color: var(--primary-color); font-weight: bold; text-decoration: none;'>$name</a><br>
-                            <span style='color: var(--text-primary-color); font-size: smaller;'>UUID: $uuid</span><br>
-                            <span style='color: var(--text-primary-color); font-size: smaller;'>📞 $phone</span>
+                            <span style='color: var(--text-secondary-color); font-size: smaller;'>UUID: $uuid</span><br>
+                            <span style='color: var(--text-secondary-color); font-size: smaller;'>📞 $phone</span>
                         </div>
                     </div>";
         });
