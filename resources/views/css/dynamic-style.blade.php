@@ -70,12 +70,14 @@
     body {
         color: var(--primary-color) !important;
         background-color: var(--box-background-color) !important;
+        background-image: var(--brand_background-image) !important;
     }
 
     .skin-black-light .content-wrapper,
-    .skin-black-light .main-footer ,
-    .skin-black-light .main-header > .navbar,
-    .skin-black-light .wrapper{
+    /*.skin-black-light .main-footer ,*/
+    /*.skin-black-light .main-header > .navbar,*/
+    .skin-black-light .wrapper
+    {
         border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
@@ -84,16 +86,13 @@
         background-position: center;
     }
 
-    /*.settings-menu button{*/
-    /*    background-color: var(--secondary-color) !important;*/
-    /*}*/
-
     form {
         background-color: var(--secondary-color) !important;
     }
 
     .skin-black-light .main-header > .navbar {
         color: var(--primary-color) !important;
+        background-color: transparent !important;
         /*background-color: var(--box-background-color) a !important;*/
     }
 
