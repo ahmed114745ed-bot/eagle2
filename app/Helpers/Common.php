@@ -1225,5 +1225,14 @@ class Common
         return ['title' => __('Notification'), 'body' => $body];
     }
 
+    public  static function getTargetUsd($diamonds,$percentage)
+    {
+        $coins = Cache::get('shipping_coins', 1) ?? 1;
+        $usd = $diamonds / $coins;
+        $userUsd = $usd *  $percentage  / 100;
+
+        return $userUsd;
+    }
+
 
 }

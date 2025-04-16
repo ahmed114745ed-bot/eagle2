@@ -11,6 +11,8 @@ use App\Models\Admin as AdminModel;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -83,7 +85,7 @@ class TargetController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        $grid->usd(__('usd'))->editable();;
+        $grid->usd(__('User Percentage'));
 
         $grid->hours(__('hours'))->editable();
         $grid->days(__('days'))->editable();
@@ -121,8 +123,9 @@ class TargetController extends MainController
         //        $grid->img('img');
         $grid->agency_share(__('agency share') . '(%)')->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
+
             return number_format($value, 2);
-        })->editable();
+        });
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->actions(function ($actions) {
@@ -173,19 +176,56 @@ class TargetController extends MainController
     protected function form()
     {
         $form = new Form(new Target);
+        $coins = Cache::get('shipping_coins', 1) ?? 1;
 
 
         $form->display(__('ID'));
         $form->number('level', __('target no'));
         $form->number('diamonds', __('diamonds'));
-        $form->decimal('usd', __('usd'));
-        //        $form->text('coin', 'coin');
-        //        $form->text('gold', 'gold');
-        //        $form->text('minuts', 'minuts');
-        $form->number('hours', __('hours'));
-        $form->number('days', __('days'));
-        //        $form->text('img', 'img');
-        $form->decimal('agency_share', __('agency share') . '(%)');
+        $initialDiamonds = $form->model()->diamonds ?? 0;
+        // $initialUsd = $initialDiamonds / $coins;
+        $form->decimal('usd', __('Percentage'))
+            ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
+        $form->html('
+    <div class="form-group form-horizontal">
+        <div class="col-sm-8 no-margin">
+            <input type="hidden" id="agency_share_input" name="agency_share" value="">
+            <div id="agency_share_display" class="input-group">
+                <input type="text" class="form-control usd" value="0.00" readonly>
+            </div>
+            <span id="agency_amount" class="help-block">
+                <i class="fa fa-info-circle"></i> ' . __('Amount will be: ') . ' USD
+            </span>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var coins = ' . $coins . ';
+
+            function calculateUsdAmount() {
+                var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
+                var percentage = parseFloat($("input[name=\'usd\']").val()) || 0;
+                var totalUsd = diamonds / coins;
+
+                var userAmount = (totalUsd * percentage / 100).toFixed(2);
+                var agencyAmount = (totalUsd - userAmount).toFixed(2);
+                $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
+                $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
+            }
+
+            $("input[name=\'diamonds\']").on("input", function() {
+                calculateUsdAmount();
+            });
+
+            $("input[name=\'usd\']").on("input", function() {
+                var percentage = parseFloat($(this).val()) || 0;
+                var agencyShare = 100 - percentage;
+                $("#agency_share_display input").val(agencyShare.toFixed(2));
+                $("#agency_share_input").val(agencyShare.toFixed(2));
+                calculateUsdAmount();
+            });
+        });
+    </script>', __('agency share') . '(%)' );
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');

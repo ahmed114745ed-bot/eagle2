@@ -27,6 +27,16 @@
         });
     });
 
+            $(document).ready(function() {
+                $('input[name="usd"]').on('input', function() {
+                                
+
+                    var percentage = parseFloat($(this).val()) || 0;
+                    var agencyShare = 100 - percentage;
+                    
+                    $('.agency_share').text(agencyShare.toFixed(2));
+                });
+            });
 
 
 </script>

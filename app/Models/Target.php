@@ -23,6 +23,18 @@ class Target extends Model
         'coin',
         'img',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            if (isset($model->usd)) {
+                $model->agency_share = 100 - (double) $model->usd;
+            }
+        });
+    }
+
     public function getCreatedAtAttribute($value)
     {
         $cacheKey = 'timezone';
@@ -58,17 +70,17 @@ class Target extends Model
     return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        // static::deleting(function ($banner) {
+    //     // static::deleting(function ($banner) {
 
-        //     if (auth()->user() && $banner->creator?->isRole('developer')) {
-        //         abort(403);
-        //     }
-        // });
-    }
+    //     //     if (auth()->user() && $banner->creator?->isRole('developer')) {
+    //     //         abort(403);
+    //     //     }
+    //     // });
+    // }
 
     public function creator(){
         return $this->belongsTo(Admin::class, 'created_by');
