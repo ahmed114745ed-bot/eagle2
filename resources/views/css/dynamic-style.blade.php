@@ -88,6 +88,7 @@
 
     form {
         background-color: var(--secondary-color) !important;
+        filter: brightness(0.85);
     }
 
     .skin-black-light .main-header > .navbar {

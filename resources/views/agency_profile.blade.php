@@ -88,6 +88,7 @@
         }
         .container {
             background: var(--secondary-color);
+            filter: brightness(0.85);
             padding: 20px;
             border-radius: 5px;
             width: 100%;
@@ -146,11 +147,15 @@
         }
         th, td {
             padding: 8px;
+            background-color: var(--secondary-color);
+            filter: brightness(0.85);
             text-align: center;
             border-bottom: 1px solid #444;
         }
+
         th {
             background-color: var(--secondary-color);
+            filter: brightness(0.85);
         }
 
         /* Responsive adjustments */
