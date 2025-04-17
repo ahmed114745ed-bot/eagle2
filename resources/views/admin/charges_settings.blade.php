@@ -167,15 +167,10 @@
     }
 
     button {
-        background: #ff9800;
         padding: 10px;
         border: none;
         cursor: pointer;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: #e68900;
     }
 
     .all-page {

@@ -50,16 +50,13 @@
             color: white;
         }
         button {
-            background: #ff9800;
             padding: 10px;
             border: none;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
         }
-        button:hover {
-            background: #e68900;
-        }
+
         .avatar {
             text-align: center;
             margin-bottom: 20px;

@@ -81,17 +81,14 @@
         .details strong {
             color: #ff9800;
         }
+
         button {
-            background: #ff9800;
             padding: 10px;
             border: none;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
             margin-top: 15px;
-        }
-        button:hover {
-            background: #e68900;
         }
 
         /* Table styles */

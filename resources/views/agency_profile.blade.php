@@ -27,25 +27,25 @@
     margin-bottom: 20px;
 }
 
-.settings-menu button {
-    background-color: var(--box-background-color);
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: var(--text-secondary-color) !important;
-    border-radius: 4px;
-}
+/*.settings-menu button {*/
+/*    background-color: var(--box-background-color);*/
+/*    border: none;*/
+/*    padding: 10px 15px;*/
+/*    font-size: 16px;*/
+/*    cursor: pointer;*/
+/*    transition: all 0.3s ease;*/
+/*    color: var(--text-secondary-color) !important;*/
+/*    border-radius: 4px;*/
+/*}*/
 
-.settings-menu button:hover {
-    background-color: #ff9800;
-}
+/*.settings-menu button:hover {*/
+/*    background-color: #ff9800;*/
+/*}*/
 
-.settings-menu button.active {
-    background-color: var(--primary-color);
-    color: var(--text-secondary-color) !important;
-}
+/*.settings-menu button.active {*/
+/*    background-color: var(--primary-color);*/
+/*    color: var(--text-secondary-color) !important;*/
+/*}*/
 
 .settings-content {
     width: 100%;
@@ -127,16 +127,12 @@
         /*    color: #ff9800;*/
         /*}*/
         button {
-            background: #ff9800;
             padding: 10px;
             border: none;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
             margin-top: 15px;
-        }
-        button:hover {
-            background: #e68900;
         }
 
         /* Table styles */

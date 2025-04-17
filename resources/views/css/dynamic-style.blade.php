@@ -266,9 +266,12 @@
 
     .cardHome {
         color: var(--inverse-box-color) !important;
-        background-color: var(--box-background-color) !important;
+        background-color: var(--secondary-color) !important;
     }
 
+    .small-box {
+        background-color: var(--secondary-color);
+    }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
         background: var(--primary-color) !important;
@@ -517,7 +520,7 @@
         font-size: 14px;
         text-align: left;
         list-style: none;
-        background-color: var(--box-background-color) !important;
+        background-color: var(--secondary-color) !important;
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
         border: 1px solid var(--primary-hover-alpha) !important;
@@ -845,9 +848,40 @@
         transition: background-color 0.3s;
     }
 
+    button {
+        background: var(--primary-color);
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: var(--primary-color);
+        filter: brightness(0.85);
+        color: var(--secondary-color);
+    }
+
     .tab-button:hover {
         opacity: 0.8;
     }
+
+    button.active {
+        background-color: var(--secondary-color); !important;
+        color: var(--text-secondary-color) !important;
+    }
+
+    .btn-warning{
+        background-color: var(--primary-color);
+        color: var(--text-secondary-color);
+    }
+
+    .btn-warning:hover {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+        filter: brightness(0.85);
+    }
+
 
     .tab-button.active {
         background-color: var(--primary-color);
