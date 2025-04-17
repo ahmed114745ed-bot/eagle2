@@ -325,6 +325,10 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
+    .rtl [class*="col-md-"] {
+        float: none !important;
+    }
+
     .pagination > li > a, .pagination > li > span {
         position: relative;
         float: left;
