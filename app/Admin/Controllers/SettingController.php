@@ -34,7 +34,6 @@ class SettingController extends MainController
     public function saveSettings(Request $request)
     {
         $data = $request->except('_token');
-
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
