@@ -325,8 +325,12 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
-    .rtl [class*="col-md-"] {
+    .rtl [class*="col-md-12"] {
         float: none !important;
+    }
+
+    .rtl [class*="col-md-6"] {
+        float: right;
     }
 
     .pagination > li > a, .pagination > li > span {
@@ -829,10 +833,6 @@
             .sidebar-open .content-wrapper {
                 margin-right: 250px;
         }
-    }
-
-    .rtl [class*="col-md-"] {
-        float: right;
     }
 
     .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-left,
