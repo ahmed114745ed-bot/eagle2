@@ -111,68 +111,70 @@ class MomentController extends MainController
     // $grid->column('img', __('Image'))->display(function () {
     //     $id = $this->id;
     //     $galleries = MomentGallery::where('moment_id', $id)->get();
-    
+
     //     $html = '<div id="image-gallery-' . $id . '" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">';
-    
+
     //     foreach ($galleries as $image) {
     //         $imgUrl = getDriverUrl() . '/' . $image->image;
-    
+
     //         $html .= '<div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
-    //                     <img src="' . $imgUrl . '" 
+    //                     <img src="' . $imgUrl . '"
     //                          style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
-    //                          data-original="' . $imgUrl . '"  
+    //                          data-original="' . $imgUrl . '"
     //                          loading="lazy"
     //                          class="gallery-image">
     //                  </div>';
     //     }
-    
+
     //     $html .= '</div>';
-    
+
     //     Admin::script("
     //         new Viewer(document.getElementById('image-gallery-$id'));
     //     ");
-    
+
     //     return $html;
     // });
 
     $grid->column('img', __('Image'))->display(function () {
         $id = $this->id;
         $galleries = MomentGallery::where('moment_id', $id)->get();
-    
+
         if ($galleries->isEmpty()) {
             return 'No Image';
         }
-    
+
         $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
-    
+
         foreach ($galleries as $image) {
             $imgUrl = getDriverUrl() . '/' . $image->image;
-    
-            $html .= '<img src="' . $imgUrl . '" 
+
+            $html .= '<img src="' . $imgUrl . '"
                          style="width: 100%; height: 200px; object-fit: cover;"
-                         data-original="' . $imgUrl . '"  
+                         data-original="' . $imgUrl . '"
                          loading="lazy"
                          class="gallery-image">';
         }
-    
+
         $html .= '</div>';
-    
+
         // Show only the first image
         $firstImageUrl = asset("images/moment.jpg");
-    
-        $html .= '<img src="' . $firstImageUrl . '" 
+
+        $html .= '<img src="' . $firstImageUrl . '"
                       style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
                       onclick="document.querySelector(`#image-gallery-' . $id . ' img`).click()">';
-    
+
         Admin::script("
             new Viewer(document.getElementById('image-gallery-$id'));
         ");
-    
+
         return $html;
     });
+
+    $grid->disableCreateButton();
     return $grid;
 
-    
+
 }
 
     // protected function grid()
