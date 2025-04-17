@@ -392,6 +392,10 @@
         background-color: #fff;
     }
 
+    .modal-backdrop {
+        position: static; !important;
+    }
+
     .modal-content {
         position: relative;
         background-color: var(--box-background-color) !important;
