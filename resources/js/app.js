@@ -54,3 +54,12 @@ getToken(messaging, { vapidKey: 'BMUJdEtRolJtxXjFR2XdIrVx99gpC4hoFr6WlfCreUF2aZ1
     console.log('An error occurred while retrieving token. ', err);
     // ...
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.querySelector('.table-responsive');
+    if (document.documentElement.lang === "ar") {
+        table.scrollLeft = table.scrollWidth;
+    } else {
+        table.scrollLeft = 0;
+    }
+});
