@@ -40,9 +40,14 @@ class BoxController extends Controller
         $room = Room::query ()->where ('uid',$request->room_uid)->first ();
         if (!$room)  return Common::apiResponse (0,'not found',null,404);
         $box = Box::query ()->find ($request->box_id);
-        $user = $request->user ();
-        $label = '';
 
+        if (!$box) return Common::apiResponse (0,'not found',null,404);
+
+        $user = $request->user ();
+        if ($user->di < $box->coins){
+            return Common::apiResponse (0,'low balance',null,407);
+        }
+        $label = '';
 
         $app_percentage = Config::query()->where('name','app_wallet_lucky_box')->first()?->value ?? 2;
         $walletCoins = ($box->coins*$app_percentage) / 100;
@@ -54,13 +59,10 @@ class BoxController extends Controller
         ]);
 
 
-        if (!$box) return Common::apiResponse (0,'not found',null,404);
         if ($request->label && $box->type == 1 && $box->has_label == 1){
             $label = $request->label;
         }
-        if ($user->di < $box->coins){
-            return Common::apiResponse (0,'low balance',null,407);
-        }
+       
         try {
             DB::beginTransaction ();
             $box_use_data=[
