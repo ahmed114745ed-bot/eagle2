@@ -727,8 +727,8 @@
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
                                     onchange="toggleBackgroundInput()">
-                                    <option value="color" {{ ($settings['background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
-                                    <option value="image" {{ ($settings['background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
+                                    <option value="color" {{ $settings['background_type'] === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
+                                    <option value="image" {{ $settings['background_type'] === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
                                 </select>
                             </div>
                         </div>

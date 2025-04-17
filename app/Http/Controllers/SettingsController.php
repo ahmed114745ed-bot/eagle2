@@ -39,9 +39,7 @@ class SettingsController extends Controller
                 admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                 return back();
             }
-        }
-
-        info($request);
+        }   
 
         // Handle background settings
         if ($request->background_type === 'color') {
@@ -60,7 +58,7 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
-        unset($data['background_type'], $data['app_background_image'], $data['brand_background_image_reset']);
+        unset($data['app_background_image'], $data['brand_background_image_reset']);
 
         // Process and save settings
         foreach ($data as $key => $value) {
