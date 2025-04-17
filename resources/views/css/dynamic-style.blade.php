@@ -95,6 +95,11 @@
         filter: brightness(0.85);
     }
 
+    .rtl .small-box .icon{
+        width: 96%;
+        text-align: left;
+    }
+
     .skin-black-light .main-header > .navbar {
         color: var(--primary-color) !important;
         background-color: transparent !important;
