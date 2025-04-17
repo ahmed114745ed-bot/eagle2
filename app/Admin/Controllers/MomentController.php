@@ -30,7 +30,7 @@ class MomentController extends MainController
     /**
      * Make a grid builder.
      *
-     * @return Grid
+     * @return Content
      */
     public function index(Content $content)
     {
@@ -91,8 +91,8 @@ class MomentController extends MainController
         return "<div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                     <div>
-                        <a href='$userUrl' style='color: #3498db; font-weight: bold; text-decoration: none;'>$name</a><br>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                        <a href='$userUrl' style='font-weight: bold; text-decoration: none;'>$name</a><br>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
                 </div>";
     });

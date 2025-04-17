@@ -236,9 +236,19 @@
 
     .btn-dropbox,
     .btn-instagram,
+    .btn-twitter,
     .btn-success {
         background-color: var(--primary-color) !important;
         color: var(--inverse-color) !important;
+    }
+
+    .btn-dropbox:hover,
+    .btn-instagram:hover,
+    .btn-twitter:hover,
+    .btn-success:hover {
+        background: var(--primary-color);
+        filter: brightness(0.85);
+        color: var(--secondary-color)
     }
 
     .content-header > .breadcrumb > li > a {
