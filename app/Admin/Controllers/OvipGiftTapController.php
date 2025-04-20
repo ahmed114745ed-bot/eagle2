@@ -100,25 +100,25 @@ class OvipGiftTapController extends MainController
 
 
         $grid->actions(function ($actions) use ($level) {
-            $actions->disableAll(); // Disable all default actions
+            $actions->disableView();
+            $actions->disableEdit();
+            $actions->disableDelete();
 
             $id = $actions->getKey();
+            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
+            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
 
             // Edit button
             $actions->append(
-                "<a href='".url("admin/ware-gift/{$level}/{$id}/edit")."' class='btn btn-xs btn-primary'>
-                    <i class='fa fa-edit'></i> ".__('admin.edit')."
+                "<a href='{$editUrl}' class='btn btn-xs btn-primary' style='margin-right:5px'>
+                    <i class='fa fa-edit'></i> Edit
                 </a>"
             );
 
-            // Delete button
-            $actions->append(
-                Admin::action(
-                    url("admin/ware-gift/{$level}/{$id}"),
-                    ['icon' => 'fa-trash', 'class' => 'btn-danger btn-xs'],
-                    ['method' => 'DELETE']
-                )
-            );
+            // Delete button with form
+            $actions->append(view('admin.views.dashboard.delete-button', [
+                'url' => $deleteUrl
+            ]));
         });
 
 
