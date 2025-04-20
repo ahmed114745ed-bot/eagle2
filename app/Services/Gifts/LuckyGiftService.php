@@ -69,8 +69,8 @@ class LuckyGiftService
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
 
         if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
-        $firstAppWalletCoins = $appWallet->coins;
-        $firstOwnerWalletCoins = $ownerWallet->coins;
+        $firstAppWalletCoins = round($appWallet->coins, 1);
+        $firstOwnerWalletCoins = round($ownerWallet->coins, 1);
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
