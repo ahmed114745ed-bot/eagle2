@@ -100,9 +100,7 @@ class OvipGiftTapController extends MainController
 
 
         $grid->actions(function ($actions) use ($level) {
-            $actions->disableView();
-            $actions->disableEdit();
-            $actions->disableDelete();
+            $actions->disableAll();
 
             $id = $actions->getKey();
             $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
