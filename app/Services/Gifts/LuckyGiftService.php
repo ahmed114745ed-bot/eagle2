@@ -69,8 +69,8 @@ class LuckyGiftService
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
 
         if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
-        $firstAppWalletCoins = $appWallet->coins;
-        $firstOwnerWalletCoins = $ownerWallet->coins;
+        $firstAppWalletCoins = round($appWallet->coins, 1);
+        $firstOwnerWalletCoins = round($ownerWallet->coins, 1);
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
@@ -426,11 +426,13 @@ class LuckyGiftService
      */
     public function getCoreWallets(): array
     {
-        $collection = CoreWallet::query()->whereIn('id', [1, 2])->get();
-        $wallets = $collection->sortBy('id')->values(); // Sort by id and reindex
+        $wallets = CoreWallet::query()
+            ->whereIn('name', ['owner_wallet', 'app_wallet'])
+            ->get()
+            ->keyBy('name');
 
-        $ownerWallet = $wallets[1] ?? null;
-        $appWallet = $wallets[0] ?? null;
+        $ownerWallet = $wallets['owner_wallet'] ?? null;
+        $appWallet = $wallets['app_wallet'] ?? null;
 
         return [$ownerWallet, $appWallet];
     }

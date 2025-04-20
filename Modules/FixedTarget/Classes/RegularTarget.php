@@ -45,8 +45,6 @@ class RegularTarget implements TargetInterface
 //                $per = 0;
 //            }
 //        }
-
-          
           $usd = Common::getTargetUsd($target->diamonds,$target->usd);
           
           return $usd * $per;
