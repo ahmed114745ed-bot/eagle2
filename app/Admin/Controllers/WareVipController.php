@@ -273,6 +273,7 @@ class WareVipController extends MainController
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
+                'vap' => __('vap'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
                 'image' => __('image'),
