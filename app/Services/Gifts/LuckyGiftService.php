@@ -426,11 +426,13 @@ class LuckyGiftService
      */
     public function getCoreWallets(): array
     {
-        $collection = CoreWallet::query()->whereIn('id', [1, 2])->get();
-        $wallets = $collection->sortBy('id')->values(); // Sort by id and reindex
+        $wallets = CoreWallet::query()
+            ->whereIn('name', ['owner_wallet', 'app_wallet'])
+            ->get()
+            ->keyBy('name');
 
-        $ownerWallet = $wallets[1] ?? null;
-        $appWallet = $wallets[0] ?? null;
+        $ownerWallet = $wallets['owner_wallet'] ?? null;
+        $appWallet = $wallets['app_wallet'] ?? null;
 
         return [$ownerWallet, $appWallet];
     }
