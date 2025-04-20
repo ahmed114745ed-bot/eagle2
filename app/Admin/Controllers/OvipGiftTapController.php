@@ -100,25 +100,25 @@ class OvipGiftTapController extends MainController
 
 
         $grid->actions(function ($actions) use ($level) {
-            $actions->disableAll();
+            $actions->disableAll(); // Disable all default actions
 
             $id = $actions->getKey();
-            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
-            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
-            $csrf = csrf_token();
 
-            $actions->append("
-                <a href='{$editUrl}' class='btn btn-xs btn-primary' style='margin-right: 5px'>
-                    <i class='fa fa-edit'></i> Edit
-                </a>
-                <form action='{$deleteUrl}' method='POST' style='display:inline-block;' onsubmit='return confirm(\"Are you sure?\")'>
-                    <input type='hidden' name='_token' value='{$csrf}'>
-                    <input type='hidden' name='_method' value='DELETE'>
-                    <button type='submit' class='btn btn-xs btn-danger'>
-                        <i class='fa fa-trash'></i> Delete
-                    </button>
-                </form>
-            ");
+            // Edit button
+            $actions->append(
+                "<a href='".url("admin/ware-gift/{$level}/{$id}/edit")."' class='btn btn-xs btn-primary'>
+                    <i class='fa fa-edit'></i> ".__('admin.edit')."
+                </a>"
+            );
+
+            // Delete button
+            $actions->append(
+                Admin::action(
+                    url("admin/ware-gift/{$level}/{$id}"),
+                    ['icon' => 'fa-trash', 'class' => 'btn-danger btn-xs'],
+                    ['method' => 'DELETE']
+                )
+            );
         });
 
 
