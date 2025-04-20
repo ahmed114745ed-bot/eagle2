@@ -99,21 +99,26 @@ class OvipGiftTapController extends MainController
         $grid->expire(__('expire'));
 
 
-        $grid->column('actions', __('Actions'))->display(function () use ($type) {
-            $id = $this->id; // current model ID
-            $editUrl = url("admin/ware-gift/{$type}/{$id}/edit");
-            $deleteUrl = url("admin/ware-gift/{$type}/{$id}");
+        $grid->column('actions', __('Actions'))->display(function () use ($level) {
+            $id = $this->id;
+
+            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
+            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
             $csrf = csrf_token();
+
+            $editText = __('admin.edit');
+            $deleteText = __('admin.delete');
+            $confirmText = __('Are you sure?');
 
             return <<<HTML
                 <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
-                    <i class="fa fa-edit"></i> {{ __('admin.edit') }}
+                    <i class="fa fa-edit"></i> {$editText}
                 </a>
-                <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?')">
+                <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('{$confirmText}')">
                     <input type="hidden" name="_token" value="{$csrf}">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="btn btn-xs btn-danger">
-                        <i class="fa fa-trash"></i> {{ __('admin.delete') }}
+                        <i class="fa fa-trash"></i> {$deleteText}
                     </button>
                 </form>
             HTML;
