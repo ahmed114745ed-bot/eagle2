@@ -30,21 +30,21 @@ class SettingsController extends Controller
 
 
         $data = $request->except('_token');
+.
 
-
-        if (
-            ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
-            ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
-            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins'))
-        ) {
-            $target = Target::first();
-            $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
+        // if (
+        //     ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
+        //     ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
+        //     ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins'))
+        // ) {
+        //     $target = Target::first();
+        //     $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
         
-            if ($hasActiveTargets) {
-                admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
-                return back();
-            }
-        }
+        //     if ($hasActiveTargets) {
+        //         admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
+        //         return back();
+        //     }
+        // }
         
 
 
