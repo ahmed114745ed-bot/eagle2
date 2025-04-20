@@ -560,7 +560,6 @@ class LuckyGiftService
      */
     public function updateCoreWallet(mixed $diffAppWallet, mixed $diffOwnerWallet): void
     {
-        dd($diffAppWallet, $diffOwnerWallet);
         \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
             'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
         ]);
