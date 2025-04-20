@@ -99,10 +99,10 @@ class OvipGiftTapController extends MainController
         $grid->expire(__('expire'));
 
 
-        $grid->column('actions', __('Actions'))->display(function () use ($level) {
+        $grid->column('actions', __('Actions'))->display(function () use ($type) {
             $id = $this->id; // current model ID
-            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
-            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
+            $editUrl = url("admin/ware-gift/{$type}/{$id}/edit");
+            $deleteUrl = url("admin/ware-gift/{$type}/{$id}");
             $csrf = csrf_token();
 
             return <<<HTML
@@ -119,7 +119,7 @@ class OvipGiftTapController extends MainController
             HTML;
         })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
 
-        
+
         $grid->actions(function ($actions) {
             $actions->disableView();
         });
