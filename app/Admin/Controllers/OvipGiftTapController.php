@@ -107,13 +107,13 @@ class OvipGiftTapController extends MainController
 
             return <<<HTML
                 <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
-                    <i class="fa fa-edit"></i> Edit
+                    <i class="fa fa-edit"></i> {{ __('admin.edit') }}
                 </a>
                 <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?')">
                     <input type="hidden" name="_token" value="{$csrf}">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="btn btn-xs btn-danger">
-                        <i class="fa fa-trash"></i> Delete
+                        <i class="fa fa-trash"></i> {{ __('admin.delete') }}
                     </button>
                 </form>
             HTML;
