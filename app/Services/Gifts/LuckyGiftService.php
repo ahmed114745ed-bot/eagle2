@@ -69,8 +69,8 @@ class LuckyGiftService
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
 
         if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
-        $firstAppWalletCoins = round($appWallet->coins, 1);
-        $firstOwnerWalletCoins = round($ownerWallet->coins, 1);
+        $firstAppWalletCoins = $appWallet->coins;
+        $firstOwnerWalletCoins = $ownerWallet->coins;
 
 
         $receivedUsers = User::whereIn('id', $receiversIds)->select(['id', 'name'])->get();
@@ -426,13 +426,11 @@ class LuckyGiftService
      */
     public function getCoreWallets(): array
     {
-        $wallets = CoreWallet::query()
-            ->whereIn('name', ['owner_wallet', 'app_wallet'])
-            ->get()
-            ->keyBy('name');
+        $collection = CoreWallet::query()->whereIn('id', [1, 2])->get();
+        $wallets = $collection->sortBy('id')->values(); // Sort by id and reindex
 
-        $ownerWallet = $wallets['owner_wallet'] ?? null;
-        $appWallet = $wallets['app_wallet'] ?? null;
+        $ownerWallet = $wallets[1] ?? null;
+        $appWallet = $wallets[0] ?? null;
 
         return [$ownerWallet, $appWallet];
     }
@@ -562,22 +560,10 @@ class LuckyGiftService
      */
     public function updateCoreWallet(mixed $diffAppWallet, mixed $diffOwnerWallet): void
     {
-        \DB::transaction(function () use ($diffAppWallet, $diffOwnerWallet) {
-            $wallet1 = \DB::table('core_wallets')->where('id', 1)->lockForUpdate()->first();
-
-            if ($wallet1->coins + $diffAppWallet < 0) {
-                throw new \RuntimeException('Insufficient coins in wallet 1');
-            }
-
-            \DB::table('core_wallets')
-                ->whereIn('id', [1, 2])
-                ->update([
-                    'coins' => \DB::raw('CASE
-                        WHEN id = 2 THEN coins + ?
-                        WHEN id = 1 THEN coins + ?
-                        END'),
-                ], [$diffOwnerWallet, $diffAppWallet]);
-        });
+        dd($diffAppWallet, $diffOwnerWallet);
+        \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
+            'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
+        ]);
     }
 
     /**
