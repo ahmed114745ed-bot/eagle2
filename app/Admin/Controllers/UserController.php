@@ -90,6 +90,15 @@ class UserController extends MainController
             ->body($this->form()->edit($id)));
     }
 
+    public function close_open_gift(Request $request)
+    {
+        if ($request->make_rooms_top == "true") {
+            settings()->set("close_open_gifts", "1");
+        } else {
+            settings()->set("close_open_gifts", "0");
+        }
+    }
+
     public function create(Content $content)
     {
         return parent::create($content
