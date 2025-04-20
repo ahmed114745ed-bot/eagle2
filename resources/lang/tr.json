@@ -1939,7 +1939,14 @@
   "Agency Coins": "Nakliye Jetonları",
   "User Coins": "Kullanıcı Jetonları",
   "Charges settings": "Şarj Ayarları",
-  "charges-settings": "Şarj Ayarları"
+  "charges-settings": "Şarj Ayarları",
+  "Agency Coins": "Ajans Jetonları",
+  "User Coins": "Kullanıcı Jetonları",
+  "Super Admin Coins": "Süper Yönetici Jetonları",
+  "Zones Coins": "Bölge Jetonları",
+  "DB  Percentage": "DB Yüzdesi",
+  "Super Admin amount will be: ": "Süper Yönetici miktarı: ",
+  "app profit Percentage": "Uygulama Karı Yüzdesi"
 
 
 }

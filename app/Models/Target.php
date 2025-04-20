@@ -22,6 +22,8 @@ class Target extends Model
         'gold',
         'coin',
         'img',
+        'app_profit_percentage',
+        'db_percentage'
     ];
 
     protected static function boot()

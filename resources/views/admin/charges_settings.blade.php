@@ -412,6 +412,22 @@
                                     class="form-control">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Super Admin Coins') }} </label>
+                                <input type="text" name="super_admin_coins" value="{{ $settings['super_admin_coins'] ?? '' }}"
+                                    class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Zones Coins') }} </label>
+                                <input type="text" name="zones_coins" value="{{ $settings['zones_coins'] ?? '' }}"
+                                    class="form-control">
+                            </div>
+                        </div>
                        
                         
 

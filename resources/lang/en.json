@@ -625,6 +625,12 @@
      "User Info":"User Info",
      "user_uuid":"user uuid",
      "Normal":"Normal",
-     "charges-settings": "Charges Settings"
-
+     "charges-settings": "Charges Settings",
+     "Agency Coins": "Agency Coins",
+     "User Coins": "User Coins",
+     "Super Admin Coins": "Super Admin Coins",
+     "Zones Coins": "Zones Coins",
+     "DB  Percentage": "DB  Percentage",
+     "Super Admin amount will be: ": "Super Admin amount will be: ",
+     "app profit Percentage": "app profit Percentage"
 }
