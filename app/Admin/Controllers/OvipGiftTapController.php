@@ -71,7 +71,6 @@ class OvipGiftTapController extends MainController
 
     public function edit($id, Content $content)
     {
-
         return $content
             ->title(trans('gift'))
             ->body($this->form()->edit($id));
