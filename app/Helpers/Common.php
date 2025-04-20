@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\NotificationTemplate;
+use App\Models\Setting;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -1227,7 +1228,9 @@ class Common
 
     public  static function getTargetUsd($diamonds,$percentage)
     {
-        $coins = Cache::get('shipping_coins', 1) ?? 1;
+        $coins = Cache::rememberForever('shipping_coins', function () {
+            return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
+        });        
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
 
