@@ -301,7 +301,7 @@ class LuckyGiftService
 
             [$commentMessage, $sendMessage] =
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
-            // UPDATE user win 
+            // UPDATE user win
             (new LuckyStrategyService())->getUpdateUserStatistic($user, $totalGiftPrice, (int)($totalGiftPrice * $cashback_percentage));
             $responseData['combo'][] = [
                 'status'        => 0,
@@ -560,9 +560,22 @@ class LuckyGiftService
      */
     public function updateCoreWallet(mixed $diffAppWallet, mixed $diffOwnerWallet): void
     {
-        \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
-            'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
-        ]);
+        \DB::transaction(function () use ($diffAppWallet, $diffOwnerWallet) {
+            $wallet1 = \DB::table('core_wallets')->where('id', 1)->lockForUpdate()->first();
+
+            if ($wallet1->coins + $diffAppWallet < 0) {
+                throw new \RuntimeException('Insufficient coins in wallet 1');
+            }
+
+            \DB::table('core_wallets')
+                ->whereIn('id', [1, 2])
+                ->update([
+                    'coins' => \DB::raw('CASE
+                        WHEN id = 2 THEN coins + ?
+                        WHEN id = 1 THEN coins + ?
+                        END'),
+                ], [$diffOwnerWallet, $diffAppWallet]);
+        });
     }
 
     /**
