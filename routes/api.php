@@ -232,13 +232,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone']);
                 Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone']);
                 Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-
-
                 // Invite user to room
                 Route::post('invite-user', [EnteranceController::class, 'invite_user']);
-
-
-
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
