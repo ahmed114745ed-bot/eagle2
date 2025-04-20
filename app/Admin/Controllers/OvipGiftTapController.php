@@ -99,29 +99,9 @@ class OvipGiftTapController extends MainController
         $grid->expire(__('expire'));
 
 
-        $grid->actions(function ($actions) use ($level) {
+        $grid->actions(function ($actions) {
             $actions->disableView();
-            $actions->disableEdit();
-            $actions->disableDelete();
-
-            $id = $actions->getKey();
-            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
-            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
-
-            // Edit button
-            $actions->append(
-                "<a href='{$editUrl}' class='btn btn-xs btn-primary' style='margin-right:5px'>
-                    <i class='fa fa-edit'></i> Edit
-                </a>"
-            );
-
-            // Delete button with form
-            $actions->append(view('admin.views.dashboard.delete-button', [
-                'url' => $deleteUrl
-            ]));
         });
-
-
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
