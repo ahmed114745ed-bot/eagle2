@@ -101,6 +101,8 @@ class OvipGiftTapController extends MainController
 
         $grid->actions(function ($actions) {
             $actions->disableView();
+            $actions->disableEdit();
+            $actions->disableDelete();
         });
         $grid->disableCreateButton();
         $this->extendGrid($grid);

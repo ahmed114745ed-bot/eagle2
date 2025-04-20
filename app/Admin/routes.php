@@ -333,7 +333,6 @@ Route::group(
 
 
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
-        Route::get('ovip-gift/{ovip_id}/{id}/edit', [OvipGiftTapController::class, 'edit']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
             Route::prefix('ware-gift/{level}')->group(function () {
