@@ -75,6 +75,11 @@
         color: var(--text-secondary-color) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
+
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
 
     .skin-black-light .content-wrapper,
@@ -85,9 +90,10 @@
         border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
 
     form {
