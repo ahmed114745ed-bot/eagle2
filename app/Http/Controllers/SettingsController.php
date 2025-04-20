@@ -35,10 +35,10 @@ class SettingsController extends Controller
             $target = Target::first();
             $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
 
-            // if ($hasActiveTargets) {
-            //     admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
-            //     return back();
-            // }
+            if ($hasActiveTargets) {
+                admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
+                return back();
+            }
         }
 
         info($request);
