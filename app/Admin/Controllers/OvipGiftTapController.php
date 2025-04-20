@@ -104,26 +104,22 @@ class OvipGiftTapController extends MainController
             $actions->disableEdit();
             $actions->disableDelete();
 
-            /** @var \App\Models\Ware $model */
-            $model = $actions->getKey();
-
-            // Example edit and delete URLs – replace with your actual routes
-            $editUrl = url("admin/ware-gift/{$level}/{$model}/edit");
-            $deleteUrl = url("admin/ware-gift/{$level}/{$model}");
+            $id = $actions->getKey();
+            $editUrl = url("admin/ware-gift/{$level}/{$id}/edit");
+            $deleteUrl = url("admin/ware-gift/{$level}/{$id}");
             $csrf = csrf_token();
 
             $actions->append("
                 <a href='{$editUrl}' class='btn btn-xs btn-primary' style='margin-right: 5px'>
                     <i class='fa fa-edit'></i> Edit
                 </a>
-
-            <form action='{$deleteUrl}' method='POST' style='display:inline-block;' onsubmit='return confirm(\"Are you sure?\")'>
-                <input type='hidden' name='_token' value='{$csrf}'>
-                <input type='hidden' name='_method' value='DELETE'>
-                <button type='submit' class='btn btn-xs btn-danger'>
-                    <i class='fa fa-trash'></i> Delete
-                </button>
-            </form>
+                <form action='{$deleteUrl}' method='POST' style='display:inline-block;' onsubmit='return confirm(\"Are you sure?\")'>
+                    <input type='hidden' name='_token' value='{$csrf}'>
+                    <input type='hidden' name='_method' value='DELETE'>
+                    <button type='submit' class='btn btn-xs btn-danger'>
+                        <i class='fa fa-trash'></i> Delete
+                    </button>
+                </form>
             ");
         });
 
