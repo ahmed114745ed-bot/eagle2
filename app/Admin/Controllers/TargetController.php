@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\Target;
 use Encore\Admin\Form;
@@ -177,9 +178,7 @@ class TargetController extends MainController
     protected function form()
     {
         $form = new Form(new Target);
-        $coins = Cache::rememberForever('shipping_coins', function () {
-            return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        });
+        $coins = Common::getMaxCoins();
         
 
 
@@ -193,57 +192,64 @@ class TargetController extends MainController
         $form->decimal('agency_share',  __('agency share') . '(%)')
             ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>');
 
+
+        $form->decimal('zone_percentage', __('app profit Percentage'))
+            ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
+        
+        $form->decimal('super_admin_percentage',  __('DB  Percentage') . '(%)')
+            ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
+        
         $form->html('
-     <script>
-    $(document).ready(function () {
-        var coins = ' . $coins . ';
-
-        function calculateUsdAmount() {
-            var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
-            var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
-            var totalUsd = diamonds / coins;
-
-            var userAmount = (totalUsd * usd / 100).toFixed(2);
-            var agencyAmount = (totalUsd - userAmount).toFixed(2);
-
-            $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
-            $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
-        }
-
-        function enforceLimit(changedField) {
-            var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
-            var agency = parseFloat($("input[name=\'agency_share\']").val()) || 0;
-            var total = usd + agency;
-
-            if (total > 100) {
-                if (changedField === "usd") {
-                    usd = 100 - agency;
-                    $("input[name=\'usd\']").val(usd.toFixed(2));
-                } else {
-                    agency = 100 - usd;
-                    $("input[name=\'agency_share\']").val(agency.toFixed(2));
+        <script>
+            $(document).ready(function () {
+                var coins = ' . $coins . ';
+        
+                function calculateUsdAmount() {
+                    var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
+                    var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
+                    var totalUsd = diamonds / coins;
+        
+                    var userAmount = (totalUsd * usd / 100).toFixed(2);
+                    var agencyAmount = (totalUsd * (parseFloat($("input[name=\'agency_share\']").val()) || 0) / 100).toFixed(2);
+                    var zoneAmount = (totalUsd * (parseFloat($("input[name=\'zone_percentage\']").val()) || 0) / 100).toFixed(2);
+                    var superAdminAmount = (totalUsd * (parseFloat($("input[name=\'super_admin_percentage\']").val()) || 0) / 100).toFixed(2);
+        
+                    $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
+                    $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
+                    $("#zone_amount").text("' . __('Zone amount will be: ') . '" + zoneAmount + " USD");
+                    $("#super_admin_amount").text("' . __('Super Admin amount will be: ') . '" + superAdminAmount + " USD");
                 }
-            }
-
-            $("#agency_share_display input").val((100 - usd).toFixed(2));
-            $("#agency_share_input").val((100 - usd).toFixed(2));
-        }
-
-        $("input[name=\'diamonds\']").on("input", function () {
-            calculateUsdAmount();
-        });
-
-        $("input[name=\'usd\']").on("input", function () {
-            enforceLimit("usd");
-            calculateUsdAmount();
-        });
-
-        $("input[name=\'agency_share\']").on("input", function () {
-            enforceLimit("agency");
-            calculateUsdAmount();
-        });
-    });
-</script>');
+        
+                function enforceTotalPercentageLimit(changedField) {
+                    var fields = ["usd", "agency_share", "zone_percentage", "super_admin_percentage"];
+                    var values = {};
+                    var total = 0;
+        
+                    fields.forEach(function (field) {
+                        values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
+                        total += values[field];
+                    });
+        
+                    if (total > 100) {
+                        var excess = total - 100;
+                        var currentValue = values[changedField];
+                        var newValue = Math.max(0, currentValue - excess);
+                        $("input[name=\'" + changedField + "\']").val(newValue.toFixed(2));
+                    }
+                }
+        
+                ["usd", "agency_share", "zone_percentage", "super_admin_percentage"].forEach(function (field) {
+                    $("input[name=\'" + field + "\']").on("input", function () {
+                        enforceTotalPercentageLimit(field);
+                        calculateUsdAmount();
+                    });
+                });
+        
+                $("input[name=\'diamonds\']").on("input", function () {
+                    calculateUsdAmount();
+                });
+            });
+        </script>');
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');

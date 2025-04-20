@@ -2018,7 +2018,12 @@
   "Convert diamonds to coins":"تحويل الماس الى كوين",
   "Other accounts on the same device":"حسابات اخري علي نفس الجهاز",
  "Remaining diamond": "الماس المتبقي",
- "Total Remaining Diamond": "إجمالي الألماس المتبقي"
+ "Total Remaining Diamond": "إجمالي الألماس المتبقي",
+  "Super Admin Coins": "عملات المشرف العام",
+  "Zones Coins": "عملات المناطق",
+  "DB  Percentage": "نسبة  DB",
+  "app profit Percentage": "نسبة أرباح التطبيق"
+
 
 
 }
