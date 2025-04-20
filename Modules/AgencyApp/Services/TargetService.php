@@ -65,7 +65,7 @@ class TargetService
                 $ap               = $target->agency_share / 100;
                 $user->target_usd = $t;
 
-                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received);
+                $this->updateSalaries( $user, $t, $ap, $hours, $target, $days, $month_received);
             }else{
 
         $values = [
