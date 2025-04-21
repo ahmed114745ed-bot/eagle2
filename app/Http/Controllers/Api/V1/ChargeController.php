@@ -65,6 +65,12 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::withoutAppends()->searchByUuid($toId)->first();
 
+        if(!$from->transfer_salary){
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        }
+        if(!$to->transfer_salary){
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        }
 
         if ($from->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
