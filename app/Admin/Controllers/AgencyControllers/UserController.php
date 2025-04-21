@@ -504,9 +504,9 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $model = $actions->row;
 
-            if ($model->agency_id >= 1) {
+/*             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
-            }
+            } */
         });
 
 
