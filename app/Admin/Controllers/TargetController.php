@@ -5,18 +5,15 @@ namespace App\Admin\Controllers;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\Target;
+use App\Http\Controllers\Controller;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Models\Admin as AdminModel;
-use App\Services\AppFeatureService;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Actions\DenyDeleteAction;
+use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class TargetController extends MainController
 {
@@ -66,8 +63,6 @@ class TargetController extends MainController
             ->body($this->form()));
     }
 
-   
-
 
 
     /**
@@ -78,16 +73,44 @@ class TargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Target);
-        $grid->model()->orderBy('diamonds');
+        $grid->model()->orderBy('level');
+        $coins = Common::getMaxCoins();
 
-        $grid->id(__('ID'));
+        // $grid->id(__('ID'));
         $grid->level(__('target no'));
 
-        $grid->diamonds(__('diamonds'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->usd(__('User Percentage'));
+        $grid->diamonds(__('diamonds'))
+        ->display(function ($value) use ($coins) {
+            $endFormatted = $coins ? number_format($value / $coins) : 0;
+    
+            return "
+                <div style='display: flex; flex-direction: column;'>
+                    <span style='font-weight: bold;'>💎 {$value}</span>
+                    <span style='color: #888; font-size: smaller;'>\$ {$endFormatted}</span>
+                </div>
+            ";
+        });
+
+        $grid->usd(__('User Percentage'))
+        ->display(function ($value) use ($coins) {
+            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+
+            $userUsd = floatval($endFormatted) * floatval($value) / 100;
+            $userPercentage = number_format($value);
+            return "
+                <div style='display: flex; flex-direction: column;'>
+                    <span style='font-weight: bold;'>% {$userPercentage}</span>
+                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                </div>
+            ";
+        });
+  
+       
+        
+        
+        
+        
+        // $grid->usd(__('User Percentage'));
 
         $grid->hours(__('hours'))->editable();
         $grid->days(__('days'))->editable();
@@ -123,27 +146,39 @@ class TargetController extends MainController
         });
 
         //        $grid->img('img');
-        $grid->agency_share(__('agency share') . '(%)')->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
+        // $grid->agency_share(__('agency share') . '(%)')->display(function ($column, Grid\Column $value) {
+        //     $value = $value->getOriginal();
 
-            return number_format($value, 2);
+        //     return number_format($value, 2);
+        // });
+        $grid->agency_share(__('agency share'))
+        ->display(function ($value) use ($coins) {
+            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+            $userUsd = floatval($endFormatted) * floatval($value) / 100;
+            $userPercentage = number_format($value);
+            return "
+                <div style='display: flex; flex-direction: column;'>
+                    <span style='font-weight: bold;'>% {$userPercentage}</span>
+                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                </div>
+            ";
+        });
+        $grid->db_percentage(__('DB  Percentage'))
+        ->display(function ($value) use ($coins) {
+            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+            $userUsd = floatval($endFormatted) * floatval($value) / 100;
+            $userPercentage = number_format($value);
+            return "
+                <div style='display: flex; flex-direction: column;'>
+                    <span style='font-weight: bold;'>% {$userPercentage}</span>
+                    <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
+                </div>
+            ";
         });
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->actions(function ($actions) {
-            $model = $actions->row;
-            $admin = Auth::user();
-            $created = AdminModel::find($model->created_by);
-
-           // dd( $admin ,$created);
-           if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
-                $actions->disableDelete();
-                $actions->add(new DenyDeleteAction());
-            }
-        });
         return $grid;
     }
-
     /**
      * Make a show builder.
      *
@@ -184,72 +219,87 @@ class TargetController extends MainController
 
         $form->display(__('ID'));
         $form->number('level', __('target no'));
-        $form->number('diamonds', __('diamonds'));
-        $initialDiamonds = $form->model()->diamonds ?? 0;
-        // $initialUsd = $initialDiamonds / $coins;
-        $form->decimal('usd', __('Percentage'))
-            ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
-        $form->decimal('agency_share',  __('agency share') . '(%)')
-            ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>');
 
+        $form->decimal('diamonds', __('diamonds'))
+    ->help('<span id="diamonds_amount">' . __('Amount will be: ') . ' USD</span>
+            <br><span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
 
-        $form->decimal('zone_percentage', __('app profit Percentage'))
-            ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
-        
-        $form->decimal('super_admin_percentage',  __('DB  Percentage') . '(%)')
-            ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
-        
-        $form->html('
-        <script>
-            $(document).ready(function () {
-                var coins = ' . $coins . ';
-        
-                function calculateUsdAmount() {
-                    var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
-                    var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
-                    var totalUsd = diamonds / coins;
-        
-                    var userAmount = (totalUsd * usd / 100).toFixed(2);
-                    var agencyAmount = (totalUsd * (parseFloat($("input[name=\'agency_share\']").val()) || 0) / 100).toFixed(2);
-                    var zoneAmount = (totalUsd * (parseFloat($("input[name=\'zone_percentage\']").val()) || 0) / 100).toFixed(2);
-                    var superAdminAmount = (totalUsd * (parseFloat($("input[name=\'super_admin_percentage\']").val()) || 0) / 100).toFixed(2);
-        
-                    $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
-                    $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
-                    $("#zone_amount").text("' . __('Zone amount will be: ') . '" + zoneAmount + " USD");
-                    $("#super_admin_amount").text("' . __('Super Admin amount will be: ') . '" + superAdminAmount + " USD");
-                }
-        
-                function enforceTotalPercentageLimit(changedField) {
-                    var fields = ["usd", "agency_share", "zone_percentage", "super_admin_percentage"];
-                    var values = {};
-                    var total = 0;
-        
-                    fields.forEach(function (field) {
-                        values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
-                        total += values[field];
-                    });
-        
-                    if (total > 100) {
-                        var excess = total - 100;
-                        var currentValue = values[changedField];
-                        var newValue = Math.max(0, currentValue - excess);
-                        $("input[name=\'" + changedField + "\']").val(newValue.toFixed(2));
-                    }
-                }
-        
-                ["usd", "agency_share", "zone_percentage", "super_admin_percentage"].forEach(function (field) {
-                    $("input[name=\'" + field + "\']").on("input", function () {
-                        enforceTotalPercentageLimit(field);
-                        calculateUsdAmount();
-                    });
-                });
-        
-                $("input[name=\'diamonds\']").on("input", function () {
-                    calculateUsdAmount();
-                });
+$form->decimal('usd', __('Percentage'))
+    ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
+
+$form->decimal('agency_share',  __('agency share') . '(%)')
+    ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>');
+
+$form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
+    ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
+
+$form->decimal('app_profit_percentage', __('app profit Percentage'))
+    ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
+
+$form->html('
+<script>
+    $(document).ready(function () {
+        var debounceTimer;
+        var coins = ' . $coins . ';
+
+        function floor2(num) {
+            return Math.floor(num * 100) / 100;
+        }
+
+        function calculateUsdAmount() {
+            var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
+            var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
+            var agency = parseFloat($("input[name=\'agency_share\']").val()) || 0;
+            var db = parseFloat($("input[name=\'db_percentage\']").val()) || 0;
+            var app = parseFloat($("input[name=\'app_profit_percentage\']").val()) || 0;
+
+            var totalUsd = diamonds / coins;
+            var userAmount = floor2(totalUsd * usd / 100);
+            var agencyAmount = floor2(totalUsd * agency / 100);
+            var zoneAmount = floor2(totalUsd * app / 100);
+            var superAdminAmount = floor2(totalUsd * db / 100);
+
+            $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
+            $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
+            $("#zone_amount").text("' . __('Amount will be: ') . '" + zoneAmount + " USD");
+            $("#super_admin_amount").text("' . __('Amount will be: ') . '" + superAdminAmount + " USD");
+            $("#total_usd_amount").text("' . __('Total USD: ') . '" + floor2(totalUsd) + " USD");
+        }
+
+        function enforceTotalPercentageLimit(changedField) {
+            var fields = ["usd", "agency_share", "app_profit_percentage", "db_percentage"];
+            var values = {};
+            var total = 0;
+
+            fields.forEach(function (field) {
+                values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
+                total += values[field];
             });
-        </script>');
+
+            if (total > 100) {
+                var excess = total - 100;
+                var currentValue = values[changedField];
+                var newValue = Math.max(0, currentValue - excess);
+                $("input[name=\'" + changedField + "\']").val(floor2(newValue));
+            }
+        }
+
+        var allFields = ["diamonds", "usd", "agency_share", "app_profit_percentage", "db_percentage"];
+        allFields.forEach(function (field) {
+            $(document).on("input", "input[name=\'" + field + "\']", function () {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function () {
+                    enforceTotalPercentageLimit(field);
+                    calculateUsdAmount();
+                }, 500); // يمكن تغييره إلى 2000 لو حبيت
+            });
+        });
+
+        // تنفيذ عند التحميل
+        calculateUsdAmount();
+    });
+</script>');
+    
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');
@@ -286,21 +336,20 @@ class TargetController extends MainController
 
             return @explode(',', $moment)[2] ?? 0;
         });
-
-
-        if ($form->isCreating()) {
-            $form->model()->created_by = auth()->id();
-        }
-        $form->model()->updated_by = auth()->id();
-
+ 
+        $form->hidden('hours', __('hours'))->default(function ($form) {
+            $hours = $form->model()->hours;
+            return $hours == null || $hours == '' ? 0 : $hours;
+        });
+        $form->hidden('days', __('days'))->default(function ($form) {
+            $days = $form->model()->days;
+            return $days == null || $days == '' ? 0 : $days;
+        });
         return $form;
     }
 
     public function update($id)
     {
-        $banner = Target::find($id);
-        $admin = Auth::user();
-        $created = AdminModel::find($banner->created_by);
         $data   = \request()->all();
         if (isset($data['reel1'])) {
             $reel1  = $data['reel1'];
@@ -335,19 +384,13 @@ class TargetController extends MainController
         }
 
 
-        if ((!$admin->isRole('developer')) && $created && ($created->isRole('developer'))) {
-            admin_info(trans('messages.denyDelete'));
-            return redirect()->route('admin.targets.index');
-        } else {
-            Request::replace($data);
-            return $this->form()->update($id);
-        }
-        
+
+        Request::replace($data);
+        return $this->form()->update($id);
     }
 
     public function store()
     {
-        
 
         $data = \request()->all();
         $values = [
