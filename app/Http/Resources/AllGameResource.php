@@ -20,6 +20,7 @@ class AllGameResource extends JsonResource
             'high_safety' => (intval(@$this->hight_image) ?? 0),
             'high' => intval($this->in_room == 1 ? (floatval($this->hight?? 0) ) : null),
             'in_room' => @$this->in_room,
+            'is_hot' => rand(0,1)
         ];
     }
 }
