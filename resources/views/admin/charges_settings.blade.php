@@ -1,9 +1,14 @@
-
 @php
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
+    $user_coinsConfig = App\Models\Config::where ('name', '=','one_usd_value_in_coins')->first();
+    $shipping_coins = cache()->get('shipping_coins', $settings['shipping_coins'] ?? '');
+    $user_coins = cache()->get('user_coins', $user_coinsConfig['value'] ?? '');
 
 @endphp
+
+<!-- Add SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     /* Add this CSS to your stylesheet */
     .radio-options-container {
@@ -196,33 +201,80 @@
     .modal {
         display: none;
         position: fixed;
-        z-index: 1000;
-        padding-top: 50px;
+        z-index: 9999;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: var(--secondary-color);
-        ;
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
-    /* الصورة داخل النافذة */
+    .modal-dialog {
+        position: relative;
+        width: auto;
+        margin: 10% auto;
+        max-width: 500px;
+    }
+
     .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
+        position: relative;
+        background-color: var(--box-background-color);
+        border: 1px solid #888;
+        border-radius: 5px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        padding: 20px;
     }
 
-    /* زر الإغلاق */
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .modal-title {
+        color: var(--text-primary-color);
+        margin: 0;
+    }
+
     .close {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: white;
-        font-size: 40px;
+        color: var(--text-primary-color);
+        font-size: 28px;
         font-weight: bold;
         cursor: pointer;
+    }
+
+    .modal-body {
+        color: var(--text-primary-color);
+        margin-bottom: 20px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #ff9800;
+        color: black;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
     }
 
     img {
@@ -266,7 +318,7 @@
         /* تقليل عرض شريط التمرير */
 
     }
- 
+
     .settings-menu button {
         background-color: var(--box-background-color);
         border: none;
@@ -375,7 +427,38 @@
     .switch.active::after {
         left: 25px;
     }
+
+    /* Custom styles for the confirmation dialog */
+    .swal2-popup {
+        background: var(--box-background-color) !important;
+        color: var(--text-primary-color) !important;
+    }
+
+    .swal2-title {
+        color: var(--text-primary-color) !important;
+    }
+
+    .swal2-content {
+        color: var(--text-primary-color) !important;
+    }
+
+    .swal2-confirm {
+        background-color: #ff9800 !important;
+        border: none !important;
+    }
+
+    .swal2-cancel {
+        background-color: #dc3545 !important;
+        border: none !important;
+    }
 </style>
+
+<!-- Add SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Add Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </head>
 <body>
@@ -393,14 +476,14 @@
 
                 <h3> {{ __('Brand settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
                     @csrf
                     <div class="form row">
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Agency Coins') }} </label>
-                                <input type="text" name="shipping_coins" value="{{ $settings['shipping_coins'] ?? '' }}"
+                                <input type="text" name="shipping_coins" value="{{ $shipping_coins }}"
                                     class="form-control">
                             </div>
                         </div>
@@ -408,7 +491,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('User Coins') }} </label>
-                                <input type="text" name="user_coins" value="{{ $settings['user_coins'] ?? '' }}"
+                                <input type="text" name="user_coins" value="{{ $user_coins }}"
                                     class="form-control">
                             </div>
                         </div>
@@ -431,15 +514,47 @@
                        
                         
 
-                        <button type="submit">{{ __('save') }}</button>
+                        <!-- <button type="submit">{{ __('save') }}</button> -->
 
+                        <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
 
                     </div>
 
                 </form>
             </div>
 
-          
+            <!-- Bootstrap Modal -->
+            <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmationModalLabel">{{ __('Confirm Update') }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {{ __('Are you sure you want to update the target settings? This action cannot be undone.') }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button type="button" class="btn btn-primary" onclick="submitForm()">{{ __('Yes, update') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function showConfirmationModal() {
+                    $('#confirmationModal').modal('show');
+                }
+
+                function submitForm() {
+                    $('#confirmationModal').modal('hide');
+                    document.getElementById('targetSettingsForm').submit();
+                }
+            </script>
+
             <script>
                 $(document).ready(function () {
                     function updateLibrary(selectedLibrary) {
@@ -586,10 +701,10 @@
                     document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
                 }
 
- 
+
             </script>
 
-            
+
 
         </div>
 </body>
