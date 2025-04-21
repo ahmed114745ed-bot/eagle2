@@ -23,7 +23,9 @@ class UserAction extends Action
 
     protected $selector = '.delete-ban';
 
-    public function __construct($id = 0, $charge_status = 0, $transfer_salary = 0, $show_invite_code = 0, $hide_chat = 0, $can_play = 3)
+    public function __construct($id = 0, $charge_status = 0, $transfer_salary = 0, $show_invite_code = 0,
+    $hide_chat = 0,
+    $can_play = 3)
     {
 
         if ($can_play == 0) {
@@ -79,9 +81,11 @@ class UserAction extends Action
         $this->radio('show_invite_code', __('Show Invite Code'))
             ->options([1 => __('on'), 0 => __('off')])->value($this->show_invite_code);
 
+            $this->hidden('hide_chat', __('ID'))->attribute('hide_chat', 'id');
 
-        $this->radio('hide_chat', __('Hide Chat'))
-            ->options([1 => __('on'), 0 => __('off')])->value($this->hide_chat);
+        /* $this->radio('hide_chat', __('Hide Chat'))
+            ->options([1 => __('on'), 0 => __('off')])->value($this->hide_chat); */
+            $this->hidden('hide_chat')->default(0); // false == 0
 
         $this->radio('can_play', __('Can Play'))
             ->options([2 => __('yes'), 3 => __('no')])->value($this->can_play);
@@ -104,7 +108,7 @@ class UserAction extends Action
         <script>
             function openUserForm(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play) {
                 console.log(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play);
-                
+
                 $("#id").val(id);
                 $("#charge_status").val(charge_status);
                 $("#transfer_salary").val(transfer_salary);

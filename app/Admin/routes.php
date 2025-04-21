@@ -389,6 +389,8 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
             $router->get('/users', 'UserController@index')->name('users');
+            $router->get('/users/{id}/edit', 'UserController@edit');
+            $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
             $router->get('/target', 'AgencyTargetController@index')->name('targets');
             $router->get('/charges', 'ChargeController@index')->name('charges');
