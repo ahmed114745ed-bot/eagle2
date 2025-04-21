@@ -30,7 +30,7 @@ class SettingsController extends Controller
 
 
         $data = $request->except('_token');
-.
+
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
