@@ -796,7 +796,12 @@ class UserController extends MainController
         }
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            $form->number('di', __('Coins'))->default(0);
+            if ($form->isEditing()) {
+                $form->number('di', __('Coins'))->default(0)
+                ->disable($form->isEditing());
+            } else {
+                $form->number('di', __('Coins'))->default(0);
+            }
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
             $form->number('total_received_level', __('Received Level'))->default(0);
