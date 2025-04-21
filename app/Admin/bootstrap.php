@@ -60,7 +60,4 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/css.blade.php'));
 });
 
-Admin::css('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css');
-Admin::js('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js');
-
 
