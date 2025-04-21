@@ -1263,6 +1263,14 @@ class Common
         return $zones_coins;
     }
 
+    public  static function getCoinsValue($key)
+    {
+        $value = Cache::rememberForever($key, function () use ($key) {
+            return Setting::where('key', $key)->value('value') ?? 1;
+        }); 
+        return $value;
+    }
+
 
 
 
