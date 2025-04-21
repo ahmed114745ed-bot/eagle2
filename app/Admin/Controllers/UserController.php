@@ -285,7 +285,6 @@ class UserController extends MainController
                     [
                         'id' => $target->id,
                         'add_month' => $target->add_month . '/' . $target->add_year,
-
                         'target_usd' => $target->target_usd,
                         'target_agency_share' => $target->target_agency_share,
                         'user_diamonds' => $target->user_diamonds,
@@ -311,6 +310,7 @@ class UserController extends MainController
                     __('user days'),
                     __('user obtain'),
                     __('at time'),
+                    __('updated at'),
 
                 ],
                 $targets->toArray()
