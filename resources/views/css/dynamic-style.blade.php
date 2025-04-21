@@ -403,7 +403,7 @@
     }
 
     .modal-backdrop {
-        position: static; !important;
+        /* position: static; !important; */
     }
 
     .modal-content {
