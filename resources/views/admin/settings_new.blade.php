@@ -184,16 +184,10 @@
     }
 
     button {
-        background: #ff9800;
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: #e68900;
     }
 
     .all-page {
@@ -300,9 +294,9 @@
 
     }
 
-    .settings-menu button:hover {
-        background: var(--primary-color);
-    }
+    /*.settings-menu button:hover {*/
+    /*    background: var(--primary-color);*/
+    /*}*/
 
 
     .card {
@@ -733,8 +727,8 @@
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
                                     onchange="toggleBackgroundInput()">
-                                    <option value="color" {{ ($settings['background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
-                                    <option value="image" {{ ($settings['background_type'] ?? '') === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
+                                    <option value="color" {{ @$settings['background_type'] === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
+                                    <option value="image" {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
                                 </select>
                             </div>
                         </div>

@@ -1,8 +1,8 @@
 <div>
-    <form action="">
+    <dev action="">
         <input type="month" name="date">
         <button>{{ __('admin.filter') }}</button>
-    </form>
+    </dev>
 </div>
 <style>
 

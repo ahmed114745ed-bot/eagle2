@@ -93,6 +93,15 @@ class UserController extends MainController
             ->body($this->form()->edit($id)));
     }
 
+    public function close_open_gift(Request $request)
+    {
+        if ($request->make_rooms_top == "true") {
+            settings()->set("close_open_gifts", "1");
+        } else {
+            settings()->set("close_open_gifts", "0");
+        }
+    }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -796,7 +805,12 @@ class UserController extends MainController
         }
 
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            $form->number('di', __('Coins'))->default(0);
+            if ($form->isEditing()) {
+                $form->number('di', __('Coins'))->default(0)
+                ->disable($form->isEditing());
+            } else {
+                $form->number('di', __('Coins'))->default(0);
+            }
             $form->number('user_diamond', __('Diamonds'))->default(0);
             $form->number('total_sender_level', __('Sender Level'))->default(0);
             $form->number('total_received_level', __('Received Level'))->default(0);

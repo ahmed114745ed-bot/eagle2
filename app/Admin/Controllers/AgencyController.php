@@ -236,7 +236,7 @@ class AgencyController extends MainController
                        <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                          <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                         </a>
-                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                        <span style='font-size: smaller;'>UUID: $uid</span>
                     </div>
                 </div>
             ";

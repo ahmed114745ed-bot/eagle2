@@ -5,6 +5,7 @@ namespace App\Tik\Repositories;
 use App\Models\EnteredRoom;
 use App\Models\Room;
 use App\Models\RoomPrivateMessages;
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -103,6 +104,7 @@ class RoomRepository extends AbstractRepository
                     // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
                 });
             })
+            ->where('uid','!=', Auth::id())
             ->where('room_status', 1);
         // Filter by country if provided
         if (!is_null($req->country_id)) {
@@ -179,11 +181,11 @@ class RoomRepository extends AbstractRepository
 
                     ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
                     ->orderByDesc('session');
-                  
+
                 break;
 
                 case 'friends':
-                   
+
 
                     $result->whereIn('uid', $user->friends_ids())
                          ->orderByDesc('top_room')->orderBy('room_visitors_count', 'desc')
@@ -205,11 +207,11 @@ class RoomRepository extends AbstractRepository
                 break;
 
             default:
-           
+
                 $result->orderByDesc('hour_hot');
                 break;
         }
-      
+
         // Paginate the results with 10 items per page
         if (count($ids) > 0) {
             $result = $result->whereIn('uid', $ids);

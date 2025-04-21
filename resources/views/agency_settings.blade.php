@@ -77,16 +77,10 @@
     }
 
     button {
-        background: var(--primary-color);
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: var(--primary-color);
     }
 
     .all-page {

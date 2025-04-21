@@ -75,6 +75,11 @@
         color: var(--text-secondary-color) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
+
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
 
     .skin-black-light .content-wrapper,
@@ -85,14 +90,20 @@
         border-left: 1px solid var(--second-alpha) !important;
         background-color: var(--box-background-color) !important;
         background-image: var(--brand_background-image) !important;
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
 
     form {
         background-color: var(--secondary-color) !important;
         filter: brightness(0.85);
+    }
+
+    .rtl .small-box .icon{
+        width: 96%;
+        text-align: left;
     }
 
     .skin-black-light .main-header > .navbar {
@@ -199,6 +210,10 @@
         color: var(--text-secondary-color);
     }
 
+    .btn-primary:hover{
+        color: var(--secondary-color); !important;
+    }
+
     .form-control,
     select,
     .select2-container .select2-selection--single,
@@ -227,9 +242,19 @@
 
     .btn-dropbox,
     .btn-instagram,
+    .btn-twitter,
     .btn-success {
         background-color: var(--primary-color) !important;
         color: var(--inverse-color) !important;
+    }
+
+    .btn-dropbox:hover,
+    .btn-instagram:hover,
+    .btn-twitter:hover,
+    .btn-success:hover {
+        background: var(--primary-color);
+        filter: brightness(0.85);
+        color: var(--secondary-color)
     }
 
     .content-header > .breadcrumb > li > a {
@@ -262,12 +287,14 @@
 
     .cardHome {
         color: var(--inverse-box-color) !important;
-        background-color: var(--box-background-color) !important;
+        background-color: var(--secondary-color) !important;
     }
 
+    .small-box {
+        background-color: var(--secondary-color);
+    }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-        color: #fff;
         background: var(--primary-color) !important;
     }
 
@@ -304,6 +331,13 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
+    .rtl [class*="col-md-12"] {
+        float: none !important;
+    }
+
+    .rtl [class*="col-md-6"] {
+        float: right;
+    }
 
     .pagination > li > a, .pagination > li > span {
         position: relative;
@@ -366,6 +400,10 @@
         border-radius: 0;
         border-color: var(--primary-hover-alpha) !important;
         background-color: #fff;
+    }
+
+    .modal-backdrop {
+        position: static; !important;
     }
 
     .modal-content {
@@ -514,7 +552,7 @@
         font-size: 14px;
         text-align: left;
         list-style: none;
-        background-color: var(--box-background-color) !important;
+        background-color: var(--secondary-color) !important;
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
         border: 1px solid var(--primary-hover-alpha) !important;
@@ -803,10 +841,6 @@
         }
     }
 
-    .rtl [class*="col-md-"] {
-        float: right;
-    }
-
     .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-left,
     .rtl .sidebar-menu .treeview-menu>li>a>.fa-angle-down {
         transform: rotate(180deg);
@@ -842,9 +876,40 @@
         transition: background-color 0.3s;
     }
 
+    button {
+        background: var(--primary-color);
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: var(--primary-color);
+        filter: brightness(0.85);
+        color: var(--secondary-color);
+    }
+
     .tab-button:hover {
         opacity: 0.8;
     }
+
+    button.active {
+        background-color: var(--secondary-color); !important;
+        color: var(--text-secondary-color) !important;
+    }
+
+    .btn-warning{
+        background-color: var(--primary-color);
+        color: var(--text-secondary-color);
+    }
+
+    .btn-warning:hover {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+        filter: brightness(0.85);
+    }
+
 
     .tab-button.active {
         background-color: var(--primary-color);
