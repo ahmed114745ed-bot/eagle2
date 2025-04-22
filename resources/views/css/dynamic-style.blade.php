@@ -208,6 +208,7 @@
     .btn-primary {
         background-color: var(--primary-color) !important;
         color: var(--text-secondary-color);
+        border-color: var(--secondary-color);
     }
 
     .btn-primary:hover{
@@ -900,10 +901,11 @@
         color: var(--text-secondary-color) !important;
     }
 
-    .btn-warning{
+    .btn-warning {
         background-color: var(--primary-color);
         filter: brightness(4);
         color: var(--text-secondary-color);
+        border-color: var(--secondary-color);
     }
 
     .btn-warning:hover {
