@@ -53,7 +53,10 @@ class AgoraController extends Controller
 
     public function webhook(Request $request)
     {
-        return ;
+        $library = Common::getConfig('library');
+        if ($library == 2) return  Common::apiResponse(false, 'you used pusher');
+
+        return $this->enteranceRoomService->updateRoomCountFromAgora($request);
         // $agoraSignature = $request->header('Agora-Signature');
 
         // // التحقق من أن الطلب يحتوي على JSON صحيح
@@ -83,10 +86,7 @@ class AgoraController extends Controller
         //            "ts":1741600265},
         //        "productId":1
         //    }]
-        $library = Common::getConfig('library');
-        if ($library == 2) return  Common::apiResponse(false, 'you used pusher');
-
-        return $this->enteranceRoomService->updateRoomCountFromAgora($request);
+      
     }
 
 
