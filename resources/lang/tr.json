@@ -1962,6 +1962,9 @@
   "Convert diamonds to coins": "Elmasları paraya çevir",
   "Other accounts on the same device": "Aynı cihazdaki diğer hesaplar",
   "Remaining diamond": "Kalan elmas",
-  "Total Remaining Diamond": "Toplam Kalan Elmas"
+  "Total Remaining Diamond": "Toplam Kalan Elmas",
+  "Luck Box Settings": "Şans Kutusu Ayarları",
+  "app wallet lucky box": "Uygulama Cüzdanı Şans Kutusu",
+  "normal box duration": "Normal Kutu Süresi"
 
 }

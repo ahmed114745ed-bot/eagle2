@@ -2,14 +2,15 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Box;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class BoxController extends MainController
 {
@@ -132,14 +133,57 @@ class BoxController extends MainController
         $form = new Form(new Box);
 
         $form->display(__('ID'));
-        $form->select('type', __('type'))->options([0 => __('normal'), 1 => __('super')]);
+        $form->select('type', __('type'))
+            ->options([0 => __('normal'), 1 => __('super')])
+            ->attribute(['id' => 'box_type'])
+            ->required();
+
         $form->number('coins', __('coins'));
-        $form->number('users', __('users'));
+        $form->number('users', __('users'))->attribute(['id' => 'users_field']);
+        $form->number('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
-        $form->number('duration', __('duration'))->help(__('in minutes'));
+
+        // Fixed JS
+        $script = <<<SCRIPT
+        $(document).ready(function() {
+            function toggleFields() {
+                var type = $('#box_type').val();
+                if (type == '0') {
+                    $('#users_field').closest('.form-group').show();
+                    $('#duration_field').closest('.form-group').show();
+                } else {
+                    $('#users_field').closest('.form-group').hide();
+                    $('#duration_field').closest('.form-group').hide();
+                }
+            }
+
+            toggleFields(); // on page load
+
+            $('#type').change(function() {
+                toggleFields(); // on select change
+            });
+        });
+    SCRIPT;
+
+        Admin::script($script);
+        $form->saving(function (Form $form) {
+            $normalDuration = Common::getConf('normal_box_duration') ?? 1;
+
+            if ($form->type == 0) {
+                $form->duration =  $normalDuration;
+            }
+        });
+
 
         return $form;
+    }
+
+
+    public function box_settings(Content $content)
+    {
+        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration'])->pluck('value', 'name')->toArray();
+        return $content->view('box_settings', compact('config'));
     }
 }

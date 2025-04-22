@@ -1,11 +1,9 @@
 <?php
 
-use App\Admin\Controllers\ChargeReportController;
-use App\Admin\Controllers\ChargesSettingController;
-use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
@@ -17,6 +15,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
+use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
@@ -51,6 +50,7 @@ use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 
 use App\Admin\Controllers\ReportMomentController;
@@ -64,6 +64,7 @@ use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -348,6 +349,7 @@ Route::group(
         $router->resource('pages', 'PageController');
         $router->resource('exchanges', 'ExchangeController');
         $router->resource('boxes', 'BoxController');
+        $router->get('lucy-box-settings', [BoxController::class, 'box_settings']);
         $router->resource('thrown_boxes', 'BoxUseController');
         $router->resource('reports', 'ReportController');
         $router->resource('charges-reports', 'ChargeReportController');
