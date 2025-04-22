@@ -317,20 +317,6 @@ class UserController extends MainController
             );
         });
         Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::script(<<<JS
-    $(document).on('click', '[data-toggle="modal"]', function () {
-        setTimeout(function () {
-            $('html, body').animate({ scrollTop: 200 }, 300);
-        }, 200);
-    });
-JS);
-
-        Admin::style(<<<CSS
-.modal {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-CSS);
         $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
             return $this->sameDeviceUsers()->count();
         })->modal('حسابات اخري علي نفس الجهاز', function ($model) {

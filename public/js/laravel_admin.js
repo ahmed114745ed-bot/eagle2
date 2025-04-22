@@ -16,4 +16,10 @@ $(document).ready(function () {
         $('#modalImageContent').attr('src', imgSrc);
         $('#imageModal').modal('show');
     });
+
+    $(document).on('click', '[data-toggle="modal"]', function () {
+       setTimeout(function () {
+           $('html, body').animate({ scrollTop: 300 }, 300);
+       }, 200);
+    });
 });

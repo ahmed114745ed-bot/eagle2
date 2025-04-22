@@ -63,9 +63,3 @@ document.addEventListener("DOMContentLoaded", function () {
         table.scrollLeft = 0;
     }
 });
-
-$(document).on('click', '[data-toggle="modal"]', function () {
-    setTimeout(function () {
-        $('html, body').animate({ scrollTop: 0 }, 300);
-    }, 200); // Small delay to allow modal DOM to render
-});
