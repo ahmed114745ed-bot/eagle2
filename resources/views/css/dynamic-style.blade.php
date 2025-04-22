@@ -460,14 +460,18 @@
 
     .btn-default {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
 
     .btn-default:hover {
         background-color: var(--second-color) !important;
-        color: var(--inverse-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .rtl .modal-footer {
+        text-align: left;
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
@@ -928,6 +932,10 @@
         filter: brightness(0.85);
     }
 
+    tr[data-key="18"] {
+        background-color: var(--secondary-color) !important;
+        filter: brightness(2);
+    }
 
     .tab-button.active {
         background-color: var(--primary-color);
