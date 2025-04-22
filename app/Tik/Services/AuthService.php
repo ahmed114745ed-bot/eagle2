@@ -117,13 +117,10 @@ class AuthService
     {
         
      
-       dd($request['id_token']);
         $client = new Google_Client();
         
-        $client->setClientId('813834667937-0c8iabakv020vrc7qme164aojq1r7eeg.apps.googleusercontent.com');
-        
+        $client->setClientId(env('GOOGLE_CLIENT_ID'));
         $payload = $client->verifyIdToken($request['id_token']);
-        
         if (!$payload) {
             throw new \Exception('Google ID Token not found or invalid');
         }

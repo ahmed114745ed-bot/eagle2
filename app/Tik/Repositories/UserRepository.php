@@ -168,29 +168,7 @@ class UserRepository extends AbstractRepository
         return $this->model->whereNotNull('google_id')->where('google_id', $googleId)->first();
     }
 
-    public function verifyGoogleId($googleId)
-    {
-        $client = new Client();
-    
-        $url = 'https://people.googleapis.com/v1/people/' . $googleId . '?personFields=names,emailAddresses';
-    
-        $response = $client->request('GET', $url, [
-            'headers' => [
-                'Authorization' => 'Bearer '  . $this->getAccessToken()
-            ]
-        ]);
-        $data = json_decode($response->getBody()->getContents(), true);
-    
-        if (isset($data['names'])) {
-            return true;
-        }
-    
-        return false;
-    }
-    public function getAccessToken()
-    {
-        return 'your_access_token_here'; 
-    }
+   
 
     public function checkTrashedEmail($email, $googleId)
     {
