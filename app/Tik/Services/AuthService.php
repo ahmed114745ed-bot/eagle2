@@ -124,6 +124,7 @@ class AuthService
         if (!$payload) {
             throw new \Exception('Google ID Token not found or invalid');
         }
+        dd($payload);
 
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
