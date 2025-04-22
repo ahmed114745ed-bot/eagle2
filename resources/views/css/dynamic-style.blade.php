@@ -901,8 +901,8 @@
     }
 
     .btn-warning{
-        background-color: var(--secondary-color);
-        filter: brightness(2.5);
+        background-color: var(--primary-color);
+        filter: brightness(3);
         color: var(--text-secondary-color);
     }
 
