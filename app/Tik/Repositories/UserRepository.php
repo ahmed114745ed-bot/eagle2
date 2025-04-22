@@ -8,6 +8,8 @@ use App\Helpers\Common;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
+use GuzzleHttp\Client;
+
 
 /** @property User $model*/
 class UserRepository extends AbstractRepository
@@ -165,6 +167,31 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->whereNotNull('google_id')->where('google_id', $googleId)->first();
     }
+
+    public function verifyGoogleId($googleId)
+    {
+        $client = new Client();
+    
+        $url = 'https://people.googleapis.com/v1/people/' . $googleId . '?personFields=names,emailAddresses';
+    
+        $response = $client->request('GET', $url, [
+            'headers' => [
+                'Authorization' => 'Bearer '  . $this->getAccessToken()
+            ]
+        ]);
+        $data = json_decode($response->getBody()->getContents(), true);
+    
+        if (isset($data['names'])) {
+            return true;
+        }
+    
+        return false;
+    }
+    public function getAccessToken()
+    {
+        return 'your_access_token_here'; 
+    }
+
     public function checkTrashedEmail($email, $googleId)
     {
         return $this->model->withTrashed()->where(fn($q) => $q->whereNotNull('email')->where('email', $email))->orWhere('google_id', $googleId)->first();
