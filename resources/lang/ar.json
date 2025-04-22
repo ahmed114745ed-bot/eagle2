@@ -2018,7 +2018,15 @@
   "Convert diamonds to coins":"تحويل الماس الى كوين",
   "Other accounts on the same device":"حسابات اخري علي نفس الجهاز",
  "Remaining diamond": "الماس المتبقي",
- "Total Remaining Diamond": "إجمالي الألماس المتبقي"
+ "Total Remaining Diamond": "إجمالي الألماس المتبقي",
+ "Coin Color": "لون العملة",
+ "Main Color": "اللون الرئيسي",
+ "Selected Color": "اللون المحدد",
+ "Unselected Color": "اللون غير المحدد",
+ "Warning Color": "لون التحذير",
+ "Charmpink Color": "لون الشارم بينك",
+ "Heartpink Color": "لون هارت بينك",
+ "Date Color": "لون التاريخ"
 
 
 }
