@@ -10,7 +10,7 @@
     <h2>تسجيل الدخول باستخدام جوجل</h2>
 
     <div id="g_id_onload"
-         data-client_id="{{ env('GOOGLE_CLIENT_ID') }}"
+         data-client_id="819785490348-hdnei0669v081ftuhnigf34g4hp0hsue.apps.googleusercontent.com"
          data-context="signin"
          data-ux_mode="popup"
          data-callback="handleCredentialResponse"
