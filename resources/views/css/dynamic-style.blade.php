@@ -466,7 +466,7 @@
 
 
         background: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
