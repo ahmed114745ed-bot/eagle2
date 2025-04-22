@@ -902,7 +902,7 @@
 
     .btn-warning{
         background-color: var(--primary-color);
-        filter: brightness(3);
+        filter: brightness(4);
         color: var(--text-secondary-color);
     }
 
