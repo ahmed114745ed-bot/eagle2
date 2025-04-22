@@ -134,10 +134,10 @@ abstract class AbstractRepository
     {
         $data = $this->model->find($id);
         if (!$data) return false;
-        
+
         $data->delete();
         return true;
     }
-    
+
 
 }

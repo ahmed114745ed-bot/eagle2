@@ -635,5 +635,13 @@
      "Are you sure you want to update the target settings? This action cannot be undone.": "Are you sure you want to update the target settings? This action cannot be undone.",
      "Cancel": "Cancel",
      "Yes, update": "Yes, update",
-     "We can`t update the target system right now because some users still have active targets.": "We can't update the target system right now because some users still have active targets."
-}
+     "We can`t update the target system right now because some users still have active targets.": "We can't update the target system right now because some users still have active targets.",
+     "Coin Color": "Coin Color",
+     "Main Color": "Main Color",
+     "Selected Color": "Selected Color",
+     "Unselected Color": "Unselected Color",
+     "Warning Color": "Warning Color",
+     "Charmpink Color": "Charmpink Color",
+     "Heartpink Color": "Heartpink Color",
+     "Date Color": "Date Color"
+    }

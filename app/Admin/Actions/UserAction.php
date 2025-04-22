@@ -2,6 +2,7 @@
 
 namespace App\Admin\Actions;
 
+use App\Events\UserStatus;
 use App\Facades\CustomNotification;
 use App\Models\Ban;
 use App\Models\User;
@@ -31,7 +32,7 @@ class UserAction extends Action
         if ($can_play == 0) {
             $can_play = 3;
         } elseif ($can_play == 1) {
-            $can_play = 2;
+            $can_play = 2;  
         }
         $this->id = $id;
         $this->charge_status = $charge_status;
@@ -45,12 +46,24 @@ class UserAction extends Action
     }
 
     public function handle(\Illuminate\Http\Request $request)
-    {
-
+    { 
+        
         $user = User::find($request->id);
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
+
+        if($user->online){
+            $can_play = $request->can_play ?? 0;  
+            $show_invite_code = $request->show_invite_code ?? 0;  
+            broadcast(new UserStatus(
+                $can_play == 2 ? true : false, 
+                $show_invite_code == 1 ? true : false, 
+                $request->id
+            ));
+        }
+
+        
         $user->update([
             'charge_status'   => $request->charge_status,
             'transfer_salary'  => $request->transfer_salary,

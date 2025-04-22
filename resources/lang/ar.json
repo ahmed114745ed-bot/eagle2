@@ -10,6 +10,7 @@
     "Users": "المستخدمين",
     "URI": "الرابط",
     "Roles": "الادوار",
+    "User Info":"معلومات المستخدم",
     "Permission": "الصلاحيات",
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
@@ -2021,6 +2022,15 @@
  "Total Remaining Diamond": "إجمالي الألماس المتبقي",
  "Luck Box Settings": "إعدادات صندوق الحظ",
  "app wallet lucky box": "صندوق الحظ لمحفظة التطبيق",
-  "normal box duration": "مدة الصندوق العادي"
+  "normal box duration": "مدة الصندوق العادي",
+ "Coin Color": "لون العملة",
+ "Main Color": "اللون الرئيسي",
+ "Selected Color": "اللون المحدد",
+ "Unselected Color": "اللون غير المحدد",
+ "Warning Color": "لون التحذير",
+ "Charmpink Color": "لون الشارم بينك",
+ "Heartpink Color": "لون هارت بينك",
+ "Date Color": "لون التاريخ"
+
 
 }

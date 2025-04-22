@@ -211,8 +211,8 @@ class BanUser extends Action
     {
         $banText = __('create bans'); // Laravel translation
         return <<<HTML
-    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white" 
-       style="background-color: #28a745; border-color: #28a745; color: white;">
+    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white"
+       style="background-color: var(--primary-color); border-color: var(--secondary-color); color: var(--text-secondary-color);">
         {$banText}
     </a>
     HTML;

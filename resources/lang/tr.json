@@ -11,6 +11,7 @@
   "Admin": "Yönetici",
   "Users": "Kullanıcılar",
   "URI": "URI",
+    "User Info": "Kullanıcı Bilgisi",
     "Charge reports": "Şarj raporları",
     "Charge Reports": "Şarj Raporları",
     "Agency name": "Ajans adı",
@@ -1965,6 +1966,14 @@
   "Total Remaining Diamond": "Toplam Kalan Elmas",
   "Luck Box Settings": "Şans Kutusu Ayarları",
   "app wallet lucky box": "Uygulama Cüzdanı Şans Kutusu",
-  "normal box duration": "Normal Kutu Süresi"
+  "normal box duration": "Normal Kutu Süresi",
 
+  "Coin Color": "Jeton Rengi",
+  "Main Color": "Ana Renk",
+  "Selected Color": "Seçilen Renk",
+  "Unselected Color": "Seçilmeyen Renk",
+  "Warning Color": "Uyarı Rengi",
+  "Charmpink Color": "Charmpink Rengi",
+  "Heartpink Color": "Heartpink Rengi",
+  "Date Color": "Tarih Rengi"
 }

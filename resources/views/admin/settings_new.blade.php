@@ -702,7 +702,7 @@
 
 
             <div id="appSettings" class="settings-section">
-                <h3>{{ __('Timing settings') }}</h3>
+                <h3>{{ __('App settings') }}</h3>
                 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
@@ -721,6 +721,71 @@
                                     value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
                             </div>
                         </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="app_coin_color">{{ __('Coin Color') }}</label>
+                        <input type="color" id="app_coin_color" name="app_coin_color"
+                            value="{{ $settings['app_coin_color'] ?? '#f1c40f' }}" class="form-control">
+                    </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_main_color">{{ __('Main Color') }}</label>
+                            <input type="color" id="app_main_color" name="app_main_color"
+                                value="{{ $settings['app_main_color'] ?? '#34495e' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_selected_color">{{ __('Selected Color') }}</label>
+                            <input type="color" id="app_selected_color" name="app_selected_color"
+                                value="{{ $settings['app_selected_color'] ?? '#1abc9c' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_unselected_color">{{ __('Unselected Color') }}</label>
+                            <input type="color" id="app_unselected_color" name="app_unselected_color"
+                                value="{{ $settings['app_unselected_color'] ?? '#bdc3c7' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_warning_color">{{ __('Warning Color') }}</label>
+                            <input type="color" id="app_warning_color" name="app_warning_color"
+                                value="{{ $settings['app_warning_color'] ?? '#e67e22' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_charmpink_color">{{ __('Charmpink Color') }}</label>
+                            <input type="color" id="app_charmpink_color" name="app_charmpink_color"
+                                value="{{ $settings['app_charmpink_color'] ?? '#ff69b4' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_heartpink_color">{{ __('Heartpink Color') }}</label>
+                            <input type="color" id="app_heartpink_color" name="app_heartpink_color"
+                                value="{{ $settings['app_heartpink_color'] ?? '#ffc0cb' }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="app_date_color">{{ __('Date Color') }}</label>
+                            <input type="color" id="app_date_color" name="app_date_color"
+                                value="{{ $settings['app_date_color'] ?? '#95a5a6' }}" class="form-control">
+                        </div>
+                    </div>
 
                         <div class="col-md-6">
                             <div class="form-group">

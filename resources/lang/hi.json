@@ -10,6 +10,7 @@
     "Users": "उपयोगकर्ताओं",
     "URI": "यूआरआई",
     "Roles": "भूमिकाएँ",
+    "User Info": "उपयोगकर्ता जानकारी",
     "Charge reports": "चार्ज रिपोर्ट",
     "Charge Reports": "चार्ज रिपोर्ट",
     "Agency name": "एजेंसी का नाम",
@@ -1112,9 +1113,17 @@
    "Total Remaining Diamond": "कुल शेष हीरा",
    "Luck Box Settings": "लकी बॉक्स सेटिंग्स",
   "app wallet lucky box": "ऐप वॉलेट लकी बॉक्स",
-  "normal box duration": "नॉर्मल बॉक्स की अवधि"
+  "normal box duration": "नॉर्मल बॉक्स की अवधि",
 
 
+   "Coin Color": "सिक्का रंग",
+   "Main Color": "मुख्य रंग",
+   "Selected Color": "चुनिंदा रंग",
+   "Unselected Color": "अनचुनिंदा रंग",
+   "Warning Color": "चेतावनी रंग",
+   "Charmpink Color": "चार्मपिंक रंग",
+   "Heartpink Color": "हार्टपिंक रंग",
+   "Date Color": "तिथि रंग"
 
 
 

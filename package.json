@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.7.14"
     },
     "dependencies": {
-        "firebase": "^10.0.0"
+        "firebase": "^10.0.0",
+        "jquery": "^3.7.1"
     }
 }
