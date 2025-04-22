@@ -115,7 +115,18 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
-
+        
+     
+       dd($request['id_token']);
+        $client = new Google_Client();
+        
+        $client->setClientId('813834667937-0c8iabakv020vrc7qme164aojq1r7eeg.apps.googleusercontent.com');
+        
+        $payload = $client->verifyIdToken($request['id_token']);
+        
+        if (!$payload) {
+            throw new \Exception('Google ID Token not found or invalid');
+        }
 
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;

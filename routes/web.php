@@ -144,3 +144,7 @@ Route::group(
 
     }
 );
+
+Route::get('/google-login', function () {
+    return view('google');
+});
