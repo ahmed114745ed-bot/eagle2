@@ -1962,6 +1962,13 @@
   "Convert diamonds to coins": "Elmasları paraya çevir",
   "Other accounts on the same device": "Aynı cihazdaki diğer hesaplar",
   "Remaining diamond": "Kalan elmas",
-  "Total Remaining Diamond": "Toplam Kalan Elmas"
-
+  "Total Remaining Diamond": "Toplam Kalan Elmas",
+  "Coin Color": "Jeton Rengi",
+  "Main Color": "Ana Renk",
+  "Selected Color": "Seçilen Renk",
+  "Unselected Color": "Seçilmeyen Renk",
+  "Warning Color": "Uyarı Rengi",
+  "Charmpink Color": "Charmpink Rengi",
+  "Heartpink Color": "Heartpink Rengi",
+  "Date Color": "Tarih Rengi"
 }

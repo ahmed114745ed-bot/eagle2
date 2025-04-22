@@ -1109,9 +1109,15 @@
   "Convert diamonds to coins": "हीरे को सिक्कों में बदलें",
   "Other accounts on the same device": "उसी डिवाइस पर अन्य खाते",
   "Remaining diamond": "शेष हीरा",
-   "Total Remaining Diamond": "कुल शेष हीरा"
-
-
+   "Total Remaining Diamond": "कुल शेष हीरा",
+   "Coin Color": "सिक्का रंग",
+   "Main Color": "मुख्य रंग",
+   "Selected Color": "चुनिंदा रंग",
+   "Unselected Color": "अनचुनिंदा रंग",
+   "Warning Color": "चेतावनी रंग",
+   "Charmpink Color": "चार्मपिंक रंग",
+   "Heartpink Color": "हार्टपिंक रंग",
+   "Date Color": "तिथि रंग"
 
 
 
