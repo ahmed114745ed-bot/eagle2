@@ -441,7 +441,11 @@
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
-    .main-footer {
+    .rtl .modal-footer {
+        text-align: left;
+    }
+
+        .main-footer {
         background: transparent; !important;
         padding: 15px;
         color: #444;
@@ -459,14 +463,14 @@
     }
 
     .btn-default {
-        background-color: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
-        border: 1px solid var(--primary-hover-alpha) !important;
+        background-color: var(--primary-color) !important;
+        color: var(--text-secondary-color) !important;
+        border: 1px solid var(--secondary-color) !important;
     }
 
     .btn-default:hover {
         background-color: var(--second-color) !important;
-        color: var(--inverse-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
 
@@ -928,6 +932,10 @@
         filter: brightness(0.85);
     }
 
+    tr[data-key="18"] {
+        background-color: var(--secondary-color) !important;
+        filter: brightness(2);
+    }
 
     .tab-button.active {
         background-color: var(--primary-color);
