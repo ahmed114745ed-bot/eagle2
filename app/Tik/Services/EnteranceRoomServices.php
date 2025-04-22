@@ -197,7 +197,7 @@ class EnteranceRoomServices
         $roomId = $data[0]['payload']['channelName'];
         $userId = $data[0]['payload']['lastUid'];
 
-        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])
+        $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone','type'])
                     ->find($roomId);
 
         $user = User::find($userId);
@@ -215,13 +215,12 @@ class EnteranceRoomServices
 
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                     $room->update(['is_live' => true]);
-
             }
 
         } elseif (in_array($eventType, [102, 104])) {
             $this->removeUserToVisitors($room->id, $user->id);
             $this->handleLeaveCp($user, $room);
-
+            
             if (
                 Schema::hasColumn('rooms', 'is_live') &&
                 $room->uid == $user->id &&
