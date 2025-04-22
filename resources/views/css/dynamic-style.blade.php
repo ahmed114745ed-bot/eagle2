@@ -553,6 +553,7 @@
         text-align: left;
         list-style: none;
         background-color: var(--secondary-color) !important;
+        filter: brightness(0.80);
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
         border: 1px solid var(--primary-hover-alpha) !important;
@@ -624,7 +625,7 @@
         color: var(--text-secondary-color); !important;
     }
     .dropdown-menu>li>a {
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
 
