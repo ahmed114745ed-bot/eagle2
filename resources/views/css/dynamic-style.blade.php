@@ -441,11 +441,7 @@
         border-top: 1px solid var(--primary-hover-alpha) !important;
     }
 
-    .rtl .modal-footer {
-        text-align: left;
-    }
-
-        .main-footer {
+    .main-footer {
         background: transparent; !important;
         padding: 15px;
         color: #444;
@@ -463,15 +459,19 @@
     }
 
     .btn-default {
-        background-color: var(--primary-color) !important;
+        background-color: var(--primary-hover-alpha) !important;
         color: var(--text-secondary-color) !important;
-        border: 1px solid var(--secondary-color) !important;
+        border: 1px solid var(--primary-hover-alpha) !important;
     }
 
     .btn-default:hover {
         background-color: var(--second-color) !important;
         color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .rtl .modal-footer {
+        text-align: left;
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
