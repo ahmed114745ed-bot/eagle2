@@ -91,12 +91,11 @@ class TargetController extends MainController
             $like = $reel[1] ?? 0;
             $commit = $reel[2] ?? 0;
 
-            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('admin.update')  . "$update</span>
-            <br>
-             <span style=\"color:var(--inverse-box-color) ;\">" .   __('admin.like')  . "$like</span>
-             <br>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('admin.comment')  . "$commit </span>
-             ";
+            return "<span>" . __('admin.update') . "$update</span>
+                    <br>
+                    <span>" . __('admin.like') . "$like</span>
+                    <br>
+                    <span>" . __('admin.comment') . "$commit</span>";
         });
         $grid->column(('moment'), __('Moment'))->display(function ($value) {
 
@@ -106,12 +105,11 @@ class TargetController extends MainController
             $like = $moment[1] ?? 0;
             $commit = $moment[2] ?? 0;
 
-            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('admin.update')  . "$update</span>
-            <br>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('admin.like')  . "$like </span>
-             <br>
-             <span style=\"color: var(--inverse-box-color) ;\"> " .   __('admin.comment')  . "$commit </span>
-             ";
+            return "<span>" . __('admin.update') . " $update</span>
+                    <br>
+                    <span>" . __('admin.like') . " $like</span>
+                    <br>
+                    <span>" . __('admin.comment') . " $commit</span>";
         });
 
         //        $grid->img('img');
