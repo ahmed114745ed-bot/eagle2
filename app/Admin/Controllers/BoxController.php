@@ -141,45 +141,37 @@ class BoxController extends MainController
         $form->number('coins', __('coins'));
         $form->number('users', __('users'))->attribute(['id' => 'users_field']);
         $form->number('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
+       
+        $form->html('
+    <div id="dynamic_fields_container">
+        <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+            <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
+            <button type="button" class="btn btn-danger remove-field">حذف</button>
+        </div>
+    </div>
+    <div class="form-group">
+        <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
+            إضافة حقل جديد
+        </button>
+    </div>
+');
+
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
+       
 
-        // Fixed JS
-        $script = <<<SCRIPT
-        $(document).ready(function() {
-            function toggleFields() {
-                var type = $('#box_type').val();
-                if (type == '0') {
-                    $('#users_field').closest('.form-group').show();
-                    $('#duration_field').closest('.form-group').show();
-                } else {
-                    $('#users_field').closest('.form-group').hide();
-                    $('#duration_field').closest('.form-group').hide();
-                }
-            }
+    
 
-            toggleFields(); // on page load
-
-            $('#type').change(function() {
-                toggleFields(); // on select change
-            });
-        });
-    SCRIPT;
-
-        Admin::script($script);
+        // دالة لجمع القيم عند الحفظ
         $form->saving(function (Form $form) {
-            $normalDuration = Common::getConf('normal_box_duration') ?? 1;
-
-            if ($form->type == 0) {
-                $form->duration =  $normalDuration;
-            }
+            $dynamicFields = request('dynamic_fields', []);
+            $combinedValues = implode(',', array_filter($dynamicFields));
+            $form->model()->dynamic_users_values = $combinedValues;
         });
-
 
         return $form;
     }
-
 
     public function box_settings(Content $content)
     {
