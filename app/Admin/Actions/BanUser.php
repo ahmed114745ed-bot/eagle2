@@ -138,8 +138,8 @@ class BanUser extends Action
                     'messageContent' => [
                         "message" => "unableToEnterRoom",
                         'user_id' => $user->id,
-                        'description_ar' => $request->description_ar ?? '',
-                        'description_en' => $request->description_en ?? '',
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
                         'duration' => $request->duration ?? 0,
                     ]
                 ];
@@ -150,8 +150,8 @@ class BanUser extends Action
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
                         'user_id' => $user->id,
-                        'description_ar' => $request->description_ar ?? '',
-                        'description_en' => $request->description_en ?? '',
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
                         'duration' => $request->duration ?? 0,
                     ]
                 ];
@@ -162,8 +162,8 @@ class BanUser extends Action
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
                         'user_id' => $user->id,
-                        'description_ar' => $request->description_ar ?? '',
-                        'description_en' => $request->description_en ?? '',
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
                         'duration' => $request->duration ?? 0,
                     ]
                 ];
@@ -179,8 +179,8 @@ class BanUser extends Action
                 "messageContent" => [
                     "message" => "banDevice",
                     "userId" => $user->id,
-                    'description_ar' => $request->description_ar ?? '',
-                    'description_en' => $request->description_en ?? '',
+                    'reason_ar' => $request->description_ar ?? '',
+                    'reason_en' => $request->description_en ?? '',
                     'duration' => $request->duration ?? 0,
                 ]
             ];
