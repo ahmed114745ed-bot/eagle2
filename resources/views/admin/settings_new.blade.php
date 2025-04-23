@@ -585,14 +585,16 @@
                                 <label for="brand_background_image">{{ __('Brand Background Image') }}</label>
                                 <input onchange="choose_image()" type="file" id="brand_background_image"
                                     name="brand_background_image" class="form-control">
-                                <div>
-                                    @foreach ($brand_images as $img)
-                                        <img class="image_success" onclick="select_brand_image('{{ $img->name }}', this)" src="{{ !empty($img->name) ? getImagePath($img->name) : '' }}"
-                                            alt="" style="width: 50px; height: 50px;" width="50"
-                                            height="50">
-                                    @endforeach
-                                </div>
-                                @if (!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                        @foreach ($brand_images as $img)
+                                            <img class="image_success @if (!empty($settings['brand_background_image']) && $img->name == $settings['brand_background_image']) border-success @endif"
+                                                onclick="select_brand_image('{{ $img->name }}', this)"
+                                                src="{{ !empty($img->name) ? getImagePath($img->name) : '' }}"
+                                                alt=""
+                                                style="width: 50px; height: 50px; cursor: pointer;">
+                                        @endforeach
+                                    </div>
+                                {{-- @if (!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
                                     <div class="mt-2">
                                         <img id="imagePreview"
                                             src="{{ !empty($settings['brand_background_image']) ? getImagePath($settings['brand_background_image']) : '' }}"
@@ -600,9 +602,8 @@
                                             style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
                                             onclick="openFullScreen(this)">
 
-                                        {{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail"> --}}
                                     </div>
-                                @endif
+                                @endif --}}
                             </div>
                         </div>
 
