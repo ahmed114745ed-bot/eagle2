@@ -164,7 +164,7 @@ class BoxController extends Controller
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
                 }
                 dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('super-lucky');
-                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('normal-lucky');
+                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
             } catch (\Exception $exception) {
             }
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
