@@ -138,32 +138,36 @@ class BoxController extends MainController
             ->attribute(['id' => 'box_type'])
             ->required();
 
-        $form->number('coins', __('coins'));
-        $form->number('users', __('users'))->attribute(['id' => 'users_field']);
-        $form->number('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
+        $form->decimal('coins', __('coins'));
+        $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
+        $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
        
-        $form->html('
-    <div id="dynamic_fields_container">
-        <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-            <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
-            <button type="button" class="btn btn-danger remove-field">حذف</button>
-        </div>
-    </div>
-    <div class="form-group">
-        <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
-            إضافة حقل جديد
-        </button>
-    </div>
-');
+        $form->html(<<<HTML
+                <div id="dynamic_fields_container">
+                    <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
+                        <button type="button" class="btn btn-danger remove-field">حذف</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
+                        إضافة حقل جديد
+                    </button>
+                </div>
+            HTML);
 
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
-       
-
-    
-
-        // دالة لجمع القيم عند الحفظ
+        $form->html(<<<HTML
+        <script>
+           $(document).ready(function () {
+                initDynamicFieldsScript();
+            });
+        </script>
+        HTML);
+        
+        
         $form->saving(function (Form $form) {
             $dynamicFields = request('dynamic_fields', []);
             $combinedValues = implode(',', array_filter($dynamicFields));
