@@ -468,7 +468,7 @@ Route::group(
         $router->resource('settings', SettingController::class);
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
-
+        Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
 
         $router->resource('notification-templates', NotificationsTemplatesController::class);
        // Route::get('ware-management', [WareTabController::class, 'index']);

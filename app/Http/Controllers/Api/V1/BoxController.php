@@ -16,6 +16,8 @@ use App\Models\PickBoxList;
 use App\Models\UserBoxGift;
 use Illuminate\Http\Request;
 use App\Facades\RedisService;
+use App\Jobs\SuperLuckyBoxJob;
+use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
@@ -39,6 +41,11 @@ class BoxController extends Controller
 
     public function send(Request $request)
     {
+        $cacheKey = 'timezone';
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
         if (!$room)  return Common::apiResponse(0, 'not found', null, 404);
@@ -49,7 +56,9 @@ class BoxController extends Controller
         if ($user->di < $box->coins) {
             return Common::apiResponse(0, 'low balance', null, 407);
         }
-
+        $timestamp = Carbon::now($timezone)->timestamp;
+        $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id',$user->id)->exists();
+        if($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
 
@@ -67,15 +76,15 @@ class BoxController extends Controller
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
             $label = $request->label;
         }
-        $cacheKey = 'timezone';
+        
         try {
             DB::beginTransaction();
             $box_use_data = [
                 'box_id' => $box->id,
                 'user_id' => $user->id,
                 'coins' => $boxCoin,
-                'start_at' => now()->setTimezone($cacheKey)->timestamp,
-                'end_at' => now()->setTimezone($cacheKey)->addMinutes($box->duration)->timestamp,
+                'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
+                'end_at' => now()->setTimezone($timezone ?? 'UTC')->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
                 'users_num' => $request->users_num ?: $box->users,
@@ -111,7 +120,9 @@ class BoxController extends Controller
             );
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
-            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds($boxU->end_at);
+            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
+                Carbon::createFromTimestamp($boxU->end_at)
+            );
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -131,7 +142,7 @@ class BoxController extends Controller
             $json = json_encode($m);
             try {
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                
+
                 if ($box->type == 1) {
                     if (!$user instanceof User) return;
                     $d2 = [
@@ -152,6 +163,8 @@ class BoxController extends Controller
                     $json2 = json_encode($d2);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
                 }
+                dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('super-lucky');
+                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
             } catch (\Exception $exception) {
             }
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
@@ -242,22 +255,23 @@ class BoxController extends Controller
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-
+        
         if (!$box_use || $box_use['not_used_num'] == 0 || $box_use['unused_coins'] == 0) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
 
-        if (! $box_use['end_at'] < $timestamp) {
+        if ( $box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
-
-        $box = Box::first($box_use['box_id']);
+       
+        $box = Box::where('id',$box_use['box_id'])->first();
+        // dd($box_use['box_id'],$box);
 
         if ($box->type == 0) // normal
         {
-            $this->normalBox($box_use, $keyBoxUse, $user, $request);
+           return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-            $this->superBox($box_use, $user, $keyBoxUse);
+          return  $this->superBox($box_use, $user, $keyBoxUse);
         }
     }
 
@@ -314,19 +328,18 @@ class BoxController extends Controller
     public function superBox($box_use, $user, $keyBoxUse)
     {
 
-       
-            if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
-                return Common::apiResponse(0, 'used it before', null, 403);
-            }
-            PickBoxList::create([
-                'box_user_id' => $box_use['id'],
-                'user_id' => $user->id,
-            ]);
 
-            $box_use['used_num'] += 1;
-            //update box use in redis
-            RedisService::updateUnSerialize($keyBoxUse, $box_use);
-            return Common::apiResponse(1, ' you are in waiting list', [], 200);
-        
+        if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
+            return Common::apiResponse(0, 'used it before', null, 403);
+        }
+        PickBoxList::create([
+            'box_user_id' => $box_use['id'],
+            'user_id' => $user->id,
+        ]);
+
+        $box_use['used_num'] += 1;
+        //update box use in redis
+        RedisService::updateUnSerialize($keyBoxUse, $box_use);
+        return Common::apiResponse(1, ' you are in waiting list', [], 200);
     }
 }

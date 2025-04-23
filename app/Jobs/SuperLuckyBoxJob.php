@@ -1,47 +1,61 @@
 <?php
 
-namespace App\Console\Commands;
-
+namespace App\Jobs;
 
 use Carbon\Carbon;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\BoxUse;
-use App\Jobs\OpenBoxJob;
+use App\Models\Follow;
+use App\Helpers\Common;
 use App\Models\PickBoxList;
 use App\Models\RoomVisitor;
 use App\Models\UserBoxGift;
 use App\Facades\RedisService;
-use Illuminate\Console\Command;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
 use App\Http\Services\LuckyBoxServices;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-
-class SuperLuckyBoxCommend extends Command
+class SuperLuckyBoxJob implements ShouldQueue
 {
-    protected $signature = 'super-lucy-box';
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $description = 'Command description';
+    /**
+     * Create a new job instance.
+     */
+    public function __construct()
+    {
+        //
+    }
 
-    public function handle()
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
     {
         $cacheKey = 'timezone';
         $timezone = \Cache::rememberForever($cacheKey, function () {
             $setting = \App\Models\Setting::where('key', 'timezone')->first();
             return $setting?->value ?? 'UTC';
         });
-        $timestamp = Carbon::now( $timezone)->timestamp;
+        $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
-        if (!$userBoxes) return '';
+        if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->bid;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            if (!$pickerBoxIds) return '';
+            if (!$pickerBoxIds)  return;
             $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
             foreach ($users as $user) {
 
                 $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
-                if (!$userInRoom) return '';
-                
+                if (!$userInRoom)  return;
+
                 if ($userBox->users_num != $userBox->used_num) {
 
                     if (($userBox->not_used_num == 1)) {
@@ -69,7 +83,7 @@ class SuperLuckyBoxCommend extends Command
                     ];
 
                     if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
-                        return '';
+                         return;
                     }
 
                     UserBoxGift::query()->create($data);
