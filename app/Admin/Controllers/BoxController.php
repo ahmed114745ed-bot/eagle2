@@ -174,8 +174,8 @@ class BoxController extends MainController
             $form->model()->dynamic_users_values = $combinedValues;
             $normalDuration = Common::getConf('normal_box_duration') ?? 1;
 
-            if ($form->type == 0) {
-                $form->duration =  $normalDuration;
+            if ($form->model()->type == 0) {
+                $form->model()->duration =  $normalDuration;
             }
         });
 
