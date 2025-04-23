@@ -367,8 +367,10 @@ class PkEventGiftController extends MainOldController
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'));
+        
         $form->saved(function (Form $form) {
-            $route = url('admin/pk-events-gift/pk-star/' . request('pk_event_id'));
+            
+            $route = url('admin/pk-events-gift/'.request('pk_type') . '/' . request('pk_event_id'));
             return redirect($route);
         });
         return $form;
