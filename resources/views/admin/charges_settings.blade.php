@@ -474,7 +474,18 @@
     @csrf
                     <div class="form row">
 
+                      
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Zones Coins') }}</label>
+                                <input type="text" name="zones_coins" id="zones_coins"
+                                    value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
+                                    <small id="zones_coins_hint" class="form-text text-muted mt-1"
+                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            </small>            </div>
+                         </div>
+
+                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Super Admin Coins') }}</label>
                                 <input type="text" name="super_admin_coins" id="super_admin_coins"
@@ -486,25 +497,8 @@
                         </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Zones Coins') }}</label>
-                                <input type="text" name="zones_coins" id="zones_coins"
-                                    value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
-                                    <small id="zones_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
-                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('User Coins') }}</label>
-                                <input type="text" name="user_coins" id="user_coins"
-                                    value="{{ $user_coins }}" class="form-control">
-                                    <small id="user_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
-                        </div>
+                       
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -516,6 +510,16 @@
                             </small>     
                         
                         </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('User Coins') }}</label>
+                                <input type="text" name="user_coins" id="user_coins"
+                                    value="{{ $user_coins }}" class="form-control">
+                                    <small id="user_coins_hint" class="form-text text-muted mt-1"
+                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            </small>            </div>
                         </div>
 
                         <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
