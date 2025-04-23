@@ -117,7 +117,9 @@ class BoxController extends Controller
             );
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
-            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds($boxU->end_at);
+            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
+                Carbon::createFromTimestamp($boxU->end_at)
+            );
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
