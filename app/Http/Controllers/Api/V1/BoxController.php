@@ -16,6 +16,8 @@ use App\Models\PickBoxList;
 use App\Models\UserBoxGift;
 use Illuminate\Http\Request;
 use App\Facades\RedisService;
+use App\Jobs\SuperLuckyBoxJob;
+use App\Jobs\NormalLuckyBoxJop;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
@@ -152,6 +154,8 @@ class BoxController extends Controller
                     $json2 = json_encode($d2);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
                 }
+                dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($cacheKey)->addMinutes(2))->onQueue('super-lucky');
+                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($cacheKey)->addMinutes(2))->onQueue('normal-lucky');
             } catch (\Exception $exception) {
             }
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
