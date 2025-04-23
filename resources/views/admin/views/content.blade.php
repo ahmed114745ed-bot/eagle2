@@ -42,9 +42,10 @@
         <ol class="breadcrumb" style="margin-right: 30px;">
             <li><a href="{{ admin_url('/') }}"><i class="fa fa-dashboard"></i> {{__('admin.home')}}</a></li>
             @for($i = 2; $i <= count(Request::segments()); $i++)
-                <li>
-                {{ucfirst(Request::segment($i))}}
-                </li>
+            <li>
+                {{ ucfirst(__((Request::segment($i)))) }}
+                                {{ ucfirst(is_array($segment = __(Request::segment($i))) ? Request::segment($i) : $segment) }}
+                                </li>
             @endfor
         </ol>
         @endif
