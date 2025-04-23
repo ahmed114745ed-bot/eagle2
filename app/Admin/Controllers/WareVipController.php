@@ -245,6 +245,7 @@ class WareVipController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
+        $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
 
