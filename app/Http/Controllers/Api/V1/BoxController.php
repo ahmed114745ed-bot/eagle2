@@ -265,7 +265,7 @@ class BoxController extends Controller
         }
        
         $box = Box::where('id',$box_use['box_id'])->first();
-        dd($box_use['box_id'],$box);
+        // dd($box_use['box_id'],$box);
 
         if ($box->type == 0) // normal
         {
