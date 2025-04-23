@@ -13,8 +13,8 @@ return new class extends Migration
     {
         
             Schema::table('targets', function (Blueprint $table) {
-                $table->decimal('app_profit_percentage', 5, 2)->default(0)->after('super_admin_percentage');
-                $table->decimal('db_percentage', 5, 2)->default(0)->after('app_profit_percentage');
+                $table->decimal('app_profit_percentage', 5, 2)->default(0);
+                $table->decimal('db_percentage', 5, 2)->default(0);
             });
         }
     
