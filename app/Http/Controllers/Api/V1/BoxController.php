@@ -80,8 +80,8 @@ class BoxController extends Controller
                 'box_id' => $box->id,
                 'user_id' => $user->id,
                 'coins' => $boxCoin,
-                'start_at' => now()->setTimezone($timezone)->timestamp,
-                'end_at' => now()->setTimezone($timezone)->addMinutes($box->duration)->timestamp,
+                'start_at' => now()->setTimezone($timezone ?? 'UTC')->timestamp,
+                'end_at' => now()->setTimezone($timezone ?? 'UTC')->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
                 'users_num' => $request->users_num ?: $box->users,
@@ -137,7 +137,7 @@ class BoxController extends Controller
             $json = json_encode($m);
             try {
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-                
+
                 if ($box->type == 1) {
                     if (!$user instanceof User) return;
                     $d2 = [
@@ -158,8 +158,8 @@ class BoxController extends Controller
                     $json2 = json_encode($d2);
                     dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json2, $user->id, $room->id, isExceptRoom: false), 'heavyProcessing');
                 }
-                dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($cacheKey)->addMinutes(2))->onQueue('super-lucky');
-                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($cacheKey)->addMinutes(2))->onQueue('normal-lucky');
+                dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('super-lucky');
+                dispatch(new NormalLuckyBoxJop())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('normal-lucky');
             } catch (\Exception $exception) {
             }
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
@@ -322,19 +322,18 @@ class BoxController extends Controller
     public function superBox($box_use, $user, $keyBoxUse)
     {
 
-       
-            if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
-                return Common::apiResponse(0, 'used it before', null, 403);
-            }
-            PickBoxList::create([
-                'box_user_id' => $box_use['id'],
-                'user_id' => $user->id,
-            ]);
 
-            $box_use['used_num'] += 1;
-            //update box use in redis
-            RedisService::updateUnSerialize($keyBoxUse, $box_use);
-            return Common::apiResponse(1, ' you are in waiting list', [], 200);
-        
+        if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
+            return Common::apiResponse(0, 'used it before', null, 403);
+        }
+        PickBoxList::create([
+            'box_user_id' => $box_use['id'],
+            'user_id' => $user->id,
+        ]);
+
+        $box_use['used_num'] += 1;
+        //update box use in redis
+        RedisService::updateUnSerialize($keyBoxUse, $box_use);
+        return Common::apiResponse(1, ' you are in waiting list', [], 200);
     }
 }
