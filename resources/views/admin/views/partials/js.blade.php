@@ -26,51 +26,58 @@
             $('#langModal').modal('show');
         });
     });
-
-
     function initDynamicFieldsScript() {
-            $("#add_field").off('click').on("click", function() {
-                var newField = `
-                    <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                        <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
-                        <button type="button" class="btn btn-danger remove-field">حذف</button>
-                    </div>
-                `;
-                $("#dynamic_fields_container").append(newField);
-            });
-    
-            $(document).off("click", ".remove-field").on("click", ".remove-field", function() {
-                $(this).closest(".dynamic-field-group").remove();
-            });
-    
-            function toggleFields() {
-                var type = $("#box_type").val();
-                if (type == "0") {
-                    $("#coins").closest(".form-group").show();
-                    $("#users_field").closest(".form-group").hide();
-                    $("#duration_field").closest(".form-group").hide();
-                    $("#dynamic_fields_container").show();
-                    $("#add_field").show();
-                } else {
-                    $("#coins").closest(".form-group").show();
-                    $("#users_field").closest(".form-group").show();
-                    $("#duration_field").closest(".form-group").show();
-                    $("#dynamic_fields_container").hide();
-                    $("#add_field").hide();
+                $("#add_field").off("click").on("click", function() {
+                    var newField = '<div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">' +
+                        '<input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">' +
+                        '<button type="button" class="btn btn-danger remove-field">حذف</button>' +
+                    '</div>';
+                    $("#dynamic_fields_container").append(newField);
+                });
+        
+                $(document).off("click", ".remove-field").on("click", ".remove-field", function() {
+                    $(this).closest(".dynamic-field-group").remove();
+                });
+        
+                function toggleFields() {
+                    var type = $("#box_type").val();
+                    if (type == "1" || type == 1 ) {
+                        console.log('type is 1');
+                                            $("#users_field").closest(".form-group").show();
+                        $("#users_field").show();
+                        $("#duration_field").closest(".form-group").show();
+                        $("#duration_field").show();
+                        $("#dynamic_fields_container").hide();
+                        $("#add_field").hide();
+                    } else {
+                        console.log('type is 0');
+                        
+                        // $("#users_field").closest(".form-group").hide();
+                        $("#users_field").closest(".form-group").css("display", "none !important");
+
+                        $("#users_field").hide();
+
+                        // $("#duration_field").closest(".form-group").hide();
+                        $("#duration_field").closest(".form-group").css("display", "none !important");
+
+                        $("#duration_field").hide();
+
+                        $("#dynamic_fields_container").show();
+                        $("#add_field").show();
+                    }
                 }
+                $(document).on("change", "#box_type", toggleFields);
+
+                $("#box_type").off("change").on("change", toggleFields);
+                toggleFields();
             }
-    
-            $("#box_type").off('change').on("change", toggleFields);
-            toggleFields();
-        }
-    
-        // عند تحميل الصفحة أول مرة
-        $(document).ready(function () {
-            initDynamicFieldsScript();
-        });
-    
-        // عند تنقلك بين الصفحات باستخدام pjax
-        $(document).on('pjax:end', function () {
-            initDynamicFieldsScript();
-        });
+        
+            $(document).ready(function () {
+                initDynamicFieldsScript();
+            });
+        
+            // $(document).on("pjax:end", function () {
+            //     initDynamicFieldsScript();
+            // });
+
 </script>
