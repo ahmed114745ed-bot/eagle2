@@ -419,11 +419,20 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>{{ __('Application title:') }} </label>
-                                <input type="text" name="app_title" value="{{ $settings['app_title'] ?? '' }}"
+                                <label>{{ __('Application title en:') }} </label>
+                                <input type="text" name="app_title_en" value="{{ $settings['app_title_en'] ?? '' }}"
                                     class="form-control">
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>{{ __('Application title ar:') }} </label>
+                                <input type="text" name="app_title_ar" value="{{ $settings['app_title_ar'] ?? '' }}"
+                                       class="form-control">
+                            </div>
+                        </div>
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Application logo:') }}</label>
@@ -437,7 +446,7 @@
                                      onclick="openFullScreen(this)">
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Application Fav Icon:') }}</label>
                                 <input type="file" name="app_fav_icon" class="form-control" onchange="previewFavIcon(event)">

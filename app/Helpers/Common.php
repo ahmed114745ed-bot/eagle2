@@ -668,7 +668,7 @@ class Common
         ];
 
 
-        $projectName = config('app.projectName');
+        $projectName = app()->getLocale() == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
         $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/' . $projectName . '/messages:send', [
             'message' => $payload
         ]);

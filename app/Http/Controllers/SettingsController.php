@@ -39,7 +39,7 @@ class SettingsController extends Controller
                 admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                 return back();
             }
-        }   
+        }
 
         // Handle background settings
         if ($request->background_type === 'color') {
@@ -56,6 +56,10 @@ class SettingsController extends Controller
 
         if ($request->brand_background_type == 'color'){
             $data['brand_background_image'] = null;
+        }
+
+        if ($request->app_title_en || $request->app_title_ar){
+            Cache::forget('app_title');
         }
 
         unset($data['app_background_image'], $data['brand_background_image_reset']);
@@ -78,12 +82,11 @@ class SettingsController extends Controller
           //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
             $key = Str::contains($key, ['color', 'app_background','image1','image2','image3']) ? 'colors_updated_at' : $key.'_updated_at';
             settings()->set($key, true);
-          
+
         }
 
         if( $request->has('user_coins')){
             Config::query()->where('name', '=','one_usd_value_in_coins')->update(['value' => $request->user_coins]);
-
        }
 
 
