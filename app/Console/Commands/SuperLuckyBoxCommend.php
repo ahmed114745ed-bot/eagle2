@@ -30,7 +30,7 @@ class SuperLuckyBoxCommend extends Command
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->bid;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            $users =  User::whereIn('id', $pickerBoxIds)->get();
+            $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
             foreach ($users as $user) {
 
                 $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
