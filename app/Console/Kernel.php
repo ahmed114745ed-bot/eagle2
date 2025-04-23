@@ -32,8 +32,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=heavy1')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy2')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy3')->withoutOverlapping()->runInBackground();
-        $schedule->command('normal-lucy-box')->everyMinute();
-        $schedule->command('super-lucy-box')->everyMinute();
+        $schedule->command('normal-lucy-box')->everyMinute()->withoutOverlapping()->runInBackground();
+        $schedule->command('super-lucy-box')->everyMinute()->withoutOverlapping()->runInBackground();
     }
 
     /**
