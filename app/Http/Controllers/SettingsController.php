@@ -49,9 +49,11 @@ class SettingsController extends Controller
         } elseif ($request->brand_background_type === 'image') {
             if(!empty($request->brand_image)){
                 $data['brand_background'] = $request->brand_image;
+                $data['brand_background_image'] = $request->brand_image;
             }
             else if($request->hasFile('brand_background_image')){
                 $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
+                $data['brand_background_image'] = $data['brand_background'];
             }
         }
 
