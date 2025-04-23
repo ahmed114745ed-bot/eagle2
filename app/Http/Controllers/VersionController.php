@@ -49,6 +49,7 @@ class VersionController extends Controller
             'is_auth'         => $isAuth && !$isBan,
             'is_last_version' => $currentVersion <= (integer)$version && (integer)$version <= 40,
             'is_force'        => $this->isForce($version, $request->OS ),
+            'is_show_shipping_agencies' => true,
             'cache_update' => [
                 'gifts'  => $isGiftUpdated,
                 'intro' => $isIntroUpdated,
