@@ -78,7 +78,13 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         if (Schema::hasTable('settings')) {
-            $appName = Setting::where('key', 'app_title')->value('value') ?? 'Default';
+            if (app()->getLocale() === 'en'){
+                $appName = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+            }
+            if (app()->getLocale() === 'ar'){
+                $appName = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
+            }
+
             config(['app.name' => $appName]);
 
             $settings = DB::table('settings')->pluck('value', 'key')->toArray();

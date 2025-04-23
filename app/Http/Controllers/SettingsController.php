@@ -65,6 +65,10 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
+        if ($request->app_title_en || $request->app_title_ar){
+            Cache::forget('app_title');
+        }
+
         unset($data['app_background_image'], $data['brand_background_image_reset']);
 
         // Process and save settings
@@ -90,7 +94,6 @@ class SettingsController extends Controller
 
         if( $request->has('user_coins')){
             Config::query()->where('name', '=','one_usd_value_in_coins')->update(['value' => $request->user_coins]);
-
        }
 
 
