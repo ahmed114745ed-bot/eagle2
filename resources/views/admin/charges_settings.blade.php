@@ -227,19 +227,19 @@
     }
 
     .modal-title {
-        color: var(--text-secondary-color);
+        color: var(--text-primary-color);
         margin: 0;
     }
 
     .close {
-        color: var(--text-secondary-color);
+        color: var(--text-primary-color);
         font-size: 28px;
         font-weight: bold;
         cursor: pointer;
     }
 
     .modal-body {
-        color: var(--text-secondary-color);
+        color: var(--text-primary-color);
         margin-bottom: 20px;
     }
 
@@ -425,15 +425,15 @@
     /* Custom styles for the confirmation dialog */
     .swal2-popup {
         background: var(--box-background-color) !important;
-        color: var(--text-secondary-color) !important;
+        color: var(--text-primary-color) !important;
     }
 
     .swal2-title {
-        color: var(--text-secondary-color) !important;
+        color: var(--text-primary-color) !important;
     }
 
     .swal2-content {
-        color: var(--text-secondary-color) !important;
+        color: var(--text-primary-color) !important;
     }
 
     .swal2-confirm {
@@ -508,7 +508,7 @@
                        
                         
 
-                        <button type="submit">{{ __('save') }}</button>
+                        <!-- <button type="submit">{{ __('save') }}</button> -->
 
                         <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
 

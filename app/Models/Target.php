@@ -31,9 +31,12 @@ class Target extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            if (isset($model->usd)) {
-                $model->agency_share = 100 - (double) $model->usd;
+           
+            if (isset($model->usd) && isset($model->agency_share) &&  isset($model->db_percentage)) {
+                $model->app_profit_percentage = 100 - (double) $model->usd - (double) $model->agency_share - (double) $model->db_percentage;
             }
+
+
         });
     }
 
