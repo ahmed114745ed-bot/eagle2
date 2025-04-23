@@ -175,7 +175,7 @@ class BoxController extends MainController
             $normalDuration = Common::getConf('normal_box_duration') ?? 1;
 
             if ($form->model()->type == 0) {
-                $form->model()->duration =  $normalDuration;
+                $form->duration =  $normalDuration;
             }
         });
 
