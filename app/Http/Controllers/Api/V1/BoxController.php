@@ -269,9 +269,9 @@ class BoxController extends Controller
 
         if ($box->type == 0) // normal
         {
-            $this->normalBox($box_use, $keyBoxUse, $user, $request);
+           return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-            $this->superBox($box_use, $user, $keyBoxUse);
+          return  $this->superBox($box_use, $user, $keyBoxUse);
         }
     }
 
