@@ -263,9 +263,9 @@ class BoxController extends Controller
         if ( $box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
-
+        dd($box_use['box_id']);
         $box = Box::first($box_use['box_id']);
-        dd($box,$box_use['box_id']);
+        
 
         if ($box->type == 0) // normal
         {
