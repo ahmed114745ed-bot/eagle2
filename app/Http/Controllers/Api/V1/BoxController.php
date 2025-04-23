@@ -264,8 +264,8 @@ class BoxController extends Controller
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
         dd($box_use['box_id']);
-        $box = Box::first($box_use['box_id']);
-        
+        $box = Box::where('id',$box_use['box_id'])->first();
+        dd($box_use['box_id'],$box);
 
         if ($box->type == 0) // normal
         {
