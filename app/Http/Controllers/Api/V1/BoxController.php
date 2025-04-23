@@ -255,8 +255,7 @@ class BoxController extends Controller
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-        dd($box_use);
-
+        
         if (!$box_use || $box_use['not_used_num'] == 0 || $box_use['unused_coins'] == 0) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
@@ -266,6 +265,8 @@ class BoxController extends Controller
         }
 
         $box = Box::first($box_use['box_id']);
+        dd($box,$box_use['box_id']);
+
         if ($box->type == 0) // normal
         {
             $this->normalBox($box_use, $keyBoxUse, $user, $request);
