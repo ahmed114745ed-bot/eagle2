@@ -67,15 +67,15 @@ class BoxController extends Controller
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
             $label = $request->label;
         }
-
+        $cacheKey = 'timezone';
         try {
             DB::beginTransaction();
             $box_use_data = [
                 'box_id' => $box->id,
                 'user_id' => $user->id,
                 'coins' => $boxCoin,
-                'start_at' => now()->timestamp,
-                'end_at' => now()->addMinutes($box->duration)->timestamp,
+                'start_at' => now()->setTimezone($cacheKey)->timestamp,
+                'end_at' => now()->setTimezone($cacheKey)->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
                 'users_num' => $request->users_num ?: $box->users,

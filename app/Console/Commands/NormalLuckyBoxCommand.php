@@ -17,7 +17,8 @@ class NormalLuckyBoxCommand extends Command
 
     public function handle()
     {
-        $timestamp = Carbon::now()->timestamp;
+        $cacheKey = 'timezone';
+        $timestamp = Carbon::now($cacheKey)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
         foreach ($userBoxes as $userBox) {
