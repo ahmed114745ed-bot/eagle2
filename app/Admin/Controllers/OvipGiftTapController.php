@@ -71,6 +71,7 @@ class OvipGiftTapController extends MainController
 
     public function edit($id, Content $content)
     {
+       
         return $content
             ->title(trans('gift'))
             ->body($this->form()->edit($id));
@@ -102,8 +103,8 @@ class OvipGiftTapController extends MainController
         $grid->column('actions', __('Actions'))->display(function () use ($type) {
             $id = $this->id;
 
-            $editUrl = url("admin/ware-gift/{$type}/{$id}/edit");
-            $deleteUrl = url("admin/ware-gift/{$type}/{$id}");
+            $editUrl = url("admin/ware-gifts/{$id}/edit");
+            $deleteUrl = url("admin/ware-gifts/{$id}");
             $csrf = csrf_token();
 
             $editText = __('admin.edit');
@@ -247,9 +248,12 @@ class OvipGiftTapController extends MainController
 
         $form->saving(function (Form $form) {
 
+            $id = $form->model()->id;
+         
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)
-                ->exists();
+                ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
             if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([
