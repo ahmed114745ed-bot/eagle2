@@ -74,8 +74,8 @@ class BoxController extends Controller
                 'box_id' => $box->id,
                 'user_id' => $user->id,
                 'coins' => $boxCoin,
-                'end_at' => now()->addHours(24)->timestamp,
-                'start_at' => now()->addMinutes($box->duration)->timestamp,
+                'start_at' => now()->timestamp,
+                'end_at' => now()->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
                 'users_num' => $request->users_num ?: $box->users,
@@ -86,6 +86,7 @@ class BoxController extends Controller
                 'type' => $box->type,
                 'label' => $label,
                 'image' => $box->image,
+                'is_closed' => false,
             ];
             $boxU = BoxUse::query()->create(
                 $box_use_data
@@ -110,7 +111,7 @@ class BoxController extends Controller
             );
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
-            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(now());
+            $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds($boxU->end_at);
             $m = [
                 "messageContent" => [
                     "message" => "showluckybox",
@@ -124,11 +125,13 @@ class BoxController extends Controller
                     "ownerBoxUId"  => $user->uuid,
                     'usersNum' => $request->users_num ?: $box->users,
                     'rem_time' => $rem_time,
+                    'is_closed' => $box->is_closed,
                 ]
             ];
             $json = json_encode($m);
             try {
                 Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+                
                 if ($box->type == 1) {
                     if (!$user instanceof User) return;
                     $d2 = [
@@ -233,7 +236,7 @@ class BoxController extends Controller
     {
         $user = $request->user();
         $userId = $user->id;
-        $time = now();
+        $timestamp = Carbon::now()->timestamp;
 
         if (!$request->bid) return Common::apiResponse(0, 'missing params', null, 422);
 
@@ -244,7 +247,12 @@ class BoxController extends Controller
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
 
+        if (! $box_use['end_at'] < $timestamp) {
+            return Common::apiResponse(0, __("box closed"), null, 404);
+        }
+
         $box = Box::first($box_use['box_id']);
+
         if ($box->type == 0) // normal
         {
             $this->normalBox($box_use, $keyBoxUse, $user, $request);
@@ -306,8 +314,10 @@ class BoxController extends Controller
     public function superBox($box_use, $user, $keyBoxUse)
     {
 
-        if ($box_use['users_num'] != $box_use['used_num']) {
-
+       
+            if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
+                return Common::apiResponse(0, 'used it before', null, 403);
+            }
             PickBoxList::create([
                 'box_user_id' => $box_use['id'],
                 'user_id' => $user->id,
@@ -317,8 +327,6 @@ class BoxController extends Controller
             //update box use in redis
             RedisService::updateUnSerialize($keyBoxUse, $box_use);
             return Common::apiResponse(1, ' you are in waiting list', [], 200);
-        } else {
-            return Common::apiResponse(1, 'full user picked', [], 200);
-        }
+        
     }
 }
