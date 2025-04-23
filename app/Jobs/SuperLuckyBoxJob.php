@@ -38,19 +38,24 @@ class SuperLuckyBoxJob implements ShouldQueue
     public function handle(): void
     {
         $cacheKey = 'timezone';
-        $timestamp = Carbon::now( $cacheKey)->timestamp;
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+        $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+        if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->bid;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();
-            if (!$pickerBoxIds) continue;
+            if (!$pickerBoxIds)  return;
             $users =  User::whereIn('id', $pickerBoxIds)->inRandomOrder()->get();
             foreach ($users as $user) {
 
                 $userInRoom =     RoomVisitor::where('user_id', $user->id)->exists();
-                if (!$userInRoom) continue;
-                
+                if (!$userInRoom)  return;
+
                 if ($userBox->users_num != $userBox->used_num) {
 
                     if (($userBox->not_used_num == 1)) {
@@ -78,7 +83,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     ];
 
                     if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
-                        continue;
+                         return;
                     }
 
                     UserBoxGift::query()->create($data);

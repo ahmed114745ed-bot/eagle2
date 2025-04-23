@@ -307,7 +307,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('box')->group(function () {
                 Route::get('list', [BoxController::class, 'index']);
                 Route::post('send', [BoxController::class, 'send']);
-                Route::post('pickup', [BoxController::class, 'pick3']);
+                Route::post('pickup', [BoxController::class, 'pickBox']);
             });
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
