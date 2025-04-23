@@ -172,6 +172,11 @@ class BoxController extends MainController
             $dynamicFields = request('dynamic_fields', []);
             $combinedValues = implode(',', array_filter($dynamicFields));
             $form->model()->dynamic_users_values = $combinedValues;
+            $normalDuration = Common::getConf('normal_box_duration') ?? 1;
+
+            if ($form->type == 0) {
+                $form->duration =  $normalDuration;
+            }
         });
 
         return $form;

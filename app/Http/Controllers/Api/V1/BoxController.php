@@ -57,7 +57,7 @@ class BoxController extends Controller
             return Common::apiResponse(0, 'low balance', null, 407);
         }
         $timestamp = Carbon::now($timezone)->timestamp;
-        $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('user_id',$user->id)->where('is_closed', false)->exists();
+        $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id',$user->id)->exists();
         if($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
