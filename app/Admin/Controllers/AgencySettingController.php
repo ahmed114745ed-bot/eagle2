@@ -27,7 +27,8 @@ use Encore\Admin\Widgets\Tab;
 class  AgencySettingController extends MainController
 {
 
-    public $permission_name = 'agency-setting';
+   // public $permission_name = 'agency-setting';
+    public $permission_name = 'settings';
     public function index(Content $content)
     {
         $tab = new Tab();
