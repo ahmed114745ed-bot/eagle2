@@ -41,6 +41,11 @@ class BoxController extends Controller
 
     public function send(Request $request)
     {
+        $cacheKey = 'timezone';
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
         if (!$room)  return Common::apiResponse(0, 'not found', null, 404);
@@ -51,7 +56,9 @@ class BoxController extends Controller
         if ($user->di < $box->coins) {
             return Common::apiResponse(0, 'low balance', null, 407);
         }
-
+        $timestamp = Carbon::now($timezone)->timestamp;
+        $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('user_id',$user->id)->where('is_closed', false)->exists();
+        if($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
 
@@ -69,11 +76,7 @@ class BoxController extends Controller
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
             $label = $request->label;
         }
-        $cacheKey = 'timezone';
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
+        
         try {
             DB::beginTransaction();
             $box_use_data = [
