@@ -295,7 +295,6 @@ $form->html('
             });
         });
 
-        // تنفيذ عند التحميل
         calculateUsdAmount();
     });
 </script>');
