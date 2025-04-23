@@ -11,10 +11,12 @@ use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Auth\Permission;
 
 class BoxController extends MainController
 {
     public $permission_name = 'boxes';
+    public $permission_setting = 'settings';
     use HasResourceActions;
 
     /**
@@ -184,6 +186,9 @@ class BoxController extends MainController
 
     public function box_settings(Content $content)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
         $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration'])->pluck('value', 'name')->toArray();
         return $content->view('box_settings', compact('config'));
     }
