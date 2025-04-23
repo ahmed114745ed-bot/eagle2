@@ -39,15 +39,20 @@ class SettingsController extends Controller
                 admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                 return back();
             }
-        }   
+        }
 
         // Handle background settings
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
-        } elseif ($request->brand_background_type === 'image' && $request->hasFile('brand_background_image')) {
-            $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
+        } elseif ($request->brand_background_type === 'image') {
+            if(!empty($request->brand_image)){
+                $data['brand_background'] = $request->brand_image;
+            }
+            else if($request->hasFile('brand_background_image')){
+                $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
+            }
         }
 
         if ($request->has('brand_background_image_reset') && $request->brand_background_image_reset == '1') {
@@ -78,7 +83,7 @@ class SettingsController extends Controller
           //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
             $key = Str::contains($key, ['color', 'app_background','image1','image2','image3']) ? 'colors_updated_at' : $key.'_updated_at';
             settings()->set($key, true);
-          
+
         }
 
         if( $request->has('user_coins')){

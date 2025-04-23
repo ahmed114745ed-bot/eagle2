@@ -316,6 +316,7 @@
         position: relative;
 
     }
+
     .btn-save {
         position: absolute;
         bottom: 15px;
@@ -341,16 +342,18 @@
         color: #333;
 
         display: flex;
-    justify-content: space-between;
-    align-items: center;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .card-header h4 {
-    margin: 0;
-}
-.d-flex.align-items-center {
-    gap: 10px; /* Add spacing between radio and switch */
-}
+        margin: 0;
+    }
+
+    .d-flex.align-items-center {
+        gap: 10px;
+        /* Add spacing between radio and switch */
+    }
 
 
     .custom-radio {
@@ -391,9 +394,13 @@
     .switch.active::after {
         left: 25px;
     }
+    .border-success{
+        border: #4caf50, solid, 5px;
+    }
 </style>
 
 </head>
+
 <body>
 
     <div class="settings-sidebar">
@@ -427,27 +434,29 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Application logo:') }}</label>
-                                <input type="file" name="app_logo" class="form-control" onchange="previewImage(event)">
+                                <input type="file" name="app_logo" class="form-control"
+                                    onchange="previewImage(event)">
 
                                 <!-- Image Preview -->
                                 <img id="imagePreview"
-                                     src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
-                                     width="100" class="mt-2"
-                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                     onclick="openFullScreen(this)">
+                                    src="{{ !empty($settings['app_logo']) ? getImagePath($settings['app_logo']) : '' }}"
+                                    width="100" class="mt-2"
+                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                    onclick="openFullScreen(this)">
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>{{ __('Application Fav Icon:') }}</label>
-                                <input type="file" name="app_fav_icon" class="form-control" onchange="previewFavIcon(event)">
+                                <input type="file" name="app_fav_icon" class="form-control"
+                                    onchange="previewFavIcon(event)">
 
                                 <!-- Image Preview -->
                                 <img id="favIconPreview"
-                                     src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
-                                     width="100" class="mt-2"
-                                     style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
-                                     onclick="openFullScreen(this)">
+                                    src="{{ !empty($settings['app_fav_icon']) ? getImagePath($settings['app_fav_icon']) : '' }}"
+                                    width="100" class="mt-2"
+                                    style="{{ !empty($settings['app_fav_icon']) ? '' : 'display:none;' }}"
+                                    onclick="openFullScreen(this)">
                             </div>
                         </div>
 
@@ -461,7 +470,8 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST"
+                    enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
 
@@ -469,9 +479,9 @@
                             <div class="form-group">
                                 <label for="secondary_color">{{ __('Primary Color:') }}</label>
                                 <input type="color" id="secondary_color" name="secondary_color"
-                                       value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
-                                       style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
-                                       title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
+                                    value="{{ $settings['secondary_color'] ?? '#FFFFFF' }}"
+                                    style="background: {{ $settings['secondary_color'] ?? '#FFFFFF' }};"
+                                    title="اللون الثانوي المستخدم كخلفية لبعض الأقسام أو لتوضيح بعض العناصر.">
                             </div>
                         </div>
 
@@ -485,15 +495,15 @@
                             </div>
                         </div>
 
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label>--}}
-{{--                                <input type="color" id="text_primary_color" name="text_primary_color"--}}
-{{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}"--}}
-{{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};"--}}
-{{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+                        {{--                        <div class="col-md-6"> --}}
+                        {{--                            <div class="form-group"> --}}
+                        {{--                                <label for="text_primary_color">{{ __('Text Primary Color:') }}</label> --}}
+                        {{--                                <input type="color" id="text_primary_color" name="text_primary_color" --}}
+                        {{--                                    value="{{ $settings['text_primary_color'] ?? '#000000' }}" --}}
+                        {{--                                    style="background: {{ $settings['text_primary_color'] ?? '#000000' }};" --}}
+                        {{--                                    title="لون النص الأساسي الذي يظهر في العناوين والمحتوى الرئيسي."> --}}
+                        {{--                            </div> --}}
+                        {{--                        </div> --}}
 
                         <div class="col-md-6">
                             <div class="form-group">
@@ -505,39 +515,41 @@
                             </div>
                         </div>
 
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label>--}}
-{{--                                <input type="color" id="box_background_color" name="box_background_color"--}}
-{{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"--}}
-{{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"--}}
-{{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+                        {{--                        <div class="col-md-6"> --}}
+                        {{--                            <div class="form-group"> --}}
+                        {{--                                <label for="box_background_color">{{ __('Box Background Color:') }}</label> --}}
+                        {{--                                <input type="color" id="box_background_color" name="box_background_color" --}}
+                        {{--                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}" --}}
+                        {{--                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};" --}}
+                        {{--                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق."> --}}
+                        {{--                            </div> --}}
+                        {{--                        </div> --}}
                     </div>
 
-{{--                    <div class="form row">--}}
-{{--                        <div class="col-md-6">--}}
-{{--                            <div class="form-group">--}}
-{{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label>--}}
-{{--                                <input type="color" id="table_background_color" name="table_background_color"--}}
-{{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}"--}}
-{{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};"--}}
-{{--                                       title="لون خلفية الجداول في التقارير أو البيانات.">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
+                    {{--                    <div class="form row"> --}}
+                    {{--                        <div class="col-md-6"> --}}
+                    {{--                            <div class="form-group"> --}}
+                    {{--                                <label for="table_background_color">{{ __('Table Background Color:') }}</label> --}}
+                    {{--                                <input type="color" id="table_background_color" name="table_background_color" --}}
+                    {{--                                       value="{{ $settings['table_background_color'] ?? '#FFFFFF' }}" --}}
+                    {{--                                       style="background: {{ $settings['table_background_color'] ?? '#FFFFFF' }};" --}}
+                    {{--                                       title="لون خلفية الجداول في التقارير أو البيانات."> --}}
+                    {{--                            </div> --}}
+                    {{--                        </div> --}}
+                    {{--                    </div> --}}
                     <div class="form row">
                         <!-- New Background Type Selection -->
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="brand_background_type">{{ __('Brand Background Type') }}</label>
                                 <select id="brand_background_type" name="brand_background_type" class="form-control"
-                                        onchange="toggleBrandBackgroundInput()">
-                                    <option value="color" {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>
+                                    onchange="toggleBrandBackgroundInput()">
+                                    <option value="color"
+                                        {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'selected' : '' }}>
                                         {{ __('Color') }}
                                     </option>
-                                    <option value="image" {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'selected' : '' }}>
+                                    <option value="image"
+                                        {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'selected' : '' }}>
                                         {{ __('Image') }}
                                     </option>
                                 </select>
@@ -547,30 +559,39 @@
                         <!-- Background Color Input -->
                         <div class="col-md-6">
                             <div class="form-group" id="brand_background_color_group"
-                                 style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
+                                style="display: {{ ($settings['brand_background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="box_background_color">{{ __('Box Background Color:') }}</label>
                                 <input type="color" id="box_background_color" name="box_background_color"
-                                       value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
-                                       style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
-                                       title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
+                                    value="{{ $settings['box_background_color'] ?? '#F8F9FA' }}"
+                                    style="background: {{ $settings['box_background_color'] ?? '#F8F9FA' }};"
+                                    title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
                             </div>
                         </div>
+                        <input type="hidden" name="brand_image" id="brand_image">
 
                         <!-- Background Image Input -->
                         <div class="col-md-6">
                             <div class="form-group" id="brand_background_image_group"
-                                 style="display: {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
+                                style="display: {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="brand_background_image">{{ __('Brand Background Image') }}</label>
-                                <input type="file" id="brand_background_image" name="brand_background_image" class="form-control">
-                                @if(!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
+                                <input onchange="choose_image()" type="file" id="brand_background_image"
+                                    name="brand_background_image" class="form-control">
+                                <div>
+                                    @foreach ($brand_images as $img)
+                                        <img class="image_success" onclick="select_brand_image('{{ $img->name }}', this)" src="{{ !empty($img->name) ? getImagePath($img->name) : '' }}"
+                                            alt="" style="width: 50px; height: 50px;" width="50"
+                                            height="50">
+                                    @endforeach
+                                </div>
+                                @if (!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
                                     <div class="mt-2">
                                         <img id="imagePreview"
-                                             src="{{ !empty($settings['brand_background_image']) ? getImagePath($settings['brand_background_image']) : '' }}"
-                                             width="100" class="mt-2"
-                                             style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                             onclick="openFullScreen(this)">
+                                            src="{{ !empty($settings['brand_background_image']) ? getImagePath($settings['brand_background_image']) : '' }}"
+                                            width="100" class="mt-2"
+                                            style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                            onclick="openFullScreen(this)">
 
-                                        {{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail">--}}
+                                        {{--                                        <img src="{{ asset($settings['brand_background_image']) }}" width="100" class="img-thumbnail"> --}}
                                     </div>
                                 @endif
                             </div>
@@ -581,7 +602,7 @@
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                         <button type="button" id="resetColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                            class="btn btn-secondary">{{ __('Reset Colors') }}</button>
                     </div>
 
                 </form>
@@ -615,12 +636,13 @@
 
                         <div class="row mt-4">
                             <!-- Agora Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center  ">
                                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="agoraRadio" class="custom-radio libraryRealTime" name="library" value="0"
+                                            <input type="radio" id="agoraRadio"
+                                                class="custom-radio libraryRealTime" name="library" value="0"
                                                 {{ $library == '0' ? 'checked' : '' }}>
                                             <label for="agoraRadio" class="switch"></label>
                                         </div>
@@ -629,50 +651,57 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="agora_app_id" name="app_id" placeholder="app_id"
-                                                    value="{{ $agora_app_id }}" class="form-control">
+                                                <input type="text" id="agora_app_id" name="app_id"
+                                                    placeholder="app_id" value="{{ $agora_app_id }}"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
 
                             <!-- Zego Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime" name="library" value="1"
-                                                {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
+                                                name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                             <label for="zegoRadio" class="switch"></label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="zego_server_secret" name="zego_server_secret"
-                                                    placeholder="server_secret" value="{{ $zego_server_secret }}" class="form-control">
+                                                <label
+                                                    for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="zego_server_secret"
+                                                    name="zego_server_secret" placeholder="server_secret"
+                                                    value="{{ $zego_server_secret }}" class="form-control">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="zego_app_id" name="zego_app_id" placeholder="app_id"
-                                                    value="{{ $zego_app_id }}" class="form-control">
+                                                <input type="text" id="zego_app_id" name="zego_app_id"
+                                                    placeholder="app_id" value="{{ $zego_app_id }}"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="app_sign">{{ __('admin.app_sign') }}:</label>
-                                                <input type="text" id="app_sign" name="app_sign" placeholder="app_sign"
-                                                    value="{{ $app_sign }}" class="form-control">
+                                                <input type="text" id="app_sign" name="app_sign"
+                                                    placeholder="app_sign" value="{{ $app_sign }}"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
 
@@ -723,77 +752,82 @@
                         </div>
 
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="app_coin_color">{{ __('Coin Color') }}</label>
-                        <input type="color" id="app_coin_color" name="app_coin_color"
-                            value="{{ $settings['app_coin_color'] ?? '#f1c40f' }}" class="form-control">
-                    </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_main_color">{{ __('Main Color') }}</label>
-                            <input type="color" id="app_main_color" name="app_main_color"
-                                value="{{ $settings['app_main_color'] ?? '#34495e' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_coin_color">{{ __('Coin Color') }}</label>
+                                <input type="color" id="app_coin_color" name="app_coin_color"
+                                    value="{{ $settings['app_coin_color'] ?? '#f1c40f' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_selected_color">{{ __('Selected Color') }}</label>
-                            <input type="color" id="app_selected_color" name="app_selected_color"
-                                value="{{ $settings['app_selected_color'] ?? '#1abc9c' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_main_color">{{ __('Main Color') }}</label>
+                                <input type="color" id="app_main_color" name="app_main_color"
+                                    value="{{ $settings['app_main_color'] ?? '#34495e' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_unselected_color">{{ __('Unselected Color') }}</label>
-                            <input type="color" id="app_unselected_color" name="app_unselected_color"
-                                value="{{ $settings['app_unselected_color'] ?? '#bdc3c7' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_selected_color">{{ __('Selected Color') }}</label>
+                                <input type="color" id="app_selected_color" name="app_selected_color"
+                                    value="{{ $settings['app_selected_color'] ?? '#1abc9c' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_warning_color">{{ __('Warning Color') }}</label>
-                            <input type="color" id="app_warning_color" name="app_warning_color"
-                                value="{{ $settings['app_warning_color'] ?? '#e67e22' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_unselected_color">{{ __('Unselected Color') }}</label>
+                                <input type="color" id="app_unselected_color" name="app_unselected_color"
+                                    value="{{ $settings['app_unselected_color'] ?? '#bdc3c7' }}"
+                                    class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_charmpink_color">{{ __('Charmpink Color') }}</label>
-                            <input type="color" id="app_charmpink_color" name="app_charmpink_color"
-                                value="{{ $settings['app_charmpink_color'] ?? '#ff69b4' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_warning_color">{{ __('Warning Color') }}</label>
+                                <input type="color" id="app_warning_color" name="app_warning_color"
+                                    value="{{ $settings['app_warning_color'] ?? '#e67e22' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_heartpink_color">{{ __('Heartpink Color') }}</label>
-                            <input type="color" id="app_heartpink_color" name="app_heartpink_color"
-                                value="{{ $settings['app_heartpink_color'] ?? '#ffc0cb' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_charmpink_color">{{ __('Charmpink Color') }}</label>
+                                <input type="color" id="app_charmpink_color" name="app_charmpink_color"
+                                    value="{{ $settings['app_charmpink_color'] ?? '#ff69b4' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="app_date_color">{{ __('Date Color') }}</label>
-                            <input type="color" id="app_date_color" name="app_date_color"
-                                value="{{ $settings['app_date_color'] ?? '#95a5a6' }}" class="form-control">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_heartpink_color">{{ __('Heartpink Color') }}</label>
+                                <input type="color" id="app_heartpink_color" name="app_heartpink_color"
+                                    value="{{ $settings['app_heartpink_color'] ?? '#ffc0cb' }}" class="form-control">
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="app_date_color">{{ __('Date Color') }}</label>
+                                <input type="color" id="app_date_color" name="app_date_color"
+                                    value="{{ $settings['app_date_color'] ?? '#95a5a6' }}" class="form-control">
+                            </div>
+                        </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
                                     onchange="toggleBackgroundInput()">
-                                    <option value="color" {{ @$settings['background_type'] === 'color' ? 'selected' : '' }}>{{ __('Color') }}</option>
-                                    <option value="image" {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>{{ __('Image') }}</option>
+                                    <option value="color"
+                                        {{ @$settings['background_type'] === 'color' ? 'selected' : '' }}>
+                                        {{ __('Color') }}</option>
+                                    <option value="image"
+                                        {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>
+                                        {{ __('Image') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -802,8 +836,8 @@
                             <div class="form-group" id="background_color_group"
                                 style="display: {{ ($settings['background_type'] ?? 'color') === 'color' ? 'block' : 'none' }};">
                                 <label for="background_color">{{ __('Background Color') }}</label>
-                                <input type="color" id="background_color" name="background_color" class="form-control"
-                                    value="{{ $settings['background_color'] ?? '#ffffff' }}">
+                                <input type="color" id="background_color" name="background_color"
+                                    class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
                         </div>
 
@@ -811,10 +845,12 @@
                             <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
-                                <input type="file" id="background_image" name="app_background_image" class="form-control">
-                                @if(!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
+                                <input type="file" id="background_image" name="app_background_image"
+                                    class="form-control">
+                                @if (!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
                                     <div class="mt-2">
-                                        <img src="{{ asset($settings['app_background']) }}" width="100" class="img-thumbnail">
+                                        <img src="{{ asset($settings['app_background']) }}" width="100"
+                                            class="img-thumbnail">
                                     </div>
                                 @endif
                             </div>
@@ -824,39 +860,42 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Image 1') }}</label>
-                                <input type="file" name="image1" class="form-control" onchange="previewImage(event)">
+                                <input type="file" name="image1" class="form-control"
+                                    onchange="previewImage(event)">
 
                                 <img id="imagePreview"
-                                     src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
-                                     width="100" class="mt-2"
-                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                     onclick="openFullScreen(this)">
+                                    src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
+                                    width="100" class="mt-2"
+                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                    onclick="openFullScreen(this)">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Image 2') }}</label>
-                                <input type="file" name="image2" class="form-control" onchange="previewImage(event)">
+                                <input type="file" name="image2" class="form-control"
+                                    onchange="previewImage(event)">
 
                                 <img id="imagePreview"
-                                     src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
-                                     width="100" class="mt-2"
-                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                     onclick="openFullScreen(this)">
+                                    src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
+                                    width="100" class="mt-2"
+                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                    onclick="openFullScreen(this)">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>{{ __('Image 3') }}</label>
-                                <input type="file" name="image3" class="form-control" onchange="previewImage(event)">
+                                <input type="file" name="image3" class="form-control"
+                                    onchange="previewImage(event)">
 
                                 <img id="imagePreview"
-                                     src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
-                                     width="100" class="mt-2"
-                                     style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                     onclick="openFullScreen(this)">
+                                    src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
+                                    width="100" class="mt-2"
+                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
+                                    onclick="openFullScreen(this)">
                             </div>
                         </div>
                     </div>
@@ -864,7 +903,7 @@
                     <div class="col-12 d-flex gap-3 mt-3">
                         <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                         <button type="button" id="resetAppColors"
-                                class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                            class="btn btn-secondary">{{ __('Reset Colors') }}</button>
                     </div>
 
                 </form>
@@ -876,8 +915,46 @@
                 <span class="close">&times;</span>
                 <img class="modal-content" id="fullImage">
             </div>
+
             <script>
-                $(document).ready(function () {
+                function select_brand_image(name, obj){
+                    $('#brand_image').val(name)
+                    $('.image_success').removeClass('border-success')
+                    $(obj).addClass('border-success')
+                    toastr.success('Brand image chosen successfully');
+                }
+                function choose_image() {
+                    var fileInput = document.getElementById('brand_background_image');
+                    var image = fileInput.files[0]; // Get the file object
+
+                    if (!image) {
+                        toastr.error('Please select an image first.');
+                        return;
+                    }
+
+                    var formData = new FormData();
+                    formData.append('image', image);
+                    formData.append('_token', "{{ csrf_token() }}");
+
+                    $.ajax({
+                        url: "{{ route('admin.save_image') }}",
+                        type: "POST",
+                        data: formData,
+                        contentType: false, // Important
+                        processData: false, // Important
+                        success: function(response) {
+                            console.log('Uploading image is true');
+                            toastr.success('Library preference saved!');
+                        },
+                        error: function(xhr) {
+                            console.error('Failed to Upload image');
+                            toastr.error('Failed to Upload image');
+                        }
+                    });
+                }
+            </script>
+            <script>
+                $(document).ready(function() {
                     function updateLibrary(selectedLibrary) {
                         $.ajax({
                             url: "{{ route('admin.update-agora-zego') }}",
@@ -886,11 +963,11 @@
                                 _token: "{{ csrf_token() }}",
                                 library: selectedLibrary
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 console.log("Library updated via AJAX:", response);
                                 toastr.success('Library preference saved!');
                             },
-                            error: function (xhr) {
+                            error: function(xhr) {
                                 console.error("AJAX Error:", xhr.responseText);
                                 toastr.error('Failed to update library');
                             }
@@ -898,7 +975,7 @@
                     }
 
                     function updateSwitches() {
-                        $(".custom-radio").each(function () {
+                        $(".custom-radio").each(function() {
                             if ($(this).prop("checked")) {
                                 $(this).next(".switch").addClass("active");
                             } else {
@@ -908,14 +985,14 @@
                     }
 
                     // عند تغيير الراديو، نحدث الواجهة
-                    $(document).on("change", ".libraryRealTime", function () {
+                    $(document).on("change", ".libraryRealTime", function() {
                         let selectedLibrary = $(this).val();
                         console.log("Selected library:", selectedLibrary);
                         updateLibrary(selectedLibrary);
                         updateSwitches();
                     });
 
-                    $(".switch").click(function () {
+                    $(".switch").click(function() {
                         let radio = $(this).prev(".custom-radio");
 
                         if (!radio.prop("checked")) {
@@ -928,12 +1005,10 @@
 
                     updateSwitches();
                 });
-
             </script>
 
             <!-- كود JavaScript -->
             <script>
-
                 function previewImage(event) {
                     let file = event.target.files[0];
                     if (file) {
@@ -1028,71 +1103,71 @@
                     document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
                 }
 
-    async function updateBackgroundValue() {
-        const type = document.getElementById("background_type").value;
-        const hiddenInput = document.getElementById("app_background");
+                async function updateBackgroundValue() {
+                    const type = document.getElementById("background_type").value;
+                    const hiddenInput = document.getElementById("app_background");
 
-        if (type === "color") {
-            hiddenInput.value = document.getElementById("background_color").value;
-        } else if (type === "image") {
-            const fileInput = document.getElementById("background_image");
-            if (fileInput.files.length > 0) {
-                try {
-                    // Create a base64 representation of the image
-                    const base64String = await getBase64(fileInput.files[0]);
-                    hiddenInput.value = base64String;
-                } catch (error) {
-                    console.error("Error converting image:", error);
-                    hiddenInput.value = "";
+                    if (type === "color") {
+                        hiddenInput.value = document.getElementById("background_color").value;
+                    } else if (type === "image") {
+                        const fileInput = document.getElementById("background_image");
+                        if (fileInput.files.length > 0) {
+                            try {
+                                // Create a base64 representation of the image
+                                const base64String = await getBase64(fileInput.files[0]);
+                                hiddenInput.value = base64String;
+                            } catch (error) {
+                                console.error("Error converting image:", error);
+                                hiddenInput.value = "";
+                            }
+                        } else {
+                            hiddenInput.value = "";
+                        }
+                    }
                 }
-            } else {
-                hiddenInput.value = "";
-            }
-        }
-    }
 
-function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
+                function getBase64(file) {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(file);
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = error => reject(error);
+                    });
+                }
             </script>
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                        // Updated selector to match your new class
-                                        const radioButtons = document.querySelectorAll('.radio-input');
-                                        const fieldsContainers = {
-                                            '0': document.getElementById('agora-fields'),
-                                            '1': document.getElementById('zego-fields'),
-                                            '2': document.getElementById('pusher-fields')
-                                        };
+                                                                // Updated selector to match your new class
+                                                                const radioButtons = document.querySelectorAll('.radio-input');
+                                                                const fieldsContainers = {
+                                                                    '0': document.getElementById('agora-fields'),
+                                                                    '1': document.getElementById('zego-fields'),
+                                                                    '2': document.getElementById('pusher-fields')
+                                                                };
 
-                                        function toggleFields() {
-                                            const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                function toggleFields() {
+                                                                    const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                            // Hide all fields first
-                                            Object.values(fieldsContainers).forEach(container => {
-                                                container.style.display = 'none';
-                                            });
+                                                                    // Hide all fields first
+                                                                    Object.values(fieldsContainers).forEach(container => {
+                                                                        container.style.display = 'none';
+                                                                    });
 
-                                            // Show the selected one
-                                            if (fieldsContainers[selectedValue]) {
-                                                fieldsContainers[selectedValue].style.display = 'flex';
-                                            }
-                                        }
+                                                                    // Show the selected one
+                                                                    if (fieldsContainers[selectedValue]) {
+                                                                        fieldsContainers[selectedValue].style.display = 'flex';
+                                                                    }
+                                                                }
 
-                                        // Add event listeners to radio buttons
-                                        radioButtons.forEach(radio => {
-                                            radio.addEventListener('change', toggleFields);
-                                        });
+                                                                // Add event listeners to radio buttons
+                                                                radioButtons.forEach(radio => {
+                                                                    radio.addEventListener('change', toggleFields);
+                                                                });
 
-                                        // Initialize the fields visibility
-                                        toggleFields();
-                                    });*/
+                                                                // Initialize the fields visibility
+                                                                toggleFields();
+                                                            });*/
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');
@@ -1153,7 +1228,8 @@ function getBase64(file) {
                             document.getElementById('themeSettingsForm').appendChild(hiddenInput);
 
                             // Remove any preview images
-                            const imagePreviewContainer = document.querySelector('#brand_background_image_group .mt-2');
+                            const imagePreviewContainer = document.querySelector(
+                                '#brand_background_image_group .mt-2');
                             if (imagePreviewContainer) {
                                 imagePreviewContainer.style.display = 'none';
                             }
