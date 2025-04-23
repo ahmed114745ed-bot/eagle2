@@ -24,9 +24,14 @@ class SuperLuckyBoxCommend extends Command
     public function handle()
     {
         $cacheKey = 'timezone';
-        $timestamp = Carbon::now( $cacheKey)->timestamp;
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+        $timestamp = Carbon::now( $timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
+        if (!$userBoxes) return '';
         foreach ($userBoxes as $userBox) {
             $keyBoxUse  = 'BoxUse_' . $userBox->bid;
             $pickerBoxIds =   PickBoxList::where('box_user_id', $userBox->id)->pluck('user_id')->toArray();

@@ -70,14 +70,18 @@ class BoxController extends Controller
             $label = $request->label;
         }
         $cacheKey = 'timezone';
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
         try {
             DB::beginTransaction();
             $box_use_data = [
                 'box_id' => $box->id,
                 'user_id' => $user->id,
                 'coins' => $boxCoin,
-                'start_at' => now()->setTimezone($cacheKey)->timestamp,
-                'end_at' => now()->setTimezone($cacheKey)->addMinutes($box->duration)->timestamp,
+                'start_at' => now()->setTimezone($timezone)->timestamp,
+                'end_at' => now()->setTimezone($timezone)->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
                 'users_num' => $request->users_num ?: $box->users,

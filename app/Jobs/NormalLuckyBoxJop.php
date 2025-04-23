@@ -38,9 +38,14 @@ class NormalLuckyBoxJop implements ShouldQueue
     public function handle(): void
     {
         $cacheKey = 'timezone';
-        $timestamp = Carbon::now($cacheKey)->timestamp;
+        $timezone = \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+        $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
+        if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
             User::where('id', $userBox->user_id)->increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
