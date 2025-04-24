@@ -299,6 +299,10 @@
     "un supported payment gateway": "समर्थित भुगतान गेटवे नहीं",
     "item not found or not for sale": "आइटम नहीं मिला या बिक्री के लिए नहीं है",
     "receiver user not found": "प्राप्तकर्ता उपयोगकर्ता नहीं मिला",
+    "Payment Credential Settings:": "भुगतान प्रमाण-पत्र सेटिंग्स:",
+    "Payment Credential Settings": "भुगतान प्रमाण-पत्र सेटिंग्स",
+    "Real Time system Setting:": "रीयल टाइम सिस्टम सेटिंग:",
+
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
     "success process": "सफलता प्रक्रिया",
     "user has this item in his pack no need to send it": "उपयोगकर्ता के पास इस आइटम को अपने पैक में है, इसे भेजने की कोई आवश्यकता नहीं है",

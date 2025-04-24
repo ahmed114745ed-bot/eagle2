@@ -23,6 +23,11 @@ class SettingController extends MainController
         $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
+
+        $stripe_server_secret = Common::getConfig('stripe_server_secret');
+        $stripe_app_id = Common::getConfig('stripe_app_id');
+        $opay_server_secret = Common::getConfig('opay_server_secret');
+        $opay_app_id = Common::getConfig('opay_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $brand_images = BrandImage::all();
@@ -30,7 +35,21 @@ class SettingController extends MainController
             ->header(__('Settings'))
             ->description('')
 
-            ->body(view('admin.settings_new', compact('settings','timezones','agora_app_id','zego_server_secret','zego_app_id','app_sign','library', 'brand_images')));
+            ->body(view('admin.settings_new', compact([
+                'settings',
+                'timezones',
+                'agora_app_id',
+                'zego_server_secret',
+                'zego_app_id',
+                'app_sign',
+                'library',
+                'brand_images',
+
+                'stripe_server_secret',
+                'stripe_app_id',
+                'opay_server_secret',
+                'opay_app_id',
+                ])));
     }
 
     public function save_image(Request $request){
