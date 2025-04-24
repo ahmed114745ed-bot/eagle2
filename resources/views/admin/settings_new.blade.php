@@ -205,7 +205,7 @@
     }
 
     button {
-        width: 240px;
+        width: 171px;
     }
 
     /* تصميم النافذة */
@@ -360,6 +360,10 @@
         display: none;
     }
 
+    .custom-payment-radio {
+        display: none;
+    }
+
     /* Switch container */
     .switch {
         display: inline-block;
@@ -398,6 +402,60 @@
     .border-success {
         border: #4caf50, solid, 5px;
     }
+
+    .position-relative {
+        position: relative;
+        overflow: visible;
+    }
+
+    .ribbon-banner {
+        position: absolute;
+        top: 6px;
+        right: -10px;
+        background-color: #ff0000;
+        padding: 2px 7px;
+        transform: rotate(90deg);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .ribbon-banner-card {
+        position: absolute;
+        top: 6px;
+        right: -9px;
+        background-color: #ff0000;
+        padding: 2px 7px;
+        transform: rotate(90deg);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .ribbon-banner-card span {
+        color: white;
+        font-size: 15px;
+        font-weight: normal;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+
+    }
+
+    .rtl .ribbon-banner{
+        right: auto;
+        left: -11px; !important;
+        padding: 2px 13px; !important;
+    }
+
+    .ribbon-banner span {
+        color: white;
+        font-size: 15px;
+        font-weight: normal;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    }
+
+    .text-center.my-3 img.img-fluid {
+        max-height: 80px;
+        display: unset !important;
+        margin-top: 20px;
+    }
+    .card-top{
+        margin-top: 33px;
+
+    }
 </style>
 
 </head>
@@ -409,10 +467,22 @@
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
-            <button onclick="showSection('appSettings')">{{ __('App settings') }}</button>
-            <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
-            <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
-            <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment Credential Settings') }}</button>
+
+            <button onclick="showSection('appSettings')" class="position-relative">
+                {{ __('App settings') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
+
+            <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>
+            <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
+            <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
+                {{ __('Payment') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
         </div>
     </div>
     <div class="all-page" style="    width: 100%;">
@@ -644,7 +714,7 @@
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="form">
-                        <label class="d-block">{{ __('Real Time system Setting:') }}</label>
+                        <label class="d-block">{{ __('Sound & Video System Setting:') }}</label>
 
                         <div class="row mt-4">
                             <!-- Agora Fields -->
@@ -652,6 +722,9 @@
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center  ">
                                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="agoraRadio"
                                                 class="custom-radio libraryRealTime" name="library" value="0"
@@ -660,12 +733,12 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
                                                 <input type="text" id="agora_app_id" name="app_id"
                                                     placeholder="app_id" value="{{ $agora_app_id }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -692,7 +765,7 @@
                                                     for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="zego_server_secret"
                                                     name="zego_server_secret" placeholder="server_secret"
-                                                    value="{{ $zego_server_secret }}" class="form-control">
+                                                    value="{{ $zego_server_secret }}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -700,20 +773,66 @@
                                                 <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
                                                 <input type="text" id="zego_app_id" name="zego_app_id"
                                                     placeholder="app_id" value="{{ $zego_app_id }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="app_sign">{{ __('admin.app_sign') }}:</label>
                                                 <input type="text" id="app_sign" name="app_sign"
                                                     placeholder="app_sign" value="{{ $app_sign }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+                            <!-- Tencent Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 300px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
+                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="tencentRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="tencent_server_secret"
+                                                       name="tencent_server_secret" placeholder="server_secret"
+                                                       value="{{ $tencent_server_secret }}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="tencent_app_id" name="tencent_app_id"
+                                                       placeholder="app_id" value="{{ $tencent_app_id }}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                <input type="text" id="app_sign" name="app_sign"
+                                                       placeholder="app_sign" value="{{ $app_sign }}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
                         </div>
@@ -735,25 +854,145 @@
                         </div> --}}
                     </div>
                 </form>
+
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Sound System Setting:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- Agora Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="agoraRadio"
+                                               class="custom-radio libraryRealTime" name="library" value="0"
+                                            {{ $library == '0' ? 'checked' : '' }}>
+                                        <label for="agoraRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zego Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
+                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                        <label for="zegoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tencent Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
+                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                                        <label for="tencentRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Video System Setting:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- Agora Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="agoraRadio"
+                                               class="custom-radio libraryRealTime" name="library" value="0"
+                                            {{ $library == '0' ? 'checked' : '' }}>
+                                        <label for="agoraRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zego Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
+                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                        <label for="zegoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tencent Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
+                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                                        <label for="tencentRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
             </div>
 
             <div id="paymentCredentialSettings" class="settings-section">
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    @csrf
+
                     <div class="form">
                         <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
 
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.fawry') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="fawryRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_fawry_active" value="0">
+                                            <input type="checkbox" id="fawryRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_fawry_active"
+                                                value="1"
+                                                {{ @$settings['is_fawry_active'] == '1' ? 'checked' : '' }}>
                                             <label for="fawryRadio" class="switch"></label>
                                         </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $fawryImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'fawry')
+                                            <img src="{{ asset('images/fawry.jpeg') }}"
+                                            alt="Fawry Payment"
+                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+
+                                                @php
+                                                    $fawryImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$fawryImageFound)
+                                            <img src="{{ asset('images/dollar.jpg') }}"
+                                                 alt="Fawry Payment"
+                                                 class="img-fluid">
+                                        @endif
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -762,7 +1001,7 @@
                                                     for="fawry_secret">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="fawry_secret"
                                                        name="fawry_secret" placeholder="secret"
-                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -770,7 +1009,7 @@
                                                 <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>
                                                 <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"
                                                        placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -778,7 +1017,7 @@
                                                 <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
                                                 <input type="text" id="fawry_utd_url" name="fawry_utd_url"
                                                        placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -786,7 +1025,7 @@
                                                 <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>
                                                 <input type="text" id="fawry_return_url" name="fawry_return_url"
                                                        placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -794,25 +1033,52 @@
                                                 <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>
                                                 <input type="text" id="fawry_url" name="fawry_url"
                                                        placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- skyPay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="skyPayRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_skyPay_active" value="0">
+                                            <input type="checkbox" id="skyPayRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_skyPay_active"
+                                                value="1" {{ @$settings['is_skyPay_active'] ? 'checked' : '' }}>
                                             <label for="skyPayRadio" class="switch"></label>
                                         </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $skypayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'sky pay')
+                                                <img src="{{ asset('images/paysky.png') }}"
+                                                     alt="Skypay Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $skypayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$skypayImageFound)
+                                        <img src="{{ asset('images/paysky.png') }}"
+                                        alt="Skypay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -821,7 +1087,7 @@
                                                     for="paysky_base_url">{{ __('admin.base_url') }}:</label>
                                                 <input type="text" id="paysky_base_url"
                                                        name="paysky_base_url" placeholder="base_url"
-                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -829,7 +1095,7 @@
                                                 <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label>
                                                 <input type="text" id="paysky_merchant_id" name="paysky_merchant_id"
                                                        placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -837,7 +1103,7 @@
                                                 <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label>
                                                 <input type="text" id="paysky_terminal_id" name="paysky_terminal_id"
                                                        placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -845,25 +1111,52 @@
                                                 <label for="paysky_api_key">{{ __('admin.api_key') }}:</label>
                                                 <input type="text" id="paysky_api_key" name="paysky_api_key"
                                                        placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- stripe Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.stripe') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="stripeRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_stripe_active" value="0">
+                                            <input type="checkbox" id="stripeRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_stripe_active"
+                                                value="1" {{ @$settings['is_stripe_active'] ? 'checked' : '' }}>
                                             <label for="stripeRadio" class="switch"></label>
                                         </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $stripeImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'stripe')
+                                                <img src="{{ asset('images/stripe.png') }}"
+                                                     alt="Stripe Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $stripeImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$stripeImageFound)
+                                        <img src="{{ asset('images/stripe.png') }}"
+                                        alt="Stripe Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -872,7 +1165,7 @@
                                                     for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>
                                                 <input type="text" id="stripe_test_secret_key"
                                                        name="stripe_test_secret_key" placeholder="test_secret_key"
-                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -880,7 +1173,7 @@
                                                 <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>
                                                 <input type="text" id="stripe_success_url" name="stripe_success_url"
                                                        placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -888,7 +1181,7 @@
                                                 <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>
                                                 <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"
                                                        placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -896,7 +1189,7 @@
                                                 <label for="stripe_currency">{{ __('admin.currency') }}:</label>
                                                 <input type="text" id="stripe_currency" name="stripe_currency"
                                                        placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -904,25 +1197,53 @@
                                                 <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>
                                                 <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"
                                                        placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- opay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="opayRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_opay_active" value="0">
+                                            <input type="checkbox" id="opayRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_opay_active"
+                                                value="1"
+                                                {{ @$settings['is_opay_active'] == '1' ? 'checked' : '' }}>
                                             <label for="opayRadio" class="switch"></label>
                                         </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $opayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'opay')
+                                                <img src="{{ asset('images/opay.png') }}"
+                                                     alt="Opay Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $opayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$opayImageFound)
+                                        <img src="{{ asset('images/opay.png') }}"
+                                        alt="Opay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -930,16 +1251,16 @@
                                                 <label for="opay_currency">{{ __('admin.currency') }}:</label>
                                                 <input type="text" id="opay_currency" name="opay_currency"
                                                        placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label
-                                                    for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="opay_secret_key"
-                                                       name="opay_secret_key" placeholder="server_secret"
-                                                       value="{{ $settings['opay_secret_key'] ?? ''}}" class="form-control">
+                                                <label for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="opay_secret_key" name="opay_secret_key"
+                                                    placeholder="server_secret"
+                                                    value="{{ $settings['opay_secret_key'] ?? '' }}"
+                                                    class="form-control">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -948,7 +1269,7 @@
                                                     for="opay_public_key">{{ __('admin.public_key') }}:</label>
                                                 <input type="text" id="opay_public_key"
                                                        name="opay_public_key" placeholder="public_key"
-                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -957,7 +1278,7 @@
                                                     for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
                                                 <input type="text" id="opay_merchant_id"
                                                        name="opay_merchant_id" placeholder="merchant_id"
-                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -966,7 +1287,7 @@
                                                     for="opay_country_code">{{ __('admin.country_code') }}:</label>
                                                 <input type="text" id="opay_country_code"
                                                        name="country_code" placeholder="server_secret"
-                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -975,13 +1296,14 @@
                                                     for="opay_base_url">{{ __('admin.base_url') }}:</label>
                                                 <input type="text" id="opay_base_url"
                                                        name="opay_base_url" placeholder="base_url"
-                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
                         </div>
                         {{-- <div class="row">
@@ -1001,7 +1323,6 @@
                             </div>
                         </div> --}}
                     </div>
-                </form>
             </div>
 
 
@@ -1014,7 +1335,12 @@
                     <div class="form row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="primary_color">{{ __('Primary Color') }}</label>
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <label for="primary_color">{{ __('Primary Color') }}</label>
+                                    <span onclick="reseting('app_primary_color', '#32e5ac')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
                                 <input type="color" id="app_primary_color" name="app_primary_color"
                                     value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
                             </div>
@@ -1022,8 +1348,14 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="second_color">{{ __('Second Color') }}</label>
-                                <input type="color" id="second_color" name="app_second_color"
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+
+                                    <label for="second_color">{{ __('Second Color') }}</label>
+                                    <span onclick="reseting('app_second_color', '#003FA6')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
+                                <input type="color" id="app_second_color" name="app_second_color"
                                     value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
                             </div>
                         </div>
@@ -1031,70 +1363,65 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_coin_color">{{ __('Coin Color') }}</label>
-                                <input type="color" id="app_coin_color" name="app_coin_color"
-                                    value="{{ $settings['app_coin_color'] ?? '#f1c40f' }}" class="form-control">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+
+                                    <label for="white_color">{{ __('White Color') }}</label>
+                                    <span onclick="reseting('app_white_color', '#ffffff')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
+                                <input type="color" id="app_white_color" name="app_white_color"
+                                    value="{{ $settings['app_white_color'] ?? '#ffffff' }}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_main_color">{{ __('Main Color') }}</label>
-                                <input type="color" id="app_main_color" name="app_main_color"
-                                    value="{{ $settings['app_main_color'] ?? '#34495e' }}" class="form-control">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+
+                                    <label for="black_color">{{ __('Black Color') }}</label>
+                                    <span onclick="reseting('app_black_color', '#000000')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
+                                <input type="color" id="app_black_color" name="app_black_color"
+                                    value="{{ $settings['app_black_color'] ?? '#000000' }}" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+
+                                    <label for="grey_color">{{ __('Grey Color') }}</label>
+                                    <span onclick="reseting('app_grey_color','#a5a7a4')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
+                                <input type="color" id="app_grey_color" name="app_grey_color"
+                                    value="{{ $settings['app_grey_color'] ?? '#808080' }}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_selected_color">{{ __('Selected Color') }}</label>
-                                <input type="color" id="app_selected_color" name="app_selected_color"
-                                    value="{{ $settings['app_selected_color'] ?? '#1abc9c' }}" class="form-control">
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+
+                                    <label for="yellow_color">{{ __('Yellow Color') }}</label>
+                                    <span onclick="reseting('app_yellow_color', '#FFAD38')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
+                                <input type="color" id="app_yellow_color" name="app_yellow_color"
+                                    value="{{ $settings['app_yellow_color'] ?? '#ffff00' }}" class="form-control">
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_unselected_color">{{ __('Unselected Color') }}</label>
-                                <input type="color" id="app_unselected_color" name="app_unselected_color"
-                                    value="{{ $settings['app_unselected_color'] ?? '#bdc3c7' }}"
-                                    class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_warning_color">{{ __('Warning Color') }}</label>
-                                <input type="color" id="app_warning_color" name="app_warning_color"
-                                    value="{{ $settings['app_warning_color'] ?? '#e67e22' }}" class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_charmpink_color">{{ __('Charmpink Color') }}</label>
-                                <input type="color" id="app_charmpink_color" name="app_charmpink_color"
-                                    value="{{ $settings['app_charmpink_color'] ?? '#ff69b4' }}" class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_heartpink_color">{{ __('Heartpink Color') }}</label>
-                                <input type="color" id="app_heartpink_color" name="app_heartpink_color"
-                                    value="{{ $settings['app_heartpink_color'] ?? '#ffc0cb' }}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_date_color">{{ __('Date Color') }}</label>
-                                <input type="color" id="app_date_color" name="app_date_color"
-                                    value="{{ $settings['app_date_color'] ?? '#95a5a6' }}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
@@ -1116,9 +1443,9 @@
                                 <input type="color" id="background_color" name="background_color"
                                     class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
@@ -1131,50 +1458,7 @@
                                     </div>
                                 @endif
                             </div>
-                        </div>
-                    </div>
-                    <div class="form row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 1') }}</label>
-                                <input type="file" name="image1" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 2') }}</label>
-                                <input type="file" name="image2" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 3') }}</label>
-                                <input type="file" name="image3" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
@@ -1186,56 +1470,123 @@
                 </form>
             </div>
             <div id="pusherSettings" class="settings-section">
-                <h3>{{ __('Pusher settings') }}</h3>
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
-                    @csrf
-                    <div class="form">
-                        <label class="d-block">{{ __('Real Time system Setting:') }}</label>
-                        <div class="row">
-                            <!-- Pusher Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('pusher') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="radio" id="pusherRadio" class="custom-radio pusherLib"
-                                                name="library" value="2"
-                                                {{ $library == '2' ? 'checked' : '' }}>
-                                            <label for="pusherRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
-                                                <input type="text" id="pusher_app_id" name="pusher_app_id"
-                                                    placeholder="pusher_app_id" value="{{ $pusher_app_id }}"
-                                                    class="form-control" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
-                                                <input type="text" id="pusher_app_key" name="pusher_app_key"
-                                                    placeholder="pusher_app_key" value="{{ $pusher_app_key }}"
-                                                    class="form-control" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
-                                                <input type="text" id="pusher_app_secret" name="pusher_app_secret"
-                                                    placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}"
-                                                    class="form-control" required>
-                                            </div>
-                                        </div>
+                <h3>{{ __('Real Time Setting') }}</h3>
+             
+                <div class="row" style="
+                background-color:var(--box-background-color)!important;
 
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+                ">
+                <div class="col-md-6 mb-3 ms-0 me-auto">
 
+    <!-- Pusher Form -->
+    <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+        @csrf
+        <div class="card p-3 shadow" style="height: 400px;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="m-0">{{ __('pusher') }}</h4>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="pusherRadio" class="custom-radio pusherLib" name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                    <label for="pusherRadio" class="switch"></label>
+                </div>
             </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
+                        <input type="text" id="pusher_app_id" name="pusher_app_id" placeholder="pusher_app_id" value="{{ $pusher_app_id }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
+                        <input type="text" id="pusher_app_key" name="pusher_app_key" placeholder="pusher_app_key" value="{{ $pusher_app_key }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
+                        <input type="text" id="pusher_app_secret" name="pusher_app_secret" placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+        </div>
+    </form>
+</div>
+<div class="col-md-6 mb-3 ms-0 me-auto">
+
+    <!-- Firebase Form -->
+    <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+        @csrf
+        <div class="card p-3 shadow" style="height: 400px;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="m-0">{{ __('firebase') }}</h4>
+                <div class="ribbon-banner-card">
+                    <span>{{ __('soon') }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="firebaseRadio" class="custom-radio firebaseLib" name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                    <label for="firebaseRadio" class="switch"></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="firebase_api_key">{{ __('firebase_api_key') }}:</label>
+                        <input type="text" id="firebase_api_key" name="firebase_api_key" placeholder="{{ __('firebase_api_key') }}" value="{{ $firebase_api_key }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebase_auth_domain">{{ __('firebase_auth_domain') }}:</label>
+                        <input type="text" id="firebase_auth_domain" name="firebase_auth_domain" placeholder="{{ __('firebase_auth_domain') }}" value="{{ $firebase_auth_domain }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firebase_database_url">{{ __('firebase_database_url') }}:</label>
+                        <input type="text" id="firebase_database_url" name="firebase_database_url" placeholder="{{ __('firebase_database_url') }}" value="{{ $firebase_database_url }}" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+        </div>
+    </form>
+</div>
+<div class="col-md-6 mb-3 ms-0 me-auto card-top">
+
+    <!-- Supabase Form -->
+    <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+        @csrf
+        <div class="card p-3 shadow" style="height: 400px;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="m-0">{{ __('supabase') }}</h4>
+                <div class="ribbon-banner-card">
+                    <span>{{ __('soon') }}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <input type="radio" id="supabaseRadio" class="custom-radio supabaseLib" name="library" value="3" {{ $library == '3' ? 'checked' : '' }}>
+                    <label for="supabaseRadio" class="switch"></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="supabase_url">{{ __('supabase_url') }}:</label>
+                        <input type="text" id="supabase_url" name="supabase_url" placeholder="{{ __('supabase_url') }}" value="{{ $supabase_url }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supabase_key">{{ __('supabase_key') }}:</label>
+                        <input type="text" id="supabase_key" name="supabase_key" placeholder="{{ __('supabase_key') }}" value="{{ $supabase_key }}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supabase_service_role_key">{{ __('supabase_service_role_key') }}:</label>
+                        <input type="text" id="supabase_service_role_key" name="supabase_service_role_key" placeholder="{{ __('supabase_service_role_key') }}" value="{{ $supabase_service_role_key }}" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+        </div>
+    </form>
+
+</div>
+</div>
+</div>
+
+
+
 
 
             <div id="imageModal" class="modal" onclick="closeFullScreen()">
@@ -1243,6 +1594,11 @@
                 <img class="modal-content" id="fullImage">
             </div>
 
+            <script>
+                function reseting(colorid, value) {
+                    $('#' + colorid).val(value)
+                }
+            </script>
             <script>
                 function select_brand_image(name, obj) {
                     $('#brand_image').val(name)
@@ -1311,12 +1667,26 @@
                     });
                 }
 
+                function updatePaymentSwitches() {
+                    $(".custom-payment-radio").each(function() {
+                        if ($(this).is(":checked")) {
+                            $(this).next(".switch").addClass("active");
+                        } else {
+                            $(this).next(".switch").removeClass("active");
+                        }
+                    });
+                }
+
                 // Handle change event on radio buttons
                 $(document).on("change", ".custom-radio", function() {
                     let selectedLibrary = $(this).val();
                     console.log("Selected library:", selectedLibrary);
                     updateLibrary(selectedLibrary);
                     updateSwitches();
+                });
+
+                $(document).on("change", ".custom-payment-radio", function() {
+                    updatePaymentSwitches();
                 });
 
                 // Handle click on switch to activate the corresponding radio button
@@ -1337,6 +1707,7 @@
                 // Initialize switches based on current checked radio on load
                 $(document).ready(function() {
                     updateSwitches();
+                    updatePaymentSwitches();
                 });
             </script>
 
@@ -1471,36 +1842,37 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                            // Updated selector to match your new class
-                                                                            const radioButtons = document.querySelectorAll('.radio-input');
-                                                                            const fieldsContainers = {
-                                                                                '0': document.getElementById('agora-fields'),
-                                                                                '1': document.getElementById('zego-fields'),
-                                                                                '2': document.getElementById('pusher-fields')
-                                                                            };
+                                                                                                    // Updated selector to match your new class
+                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
+                                                                                                    const fieldsContainers = {
+                                                                                                        '0': document.getElementById('agora-fields'),
+                                                                                                        '1': document.getElementById('zego-fields'),
+                                                                                                        '2': document.getElementById('pusher-fields')
+                                                                                                    };
 
-                                                                            function toggleFields() {
-                                                                                const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                                                    function toggleFields() {
+                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                // Hide all fields first
-                                                                                Object.values(fieldsContainers).forEach(container => {
-                                                                                    container.style.display = 'none';
-                                                                                });
+                                                                                                        // Hide all fields first
+                                                                                                        Object.values(fieldsContainers).forEach(container => {
+                                                                                                            container.style.display = 'none';
+                                                                                                        });
 
-                                                                                // Show the selected one
-                                                                                if (fieldsContainers[selectedValue]) {
-                                                                                    fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                }
-                                                                            }
+                                                                                                        // Show the selected one
+                                                                                                        if (fieldsContainers[selectedValue]) {
+                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
+                                                                                                        }
+                                                                                                    }
 
-                                                                            // Add event listeners to radio buttons
-                                                                            radioButtons.forEach(radio => {
-                                                                                radio.addEventListener('change', toggleFields);
-                                                                            });
+                                                                                                    // Add event listeners to radio buttons
+                                                                                                    radioButtons.forEach(radio => {
+                                                                                                        radio.addEventListener('change', toggleFields);
+                                                                                                    });
 
-                                                                            // Initialize the fields visibility
-                                                                            toggleFields();
-                                                                        });*/
+                                                                                                    // Initialize the fields visibility
+                                                                                                    toggleFields();
+                                                                                                });*/
+
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');
@@ -1510,18 +1882,13 @@
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
                             document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('second_color').value = "#003FA6";
+                            document.getElementById('app_second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
-                            document.getElementById('background_type').value = "color";
-                            document.getElementById('background_color').value = "#32e5ac";
-                            document.getElementById('app_background').value = "#32e5ac";
-
-                            // Show the correct background input group
-                            document.getElementById('background_color_group').style.display = 'block';
-                            document.getElementById('background_image_group').style.display = 'none';
-
-                            document.getElementById('brand_background_image_group').style.display = 'none';
+                            document.getElementById('app_white_color').value = "#ffffff";
+                            document.getElementById('app_black_color').value = "#000000";
+                            document.getElementById('app_grey_color').value = "#a5a7a4"; // Grey color
+                            document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
 
                             // Submit the form
                             document.querySelector('#appSettings form').submit();

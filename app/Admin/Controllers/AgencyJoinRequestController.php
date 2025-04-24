@@ -14,6 +14,7 @@ use App\Helpers\UserCommon;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
+use App\Models\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -270,21 +271,35 @@ class AgencyJoinRequestController extends MainController
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
-            $user = User::query()->where('id', $form->model()->user_id)->first();
-            if (($user->agency_id)) {
-                $error = new MessageBag(
-                    [
-                        'title'   => 'forbidden',
-                        'message' => 'user already in agency',
-                    ]
-                );
-                return back()->with(compact('error'));
-            }
+           
 
-            if ($form->status == 1) {
+            if ($form->model()->status == 1) {
+                $user = User::query()->where('id', $form->model()->user_id)->first();
+                if (($user->agency_id)) {
+                    $error = new MessageBag(
+                        [
+                            'title'   => 'forbidden',
+                            'message' => 'user already in agency',
+                        ]
+                    );
+                    return back()->with(compact('error'));
+                }
                 UserCommon::userVip($user);
 
                 $user_id = $form->model()->user_id;
+                $checkAgencyUser = UsersJoinedAgency::where([
+                    'user_id' => $user_id,
+                    'agency_id' => $form->model()->agency_id,
+                    'type' => 2,
+                ])->where('leave_date', null)->exists();
+                if (!$checkAgencyUser) {
+                    UsersJoinedAgency::create([
+                        'user_id' => $user_id,
+                        'agency_id' => $form->model()->agency_id,
+                        'type' => 2,
+                        'join_date' => now(),
+                    ]);
+                }
 
                 $update = DB::table('users')
                     ->where('id', $user_id)

@@ -5,8 +5,9 @@ namespace App\Admin\Actions;
 
 use App\Models\User;
 use App\Models\Agency;
-use Illuminate\Http\Request;
 use App\Models\UserSallary;
+use Illuminate\Http\Request;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
@@ -31,10 +32,28 @@ class ChangeUsersAgencyAction extends RowAction
     {
        
        $users = User::where('agency_id',$request->old_agency_id)->where('type_user',1)->get();
+       $checkAgencyUser = UsersJoinedAgency::where([
+
+        'agency_id' => $request->old_agency_id,
+        'type' => 2,
+    ])->where('leave_date', null)->update(['leave_date', now()]);
         foreach($users as $user)
         {
             $user->agency_id = $request->new_agency_id;
             $user->save();
+            $checkAgencyUser = UsersJoinedAgency::where([
+                'user_id' => $user->id,
+                'agency_id' => $request->old_agency_id,
+                'type' => 2,
+            ])->where('leave_date', null)->exists();
+            if (!$checkAgencyUser) {
+                UsersJoinedAgency::create([
+                    'user_id' => $user->id,
+                    'agency_id' => $request->old_agency_id,
+                    'type' => 2,
+                    'join_date' => now(),
+                ]);
+            }
         }
         $usersSalary = UserSallary::where('user_agency_id',$request->old_agency_id)->where('month',now()->month)->where('year',now()->year)->get();
         foreach($usersSalary as $userSalary)

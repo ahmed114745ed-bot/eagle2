@@ -144,19 +144,13 @@ class BoxController extends MainController
         $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
         $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
        
-        $form->html(<<<HTML
-                <div id="dynamic_fields_container">
-                    <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                        <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
-                        <button type="button" class="btn btn-danger remove-field">حذف</button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
-                        إضافة حقل جديد
-                    </button>
-                </div>
-            HTML);
+  
+        $addPlaceholder = __('Enter users count');
+        $deleteText = __('Delete');
+
+        $form->dynamicFields('dynamic_users_values', __('Dynamic Fields'))
+        ->attribute(['name' => 'dynamic_users_values'])
+        ;
 
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
@@ -165,9 +159,18 @@ class BoxController extends MainController
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
+           
             });
         </script>
         HTML);
+        $form->html("
+    <script>
+        window.translations = {
+            add_placeholder: " . json_encode($addPlaceholder) . ",
+            delete_text: " . json_encode($deleteText) . "
+        };
+    </script>
+");
         
         
         $form->saving(function (Form $form) {
@@ -175,10 +178,6 @@ class BoxController extends MainController
             $combinedValues = implode(',', array_filter($dynamicFields));
             $form->model()->dynamic_users_values = $combinedValues;
             $normalDuration = Common::getConf('normal_box_duration') ?? 1;
-
-            if ($form->model()->type == 0) {
-                $form->duration =  $normalDuration;
-            }
         });
 
         return $form;

@@ -27,13 +27,13 @@
         });
     });
     function initDynamicFieldsScript() {
-                $("#add_field").off("click").on("click", function() {
-                    var newField = '<div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">' +
-                        '<input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">' +
-                        '<button type="button" class="btn btn-danger remove-field">حذف</button>' +
-                    '</div>';
-                    $("#dynamic_fields_container").append(newField);
-                });
+        $("#add_field").off("click").on("click", function() {
+            var newField = '<div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">' +
+                '<input type="number" name="dynamic_fields[]" class="form-control" placeholder="' + window.translations.add_placeholder + '" style="flex: 1;">' +
+                '<button type="button" class="btn btn-danger remove-field">' + window.translations.delete_text + '</button>' +
+            '</div>';
+            $("#dynamic_fields_container").append(newField);
+        });
         
                 $(document).off("click", ".remove-field").on("click", ".remove-field", function() {
                     $(this).closest(".dynamic-field-group").remove();
@@ -42,25 +42,37 @@
                 function toggleFields() {
                     var type = $("#box_type").val();
                     if (type == "1" || type == 1 ) {
-                        console.log('type is 1');
-                                            $("#users_field").closest(".form-group").show();
+                        $("#users_field").closest(".form-group").show();
+                        $("label[for='users']").show();
+                        $('#users_field').closest('.input-group').find('.input-group-addon').show();
                         $("#users_field").show();
+
+
                         $("#duration_field").closest(".form-group").show();
+                        $("label[for='duration']").show();
+                        $('#duration_field').closest('.input-group').find('.input-group-addon').show();
+                        $('#duration_field').closest('.col-sm-8').find('.help-block').show();
+                        $("#duration_field").closest(".form-group").css("display", "block");
                         $("#duration_field").show();
+
+
                         $("#dynamic_fields_container").hide();
                         $("#add_field").hide();
                     } else {
-                        console.log('type is 0');
-                        
-                        // $("#users_field").closest(".form-group").hide();
-                        $("#users_field").closest(".form-group").css("display", "none !important");
-
+                        $("#users_field").closest(".form-group").hide();
+                        $("label[for='users']").hide();
+                        $('#users_field').closest('.input-group').find('.input-group-addon').hide();
                         $("#users_field").hide();
 
-                        // $("#duration_field").closest(".form-group").hide();
-                        $("#duration_field").closest(".form-group").css("display", "none !important");
 
                         $("#duration_field").hide();
+                        $("label[for='duration']").hide();
+                        $('#duration_field').closest('.input-group').find('.input-group-addon').hide();
+                        $('#duration_field').closest('.col-sm-8').find('.help-block').hide();
+                        $("#duration_field").closest(".form-group").css("display", "none");
+
+
+
 
                         $("#dynamic_fields_container").show();
                         $("#add_field").show();
