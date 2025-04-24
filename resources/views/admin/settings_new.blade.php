@@ -718,6 +718,9 @@
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center  ">
                                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="agoraRadio"
                                                 class="custom-radio libraryRealTime" name="library" value="0"
@@ -726,12 +729,12 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
                                                 <input type="text" id="agora_app_id" name="app_id"
                                                     placeholder="app_id" value="{{ $agora_app_id }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -758,7 +761,7 @@
                                                     for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="zego_server_secret"
                                                     name="zego_server_secret" placeholder="server_secret"
-                                                    value="{{ $zego_server_secret }}" class="form-control">
+                                                    value="{{ $zego_server_secret }}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -766,15 +769,15 @@
                                                 <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
                                                 <input type="text" id="zego_app_id" name="zego_app_id"
                                                     placeholder="app_id" value="{{ $zego_app_id }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="app_sign">{{ __('admin.app_sign') }}:</label>
                                                 <input type="text" id="app_sign" name="app_sign"
                                                     placeholder="app_sign" value="{{ $app_sign }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -804,7 +807,7 @@
                                                     for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="tencent_server_secret"
                                                        name="tencent_server_secret" placeholder="server_secret"
-                                                       value="{{ $tencent_server_secret }}" class="form-control">
+                                                       value="{{ $tencent_server_secret }}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -812,15 +815,15 @@
                                                 <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
                                                 <input type="text" id="tencent_app_id" name="tencent_app_id"
                                                        placeholder="app_id" value="{{ $tencent_app_id }}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="app_sign">{{ __('admin.app_sign') }}:</label>
                                                 <input type="text" id="app_sign" name="app_sign"
                                                        placeholder="app_sign" value="{{ $app_sign }}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
