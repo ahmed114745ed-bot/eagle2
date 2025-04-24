@@ -1172,70 +1172,41 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_coin_color">{{ __('Coin Color') }}</label>
-                                <input type="color" id="app_coin_color" name="app_coin_color"
-                                    value="{{ $settings['app_coin_color'] ?? '#f1c40f' }}" class="form-control">
+                                <label for="white_color">{{ __('White Color') }}</label>
+                                <input type="color" id="app_white_color" name="app_white_color"
+                                    value="{{ $settings['app_white_color'] ?? '#ffffff' }}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_main_color">{{ __('Main Color') }}</label>
-                                <input type="color" id="app_main_color" name="app_main_color"
-                                    value="{{ $settings['app_main_color'] ?? '#34495e' }}" class="form-control">
+                                <label for="black_color">{{ __('Black Color') }}</label>
+                                <input type="color" id="app_black_color" name="app_black_color"
+                                    value="{{ $settings['app_black_color'] ?? '#000000' }}" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="grey_color">{{ __('Grey Color') }}</label>
+                                <input type="color" id="app_grey_color" name="app_grey_color"
+                                    value="{{ $settings['app_grey_color'] ?? '#808080' }}" class="form-control">
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="app_selected_color">{{ __('Selected Color') }}</label>
-                                <input type="color" id="app_selected_color" name="app_selected_color"
-                                    value="{{ $settings['app_selected_color'] ?? '#1abc9c' }}" class="form-control">
+                                <label for="yellow_color">{{ __('Yellow Color') }}</label>
+                                <input type="color" id="app_yellow_color" name="app_yellow_color"
+                                    value="{{ $settings['app_yellow_color'] ?? '#ffff00' }}" class="form-control">
                             </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_unselected_color">{{ __('Unselected Color') }}</label>
-                                <input type="color" id="app_unselected_color" name="app_unselected_color"
-                                    value="{{ $settings['app_unselected_color'] ?? '#bdc3c7' }}"
-                                    class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_warning_color">{{ __('Warning Color') }}</label>
-                                <input type="color" id="app_warning_color" name="app_warning_color"
-                                    value="{{ $settings['app_warning_color'] ?? '#e67e22' }}" class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_charmpink_color">{{ __('Charmpink Color') }}</label>
-                                <input type="color" id="app_charmpink_color" name="app_charmpink_color"
-                                    value="{{ $settings['app_charmpink_color'] ?? '#ff69b4' }}" class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_heartpink_color">{{ __('Heartpink Color') }}</label>
-                                <input type="color" id="app_heartpink_color" name="app_heartpink_color"
-                                    value="{{ $settings['app_heartpink_color'] ?? '#ffc0cb' }}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="app_date_color">{{ __('Date Color') }}</label>
-                                <input type="color" id="app_date_color" name="app_date_color"
-                                    value="{{ $settings['app_date_color'] ?? '#95a5a6' }}" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
@@ -1257,9 +1228,9 @@
                                 <input type="color" id="background_color" name="background_color"
                                     class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
@@ -1272,50 +1243,7 @@
                                     </div>
                                 @endif
                             </div>
-                        </div>
-                    </div>
-                    <div class="form row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 1') }}</label>
-                                <input type="file" name="image1" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image1']) ? getImagePath($settings['image1']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 2') }}</label>
-                                <input type="file" name="image2" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image2']) ? getImagePath($settings['image2']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Image 3') }}</label>
-                                <input type="file" name="image3" class="form-control"
-                                    onchange="previewImage(event)">
-
-                                <img id="imagePreview"
-                                    src="{{ !empty($settings['image3']) ? getImagePath($settings['image3']) : '' }}"
-                                    width="100" class="mt-2"
-                                    style="{{ !empty($settings['app_logo']) ? '' : 'display:none;' }}"
-                                    onclick="openFullScreen(this)">
-                            </div>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
@@ -1669,15 +1597,10 @@
                             document.getElementById('second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
-                            document.getElementById('background_type').value = "color";
-                            document.getElementById('background_color').value = "#32e5ac";
-                            document.getElementById('app_background').value = "#32e5ac";
-
-                            // Show the correct background input group
-                            document.getElementById('background_color_group').style.display = 'block';
-                            document.getElementById('background_image_group').style.display = 'none';
-
-                            document.getElementById('brand_background_image_group').style.display = 'none';
+                            document.getElementById('app_white_color').value = "#ffffff";
+                            document.getElementById('app_black_color').value = "#000000";
+                            document.getElementById('app_grey_color').value = "#a5a7a4";  // Grey color
+                            document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
 
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
