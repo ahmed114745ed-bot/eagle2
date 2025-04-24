@@ -205,7 +205,7 @@
     }
 
     button {
-        width: 247px;
+        width: 171px;
     }
 
     /* تصميم النافذة */
@@ -411,7 +411,7 @@
     .ribbon-banner {
         position: absolute;
         top: 6px;
-        right: -19px;
+        right: -10px;
         background-color: #ff0000;
         padding: 2px 7px;
         transform: rotate(90deg);
@@ -420,7 +420,7 @@
 
     .rtl .ribbon-banner{
         right: auto;
-        left: -14px; !important;
+        left: -11px; !important;
         padding: 2px 13px; !important;
     }
 
@@ -453,10 +453,10 @@
                     <span>{{ __('soon') }}</span>
                 </div>
             </button>
-            <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
+            <button onclick="showSection('realTimeSetting')">{{ __('Real Time') }}</button>
             <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
             <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
-                {{ __('Payment Credential Settings') }}
+                {{ __('Payment') }}
                 <div class="ribbon-banner">
                     <span>{{ __('soon') }}</span>
                 </div>
