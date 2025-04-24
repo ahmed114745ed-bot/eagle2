@@ -940,19 +940,19 @@
                                                 <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
                                                 <input type="text" id="pusher_app_id" name="pusher_app_id"
                                                     placeholder="pusher_app_id" value="{{ $pusher_app_id }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
                                                 <input type="text" id="pusher_app_key" name="pusher_app_key"
                                                     placeholder="pusher_app_key" value="{{ $pusher_app_key }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
                                                 <input type="text" id="pusher_app_secret" name="pusher_app_secret"
                                                     placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}"
-                                                    class="form-control">
+                                                    class="form-control" required>
                                             </div>
                                         </div>
 
