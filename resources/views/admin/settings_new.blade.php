@@ -360,6 +360,10 @@
         display: none;
     }
 
+    .custom-payment-radio {
+        display: none;
+    }
+
     /* Switch container */
     .switch {
         display: inline-block;
@@ -750,8 +754,9 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.fawry') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="fawryRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_fawry_active" value="0">
+                                            <input type="checkbox" id="fawryRadio" class="custom-payment-radio libraryRealTime"
+                                                   name="is_fawry_active" value="1" {{ $settings['is_fawry_active'] == '1' ? 'checked' : '' }}>
                                             <label for="fawryRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -809,8 +814,9 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="skyPayRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_skyPay_active" value="0">
+                                            <input type="checkbox" id="skyPayRadio" class="custom-payment-radio libraryRealTime"
+                                                   name="is_skyPay_active" value="1" {{ $settings['is_skyPay_active'] ? 'checked' : '' }}>
                                             <label for="skyPayRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -860,8 +866,9 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.stripe') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="stripeRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_stripe_active" value="0">
+                                            <input type="checkbox" id="stripeRadio" class="custom-payment-radio libraryRealTime"
+                                                   name="is_stripe_active" value="1" {{ $settings['is_stripe_active'] ? 'checked' : '' }}>
                                             <label for="stripeRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -919,8 +926,9 @@
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
                                         <div class="d-flex align-items-center">
-                                            <input type="radio" id="opayRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <input type="hidden" name="is_opay_active" value="0">
+                                            <input type="checkbox" id="opayRadio" class="custom-payment-radio libraryRealTime"
+                                                   name="is_opay_active" value="1" {{ $settings['is_opay_active'] == '1' ? 'checked' : '' }}>
                                             <label for="opayRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -1311,12 +1319,26 @@
                     });
                 }
 
+                function updatePaymentSwitches() {
+                    $(".custom-payment-radio").each(function() {
+                        if ($(this).is(":checked")) {
+                            $(this).next(".switch").addClass("active");
+                        } else {
+                            $(this).next(".switch").removeClass("active");
+                        }
+                    });
+                }
+
                 // Handle change event on radio buttons
                 $(document).on("change", ".custom-radio", function() {
                     let selectedLibrary = $(this).val();
                     console.log("Selected library:", selectedLibrary);
                     updateLibrary(selectedLibrary);
                     updateSwitches();
+                });
+
+                $(document).on("change", ".custom-payment-radio", function() {
+                    updatePaymentSwitches();
                 });
 
                 // Handle click on switch to activate the corresponding radio button
@@ -1337,6 +1359,7 @@
                 // Initialize switches based on current checked radio on load
                 $(document).ready(function() {
                     updateSwitches();
+                    updatePaymentSwitches();
                 });
             </script>
 
