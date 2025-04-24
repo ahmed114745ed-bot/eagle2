@@ -66,8 +66,6 @@ class BoxService
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
-        } catch (\Exception $exception) {
-
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -127,7 +125,7 @@ class BoxService
             'image' => $box->image,
             'is_closed' => false,
         ];
-        dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addMinutes(2))->onQueue('super-lucky');
+        dispatch(new SuperLuckyBoxJob())->delay(now()->setTimezone($timezone ?? 'UTC')->addSecond(30));
         $boxUser = BoxUse::query()->create(
             $box_use_data
         );
