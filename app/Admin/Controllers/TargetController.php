@@ -228,23 +228,28 @@ class TargetController extends MainController
         $form->decimal('diamonds', __('diamonds'))
         ->help('
                 <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>')
-        ->rules('min:0');
+        ->rules('min:0')
+        ->required();
 
     $form->decimal('usd', __('agent Percentage').'(%)')
         ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0');
+        ->rules('min:0')
+        ->required();
 
     $form->decimal('agency_share',  __('agency share') . '(%)')
         ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0');
+        ->rules('min:0')
+        ->required();
 
     $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
         ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0');
+        ->rules('min:0')
+        ->required();
 
     $form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
         ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0');
+        ->rules('min:0')
+        ->required();
         $form->html('
 <script>
     $(document).ready(function () {
