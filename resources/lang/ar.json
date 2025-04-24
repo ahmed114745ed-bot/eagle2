@@ -2046,7 +2046,14 @@
       "User Percentage": "نسبة المستخدم", 
       "charges settings": "اعدادات الشحن",
       "charges-settings": "اعدادات الشحن",
-   "Dollar": "دولار"
+   "Dollar": "دولار",
+
+"Joined at": "تاريخ الانضمام",
+"Left at": "تاريخ الانضمام",
+"Still Active": "منضم حاليا",
+"AgencyUserLog": "سجل الانضمام للوكالة",
+"agency-user-logs": "سجل الانضمام للوكالة",
+"days and hours": "الأيام و الساعات"
 
 
 
