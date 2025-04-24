@@ -137,7 +137,10 @@ class BanUser extends Action
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToEnterRoom",
-                        'user_id' => $user->id
+                        'user_id' => $user->id,
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
+                        'duration' => $request->duration ?? 0,
                     ]
                 ];
                 $json = json_encode($ms);
@@ -146,7 +149,10 @@ class BanUser extends Action
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
-                        'user_id' => $user->id
+                        'user_id' => $user->id,
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
+                        'duration' => $request->duration ?? 0,
                     ]
                 ];
                 $json = json_encode($ms);
@@ -155,7 +161,10 @@ class BanUser extends Action
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
-                        'user_id' => $user->id
+                        'user_id' => $user->id,
+                        'reason_ar' => $request->description_ar ?? '',
+                        'reason_en' => $request->description_en ?? '',
+                        'duration' => $request->duration ?? 0,
                     ]
                 ];
                 $json = json_encode($ms);
@@ -169,7 +178,10 @@ class BanUser extends Action
             $d = [
                 "messageContent" => [
                     "message" => "banDevice",
-                    "userId" => $user->id
+                    "userId" => $user->id,
+                    'reason_ar' => $request->description_ar ?? '',
+                    'reason_en' => $request->description_en ?? '',
+                    'duration' => $request->duration ?? 0,
                 ]
             ];
             $json = json_encode($d);
@@ -211,8 +223,8 @@ class BanUser extends Action
     {
         $banText = __('create bans'); // Laravel translation
         return <<<HTML
-    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white" 
-       style="background-color: #28a745; border-color: #28a745; color: white;">
+    <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white"
+       style="background-color: var(--primary-color); border-color: var(--secondary-color); color: var(--text-secondary-color);">
         {$banText}
     </a>
     HTML;

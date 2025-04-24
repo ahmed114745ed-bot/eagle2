@@ -227,7 +227,7 @@
     }
 
     .modal-title {
-        color: var(--text-primary-color);
+        color: var(--text-secondary-color);
         margin: 0;
     }
 

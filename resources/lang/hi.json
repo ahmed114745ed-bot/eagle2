@@ -10,6 +10,7 @@
     "Users": "उपयोगकर्ताओं",
     "URI": "यूआरआई",
     "Roles": "भूमिकाएँ",
+    "User Info": "उपयोगकर्ता जानकारी",
     "Charge reports": "चार्ज रिपोर्ट",
     "Charge Reports": "चार्ज रिपोर्ट",
     "Agency name": "एजेंसी का नाम",
@@ -298,6 +299,10 @@
     "un supported payment gateway": "समर्थित भुगतान गेटवे नहीं",
     "item not found or not for sale": "आइटम नहीं मिला या बिक्री के लिए नहीं है",
     "receiver user not found": "प्राप्तकर्ता उपयोगकर्ता नहीं मिला",
+    "Payment Credential Settings:": "भुगतान प्रमाण-पत्र सेटिंग्स:",
+    "Payment Credential Settings": "भुगतान प्रमाण-पत्र सेटिंग्स",
+    "Real Time system Setting:": "रीयल टाइम सिस्टम सेटिंग:",
+
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
     "success process": "सफलता प्रक्रिया",
     "user has this item in his pack no need to send it": "उपयोगकर्ता के पास इस आइटम को अपने पैक में है, इसे भेजने की कोई आवश्यकता नहीं है",
@@ -1090,15 +1095,10 @@
   "recipient": "प्राप्तकर्ता",
   "amount usd": "राशि (USD)",
   "shipping date": "शिपिंग तिथि",
-  "Agency Coins": "शिपिंग सिक्के",
-  "User Coins": "उपयोगकर्ता सिक्के",
-  "Charges settings": "शुल्क सेटिंग्स",
   "charges-settings": "शुल्क सेटिंग्स",
   "Charges settings": "शुल्क सेटिंग्स",
-  "Brand settings": "ब्रांड सेटिंग्स",
   "Agency Coins": "एजेंसी सिक्के",
   "User Coins": "उपयोगकर्ता सिक्के",
-  "save": "सहेजें",
   "Confirm Update": "अपडेट की पुष्टि करें",
   "Are you sure you want to update the target settings? This action cannot be undone.": "क्या आप वाकई लक्ष्य सेटिंग्स अपडेट करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती.",
   "Cancel": "रद्द करें",
@@ -1110,6 +1110,11 @@
   "Other accounts on the same device": "उसी डिवाइस पर अन्य खाते",
   "Remaining diamond": "शेष हीरा",
    "Total Remaining Diamond": "कुल शेष हीरा",
+   "Luck Box Settings": "लकी बॉक्स सेटिंग्स",
+  "app wallet lucky box": "ऐप वॉलेट लकी बॉक्स",
+  "normal box duration": "नॉर्मल बॉक्स की अवधि",
+   "half image": "आधा चित्र",
+
   "Super Admin Coins": "सुपर एडमिन सिक्के",
   "Zones Coins": "क्षेत्र सिक्के",
   "DB  Percentage": "डीबी प्रतिशत",
@@ -1117,21 +1122,25 @@
   "app profit Percentage": "एप्लिकेशन लाभ प्रतिशत",
   "User Percentage": "उपयोगकर्ता प्रतिशत",
   "charges settings": "शुल्क सेटिंग्स",
-  "Dollar": "डॉलर"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  "Dollar": "डॉलर",
+   "Coin Color": "सिक्का रंग",
+   "Main Color": "मुख्य रंग",
+   "Selected Color": "चुनिंदा रंग",
+   "Unselected Color": "अनचुनिंदा रंग",
+   "Warning Color": "चेतावनी रंग",
+   "Charmpink Color": "चार्मपिंक रंग",
+   "Heartpink Color": "हार्टपिंक रंग",
+   "Date Color": "तिथि रंग",
+   "time view type": "समय देखने का प्रकार",
+   "Joined at": "जॉइन हुआ",
+   "Left at": "बाहर हो गया",
+   "Still Active": "अभी सक्रिय है",
+   "AgencyUserLog": "एजेंसी उपयोगकर्ता लॉग",
+   "agency-user-logs": "एजेंसी उपयोगकर्ता लॉग्स",
+   "days and hours": "दिन और घंटे",
+   "agent Percentage": "एजेंट प्रतिशत",
+   "Total USD: ": "कुल यूएसडी: ",
+   "Amount will be: ": "राशि होगी: "
 
 }
 

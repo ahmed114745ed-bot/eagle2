@@ -32,6 +32,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=heavy1')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy2')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy3')->withoutOverlapping()->runInBackground();
+       
     }
 
     /**

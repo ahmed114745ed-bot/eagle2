@@ -2,18 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Box;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Auth\Permission;
 
 class BoxController extends MainController
 {
     public $permission_name = 'boxes';
+    public $permission_setting = 'settings';
     use HasResourceActions;
 
     /**
@@ -132,14 +135,61 @@ class BoxController extends MainController
         $form = new Form(new Box);
 
         $form->display(__('ID'));
-        $form->select('type', __('type'))->options([0 => __('normal'), 1 => __('super')]);
-        $form->number('coins', __('coins'));
-        $form->number('users', __('users'));
+        $form->select('type', __('type'))
+            ->options([0 => __('normal'), 1 => __('super')])
+            ->attribute(['id' => 'box_type'])
+            ->required();
+
+        $form->decimal('coins', __('coins'));
+        $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
+        $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
+       
+        $form->html(<<<HTML
+                <div id="dynamic_fields_container">
+                    <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
+                        <button type="button" class="btn btn-danger remove-field">حذف</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
+                        إضافة حقل جديد
+                    </button>
+                </div>
+            HTML);
+
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
-        $form->number('duration', __('duration'))->help(__('in minutes'));
+        $form->html(<<<HTML
+        <script>
+           $(document).ready(function () {
+                initDynamicFieldsScript();
+            });
+        </script>
+        HTML);
+        
+        
+        $form->saving(function (Form $form) {
+            $dynamicFields = request('dynamic_fields', []);
+            $combinedValues = implode(',', array_filter($dynamicFields));
+            $form->model()->dynamic_users_values = $combinedValues;
+            $normalDuration = Common::getConf('normal_box_duration') ?? 1;
+
+            if ($form->model()->type == 0) {
+                $form->duration =  $normalDuration;
+            }
+        });
 
         return $form;
+    }
+
+    public function box_settings(Content $content)
+    {
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
+        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration'])->pluck('value', 'name')->toArray();
+        return $content->view('box_settings', compact('config'));
     }
 }

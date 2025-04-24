@@ -205,9 +205,20 @@
 
     }
 
+    .btn-info {
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%)!important;
+        color: var(--text-secondary-color); !important;
+        border-color: var(--secondary-color);
+    }
+
+    .btn-info:hover{
+        color: var(--secondary-color); !important;
+    }
+
     .btn-primary {
         background-color: var(--primary-color) !important;
         color: var(--text-secondary-color);
+        border-color: var(--secondary-color);
     }
 
     .btn-primary:hover{
@@ -373,15 +384,14 @@
 
 
     .select2-dropdown {
-        background-color: var(--box-background-color) !important;
-        border: 1px solid var(--primary-hover-alpha) !important;
+        background-color: var(--secondary-color) !important;
+        border: 1px solid var(--primary-color) !important;
         border-radius: 4px;
-
     }
 
     .select2-container--default .select2-results__option--highlighted[aria-selected] {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
     .select2-container--default .select2-results__option[aria-selected=true] {
@@ -450,14 +460,18 @@
 
     .btn-default {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
 
     .btn-default:hover {
         background-color: var(--second-color) !important;
-        color: var(--inverse-color) !important;
+        color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
+    }
+
+    .rtl .modal-footer {
+        text-align: left;
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
@@ -465,7 +479,7 @@
 
 
         background: var(--primary-hover-alpha) !important;
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
 
     }
 
@@ -496,6 +510,11 @@
         }
     }
 
+
+    .rtl .pull-right>.dropdown-menu {
+        right: auto;
+        left: 0;
+    }
 
     .popover {
         position: absolute;
@@ -553,6 +572,7 @@
         text-align: left;
         list-style: none;
         background-color: var(--secondary-color) !important;
+        filter: brightness(0.80);
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
         border: 1px solid var(--primary-hover-alpha) !important;
@@ -624,7 +644,7 @@
         color: var(--text-secondary-color); !important;
     }
     .dropdown-menu>li>a {
-        color: var(--inverse-box-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
 
@@ -899,9 +919,11 @@
         color: var(--text-secondary-color) !important;
     }
 
-    .btn-warning{
+    .btn-warning {
         background-color: var(--primary-color);
+        filter: brightness(4);
         color: var(--text-secondary-color);
+        border-color: var(--secondary-color);
     }
 
     .btn-warning:hover {
@@ -910,12 +932,33 @@
         filter: brightness(0.85);
     }
 
+    tr[data-key="18"] {
+        background-color: var(--secondary-color) !important;
+        filter: brightness(2);
+    }
 
     .tab-button.active {
         background-color: var(--primary-color);
         border: 2px solid #fff;
         opacity: 1;
     }
+    /*.small-input {*/
+    /*    width: 80px; !* Adjust width as needed *!*/
+    /*    padding: 5px;*/
+    /*    text-align: center;*/
+    /*    border: 1px solid #ccc;*/
+    /*    border-radius: 4px;*/
+    /*    background-color: #f9f9f9;*/
+    /*    margin-bottom: 10px;*/
+    /*}*/
+
+    /*.amount-text {*/
+    /*    display: block;*/
+    /*    margin-top: 5px; !* Adjust spacing as needed *!*/
+    /*    font-size: 14px; !* Adjust font size as needed *!*/
+    /*    color: #666;*/
+    /*    text-align: center;*/
+    /*}*/
 
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);

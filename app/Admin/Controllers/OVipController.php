@@ -20,11 +20,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Admin\Actions\DenyDeleteAction;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Auth\Permission;
 
 class OVipController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ovip';
+    public $permission_setting = 'settings';
 
 
     public $hiddenColumns = [];
@@ -34,6 +36,9 @@ class OVipController extends MainController
     }
 
     public function vip_settings(Content $content){
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
         $config = Config::pluck('value', 'name')->toArray();
         return $content->view('vip_settings', compact('config'));
     }

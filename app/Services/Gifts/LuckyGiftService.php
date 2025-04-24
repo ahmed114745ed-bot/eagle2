@@ -67,7 +67,6 @@ class LuckyGiftService
         /// todo check visitors
 
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
-
         if (!($appWallet instanceof CoreWallet) || !($ownerWallet instanceof CoreWallet)) throw new InvalidArgumentException('app dosn\'t resolved ');
         $firstAppWalletCoins = $appWallet->coins;
         $firstOwnerWalletCoins = $ownerWallet->coins;
@@ -426,11 +425,16 @@ class LuckyGiftService
      */
     public function getCoreWallets(): array
     {
-        $collection = CoreWallet::query()->whereIn('id', [1, 2])->get();
-        $wallets = $collection->sortBy('id')->values(); // Sort by id and reindex
+        $collection = CoreWallet::query()
+        ->whereIn('name', ['app_wallet', 'owner_wallet'])
+        ->get();
 
-        $ownerWallet = $wallets[1] ?? null;
-        $appWallet = $wallets[0] ?? null;
+        $wallets = $collection->sortBy('id')->values(); 
+
+        $ownerWallet = $wallets->firstWhere('name', 'owner_wallet') ?? null;
+        $appWallet = $wallets->firstWhere('name', 'app_wallet') ?? null;
+        // $ownerWallet = $wallets[1] ?? null;
+        // $appWallet = $wallets[0] ?? null;
 
         return [$ownerWallet, $appWallet];
     }
@@ -560,9 +564,24 @@ class LuckyGiftService
      */
     public function updateCoreWallet(mixed $diffAppWallet, mixed $diffOwnerWallet): void
     {
-        \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
-            'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
-        ]);
+        // \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
+        //     'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
+        // ]);
+        
+        $sql = '
+        UPDATE core_wallets
+        SET coins = CASE
+            WHEN name = "owner_wallet" THEN coins + :owner_wallet
+            WHEN name = "app_wallet" THEN coins + :app_wallet
+        END
+        WHERE name IN ("owner_wallet", "app_wallet")
+            ';
+
+            \DB::update($sql, [
+                'owner_wallet' => $diffOwnerWallet,
+                'app_wallet' => $diffAppWallet,
+            ]);
+       
     }
 
     /**

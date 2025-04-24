@@ -13,6 +13,7 @@ class MomentSettingsController extends AdminController
      * @var string
      */
     protected $title = 'Moment Settings';
+    public $permission_name = 'settings';
 
     public function index(Content $content)
     {

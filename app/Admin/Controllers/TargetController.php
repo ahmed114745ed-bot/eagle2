@@ -91,7 +91,7 @@ class TargetController extends MainController
             ";
         });
 
-        $grid->usd(__('User Percentage'))
+        $grid->usd(__('agent Percentage'))
         ->display(function ($value) use ($coins) {
             $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
 
@@ -122,12 +122,11 @@ class TargetController extends MainController
             $like = $reel[1] ?? 0;
             $commit = $reel[2] ?? 0;
 
-            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('admin.update')  . "$update</span>
-            <br>
-             <span style=\"color:var(--inverse-box-color) ;\">" .   __('admin.like')  . "$like</span>
-             <br>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('admin.comment')  . "$commit </span>
-             ";
+            return "<span>" . __('admin.update') . "$update</span>
+                    <br>
+                    <span>" . __('admin.like') . "$like</span>
+                    <br>
+                    <span>" . __('admin.comment') . "$commit</span>";
         });
         $grid->column(('moment'), __('Moment'))->display(function ($value) {
 
@@ -137,12 +136,11 @@ class TargetController extends MainController
             $like = $moment[1] ?? 0;
             $commit = $moment[2] ?? 0;
 
-            return "<span style=\"color: var(--inverse-box-color);\"> " .   __('admin.update')  . "$update</span>
-            <br>
-             <span style=\"color: var(--inverse-box-color) ;\">" .   __('admin.like')  . "$like </span>
-             <br>
-             <span style=\"color: var(--inverse-box-color) ;\"> " .   __('admin.comment')  . "$commit </span>
-             ";
+            return "<span>" . __('admin.update') . " $update</span>
+                    <br>
+                    <span>" . __('admin.like') . " $like</span>
+                    <br>
+                    <span>" . __('admin.comment') . " $commit</span>";
         });
 
         //        $grid->img('img');
@@ -218,13 +216,19 @@ class TargetController extends MainController
 
 
         $form->display(__('ID'));
-        $form->number('level', __('target no'));
+
+        $form->hidden('level', __('target no'))->default(function () {
+            return Target::max('level') + 1;
+        });   
+        
+        
+       
 
         $form->decimal('diamonds', __('diamonds'))
-    ->help('<span id="diamonds_amount">' . __('Amount will be: ') . ' USD</span>
-            <br><span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
+    ->help('
+            <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
 
-$form->decimal('usd', __('Percentage'))
+$form->decimal('usd', __('agent Percentage').'(%)')
     ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
 
 $form->decimal('agency_share',  __('agency share') . '(%)')
@@ -233,7 +237,7 @@ $form->decimal('agency_share',  __('agency share') . '(%)')
 $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
     ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
 
-$form->decimal('app_profit_percentage', __('app profit Percentage'))
+$form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
     ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
 
 $form->html('
@@ -335,12 +339,13 @@ $form->html('
 
             return @explode(',', $moment)[2] ?? 0;
         });
- 
-        $form->hidden('hours', __('hours'))->default(function ($form) {
+        $form->html('<h1>' . __('days and hours') . '</h1>');
+
+        $form->number('hours', __('hours'))->default(function ($form) {
             $hours = $form->model()->hours;
             return $hours == null || $hours == '' ? 0 : $hours;
         });
-        $form->hidden('days', __('days'))->default(function ($form) {
+        $form->number('days', __('days'))->default(function ($form) {
             $days = $form->model()->days;
             return $days == null || $days == '' ? 0 : $days;
         });
