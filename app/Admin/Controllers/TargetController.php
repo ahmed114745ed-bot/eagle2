@@ -339,12 +339,13 @@ $form->html('
 
             return @explode(',', $moment)[2] ?? 0;
         });
- 
-        $form->hidden('hours', __('hours'))->default(function ($form) {
+        $form->html('<h1>' . __('days and hours') . '</h1>');
+
+        $form->number('hours', __('hours'))->default(function ($form) {
             $hours = $form->model()->hours;
             return $hours == null || $hours == '' ? 0 : $hours;
         });
-        $form->hidden('days', __('days'))->default(function ($form) {
+        $form->number('days', __('days'))->default(function ($form) {
             $days = $form->model()->days;
             return $days == null || $days == '' ? 0 : $days;
         });
