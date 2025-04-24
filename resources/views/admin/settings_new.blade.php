@@ -1198,7 +1198,7 @@
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="form">
-                        <label class="d-block">{{ __('Real Time system Setting:') }}</label>
+                        <label class="d-block">{{ __('Pusher settings') }}</label>
                         <div class="row">
                             <!-- Pusher Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">

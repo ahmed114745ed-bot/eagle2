@@ -658,4 +658,14 @@
      "charges settings": "charges settings",
      "Dollar": "Dollar"
 
-}
+,
+     "Joined at": "Joined at",
+     "Left at": "Left at",
+     "Still Active": "Still Active",
+     "AgencyUserLog": "Agency User Log",
+     "agency-user-logs": "Agency User Logs",
+     "days and hours": "Days and Hours",
+     "agent Percentage": "Agent Percentage",
+     "Total USD: ": "Total USD: ",
+     "Amount will be: ": "Amount will be: "
+    }

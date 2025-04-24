@@ -1984,5 +1984,14 @@
   "Super Admin amount will be: ": "Süper Yönetici miktarı: ",
   "app profit Percentage": "Uygulama Karı Yüzdesi",
   "User Percentage": "Kullanıcı Yüzdesi",
-  "Dollar": "Dolar"
+  "Dollar": "Dolar",
+  "Joined at": "Katılma Tarihi",
+  "Left at": "Ayrılma Tarihi",
+  "Still Active": "Hala Aktif",
+  "AgencyUserLog": "Ajans Kullanıcı Kayıtları",
+  "agency-user-logs": "Ajans Kullanıcı Kayıtları",
+  "days and hours": "Gün ve Saat",
+  "agent Percentage": "Ajans Yüzdesi",
+  "Total USD: ": "Toplam USD: ",
+  "Amount will be: ": "Miktar: "
 }

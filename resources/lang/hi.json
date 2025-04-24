@@ -1132,7 +1132,16 @@
    "Charmpink Color": "चार्मपिंक रंग",
    "Heartpink Color": "हार्टपिंक रंग",
    "Date Color": "तिथि रंग",
-   "time view type": "समय देखने का प्रकार"
+   "time view type": "समय देखने का प्रकार",
+   "Joined at": "जॉइन हुआ",
+   "Left at": "बाहर हो गया",
+   "Still Active": "अभी सक्रिय है",
+   "AgencyUserLog": "एजेंसी उपयोगकर्ता लॉग",
+   "agency-user-logs": "एजेंसी उपयोगकर्ता लॉग्स",
+   "days and hours": "दिन और घंटे",
+   "agent Percentage": "एजेंट प्रतिशत",
+   "Total USD: ": "कुल यूएसडी: ",
+   "Amount will be: ": "राशि होगी: "
 
 
 
