@@ -2038,6 +2038,77 @@
  "Heartpink Color": "لون هارت بينك",
  "Date Color": "لون التاريخ",
 "half image": "نصف صورة",
-"time view type": "نوع مدة الظهور "
+"time view type": "نوع مدة الظهور ",
+    "Super Admin Coins": "عملات المشرف العام",
+    "Zones Coins": "عملات المناطق",
+      "DB  Percentage": "نسبة  DB",
+      "app profit Percentage": "نسبة أرباح التطبيق",
+      "User Percentage": "نسبة المستخدم", 
+      "charges settings": "اعدادات الشحن",
+      "charges-settings": "اعدادات الشحن",
+   "Dollar": "دولار"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

@@ -5,13 +5,14 @@ namespace Modules\FixedTarget\Classes;
 use App\Helpers\Common;
 use App\Models\Target;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Interfaces\TargetInterface;
 
 class RegularTarget implements TargetInterface
 {
 
     public function getTarget(int $diamond): Model|null
-    {
+    { 
         return Target::query()->where('diamonds', '<=', $diamond)->orderBy('diamonds', 'desc')->first();
     }
 
@@ -44,7 +45,8 @@ class RegularTarget implements TargetInterface
 //                $per = 0;
 //            }
 //        }
-
-        return $target->usd * $per;
+          $usd = Common::getTargetUsd($target->diamonds,$target->usd);
+          
+          return $usd * $per;
     }
 }

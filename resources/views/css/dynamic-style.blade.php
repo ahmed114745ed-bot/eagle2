@@ -942,6 +942,23 @@
         border: 2px solid #fff;
         opacity: 1;
     }
+    /*.small-input {*/
+    /*    width: 80px; !* Adjust width as needed *!*/
+    /*    padding: 5px;*/
+    /*    text-align: center;*/
+    /*    border: 1px solid #ccc;*/
+    /*    border-radius: 4px;*/
+    /*    background-color: #f9f9f9;*/
+    /*    margin-bottom: 10px;*/
+    /*}*/
+
+    /*.amount-text {*/
+    /*    display: block;*/
+    /*    margin-top: 5px; !* Adjust spacing as needed *!*/
+    /*    font-size: 14px; !* Adjust font size as needed *!*/
+    /*    color: #666;*/
+    /*    text-align: center;*/
+    /*}*/
 
     .rtl .sidebar-menu > li > a .fa-angle-left {
         transform: rotate(180deg);
