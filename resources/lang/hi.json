@@ -303,7 +303,8 @@
     "Payment Credential Settings": "भुगतान प्रमाण-पत्र सेटिंग्स",
     "Real Time system Setting:": "रीयल टाइम सिस्टम सेटिंग:",
     "soon": "जल्द ही",
-
+    "gateway_ready" : "भुगतान गेटवे उपयोग के लिए तैयार है",
+    "edit_credentials" : "कृपया भुगतान प्रमाण पत्र सेटिंग्स संपादित करें",
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
     "success process": "सफलता प्रक्रिया",
     "user has this item in his pack no need to send it": "उपयोगकर्ता के पास इस आइटम को अपने पैक में है, इसे भेजने की कोई आवश्यकता नहीं है",
@@ -1147,7 +1148,10 @@
    "Enter users count": "उपयोगकर्ता संख्या दर्ज करें",
    "Delete": "हटाएं",
    "Add": "जोड़ें",
-   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें"
+   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
+   "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
+   "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
+   "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए"
 
 
 

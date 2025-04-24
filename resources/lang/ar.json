@@ -857,6 +857,8 @@
     "agency_settings": "إعدادات الوكالة",
     "level_settings": "إعدادات المستوى",
     "category" : "فئة",
+    "Payment gateway is ready to use" : "بوابة الدفع جاهزة للاستخدام",
+    "Please edit payment credential settings" : "يرجى تعديل إعدادات بيانات بوابات الدفع",
     "Payment Credential Settings:": "إعدادات بيانات الدفع:",
     "Payment Credential Settings": "إعدادات بيانات الدفع",
     "Real Time system Setting:": "إعداد نظام الوقت الفعلي:",
@@ -2069,7 +2071,10 @@
 "Enter users count": "أدخل عدد المستخدمين",
 "Delete": "حذف",
 "Add": "إضافة",
-"Add Users Count": "إضافة عدد المستخدمين"
+"Add Users Count": "إضافة عدد المستخدمين",
+"Zones coins must be greater than super admin coins": "عملات المناطق يجب أن تكون أكبر من عملات المشرف العام",
+"super admin coins must be greater than agancy coins": "عملات المشرف العام يجب أن تكون أكبر من عملات الوكالة",
+"agancy coins must be greater than user coins": "عملات الوكالة يجب أن تكون أكبر من عملات المستخدم"
 
 
 
