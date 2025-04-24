@@ -144,36 +144,13 @@ class BoxController extends MainController
         $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
         $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
        
-     // تخزين الترجمات في متغيرات
-        $enterUsersCount = __('Enter users count');
-        $delete = __('Delete');
-        $add = __('Add Users Count');
+  
         $addPlaceholder = __('Enter users count');
         $deleteText = __('Delete');
 
-        $dynamicFields = isset($form->model()->dynamic_users_values) ? explode(',', $form->model()->dynamic_users_values) : [];
-
-        ob_start(); // بداية التخزين في الذاكرة
-        ?>
-        <div id="dynamic_fields_container">
-            <!-- Loop through dynamic fields to show old values -->
-            <?php foreach ($dynamicFields as $field): ?>
-                <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                    <input type="number" name="dynamic_fields[]" class="form-control" placeholder="<?= $enterUsersCount ?>" value="<?= trim($field) ?>" style="flex: 1;">
-                    <button type="button" class="btn btn-danger remove-field"><?= $delete ?></button>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="form-group">
-            <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
-                <?= $add ?>
-            </button>
-        </div>
-        <?php
-        $html = ob_get_clean(); // الحصول على المحتوى المولد من خلال PHP
-
-        $form->html($html); // تمرير الـ HTML المعدل
-                
+        $form->dynamicFields('dynamic_users_values', __('Dynamic Fields'))
+        ->attribute(['name' => 'dynamic_users_values'])
+        ;
 
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
@@ -184,8 +161,6 @@ class BoxController extends MainController
                 initDynamicFieldsScript();
            
             });
-
-           
         </script>
         HTML);
         $form->html("

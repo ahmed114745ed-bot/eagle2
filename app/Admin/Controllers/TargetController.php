@@ -73,7 +73,7 @@ class TargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Target);
-        $grid->model()->orderBy('level');
+        $grid->model()->orderBy('diamonds', 'desc');
         $coins = Common::getMaxCoins();
 
         // $grid->id(__('ID'));
@@ -82,7 +82,7 @@ class TargetController extends MainController
         $grid->diamonds(__('diamonds'))
         ->display(function ($value) use ($coins) {
             $endFormatted = $coins ? number_format($value / $coins) : 0;
-    
+
             return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>💎 {$value}</span>
@@ -104,12 +104,12 @@ class TargetController extends MainController
                 </div>
             ";
         });
-  
-       
-        
-        
-        
-        
+
+
+
+
+
+
         // $grid->usd(__('User Percentage'));
 
         $grid->hours(__('hours'))->editable();
@@ -212,17 +212,17 @@ class TargetController extends MainController
     {
         $form = new Form(new Target);
         $coins = Common::getMaxCoins();
-        
+
 
 
         $form->display(__('ID'));
 
         $form->hidden('level', __('target no'))->default(function () {
             return Target::max('level') + 1;
-        });   
-        
-        
-       
+        });
+
+
+
 
         $form->decimal('diamonds', __('diamonds'))
     ->help('
@@ -302,7 +302,7 @@ $form->html('
         calculateUsdAmount();
     });
 </script>');
-    
+
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');
