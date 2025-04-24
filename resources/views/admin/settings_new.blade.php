@@ -413,7 +413,7 @@
         top: 6px;
         right: -19px;
         background-color: #ff0000;
-        padding: 2px 15px;
+        padding: 2px 7px;
         transform: rotate(90deg);
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
@@ -421,6 +421,7 @@
     .rtl .ribbon-banner{
         right: auto;
         left: -14px; !important;
+        padding: 2px 13px; !important;
     }
 
     .ribbon-banner span {
@@ -428,6 +429,12 @@
         font-size: 15px;
         font-weight: normal;
         text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    }
+
+    .text-center.my-3 img.img-fluid {
+        max-height: 80px;
+        display: unset !important;
+        margin-top: 20px;
     }
 </style>
 
@@ -808,8 +815,7 @@
                                             @if($coin->title == 'fawry')
                                                 <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
                                                      alt="Fawry Payment"
-                                                     class="img-fluid"
-                                                     style="max-height: 80px; display: unset !important;">
+                                                     class="img-fluid">
                                                 @php
                                                     $fawryImageFound = true;
                                                 @endphp
@@ -819,8 +825,7 @@
                                         @if(!$fawryImageFound)
                                             <img src="{{ asset('images/dollar.jpg') }}"
                                                  alt="Fawry Payment"
-                                                 class="img-fluid"
-                                                 style="max-height: 80px; display: unset !important;">
+                                                 class="img-fluid">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -893,8 +898,7 @@
                                             @if($coin->title == 'sky pay')
                                                 <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
                                                      alt="Skypay Payment"
-                                                     class="img-fluid"
-                                                     style="max-height: 80px; display: unset !important;">
+                                                     class="img-fluid">
                                                 @php
                                                     $skypayImageFound = true;
                                                 @endphp
@@ -904,8 +908,7 @@
                                         @if(!$skypayImageFound)
                                             <img src="{{ asset('images/dollar.jpg') }}"
                                                  alt="Skypay Payment"
-                                                 class="img-fluid"
-                                                 style="max-height: 80px; display: unset !important;">
+                                                 class="img-fluid">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -970,8 +973,7 @@
                                             @if($coin->title == 'stripe')
                                                 <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
                                                      alt="Stripe Payment"
-                                                     class="img-fluid"
-                                                     style="max-height: 80px; display: unset !important;">
+                                                     class="img-fluid">
                                                 @php
                                                     $stripeImageFound = true;
                                                 @endphp
@@ -981,8 +983,7 @@
                                         @if(!$stripeImageFound)
                                             <img src="{{ asset('images/dollar.jpg') }}"
                                                  alt="Stripe Payment"
-                                                 class="img-fluid"
-                                                 style="max-height: 80px; display: unset !important;">
+                                                 class="img-fluid">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -1056,8 +1057,7 @@
                                             @if($coin->title == 'opay')
                                                 <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
                                                      alt="Opay Payment"
-                                                     class="img-fluid"
-                                                     style="max-height: 80px; display: unset !important;">
+                                                     class="img-fluid">
                                                 @php
                                                     $opayImageFound = true;
                                                 @endphp
@@ -1067,8 +1067,7 @@
                                         @if(!$opayImageFound)
                                             <img src="{{ asset('images/dollar.jpg') }}"
                                                  alt="Opay Payment"
-                                                 class="img-fluid"
-                                                 style="max-height: 80px; display: unset !important;">
+                                                 class="img-fluid">
                                         @endif
                                     </div>
                                     <div class="row">

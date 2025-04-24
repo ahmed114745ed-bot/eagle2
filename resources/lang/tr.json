@@ -66,7 +66,8 @@
     "Payment Credential Settings": "Ödeme Bilgisi Ayarları",
     "Real Time system Setting:": "Gerçek Zamanlı Sistem Ayarı:",
     "soon": "yakında",
-
+    "gateway_ready" : "Ödeme ağ geçidi kullanıma hazır",
+    "edit_credentials" : "Lütfen ödeme kimlik bilgisi ayarlarını düzenleyin",
     "phone": "Telefon",
   "code": "Kod",
   "aid": "Yönetici Kimliği",
