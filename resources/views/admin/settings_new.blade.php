@@ -205,7 +205,7 @@
     }
 
     button {
-        width: 240px;
+        width: 247px;
     }
 
     /* تصميم النافذة */
@@ -402,6 +402,33 @@
     .border-success {
         border: #4caf50, solid, 5px;
     }
+
+    .position-relative {
+        position: relative;
+        overflow: visible;
+    }
+
+    .ribbon-banner {
+        position: absolute;
+        top: 6px;
+        right: -19px;
+        background-color: #ff0000;
+        padding: 2px 15px;
+        transform: rotate(90deg);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .rtl .ribbon-banner{
+        right: auto;
+        left: -14px; !important;
+    }
+
+    .ribbon-banner span {
+        color: white;
+        font-size: 15px;
+        font-weight: normal;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    }
 </style>
 
 </head>
@@ -413,10 +440,20 @@
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
-            <button onclick="showSection('appSettings')">{{ __('App settings') }}</button>
+            <button onclick="showSection('appSettings')" class="position-relative">
+                {{ __('App settings') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
             <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
             <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
-            <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment Credential Settings') }}</button>
+            <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
+                {{ __('Payment Credential Settings') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
         </div>
     </div>
     <div class="all-page" style="    width: 100%;">
@@ -750,7 +787,7 @@
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.fawry') }}</h4>
                                         <div class="d-flex align-items-center">
@@ -760,6 +797,30 @@
                                             <label for="fawryRadio" class="switch"></label>
                                         </div>
                                     </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $fawryImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'fawry')
+                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                     alt="Fawry Payment"
+                                                     class="img-fluid"
+                                                     style="max-height: 80px; display: unset !important;">
+                                                @php
+                                                    $fawryImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$fawryImageFound)
+                                            <img src="{{ asset('images/dollar.jpg') }}"
+                                                 alt="Fawry Payment"
+                                                 class="img-fluid"
+                                                 style="max-height: 80px; display: unset !important;">
+                                        @endif
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -767,7 +828,7 @@
                                                     for="fawry_secret">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="fawry_secret"
                                                        name="fawry_secret" placeholder="secret"
-                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -775,7 +836,7 @@
                                                 <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>
                                                 <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"
                                                        placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -783,7 +844,7 @@
                                                 <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
                                                 <input type="text" id="fawry_utd_url" name="fawry_utd_url"
                                                        placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -791,7 +852,7 @@
                                                 <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>
                                                 <input type="text" id="fawry_return_url" name="fawry_return_url"
                                                        placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -799,7 +860,7 @@
                                                 <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>
                                                 <input type="text" id="fawry_url" name="fawry_url"
                                                        placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -810,7 +871,7 @@
 
                             <!-- skyPay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
                                         <div class="d-flex align-items-center">
@@ -820,6 +881,30 @@
                                             <label for="skyPayRadio" class="switch"></label>
                                         </div>
                                     </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $skypayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'sky pay')
+                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                     alt="Skypay Payment"
+                                                     class="img-fluid"
+                                                     style="max-height: 80px; display: unset !important;">
+                                                @php
+                                                    $skypayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$skypayImageFound)
+                                            <img src="{{ asset('images/dollar.jpg') }}"
+                                                 alt="Skypay Payment"
+                                                 class="img-fluid"
+                                                 style="max-height: 80px; display: unset !important;">
+                                        @endif
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -827,7 +912,7 @@
                                                     for="paysky_base_url">{{ __('admin.base_url') }}:</label>
                                                 <input type="text" id="paysky_base_url"
                                                        name="paysky_base_url" placeholder="base_url"
-                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -835,7 +920,7 @@
                                                 <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label>
                                                 <input type="text" id="paysky_merchant_id" name="paysky_merchant_id"
                                                        placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -843,7 +928,7 @@
                                                 <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label>
                                                 <input type="text" id="paysky_terminal_id" name="paysky_terminal_id"
                                                        placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -851,7 +936,7 @@
                                                 <label for="paysky_api_key">{{ __('admin.api_key') }}:</label>
                                                 <input type="text" id="paysky_api_key" name="paysky_api_key"
                                                        placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -862,7 +947,7 @@
 
                             <!-- stripe Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.stripe') }}</h4>
                                         <div class="d-flex align-items-center">
@@ -872,6 +957,30 @@
                                             <label for="stripeRadio" class="switch"></label>
                                         </div>
                                     </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $stripeImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'stripe')
+                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                     alt="Stripe Payment"
+                                                     class="img-fluid"
+                                                     style="max-height: 80px; display: unset !important;">
+                                                @php
+                                                    $stripeImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$stripeImageFound)
+                                            <img src="{{ asset('images/dollar.jpg') }}"
+                                                 alt="Stripe Payment"
+                                                 class="img-fluid"
+                                                 style="max-height: 80px; display: unset !important;">
+                                        @endif
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -879,7 +988,7 @@
                                                     for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>
                                                 <input type="text" id="stripe_test_secret_key"
                                                        name="stripe_test_secret_key" placeholder="test_secret_key"
-                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -887,7 +996,7 @@
                                                 <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>
                                                 <input type="text" id="stripe_success_url" name="stripe_success_url"
                                                        placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -895,7 +1004,7 @@
                                                 <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>
                                                 <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"
                                                        placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -903,7 +1012,7 @@
                                                 <label for="stripe_currency">{{ __('admin.currency') }}:</label>
                                                 <input type="text" id="stripe_currency" name="stripe_currency"
                                                        placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -911,7 +1020,7 @@
                                                 <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>
                                                 <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"
                                                        placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
@@ -922,7 +1031,7 @@
 
                             <!-- opay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 385px;">
+                                <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
                                         <div class="d-flex align-items-center">
@@ -932,13 +1041,37 @@
                                             <label for="opayRadio" class="switch"></label>
                                         </div>
                                     </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $opayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'opay')
+                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                     alt="Opay Payment"
+                                                     class="img-fluid"
+                                                     style="max-height: 80px; display: unset !important;">
+                                                @php
+                                                    $opayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$opayImageFound)
+                                            <img src="{{ asset('images/dollar.jpg') }}"
+                                                 alt="Opay Payment"
+                                                 class="img-fluid"
+                                                 style="max-height: 80px; display: unset !important;">
+                                        @endif
+                                    </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="opay_currency">{{ __('admin.currency') }}:</label>
                                                 <input type="text" id="opay_currency" name="opay_currency"
                                                        placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}"
-                                                       class="form-control">
+                                                       class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -947,7 +1080,7 @@
                                                     for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
                                                 <input type="text" id="opay_secret_key"
                                                        name="opay_secret_key" placeholder="server_secret"
-                                                       value="{{ $settings['opay_secret_key'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_secret_key'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -956,7 +1089,7 @@
                                                     for="opay_public_key">{{ __('admin.public_key') }}:</label>
                                                 <input type="text" id="opay_public_key"
                                                        name="opay_public_key" placeholder="public_key"
-                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -965,7 +1098,7 @@
                                                     for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
                                                 <input type="text" id="opay_merchant_id"
                                                        name="opay_merchant_id" placeholder="merchant_id"
-                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -974,7 +1107,7 @@
                                                     for="opay_country_code">{{ __('admin.country_code') }}:</label>
                                                 <input type="text" id="opay_country_code"
                                                        name="country_code" placeholder="server_secret"
-                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -983,7 +1116,7 @@
                                                     for="opay_base_url">{{ __('admin.base_url') }}:</label>
                                                 <input type="text" id="opay_base_url"
                                                        name="opay_base_url" placeholder="base_url"
-                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control">
+                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                     </div>
