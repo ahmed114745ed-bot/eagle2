@@ -221,6 +221,7 @@
     "Balance": "الرصيد",
     "sender_level": "مستوى المرسل",
     "Browse Categories": "قائمة الفئات",
+    "puser_app_id": "pusher app id",
     "reports": "تقارير",
     "Sallaries": "الرواتب",
     "dedicate": "اهداء",
@@ -669,10 +670,16 @@
     "roomName" : "اسم الغرفة",
     "Percentage" : "نسبة مئوية",
     "sound effect" : "تأثيرات صوتية",
+    "Enable Vip Auto": "تفعيل ال VIP تلقائيا",
+    "Using Vip without presenting": "استخدام ال VIP مباشرتا دون  الاهداء",
+    "Pusher settings" : "اعدادات بشر",
+    "pusher_app_id" : "معرف تطبيق بشر",
+    "pusher_app_key" : "معرف مفتاح بشر",
     "Enabled" : "طلب مقبول",
     "Disabled" : "طلب مازال مرفوض",
     "Text ar" : "نص عربي",
     "Text en":"نص انجليش",
+    "pusher_app_secret" : "معرف سر بشر",
     "WhatsappMessages":"رسائل الوتساب",
     "whatsapp-messages":"رسائل الوتساب",
     "create":"انشاء",
@@ -846,9 +853,11 @@
     "agency_settings": "إعدادات الوكالة",
     "level_settings": "إعدادات المستوى",
     "category" : "فئة",
+    "Payment Credential Settings:": "إعدادات بيانات الدفع:",
+    "Payment Credential Settings": "إعدادات بيانات الدفع",
+    "Real Time system Setting:": "إعداد نظام الوقت الفعلي:",
 
-
-   " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
+    " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
  "login_from_only_one_device" :"تسجيل الدخول من جهاز واحد فقط" ,
  "one_usd_value_in_coins" : "قيمة الدولار الواحد بالعملات" ,
  "zego_server_secret" : "سر خادم زيغو",
@@ -2033,6 +2042,93 @@
  "Heartpink Color": "لون هارت بينك",
  "Date Color": "لون التاريخ",
 "half image": "نصف صورة",
-"time view type": "نوع مدة الظهور "
+"time view type": "نوع مدة الظهور ",
+    "Super Admin Coins": "عملات المشرف العام",
+    "Zones Coins": "عملات المناطق",
+      "DB  Percentage": "نسبة  DB",
+      "app profit Percentage": "نسبة أرباح التطبيق",
+      "User Percentage": "نسبة المستخدم",
+      "charges settings": "اعدادات الشحن",
+      "charges-settings": "اعدادات الشحن",
+   "Dollar": "دولار",
+
+"Joined at": "تاريخ الانضمام",
+"Left at": "تاريخ الانضمام",
+"Still Active": "منضم حاليا",
+"AgencyUserLog": "سجل الانضمام للوكالة",
+"agency-user-logs": "سجل الانضمام للوكالة",
+"days and hours": "الأيام و الساعات",
+"agent Percentage": "نسبة الوكيل",
+"Amount will be: ": "سيكون المبلغ: ",
+"Total USD: ": "إجمالي الدولار: ",
+"duration in seconds": "المدة المحددة بالثواني",
+"Enter users count": "أدخل عدد المستخدمين",
+"Delete": "حذف",
+"Add": "إضافة",
+"Add Users Count": "إضافة عدد المستخدمين"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

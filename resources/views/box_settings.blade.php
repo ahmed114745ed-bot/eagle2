@@ -159,24 +159,45 @@
 
         <div class="settings-content">
             <div id="VipSettings" class="settings-section active">
-                <h3> {{ __('Luck Box Settings') }}</h3>
+                <h3>{{ __('Luck Box Settings') }}</h3>
 
                 <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form">
-                        <label for="buy_aristocracy">{{ __('app wallet lucky box') }}</label>
-                        <input type="number" id="app_wallet_lucky_box" name="app_wallet_lucky_box" min="1"  value="{{$config['app_wallet_lucky_box'] ?? 0}}"/>
+                        <!-- Wallet Lucky Box -->
+                        <div class="form-group">
+                            <label for="app_wallet_lucky_box">{{ __('app wallet lucky box') }}</label>
+                            <input type="number" 
+                                id="app_wallet_lucky_box" 
+                                name="app_wallet_lucky_box" 
+                                min="1" 
+                                value="{{ $config['app_wallet_lucky_box'] ?? 0 }}" 
+                                class="form-control" 
+                                placeholder="{{ __('Enter the wallet lucky box value') }}" />
+                        </div>
 
-                        <label for="buy_aristocracy">{{ __('normal box duration') }}</label>
-                        <input type="number" id="normal_box_duration" name="normal_box_duration" min="1"  value="{{$config['normal_box_duration'] ?? 0}}"/>
-                        <button type="submit">{{ __('Save') }}</button>
+                        <!-- Normal Box Duration -->
+                        <div class="form-group">
+                            <label for="normal_box_duration">{{ __('normal box duration') }}</label>
+                            <input type="number" 
+                                id="normal_box_duration" 
+                                name="normal_box_duration" 
+                                min="1" 
+                                value="{{ $config['normal_box_duration'] ?? 0 }}" 
+                                class="form-control" 
+                                placeholder="{{ __('Enter duration in minutes') }}" />
+                            <span class="help-block">{{ __('duration in seconds') }}</span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        </div>
                     </div>
-
                 </form>
             </div>
-
-            
         </div>
+
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
