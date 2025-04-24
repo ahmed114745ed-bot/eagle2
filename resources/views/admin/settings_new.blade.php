@@ -756,7 +756,7 @@
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_fawry_active" value="0">
                                             <input type="checkbox" id="fawryRadio" class="custom-payment-radio libraryRealTime"
-                                                   name="is_fawry_active" value="1" {{ $settings['is_fawry_active'] == '1' ? 'checked' : '' }}>
+                                                   name="is_fawry_active" value="1" {{ @$settings['is_fawry_active'] == '1' ? 'checked' : '' }}>
                                             <label for="fawryRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -816,7 +816,7 @@
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_skyPay_active" value="0">
                                             <input type="checkbox" id="skyPayRadio" class="custom-payment-radio libraryRealTime"
-                                                   name="is_skyPay_active" value="1" {{ $settings['is_skyPay_active'] ? 'checked' : '' }}>
+                                                   name="is_skyPay_active" value="1" {{ @$settings['is_skyPay_active'] ? 'checked' : '' }}>
                                             <label for="skyPayRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -868,7 +868,7 @@
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_stripe_active" value="0">
                                             <input type="checkbox" id="stripeRadio" class="custom-payment-radio libraryRealTime"
-                                                   name="is_stripe_active" value="1" {{ $settings['is_stripe_active'] ? 'checked' : '' }}>
+                                                   name="is_stripe_active" value="1" {{ @$settings['is_stripe_active'] ? 'checked' : '' }}>
                                             <label for="stripeRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -928,7 +928,7 @@
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_opay_active" value="0">
                                             <input type="checkbox" id="opayRadio" class="custom-payment-radio libraryRealTime"
-                                                   name="is_opay_active" value="1" {{ $settings['is_opay_active'] == '1' ? 'checked' : '' }}>
+                                                   name="is_opay_active" value="1" {{ @$settings['is_opay_active'] == '1' ? 'checked' : '' }}>
                                             <label for="opayRadio" class="switch"></label>
                                         </div>
                                     </div>
