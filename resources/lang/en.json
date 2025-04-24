@@ -675,5 +675,20 @@
      "Add Users Count": "Add Users Count",
      "Zones coins must be greater than super admin coins": "Zones coins must be greater than super admin coins",
      "super admin coins must be greater than agancy coins": "super admin coins must be greater than agancy coins",
-     "agancy coins must be greater than user coins": "agancy coins must be greater than user coins"
+     "agancy coins must be greater than user coins": "agancy coins must be greater than user coins",
+     "soon": "soon",
+     "firebase": "firebase",
+     "supabase": "supabase",
+     "supabase_url": "url supabase",
+     "supabase_key": "key supabase",
+     "supabase_service_role_key": "service role key supabase",
+     "pusher_app_id": "app id pusher",
+     "pusher_app_key": "app key pusher",
+     "pusher_app_secret": "app secret pusher",
+     "firebase_api_key": "api key firebase",
+     "firebase_auth_domain": "auth domain firebase",
+     "firebase_database_url": "database url firebase",
+     "Real Time Setting": "Real Time Setting",
+     "Real Time system Setting": "Real Time system Setting",
+     "Payment Credential Settings": "Payment Credential Settings"
     }
