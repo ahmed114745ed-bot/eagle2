@@ -42,8 +42,10 @@ class NormalLuckyBoxJop implements ShouldQueue
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
         if (!$userBoxes)  return;
+        \Log::error('normal box ' );
         foreach ($userBoxes as $userBox) {
-            User::where('id', $userBox->user_id)->increment('di', $userBox->unused_coins);
+           $user = User::where('id', $userBox->user_id)->first();
+           $user-> increment('di', $userBox->unused_coins);
             $userBox->is_closed = true;
             $userBox->save();
         }

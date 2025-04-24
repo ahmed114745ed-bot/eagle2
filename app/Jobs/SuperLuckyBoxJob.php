@@ -39,7 +39,7 @@ class SuperLuckyBoxJob implements ShouldQueue
     {
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
-
+        \Log::error('super box ' );
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 1)->where('is_closed', false)->get();
         if (!$userBoxes)  return;
         foreach ($userBoxes as $userBox) {
@@ -79,7 +79,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                     ];
 
                     if (UserBoxGift::where(['user_id' => $user->id, 'box_uses_id' => true])->exists()) {
-                         return;
+                        return;
                     }
 
                     UserBoxGift::query()->create($data);
@@ -93,7 +93,8 @@ class SuperLuckyBoxJob implements ShouldQueue
 
                     $user->increment('di', $coins);
                 }
-                User::where('id', $userBox->user_id)->increment('di', $userBox->unused_coins);
+                $user = User::where('id', $userBox->user_id)->first();
+                $user->increment('di', $userBox->unused_coins);
                 $userBox->is_closed = true;
                 $userBox->save();
             }
