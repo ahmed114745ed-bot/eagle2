@@ -39,10 +39,10 @@ class NormalLuckyBoxJop implements ShouldQueue
     {
         $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
-
+        \Log::error('normal box ' );
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
         if (!$userBoxes)  return;
-        \Log::error('normal box ' );
+       
         foreach ($userBoxes as $userBox) {
            $user = User::where('id', $userBox->user_id)->first();
            $user-> increment('di', $userBox->unused_coins);
