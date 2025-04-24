@@ -37,11 +37,7 @@ class NormalLuckyBoxJop implements ShouldQueue
      */
     public function handle(): void
     {
-        $cacheKey = 'timezone';
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
+        $timezone = Common::timeZone();
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes =   BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
