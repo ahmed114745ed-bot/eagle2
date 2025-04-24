@@ -210,7 +210,7 @@ return [
     "opay" => 'أوباي',
     "public_key" => 'المفتاح العام',
     "country_code" => 'رمز الدولة',
-    
+    "Tencent" => 'تينسينت',
     "charge_level" => "مستوي الشحن",
 
 
