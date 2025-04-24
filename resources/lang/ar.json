@@ -2074,7 +2074,23 @@
 "Add Users Count": "إضافة عدد المستخدمين",
 "Zones coins must be greater than super admin coins": "عملات المناطق يجب أن تكون أكبر من عملات المشرف العام",
 "super admin coins must be greater than agancy coins": "عملات المشرف العام يجب أن تكون أكبر من عملات الوكالة",
-"agancy coins must be greater than user coins": "عملات الوكالة يجب أن تكون أكبر من عملات المستخدم"
+"agancy coins must be greater than user coins": "عملات الوكالة يجب أن تكون أكبر من عملات المستخدم",
+"firebase": "فايربيس",
+"supabase": "سوباباس",
+"supabase_url": "رابط سوباباس",
+"supabase_key": "مفتاح سوباباس",
+"supabase_service_role_key": "مفتاح دور الخدمة في سوباباس",
+"firebase_api_key": "مفتاح API في فايربيس",
+"firebase_auth_domain": "نطاق المصادقة في فايربيس",
+"firebase_database_url": "رابط قاعدة البيانات في فايربيس",
+"gateway_ready" : "الدفع جاهز للاستخدام",
+"edit_credentials" : "يرجى تعديل إعدادات الدفع",
+"Real Time Setting": "إعدادات الوقت الحقيقي"
+
+
+
+
+
 
 
 
