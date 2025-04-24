@@ -40,11 +40,9 @@ class ChatMessagesController extends Controller
     public function __construct(public ChatService $chatService, public MessageService $messageService) {}
 
 
-    
+
     public function store(ChatStoreRequest $request)
     {
-
-        // \Log::info('chat response : ' . json_encode($request->all()));
         $user = $request->user();
 
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
@@ -137,7 +135,6 @@ class ChatMessagesController extends Controller
     private function isValidFileExtension($file, $validExtensions)
     {
         $extension = $file->getClientOriginalExtension();
-        // \Log::info('This is file extension: ' . json_encode($extension) . ' This is file name: ' . json_encode($file->getClientOriginalName()));
 
         return in_array($extension, $validExtensions);
     }

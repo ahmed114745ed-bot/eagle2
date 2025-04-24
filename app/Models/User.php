@@ -128,6 +128,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function sameDeviceUsers()
+    {
+        return $this->hasMany(User::class, 'device_token', 'device_token');
+    }
+
     public function likes()
     {
         return $this->belongsToMany(User::class, 'profile_user_likes', 'user_id', 'liked_user_id')
@@ -228,7 +233,8 @@ class User extends Authenticatable
         return $this->belongsTo(MangerType::class, 'manger_type_id');
     }
 
-    public function manager(){
+    public function manager()
+    {
         return $this->hasOne(Admin::class, 'app_id');
     }
 
@@ -665,7 +671,6 @@ class User extends Authenticatable
         })
             ->orderByDesc('id')
             ->sum(DB::raw('salary - cut_amount'));
-        // \Log::info([$userSallary,$roomSalary]);
         return (floor($userSallary + (int)$roomSalary));
         //        } else {
         //            return 0;
@@ -1145,12 +1150,12 @@ class User extends Authenticatable
 
     public function userVips()
     {
-        return $this->hasMany(UserVip::class, 'user_id'); 
+        return $this->hasMany(UserVip::class, 'user_id');
     }
 
     public function getIsFrozenAttribute()
     {
-        return optional($this->agency)->is_frozen; 
+        return optional($this->agency)->is_frozen;
     }
 
     protected static function boot()
@@ -1172,13 +1177,10 @@ class User extends Authenticatable
         static::updating(function ($user) {
             $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
             $newCoins = $user->di;
-    
+
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
         });
     }
-
-
-   
 }

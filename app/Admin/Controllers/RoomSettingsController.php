@@ -16,7 +16,7 @@ class RoomSettingsController extends Controller
      * @var string
      */
     protected $title = 'Room-setting';
-
+    public $permission_name = 'settings';
     public function index(Content $content)
     {
         $settings = Config::pluck('value', 'name')->toArray();

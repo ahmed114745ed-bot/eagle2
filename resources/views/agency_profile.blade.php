@@ -20,32 +20,32 @@
 .settings-menu {
     display: flex;
     gap: 4px;
-    color: var(--text-primary-color);
+    color: var(--text-secondary-color);
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: thin;
     margin-bottom: 20px;
 }
 
-.settings-menu button {
-    background-color: var(--box-background-color);
-    border: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: var(--text-primary-color) !important;
-    border-radius: 4px;
-}
+/*.settings-menu button {*/
+/*    background-color: var(--box-background-color);*/
+/*    border: none;*/
+/*    padding: 10px 15px;*/
+/*    font-size: 16px;*/
+/*    cursor: pointer;*/
+/*    transition: all 0.3s ease;*/
+/*    color: var(--text-secondary-color) !important;*/
+/*    border-radius: 4px;*/
+/*}*/
 
-.settings-menu button:hover {
-    background-color: #ff9800;
-}
+/*.settings-menu button:hover {*/
+/*    background-color: #ff9800;*/
+/*}*/
 
-.settings-menu button.active {
-    background-color: var(--primary-color);
-    color: var(--text-primary-color) !important;
-}
+/*.settings-menu button.active {*/
+/*    background-color: var(--primary-color);*/
+/*    color: var(--text-secondary-color) !important;*/
+/*}*/
 
 .settings-content {
     width: 100%;
@@ -87,7 +87,8 @@
             box-sizing: border-box;
         }
         .container {
-            background: #222;
+            background: var(--secondary-color);
+            filter: brightness(0.85);
             padding: 20px;
             border-radius: 5px;
             width: 100%;
@@ -115,27 +116,25 @@
             text-align: left;
             margin-top: 10px;
         }
+        .rtl .details {
+            text-align: right;
+        }
         .details p {
             margin: 5px 0;
             font-size: 16px;
         }
-        .details strong {
-            color: #ff9800;
-        }
+        /*.details strong {*/
+        /*    color: #ff9800;*/
+        /*}*/
         button {
-            background: #ff9800;
             padding: 10px;
             border: none;
             cursor: pointer;
-            color: black;
             font-weight: bold;
             width: 100%;
             margin-top: 15px;
         }
-        button:hover {
-            background: #e68900;
-        }
-        
+
         /* Table styles */
         .table-responsive {
             overflow-x: auto;
@@ -146,21 +145,25 @@
         }
         th, td {
             padding: 8px;
+            background-color: var(--secondary-color);
+            filter: brightness(0.85);
             text-align: center;
             border-bottom: 1px solid #444;
         }
+
         th {
-            background-color: #333;
+            background-color: var(--secondary-color);
+            filter: brightness(0.85);
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
             }
-            
 
-            
+
+
             .container, .agency-container, .charge-container {
                 padding: 15px;
             }
@@ -175,7 +178,7 @@
                 padding: 6px 4px;
             }
         }
-        
+
         @media (max-width: 480px) {
             .details p {
                 font-size: 14px;
@@ -191,7 +194,7 @@
             .settings-menu {
                 flex-wrap: wrap;
             }
-            
+
             .settings-menu button {
                 flex: 1 0 50%; /* Two buttons per row on small screens */
                 max-width: none;
@@ -217,7 +220,7 @@
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
 
-        
+
 
         <div class="settings-sidebar">
             <div class="settings-menu">
@@ -226,14 +229,14 @@
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
             </div>
         </div>
-        
+
         <div class="settings-content">
             <!-- Members Section -->
             <div id="showMembers" class="settings-section active">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('members') }}</h4>
-        
+
                         @if($members && $members->count())
                             <div class="table-responsive">
                                 <div class="box-body table-responsive no-padding">
@@ -257,7 +260,7 @@
                                                     <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                                     <td>{{ @$member->name ?? '' }}</td>
                                                     <td>{{ @$member->uuid ?? '' }}</td>
-                                                    
+
                                                     <td>
                                                         <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
                                                     </td>
@@ -270,7 +273,7 @@
                                             @endforeach
                                         </tbody>
                                     </table>
-        
+
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
                                         {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
@@ -283,14 +286,14 @@
                     </div>
                 </div>
             </div>
-        
+
             <!-- Charges Section -->
             <div id="showCharges" class="settings-section">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
-                
-                       
+
+
                             <div class="table-responsive">
                                 <div class="box-body table-responsive no-padding">
                                     <table class="table table-hover grid-table" id="charge">
@@ -331,14 +334,14 @@
                                     </table>
                                 </div>
                             </div>
-        
+
                             <div class="pagination-container">
                                 {{ $charges->appends(['members_page' => $members->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
                             </div>
-                       
+
                     </div>
                 </div>
-              
+
             </div>
 
             <!-- salary Section -->
@@ -355,8 +358,8 @@
                                                 <th>{{ __('salary') }}</th>
                                                 <th>{{ __('month') }}</th>
                                                 <th>{{ __('year') }}</th>
-                                              
-                                               
+
+
                                             </tr>
                                         </thead>
                                         @if($salaries && $salaries->count())
@@ -367,26 +370,26 @@
                                                         <td>{{ @$salary->sallary - $salary->cut_amount }}</td>
                                                         <td>{{ @$salary->month?? '' }}</td>
                                                         <td>{{ @$salary->year ?? '' }}</td>
-                                                        
-                                                    
+
+
                                                     </tr>
                                                 @endforeach
                                             </tbody>
                                         @endif
                                     </table>
-        
+
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
                                         {{ $salaries->appends(['charges_page' => $charges->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
-                       
+
                     </div>
                 </div>
             </div>
         </div>
-    
+
     </div>
 
 
@@ -394,11 +397,11 @@
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-  
+
     document.addEventListener("DOMContentLoaded", function() {
         // Show members tab by default
         showSection('showMembers');
-        
+
         // Check URL for active tab
         const urlParams = new URLSearchParams(window.location.search);
         const activeTab = urlParams.get('tab');
@@ -412,20 +415,20 @@
         document.querySelectorAll('.settings-section').forEach(section => {
             section.classList.remove('active');
         });
-        
+
         // Show selected section
         document.getElementById(sectionId).classList.add('active');
-        
+
         // Update button styles
         document.querySelectorAll('.settings-menu button').forEach(button => {
             button.classList.remove('active');
         });
-        
+
         const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
         if (activeButton) {
             activeButton.classList.add('active');
         }
-        
+
         // Update URL with active tab
         const url = new URL(window.location);
         url.searchParams.set('tab', sectionId);
@@ -433,7 +436,7 @@
     }
 
 
-   
+
     </script>
 </body>
 

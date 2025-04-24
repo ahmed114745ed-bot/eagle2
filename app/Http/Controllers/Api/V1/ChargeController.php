@@ -65,6 +65,12 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::withoutAppends()->searchByUuid($toId)->first();
 
+        if(!$from->transfer_salary){
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        }
+        if(!$to->transfer_salary){
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        }
 
         if ($from->charge_status == 0) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
@@ -78,7 +84,9 @@ class ChargeController extends Controller
         if (!$usd || !$to) {
             return Common::apiResponse(0, 'not found', 404);
         }
-        $rate = Common::getConf('one_usd_value_in_coins');
+        // $rate = Common::getConf('one_usd_value_in_coins');
+        $rate = Common::getCoinsValue('user_coins');
+        
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         }
@@ -99,7 +107,6 @@ class ChargeController extends Controller
             DB::commit();
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
-            // Log::info('this from charge to - ' . $exception->getMessage());
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }

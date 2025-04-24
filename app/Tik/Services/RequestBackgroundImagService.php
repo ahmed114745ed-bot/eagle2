@@ -29,7 +29,7 @@ class RequestBackgroundImagService
             ];
             $this->requestBackgroundImageRepository->create($data);
             $this->userRepository->decrementCoins($userId, $price);
-            return true;
+            return $image;
         }
     }
 

@@ -54,17 +54,11 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromPusher(Request $request)
     {
-        Log::info('test old shami enter room ', [
-            $request->all()
-        ]);
         return $this->enteranceRoomService->updateRoomCountFromPusher($request);
     }
 
     public function updateRoomCountFromPusher_new(Request $request)
     {
-        //  Log::info('📌 Received Webhook Data:', [
-        //     $request->all()
-        // ]);
     }
 
 
@@ -145,7 +139,6 @@ class EnteranceController extends Controller
 
     protected function handleCharismaStatusOnLogout($room, $user, $ownerId)
     {
-        // Log::info("Handling charisma status for user $user->id in room $room->id");
         $userCharismaService = new UserCharismaService();
         $userCharismaService->resetUserCharisma($user->id, $room->id);
         $userDataWithCharisma = $userCharismaService->getUserResetData($room->microphone, [$user->id]);
@@ -168,7 +161,6 @@ class EnteranceController extends Controller
     //
     //        $tmpStr = implode('', $tempArr);
     //        $calculatedSignature = sha1($tmpStr);
-    //        Log::info($signature.'--sinature--'.$calculatedSignature);
     //        return $signature == $calculatedSignature;
     //    }
 
@@ -195,7 +187,6 @@ class EnteranceController extends Controller
                 }
             }
         }
-        // log::info($name . $user_id);
         return response()->json(['status' => 'Webhook received']);
     }
 
@@ -254,7 +245,6 @@ class EnteranceController extends Controller
         $user = $request->user();
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
-        // Log::info('here');
         return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $owner_id);
     }
 

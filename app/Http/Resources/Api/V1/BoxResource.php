@@ -15,16 +15,19 @@ class BoxResource extends JsonResource
     public function toArray($request)
     {
         $is_label = false;
-        if ($this->type == 1 && $this->has_label == 1){
+        if ($this->type == 1 && $this->has_label == 1) {
             $is_label = true;
         }
+        $dynamic_users_values = explode(',', $this->dynamic_users_values);
+        $dynamic_users_values = array_map('trim', $dynamic_users_values);
         return [
-            'id'=>$this->id,
-            'type'=>$this->type == 1 ? 'super':'normal',
-            'coins'=>$this->coins,
-            'users_num'=>$this->users,
-            'image'=>$this->image,
-            'is_label'=>$is_label
+            'id' => $this->id,
+            'type' => $this->type == 1 ? 'super' : 'normal',
+            'coins' => $this->coins,
+            'users_num' => $this->users,
+            'image' => $this->image,
+            'is_label' => $is_label,
+            'dynamic_users_values' => $dynamic_users_values,
         ];
     }
 }

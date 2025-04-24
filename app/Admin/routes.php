@@ -1,9 +1,9 @@
 <?php
 
-use App\Admin\Controllers\ExportController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
+use App\Admin\Controllers\BoxController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
@@ -15,6 +15,7 @@ use KevinSoft\MultiLanguage\MultiLanguage;
 use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
+use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\AgencyMangerUsers;
@@ -49,6 +50,7 @@ use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 
 use App\Admin\Controllers\ReportMomentController;
@@ -62,6 +64,7 @@ use App\Admin\Controllers\PaymentMethodController;
 use App\Admin\Controllers\ServerCountryController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\BlackListUsersController;
+use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -330,25 +333,28 @@ Route::group(
         $router->get('ovip-settings', [OVipController::class, 'vip_settings']);
 
 
-            Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
+        Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-            Route::prefix('ware-gift/{level}')->group(function () {
+            Route::prefix('ware-gift')->group(function () {
 
-                Route::get('/{type}', [OvipGiftTapController::class, 'create']);
+                Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
                 Route::post('/', [OvipGiftTapController::class, 'store']);
-                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+                // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
+            $router->resource('ware-gifts', 'OvipGiftTapController');
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
         $router->resource('exchanges', 'ExchangeController');
         $router->resource('boxes', 'BoxController');
+        $router->get('lucy-box-settings', [BoxController::class, 'box_settings']);
         $router->resource('thrown_boxes', 'BoxUseController');
         $router->resource('reports', 'ReportController');
         $router->resource('charges-reports', 'ChargeReportController');
+        $router->get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         $router->resource('sallaries', 'SallariesController')->name('index', 'sallaries');
         $router->resource('total-statistics', 'AllStatisticController');
         $router->resource('coin-reports', 'CoinReportController');
@@ -386,6 +392,8 @@ Route::group(
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
             $router->get('/users', 'UserController@index')->name('users');
+            $router->get('/users/{id}/edit', 'UserController@edit');
+            $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
             $router->get('/target', 'AgencyTargetController@index')->name('targets');
             $router->get('/charges', 'ChargeController@index')->name('charges');
@@ -408,8 +416,6 @@ Route::group(
         $router->resource('interests', InterestsController::class);
         $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
-      //  $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
@@ -460,6 +466,8 @@ Route::group(
         $router->resource('languages', LanguageController::class);
         $router->resource('settings', SettingController::class);
         $router->resource('room-settings', RoomSettingsController::class);
+        $router->resource('charges-settings', ChargesSettingController::class);
+        Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
 
         $router->resource('notification-templates', NotificationsTemplatesController::class);
        // Route::get('ware-management', [WareTabController::class, 'index']);

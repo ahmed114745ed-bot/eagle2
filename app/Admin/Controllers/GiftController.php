@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 
 class GiftController extends MainController
 {
@@ -20,11 +22,24 @@ class GiftController extends MainController
     public $permission_name = 'gift';
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('Gifts'))
-            ->body($this->grid()));
+        return $content
+            ->title(__($this->title))
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
+            ->row(function ($row) {
+                $row->column(12, $this->grid());
+            });
     }
 
+    protected function grid2()
+    {
+        $make_rooms_top = settings()->get('close_open_gifts');
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.closeOpenGifts', compact(['make_rooms_top'])),
+        ));
+    }
     /**
      * Show interface.
      *
@@ -112,8 +127,8 @@ class GiftController extends MainController
             $musicIcon = '';
 
             if ($this->music_gift == 1) {
-                $musicIcon = "<img src='" . asset('images/music.jpg') . "' 
-                                style='position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; 
+                $musicIcon = "<img src='" . asset('images/music.jpg') . "'
+                                style='position: absolute; top: 10px; right: 10px; width: 20px; height: 20px;
                                 background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 5px;'>";
             }
 

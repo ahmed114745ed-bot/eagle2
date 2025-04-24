@@ -146,15 +146,15 @@ class BanController extends MainController
             $(document).ready(function () {
                 $('.view-description').click(function (e) {
                     e.preventDefault();
-        
+
                     var description = $(this).data('description');
-        
+
                     $('#modalDescriptionTitle').text('" . __('Full Description') . "');
                     $('#modalDescriptionContent').text(description);
-        
+
                     $('#descriptionModal').modal('show');
                 });
-        
+
                 $('.view-image').click(function (e) {
                     e.preventDefault();
                     var imgSrc = $(this).data('img');
@@ -186,7 +186,7 @@ class BanController extends MainController
             $avatarPath = $this->staff->avatar ?? null;
             $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
 
-            $adminUrl = admin_url('admin/auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
+            $adminUrl = admin_url('auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
 
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -219,14 +219,14 @@ class BanController extends MainController
                 $filter->equal('uid', __('uuid'));
             });
         });
-        
+
         // $grid->disableTools(); // Disable default tools
         $grid->tools(function (Grid\Tools $tools) {
             $buttons = '<span style="display: inline-flex; gap: 10px;">'
                 . (new BanUser())->render()
                 . (new RemoveBanUser())->render()
                 . '</span>';
-        
+
             $tools->append($buttons);
         });
         $grid->disableExport();

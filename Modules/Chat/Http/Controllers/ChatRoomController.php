@@ -183,7 +183,6 @@ class ChatRoomController extends Controller
     //         event(new OpenChat(['chat_room_id' => $check_room->id,'chat_room_type' => $check_room->type,'user2_profile' => $user2->profile ?? null
     //         ], $user2->id));
     //     } catch (\Throwable $th) {
-    //         Log::info($th->getMessage());
     //         return $th->getMessage();
     //     }
 

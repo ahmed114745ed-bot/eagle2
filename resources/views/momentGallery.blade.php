@@ -78,16 +78,10 @@
     }
 
     button {
-        background: #ff9800;
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: #e68900;
     }
 
     .all-page {
@@ -153,7 +147,7 @@
 
     }
 
-    
+
 </style>
 
 </head>
@@ -167,20 +161,20 @@
                 @php
                     $url = url('admin/moments');
                 @endphp
-                <a href="{{ $url }}" 
+                <a href="{{ $url }}"
                     style="display: block; text-align: center; margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">
                     {{__('back')}}
                 </a>
-            </div>        
+            </div>
             <div id="image-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
                 @foreach($galleries as $image)
                     @php
                         $imgUrl = getDriverUrl() . '/' . $image->image;
                     @endphp
                     <div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
-                        <img src="{{ $imgUrl }}" 
+                        <img src="{{ $imgUrl }}"
                              style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
-                             data-original="{{ $imgUrl }}"  
+                             data-original="{{ $imgUrl }}"
                              loading="lazy">
                     </div>
                 @endforeach
@@ -222,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
 
-            
+
         </script>
     </div>
 </body> --}}
@@ -235,20 +229,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 @php
                     $url = url('admin/moments');
                 @endphp
-                <a href="{{ $url }}" 
+                <a href="{{ $url }}"
                     style="display: block; text-align: center; margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">
                     {{__('back')}}
                 </a>
-            </div>        
+            </div>
             <div id="image-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
                 @foreach($galleries as $image)
                     @php
                         $imgUrl = getDriverUrl() . '/' . $image->image;
                     @endphp
                     <div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
-                        <img src="{{ $imgUrl }}" 
+                        <img src="{{ $imgUrl }}"
                              style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
-                             data-original="{{ $imgUrl }}"  
+                             data-original="{{ $imgUrl }}"
                              loading="lazy"
                              class="gallery-image"> <!-- Added class here -->
                     </div>
@@ -257,11 +251,11 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
 
         <!-- Viewer.js CSS -->
-        
+
 
         <script>
-       
-      
+
+
         const viewer = new Viewer(document.getElementById('image-gallery'));
 
         // const viewer = new Viewer(document.getElementById('image-gallery'));

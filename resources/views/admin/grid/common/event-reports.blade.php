@@ -37,7 +37,7 @@
 
 .nav-pills li a:hover {
     background-color: var(--primary-color) ; /* لون خلفية عند التحويم */
-    color: var(--text-primary-color) ;
+    color: var(--text-secondary-color) ;
 }
 
 .nav-pills li.active a {

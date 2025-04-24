@@ -23,7 +23,6 @@ class VerifyGameSignature
         $appKey = config('services.baishun.app_key');
         $currentTimestamp = Carbon::now()->timestamp;
 
-        // \Log::info('signature is ' . json_encode($signature) . PHP_EOL . ' signatureNonce is '. json_encode($signatureNonce) . PHP_EOL .' timestamp is '. json_encode($timestamp) . PHP_EOL .
         // 'is !$signature || !$signatureNonce || !$timestamp ' . json_encode(!$signature || !$signatureNonce || !$timestamp) . PHP_EOL .
         //     'is abs($currentTimestamp - $timestamp) > 15 ' . json_encode(abs($currentTimestamp - $timestamp) > 15)  . PHP_EOL .
 

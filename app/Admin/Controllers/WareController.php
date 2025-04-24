@@ -252,6 +252,7 @@ class WareController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
+        $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
@@ -265,7 +266,7 @@ class WareController extends MainController
 
             ]
         )->attribute(['id' => 'image_type1']);
-
+    
         $form->select('profile_frame_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
@@ -273,19 +274,20 @@ class WareController extends MainController
 
             ]
         )->attribute(['id' => 'profile_frame']);
+   
+       
 
         $script = <<<SCRIPT
              $(document).ready(function() {
                  function toggleWinProbability() {
                      var type = $('#type').val();
-                     if(type == '28') {
-                         $('#profile_frame').closest('.form-group').show();
-                          $('#image_type1').closest('.form-group').hide();
-                     } else {
-                         $('#profile_frame').closest('.form-group').hide();
-                         $('#image_type1').closest('.form-group').show();
-                         
-                     }
+                     if (type == '28') {
+                        $('tr:has(#profile_frame)').show();
+                        $('tr:has(#image_type1)').hide();
+                    } else {
+                        $('tr:has(#image_type1)').show();
+                        $('tr:has(#profile_frame)').hide();
+                    }
                  }
                  toggleWinProbability();
 

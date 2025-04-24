@@ -28,9 +28,7 @@ class BaishunGameController extends Controller
         $errorExists = $this->checkWallet($request);
 
         if ($errorExists) return response()->json($errorExists);
-//        Log::info('This ' . request()->method() . ' Request data ' . json_encode(\request()->all()));
         // $unique_id = $this->getUniqueId($request->signature_nonce,$request->signature,$request->timestamp);
-        // Log::info('uniqueId '.$unique_id);
 
         $id = $this->findUserByToken($request->code ?? $request->ss_token);
 
@@ -104,7 +102,6 @@ class BaishunGameController extends Controller
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $room?->id, false), 'heavyProcessing');
         }
 
-//        Log::info('This is data' . request()->method() . ' Response data ' . json_encode($responseArray));
 
 
         return response()->json($responseArray);
@@ -112,7 +109,6 @@ class BaishunGameController extends Controller
 
     public function getUserUniqueId()
     {
-//        Log::info('This ' . request()->method() . ' getUserUniqueId ' . json_encode(\request()->all()));
 
         $appKey = config('app.baishun_app_key');
         $url = config('app.baishun_server_url');
@@ -149,7 +145,6 @@ class BaishunGameController extends Controller
 
     public function obtianSstoken(Request $request)
     {
-        // Log::info('This ' . request()->method() . ' obtianSstoken ' . json_encode(request()->all()));
         $timestamp = $request->timestamp;
         $signatureNonce = $request->signature_nonce;
         $signature = $request->signature;
@@ -164,7 +159,6 @@ class BaishunGameController extends Controller
                 'unique_id' =>(string) 0,
 
             ];
-            // Log::info('This is data 1' . request()->method() . ' obtianSstoken ' . json_encode($responseArray));
 
             return response()->json($responseArray);
         }
@@ -177,14 +171,12 @@ class BaishunGameController extends Controller
                 'expire_date' => today()->addDay()->timestamp * 1000,
             ]
         ];
-        // Log::info('This is data ' . request()->method() . ' obtianSstoken ' . json_encode($data));
 
         return response()->json($data);
     }
 
     public function get_user_info(Request $request)
     {
-//        Log::info('This ' . request()->method() . ' get_user_info ' . json_encode(request()->all()));
 
         $userId = $this->findUserByToken($request->code ?? $request->ss_token);
 //        $allowedUsers = [1177];
@@ -225,8 +217,6 @@ class BaishunGameController extends Controller
                 'balance' => $user->di
             ]
         ];
-
-//        Log::info('This is data' . request()->method() . ' get_user_info ' . json_encode($data));
 
 
         return response()->json($data);

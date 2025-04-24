@@ -30,37 +30,36 @@ function generateRtcToken($channelName, $uid, $expiresInSeconds = 86400)
     return $token;
 }
 
-function generateAgoraRtmToken( $rtmUid)
+function generateAgoraRtmToken($channelName, $rtmUid)
 {
 
     if (!$rtmUid) {
         return null;
     }
 
-   
     $appId = config('services.agora.app_id');
     $appCertificate = config('services.agora.app_certificate');
     $user = $rtmUid;
     $expireTimeInSeconds = 86400;
-    // $currentTimestamp = now()->timestamp;
-    // $expireTimestamp = $currentTimestamp + $expireTimeInSeconds;
+    $role = RtcTokenBuilder2::ROLE_PUBLISHER;
 
-    // $appID = config('agora.app_id');
-    // $appCertificate = config('agora.app_certificate');
-    // $user = $request->uid;
     $expireTimeInSeconds = 86400;
 
 
-    $token = AgoraRtmTokenBuilder::generateRtmToken(
+    $token = RtcTokenBuilder2::buildTokenWithRtm(
+        $appId,
+        $appCertificate,
+        $channelName,
         $rtmUid,
-        $request->expire_seconds ?? 86400
+        $role,
+        time() + 86400,
+        time() + 86400,
     );
-  
-    // $token = AgoraRtmTokenBuilder::buildRtmToken($appId, $appCertificate, $rtmUid, $expireTimeInSeconds);
+
 
     return $token;
-    
-    
+
+
 }
 
 
@@ -451,7 +450,7 @@ if (!function_exists('handleShowImageWithTypes')) {
             $model = showSvgaImage($url, $uniqueId);
 
        return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
-        
+
     } elseif ($imageType == 'mp4') {
             return "
                 <video width='$width' height='$height' controls autoplay muted loop>
@@ -522,7 +521,7 @@ if (!function_exists('showSvgaImage')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-    
+
         Admin::script("
                     var $model = new SVGA.Player('#$model');
                     $model.loops = 100;
@@ -545,7 +544,7 @@ if (!function_exists('showSvgaImage')) {
                         $model2.load('$url', function(videoItem) {
                             $model.setVideoItem(videoItem);
                             $model.startAnimation();
-                
+
                             $model.onFinished(function() {
                                 // Code for when the animation finishes
                             });

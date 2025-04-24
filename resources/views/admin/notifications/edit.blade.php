@@ -1,10 +1,10 @@
 <?php
-require_once app_path('helper/helperType.php'); 
+require_once app_path('helper/helperType.php');
  $variablesList = implode(', ', VARIABLES);
 
 ?>
-    
- 
+
+
 <style>
     .settings-container { display: flex; min-height: 100vh; background: #1e1e1e; }
     .settings-sidebar { width: 250px; background: #222; padding: 20px; color: white; }
@@ -28,21 +28,21 @@ require_once app_path('helper/helperType.php');
 
     <div class="settings-content">
         <h2 class="mb-4">تعديل القالب</h2>
-        <div style="border: 1px solid var(--primary-hover-alpha); 
-                padding: 15px; 
-                border-radius: 6px; 
-                background-color: var(--box-background-color); 
-                color: var(--text-primary-color); 
+        <div style="border: 1px solid var(--primary-hover-alpha);
+                padding: 15px;
+                border-radius: 6px;
+                background-color: var(--box-background-color);
+                color: var(--text-secondary-color);
                 margin-bottom: 15px;">
         <strong style="font-size: 16px; color: var(--primary-color); display: block; margin-bottom: 10px;">🛠 المتغيرات المتاحة:</strong>
 
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
             @foreach(explode(',', $variablesList) as $variable)
-                <span style="background-color: var(--primary-color); 
-                             color: white; 
-                             padding: 8px 12px; 
-                             border-radius: 5px; 
-                             font-size: 14px; 
+                <span style="background-color: var(--primary-color);
+                             color: white;
+                             padding: 8px 12px;
+                             border-radius: 5px;
+                             font-size: 14px;
                              font-weight: bold;
                              display: inline-block;">
                     {{ trim($variable) }}
@@ -63,7 +63,7 @@ require_once app_path('helper/helperType.php');
             </div>
 
                 <h3 class="mt-4">{{ $lang }}</h3>
-                
+
                 <div class="mb-3">
                     <label class="form-label">{{ $lang }} - العنوان</label>
                     <input type="text" name="title_{{ $code }}" class="form-control" value="{{ optional($template->translations->where('language', $code)->first())->title }}">

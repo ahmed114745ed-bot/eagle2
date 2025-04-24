@@ -47,7 +47,6 @@ class ChatRoomService
     {
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
-        Log::info('reel id : ' . $reelId);
         $reel = Real::find($reelId);
         if (!$reel) return true;
         $user = User::find($userId);

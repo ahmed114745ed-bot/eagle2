@@ -51,12 +51,28 @@ class RoomRepoService
     {
         $data = array_merge($request->all(), ['uid' => $userId]);
         $room = $this->repository->create($data);
+
+        if ($request->type) {
+            $room->type = $request->type;
+            if ($request->type == 'single_live' || $request->type == 'multi_live') {
+                $room->is_live = true;
+            }
+        }
+
         if ($request->hasFile('room_cover')) {
             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
-            $this->repository->updateRoomUser($room);
+        } else {
+            $room->room_cover = $request->room_cover;
         }
+
+        if (!is_null($request->mode)) {
+            $this->changeModeCreateRoom($request, $request->mode, $room);
+        }
+
+        $this->repository->updateRoomUser($room);
         return $room;
     }
+
 
     public function findRoomUser($userId)
     {
@@ -160,8 +176,6 @@ class RoomRepoService
         if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
 
             $room->update(['is_live' => false]);
-
-
         }
         /* if ($room->count_room_socket > 0) {
             $room->count_room_socket -= 1;
@@ -169,13 +183,12 @@ class RoomRepoService
             $room->count_room_socket = 0;
         }*/
 
-        if(isset($room->microphone)){
+        if (isset($room->microphone)) {
 
             $microphones = explode(',', $room->microphone);
             if (in_array($user->id, $microphones)) {
                 UserHandling::calcTime($user->id);
             }
-
         }
 
 
@@ -248,6 +261,41 @@ class RoomRepoService
         return $this->repository->getRoomsByGameId(gameId: $gameId, with: ['game', 'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1), 'backgroundImage']);
     }
 
+    public function changeModeCreateRoom($request, $currentMode, Room $room)
+    {
+        $lastMode = $room->mode;
+
+        $room->mode = $currentMode;
+        $jsons = [];
+        $map = [];
+        if ($currentMode == '1') {
+            $mode = 'party';
+        } elseif ($currentMode == '2') {
+            $mode = 'seats12';
+        } elseif ($currentMode == '5') {
+            $mode = 'cinema';
+        } elseif ($currentMode == '4') {
+            $mode = 'game';
+            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+            $game = AllGame::find($request->game_id);
+            if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+            $room->game_id = $request->game_id;
+            $map['game_url'] = $game->mini_url;
+        } else {
+            $mode = 'topCenter';
+        }
+        $ms = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+        if ($lastMode == '3' && $currentMode != '3') {
+            $jsons[] = $this->changeBackground($room, $room->uid, $this->getRoomBackground($room));
+        }
+        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+    }
+
     public function changeMode($request, $currentMode)
     {
         $room =  $this->findRoomUser($request->owner_id);
@@ -296,6 +344,60 @@ class RoomRepoService
         }
         return Common::apiResponse(1, 'done', null, 201);
     }
+    public function getRoomBackground(?Room $room)
+    {
+        if ($room == null) return '';
+        return $room->final_room_image;
+    }
+
+    // public function changeMode($request, $currentMode, $userId = null)
+    // {
+    //     $room =  $this->findRoomUser($request->owner_id ?? $userId);
+    //     if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+    //     //get last mode of rooms to if is cinema mode and change it update room background
+    //     $lastMode = $room->mode;
+    //     $room->mode = $currentMode;
+    //     $room->save();
+    //     $jsons = [];
+    //     $map = [];
+    //     if ($currentMode == '1') {
+    //         $mode = 'party';
+    //     } elseif ($currentMode == '2') {
+    //         $mode = 'seats12';
+    //     } elseif ($currentMode == '5') {
+    //         $mode = 'cinema';
+    //         //            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
+    //         //            $jsons[] = $json;
+    //     } elseif ($currentMode == '4') {
+    //         $mode = 'game';
+    //         if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+    //         $game = AllGame::find($request->game_id);
+    //         if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+    //         $room->game_id = $request->game_id;
+    //         $room->save();
+    //         $map['game_url'] = $game->mini_url;
+    //     } else {
+    //         $mode = 'topCenter';
+    //     }
+    //     $ms   = [
+    //         'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+    //     ];
+    //     $json = json_encode($ms);
+    //     $jsons[] = $json;
+    //     //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+
+    //     if ($lastMode == '3' && $currentMode != '3') {
+    //         $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+    //     }
+    //     $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+    //     try {
+    //         Utils::unwrap($promises);
+    //     } catch (\Throwable $e) {
+    //     }
+    //     return Common::apiResponse(1, 'done', null, 201);
+    // }
 
     public function changeModeMic($request, $currentMode)
     {
@@ -355,7 +457,7 @@ class RoomRepoService
         return $this->countryRepository->countryGet();
     }
 
-    public function update($request,$id)
+    public function update($request, $id)
     {
         $room = $this->repo->find($id);
         if (!$room) {

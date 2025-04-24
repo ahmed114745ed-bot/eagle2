@@ -104,17 +104,17 @@ class AppSitiingCOnfigController extends MainController
         // $form .= '<label for="chat_enable_version" class="control-label">Chat enable version:</label>';
         // $form .= '<input type="text" id="chat_enable_version" name="chat_enable_version" placeholder="chat_enable_version" value="' . $chat_enable_version .'"  class="inputs_cus_form">';
 
-        $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.show_welcome_animation') . ':</label>';
-        $form .= '<label class="switch">
-                    <input type="checkbox" name="show_welcom_enmation"' . ($show_welcom_enmation ? "checked" : "") . '>
-                    <span class="slider round"></span>
-                </label><br><br>';
+        // $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.show_welcome_animation') . ':</label>';
+        // $form .= '<label class="switch">
+        //             <input type="checkbox" name="show_welcom_enmation"' . ($show_welcom_enmation ? "checked" : "") . '>
+        //             <span class="slider round"></span>
+        //         </label><br><br>';
 
-        $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.enable_chat') . ':</label>';
-        $form .= '<label class="switch">
-                    <input type="checkbox" name="chat_status"' . ($chat_status ? "checked" : "") . '>
-                    <span class="slider round"></span>
-                </label><br><br>';
+        // $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.enable_chat') . ':</label>';
+        // $form .= '<label class="switch">
+        //             <input type="checkbox" name="chat_status"' . ($chat_status ? "checked" : "") . '>
+        //             <span class="slider round"></span>
+        //         </label><br><br>';
 
         // $form .= '<label for="android_min_version" class="control-label">تاريخ انتهاء كود الدعوه:</label>';
         // $form .= '<input type="integer" id="invitation_code_date" name="invitation_code_date" placeholder="القيمه المؤخوذه ب الشهر " value="' . $invitation_code_date . '"  class="inputs_cus_form">';

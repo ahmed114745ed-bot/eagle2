@@ -49,7 +49,6 @@ class UserCounterServices
                 "date" => now()
             ]);
         }
-      //  \Log::info('data '. $data);
         return $data;
     }
 
@@ -61,7 +60,6 @@ class UserCounterServices
                 $query->where("type", $type);
             })
             ->get();
-         //   \Log::info('UserCounter '. $counters);
         $results = 0;
 
         foreach ($counters as $counter) {
@@ -133,8 +131,6 @@ class UserCounterServices
             case "mall":
              $ware =   Ware::query()->where("created_at", ">", $date)->where('enable',1)
                 ->whereIn ('get_type',[4,6])->count();
-                // \Log::info('ware '. $ware,);
-                // \Log::info('date'.  $date);
                 return $ware;
             case 'message':
                 return ChatMessage::where('user_id', $user->id)->where('status', 'received')->count();
@@ -145,7 +141,6 @@ class UserCounterServices
 
     public function eventUser(User $user, $type = null, $counter = null)
     {
-       // Log::info('this fire pusher');
        try{
         event(new UnreadCounterIndividual($type, $user, $counter));
     } catch (\Throwable $th) {

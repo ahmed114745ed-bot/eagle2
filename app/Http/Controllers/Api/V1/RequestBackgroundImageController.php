@@ -37,14 +37,14 @@ class RequestBackgroundImageController extends Controller
         if ($request->image == null) return Common::apiResponse(0, 'missing param', null, 422);
 
         try {
-            $this->requestBackgroundImagService->create($request, $user->id, $costRequestBackGround);
+            $image = $this->requestBackgroundImagService->create($request, $user->id, $costRequestBackGround);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
-        return Common::apiResponse(1, 'done', null, 200);
+        return Common::apiResponse(1, 'done', ['image' => $image], 200);
     }
 
 
 
-    
+
 }

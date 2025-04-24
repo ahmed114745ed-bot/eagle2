@@ -18,11 +18,13 @@ use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Auth\Permission;
 
 class OVipController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ovip';
+    public $permission_setting = 'settings';
 
 
     public $hiddenColumns = [];
@@ -32,6 +34,9 @@ class OVipController extends MainController
     }
 
     public function vip_settings(Content $content){
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
         $config = Config::pluck('value', 'name')->toArray();
         return $content->view('vip_settings', compact('config'));
     }
@@ -118,7 +123,7 @@ class OVipController extends MainController
             // توليد الروابط
             $url1 = url('admin/ovip-gift/' . $this->id);
 
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('file') . "</a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
             return $button1;
         });
         $this->extendGrid($grid);
@@ -128,7 +133,7 @@ class OVipController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
-      
+
         return $grid;
     }
 

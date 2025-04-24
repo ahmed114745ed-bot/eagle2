@@ -1,4 +1,3 @@
-
 {
     "Id": "Id",
     "ID": "ID",
@@ -217,6 +216,7 @@
     "cashing": "Encaissement",
     "agent": "Agent",
     "image Id": "ID de l'image",
+    "Charges settings": "Paramètres de charges",
 
 
   
@@ -378,6 +378,15 @@
            "require user_id and owner_id": "requiert user_id et owner_id",
            "The user is already muted, please do not repeat the settings": "l'utilisateur est déjà en sourdine, veuillez ne pas répéter les paramètres",
            "Successfully unmuted": "désactivation de la sourdine réussie",
-           "Unmute failed": "échec de la désactivation de la sourdine"
+           "Unmute failed": "échec de la désactivation de la sourdine",
+
+           "Coin Color": "Couleur des pièces",
+           "Main Color": "Couleur principale",
+           "Selected Color": "Couleur sélectionnée",
+           "Unselected Color": "Couleur non sélectionnée",
+           "Warning Color": "Couleur d'avertissement",
+           "Charmpink Color": "Couleur charmpink",
+           "Heartpink Color": "Couleur heartpink",
+           "Date Color": "Couleur de la date"
 }
 

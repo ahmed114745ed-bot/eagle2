@@ -451,6 +451,10 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        $close_open_gifts = settings()->get('close_open_gifts');
+        if ($close_open_gifts == 1) {
+            return Common::apiResponse(0, 'some thing wrong');
+        }
         //update when send the gift
         $validator = Validator::make($request->all(), [
             'id'       => 'required',

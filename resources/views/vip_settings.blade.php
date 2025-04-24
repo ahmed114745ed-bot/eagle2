@@ -77,16 +77,10 @@
     }
 
     button {
-        background: #ff9800;
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: #e68900;
     }
 
     .all-page {
@@ -159,8 +153,7 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-primary-color);">{{ __('vip Settings') }}</button>
-                <button onclick="showSection('enable_vip_auto')">{{ __('Enable Vip Auto') }}</button>
+                <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('vip Settings') }}</button>
             </div>
         </div>
 
@@ -173,19 +166,10 @@
                     <div class="form">
                         <label for="buy_aristocracy">{{ __('admin.user_exp') }}</label>
                         <input type="number" id="buy_aristocracy" name="buy_aristocracy" min="1"  value="{{$config['buy_aristocracy'] ?? ''}}"/>
-                        <button type="submit">{{ __('Save') }}</button>
                     </div>
 
-                </form>
-            </div>
-
-            <div id="enable_vip_auto" class="settings-section">
-                <h3> {{ __('Enable Vip Auto') }}</h3>
-
-                <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
                     <div class="form">
-                        <label for="enable_vip_auto">{{ __('admin.user_exp') }}</label>
+                        <label for="enable_vip_auto">{{ __('Enable Vip Auto') }}</label>
                         <select name="enable_vip_auto" id="enable_vip_auto">
                             <option value="1" {{ (isset($config['enable_vip_auto']) && $config['enable_vip_auto']) ? 'selected' : '' }}>
                                 {{ __('True') }}
@@ -194,6 +178,12 @@
                                 {{ __('False') }}
                             </option>
                         </select>
+                        <div>
+                            <small class="" style="font-weight: 600;">
+                                {{ __('Using Vip without presenting') }}
+                                <i class="fa fa-exclamation-circle"></i>
+                            </small>
+                        </div>
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
 
@@ -239,7 +229,7 @@ function showSection(sectionId) {
     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
     if (activeButton) {
         activeButton.style.backgroundColor = 'var(--primary-color)';
-        activeButton.style.color = 'var(--text-primary-color)';
+        activeButton.style.color = 'var(--text-secondary-color)';
     }
 
     // Update the URL with the selected tab without reloading

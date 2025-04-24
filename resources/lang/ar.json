@@ -1,6 +1,6 @@
 {
     "Laravel": "سبسيب",
-    "Id": "المعرف",
+    "Id": "معرف العملية",
     "ID": "المعرف",
     "Name": "اسم",
     "User": "مستخدم",
@@ -10,6 +10,7 @@
     "Users": "المستخدمين",
     "URI": "الرابط",
     "Roles": "الادوار",
+    "User Info":"معلومات المستخدم",
     "Permission": "الصلاحيات",
     "Menu": "القوائم",
     "Operation log": "سجل العمليات",
@@ -139,6 +140,12 @@
     "sender: 1 coin = 10 exp -- receiver: 1 coin = 1 exp": "المرسل : 1 كوين = 10 نقاط خبرة و المتلقى 1 كوين = 1 نقاط خبرة",
     "broadcaster": "متلقي",
     "honor": "مرسل",
+
+    "Charged by dash": "الشحن من النظام",
+    "Charged by app": "الشحن عبر التطبيق",
+    "Enter amount in dollars": "ادخل المبلغ بالدولار",
+    "please set agency coins in configs": "من فضلك ادخل عملات الوكالة في اعدادات الشحن",
+
     "Type": "النوع",
     "Level": "المستوى",
     "Exp": "نقاط الخبرة",
@@ -214,6 +221,9 @@
     "Balance": "الرصيد",
     "sender_level": "مستوى المرسل",
     "Browse Categories": "قائمة الفئات",
+    "puser_app_id": "pusher app id",
+    "pusher_app_secret" : "pusher app secret",
+    "pusher_app_key": "pusher app key",
     "reports": "تقارير",
     "Sallaries": "الرواتب",
     "dedicate": "اهداء",
@@ -571,8 +581,8 @@
     "user_count": "عدد المستخدين",
     "percentage-target": "النسبة المستهدفة",
     "charges reports": "تقارير الشحن",
-    "dash_repo": "شحن داشبورد",
-    "app_repo": "شحن عبر التطبيق",
+    "dash_repo": "شحن النظام",
+    "app_repo": "شحن وكالات الشحن",
     "payment gateway": "بوابات دفع",
     "sendTo": "المرسل اليه",
     "parent-users": "دعوات الانضمام",
@@ -662,6 +672,8 @@
     "roomName" : "اسم الغرفة",
     "Percentage" : "نسبة مئوية",
     "sound effect" : "تأثيرات صوتية",
+    "Enable Vip Auto": "تفعيل ال VIP تلقائيا",
+    "Using Vip without presenting": "استخدام ال VIP مباشرتا دون  الاهداء",
     "Enabled" : "طلب مقبول",
     "Disabled" : "طلب مازال مرفوض",
     "Text ar" : "نص عربي",
@@ -839,9 +851,11 @@
     "agency_settings": "إعدادات الوكالة",
     "level_settings": "إعدادات المستوى",
     "category" : "فئة",
+    "Payment Credential Settings:": "إعدادات بيانات الدفع:",
+    "Payment Credential Settings": "إعدادات بيانات الدفع",
+    "Real Time system Setting:": "إعداد نظام الوقت الفعلي:",
 
-
-   " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
+    " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
  "login_from_only_one_device" :"تسجيل الدخول من جهاز واحد فقط" ,
  "one_usd_value_in_coins" : "قيمة الدولار الواحد بالعملات" ,
  "zego_server_secret" : "سر خادم زيغو",
@@ -928,7 +942,7 @@
     "Browse Coin Logs": "استعراض سجلات العملات",
     "Browse Coins": "استعراض العملات",
     "browse color": "استعراض الألوان",
-    "Browse Config": "استعراض الإعدادات",
+    "browse Config": "استعراض الإعدادات",
     "browse core wallets": "استعراض المحافظ الأساسية",
     "Browse Country": "استعراض الدول",
     "Browse CP": "استعراض CP",
@@ -1628,7 +1642,7 @@
     "Agency Join Requests":"طلبات الانضمام للوكالة",
     "Background Report":"تقرير الخلفية",
     "Gift Products":"اهداء المنتجات",
-    "Gift VIP":"أهداء VIP",
+    "Gift VIP":  "أهداء الارستقراطيه",
     "Gift Badges":"أهداء الاوسمة",
     "Gift Special ID":"  اهداء المعرف المميز",
 
@@ -1784,12 +1798,19 @@
     "huawei pay": "هواوي باي",
     "google pay": "جوجل باي",
     "apple pay": "أبل باي",
-     "sky pay": "سكاي باي",
-     "stripe": "ستريب",
-      "fawry": "فوري",
+    "sky pay": "سكاي باي",
+    "stripe": "ستريب",
+    "fawry": "فوري",
     "oPay": "أو باي",
     "Brand settings" : "إعدادات العلامة التجارية",
-    "Theme settings" : "إعدادات السمة",
+    "Theme settings" : "إعدادات اللون",
+
+    "Charge reports" : "تقارير الشحن",
+    "Charge Reports" : "تقارير الشحن",
+    "Agency name": "اسم الوكيل",
+    "charge-reports": "تقارير الشحن",
+    "Owner uuid": "معرف المالك المميز",
+
     "Timing settings" : "إعدادات التوقيت",
     "Custom Background settings" : "إعدادات الخلفية المخصصة",
     "Additional settings" : "الإعدادات الإضافية",
@@ -1802,15 +1823,16 @@
     "Youtube Key:" : "مفتاح اليوتيوب:",
     "Pk Background:" : "خلفية ال pk: ",
     "Private Comment Price:" : "تعليق خاص السعر:",
-    "Application title:" : "عنوان التطبيق:",
+    "Application title en:" : "عنوان التطبيق بالانجليزية:",
+    "Application title ar:" : "عنوان التطبيق بالعربية:",
     "Application logo:" : "شعار التطبيق:",
     "save" : "حفظ",
-    "Primary Color:" : "اللون الأساسي:",
+    "Primary Color:" : "اللون الرئيسي:",
     "Secondary Color:" : "اللون الثانوي:",
-    "Text Primary Color:" : "لون النص الأساسي:",
-    "Text Secondary Color:" : "لون النص الثانوي:",
-    "Box Background Color:" : "لون خلفية الصندوق:",
-    "Table Background Color:" : "لون خلفية الجدول:",
+    "Text Primary Color:" : "لون النص الرئيسي:",
+    "Text Secondary Color:" : "لون النص الرئيسي:",
+    "Box Background Color:" : "لون او صورة الخلفية:",
+    "Table Background Color:" : "لون الجدول و الصندوق:",
     "Time zone:" : "المنطقة الزمنية:",
     "available_variables" : "المتغيرات المتاحة",
     "help_message" : "يمكنك استخدام المتغيرات التالية داخل الرسالة: :variables",
@@ -1830,7 +1852,9 @@
     "I invite you to enter my room": "أدعوكم لدخول غرفتي",
     "Image 1":"الصورة 1",
     "Image 2":"2 الصورة",
-    "Image 3":"لصورة 3",
+    "Image 3":"الصورة 3",
+    "Brand Background Type": "نوع خلفية البراند",
+    "Brand Background Image": "صورة خلفية البراند",
     "Old Image": "الصورة القديمة",
     "App Wallets":"محافظ التطبيق",
     "Revenues":"الإيرادات",
@@ -1983,7 +2007,117 @@
     "Video":"فديو",
     "REELS":"فديوهات",
     "Search by name , UUID , nickname and email": "البحث بالاسم أو UUID أو اللقب أو البريد الإلكتروني",
-    "admin owner room id": "  admin owner room id"
+    "admin owner room id": "  admin owner room id",
+    "transaction id": "معرف العملية",
+  "recipient": "االمستلم",
+  "amount $": "المبلغ $",
+  "shipping date": "تاريخ الشحن",
+  "Charges settings": "إعدادات الرسوم",
+  "Brand settings": "إعدادات العلامة التجارية",
+  "Agency Coins": "عملات الوكالة",
+  "User Coins": "عملات المستخدم",
+  "save": "حفظ",
+  "Confirm Update": "تأكيد التحديث",
+  "Are you sure you want to update the target settings? This action cannot be undone.": "هل أنت متأكد أنك تريد تحديث إعدادات الهدف؟ لا يمكن التراجع عن هذا الإجراء.",
+  "Cancel": "إلغاء",
+  "Yes, update": "نعم، قم بالتحديث",
+  "We can`t update the target system right now because some users still have active targets.": "لا يمكن تحديث نظام الأهداف الآن لأن بعض المستخدمين لا يزال لديهم أهداف نشطة",
+  "charge host agent":"شحن وكالات المضيفين",
+  "Recharge for self":"اعادة الشحن للنفس",
+  "Convert diamonds to coins":"تحويل الماس الى كوين",
+  "Other accounts on the same device":"حسابات اخري علي نفس الجهاز",
+ "Remaining diamond": "الماس المتبقي",
+ "Total Remaining Diamond": "إجمالي الألماس المتبقي",
+ "Luck Box Settings": "إعدادات صندوق الحظ",
+ "app wallet lucky box": "صندوق الحظ لمحفظة التطبيق",
+  "normal box duration": "مدة الصندوق العادي",
+ "Coin Color": "لون العملة",
+ "Main Color": "اللون الرئيسي",
+ "Selected Color": "اللون المحدد",
+ "Unselected Color": "اللون غير المحدد",
+ "Warning Color": "لون التحذير",
+ "Charmpink Color": "لون الشارم بينك",
+ "Heartpink Color": "لون هارت بينك",
+ "Date Color": "لون التاريخ",
+"half image": "نصف صورة",
+"time view type": "نوع مدة الظهور ",
+    "Super Admin Coins": "عملات المشرف العام",
+    "Zones Coins": "عملات المناطق",
+      "DB  Percentage": "نسبة  DB",
+      "app profit Percentage": "نسبة أرباح التطبيق",
+      "User Percentage": "نسبة المستخدم", 
+      "charges settings": "اعدادات الشحن",
+      "charges-settings": "اعدادات الشحن",
+   "Dollar": "دولار",
+
+"Joined at": "تاريخ الانضمام",
+"Left at": "تاريخ الانضمام",
+"Still Active": "منضم حاليا",
+"AgencyUserLog": "سجل الانضمام للوكالة",
+"agency-user-logs": "سجل الانضمام للوكالة",
+"days and hours": "الأيام و الساعات",
+"agent Percentage": "نسبة الوكيل"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

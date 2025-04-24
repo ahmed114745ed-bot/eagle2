@@ -245,6 +245,7 @@ class WareVipController extends MainController
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
+        $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
 
@@ -273,6 +274,7 @@ class WareVipController extends MainController
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
+                'vap' => __('vap'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
                 'image' => __('image'),
@@ -287,7 +289,7 @@ class WareVipController extends MainController
         //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
-        
+
         $form->switch('is_active_for_vip', __('active_for_vip'))->states(Common::getSwitchStates());
         //        $form->number('sort', 'sort');
         $form->number('num', __('num'));

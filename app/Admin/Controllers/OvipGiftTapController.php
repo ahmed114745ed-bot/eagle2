@@ -71,6 +71,7 @@ class OvipGiftTapController extends MainController
 
     public function edit($id, Content $content)
     {
+       
         return $content
             ->title(trans('gift'))
             ->body($this->form()->edit($id));
@@ -99,8 +100,36 @@ class OvipGiftTapController extends MainController
         $grid->expire(__('expire'));
 
 
+        $grid->column('actions', __('Actions'))->display(function () use ($type) {
+            $id = $this->id;
+
+            $editUrl = url("admin/ware-gifts/{$id}/edit");
+            $deleteUrl = url("admin/ware-gifts/{$id}");
+            $csrf = csrf_token();
+
+            $editText = __('admin.edit');
+            $deleteText = __('admin.delete');
+            $confirmText = __('Are you sure?');
+
+            return <<<HTML
+                <a href="{$editUrl}" class="btn btn-xs btn-primary" style="margin-right: 5px">
+                    <i class="fa fa-edit"></i> {$editText}
+                </a>
+                <form action="{$deleteUrl}" method="POST" style="display:inline-block;" onsubmit="return confirm('{$confirmText}')">
+                    <input type="hidden" name="_token" value="{$csrf}">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-xs btn-danger">
+                        <i class="fa fa-trash"></i> {$deleteText}
+                    </button>
+                </form>
+            HTML;
+        })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
+
+
         $grid->actions(function ($actions) {
             $actions->disableView();
+            $actions->disableEdit();
+            $actions->disableDelete();
         });
         $grid->disableCreateButton();
         $this->extendGrid($grid);
@@ -219,9 +248,12 @@ class OvipGiftTapController extends MainController
 
         $form->saving(function (Form $form) {
 
+            $id = $form->model()->id;
+         
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)
-                ->exists();
+                ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
+                    $query->where('id', "!=", $id);
+                })->exists();
 
             if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([

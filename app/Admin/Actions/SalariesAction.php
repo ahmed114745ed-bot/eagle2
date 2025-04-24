@@ -153,7 +153,9 @@ class SalariesAction extends Action
                                 't_no' => rand(11111111, 99999999),
                                 'note' => 'paid via admin',
                                 'payer_id' => auth()->id(),
-                                'payer_type' => 0
+                                'payer_type' => 0,
+                                'transaction_type'=>$request->select_type
+
                             ]
                         );
                     }

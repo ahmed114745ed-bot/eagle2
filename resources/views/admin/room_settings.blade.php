@@ -77,16 +77,10 @@
     }
 
     button {
-        background: #ff9800;
         padding: 10px;
         border: none;
         cursor: pointer;
-        color: black;
         font-weight: bold;
-    }
-
-    button:hover {
-        background: #e68900;
     }
 
     .all-page {
@@ -262,7 +256,7 @@
                 const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
                 if (activeButton) {
                     activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-primary-color)';
+                    activeButton.style.color = 'var(--text-secondary-color)';
                 }
 
                 // Update the URL with the selected tab without reloading

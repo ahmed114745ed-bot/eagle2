@@ -75,9 +75,6 @@ class RegisterController extends Controller
         $whatsappOtpService = new WhatsappOtp();
         $phone              = $request->phone;
 
-        // \Log::info('Phone:', ['phone' => $phone]);
-        // \Log::info('Code:', ['code' => $request->code]);
-
         error_log('Phone: ' . $phone);
         error_log('Code: ' . $request->code);
 
@@ -87,7 +84,6 @@ class RegisterController extends Controller
         }
         $isValid  = $whatsappOtpService->isValidate($phone, $request->code);
 
-        // \Log::info('isValid:', ['isValid' => $isValid]);
         error_log('isValid: ' . ($isValid ? 'true' : 'false'));
 
         if (!$isValid) {
@@ -155,7 +151,6 @@ class RegisterController extends Controller
             WhatsappWebhookValidate::create($request->all());
             //create user
         }
-       // Log::info(json_encode($data));
         return response()->json();
     }
 
@@ -171,7 +166,6 @@ class RegisterController extends Controller
         }
 
         $phone = $request->phone;
-      //  Log::info('this is the phone '. $phone);
 
         if (User::query()->where('phone', $phone)->exists()) {
             return Common::apiResponse(0, __('api.exists'), null, 405);

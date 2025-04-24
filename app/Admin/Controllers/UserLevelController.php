@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\User;
+use App\Models\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -98,15 +99,28 @@ class UserLevelController extends MainController
 
         $grid->column('total_sender_level', __('Sender Level'))
             ->display(function ($value) use ($arrowIcon) {
+
+                $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+                $vip=Vip::find($value);
+                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+    
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
+                            <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                             <span>$value</span>
+                           
                             <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                         </div>";
             });
 
         $grid->column('total_received_level', __('Received Level'))
             ->display(function ($value) use ($arrowIcon) {
+
+                $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+                $vip=Vip::find($value);
+                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
+                        <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
                             <span>$value</span>
                             <img src='$arrowIcon' style='width: 16px; height: 16px;'>
                         </div>";
