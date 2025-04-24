@@ -208,7 +208,7 @@ return [
     "opay" => 'Opay',
     "public_key" => 'Public Key',
     "country_code" => 'Country Code',
-
+    "Tencent" => 'Tencent',
     'creator' => 'admin'
 
 
