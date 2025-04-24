@@ -132,7 +132,7 @@ class PaymentCoinController extends MainController
                     }
                     break;
                 default:
-                    return "<span class='text-muted'>". __('No Details Available') ."</span>";
+                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
             }
             return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
         });
