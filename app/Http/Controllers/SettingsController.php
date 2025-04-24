@@ -58,17 +58,17 @@ class SettingsController extends Controller
                         //     } 
                         // }
 
-                if ($request->zones_coins <= $request->super_admin_coins) {
+                if ($request->zones_coins < $request->super_admin_coins) {
                     admin_toastr(__('Zones coins must be greater than super admin coins'), 'error');
                     return back();
                 }      
 
-                if ($request->super_admin_coins <= $request->shipping_coins) {
+                if ($request->super_admin_coins < $request->shipping_coins) {
                     admin_toastr(__('super admin coins must be greater than agancy coins'), 'error');
                     return back();
                 }     
 
-                if ($request->shipping_coins <= $request->user_coins) {
+                if ($request->shipping_coins < $request->user_coins) {
                     admin_toastr(__('agancy coins must be greater than user coins'), 'error');
                     return back();
                 }   
