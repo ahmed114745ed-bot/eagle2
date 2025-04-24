@@ -148,6 +148,8 @@ class BoxController extends MainController
         $enterUsersCount = __('Enter users count');
         $delete = __('Delete');
         $add = __('Add Users Count');
+        $addPlaceholder = __('Enter users count');
+        $deleteText = __('Delete');
 
         $dynamicFields = isset($form->model()->dynamic_users_values) ? explode(',', $form->model()->dynamic_users_values) : [];
 
@@ -180,9 +182,20 @@ class BoxController extends MainController
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
+           
             });
+
+           
         </script>
         HTML);
+        $form->html("
+    <script>
+        window.translations = {
+            add_placeholder: " . json_encode($addPlaceholder) . ",
+            delete_text: " . json_encode($deleteText) . "
+        };
+    </script>
+");
         
         
         $form->saving(function (Form $form) {
