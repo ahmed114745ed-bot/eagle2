@@ -413,7 +413,7 @@
         top: 6px;
         right: -19px;
         background-color: #ff0000;
-        padding: 2px 8px;
+        padding: 2px 7px;
         transform: rotate(90deg);
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
