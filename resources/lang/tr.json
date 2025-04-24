@@ -62,8 +62,11 @@
   "image": "Resim",
   "img": "Resim",
   "enable": "Etkinleştir/Devre Dışı Bırak",
+    "Payment Credential Settings:": "Ödeme Bilgisi Ayarları:",
+    "Payment Credential Settings": "Ödeme Bilgisi Ayarları",
+    "Real Time system Setting:": "Gerçek Zamanlı Sistem Ayarı:",
 
-  "phone": "Telefon",
+    "phone": "Telefon",
   "code": "Kod",
   "aid": "Yönetici Kimliği",
   "name": "Ad",

@@ -190,7 +190,27 @@ return [
     'server_secret' => 'سر الخادم',
     'app_id' => 'معرف التطبيق',
     'app_sign' => 'توقيع التطبيق',
-    'app_id' => 'app_id',
+
+    "fawry" => 'فوري',
+    "merchant_code" => 'كود التاجر',
+    "utd_url" => 'رابط UTD',
+    "return_url" => 'رابط العودة',
+    "fawry_url" => 'رابط فوري',
+    "skyPay" => 'سكاي باي',
+    "base_url" => 'الرابط الأساسي',
+    "merchant_id" => 'معرّف التاجر',
+    "terminal_id" => 'معرّف الجهاز',
+    "api_key" => 'مفتاح API',
+    "stripe" => 'سترايب',
+    "test_secret_key" => 'مفتاح الاختبار السري',
+    "success_url" => 'رابط النجاح',
+    "cancel_url" => 'رابط الإلغاء',
+    "currency" => 'العملة',
+    "webhook_secret" => 'مفتاح Webhook السري',
+    "opay" => 'أوباي',
+    "public_key" => 'المفتاح العام',
+    "country_code" => 'رمز الدولة',
+    
     "charge_level" => "مستوي الشحن",
 
 
