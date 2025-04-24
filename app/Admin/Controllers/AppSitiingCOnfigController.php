@@ -18,6 +18,9 @@ class AppSitiingCOnfigController extends MainController
     public function index(Content $content)
     {
         $route = 'admin.postAddSitin';
+        $isRTL = app()->getLocale() === 'ar';
+
+        $buttonAlignStyle = $isRTL ? 'text-align: left;' : 'text-align: right;';
 
         // Get all settings at once for better performance
         $settings = [
@@ -258,8 +261,10 @@ class AppSitiingCOnfigController extends MainController
         $form .= '</div>';
 
         $form .= '</div>'; // Close form-row
+        $form .= '<div class="col-sm-12" style="'.$buttonAlignStyle.'">';
+        $form .= '<button type="submit" class="btn btn-primary">' . __('admin.submit') . '</button>';
+        $form .= '</div>';
 
-        $form .= '<button type="submit" class="button_form_cus">' . __('admin.submit') . '</button>';
         $form .= '</form>';
         $form .= '</div>';
 
