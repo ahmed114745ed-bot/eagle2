@@ -378,6 +378,10 @@
    "require user_id and owner_id": "صارف ID اور مالک IDضروری ہے",
    "The user is already muted, please do not repeat the settings": "صارف پہلے سے ہی خاموش ہے، براہ کرم ترتیبات دوہرانے سے باز رہیں",
    "Successfully unmuted": "کامیابی سے آواز واپس آئی",
-   "Unmute failed": "آواز واپس نہیں آئی"
+   "Unmute failed": "آواز واپس نہیں آئی",
+
+   "Charges settings": "شحن اعدادات",
+   "charges settings": "شحن اعدادات",
+   "charges-settings": "شحن اعدادات"
 
 }

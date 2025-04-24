@@ -30,18 +30,25 @@ class SettingsController extends Controller
     {
         $data = $request->except('_token');
 
-        // Check for active targets before updating shipping coins
-        if ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) {
+
+        if (
+            ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
+            ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
+            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins'))
+        ) {
             $target = Target::first();
             $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
-
+        
             if ($hasActiveTargets) {
                 admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                 return back();
             }
         }
+        
 
-        // Handle background settings
+
+
+
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
@@ -92,10 +99,11 @@ class SettingsController extends Controller
 
         }
 
+
         if( $request->has('user_coins')){
             Config::query()->where('name', '=','one_usd_value_in_coins')->update(['value' => $request->user_coins]);
-       }
 
+       }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

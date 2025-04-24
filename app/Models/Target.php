@@ -22,7 +22,24 @@ class Target extends Model
         'gold',
         'coin',
         'img',
+        'app_profit_percentage',
+        'db_percentage'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+           
+            if (isset($model->usd) && isset($model->agency_share) &&  isset($model->db_percentage)) {
+                $model->app_profit_percentage = 100 - (double) $model->usd - (double) $model->agency_share - (double) $model->db_percentage;
+            }
+
+
+        });
+    }
+
     public function getCreatedAtAttribute($value)
     {
         $cacheKey = 'timezone';
@@ -57,6 +74,8 @@ class Target extends Model
     // Parse the date and set the timezone
     return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+
     //     public function setReelAttribute($values)
     // {
     //     $this->attributes['reel'] = implode(',', $values);

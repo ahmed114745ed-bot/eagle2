@@ -1946,13 +1946,9 @@
   "recipient": "alıcı",
   "amount usd": "tutar (USD)",
   "shipping date": "gönderim tarihi",
-  "Agency Coins": "Nakliye Jetonları",
-  "User Coins": "Kullanıcı Jetonları",
   "Charges settings": "Ücret Ayarları",
-  "Brand settings": "Marka Ayarları",
   "Agency Coins": "Ajans Parası",
   "User Coins": "Kullanıcı Parası",
-  "save": "Kaydet",
   "Confirm Update": "Güncellemeyi Onayla",
   "Are you sure you want to update the target settings? This action cannot be undone.": "Hedef ayarlarını güncellemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
   "Cancel": "İptal",
@@ -1977,5 +1973,13 @@
   "Charmpink Color": "Charmpink Rengi",
   "Heartpink Color": "Heartpink Rengi",
   "Date Color": "Tarih Rengi",
-  "time view type": "Zaman Görünümü Türü"
+  "time view type": "Zaman Görünümü Türü",
+  "charges-settings": "Şarj Ayarları",
+  "Super Admin Coins": "Süper Yönetici Jetonları",
+  "Zones Coins": "Bölge Jetonları",
+  "DB  Percentage": "DB Yüzdesi",
+  "Super Admin amount will be: ": "Süper Yönetici miktarı: ",
+  "app profit Percentage": "Uygulama Karı Yüzdesi",
+  "User Percentage": "Kullanıcı Yüzdesi",
+  "Dollar": "Dolar"
 }
