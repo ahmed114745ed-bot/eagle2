@@ -28,6 +28,10 @@ use App\Http\Resources\Api\V1\BoxUseResource;
 
 class BoxController extends Controller
 {
+    public function __construct(pri)
+    {
+        $this->userService = $userService;
+    }
     public function index()
     {
         $normal = Box::query()->where('type', 0)->orderByDesc('id')->get();
@@ -41,35 +45,24 @@ class BoxController extends Controller
 
     public function send(Request $request)
     {
-        $cacheKey = 'timezone';
-        $timezone = \Cache::rememberForever($cacheKey, function () {
-            $setting = \App\Models\Setting::where('key', 'timezone')->first();
-            return $setting?->value ?? 'UTC';
-        });
+        $user = $request->user();
+        $timezone = Common::timeZone();
+        $timestamp = Carbon::now($timezone)->timestamp;
+        $normalDuration = Common::getConf('normal_box_duration') ?? 1;
+
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
         if (!$room)  return Common::apiResponse(0, 'not found', null, 404);
         $box = Box::query()->find($request->box_id);
         if (!$box) return Common::apiResponse(0, 'not found', null, 404);
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
-        $user = $request->user();
-        if ($user->di < $box->coins) {
-            return Common::apiResponse(0, 'low balance', null, 407);
-        }
-        $timestamp = Carbon::now($timezone)->timestamp;
+        if ($user->di < $box->coins)  return Common::apiResponse(0, 'low balance', null, 407);
+
         $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
         if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
-
-        $app_percentage = Config::query()->where('name', 'app_wallet_lucky_box')->first()?->value ?? 2;
-        $walletCoins = ($box->coins * $app_percentage) / 100;
-        $boxCoin = $box->coins - $walletCoins;
-        $walletApp = CoreWallet::where('name', 'lucky_box')->first();
-        $newWalletCoins = $walletApp->coins + $walletCoins;
-        $walletApp->update([
-            'coins' => $newWalletCoins,
-        ]);
+        $boxCoin =     $this->calculationSendBox($box);
 
 
 
@@ -90,7 +83,7 @@ class BoxController extends Controller
                 'users_num' => $box->type == 0 ? $request->users_num : $box->users,
                 'used_num' => 0,
                 'used_coins' => 0,
-                'not_used_num' =>$box->type == 0 ? $request->users_num : $box->users,
+                'not_used_num' => $box->type == 0 ? $request->users_num : $box->users,
                 'unused_coins' => $boxCoin,
                 'type' => $box->type,
                 'label' => $label,
@@ -105,19 +98,7 @@ class BoxController extends Controller
             RedisService::updateUnSerialize($key, $box_use_data);
 
             $user->decrement('di', $box->coins);
-            GiftLog::query()->create(
-                [
-                    'type' => 2,
-                    'giftId' => $boxU->id,
-                    'roomowner_id' => $room->uid,
-                    'giftName' => 'luck box',
-                    'giftNum' => 1,
-                    'giftPrice' => $request->coins ?: $box->coins,
-                    'sender_id' => $user->id,
-                    'receiver_id' => 0,
-                    'sender_family_id' => $user->family_id,
-                ]
-            );
+            
             DB::commit();
             $c = BoxUse::query()->where('room_uid', $room->uid)->where('not_used_num', '>', 0)->count();
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
@@ -173,6 +154,25 @@ class BoxController extends Controller
             return $exception;
             return Common::apiResponse(0, 'fail', null, 400);
         }
+    }
+
+    public function sendNormalBox() {
+
+    }
+
+    public function sendSuperBox() {}
+
+    public function calculationSendBox($box)
+    {
+        $app_percentage = Config::query()->where('name', 'app_wallet_lucky_box')->first()?->value ?? 2;
+        $walletCoins = ($box->coins * $app_percentage) / 100;
+        $boxCoin = $box->coins - $walletCoins;
+        $walletApp = CoreWallet::where('name', 'lucky_box')->first();
+        $newWalletCoins = $walletApp->coins + $walletCoins;
+        $walletApp->update([
+            'coins' => $newWalletCoins,
+        ]);
+        return $boxCoin;
     }
 
     public function pick3(Request $request)
