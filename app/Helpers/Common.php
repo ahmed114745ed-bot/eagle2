@@ -64,7 +64,8 @@ class Common
     use CalcsTrait, AdminTrait, MoneyTrait, RoomTrait, AttributesTrait, ZegoTrait, InfoTrait, FilterTrait;
 
 
-    public static function switch_events($event_type){
+    public static function switch_events($event_type)
+    {
 
         $avatar = null;
 
@@ -432,7 +433,14 @@ class Common
         return $val;
     }
 
-
+    public static function timeZone()
+    {
+        $cacheKey = 'timezone';
+        return \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+    }
 
     public static function gmOrderDataFormat($data, $type = 1)
     {
@@ -1252,7 +1260,7 @@ class Common
         return ['title' => __('Notification'), 'body' => $body];
     }
 
-    public  static function getTargetUsd($diamonds,$percentage)
+    public  static function getTargetUsd($diamonds, $percentage)
     {
         // $shipping_coins = Cache::rememberForever('shipping_coins', function () {
         //     return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
@@ -1293,11 +1301,7 @@ class Common
     {
         $value = Cache::rememberForever($key, function () use ($key) {
             return Setting::where('key', $key)->value('value') ?? 1;
-        }); 
+        });
         return $value;
     }
-
-
-
-
 }
