@@ -725,12 +725,12 @@
                                         <div class="ribbon-banner-card">
                                             <span>{{ __('soon') }}</span>
                                         </div>
-                                        <div class="d-flex align-items-center">
+                                        <!-- <div class="d-flex align-items-center">
                                             <input type="radio" id="agoraRadio"
                                                 class="custom-radio libraryRealTime" name="library" value="0"
                                                 {{ $library == '0' ? 'checked' : '' }}>
                                             <label for="agoraRadio" class="switch"></label>
-                                        </div>
+                                        </div> -->
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -752,11 +752,11 @@
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                        <div class="d-flex align-items-center">
+                                        <!-- <div class="d-flex align-items-center">
                                             <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
                                                 name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                             <label for="zegoRadio" class="switch"></label>
-                                        </div>
+                                        </div> -->
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -798,11 +798,11 @@
                                         <div class="ribbon-banner-card">
                                             <span>{{ __('soon') }}</span>
                                         </div>
-                                        <div class="d-flex align-items-center">
+                                        <!-- <div class="d-flex align-items-center">
                                             <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                    name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                             <label for="tencentRadio" class="switch"></label>
-                                        </div>
+                                        </div> -->
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
@@ -855,97 +855,101 @@
                     </div>
                 </form>
 
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
-                    @csrf
-                    <div class="form">
-                        <label class="d-block">{{ __('Sound System Setting:') }}</label>
-
-                        <div class="row mt-4">
-                            <!-- Agora Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="agoraRadio"
-                                               class="custom-radio libraryRealTime" name="library" value="0"
-                                            {{ $library == '0' ? 'checked' : '' }}>
-                                        <label for="agoraRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Zego Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                        <label for="zegoRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tencent Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                                        <label for="tencentRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <!-- إعدادات النظام الصوتي -->
+<form action="{{ route('admin.update-agora-zego') }}" method="POST">
+    @csrf
+    <div class="form mb-5">
+        <label class="d-block">{{ __('Sound System Setting:') }}</label>
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="agoraAudio" class="custom-radio" name="audio_library" value="0"
+                               {{ $audio_library == '0' ? 'checked' : '' }}>
+                        <label for="agoraAudio" class="switch"></label>
                     </div>
-                </form>
-
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
-                    @csrf
-                    <div class="form">
-                        <label class="d-block">{{ __('Video System Setting:') }}</label>
-
-                        <div class="row mt-4">
-                            <!-- Agora Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="agoraRadio"
-                                               class="custom-radio libraryRealTime" name="library" value="0"
-                                            {{ $library == '0' ? 'checked' : '' }}>
-                                        <label for="agoraRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Zego Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                        <label for="zegoRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tencent Fields -->
-                            <div class="col-md-4 mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
-                                    <div class="d-flex align-items-center">
-                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                                        <label for="tencentRadio" class="switch"></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="zegoAudio" class="custom-radio" name="audio_library" value="1"
+                               {{ $audio_library == '1' ? 'checked' : '' }}>
+                        <label for="zegoAudio" class="switch"></label>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="tencentAudio" class="custom-radio" name="audio_library" value="2"
+                               {{ $audio_library == '2' ? 'checked' : '' }}>
+                        <label for="tencentAudio" class="switch"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<!-- إعدادات النظام المرئي -->
+<form action="{{ route('admin.update-agora-zego') }}" method="POST">
+    @csrf
+    <div class="form">
+        <label class="d-block">{{ __('Video System Setting:') }}</label>
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="agoraVideo" class="custom-radio" name="video_library" value="0"
+                               {{ $video_library == '0' ? 'checked' : '' }}>
+                        <label for="agoraVideo" class="switch"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="zegoVideo" class="custom-radio" name="video_library" value="1"
+                               {{ $video_library == '1' ? 'checked' : '' }}>
+                        <label for="zegoVideo" class="switch"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                    <div class="d-flex align-items-center">
+                        <input type="radio" id="tencentVideo" class="custom-radio" name="video_library" value="2"
+                               {{ $video_library == '2' ? 'checked' : '' }}>
+                        <label for="tencentVideo" class="switch"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- JavaScript للمزامنة -->
+<script>
+    function syncAudioToVideo() {
+        const selectedAudio = document.querySelector('input[name="audio_library"]:checked');
+        if (selectedAudio) {
+            const audioValue = selectedAudio.value;
+            const videoOptions = document.querySelectorAll('input[name="video_library"]');
+            videoOptions.forEach(option => {
+                option.checked = (option.value === audioValue);
+            });
+        }
+    }
+</script>
 
             </div>
 
@@ -1948,6 +1952,8 @@
                         });
                     });
                 });
+
+  
             </script>
 
         </div>
