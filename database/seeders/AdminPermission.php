@@ -113,6 +113,7 @@ class AdminPermission extends Seeder
             'ban-rooms',
             'settings',
             'notification',
+            'charge-settings'
 
 
 
@@ -170,7 +171,7 @@ class AdminPermission extends Seeder
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
             'updates_family-config' => ['updates_family-config'],
-            'setting' => ['language','settings','notification']
+            'setting' => ['language','settings','notification','charge-settings']
           
 
         ];
