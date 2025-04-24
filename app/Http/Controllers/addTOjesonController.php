@@ -65,9 +65,9 @@ class addTOjesonController extends Controller
         $invitation_code_date =  $request->invitation_code_date;
         $show_welcom_enmation =  $request->show_welcom_enmation;
         settings()->set("chat_status", $chat_status);
-        settings()->set("chat_enable_version", $chat_enable_version);
+      //  settings()->set("chat_enable_version", $chat_enable_version);
         settings()->set("invitation_code_date", $invitation_code_date);
-        settings()->set("show_welcom_enmation", $show_welcom_enmation);
+       // settings()->set("show_welcom_enmation", $show_welcom_enmation);
 
         //android
         $android_min_version =  $request->android_min_version;

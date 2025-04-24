@@ -336,14 +336,15 @@ Route::group(
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-            Route::prefix('ware-gift/{level}')->group(function () {
+            Route::prefix('ware-gift')->group(function () {
 
-                Route::get('/{type}', [OvipGiftTapController::class, 'create']);
+                Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
                 Route::post('/', [OvipGiftTapController::class, 'store']);
-                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+                // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
+            $router->resource('ware-gifts', 'OvipGiftTapController');
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -415,8 +416,6 @@ Route::group(
         $router->resource('interests', InterestsController::class);
         $router->resource('custom-settings', CustomController::class);
         $router->get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        $router->get('/agora-zego-setting', [AgoraZegoSettingController::class, 'index']);
-      //  $router->get('/agora-zego-settings', [AgoraZegoSettingController::class, 'index2']);
         $router->get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         $router->get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         $router->get('/agency-setting-manger', [MangerSettingController::class, 'index']);
