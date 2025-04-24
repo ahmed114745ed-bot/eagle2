@@ -852,9 +852,11 @@
     "agency_settings": "إعدادات الوكالة",
     "level_settings": "إعدادات المستوى",
     "category" : "فئة",
+    "Payment Credential Settings:": "إعدادات بيانات الدفع:",
+    "Payment Credential Settings": "إعدادات بيانات الدفع",
+    "Real Time system Setting:": "إعداد نظام الوقت الفعلي:",
 
-
-   " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
+    " min_tx_num" :"الحد الأدنى لعدد المعاملات" ,
  "login_from_only_one_device" :"تسجيل الدخول من جهاز واحد فقط" ,
  "one_usd_value_in_coins" : "قيمة الدولار الواحد بالعملات" ,
  "zego_server_secret" : "سر خادم زيغو",
@@ -2047,7 +2049,17 @@
       "User Percentage": "نسبة المستخدم",
       "charges settings": "اعدادات الشحن",
       "charges-settings": "اعدادات الشحن",
-   "Dollar": "دولار"
+   "Dollar": "دولار",
+
+"Joined at": "تاريخ الانضمام",
+"Left at": "تاريخ الانضمام",
+"Still Active": "منضم حاليا",
+"AgencyUserLog": "سجل الانضمام للوكالة",
+"agency-user-logs": "سجل الانضمام للوكالة",
+"days and hours": "الأيام و الساعات",
+"agent Percentage": "نسبة الوكيل",
+"Amount will be: ": "سيكون المبلغ: ",
+"Total USD: ": "إجمالي الدولار: "
 
 
 

@@ -98,6 +98,31 @@ class AppServiceProvider extends ServiceProvider
                 'themes.backgroundImage' => $settings['app_background'] ?? '',
                 'themes.brandBackgroundImage' => $settings['brand_background_image'] ?? '',
                 'themes.tableBackGroundColor' => $settings['table_background_color'] ?? '#c88213',
+
+                'services.fawry.fawry_secret' => $settings['fawry_secret'] ?? '6ed92079-a485-4373-9453-505e20f6ef48',
+                'services.fawry.fawry_merchant_code' => $settings['fawry_merchant_code'] ?? '770000019812',
+                'services.fawry.utd_url' => $settings['fawry_utd_url'] ?? 'http://utd_backend.test/api/fawry-initial',
+                'services.fawry.fawry_return_url' => $settings['fawry_return_url'] ?? '/admin/payment-with-method',
+                'services.fawry.fawry_url' => $settings['fawry_url'] ?? 'https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init',
+
+
+                'paysky.api_key'     => $settings['paysky_api_key'] ?? '',
+                'paysky.merchant_id' => $settings['paysky_merchant_id'] ?? '',
+                'paysky.terminal_id' => $settings['paysky_terminal_id'] ?? '',
+                'paysky.base_url'    => $settings['paysky_base_url'] ?? '',
+
+                'stripe.test_secret_key' => $settings['stripe_test_secret_key'] ?? '',
+                'stripe.success_url' => $settings['stripe_success_url'] ?? '',
+                'stripe.cancel_url' => $settings['stripe_cancel_url'] ?? '',
+                'stripe.currency' => $settings['stripe_currency'] ?? '',
+                'stripe.webhook_secret' => $settings['stripe_webhook_secret'] ?? '',
+
+                'nafezly-payments.OPAY_CURRENCY' => $settings['opay_currency'] ?? 'EGP',
+                'nafezly-payments.OPAY_SECRET_KEY' => $settings['opay_secret_key'] ?? '',
+                'nafezly-payments.OPAY_PUBLIC_KEY' => $settings['opay_public_key'] ?? '',
+                'nafezly-payments.OPAY_MERCHANT_ID' => $settings['opay_merchant_id'] ?? '',
+                'nafezly-payments.OPAY_COUNTRY_CODE' => $settings['opay_country_code'] ?? 'EG',
+                'nafezly-payments.OPAY_BASE_URL' => $settings['opay_base_url'] ?? 'https://sandboxapi.opaycheckout.com',
             ]);
 
             if (!Cache::has('app_title')) {

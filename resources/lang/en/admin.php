@@ -187,11 +187,31 @@ return [
     'server_secret' => 'server_secret',
     'app_id' => 'app_id',
     'app_sign' => 'app_sign',
-    'app_id' => 'app_id',
     "charge_level" => "charge level",
+
+    "fawry" => 'Fawry',
+    "merchant_code" => 'Merchant Code',
+    "utd_url" => 'Utd Url',
+    "return_url" => 'Return Url',
+    "fawry_url" => 'Fawry Url',
+    "skyPay" => 'Sky Pay',
+    "base_url" => 'Base url',
+    "merchant_id" => 'Merchant Id',
+    "terminal_id" => 'Terminal Id',
+    "api_key" => 'Api Key',
+    "stripe" => 'Stripe',
+    "test_secret_key" => 'Test Secret Key',
+    "success_url" => 'Success Url',
+    "cancel_url" => 'Cancel Url',
+    "currency" => 'Currency',
+    "webhook_secret" => 'Webhook Secret',
+    "opay" => 'Opay',
+    "public_key" => 'Public Key',
+    "country_code" => 'Country Code',
+
     'creator' => 'admin'
 
-    
+
 
 
 ];

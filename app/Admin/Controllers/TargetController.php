@@ -91,7 +91,7 @@ class TargetController extends MainController
             ";
         });
 
-        $grid->usd(__('User Percentage'))
+        $grid->usd(__('agent Percentage'))
         ->display(function ($value) use ($coins) {
             $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
 
@@ -225,10 +225,10 @@ class TargetController extends MainController
        
 
         $form->decimal('diamonds', __('diamonds'))
-    ->help('<span id="diamonds_amount">' . __('Amount will be: ') . ' USD</span>
-            <br><span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
+    ->help('
+            <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
 
-$form->decimal('usd', __('Percentage'))
+$form->decimal('usd', __('agent Percentage').'(%)')
     ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
 
 $form->decimal('agency_share',  __('agency share') . '(%)')
@@ -237,7 +237,7 @@ $form->decimal('agency_share',  __('agency share') . '(%)')
 $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
     ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
 
-$form->decimal('app_profit_percentage', __('app profit Percentage'))
+$form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
     ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
 
 $form->html('

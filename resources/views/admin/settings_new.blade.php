@@ -205,7 +205,7 @@
     }
 
     button {
-        width: 198px;
+        width: 240px;
     }
 
     /* تصميم النافذة */
@@ -412,6 +412,7 @@
             <button onclick="showSection('appSettings')">{{ __('App settings') }}</button>
             <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
             <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
+            <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment Credential Settings') }}</button>
         </div>
     </div>
     <div class="all-page" style="    width: 100%;">
@@ -715,8 +716,6 @@
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
-
-
                         </div>
                         {{-- <div class="row">
                             <!-- Pusher Fields -->
@@ -737,6 +736,277 @@
                     </div>
                 </form>
             </div>
+
+            <div id="paymentCredentialSettings" class="settings-section">
+                <form action="{{ route('admin.settings.update') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- Fawry Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 385px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.fawry') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="fawryRadio" class="custom-radio libraryRealTime"
+                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="fawryRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="fawry_secret"
+                                                       name="fawry_secret" placeholder="secret"
+                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>
+                                                <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"
+                                                       placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
+                                                <input type="text" id="fawry_utd_url" name="fawry_utd_url"
+                                                       placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>
+                                                <input type="text" id="fawry_return_url" name="fawry_return_url"
+                                                       placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>
+                                                <input type="text" id="fawry_url" name="fawry_url"
+                                                       placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+                            <!-- skyPay Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 385px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="skyPayRadio" class="custom-radio libraryRealTime"
+                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="skyPayRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="paysky_base_url">{{ __('admin.base_url') }}:</label>
+                                                <input type="text" id="paysky_base_url"
+                                                       name="paysky_base_url" placeholder="base_url"
+                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label>
+                                                <input type="text" id="paysky_merchant_id" name="paysky_merchant_id"
+                                                       placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label>
+                                                <input type="text" id="paysky_terminal_id" name="paysky_terminal_id"
+                                                       placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="paysky_api_key">{{ __('admin.api_key') }}:</label>
+                                                <input type="text" id="paysky_api_key" name="paysky_api_key"
+                                                       placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+                            <!-- stripe Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 385px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.stripe') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="stripeRadio" class="custom-radio libraryRealTime"
+                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="stripeRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>
+                                                <input type="text" id="stripe_test_secret_key"
+                                                       name="stripe_test_secret_key" placeholder="test_secret_key"
+                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>
+                                                <input type="text" id="stripe_success_url" name="stripe_success_url"
+                                                       placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>
+                                                <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"
+                                                       placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="stripe_currency">{{ __('admin.currency') }}:</label>
+                                                <input type="text" id="stripe_currency" name="stripe_currency"
+                                                       placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>
+                                                <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"
+                                                       placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+                            <!-- opay Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 385px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.opay') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="opayRadio" class="custom-radio libraryRealTime"
+                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="opayRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="opay_currency">{{ __('admin.currency') }}:</label>
+                                                <input type="text" id="opay_currency" name="opay_currency"
+                                                       placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}"
+                                                       class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
+                                                <input type="text" id="opay_secret_key"
+                                                       name="opay_secret_key" placeholder="server_secret"
+                                                       value="{{ $settings['opay_secret_key'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_public_key">{{ __('admin.public_key') }}:</label>
+                                                <input type="text" id="opay_public_key"
+                                                       name="opay_public_key" placeholder="public_key"
+                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
+                                                <input type="text" id="opay_merchant_id"
+                                                       name="opay_merchant_id" placeholder="merchant_id"
+                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_country_code">{{ __('admin.country_code') }}:</label>
+                                                <input type="text" id="opay_country_code"
+                                                       name="country_code" placeholder="server_secret"
+                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>
+                                                <input type="text" id="opay_base_url"
+                                                       name="opay_base_url" placeholder="base_url"
+                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="row">
+                            <!-- Pusher Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" >
+                                <div class="card p-3 shadow" style="height: 200px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('pusher') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="pusherRadio" class="custom-radio" name="library" value="2"
+                                                {{ $library == '2' ? 'checked' : '' }}>
+                                            <label for="pusherRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+                        </div> --}}
+                    </div>
+                </form>
+            </div>
+
+
+
+
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App settings') }}</h3>
                 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
