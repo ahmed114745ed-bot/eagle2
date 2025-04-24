@@ -178,9 +178,11 @@
                                 {{ __('False') }}
                             </option>
                         </select>
-
-                        <div class="alert alert-warning">
-                            {{ __('Using Vip without presenting') }}
+                        <div>
+                            <small class="" style="font-weight: 600;">
+                                {{ __('Using Vip without presenting') }}
+                                <i class="fa fa-exclamation-circle"></i>
+                            </small>
                         </div>
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
