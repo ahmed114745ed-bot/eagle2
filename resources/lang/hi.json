@@ -1146,7 +1146,10 @@
    "Enter users count": "उपयोगकर्ता संख्या दर्ज करें",
    "Delete": "हटाएं",
    "Add": "जोड़ें",
-   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें"
+   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
+   "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
+   "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
+   "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए"
 
 
 

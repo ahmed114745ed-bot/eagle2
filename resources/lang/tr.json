@@ -1999,5 +1999,8 @@
   "Enter users count": "Kullanıcı Sayısı Girin",
   "Delete": "Sil",
   "Add": "Ekle",
-  "Add Users Count": "Kullanıcı Sayısı Ekle"
+  "Add Users Count": "Kullanıcı Sayısı Ekle",
+  "Zones coins must be greater than super admin coins": "Bölge Jetonları Süper Yönetici Jetonlarından büyük olmalıdır",
+  "super admin coins must be greater than agancy coins": "Süper Yönetici Jetonları Ajans Jetonlarından büyük olmalıdır",
+  "agancy coins must be greater than user coins": "Ajans Jetonları Kullanıcı Jetonlarından büyük olmalıdır"
 }
