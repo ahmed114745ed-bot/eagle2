@@ -1151,12 +1151,22 @@
    "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
    "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
    "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
-   "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए"
-
-
-
-
-
+   "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए",
+   "soon": "जल्द ही",
+   "firebase": "फायरबेस",
+   "supabase": "सुपासेबेस",
+   "supabase_url": "सुपासेबेस url",
+   "supabase_key": "सुपासेबेस कुंजी",
+   "supabase_service_role_key": "सुपासेबेस सेवा भूमिका कुंजी",
+   "pusher_app_id": "पुशर ऐप आईडी",
+   "pusher_app_key": "पुशर ऐप की कुंजी",
+   "pusher_app_secret": "पुशर ऐप सर्केट",
+   "firebase_api_key": "फायरबेस api कुंजी",
+   "firebase_auth_domain": "फायरबेस एथेंटिकेशन डोमेन",
+   "firebase_database_url": "फायरबेस डेटाबेस url",
+   "Real Time Setting": "वास्तविक समय सेटिंग्स",
+   "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
+   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स"
 
 
 
