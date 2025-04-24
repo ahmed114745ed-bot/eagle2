@@ -29,7 +29,6 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        info($request);
         $data = $request->except('_token');
 
         

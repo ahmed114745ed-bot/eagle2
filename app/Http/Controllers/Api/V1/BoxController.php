@@ -64,7 +64,7 @@ class BoxController extends Controller
             $label = $request->label;
         }
 
-     return   $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
+        return   $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
     }
 
 
@@ -164,7 +164,7 @@ class BoxController extends Controller
         {
             return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-            return  $this->superBox($box_use, $user, $keyBoxUse);
+            return  $this->superBox($box, $user, $keyBoxUse);
         }
     }
 
@@ -222,7 +222,7 @@ class BoxController extends Controller
     {
 
 
-        if (PickBoxList::where(['box_user_id' => $box_use['id'], 'user_id' => $user->id,])->exists()) {
+        if (PickBoxList::where('box_user_id', $box_use->id)->where('user_id', $user->id)->exists()) {
             return Common::apiResponse(0, 'used it before', null, 403);
         }
         PickBoxList::create([
