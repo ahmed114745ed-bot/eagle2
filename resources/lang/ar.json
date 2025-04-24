@@ -2060,7 +2060,13 @@
 "days and hours": "الأيام و الساعات",
 "agent Percentage": "نسبة الوكيل",
 "Amount will be: ": "سيكون المبلغ: ",
-"Total USD: ": "إجمالي الدولار: "
+"Total USD: ": "إجمالي الدولار: ",
+"duration in seconds": "المدة المحددة بالثواني",
+"Enter users count": "أدخل عدد المستخدمين",
+"Delete": "حذف",
+"Add": "إضافة",
+"Add Users Count": "إضافة عدد المستخدمين"
+
 
 
 

@@ -667,5 +667,10 @@
      "days and hours": "Days and Hours",
      "agent Percentage": "Agent Percentage",
      "Total USD: ": "Total USD: ",
-     "Amount will be: ": "Amount will be: "
+     "Amount will be: ": "Amount will be: ",
+     "duration in seconds": "Duration in seconds",
+     "Enter users count": "Enter users count",
+     "Delete": "Delete",
+     "Add": "Add",
+     "Add Users Count": "Add Users Count"
     }

@@ -106,7 +106,7 @@ class ConfigController extends Controller
                 $config->name = $key;  // Set name first
                 $config->value = $request->input($key);
             }
-    
+
             $config->save();
         }
         return Redirect::back();

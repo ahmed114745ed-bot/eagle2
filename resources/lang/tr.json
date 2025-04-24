@@ -1993,5 +1993,11 @@
   "days and hours": "Gün ve Saat",
   "agent Percentage": "Ajans Yüzdesi",
   "Total USD: ": "Toplam USD: ",
-  "Amount will be: ": "Miktar: "
+  "Amount will be: ": "Miktar: ",
+  "duration in minutes": "Dakika",
+  "duration in seconds": "Saniye",
+  "Enter users count": "Kullanıcı Sayısı Girin",
+  "Delete": "Sil",
+  "Add": "Ekle",
+  "Add Users Count": "Kullanıcı Sayısı Ekle"
 }

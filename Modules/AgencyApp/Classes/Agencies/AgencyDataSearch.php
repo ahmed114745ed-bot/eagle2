@@ -54,7 +54,16 @@ class AgencyDataSearch
     private function getDataQuery($agency_id, $month, $year, $isCurrentPeriod)
     {
 //        if ($isCurrentPeriod) {
-            return User::where('agency_id', $agency_id)->orderBy('monthly_diamond_received', 'desc');
+            return User::where('agency_id', $agency_id)->where(function ($query) {
+                $query->where(function ($query) {
+                    $query->WhereDoesntHave('userAgencyJoined')
+                        ->whereHas('agencyJoinRequest', function ($query) {
+                            $query->orderBy('id');
+                        });
+                })->orWhereHas('userAgencyJoined', function ($query) {
+                        $query->orderBy('type')->orderBy('id');
+                    });
+            });
       /*  } else {
             return UserTarget::where('agency_id', $agency_id)->where('add_year', $year)->where('add_month', $month)->orderBy('target_diamonds', 'desc')->with('user');
 //            return History::where('agency_id', $agency_id)->where('year', $year)->where('month', $month)->orderBy('diamond', 'desc')->with('user');
