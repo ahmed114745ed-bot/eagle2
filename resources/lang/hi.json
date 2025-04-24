@@ -1141,7 +1141,12 @@
    "days and hours": "दिन और घंटे",
    "agent Percentage": "एजेंट प्रतिशत",
    "Total USD: ": "कुल यूएसडी: ",
-   "Amount will be: ": "राशि होगी: "
+   "Amount will be: ": "राशि होगी: ",
+   "duration in seconds": "सेकंड में अवधि",
+   "Enter users count": "उपयोगकर्ता संख्या दर्ज करें",
+   "Delete": "हटाएं",
+   "Add": "जोड़ें",
+   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें"
 
 
 

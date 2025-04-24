@@ -42,25 +42,37 @@
                 function toggleFields() {
                     var type = $("#box_type").val();
                     if (type == "1" || type == 1 ) {
-                        console.log('type is 1');
-                                            $("#users_field").closest(".form-group").show();
+                        $("#users_field").closest(".form-group").show();
+                        $("label[for='users']").show();
+                        $('#users_field').closest('.input-group').find('.input-group-addon').show();
                         $("#users_field").show();
+
+
                         $("#duration_field").closest(".form-group").show();
+                        $("label[for='duration']").show();
+                        $('#duration_field').closest('.input-group').find('.input-group-addon').show();
+                        $('#duration_field').closest('.col-sm-8').find('.help-block').show();
+                        $("#duration_field").closest(".form-group").css("display", "block");
                         $("#duration_field").show();
+
+
                         $("#dynamic_fields_container").hide();
                         $("#add_field").hide();
                     } else {
-                        console.log('type is 0');
-                        
-                        // $("#users_field").closest(".form-group").hide();
-                        $("#users_field").closest(".form-group").css("display", "none !important");
-
+                        $("#users_field").closest(".form-group").hide();
+                        $("label[for='users']").hide();
+                        $('#users_field').closest('.input-group').find('.input-group-addon').hide();
                         $("#users_field").hide();
 
-                        // $("#duration_field").closest(".form-group").hide();
-                        $("#duration_field").closest(".form-group").css("display", "none !important");
 
                         $("#duration_field").hide();
+                        $("label[for='duration']").hide();
+                        $('#duration_field').closest('.input-group').find('.input-group-addon').hide();
+                        $('#duration_field').closest('.col-sm-8').find('.help-block').hide();
+                        $("#duration_field").closest(".form-group").css("display", "none");
+
+
+
 
                         $("#dynamic_fields_container").show();
                         $("#add_field").show();
