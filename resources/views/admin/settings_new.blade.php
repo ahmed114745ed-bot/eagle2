@@ -814,9 +814,10 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'fawry')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
-                                                     alt="Fawry Payment"
-                                                     class="img-fluid">
+                                            <img src="{{ asset('images/fawry.jpeg') }}"
+                                            alt="Fawry Payment"
+                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+
                                                 @php
                                                     $fawryImageFound = true;
                                                 @endphp
@@ -900,9 +901,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'sky pay')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/paysky.png') }}"
                                                      alt="Skypay Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $skypayImageFound = true;
                                                 @endphp
@@ -910,9 +911,9 @@
                                         @endforeach
 
                                         @if(!$skypayImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Skypay Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/paysky.png') }}"
+                                        alt="Skypay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -978,9 +979,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'stripe')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/stripe.png') }}"
                                                      alt="Stripe Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $stripeImageFound = true;
                                                 @endphp
@@ -988,9 +989,9 @@
                                         @endforeach
 
                                         @if(!$stripeImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Stripe Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/stripe.png') }}"
+                                        alt="Stripe Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -1065,9 +1066,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'opay')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/opay.png') }}"
                                                      alt="Opay Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $opayImageFound = true;
                                                 @endphp
@@ -1075,9 +1076,9 @@
                                         @endforeach
 
                                         @if(!$opayImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Opay Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/opay.png') }}"
+                                        alt="Opay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
