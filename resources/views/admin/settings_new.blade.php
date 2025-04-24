@@ -786,14 +786,15 @@
             </div>
 
             <div id="paymentCredentialSettings" class="settings-section">
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    @csrf
+
                     <div class="form">
                         <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
 
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.fawry') }}</h4>
@@ -874,10 +875,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- skyPay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
@@ -949,10 +953,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- stripe Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.stripe') }}</h4>
@@ -1032,10 +1039,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- opay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
@@ -1128,6 +1138,7 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
                         </div>
                         {{-- <div class="row">
@@ -1147,7 +1158,6 @@
                             </div>
                         </div> --}}
                     </div>
-                </form>
             </div>
 
 
