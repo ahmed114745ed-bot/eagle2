@@ -14,6 +14,7 @@ use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\MessageBag;
 
 class TargetController extends MainController
 {
@@ -225,22 +226,36 @@ class TargetController extends MainController
 
 
         $form->decimal('diamonds', __('diamonds'))
-    ->help('
-            <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
+        ->help('
+                <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>')
+        ->rules('min:0')
+        ->default(0)
+        ->required();
 
-$form->decimal('usd', __('agent Percentage').'(%)')
-    ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');
+    $form->decimal('usd', __('agent Percentage').'(%)')
+        ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>')
+        ->rules('min:0')
+        ->default(0)
+        ->required();
 
-$form->decimal('agency_share',  __('agency share') . '(%)')
-    ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>');
+    $form->decimal('agency_share',  __('agency share') . '(%)')
+        ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>')
+        ->rules('min:0')
+        ->default(0)
+        ->required();
 
-$form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
-    ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>');
+    $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
+        ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>')
+        ->rules('min:0')
+        ->default(0)
+        ->required();
 
-$form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
-    ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>');
-
-$form->html('
+    $form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
+        ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>')
+        ->rules('min:0')
+        ->default(0)
+        ->required();
+        $form->html('
 <script>
     $(document).ready(function () {
         var debounceTimer;
@@ -291,17 +306,25 @@ $form->html('
         var allFields = ["diamonds", "usd", "agency_share", "app_profit_percentage", "db_percentage"];
         allFields.forEach(function (field) {
             $(document).on("input", "input[name=\'" + field + "\']", function () {
+                var val = parseFloat($(this).val());
+
+                // منع القيم السالبة
+                if (val < 0) {
+                    $(this).val(0);
+                    val = 0;
+                }
+
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(function () {
                     enforceTotalPercentageLimit(field);
                     calculateUsdAmount();
-                }, 500); // يمكن تغييره إلى 2000 لو حبيت
+                }, 500);
             });
         });
 
         calculateUsdAmount();
     });
-</script>');
+        </script>');
 
         $form->html('<h1>' . __('Reel') . '</h1>');
 
@@ -349,6 +372,40 @@ $form->html('
             $days = $form->model()->days;
             return $days == null || $days == '' ? 0 : $days;
         });
+
+        $form->saving(function (Form $form) {
+            $fields = [
+                'usd' => request()->usd,
+                'agency_share' => request()->agency_share,
+                'app_profit_percentage' => request()->app_profit_percentage,
+                'db_percentage' => request()->db_percentage,
+            ];
+        
+            $total = 0;
+            foreach ($fields as $key => $value) {
+                if ($value < 0) {
+                    $error = new MessageBag(
+                        [
+                            'title'   => 'forbidden',
+                            'message' => __('The field :field must be a positive number.', ['field' => $key]),
+                        ]
+                    );
+                    return back()->with(compact('error'));
+                }
+        
+                $total += $value;
+            }
+            if ($total > 100) {
+                $error = new MessageBag(
+                    [
+                        'title'   => 'forbidden',
+                        'message' => __('The total percentage must be 100%.'),
+                    ]
+                );
+                return back()->with(compact('error'));
+            }
+        });
+        
         return $form;
     }
 
