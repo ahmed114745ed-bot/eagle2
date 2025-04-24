@@ -58,9 +58,9 @@ class AgencyDataSearch
         return User::where('agency_id', $agency_id)->where(function ($query) {
             $query->where(function ($query) {
                 $query->WhereDoesntHave('userAgencyJoined')->where(function ($query) {
-                    $query->whereHas('agencyJoinRequest', function ($query) {
+                    $query->WhereHas('agency')->orWhereHas('agencyJoinRequest', function ($query) {
                         $query->orderBy('id');
-                    })->orWhereHas('agency');
+                    });
                 });
             })->orWhereHas('userAgencyJoined', function ($query) {
                 $query->orderBy('type')->orderBy('id');
