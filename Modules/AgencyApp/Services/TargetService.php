@@ -65,7 +65,7 @@ class TargetService
                 $ap               = $target->agency_share / 100;
                 $user->target_usd = $t;
 
-                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received);
+                $this->updateSalaries( $user, $t, $ap, $hours, $target, $days, $month_received);
             }else{
 
         $values = [
@@ -116,8 +116,8 @@ class TargetService
                 $per = 0;
             }
         }
-
-        return $target->usd * $per;
+         $usd = Common::getTargetUsd($target->diamonds,$target->agency_share);
+        return $usd * $per;
     }
 
     private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, array $extra = null): void

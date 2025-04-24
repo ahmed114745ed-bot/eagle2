@@ -171,7 +171,8 @@ class ChargeRepoService
 
             // DB::beginTransaction();
             // Increment 'di' column for the user
-            $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
+            // $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
+            $coinPrise = Common::getCoinsValue('user_coins');
             $numDi = $coinPrise * $count;
             $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
