@@ -18,12 +18,14 @@ use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
+use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
@@ -31,7 +33,6 @@ use App\Admin\Widgets\Table as TableWidget;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
 use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
-use Illuminate\Support\Facades\Cache;
 
 class AgencyController extends MainController
 {
@@ -65,25 +66,26 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content) {
+    public function profile($id, Content $content)
+    {
         $cacheKey = "agency_profile_{$id}";
-        $data = Cache::remember($cacheKey, 3600, function() use ($id) {
+        $data = Cache::remember($cacheKey, 3600, function () use ($id) {
             $agency = Agency::with([
-                'charges' => function($query) {
+                'charges' => function ($query) {
                     $query->select('id', 'agency_id', 'amount', 'created_at')
                         ->latest()
                         ->take(10);
                 },
-                'mempers' => function($query) {
+                'mempers' => function ($query) {
                     $query->select('id', 'agency_id', 'name', 'created_at')
                         ->latest()
                         ->take(10);
                 },
-                'owner' => function($query) {
+                'owner' => function ($query) {
                     $query->select('id', 'name', 'uuid');
                 }
             ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
-              ->findOrFail($id);
+                ->findOrFail($id);
 
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
@@ -148,7 +150,7 @@ class AgencyController extends MainController
             ->title(__("agency details"))
             ->row(function ($row) use ($id) {
                 $agency = Agency::find($id);
-                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users',$agency->users()->count()));
+                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
                 $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
                 $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
                     ->groupByRaw('agency_id,add_month,add_year')->count()));
@@ -182,7 +184,7 @@ class AgencyController extends MainController
                         $query->where('status', 1);
                     });
             })
-            ->with(['owner' => function($query) {
+            ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
             ->orderByDesc('id');
@@ -190,32 +192,32 @@ class AgencyController extends MainController
         if (request("active") == true) {
             $grid->model()->whereHas("agencySalaries", function ($q) {
                 $q->where('month', now()->month)
-                  ->where('year', now()->year);
+                    ->where('year', now()->year);
             });
         }
 
         $grid->id(__('ID'));
         $grid->column('name', __('Agency'))
-        ->display(function ($name) {
-            $cacheKey = "agency_image_{$this->id}";
-            $image = Cache::remember($cacheKey, 3600, function() {
-                $path = @$this->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $cacheKey = "agency_image_{$this->id}";
+                $image = Cache::remember($cacheKey, 3600, function () {
+                    $path = @$this->img;
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                return handleShowImageWithTypes($this->id, $url, 40, 40);
-            });
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+                    return handleShowImageWithTypes($this->id, $url, 40, 40);
+                });
 
-            return "
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <span>$name</span>
             </div>
             ";
-        });
+            });
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
@@ -430,7 +432,7 @@ class AgencyController extends MainController
             $form->switch('status', __('status'));
             $form->text('phone', __('phone'))->rules('required');
             $form->url('url', __('url'));
-            $form->image('img', __('img'))->rules('required');
+           // $form->image('img', __('img'))->rules('required');
             $form->textarea('contents', __('contents'));
             $form->switch('Host_agency', trans('Host agency'))->default(true);
             if (!Auth::user()->isRole('Agencies Managers')) {
@@ -484,6 +486,9 @@ class AgencyController extends MainController
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
+                $agencyId = $form->model()->id;
+                Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
+
                 Admin::where('username', $user->uuid)->delete();
                 $user->update([
                     'type_user' => 0,
@@ -540,14 +545,24 @@ class AgencyController extends MainController
 
 
         });
+
+        $form->saved(function (Form $form) {
+            $checkAgencyUser = UsersJoinedAgency::where([
+                'user_id' => $form->model()->app_owner_id,
+                'agency_id' => $form->model()->id,
+                'type' => 1,
+            ])->where('leave_date', null)->exists();
+            if (!$checkAgencyUser) {
+                UsersJoinedAgency::create([
+                    'user_id' => $form->model()->app_owner_id,
+                    'agency_id' => $form->model()->id,
+                    'type' => 1,
+                    'join_date' => now(),
+                ]);
+            }
+        });
         return $form;
     }
-
-
-
-
-
-
 
 
 

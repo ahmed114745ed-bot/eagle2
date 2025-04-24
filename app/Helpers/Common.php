@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Models\NotificationTemplate;
 use App\Models\Setting;
 use App\Models\Vip;
 use App\Models\Pack;
@@ -23,20 +22,27 @@ use App\Models\UserVip;
 use App\Models\Background;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
+use App\Models\ChargeWinner;
 use GuzzleHttp\Psr7\Request;
 use Kreait\Firebase\Factory;
 use Illuminate\Support\Carbon;
 use App\Models\OfficialMessage;
 use Encore\Admin\Facades\Admin;
 use App\Models\Owner_pid_target;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
+use Modules\Events\Entities\Winner;
+use App\Models\NotificationTemplate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Modules\Events\Entities\PkEvent;
+
+use Illuminate\Support\Facades\Cache;
+use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Notifications\AgencyOwnerRole;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\HelperTraits\RoomTrait;
-
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
 use App\Http\Resources\CountryResource;
@@ -44,18 +50,13 @@ use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
 use Illuminate\Support\Facades\Storage;
+use Modules\Events\Entities\WeeklyStar;
 use App\Traits\HelperTraits\FilterTrait;
 use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Classes\Facades\Agency as FacadesAgency;
-use App\Models\ChargeWinner;
-use Illuminate\Support\Facades\Notification;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkWinner;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\Events\Entities\Winner;
-use Illuminate\Support\Facades\Cache;
 
 class Common
 {
@@ -1197,6 +1198,31 @@ class Common
         ]);
         if ($user->email != null) {
             Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+        }
+        return true;
+    }
+
+    public static function userJoinAgency($originalOwnerId, $newOwnerId, $agencyId)
+    {
+        $agencyUserJoined = UsersJoinedAgency::where([
+            'user_id' => $originalOwnerId,
+            'agency_id' =>  $agencyId,
+            'type' => 1,
+        ])->where('leave_date', null)->first();
+        $agencyUserJoined->leave_date = now();
+        $agencyUserJoined->save();
+        $checkAgencyUser = UsersJoinedAgency::where([
+            'user_id' => $newOwnerId,
+            'agency_id' =>  $agencyId,
+            'type' => 1,
+        ])->where('leave_date', null)->exists();
+        if (!$checkAgencyUser) {
+            UsersJoinedAgency::create([
+                'user_id' => $newOwnerId,
+                'agency_id' =>  $agencyId,
+                'type' => 1,
+                'join_date' => now(),
+            ]);
         }
         return true;
     }

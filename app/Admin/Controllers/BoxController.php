@@ -144,19 +144,36 @@ class BoxController extends MainController
         $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
         $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
        
-        $form->html(<<<HTML
-                <div id="dynamic_fields_container">
-                    <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                        <input type="number" name="dynamic_fields[]" class="form-control" placeholder="أدخل قيمة رقمية" style="flex: 1;">
-                        <button type="button" class="btn btn-danger remove-field">حذف</button>
-                    </div>
+     // تخزين الترجمات في متغيرات
+        $enterUsersCount = __('Enter users count');
+        $delete = __('Delete');
+        $add = __('Add Users Count');
+        $addPlaceholder = __('Enter users count');
+        $deleteText = __('Delete');
+
+        $dynamicFields = isset($form->model()->dynamic_users_values) ? explode(',', $form->model()->dynamic_users_values) : [];
+
+        ob_start(); // بداية التخزين في الذاكرة
+        ?>
+        <div id="dynamic_fields_container">
+            <!-- Loop through dynamic fields to show old values -->
+            <?php foreach ($dynamicFields as $field): ?>
+                <div class="dynamic-field-group" style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <input type="number" name="dynamic_fields[]" class="form-control" placeholder="<?= $enterUsersCount ?>" value="<?= trim($field) ?>" style="flex: 1;">
+                    <button type="button" class="btn btn-danger remove-field"><?= $delete ?></button>
                 </div>
-                <div class="form-group">
-                    <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
-                        إضافة حقل جديد
-                    </button>
-                </div>
-            HTML);
+            <?php endforeach; ?>
+        </div>
+        <div class="form-group">
+            <button type="button" id="add_field" class="btn btn-primary" style="margin-top: 10px;">
+                <?= $add ?>
+            </button>
+        </div>
+        <?php
+        $html = ob_get_clean(); // الحصول على المحتوى المولد من خلال PHP
+
+        $form->html($html); // تمرير الـ HTML المعدل
+                
 
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
@@ -165,9 +182,20 @@ class BoxController extends MainController
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
+           
             });
+
+           
         </script>
         HTML);
+        $form->html("
+    <script>
+        window.translations = {
+            add_placeholder: " . json_encode($addPlaceholder) . ",
+            delete_text: " . json_encode($deleteText) . "
+        };
+    </script>
+");
         
         
         $form->saving(function (Form $form) {
