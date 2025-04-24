@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\AgencyApp\Classes\Agencies;
 
 
@@ -17,29 +18,29 @@ class AgencyDataSearch
         $agency_id = $user->agency_id;
         $month = $request->month;
         $year = $request->year;
-        $keyword=$request->keyword;
+        $keyword = $request->keyword;
 
         $isCurrentPeriod = $this->isCurrentPeriod($month, $year);
 
         $dataQuery = $this->getDataQuery($agency_id, $month, $year, $isCurrentPeriod);
-        if ($keyword != null){
-            $dataQuery=$dataQuery->where('uuid','like','%'.$keyword.'%');
+        if ($keyword != null) {
+            $dataQuery = $dataQuery->where('uuid', 'like', '%' . $keyword . '%');
         }
         $paginatedData = $this->paginateData($dataQuery, 15);
         $transformedData = AgancyHostReportResource::collection($paginatedData);
 
-//        $totalDiamond = $isCurrentPeriod ? $dataQuery->get()->sum('monthly_diamond_received') : $paginatedData->sum('target_diamonds');
+        //        $totalDiamond = $isCurrentPeriod ? $dataQuery->get()->sum('monthly_diamond_received') : $paginatedData->sum('target_diamonds');
         $users          = $dataQuery->get();
         $totalDiamond = $isCurrentPeriod ? $users->sum('monthly_diamond_received') : $users->sum('month_diamond');
         $totalusd     = $this->calculateTotalUSD($agency_id, $year, $month);
         $agencySalary = $this->getAgencySalary($agency_id, $month, $year);
 
-//        $responseData = [
-////            'sum' => $totalDiamond ?: 0,
-////            'sum_usd' => $totalusd ?: 0,
-////            'Total_owner_usd' => $agencySalary->sallary ?? 0,
-//            'users' => $transformedData ?: 0,
-//        ];
+        //        $responseData = [
+        ////            'sum' => $totalDiamond ?: 0,
+        ////            'sum_usd' => $totalusd ?: 0,
+        ////            'Total_owner_usd' => $agencySalary->sallary ?? 0,
+        //            'users' => $transformedData ?: 0,
+        //        ];
 
         return $transformedData;
     }
@@ -53,9 +54,19 @@ class AgencyDataSearch
 
     private function getDataQuery($agency_id, $month, $year, $isCurrentPeriod)
     {
-//        if ($isCurrentPeriod) {
-            return User::where('agency_id', $agency_id)->orderBy('monthly_diamond_received', 'desc');
-      /*  } else {
+        //        if ($isCurrentPeriod) {
+        return User::where('agency_id', $agency_id)->where(function ($query) {
+            $query->where(function ($query) {
+                $query->WhereDoesntHave('userAgencyJoined')->where(function ($query) {
+                    $query->WhereHas('agency')->orWhereHas('agencyJoinRequest', function ($query) {
+                        $query->orderBy('id');
+                    });
+                });
+            })->orWhereHas('userAgencyJoined', function ($query) {
+                $query->orderBy('type')->orderBy('id');
+            });
+        });
+        /*  } else {
             return UserTarget::where('agency_id', $agency_id)->where('add_year', $year)->where('add_month', $month)->orderBy('target_diamonds', 'desc')->with('user');
 //            return History::where('agency_id', $agency_id)->where('year', $year)->where('month', $month)->orderBy('diamond', 'desc')->with('user');
         }*/
@@ -77,5 +88,4 @@ class AgencyDataSearch
     {
         return AgencySallary::where('agency_id', $agency_id)->where('month', $month)->where('year', $year)->first();
     }
-
 }

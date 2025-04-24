@@ -12,7 +12,7 @@ use Encore\Admin\Controllers\AdminController;
 class ChargesSettingController extends MainController
 {
     protected $title = 'Settings';
-    public $permission_name = 'settings';
+    public $permission_name = 'charge-settings';
 
     public function index(Content $content)
     {

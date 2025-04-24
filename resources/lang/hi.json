@@ -300,9 +300,13 @@
     "item not found or not for sale": "आइटम नहीं मिला या बिक्री के लिए नहीं है",
     "receiver user not found": "प्राप्तकर्ता उपयोगकर्ता नहीं मिला",
     "Payment Credential Settings:": "भुगतान प्रमाण-पत्र सेटिंग्स:",
-    "Payment Credential Settings": "भुगतान प्रमाण-पत्र सेटिंग्स",
-    "Real Time system Setting:": "रीयल टाइम सिस्टम सेटिंग:",
-
+    "Payment": "भुगतान",
+    "Sound & Video System Setting:": "ध्वनि और वीडियो प्रणाली सेटिंग:",
+    "Sound System Setting:": "ध्वनि प्रणाली सेटिंग:",
+    "Video System Setting:": "वीडियो प्रणाली सेटिंग:",
+    "soon": "जल्द ही",
+    "gateway_ready" : "भुगतान गेटवे उपयोग के लिए तैयार है",
+    "edit_credentials" : "कृपया भुगतान प्रमाण पत्र सेटिंग्स संपादित करें",
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
     "success process": "सफलता प्रक्रिया",
     "user has this item in his pack no need to send it": "उपयोगकर्ता के पास इस आइटम को अपने पैक में है, इसे भेजने की कोई आवश्यकता नहीं है",
@@ -917,7 +921,7 @@
      "Background Color": "पृष्ठभूमि का रंग",
      "Background Image": "पृष्ठभूमि छवि",
      "Save Settings": "सेटिंग्स सहेजें",
-     "Real Time system Setting": "रियल टाइम सिस्टम सेटिंग",
+    "Sound & Video": "ध्वनि और वीडियो",
      "No members found.": "कोई सदस्य नहीं मिला",
      "I invite you to enter my room": "मैं आपको अपने कमरे में प्रवेश करने के लिए आमंत्रित करता हूँ",
      "pusher": "पुशर",
@@ -1139,12 +1143,32 @@
    "AgencyUserLog": "एजेंसी उपयोगकर्ता लॉग",
    "agency-user-logs": "एजेंसी उपयोगकर्ता लॉग्स",
    "days and hours": "दिन और घंटे",
-   "agent Percentage": "एजेंट प्रतिशत"
-
-
-
-
-
+   "agent Percentage": "एजेंट प्रतिशत",
+   "Total USD: ": "कुल यूएसडी: ",
+   "Amount will be: ": "राशि होगी: ",
+   "duration in seconds": "सेकंड में अवधि",
+   "Enter users count": "उपयोगकर्ता संख्या दर्ज करें",
+   "Delete": "हटाएं",
+   "Add": "जोड़ें",
+   "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
+   "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
+   "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
+   "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए",
+   "soon": "जल्द ही",
+   "firebase": "फायरबेस",
+   "supabase": "सुपासेबेस",
+   "supabase_url": "सुपासेबेस url",
+   "supabase_key": "सुपासेबेस कुंजी",
+   "supabase_service_role_key": "सुपासेबेस सेवा भूमिका कुंजी",
+   "pusher_app_id": "पुशर ऐप आईडी",
+   "pusher_app_key": "पुशर ऐप की कुंजी",
+   "pusher_app_secret": "पुशर ऐप सर्केट",
+   "firebase_api_key": "फायरबेस api कुंजी",
+   "firebase_auth_domain": "फायरबेस एथेंटिकेशन डोमेन",
+   "firebase_database_url": "फायरबेस डेटाबेस url",
+   "Real Time Setting": "वास्तविक समय सेटिंग्स",
+   "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
+   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स"
 
 
 

@@ -200,6 +200,6 @@ return [
     "opay" => 'ओपे',
     "public_key" => 'सार्वजनिक कुंजी',
     "country_code" => 'देश कोड',
-
+    "Tencent" => 'Tencent',
     "charge_level" => "चार्ज स्तर",
 ];

@@ -471,61 +471,59 @@
                 <h3> {{ __('Charges settings') }}</h3>
 
                 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
-    @csrf
-                    <div class="form row">
-
-                      
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Zones Coins') }}</label>
-                                <input type="text" name="zones_coins" id="zones_coins"
-                                    value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
-                                    <small id="zones_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
-                         </div>
-
-                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Super Admin Coins') }}</label>
-                                <input type="text" name="super_admin_coins" id="super_admin_coins"
-                                    value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
-                                    <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>   
-                        
-                        </div>
-                        </div>
-
-
-                       
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('Agency Coins') }}</label>
-                                <input type="text" name="shipping_coins" id="shipping_coins"
-                                    value="{{ $shipping_coins }}" class="form-control">
-                                    <small id="shipping_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>     
-                        
-                        </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>{{ __('User Coins') }}</label>
-                                <input type="text" name="user_coins" id="user_coins"
-                                    value="{{ $user_coins }}" class="form-control">
-                                    <small id="user_coins_hint" class="form-text text-muted mt-1"
-                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
-                        </div>
-
-                        <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
-
+            @csrf
+            <div class="form row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ __('Zones Coins') }}</label>
+                        <input type="text" name="zones_coins" id="zones_coins"
+                               value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
+                        <small id="zones_coins_hint" class="form-text text-muted mt-1"
+                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            {{ __('1 :dollar = :value  :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                        </small> 
                     </div>
-                </form>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ __('Super Admin Coins') }}</label>
+                        <input type="text" name="super_admin_coins" id="super_admin_coins"
+                               value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
+                        <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
+                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                        </small>   
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ __('Agency Coins') }}</label>
+                        <input type="text" name="shipping_coins" id="shipping_coins"
+                               value="{{ $shipping_coins }}" class="form-control">
+                        <small id="shipping_coins_hint" class="form-text text-muted mt-1"
+                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                        </small>     
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{ __('User Coins') }}</label>
+                        <input type="text" name="user_coins" id="user_coins"
+                               value="{{ $user_coins }}" class="form-control">
+                        <small id="user_coins_hint" class="form-text text-muted mt-1"
+                               data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
+                            {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
+                        </small> 
+                    </div>
+                </div>
+
+                <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
+            </div>
+        </form>   
             </div>
 
             <!-- Bootstrap Modal -->
@@ -707,31 +705,33 @@
                 }
 
 
-                document.addEventListener('DOMContentLoaded', function () {
-    function updateHint(inputId) {
-        const input = document.getElementById(inputId);
-        const hint = document.getElementById(inputId + '_hint');
-        const template = hint.getAttribute('data-template'); // 🔧 أضفنا السطر ده
+                
+    document.addEventListener('DOMContentLoaded', function () {
+        function updateHint(inputId) {
+            const input = document.getElementById(inputId);
+            const hint = document.getElementById(inputId + '_hint');
+            const template = hint.getAttribute('data-template'); 
 
-        function update() {
-            const value = parseFloat(input.value);
-            if (!isNaN(value) && value > 0) {
-                hint.innerText = template.replace(':value', value);
-            } else {
-                hint.innerText = '';
+            function update() {
+                // نحصل على القيمة المدخلة من المستخدم
+                const value = parseFloat(input.value);
+                // إذا كانت القيمة فارغة أو NaN نعرض 0
+                const finalValue = isNaN(value) || value === '' ? 0 : value;
+
+                // تحديث النص داخل الـ small
+                hint.innerText = template.replace(':value', finalValue);
             }
+
+            input.addEventListener('input', update);
+            update(); // تشغيل أول مرة
         }
 
-        input.addEventListener('input', update);
-        update(); // تشغيل أول مرة
-    }
-
-    updateHint('super_admin_coins');
-    updateHint('zones_coins');
-    updateHint('user_coins');
-    updateHint('shipping_coins');
-});
-
+        // تحديث الحقول عند تحميل الصفحة
+        updateHint('super_admin_coins');
+        updateHint('zones_coins');
+        updateHint('user_coins');
+        updateHint('shipping_coins');
+    });
             </script>
 
 

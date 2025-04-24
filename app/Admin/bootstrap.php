@@ -18,7 +18,9 @@
  *
  */
 
-use Encore\Admin\Facades\Admin;
+ use Encore\Admin\Form;
+ use App\Admin\Extensions\Form\Field\DynamicFields;
+ use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -60,4 +62,5 @@ view()->composer('admin::partials.css', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/css.blade.php'));
 });
 
+Form::extend('dynamicFields', DynamicFields::class);
 

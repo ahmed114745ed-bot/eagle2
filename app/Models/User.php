@@ -155,6 +155,11 @@ class User extends Authenticatable
         return $this->hasMany(AgencyJoinRequest::class, "user_id");
     }
 
+    public function userAgencyJoined()
+    {
+        return $this->hasMany(UsersJoinedAgency::class, "user_id");
+    }
+
     public function timeLog()
     {
         return $this->hasMany(TimeLog::class, "user_id");
