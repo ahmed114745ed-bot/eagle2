@@ -159,7 +159,12 @@ class TargetController extends MainController
 
 
         $form->display(__('ID'));
-        $form->number('level', __('target no'));
+
+        $form->hidden('level', __('target no'))->default(function () {
+            return Target::max('level') + 1;
+        });   
+        
+        
         $form->number('diamonds', __('diamonds'));
         $form->decimal('usd', __('usd'));
         //        $form->text('coin', 'coin');
