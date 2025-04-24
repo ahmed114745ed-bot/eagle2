@@ -394,7 +394,8 @@
     .switch.active::after {
         left: 25px;
     }
-    .border-success{
+
+    .border-success {
         border: #4caf50, solid, 5px;
     }
 </style>
@@ -410,6 +411,7 @@
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
             <button onclick="showSection('appSettings')">{{ __('App settings') }}</button>
             <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
+            <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
             <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment Credential Settings') }}</button>
         </div>
     </div>
@@ -437,7 +439,7 @@
                             <div class="form-group">
                                 <label>{{ __('Application title ar:') }} </label>
                                 <input type="text" name="app_title_ar" value="{{ $settings['app_title_ar'] ?? '' }}"
-                                       class="form-control">
+                                    class="form-control">
                             </div>
                         </div>
 
@@ -586,15 +588,14 @@
                                 <label for="brand_background_image">{{ __('Brand Background Image') }}</label>
                                 <input onchange="choose_image()" type="file" id="brand_background_image"
                                     name="brand_background_image" class="form-control">
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        @foreach ($brand_images as $img)
-                                            <img class="image_success @if (!empty($settings['brand_background_image']) && $img->name == $settings['brand_background_image']) border-success @endif"
-                                                onclick="select_brand_image('{{ $img->name }}', this)"
-                                                src="{{ !empty($img->name) ? getImagePath($img->name) : '' }}"
-                                                alt=""
-                                                style="width: 50px; height: 50px; cursor: pointer;">
-                                        @endforeach
-                                    </div>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    @foreach ($brand_images as $img)
+                                        <img class="image_success @if (!empty($settings['brand_background_image']) && $img->name == $settings['brand_background_image']) border-success @endif"
+                                            onclick="select_brand_image('{{ $img->name }}', this)"
+                                            src="{{ !empty($img->name) ? getImagePath($img->name) : '' }}"
+                                            alt="" style="width: 50px; height: 50px; cursor: pointer;">
+                                    @endforeach
+                                </div>
                                 {{-- @if (!empty($settings['brand_background_image']) && ($settings['brand_background_type'] ?? '') === 'image')
                                     <div class="mt-2">
                                         <img id="imagePreview"
@@ -1003,6 +1004,9 @@
                 </form>
             </div>
 
+
+
+
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App settings') }}</h3>
                 <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
@@ -1181,7 +1185,57 @@
 
                 </form>
             </div>
+            <div id="pusherSettings" class="settings-section">
+                <h3>{{ __('Pusher settings') }}</h3>
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Real Time system Setting:') }}</label>
+                        <div class="row">
+                            <!-- Pusher Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 400px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('pusher') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="pusherRadio" class="custom-radio pusherLib"
+                                                name="library" value="2"
+                                                {{ $library == '2' ? 'checked' : '' }}>
+                                            <label for="pusherRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
+                                                <input type="text" id="pusher_app_id" name="pusher_app_id"
+                                                    placeholder="pusher_app_id" value="{{ $pusher_app_id }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
+                                                <input type="text" id="pusher_app_key" name="pusher_app_key"
+                                                    placeholder="pusher_app_key" value="{{ $pusher_app_key }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
+                                                <input type="text" id="pusher_app_secret" name="pusher_app_secret"
+                                                    placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}"
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
 
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
 
 
             <div id="imageModal" class="modal" onclick="closeFullScreen()">
@@ -1190,12 +1244,13 @@
             </div>
 
             <script>
-                function select_brand_image(name, obj){
+                function select_brand_image(name, obj) {
                     $('#brand_image').val(name)
                     $('.image_success').removeClass('border-success')
                     $(obj).addClass('border-success')
                     toastr.success('Brand image chosen successfully');
                 }
+
                 function choose_image() {
                     var fileInput = document.getElementById('brand_background_image');
                     var image = fileInput.files[0]; // Get the file object
@@ -1227,55 +1282,60 @@
                 }
             </script>
             <script>
-                $(document).ready(function() {
-                    function updateLibrary(selectedLibrary) {
-                        $.ajax({
-                            url: "{{ route('admin.update-agora-zego') }}",
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                library: selectedLibrary
-                            },
-                            success: function(response) {
-                                console.log("Library updated via AJAX:", response);
-                                toastr.success('Library preference saved!');
-                            },
-                            error: function(xhr) {
-                                console.error("AJAX Error:", xhr.responseText);
-                                toastr.error('Failed to update library');
-                            }
-                        });
-                    }
-
-                    function updateSwitches() {
-                        $(".custom-radio").each(function() {
-                            if ($(this).prop("checked")) {
-                                $(this).next(".switch").addClass("active");
-                            } else {
-                                $(this).next(".switch").removeClass("active");
-                            }
-                        });
-                    }
-
-                    // عند تغيير الراديو، نحدث الواجهة
-                    $(document).on("change", ".libraryRealTime", function() {
-                        let selectedLibrary = $(this).val();
-                        console.log("Selected library:", selectedLibrary);
-                        updateLibrary(selectedLibrary);
-                        updateSwitches();
-                    });
-
-                    $(".switch").click(function() {
-                        let radio = $(this).prev(".custom-radio");
-
-                        if (!radio.prop("checked")) {
-                            $(".custom-radio").prop("checked", false);
-                            $(".switch").removeClass("active");
-
-                            radio.prop("checked", true).trigger("change");
+                function updateLibrary(selectedLibrary) {
+                    $.ajax({
+                        url: "{{ route('admin.update-agora-zego') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            library: selectedLibrary
+                        },
+                        success: function(response) {
+                            console.log("Library updated via AJAX:", response);
+                            toastr.success('Library preference saved!');
+                        },
+                        error: function(xhr) {
+                            console.error("AJAX Error:", xhr.responseText);
+                            toastr.error('Failed to update library');
                         }
                     });
+                }
 
+                function updateSwitches() {
+                    $(".custom-radio").each(function() {
+                        if ($(this).is(":checked")) {
+                            $(this).next(".switch").addClass("active");
+                        } else {
+                            $(this).next(".switch").removeClass("active");
+                        }
+                    });
+                }
+
+                // Handle change event on radio buttons
+                $(document).on("change", ".custom-radio", function() {
+                    let selectedLibrary = $(this).val();
+                    console.log("Selected library:", selectedLibrary);
+                    updateLibrary(selectedLibrary);
+                    updateSwitches();
+                });
+
+                // Handle click on switch to activate the corresponding radio button
+                $(document).on("click", ".switch", function() {
+                    const radio = $(this).prev(".custom-radio");
+
+                    if (!radio.prop("checked")) {
+                        // Uncheck all radios in the same group
+                        $("input[name='library']").prop("checked", false);
+                        // Remove active class from all switches
+                        $(".switch").removeClass("active");
+
+                        // Check the clicked one
+                        radio.prop("checked", true).trigger("change");
+                    }
+                });
+
+                // Initialize switches based on current checked radio on load
+                $(document).ready(function() {
                     updateSwitches();
                 });
             </script>
@@ -1411,36 +1471,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                // Updated selector to match your new class
-                                                                const radioButtons = document.querySelectorAll('.radio-input');
-                                                                const fieldsContainers = {
-                                                                    '0': document.getElementById('agora-fields'),
-                                                                    '1': document.getElementById('zego-fields'),
-                                                                    '2': document.getElementById('pusher-fields')
-                                                                };
+                                                                            // Updated selector to match your new class
+                                                                            const radioButtons = document.querySelectorAll('.radio-input');
+                                                                            const fieldsContainers = {
+                                                                                '0': document.getElementById('agora-fields'),
+                                                                                '1': document.getElementById('zego-fields'),
+                                                                                '2': document.getElementById('pusher-fields')
+                                                                            };
 
-                                                                function toggleFields() {
-                                                                    const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                            function toggleFields() {
+                                                                                const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                    // Hide all fields first
-                                                                    Object.values(fieldsContainers).forEach(container => {
-                                                                        container.style.display = 'none';
-                                                                    });
+                                                                                // Hide all fields first
+                                                                                Object.values(fieldsContainers).forEach(container => {
+                                                                                    container.style.display = 'none';
+                                                                                });
 
-                                                                    // Show the selected one
-                                                                    if (fieldsContainers[selectedValue]) {
-                                                                        fieldsContainers[selectedValue].style.display = 'flex';
-                                                                    }
-                                                                }
+                                                                                // Show the selected one
+                                                                                if (fieldsContainers[selectedValue]) {
+                                                                                    fieldsContainers[selectedValue].style.display = 'flex';
+                                                                                }
+                                                                            }
 
-                                                                // Add event listeners to radio buttons
-                                                                radioButtons.forEach(radio => {
-                                                                    radio.addEventListener('change', toggleFields);
-                                                                });
+                                                                            // Add event listeners to radio buttons
+                                                                            radioButtons.forEach(radio => {
+                                                                                radio.addEventListener('change', toggleFields);
+                                                                            });
 
-                                                                // Initialize the fields visibility
-                                                                toggleFields();
-                                                            });*/
+                                                                            // Initialize the fields visibility
+                                                                            toggleFields();
+                                                                        });*/
 
                 document.addEventListener("DOMContentLoaded", function() {
                     let resetButton = document.getElementById('resetColors');

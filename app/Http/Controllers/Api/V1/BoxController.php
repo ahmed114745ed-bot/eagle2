@@ -57,8 +57,8 @@ class BoxController extends Controller
             return Common::apiResponse(0, 'low balance', null, 407);
         }
         $timestamp = Carbon::now($timezone)->timestamp;
-        $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id',$user->id)->exists();
-        if($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
+        $userBoxes =   BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
+        if ($userBoxes) return Common::apiResponse(0, 'you send box ', null, 422);
         $label = '';
 
 
@@ -76,7 +76,7 @@ class BoxController extends Controller
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
             $label = $request->label;
         }
-        
+
         try {
             DB::beginTransaction();
             $box_use_data = [
@@ -87,10 +87,10 @@ class BoxController extends Controller
                 'end_at' => now()->setTimezone($timezone ?? 'UTC')->addMinutes($box->duration)->timestamp,
                 'room_uid' => $room->uid,
                 'room_id' => $room->id,
-                'users_num' => $request->users_num ?: $box->users,
+                'users_num' => $box->type == 0 ? $request->users_num : $box->users,
                 'used_num' => 0,
                 'used_coins' => 0,
-                'not_used_num' => $request->users_num ?: $box->users,
+                'not_used_num' =>$box->type == 0 ? $request->users_num : $box->users,
                 'unused_coins' => $boxCoin,
                 'type' => $box->type,
                 'label' => $label,
@@ -255,23 +255,23 @@ class BoxController extends Controller
 
         $keyBoxUse  = 'BoxUse_' . $request->bid;
         $box_use = RedisService::getUnSerialize($keyBoxUse);
-        
+
         if (!$box_use || $box_use['not_used_num'] == 0 || $box_use['unused_coins'] == 0) {
             return Common::apiResponse(0, __("api.box_not_found"), null, 404);
         }
 
-        if ( $box_use['end_at'] < $timestamp) {
+        if ($box_use['end_at'] < $timestamp) {
             return Common::apiResponse(0, __("box closed"), null, 404);
         }
-       
-        $box = Box::where('id',$box_use['box_id'])->first();
+
+        $box = Box::where('id', $box_use['box_id'])->first();
         // dd($box_use['box_id'],$box);
 
         if ($box->type == 0) // normal
         {
-           return $this->normalBox($box_use, $keyBoxUse, $user, $request);
+            return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-          return  $this->superBox($box_use, $user, $keyBoxUse);
+            return  $this->superBox($box_use, $user, $keyBoxUse);
         }
     }
 
