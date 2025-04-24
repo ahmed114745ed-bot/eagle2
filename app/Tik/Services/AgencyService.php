@@ -38,6 +38,7 @@ use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
+use App\Tik\Repositories\UsersJoinedAgencyRepository;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
@@ -65,6 +66,7 @@ class AgencyService
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,
         private readonly AdminRepository $adminRepository,
         private readonly ChargeAgencyRepository $chargeAgencyRepository,
+        private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
 
     ) {}
 
@@ -136,6 +138,8 @@ class AgencyService
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
 
+        if ($user->agency_id) throw new Exception('user joined agency before');
+
         $action = $this->agencyJoinRequestRepository->findRequest($user->id, $agency->id);
 
 
@@ -147,7 +151,18 @@ class AgencyService
         } elseif ($accept == 1) {
             $action->status = 1;
             $action->save();
+            $this->userRepository->update(['agency_id' => $agency->id], $user->id);
             $this->userRepository->updateTypeUser($user);
+            $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
+            if (!$checkAgencyUser) {
+                $joinAgencyData = [
+                    'user_id' =>  $user->id,
+                    'agency_id' => $agency->id,
+                    'type' => 2,
+                    'join_date' => now(),
+                ];
+                $this->usersJoinedAgencyRepository->create($joinAgencyData);
+            }
             // add vip to user
             UserCommon::userVip($user);
             CustomNotification::acceptAgencyApp($agency, $user);
@@ -379,6 +394,16 @@ class AgencyService
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
         Common::createUserAdmin($agency->app_owner_id);
+        $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
+        if (!$checkAgencyUser) {
+            $joinAgencyData = [
+                'user_id' =>  $user->id,
+                'agency_id' => $agency->id,
+                'type' => 1,
+                'join_date' => now(),
+            ];
+            $this->usersJoinedAgencyRepository->create($joinAgencyData);
+        }
         CustomNotification::acceptRequestAgency($user);
         return true;
     }
@@ -463,6 +488,20 @@ class AgencyService
             'status'    =>  0,
         ];
         $this->leaveAgencyRequestRepository->create($data);
+        $userJoin = $this->usersJoinedAgencyRepository->findByUser($userId, $agency->id);
+        if ($userJoin) {
+            $userJoin->leave_date = now();
+            $userJoin->save();
+        } else {
+            $joinAgencyData = [
+                'user_id' =>  $userId,
+                'agency_id' => $agency->id,
+                'type' => 2,
+                'join_date' => now(),
+                'leave_date' => now(),
+            ];
+            $this->usersJoinedAgencyRepository->create($joinAgencyData);
+        }
         return true;
     }
 
@@ -841,7 +880,7 @@ class AgencyService
             $data = [
                 'agency_id' => 0,
                 'type_user' => 0,
-               'monthly_diamond_received' => 0,
+                'monthly_diamond_received' => 0,
             ];
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
@@ -919,7 +958,7 @@ class AgencyService
         $this->agencyJoinRequestRepository->update($data, $id);
         if ($request->status == 1) {
             UserCommon::userVip($user);
-            $this->userRepository->update(['type_user' => 1,'monthly_diamond_received' => 0], $user->id);
+            $this->userRepository->update(['type_user' => 1, 'monthly_diamond_received' => 0], $user->id);
         }
         return true;
     }

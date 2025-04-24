@@ -41,6 +41,11 @@ class AgencyJoinRequestRepository extends AbstractRepository
         return $this->model->where('agency_id', $agencyId)->where('status', 0)->where('user_id', $userId)->first();
     }
 
+    public function findAcceptRequest($userId)
+    {
+        return $this->model->where('status', 1)->where('user_id', $userId)->first();
+    }
+
     public function findByUsersAndAgency($userId, $agencyId)
     {
         return $this->model->where(['user_id' => $userId, 'agency_id' => $agencyId])->first();

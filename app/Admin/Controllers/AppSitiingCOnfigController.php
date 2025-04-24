@@ -17,184 +17,251 @@ class AppSitiingCOnfigController extends MainController
     public $permission_name = 'updates';
     public function index(Content $content)
     {
-        // return view('admin/updatePage');
         $route = 'admin.postAddSitin';
 
-        $chat_enable_version =  settings()->get('chat_enable_version');
-        $android_min_version =  settings()->get('android_min_version');
-        $android_current_version =  settings()->get('android_current_version');
-        $android_update_required = settings()->get('android_update_required');
+        // Get all settings at once for better performance
+        $settings = [
+            'chat_enable_version' => settings()->get('chat_enable_version'),
+            'android_min_version' => settings()->get('android_min_version'),
+            'android_current_version' => settings()->get('android_current_version'),
+            'android_update_required' => settings()->get('android_update_required'),
+            'ios_min_version' => settings()->get('ios_min_version'),
+            'ios_current_version' => settings()->get('ios_current_version'),
+            'ios_update_required' => settings()->get('ios_update_required'),
+            'huawei_min_version' => settings()->get('huawei_min_version'),
+            'huawei_current_version' => settings()->get('huawei_current_version'),
+            'huawei_update_required' => settings()->get('huawei_update_required'),
+            'chat_status' => settings()->get('chat_status'),
+            'invitation_code_date' => settings()->get('invitation_code_date'),
+            'show_welcom_enmation' => settings()->get('show_welcom_enmation')
+        ];
 
-
-        $ios_min_version =  settings()->get('ios_min_version');
-        $ios_current_version =  settings()->get('ios_current_version');
-        $ios_update_required = settings()->get('ios_update_required');
-
-        $huawei_min_version =  settings()->get('huawei_min_version');
-        $huawei_current_version =  settings()->get('huawei_current_version');
-        $huawei_update_required = settings()->get('huawei_update_required');
-
-        $chat_status = settings()->get('chat_status');
-        $invitation_code_date = settings()->get('invitation_code_date');
-        $show_welcom_enmation = settings()->get('show_welcom_enmation');
-
-        $form = '<form method="POST" action="' . route($route) . '"  >';
+        $form = '<div class="settings-container">';
+        $form .= '<form method="POST" action="' . route($route) . '" class="settings-form">';
         $form .= csrf_field();
+
         $form .= '<style>
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 60px;
-          height: 34px;
-        }
+            .settings-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+            }
 
-        .switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
-        }
+            .settings-form {
+                background: #fff;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
 
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          -webkit-transition: .4s;
-          transition: .4s;
-        }
+            .form-group {
+                margin-bottom: 20px;
+            }
 
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 26px;
-          width: 26px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          -webkit-transition: .4s;
-          transition: .4s;
-        }
+            .form-row {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 30px;
+            }
 
-        input:checked + .slider {
-          background-color: #2196F3;
-        }
+            .form-col {
+                flex: 1;
+                background: #f9f9f9;
+                padding: 20px;
+                border-radius: 6px;
+            }
 
-        input:focus + .slider {
-          box-shadow: 0 0 1px #2196F3;
-        }
+            .platform-title {
+                text-align: center;
+                color: #2c3e50;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
 
-        input:checked + .slider:before {
-          -webkit-transform: translateX(26px);
-          -ms-transform: translateX(26px);
-          transform: translateX(26px);
-        }
+            .control-label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #555;
+            }
 
-        /* Rounded sliders */
-        .slider.round {
-          border-radius: 34px;
-        }
+            .inputs_cus_form {
+                width: 100%;
+                padding: 10px 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
 
-        .slider.round:before {
-          border-radius: 50%;
-        }
+            .inputs_cus_form:focus {
+                border-color: #3498db;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+            }
+
+            .button_form_cus {
+                background: #3498db;
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background 0.3s;
+                display: block;
+                width: 100%;
+                max-width: 200px;
+                margin: 30px auto 0;
+            }
+
+            .button_form_cus:hover {
+                background: #2980b9;
+            }
+
+            /* Switch styles */
+            .switch-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+                margin-left: 15px;
+            }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 34px;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+                background-color: #2196F3;
+            }
+
+            input:focus + .slider {
+                box-shadow: 0 0 1px #2196F3;
+            }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
         </style>';
-        // $form .= '<label for="chat_enable_version" class="control-label">Chat enable version:</label>';
-        // $form .= '<input type="text" id="chat_enable_version" name="chat_enable_version" placeholder="chat_enable_version" value="' . $chat_enable_version .'"  class="inputs_cus_form">';
 
-        // $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.show_welcome_animation') . ':</label>';
-        // $form .= '<label class="switch">
-        //             <input type="checkbox" name="show_welcom_enmation"' . ($show_welcom_enmation ? "checked" : "") . '>
-        //             <span class="slider round"></span>
-        //         </label><br><br>';
-
-        // $form .= '<label for="chat_enable_version" style="margin-top: 36px;" class="control-label">' . __('admin.enable_chat') . ':</label>';
-        // $form .= '<label class="switch">
-        //             <input type="checkbox" name="chat_status"' . ($chat_status ? "checked" : "") . '>
-        //             <span class="slider round"></span>
-        //         </label><br><br>';
-
-        // $form .= '<label for="android_min_version" class="control-label">تاريخ انتهاء كود الدعوه:</label>';
-        // $form .= '<input type="integer" id="invitation_code_date" name="invitation_code_date" placeholder="القيمه المؤخوذه ب الشهر " value="' . $invitation_code_date . '"  class="inputs_cus_form">';
-
-        // $form .= '<h1 class="control-label text-center">Android</h1>';
-        // $form .= '<label for="android_min_version" class="control-label">Minimum Version:</label>';
-        // $form .= '<input type="text" id="android_min_version" name="android_min_version" placeholder="android_min_version" value="' . $android_min_version . '"  class="inputs_cus_form">';
-        // $form .= '<label for="android_current_version" class="control-label">Current Version:</label>';
-        // $form .= '<input type="text" id="android_current_version" name="android_current_version" placeholder="android_current_version" value="' . $android_current_version . '" class="inputs_cus_form">';
-        // $form .= '<label for="android_update_required" class="control-label">Update Required:</label>';
-        // $form .= '<input type="text" id="android_update_required" name="android_update_required" placeholder="android_update_required" value="' . $android_update_required . '" class="inputs_cus_form">';
-        // $form .= '<div style="display: flex; flex-direction: row;">';
-
-        // $form .= '<div style="flex: 1; margin-right: 10px;">';
-        // $form .= '<h1  class="control-label text-center">Huawei</h1>';
-        // $form .= '<label for="huawei_min_version" class="control-label">Minimum Version:</label>';
-        // $form .= '<input type="text" id="huawei_min_version" name="huawei_min_version" placeholder="huawei_min_version" value="' . $huawei_min_version . '"  class="inputs_cus_form">';
-        // $form .= '<label for="huawei_current_version" class="control-label">Current Version:</label>';
-        // $form .= '<input type="text" id="huawei_current_version" name="huawei_current_version" placeholder="huawei_current_version"  value="' . $huawei_current_version . '" class="inputs_cus_form">';
-
-        // $form .= '<label for="huawei_update_required" class="control-label">Update Required:</label>';
-        // $form .= '<input type="text" id="huawei_update_required" name="huawei_update_required" placeholder="huawei_update_required" value="' . $huawei_update_required . '" class="inputs_cus_form">';
-
-
-        // $form .= '</div>';
-
-        // $form .= '<div style="flex: 1; margin-left: 10px;">';
-        // $form .= '<h1 class="control-label text-center">iOS</h1>';
-        // $form .= '<label for="ios_min_version" class="control-label">Minimum Version:</label>';
-        // $form .= '<input type="text" id="ios_min_version" name="ios_min_version" placeholder="ios_min_version" value="' . $ios_min_version . '" class="inputs_cus_form">';
-        // $form .= '<label for="ios_current_version" class="control-label">Current Version:</label>';
-        // $form .= '<input type="text" id="ios_current_version" name="ios_current_version" placeholder="ios_current_version" value="' . $ios_current_version . '" class="inputs_cus_form">';
-        // $form .= '<label for="ios_update_required" class="control-label">Update Required:</label>';
-        // $form .= '<input type="text" id="ios_update_required" name="ios_update_required" placeholder="ios_update_required" value="' . $ios_update_required . '" class="inputs_cus_form">';
-        // $form .= '</div>';
-        // $form .= '</div>';
-
-
-        // $form .= '<button type="submit" class="button_form_cus">Submit</button>';
-
-        // $form .= '</form>';
-
-        $form .= '<label for="invitation_code_date" class="control-label">' . __('admin.invitation_code_date') . ':</label>';
-        $form .= '<input type="integer" id="invitation_code_date" name="invitation_code_date" placeholder="' . __('admin.invitation_code_date_placeholder') . '" value="' . $invitation_code_date . '"  class="inputs_cus_form">';
-
-        $form .= '<h1 class="control-label text-center">' . __('admin.android') . '</h1>';
-        $form .= '<label for="android_min_version" class="control-label">' . __('admin.minimum_version') . ':</label>';
-        $form .= '<input type="text" id="android_min_version" name="android_min_version" placeholder="android_min_version" value="' . $android_min_version . '"  class="inputs_cus_form">';
-        $form .= '<label for="android_current_version" class="control-label">' . __('admin.current_version') . ':</label>';
-        $form .= '<input type="text" id="android_current_version" name="android_current_version" placeholder="android_current_version" value="' . $android_current_version . '" class="inputs_cus_form">';
-        $form .= '<label for="android_update_required" class="control-label">' . __('admin.update_required') . ':</label>';
-        $form .= '<input type="text" id="android_update_required" name="android_update_required" placeholder="android_update_required" value="' . $android_update_required . '" class="inputs_cus_form">';
-        $form .= '<div style="display: flex; flex-direction: row;">';
-
-        $form .= '<div style="flex: 1; margin-right: 10px;">';
-        $form .= '<h1  class="control-label text-center">' . __('admin.huawei') . '</h1>';
-        $form .= '<label for="huawei_min_version" class="control-label">' . __('admin.minimum_version') . ':</label>';
-        $form .= '<input type="text" id="huawei_min_version" name="huawei_min_version" placeholder="huawei_min_version" value="' . $huawei_min_version . '"  class="inputs_cus_form">';
-        $form .= '<label for="huawei_current_version" class="control-label">' . __('admin.current_version') . ':</label>';
-        $form .= '<input type="text" id="huawei_current_version" name="huawei_current_version" placeholder="huawei_current_version"  value="' . $huawei_current_version . '" class="inputs_cus_form">';
-        $form .= '<label for="huawei_update_required" class="control-label">' . __('admin.update_required') . ':</label>';
-        $form .= '<input type="text" id="huawei_update_required" name="huawei_update_required" placeholder="huawei_update_required" value="' . $huawei_update_required . '" class="inputs_cus_form">';
+        // Invitation Code Date
+        $form .= '<div class="form-group">';
+        $form .= '<label for="invitation_code_date" class="control-label">' . __('admin.invitation_code_date') . '</label>';
+        $form .= '<input type="number" id="invitation_code_date" name="invitation_code_date" placeholder="' . __('admin.invitation_code_date_placeholder') . '" value="' . $settings['invitation_code_date'] . '" class="inputs_cus_form">';
         $form .= '</div>';
 
-        $form .= '<div style="flex: 1; margin-left: 10px;">';
-        $form .= '<h1 class="control-label text-center">' . __('admin.ios') . '</h1>';
-        $form .= '<label for="ios_min_version" class="control-label">' . __('admin.minimum_version') . ':</label>';
-        $form .= '<input type="text" id="ios_min_version" name="ios_min_version" placeholder="ios_min_version" value="' . $ios_min_version . '" class="inputs_cus_form">';
-        $form .= '<label for="ios_current_version" class="control-label">' . __('admin.current_version') . ':</label>';
-        $form .= '<input type="text" id="ios_current_version" name="ios_current_version" placeholder="ios_current_version" value="' . $ios_current_version . '" class="inputs_cus_form">';
-        $form .= '<label for="ios_update_required" class="control-label">' . __('admin.update_required') . ':</label>';
-        $form .= '<input type="text" id="ios_update_required" name="ios_update_required" placeholder="ios_update_required" value="' . $ios_update_required . '" class="inputs_cus_form">';
+        // Toggle Switches
+        $form .= '<div class="form-row">';
+        $form .= '<div class="switch-container">';
+        $form .= '<label for="show_welcom_enmation" class="control-label">' . __('admin.show_welcome_animation') . '</label>';
+        $form .= '<label class="switch">';
+        $form .= '<input type="checkbox" name="show_welcom_enmation"' . ($settings['show_welcom_enmation'] ? "checked" : "") . '>';
+        $form .= '<span class="slider"></span>';
+        $form .= '</label>';
+        $form .= '</div>';
+
+        $form .= '<div class="switch-container">';
+        $form .= '<label for="chat_status" class="control-label">' . __('admin.enable_chat') . '</label>';
+        $form .= '<label class="switch">';
+        $form .= '<input type="checkbox" name="chat_status"' . ($settings['chat_status'] ? "checked" : "") . '>';
+        $form .= '<span class="slider"></span>';
+        $form .= '</label>';
         $form .= '</div>';
         $form .= '</div>';
+
+        // Platform Settings
+        $form .= '<div class="form-row">';
+
+        // Android
+        $form .= '<div class="form-col">';
+        $form .= '<h2 class="platform-title">' . __('admin.android') . '</h2>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="android_min_version" class="control-label">' . __('admin.minimum_version') . '</label>';
+        $form .= '<input type="text" id="android_min_version" name="android_min_version" placeholder="android_min_version" value="' . $settings['android_min_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="android_current_version" class="control-label">' . __('admin.current_version') . '</label>';
+        $form .= '<input type="text" id="android_current_version" name="android_current_version" placeholder="android_current_version" value="' . $settings['android_current_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="android_update_required" class="control-label">' . __('admin.update_required') . '</label>';
+        $form .= '<input type="text" id="android_update_required" name="android_update_required" placeholder="android_update_required" value="' . $settings['android_update_required'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '</div>';
+
+        // Huawei
+        $form .= '<div class="form-col">';
+        $form .= '<h2 class="platform-title">' . __('admin.huawei') . '</h2>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="huawei_min_version" class="control-label">' . __('admin.minimum_version') . '</label>';
+        $form .= '<input type="text" id="huawei_min_version" name="huawei_min_version" placeholder="huawei_min_version" value="' . $settings['huawei_min_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="huawei_current_version" class="control-label">' . __('admin.current_version') . '</label>';
+        $form .= '<input type="text" id="huawei_current_version" name="huawei_current_version" placeholder="huawei_current_version" value="' . $settings['huawei_current_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="huawei_update_required" class="control-label">' . __('admin.update_required') . '</label>';
+        $form .= '<input type="text" id="huawei_update_required" name="huawei_update_required" placeholder="huawei_update_required" value="' . $settings['huawei_update_required'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '</div>';
+
+        // iOS
+        $form .= '<div class="form-col">';
+        $form .= '<h2 class="platform-title">' . __('admin.ios') . '</h2>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="ios_min_version" class="control-label">' . __('admin.minimum_version') . '</label>';
+        $form .= '<input type="text" id="ios_min_version" name="ios_min_version" placeholder="ios_min_version" value="' . $settings['ios_min_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="ios_current_version" class="control-label">' . __('admin.current_version') . '</label>';
+        $form .= '<input type="text" id="ios_current_version" name="ios_current_version" placeholder="ios_current_version" value="' . $settings['ios_current_version'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '<div class="form-group">';
+        $form .= '<label for="ios_update_required" class="control-label">' . __('admin.update_required') . '</label>';
+        $form .= '<input type="text" id="ios_update_required" name="ios_update_required" placeholder="ios_update_required" value="' . $settings['ios_update_required'] . '" class="inputs_cus_form">';
+        $form .= '</div>';
+        $form .= '</div>';
+
+        $form .= '</div>'; // Close form-row
 
         $form .= '<button type="submit" class="button_form_cus">' . __('admin.submit') . '</button>';
-
         $form .= '</form>';
-
-
+        $form .= '</div>';
 
         return parent::index($content
             ->title(trans('Updates'))
