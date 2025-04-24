@@ -139,6 +139,7 @@
     "puser_app_id": "pusher app id",
     "pusher_app_secret" : "pusher app secret",
     "pusher_app_key": "pusher app key",
+    "Enable Vip Auto" : "Enable Vip Auto",
     "big": "VIP",
     "user obtain": "User Obtained",
     "agency obtain": "Agency Obtained",
