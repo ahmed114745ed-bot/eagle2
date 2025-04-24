@@ -480,9 +480,12 @@
                                 <label>{{ __('Zones Coins') }}</label>
                                 <input type="text" name="zones_coins" id="zones_coins"
                                     value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
+                                    
                                     <small id="zones_coins_hint" class="form-text text-muted mt-1"
                                 data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
+                            </small> 
+                        
+                        </div>
                          </div>
 
                          <div class="col-md-6">
@@ -519,7 +522,9 @@
                                     value="{{ $user_coins }}" class="form-control">
                                     <small id="user_coins_hint" class="form-text text-muted mt-1"
                                 data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
-                            </small>            </div>
+                            </small> 
+                        
+                        </div>
                         </div>
 
                         <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
@@ -708,29 +713,27 @@
 
 
                 document.addEventListener('DOMContentLoaded', function () {
-    function updateHint(inputId) {
-        const input = document.getElementById(inputId);
-        const hint = document.getElementById(inputId + '_hint');
-        const template = hint.getAttribute('data-template'); // 🔧 أضفنا السطر ده
+        function updateHint(inputId) {
+            const input = document.getElementById(inputId);
+            const hint = document.getElementById(inputId + '_hint');
+            const template = hint.getAttribute('data-template'); 
 
-        function update() {
-            const value = parseFloat(input.value);
-            if (!isNaN(value) && value > 0) {
-                hint.innerText = template.replace(':value', value);
-            } else {
-                hint.innerText = '';
+            function update() {
+                const value = parseFloat(input.value);
+                if (!isNaN(value) && value > 0) {
+                    hint.innerText = template.replace(':value', value);
+                }
             }
+
+            input.addEventListener('input', update);
+            update(); // تشغيل أول مرة
         }
 
-        input.addEventListener('input', update);
-        update(); // تشغيل أول مرة
-    }
-
-    updateHint('super_admin_coins');
-    updateHint('zones_coins');
-    updateHint('user_coins');
-    updateHint('shipping_coins');
-});
+        updateHint('super_admin_coins');
+        updateHint('zones_coins');
+        updateHint('user_coins');
+        updateHint('shipping_coins');
+    });
 
             </script>
 

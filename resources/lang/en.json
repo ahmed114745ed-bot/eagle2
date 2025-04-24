@@ -672,5 +672,8 @@
      "Enter users count": "Enter users count",
      "Delete": "Delete",
      "Add": "Add",
-     "Add Users Count": "Add Users Count"
+     "Add Users Count": "Add Users Count",
+     "Zones coins must be greater than super admin coins": "Zones coins must be greater than super admin coins",
+     "super admin coins must be greater than agancy coins": "super admin coins must be greater than agancy coins",
+     "agancy coins must be greater than user coins": "agancy coins must be greater than user coins"
     }

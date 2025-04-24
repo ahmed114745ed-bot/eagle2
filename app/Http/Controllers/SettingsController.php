@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Config;
 use App\Models\Target;
 use App\Models\User;
+use App\Models\UserSallary;
 use Cache;
 use App\Helpers\Common;
 use App\Models\Setting;
@@ -30,18 +31,57 @@ class SettingsController extends Controller
     {
         $data = $request->except('_token');
 
+        
+
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
             ($request->has('super_admin_coins') && !is_null($request->super_admin_coins) && $request->super_admin_coins != cache()->get('super_admin_coins')) ||
-            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins'))
+            ($request->has('zones_coins') && !is_null($request->zones_coins) && $request->zones_coins != cache()->get('zones_coins')) ||
+            ($request->has('user_coins') && !is_null($request->user_coins) && $request->user_coins != cache()->get('user_coins'))
         ) {
-            $target = Target::first();
-            $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
 
-            if ($hasActiveTargets) {
-                admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
-                return back();
+            $zoneSetting = Setting::where('key', 'zones_coins')->first();
+            $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
+            $shippingSetting = Setting::where('key', 'shipping_coins')->first();
+            $userSetting = Setting::where('key', 'user_coins')->first();
+            if ($zoneSetting && $superAdminSetting && $shippingSetting && $userSetting) {
+               
+                $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
+
+                        // if ($userSalary) {
+                        //     $calculatedValue = $userSalary->sallary - $userSalary->cut_amount;
+
+                        //     if ($calculatedValue > 0) {
+
+                        //             admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
+                        //             return back();
+                                
+                        //     } 
+                        // }
+
+                if ($request->zones_coins <= $request->super_admin_coins) {
+                    admin_toastr(__('Zones coins must be greater than super admin coins'), 'error');
+                    return back();
+                }      
+
+                if ($request->super_admin_coins <= $request->shipping_coins) {
+                    admin_toastr(__('super admin coins must be greater than agancy coins'), 'error');
+                    return back();
+                }     
+
+                if ($request->shipping_coins <= $request->user_coins) {
+                    admin_toastr(__('agancy coins must be greater than user coins'), 'error');
+                    return back();
+                }   
+                
+                
+
+               
+              
             }
+
+          
+          
         }
 
         if ($request->background_type === 'color') {
