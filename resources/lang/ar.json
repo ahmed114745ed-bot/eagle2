@@ -857,6 +857,8 @@
     "agency_settings": "إعدادات الوكالة",
     "level_settings": "إعدادات المستوى",
     "category" : "فئة",
+    "Payment gateway is ready to use" : "بوابة الدفع جاهزة للاستخدام",
+    "Please edit payment credential settings" : "يرجى تعديل إعدادات بيانات بوابات الدفع",
     "Payment Credential Settings:": "إعدادات بيانات الدفع:",
     "Payment Credential Settings": "إعدادات بيانات الدفع",
     "Real Time system Setting:": "إعداد نظام الوقت الفعلي:",
