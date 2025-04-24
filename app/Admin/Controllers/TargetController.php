@@ -254,7 +254,7 @@ class TargetController extends MainController
         ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>')
         ->rules('min:0')
         ->default(100)
-        ->required();
+        ->disable();
         $form->html('
         <script>
             $(document).ready(function () {
@@ -342,7 +342,7 @@ class TargetController extends MainController
             return $days == null || $days == '' ? 0 : $days;
         });
 
-        
+
         $form->html('<h1>' . __('Reel') . '</h1>');
 
         $form->hidden('reel', 'reel');
