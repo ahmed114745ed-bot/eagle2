@@ -674,6 +674,7 @@
     "sound effect" : "تأثيرات صوتية",
     "Enable Vip Auto": "تفعيل ال VIP تلقائيا",
     "Using Vip without presenting": "استخدام ال VIP مباشرتا دون  الاهداء",
+    "Pusher settings" : "اعدادات بشر",
     "Enabled" : "طلب مقبول",
     "Disabled" : "طلب مازال مرفوض",
     "Text ar" : "نص عربي",
@@ -2043,7 +2044,7 @@
     "Zones Coins": "عملات المناطق",
       "DB  Percentage": "نسبة  DB",
       "app profit Percentage": "نسبة أرباح التطبيق",
-      "User Percentage": "نسبة المستخدم", 
+      "User Percentage": "نسبة المستخدم",
       "charges settings": "اعدادات الشحن",
       "charges-settings": "اعدادات الشحن",
    "Dollar": "دولار"
