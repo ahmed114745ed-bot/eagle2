@@ -24,6 +24,8 @@ class SettingController extends MainController
         $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
+        $tencent_server_secret = Common::getConfig('tencent_server_secret');
+        $tencent_app_id = Common::getConfig('tencent_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
         $brand_images = BrandImage::all();
@@ -41,8 +43,28 @@ class SettingController extends MainController
         return $content
             ->header(__('Settings'))
             ->description('')
-
-            ->body(view('admin.settings_new', compact('pusher_app_secret','pusher_app_key','pusher_app_id','settings','timezones','agora_app_id','zego_server_secret','zego_app_id','app_sign','library', 'brand_images', 'paymentCoins','firebase_api_key','firebase_auth_domain','firebase_database_url','supabase_url','supabase_key','supabase_service_role_key')));
+            ->body(view('admin.settings_new', compact([
+                'pusher_app_secret',
+                'pusher_app_key',
+                'pusher_app_id',
+                'settings',
+                'timezones',
+                'agora_app_id',
+                'zego_server_secret',
+                'zego_app_id',
+                'app_sign',
+                'library',
+                'brand_images',
+                'paymentCoins',
+                'firebase_api_key',
+                'firebase_auth_domain',
+                'firebase_database_url',
+                'supabase_url',
+                'supabase_key',
+                'supabase_service_role_key',
+                'tencent_app_id',
+                'tencent_server_secret'
+            ])));
     }
 
     public function save_image(Request $request){
