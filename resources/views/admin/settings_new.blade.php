@@ -471,12 +471,8 @@
                 </div>
             </button>
 
-            <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
-            <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
-
-
             <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>
-            <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
+            <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
             <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
                 {{ __('Payment') }}
                 <div class="ribbon-banner">
@@ -792,6 +788,9 @@
                                 <div class="card p-3 shadow" style="height: 300px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                    name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
