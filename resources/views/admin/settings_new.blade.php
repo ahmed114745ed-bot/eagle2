@@ -1040,7 +1040,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="white_color">{{ __('White Color') }}</label>
-                                <input type="color" id="white_color" name="app_white_color"
+                                <input type="color" id="app_white_color" name="app_white_color"
                                     value="{{ $settings['app_white_color'] ?? '#ffffff' }}" class="form-control">
                             </div>
                         </div>
@@ -1048,7 +1048,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="black_color">{{ __('Black Color') }}</label>
-                                <input type="color" id="black_color" name="app_black_color"
+                                <input type="color" id="app_black_color" name="app_black_color"
                                     value="{{ $settings['app_black_color'] ?? '#000000' }}" class="form-control">
                             </div>
                         </div>
@@ -1057,7 +1057,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="grey_color">{{ __('Grey Color') }}</label>
-                                <input type="color" id="grey_color" name="app_grey_color"
+                                <input type="color" id="app_grey_color" name="app_grey_color"
                                     value="{{ $settings['app_grey_color'] ?? '#808080' }}" class="form-control">
                             </div>
                         </div>
@@ -1065,7 +1065,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="yellow_color">{{ __('Yellow Color') }}</label>
-                                <input type="color" id="yellow_color" name="app_yellow_color"
+                                <input type="color" id="app_yellow_color" name="app_yellow_color"
                                     value="{{ $settings['app_yellow_color'] ?? '#ffff00' }}" class="form-control">
                             </div>
                         </div>
@@ -1464,15 +1464,10 @@
                             document.getElementById('second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
-                            document.getElementById('background_type').value = "color";
-                            document.getElementById('background_color').value = "#32e5ac";
-                            document.getElementById('app_background').value = "#32e5ac";
-
-                            // Show the correct background input group
-                            document.getElementById('background_color_group').style.display = 'block';
-                            document.getElementById('background_image_group').style.display = 'none';
-
-                            document.getElementById('brand_background_image_group').style.display = 'none';
+                            document.getElementById('app_white_color').value = "#ffffff";
+                            document.getElementById('app_black_color').value = "#000000";
+                            document.getElementById('app_grey_color').value = "#a5a7a4";  // Grey color
+                            document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
 
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
