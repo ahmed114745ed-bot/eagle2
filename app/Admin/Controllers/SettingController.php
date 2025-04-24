@@ -34,10 +34,15 @@ class SettingController extends MainController
         $pusher_app_id = Common::getConf('pusher_app_id');
         $pusher_app_key = Common::getConf('pusher_app_key');
         $pusher_app_secret = Common::getConf('pusher_app_secret');
+        $firebase_api_key = Common::getConf('firebase_api_key');
+        $firebase_auth_domain = Common::getConf('firebase_auth_domain');
+        $firebase_database_url = Common::getConf('firebase_database_url');
+        $supabase_url = Common::getConf('supabase_url');
+        $supabase_key = Common::getConf('supabase_key');
+        $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return $content
             ->header(__('Settings'))
             ->description('')
-
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
                 'pusher_app_key',
@@ -51,9 +56,15 @@ class SettingController extends MainController
                 'library',
                 'brand_images',
                 'paymentCoins',
-                'tencent_server_secret',
-                'tencent_app_id'
-                ])));
+                'firebase_api_key',
+                'firebase_auth_domain',
+                'firebase_database_url',
+                'supabase_url',
+                'supabase_key',
+                'supabase_service_role_key',
+                'tencent_app_id',
+                'tencent_server_secret'
+            ])));
     }
 
     public function save_image(Request $request){

@@ -2006,5 +2006,22 @@
   "Add Users Count": "Kullanıcı Sayısı Ekle",
   "Zones coins must be greater than super admin coins": "Bölge Jetonları Süper Yönetici Jetonlarından büyük olmalıdır",
   "super admin coins must be greater than agancy coins": "Süper Yönetici Jetonları Ajans Jetonlarından büyük olmalıdır",
-  "agancy coins must be greater than user coins": "Ajans Jetonları Kullanıcı Jetonlarından büyük olmalıdır"
+  "agancy coins must be greater than user coins": "Ajans Jetonları Kullanıcı Jetonlarından büyük olmalıdır",
+  "soon": "Yakında",
+  "gateway_ready" : "Ödeme ağ geçidi kullanıma hazır",
+  "edit_credentials" : "Lütfen ödeme kimlik bilgisi ayarlarını düzenleyin",
+  "firebase": "firebase",
+  "supabase": "supabase",
+  "supabase_url": "supabase url",
+  "supabase_key": "supabase key",
+  "supabase_service_role_key": "supabase service role key",
+  "pusher_app_id": "pusher app id",
+  "pusher_app_key": "pusher app key",
+  "pusher_app_secret": "pusher app secret",
+  "firebase_api_key": "firebase api key",
+  "firebase_auth_domain": "firebase auth domain",
+  "firebase_database_url": "firebase database url",
+  "Real Time Setting": "Gerçek Zamanlı Ayarlar",
+  "Real Time system Setting": "Gerçek Zamanlı Sistem Ayarları",
+  "Payment Credential Settings": "Ödeme Kimlik Bilgileri Ayarları"
 }

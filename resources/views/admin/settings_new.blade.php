@@ -417,6 +417,22 @@
         transform: rotate(90deg);
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    .ribbon-banner-card {
+        position: absolute;
+        top: 6px;
+        right: -9px;
+        background-color: #ff0000;
+        padding: 2px 7px;
+        transform: rotate(90deg);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .ribbon-banner-card span {
+        color: white;
+        font-size: 15px;
+        font-weight: normal;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+
+    }
 
     .rtl .ribbon-banner{
         right: auto;
@@ -447,12 +463,18 @@
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
+
             <button onclick="showSection('appSettings')" class="position-relative">
                 {{ __('App settings') }}
                 <div class="ribbon-banner">
                     <span>{{ __('soon') }}</span>
                 </div>
             </button>
+
+            <button onclick="showSection('realTimeSetting')">{{ __('Real Time system Setting') }}</button>
+            <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
+
+
             <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>
             <button onclick="showSection('pusherSettings')">{{ __('Pusher settings') }}</button>
             <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
@@ -922,14 +944,15 @@
             </div>
 
             <div id="paymentCredentialSettings" class="settings-section">
-                <form action="{{ route('admin.settings.update') }}" method="POST">
-                    @csrf
+
                     <div class="form">
                         <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
 
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.fawry') }}</h4>
@@ -949,9 +972,10 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'fawry')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
-                                                     alt="Fawry Payment"
-                                                     class="img-fluid">
+                                            <img src="{{ asset('images/fawry.jpeg') }}"
+                                            alt="Fawry Payment"
+                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+
                                                 @php
                                                     $fawryImageFound = true;
                                                 @endphp
@@ -1010,10 +1034,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- skyPay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
@@ -1032,9 +1059,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'sky pay')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/paysky.png') }}"
                                                      alt="Skypay Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $skypayImageFound = true;
                                                 @endphp
@@ -1042,9 +1069,9 @@
                                         @endforeach
 
                                         @if(!$skypayImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Skypay Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/paysky.png') }}"
+                                        alt="Skypay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -1085,10 +1112,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- stripe Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.stripe') }}</h4>
@@ -1107,9 +1137,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'stripe')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/stripe.png') }}"
                                                      alt="Stripe Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $stripeImageFound = true;
                                                 @endphp
@@ -1117,9 +1147,9 @@
                                         @endforeach
 
                                         @if(!$stripeImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Stripe Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/stripe.png') }}"
+                                        alt="Stripe Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -1168,10 +1198,13 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
 
                             <!-- opay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
@@ -1191,9 +1224,9 @@
 
                                         @foreach($paymentCoins as $coin)
                                             @if($coin->title == 'opay')
-                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                <img src="{{ asset('images/opay.png') }}"
                                                      alt="Opay Payment"
-                                                     class="img-fluid">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                                 @php
                                                     $opayImageFound = true;
                                                 @endphp
@@ -1201,9 +1234,9 @@
                                         @endforeach
 
                                         @if(!$opayImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Opay Payment"
-                                                 class="img-fluid">
+                                        <img src="{{ asset('images/opay.png') }}"
+                                        alt="Opay Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                         @endif
                                     </div>
                                     <div class="row">
@@ -1264,6 +1297,7 @@
                                     <button type="submit"
                                         class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
+                                </form>
                             </div>
                         </div>
                         {{-- <div class="row">
@@ -1283,7 +1317,6 @@
                             </div>
                         </div> --}}
                     </div>
-                </form>
             </div>
 
 
@@ -1431,11 +1464,11 @@
                 </form>
             </div>
             <div id="pusherSettings" class="settings-section">
-                <h3>{{ __('Pusher settings') }}</h3>
+                <h3>{{ __('Real Time Setting') }}</h3>
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="form">
-                        <label class="d-block">{{ __('Pusher settings') }}</label>
+                        <!-- <label class="d-block">{{ __('Pusher settings') }}</label> -->
                         <div class="row">
                             <!-- Pusher Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
@@ -1476,11 +1509,105 @@
                                         class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
                                 </div>
                             </div>
+<!-- firebase -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto">
+
+                                <div class="card p-3 shadow" style="height: 400px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+
+                                        <h4 class="m-0">{{ __('firebase') }}</h4>
+                                          <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="firebaseRadio" class="custom-radio firebaseLib"
+                                                name="library" value="1"
+                                                {{ $library == '1' ? 'checked' : '' }}>
+                                            <label for="firebaseRadio" class="switch"></label>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="firebase_api_key">{{ __('firebase_api_key') }}:</label>
+                                                <input type="text" id="firebase_api_key" name="firebase_api_key"
+                                                    placeholder="{{ __('firebase_api_key') }}" value="{{ $firebase_api_key }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="firebase_auth_domain">{{ __('firebase_auth_domain') }}:</label>
+                                                <input type="text" id="firebase_auth_domain" name="firebase_auth_domain"
+                                                    placeholder="{{ __('firebase_auth_domain') }}" value="{{ $firebase_auth_domain }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="firebase_database_url">{{ __('firebase_database_url') }}:</label>
+                                                <input type="text" id="firebase_database_url" name="firebase_database_url"
+                                                    placeholder="{{ __('firebase_database_url') }}" value="{{ $firebase_database_url }}"
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+
+                                  <!-- supabase Fields -->
+                                  <div class="col-md-6 mb-3 ms-0 me-auto">
+                                <div class="card p-3 shadow" style="height: 400px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('supabase') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="supabaseRadio" class="custom-radio supabaseLib"
+                                                name="library" value="3"
+                                                {{ $library == '3' ? 'checked' : '' }}>
+                                            <label for="supabaseRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="supabase_url">{{ __('supabase_url') }}:</label>
+                                                <input type="text" id="supabase_url" name="supabase_url"
+                                                    placeholder="{{ __('supabase_url') }}" value="{{ $supabase_url }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="supabase_key">{{ __('supabase_key') }}:</label>
+                                                <input type="text" id="supabase_key" name="supabase_key"
+                                                    placeholder="{{ __('supabase_key') }}" value="{{ $supabase_key }}"
+                                                    class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
+                                                <input type="text" id="supabase_service_role_key" name="supabase_service_role_key"
+                                                    placeholder="{{ __('supabase_service_role_key') }}" value="{{ $supabase_service_role_key }}"
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </form>
 
             </div>
+
+
 
 
             <div id="imageModal" class="modal" onclick="closeFullScreen()">
