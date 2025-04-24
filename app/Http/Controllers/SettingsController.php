@@ -43,8 +43,7 @@ class SettingsController extends Controller
             $zoneSetting = Setting::where('key', 'zones_coins')->first();
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
-            $userSetting = Setting::where('key', 'user_coins')->first();
-            if ($zoneSetting && $superAdminSetting && $shippingSetting && $userSetting) {
+            if ($zoneSetting && $superAdminSetting && $shippingSetting ) {
                
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 

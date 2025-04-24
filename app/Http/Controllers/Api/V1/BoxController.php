@@ -164,7 +164,7 @@ class BoxController extends Controller
         {
             return $this->normalBox($box_use, $keyBoxUse, $user, $request);
         } else {  // super
-            return  $this->superBox($box, $user, $keyBoxUse);
+            return  $this->superBox($box_use, $user, $keyBoxUse,$request->bid);
         }
     }
 
@@ -218,15 +218,15 @@ class BoxController extends Controller
         }
     }
 
-    public function superBox($box_use, $user, $keyBoxUse)
+    public function superBox($box_use, $user, $keyBoxUse, $bosUserId)
     {
 
 
-        if (PickBoxList::where('box_user_id', $box_use->id)->where('user_id', $user->id)->exists()) {
+        if (PickBoxList::where('box_user_id', $bosUserId)->where('user_id', $user->id)->exists()) {
             return Common::apiResponse(0, 'used it before', null, 403);
         }
         PickBoxList::create([
-            'box_user_id' => $box_use['id'],
+            'box_user_id' => $bosUserId,
             'user_id' => $user->id,
         ]);
 
