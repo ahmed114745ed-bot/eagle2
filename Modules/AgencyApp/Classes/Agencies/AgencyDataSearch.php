@@ -63,7 +63,7 @@ class AgencyDataSearch
                 })->orWhereHas('userAgencyJoined', function ($query) {
                         $query->orderBy('type')->orderBy('id');
                     });
-            })->orderBy('monthly_diamond_received', 'desc');
+            });
       /*  } else {
             return UserTarget::where('agency_id', $agency_id)->where('add_year', $year)->where('add_month', $month)->orderBy('target_diamonds', 'desc')->with('user');
 //            return History::where('agency_id', $agency_id)->where('year', $year)->where('month', $month)->orderBy('diamond', 'desc')->with('user');
