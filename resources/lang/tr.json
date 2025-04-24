@@ -1991,5 +1991,7 @@
   "AgencyUserLog": "Ajans Kullanıcı Kayıtları",
   "agency-user-logs": "Ajans Kullanıcı Kayıtları",
   "days and hours": "Gün ve Saat",
-  "agent Percentage": "Ajans Yüzdesi"
+  "agent Percentage": "Ajans Yüzdesi",
+  "Total USD: ": "Toplam USD: ",
+  "Amount will be: ": "Miktar: "
 }

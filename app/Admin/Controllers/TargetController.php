@@ -225,8 +225,8 @@ class TargetController extends MainController
        
 
         $form->decimal('diamonds', __('diamonds'))
-    ->help('<span id="diamonds_amount">' . __('Amount will be: ') . ' USD</span>
-            <br><span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
+    ->help('
+            <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>');
 
 $form->decimal('usd', __('agent Percentage'))
     ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>');

@@ -2056,7 +2056,9 @@
 "AgencyUserLog": "سجل الانضمام للوكالة",
 "agency-user-logs": "سجل الانضمام للوكالة",
 "days and hours": "الأيام و الساعات",
-"agent Percentage": "نسبة الوكيل"
+"agent Percentage": "نسبة الوكيل",
+"Amount will be: ": "سيكون المبلغ: ",
+"Total USD: ": "إجمالي الدولار: "
 
 
 
