@@ -64,7 +64,7 @@ class BoxController extends Controller
             $label = $request->label;
         }
 
-        return $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
+        $this->boxService->sendBox($request, $user, $box, $room, $timezone, $label);
     }
 
 
