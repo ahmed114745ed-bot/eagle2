@@ -28,8 +28,8 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+        info($request);
         $data = $request->except('_token');
-
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -38,16 +38,12 @@ class SettingsController extends Controller
         ) {
             $target = Target::first();
             $hasActiveTargets = User::where('monthly_diamond_received', '>=', $target->diamonds)->exists();
-        
+
             if ($hasActiveTargets) {
                 admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                 return back();
             }
         }
-        
-
-
-
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
