@@ -800,7 +800,7 @@
                                         </div>
                                         <div class="d-flex align-items-center">
                                             <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                                   name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
                                             <label for="tencentRadio" class="switch"></label>
                                         </div>
                                     </div>
@@ -866,10 +866,10 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="agoraRadio"
-                                               class="custom-radio libraryRealTime" name="library" value="0"
-                                            {{ $library == '0' ? 'checked' : '' }}>
-                                        <label for="agoraRadio" class="switch"></label>
+                                        <input type="radio" id="agoraSoundRadio"
+                                               class="custom-radio libraryRealTime" name="sound_library" value="0"
+                                            {{ $soundLibrary == '0' ? 'checked' : '' }}>
+                                        <label for="agoraSoundRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -879,9 +879,9 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                        <label for="zegoRadio" class="switch"></label>
+                                        <input type="radio" id="zegoSoundRadio" class="custom-radio libraryRealTime"
+                                               name="sound_library" value="1" {{ $soundLibrary == '1' ? 'checked' : '' }}>
+                                        <label for="zegoSoundRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -891,9 +891,9 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                                        <label for="tencentRadio" class="switch"></label>
+                                        <input type="radio" id="tencentSoundRadio" class="custom-radio libraryRealTime"
+                                               name="sound_library" value="2" {{ $soundLibrary == '2' ? 'checked' : '' }}>
+                                        <label for="tencentSoundRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -912,10 +912,10 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="agoraRadio"
-                                               class="custom-radio libraryRealTime" name="library" value="0"
-                                            {{ $library == '0' ? 'checked' : '' }}>
-                                        <label for="agoraRadio" class="switch"></label>
+                                        <input type="radio" id="agoraVideoRadio"
+                                               class="custom-radio libraryRealTime" name="video_library" value="0"
+                                            {{ $videoLibrary == '0' ? 'checked' : '' }}>
+                                        <label for="agoraVideoRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -925,9 +925,9 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                        <label for="zegoRadio" class="switch"></label>
+                                        <input type="radio" id="zegoVideoRadio" class="custom-radio libraryRealTime"
+                                               name="video_library" value="1" {{ $videoLibrary == '1' ? 'checked' : '' }}>
+                                        <label for="zegoVideoRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -937,9 +937,9 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                                     <div class="d-flex align-items-center">
-                                        <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                               name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                                        <label for="tencentRadio" class="switch"></label>
+                                        <input type="radio" id="tencentVideoRadio" class="custom-radio libraryRealTime"
+                                               name="video_library" value="2" {{ $videoLibrary == '2' ? 'checked' : '' }}>
+                                        <label for="tencentVideoRadio" class="switch"></label>
                                     </div>
                                 </div>
                             </div>
@@ -1471,7 +1471,7 @@
             </div>
             <div id="pusherSettings" class="settings-section">
                 <h3>{{ __('Real Time Setting') }}</h3>
-             
+
                 <div class="row" style="
                 background-color:var(--box-background-color)!important;
 
@@ -1638,14 +1638,16 @@
                 }
             </script>
             <script>
-                function updateLibrary(selectedLibrary) {
+                function updateLibrary(selectedLibrary, inputName) {
+                    let data = {
+                        _token: "{{ csrf_token() }}",
+                    };
+                    data[inputName] = selectedLibrary;
+
                     $.ajax({
                         url: "{{ route('admin.update-agora-zego') }}",
                         type: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            library: selectedLibrary
-                        },
+                        data: data,
                         success: function(response) {
                             console.log("Library updated via AJAX:", response);
                             toastr.success('Library preference saved!');
@@ -1680,8 +1682,10 @@
                 // Handle change event on radio buttons
                 $(document).on("change", ".custom-radio", function() {
                     let selectedLibrary = $(this).val();
+                    let inputName= $(this).attr('name');
                     console.log("Selected library:", selectedLibrary);
-                    updateLibrary(selectedLibrary);
+                    console.log("library Name:", inputName);
+                    updateLibrary(selectedLibrary, inputName);
                     updateSwitches();
                 });
 

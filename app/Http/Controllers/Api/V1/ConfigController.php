@@ -94,6 +94,7 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
+        info($request);
         $keys = array_keys($request->all());
 
         foreach ($keys as $key) {
