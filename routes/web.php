@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\ConfigController;
 use App\Models\User;
 use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
+use App\Models\RoomVisitor;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +144,12 @@ Route::group(
 
 
     }
+
+    
 );
+Route::get('/update-rooms', function(){
+    RoomVisitor::whereDate('created_at','<',date("Y-m-d"))->delete();
+    return "done";
+});
 
 
