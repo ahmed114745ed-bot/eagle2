@@ -65,7 +65,9 @@ class CoreWalletsController extends MainController
 
             $form .= '<div class="col-md-5 col-lg-5 mb-4 px-3 wallet_posation">'; // Added padding for space
             $form .= '<div class="card shadow-lg position-relative border-0"
-          style="border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
+          style="
+              padding-top: 39px;
+          border-radius: 15px; overflow: hidden; background: linear-gradient(135deg,rgb(211, 211, 183),rgb(202, 211, 193)); transition: transform 0.3s ease-in-out; margin-bottom: 20px;">';
 
 
             // Card hover effect
@@ -74,21 +76,21 @@ class CoreWalletsController extends MainController
   </style>';
 
             // Edit Button - Circle taking all card edges
-            $form .= '<a href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '"
-        class="btn position-absolute top-0 start-0 w-100 h-100 rounded-circle shadow-lg d-flex align-items-center justify-content-center"
-        style="
-            background: rgba(255, 255, 255, 0.8);
-            color: #333;
-            transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border: 2px solid #fff;
-            border-radius: 50%;
-        "
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="' . __('Edit') . '">
-        <i class="fas fa-pen"></i>
-    </a>';
+    //         $form .= '<a href="' . admin_url('core-wallets/' . $wallet->id . '/edit') . '"
+    //     class="btn position-absolute top-0 start-0 w-100 h-100 rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+    //     style="
+    //         background: rgba(255, 255, 255, 0.8);
+    //         color: #333;
+    //         transition: transform 0.2s ease-in-out, background 0.2s ease-in-out;
+    //         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    //         border: 2px solid #fff;
+    //         border-radius: 50%;
+    //     "
+    //     data-bs-toggle="tooltip"
+    //     data-bs-placement="top"
+    //     title="' . __('Edit') . '">
+    //     <i class="fas fa-pen"></i>
+    // </a>';
 
             // Add hover effect with CSS
             $form .= '<style>
