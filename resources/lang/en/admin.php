@@ -209,6 +209,7 @@ return [
     "public_key" => 'Public Key',
     "country_code" => 'Country Code',
     "Tencent" => 'Tencent',
+    "lucky_flex" => "Lucky Flex",
     'creator' => 'admin'
 
 

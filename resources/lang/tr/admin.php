@@ -206,5 +206,6 @@ return [
     "public_key" => 'Genel Anahtar',
     "country_code" => 'Ülke Kodu',
     "Tencent" => 'Tencent',
+    "lucky_flex" => "Lucky Flex",
     "charge_level" => "şarj seviyesi",
 ];
