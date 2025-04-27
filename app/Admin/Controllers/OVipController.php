@@ -24,7 +24,7 @@ class OVipController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ovip';
-    public $permission_setting = 'settings';
+    public $permission_setting = 'ovip-settings';
 
 
     public $hiddenColumns = [];

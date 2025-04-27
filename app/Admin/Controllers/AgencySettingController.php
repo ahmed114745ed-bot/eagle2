@@ -28,7 +28,7 @@ class  AgencySettingController extends MainController
 {
 
    // public $permission_name = 'agency-setting';
-    public $permission_name = 'settings';
+    public $permission_name = 'agency-settings';
     public function index(Content $content)
     {
         $tab = new Tab();

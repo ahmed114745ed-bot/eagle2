@@ -16,7 +16,7 @@ use Encore\Admin\Auth\Permission;
 class BoxController extends MainController
 {
     public $permission_name = 'boxes';
-    public $permission_setting = 'settings';
+    public $permission_setting = 'box-settings';
     use HasResourceActions;
 
     /**

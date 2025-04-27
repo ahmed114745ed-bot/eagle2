@@ -2,20 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\GroupChat;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use App\Models\GroupChat;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\Box;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class GroupChatController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'group-chat';
+    public $permission_setting = "chat-setting";
     /**
      * Index interface.
      *
@@ -35,6 +36,9 @@ class GroupChatController extends MainController
     }
 
     public function chat_settings(Content $content){
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
         return $content
         ->view('chat_settings');
     }
