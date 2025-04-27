@@ -163,49 +163,201 @@ class RoomController extends MainController
         });
         $grid->column('count_room_socket', __('Number of users'));
 
-        $grid->column(__('microphone'))
-            ->display(function () {
-                $ids = explode(',', $this->microphone);
-                $cachedUsers = \App\Models\User::whereIn('id', $ids)->with(['profile:user_id,avatar'])->take(6)->get(['id']);
-               
+        
+        
 
-                // Check if there are no users
-                if ($cachedUsers->isEmpty()) {
-                    return '';
-                }
 
-                $html = '<div style="display: flex; gap: 10px; align-items: center;">';
-
-                foreach ($cachedUsers->take(5) as $user) {
-                    $path = $user->profile?->avatar;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+        // $grid->column(__('microphone'))->display(function () {
+        //     $ids = explode(',', $this->microphone);
+        //     $cachedUsers = \App\Models\User::whereIn('id', $ids)
+        //         ->with(['profile:user_id,avatar'])
+        //         ->get(['id', 'name']);
             
-                    $html .= '
-                    <div style="position: relative; margin-left: -20px;">
-                        <img src="' . $url . '" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white;"/>
+        //     if ($cachedUsers->isEmpty()) {
+        //         return '';
+        //     }
+            
+        //     $html = '
+        //     <div class="avatar-container" style="
+        //         display: flex;
+        //         overflow-x: auto;
+        //         overflow-y: hidden; /* Hides vertical scroll */
+        //         white-space: nowrap;
+        //         padding: 8px 0;
+        //         scrollbar-width: thin;
+        //         scrollbar-color: #cccrgb(43, 183, 36);
+        //         max-width: 100%;
+        //     ">';
+            
+        //     foreach ($cachedUsers as $user) {
+        //         $path = $user->profile?->avatar;
+        //         $defaultImage = asset("images/businessman-icon.jpg");
+        //         $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+        //         $username = htmlspecialchars($user->name ?? 'Unknown');
+                
+        //         $html .= '
+        //             <div style="flex: 0 0 auto; text-align: center; position: relative; margin-right: -8px;">
+        //                 <img src="'.$url.'" 
+        //                      title="'.$username.'" 
+        //                      style="width: 36px; height: 36px; border-radius: 50%; 
+        //                             object-fit: cover; border: 2px solid white;
+        //                             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        //                             transition: transform 0.2s ease;
+        //                             margin-right: 0;"/>
+        //                 <span style="position: absolute; bottom: -18px; left: 50%; 
+        //                             transform: translateX(-50%); font-size: 10px; 
+        //                             white-space: nowrap; display: none;
+        //                             background: rgba(0,0,0,0.7); color: white;
+        //                             padding: 2px 5px; border-radius: 3px;">
+        //                     '.substr($username, 0, 12).'
+        //                 </span>
+        //             </div>';
+        //     }
+            
+        //     $html .= '</div>';
+            
+        //     // Hover effect
+        //     $html .= '
+        //     <script>
+        //     document.addEventListener("DOMContentLoaded", function() {
+        //         document.querySelectorAll(".avatar-container img").forEach(img => {
+        //             img.addEventListener("mouseenter", function() {
+        //                 this.style.transform = "scale(1.3)";
+        //                 this.style.zIndex = "10";
+        //                 this.nextElementSibling.style.display = "block";
+        //             });
+        //             img.addEventListener("mouseleave", function() {
+        //                 this.style.transform = "scale(1)";
+        //                 this.style.zIndex = "1";
+        //                 this.nextElementSibling.style.display = "none";
+        //             });
+        //         });
+        //     });
+        //     </script>';
+            
+        //     return $html;
+        // });
+
+        // $grid->column(__('microphone'))->display(function () {
+        //     $ids = explode(',', $this->microphone);
+        //     $cachedUsers = \App\Models\User::whereIn('id', $ids)
+        //         ->with(['profile:user_id,avatar'])
+        //         ->get(['id', 'name']);
+            
+        //     if ($cachedUsers->isEmpty()) {
+        //         return '';
+        //     }
+            
+        //     $html = '
+        //     <div class="scroll" style="
+        //         overflow: auto;
+        //         white-space: nowrap;
+        //         padding: 8px 0;
+        //         max-width: 100%;
+        //     ">';
+            
+        //     foreach ($cachedUsers as $user) {
+        //         $path = $user->profile?->avatar;
+        //         $defaultImage = asset("images/businessman-icon.jpg");
+        //         $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+        //         $username = htmlspecialchars($user->name ?? 'Unknown');
+                
+        //         $html .= '
+        //             <div style="display: inline-block; text-align: center; margin-right: 12px;">
+        //                 <img src="'.$url.'" 
+        //                      title="'.$username.'" 
+        //                      style="width: 60px; height: 60px; border-radius: 50%; 
+        //                             object-fit: cover; border: 2px solid white;
+        //                             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        //                             transition: transform 0.2s ease;"/>
+        //                 <span style="font-size: 10px; white-space: nowrap; display: block; margin-top: -10px;">
+        //                     '.substr($username, 0, 12).'
+        //                 </span>
+        //             </div>';
+        //     }
+            
+        //     $html .= '</div>';
+            
+        //     // Hover effect
+        //     $html .= '
+        //     <script>
+        //     document.addEventListener("DOMContentLoaded", function() {
+        //         document.querySelectorAll(".scroll img").forEach(img => {
+        //             img.addEventListener("mouseenter", function() {
+        //                 this.style.transform = "scale(1.3)";
+        //                 this.style.zIndex = "10";
+        //             });
+        //             img.addEventListener("mouseleave", function() {
+        //                 this.style.transform = "scale(1)";
+        //                 this.style.zIndex = "1";
+        //             });
+        //         });
+        //     });
+        //     </script>';
+            
+        //     return $html;
+        // });
+        
+
+        $grid->column(__('microphone'))->display(function () {
+            $ids = explode(',', $this->microphone);
+            $cachedUsers = \App\Models\User::whereIn('id', $ids)
+                ->with(['profile:user_id,avatar'])
+                ->get(['id', 'name']);
+            
+            if ($cachedUsers->isEmpty()) {
+                return '';
+            }
+            
+            $html = '
+            <div class="scroll" style="
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 8px 0;
+                max-width: calc(4 * 72px); /* 4 images with 12px margin each */
+            ">';
+            
+            foreach ($cachedUsers as $user) {
+                $path = $user->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                $username = htmlspecialchars($user->name ?? 'Unknown');
+                
+                $html .= '
+                    <div style="display: inline-block; text-align: center; margin-right: 12px;">
+                        <img src="'.$url.'" 
+                             title="'.$username.'" 
+                             style="width: 60px; height: 60px; border-radius: 50%; 
+                                    object-fit: cover; border: 2px solid white;
+                                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                                    transition: transform 0.2s ease;"/>
+                        
                     </div>';
-                }
+            }
             
-                // Show "add" icon if more than 5 users
-                if (count($cachedUsers) > 5) {
-                    $url1 = url('admin/room-mic/' . $this->id);
-                    $arrowIcon = asset('images/add.png');
+            $html .= '</div>';
             
-                    $html .= '
-                    <div>
-                        <a href="' . $url1 . '" 
-                           style="text-decoration: none; cursor: pointer;">
-                            <img src="' . $arrowIcon . '" style="width: 30px; height: 30px;">
-                        </a>
-                    </div>';
-                }
-            
-                $html .= '</div>';
-                return $html;
+            // Hover effect
+            $html .= '
+            <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                document.querySelectorAll(".scroll img").forEach(img => {
+                    img.addEventListener("mouseenter", function() {
+                        this.style.transform = "scale(1.3)";
+                        this.style.zIndex = "10";
+                    });
+                    img.addEventListener("mouseleave", function() {
+                        this.style.transform = "scale(1)";
+                        this.style.zIndex = "1";
+                    });
+                });
             });
-
-
+            </script>';
+            
+            return $html;
+        });
+        
+        
 
 
         $grid->actions(function ($action) {
