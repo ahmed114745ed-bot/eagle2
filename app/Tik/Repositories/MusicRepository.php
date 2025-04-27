@@ -23,9 +23,9 @@ class MusicRepository extends AbstractRepository
         return $this->model->where('user_id', $userId)->get();
     }
 
-    public function deleteByUser($userId)
+    public function deleteByUser($userId,$musicId)
     {
-        $music = $this->model->where('id', $userId)->where('user_id', $userId)->firstOrFail();
+        $music = $this->model->where('id', $musicId)->where('user_id', $userId)->firstOrFail();
         $music->delete();
 
         return true;

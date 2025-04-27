@@ -163,10 +163,10 @@
 
                 <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <div class="form">
+                    {{-- <div class="form">
                         <label for="buy_aristocracy">{{ __('admin.user_exp') }}</label>
                         <input type="number" id="buy_aristocracy" name="buy_aristocracy" min="1"  value="{{$config['buy_aristocracy'] ?? ''}}"/>
-                    </div>
+                    </div> --}}
 
                     <div class="form">
                         <label for="enable_vip_auto">{{ __('Enable Vip Auto') }}</label>
