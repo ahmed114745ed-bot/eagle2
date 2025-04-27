@@ -1421,7 +1421,7 @@
 
 
 
-                        {{-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
@@ -1443,9 +1443,9 @@
                                 <input type="color" id="background_color" name="background_color"
                                     class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
-                        </div> --}}
+                        </div>
 
-                        {{-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
@@ -1458,7 +1458,7 @@
                                     </div>
                                 @endif
                             </div>
-                        </div> --}}
+                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
