@@ -79,7 +79,6 @@ class UserResource extends JsonResource
             'image_color'          => @$this->color_image ?? '',
             'special_color'    => @$this->color_id ?? '',
             'color_name'   => common::wareUserVipColor($this->id, 18) ?? '',
-            'color_name_id'   => common::wareUserVip($this->id, 18, 'id') ?? 0
 
         ];
     }
