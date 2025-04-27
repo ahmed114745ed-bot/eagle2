@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Modules\Chat\Traits\ChatUserTrait;
 use App\Traits\MomentRelationshipTrait;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SpecialId\Traits\SpecialId;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
@@ -1178,7 +1179,20 @@ class User extends Authenticatable
                 }
                 request()->request->remove('is_frozen');
             }
-        });
+            if (request()->has('charge_agency')) { 
+                if (request('charge_agency') == 1) { 
+                    // لو مش موجود، أضيف
+                    ChargeAgency::firstOrCreate([
+                        'agency_id' => $model->agency_id
+                    ]);
+                } else {
+                    // لو السويتش = 0، أمسح السطر لو موجود
+                    ChargeAgency::where('agency_id', $model->agency_id)->delete();
+                }
+            }
+
+    });
+    
         static::updating(function ($user) {
             $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
             $newCoins = $user->di;
