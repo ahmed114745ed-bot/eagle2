@@ -302,6 +302,7 @@ class OvipGiftTapController extends MainController
             $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
         }
 
+        dd($privilegeTypes);
         // Default to the first type if none is selected
         $currentType = request()->get('type', $privilegeTypes->keys()->first());
 
