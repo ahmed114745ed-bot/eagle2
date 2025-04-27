@@ -718,7 +718,7 @@
                 text-align: start;
             }
             .rtl .form-horizontal .row {
-                display: ruby;
+                display: math !important;
                 direction: rtl !important;
                 flex-direction: row-reverse !important;
 

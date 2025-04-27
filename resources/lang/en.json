@@ -260,6 +260,11 @@
     "Empty successfully": "Successfully emptied",
     "Empty failed": "Failed to empty",
     "return": "return",
+    "AppSender": "Sender",
+    "AppReceived" : "Received",
+    "AppCP": "Cp",
+    "AppRoom" : "Room",
+    "AppCharge": "Charge",
     "config returned success": "Configuration returned successfully",
     "anonymous icon": "Anonymous icon",
     "user_id , room_id are required": "User ID, Room ID are required",
@@ -692,5 +697,6 @@
      "firebase_database_url": "database url firebase",
      "Real Time Setting": "Real Time Setting",
      "Real Time system Setting": "Real Time system Setting",
-     "Payment Credential Settings": "Payment Credential Settings"
+     "Payment Credential Settings": "Payment Credential Settings",
+     "Charge-agency":"Charge Agency"
     }

@@ -272,7 +272,13 @@
     "un_auth": "غير مصرح",
     "Empty successfully": "الفراغ بنجاح",
     "Empty failed": "فشل الفراغ",
-    "Procedures": "Procedures",
+    "Procedures": "الاجراءات",
+    "AppSender": "مستوي الثروه",
+    "AppReceived" : "مستوي الجازبيه",
+    "AppCP": "مستوي ال cp",
+    "AppRoom" : "مستوي الغرفه",
+    "AppCharge": "مستوي الشحن",
+
     "config returned success": "تم إعادة تكوين الإعدادات بنجاح",
     "anonymous icon": "أيقونة مجهول",
     "user_id , room_id are required": "مطلوب معرف المستخدم ومعرف الغرفة",
@@ -2095,7 +2101,8 @@
 "firebase_database_url": "رابط قاعدة البيانات في فايربيس",
 "gateway_ready" : "الدفع جاهز للاستخدام",
 "edit_credentials" : "يرجى تعديل إعدادات الدفع",
-"Real Time Setting": "إعدادات الوقت الحقيقي"
+"Real Time Setting": "إعدادات الوقت الحقيقي",
+"Charge-agency":"وكالة شحن موثوقة"
 
 
 
