@@ -176,39 +176,31 @@ class RoomController extends MainController
             
             $html = '
             <div class="scroll" style="
-                display: flex;
-                align-items: center;
-                padding: 8px 0;
-                max-width: calc(4 * 50px);
                 overflow-x: auto;
-            ">
-                <div style="position: relative; height: 50px;">';
+                white-space: nowrap;
+                padding: 8px 0;
+                max-width: calc(4 * 72px); /* 4 images with 12px margin each */
+            ">';
             
-            $leftPosition = 0;
             foreach ($cachedUsers as $user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                 $username = htmlspecialchars($user->name ?? 'Unknown');
-        
-                $html .= '
-                    <img src="'.$url.'" 
-                        title="'.$username.'"
-                        style="width: 50px; height: 50px; border-radius: 50%; 
-                               object-fit: cover; border: 2px solid white;
-                               box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                               transition: transform 0.2s ease;
-                               position: absolute; 
-                               left: '.$leftPosition.'px;
-                               background: #fff;"
-                    />';
                 
-                $leftPosition += 30; // move each next image 30px to the right (20px overlap)
+                $html .= '
+                    <div style="display: inline-block; text-align: center; margin-right: 12px;">
+                        <img src="'.$url.'" 
+                             title="'.$username.'" 
+                             style="width: 50px; height: 50px; border-radius: 50%; 
+                                    object-fit: cover; border: 2px solid white;
+                                    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                                    transition: transform 0.2s ease;"/>
+                        
+                    </div>';
             }
             
-            $html .= '
-                </div>
-            </div>';
+            $html .= '</div>';
             
             // Hover effect
             $html .= '
@@ -229,6 +221,7 @@ class RoomController extends MainController
             
             return $html;
         });
+
         
         
         
