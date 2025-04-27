@@ -456,6 +456,14 @@
         margin-top: 33px;
 
     }
+
+    .no-background-form {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 </style>
 
 </head>
@@ -711,130 +719,140 @@
                 </form>
             </div>
             <div id="realTimeSetting" class="settings-section">
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                <form>
                     @csrf
                     <div class="form">
                         <label class="d-block">{{ __('Sound & Video System Setting:') }}</label>
 
                         <div class="row mt-4">
-                            <!-- Agora Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center  ">
-                                        <h4 class="m-0">{{ __('admin.Agora') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="radio" id="agoraRadio"
-                                                class="custom-radio libraryRealTime" name="library" value="0"
-                                                {{ $library == '0' ? 'checked' : '' }}>
-                                            <label for="agoraRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="agora_app_id" name="app_id"
-                                                    placeholder="app_id" value="{{ $agora_app_id }}"
-                                                    class="form-control" required>
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Agora Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center  ">
+                                            <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                            <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="agoraRadio"
+                                                       class="custom-radio libraryRealTime" name="library" value="0"
+                                                    {{ $library == '0' ? 'checked' : '' }}>
+                                                <label for="agoraRadio" class="switch"></label>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="agora_app_id" name="app_id"
+                                                           placeholder="app_id" value="{{ $agora_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
 
-                            <!-- Zego Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                                name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                            <label for="zegoRadio" class="switch"></label>
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Zego Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
+                                                       name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                                <label for="zegoRadio" class="switch"></label>
+                                            </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                    <input type="text" id="zego_server_secret"
+                                                           name="zego_server_secret" placeholder="server_secret"
+                                                           value="{{ $zego_server_secret }}" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="zego_app_id" name="zego_app_id"
+                                                           placeholder="app_id" value="{{ $zego_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                    <input type="text" id="app_sign" name="app_sign"
+                                                           placeholder="app_sign" value="{{ $app_sign }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="zego_server_secret"
-                                                    name="zego_server_secret" placeholder="server_secret"
-                                                    value="{{ $zego_server_secret }}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="zego_app_id" name="zego_app_id"
-                                                    placeholder="app_id" value="{{ $zego_app_id }}"
-                                                    class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
-                                                <input type="text" id="app_sign" name="app_sign"
-                                                    placeholder="app_sign" value="{{ $app_sign }}"
-                                                    class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
 
-                            <!-- Tencent Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Tencent Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                            <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
+                                                       name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                                                <label for="tencentRadio" class="switch"></label>
+                                            </div>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                                            <label for="tencentRadio" class="switch"></label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                    <input type="text" id="tencent_server_secret"
+                                                           name="tencent_server_secret" placeholder="server_secret"
+                                                           value="{{ $tencent_server_secret }}" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="tencent_app_id" name="tencent_app_id"
+                                                           placeholder="app_id" value="{{ $tencent_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                    <input type="text" id="app_sign" name="app_sign"
+                                                           placeholder="app_sign" value="{{ $app_sign }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
                                         </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="tencent_server_secret"
-                                                       name="tencent_server_secret" placeholder="server_secret"
-                                                       value="{{ $tencent_server_secret }}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="tencent_app_id" name="tencent_app_id"
-                                                       placeholder="app_id" value="{{ $tencent_app_id }}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
-                                                <input type="text" id="app_sign" name="app_sign"
-                                                       placeholder="app_sign" value="{{ $app_sign }}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
+
                         </div>
                         {{-- <div class="row">
                             <!-- Pusher Fields -->
