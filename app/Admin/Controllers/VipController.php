@@ -32,10 +32,11 @@ class VipController extends MainController
             ->title(trans('charge level'))
             ->body($this->grid());
     }
-    public function senderIndex(Content $content){
+    public function senderIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->senderGrid());
+            ->title(trans('charge level'))
+            ->body($this->senderGrid());
     }
     protected function senderGrid()
     {
@@ -49,7 +50,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -67,10 +68,11 @@ class VipController extends MainController
         return $grid;
     }
 
-    public function receiverIndex(Content $content){
+    public function receiverIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->receiverGrid());
+            ->title(trans('charge level'))
+            ->body($this->receiverGrid());
     }
     protected function receiverGrid()
     {
@@ -84,7 +86,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -101,10 +103,11 @@ class VipController extends MainController
 
         return $grid;
     }
-    public function cpIndex(Content $content){
+    public function cpIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->cpGrid());
+            ->title(trans('charge level'))
+            ->body($this->cpGrid());
     }
 
     protected function cpGrid()
@@ -119,7 +122,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -138,10 +141,11 @@ class VipController extends MainController
     }
 
 
-    public function roomIndex(Content $content){
+    public function roomIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->roomGrid());
+            ->title(trans('charge level'))
+            ->body($this->roomGrid());
     }
 
     protected function roomGrid()
@@ -156,7 +160,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -174,10 +178,11 @@ class VipController extends MainController
         return $grid;
     }
 
-    public function chargeIndex(Content $content){
+    public function chargeIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->chargeGrid());
+            ->title(trans('charge level'))
+            ->body($this->chargeGrid());
     }
 
     protected function chargeGrid()
@@ -192,7 +197,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -279,7 +284,7 @@ class VipController extends MainController
             }
         });
 
-        // Tabs at top
+        // Tabs at top rendered from the Blade view
         $grid->header(function () {
             $tabs = [
                 '' => __('All'),
@@ -290,37 +295,8 @@ class VipController extends MainController
                 'Appcharge' => __('AppCharge'),
             ];
 
-            $currentTab = request('tab', '');
-
-            $html = '<div style="margin-bottom: 10px;">
-                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">';
-
-            foreach ($tabs as $key => $label) {
-                // Clean URL: keep only needed query params
-                $query = request()->except('tab');
-                if ($key !== '') {
-                    $query['tab'] = $key;
-                }
-                $url = url()->current() . '?' . http_build_query($query);
-
-                // Detect active tab
-                $isActive = ($currentTab === $key);
-
-                // Inline style for active/inactive tabs
-                $style = $isActive
-                    ? 'background: white; color: black; border: 1px solid;'
-                    : 'background: none; color: white; border: 1px solid;';
-
-                $html .= "<a href='$url'
-                            style='padding: 6px 12px; font-size: 14px; border-radius: 4px;
-                                   text-decoration: none; display: inline-block; $style'>
-                            $label
-                          </a>";
-            }
-
-            $html .= '</div></div>';
-
-            return $html;
+            // Render the Blade view with tabs data
+            return view('admin.tabs', compact('tabs'));
         });
 
         // Other grid settings
@@ -352,6 +328,8 @@ class VipController extends MainController
 
         return $grid;
     }
+
+
 
 
 
@@ -395,7 +373,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         )->default(2);
         $form->textarea('name_ar', __('name_ar'));
