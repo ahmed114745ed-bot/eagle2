@@ -7,6 +7,7 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
+use App\Models\VipPrivilege;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -38,7 +39,7 @@ class OvipGiftTapController extends MainController
             $ovip = OVip::where('level', request('level'));
         }
 
-
+        dd(VipPrivilege::all());
         return parent::index($content
             ->title(trans('Privileges'))
             ->row($buttonHTML)
@@ -297,7 +298,6 @@ class OvipGiftTapController extends MainController
         // Fetch distinct privilege types and names
         if(app()->getLocale() == 'en'){
 
-            dd($privileges);
             $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
         } else {
             $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
