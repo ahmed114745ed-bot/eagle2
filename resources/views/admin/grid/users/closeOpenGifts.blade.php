@@ -86,7 +86,7 @@
     <div class="box-body no-padding">
         <div class="switch-container">
             <div class="switch-item">
-                <label for="stopChargeCheckbox" class="switch-label">غلق الغرفه</label>
+                <label for="stopChargeCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
                 <label class="switch">
                     <input type="checkbox" id="stopChargeCheckbox" {{ $make_rooms_top == 1 ? 'checked' : '' }}>
                     <span class="slider round"></span>

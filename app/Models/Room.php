@@ -287,4 +287,10 @@ class Room extends Model
 
     }
 
+    public function scopeWithoutVisitorsAndActiveMic($query)
+    {
+        return $query->whereDoesntHave('roomVisitors')
+                    ->where('microphone', '!=', '0,0,0,0,0,0,0,0,0,0');
+    }
+
 }

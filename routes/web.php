@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\DeleteAccount;
+use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -203,6 +204,15 @@ Route::group(
 );
 Route::get('/update-rooms', function(){
     RoomVisitor::whereDate('created_at','<',date("Y-m-d"))->delete();
+    return "done";
+});
+
+
+Route::get('/update-rooms-microphone', function(){
+    
+    Room::withoutVisitorsAndActiveMic()->update([
+        'microphone' => '0,0,0,0,0,0,0,0,0,0'
+    ]);    
     return "done";
 });
 
