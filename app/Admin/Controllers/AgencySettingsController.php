@@ -23,8 +23,8 @@ class AgencySettingsController extends MainController
         $moments =  settings()->get('moments');
         $reels = settings()->get('reels');
 
-        return $content
-        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels'));
+        return parent::index($content
+        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels')));
     }
 
 

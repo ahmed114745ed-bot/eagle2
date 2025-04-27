@@ -3,13 +3,16 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Config;
-use Illuminate\Support\HtmlString;
+use Encore\Admin\Auth\Permission;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\HtmlString;
 
 class MangerSettingController extends MainController
 {
     public $permission_name = 'updates_group_chat';
+    public $permission_setting = 'agency-manger-setting';
 
 
     
@@ -105,10 +108,13 @@ class MangerSettingController extends MainController
 
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
 
         $config = Config::where('name', 'system_default_manger')->first();
         $configValue = $config->value ?? '';
-        return  parent::index($content
-            ->view('mangerSetting', compact('config', 'configValue')));
+        return  $content
+            ->view('mangerSetting', compact('config', 'configValue'));
     }
 }

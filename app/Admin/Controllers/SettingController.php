@@ -43,7 +43,7 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
-        return $content
+        return parent::index($content
             ->header(__('Settings'))
             ->description('')
             ->body(view('admin.settings_new', compact([
@@ -70,7 +70,7 @@ class SettingController extends MainController
                 'soundLibrary',
                 'videoLibrary',
                 'gamesLibrary'
-            ])));
+            ]))));
     }
 
     public function save_image(Request $request){
