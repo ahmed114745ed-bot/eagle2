@@ -804,7 +804,7 @@ trait CalcsTrait
 
         if (!$vip) return new \stdClass();
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
-        return @$ware?->{$item} ?? '';
+        return optional($ware)->{$item} ?? '';
     }
 
 
