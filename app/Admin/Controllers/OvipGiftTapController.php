@@ -297,12 +297,12 @@ class OvipGiftTapController extends MainController
         // Fetch distinct privilege types and names
         if(app()->getLocale() == 'en'){
 
+            dd($privileges);
             $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
         } else {
             $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
         }
 
-        dd($privilegeTypes);
         // Default to the first type if none is selected
         $currentType = request()->get('type', $privilegeTypes->keys()->first());
 
