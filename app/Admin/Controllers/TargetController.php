@@ -92,7 +92,7 @@ class TargetController extends MainController
             ";
         });
 
-        $grid->usd(__('agent Percentage'))
+        $grid->usd(__('Host Percentage'))
         ->display(function ($value) use ($coins) {
             $endFormatted =$this->diamonds / $coins;
 
@@ -152,7 +152,7 @@ class TargetController extends MainController
         // });
         $grid->agency_share(__('agency share'))
         ->display(function ($value) use ($coins) {
-            $endFormatted =$this->diamonds ;
+            $endFormatted =$this->diamonds /$coins ;
             $userUsd = floatval($endFormatted) * floatval($value) / 100;
             $userPercentage = number_format($value);
             return "
