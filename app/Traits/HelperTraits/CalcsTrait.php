@@ -796,13 +796,13 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-        if (!isset($user->UserVip)) return $item == 'id' ? 0 : '';
+        if (!isset($user->UserVip)) return '';
         $uvip = $user?->UserVip;
-        if (!$uvip) return $item == 'id' ? 0 : '';
+        if (!$uvip) return '';
 
         $vip = OVip::query()->find($uvip->vip_id);
 
-        if (!$vip) return  $item == 'id' ? 0 : '';
+        if (!$vip) return  '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
         return optional($ware)->{$item} ?? '';
     }
