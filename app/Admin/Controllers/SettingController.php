@@ -30,6 +30,7 @@ class SettingController extends MainController
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
         $videoLibrary = Common::getConfig('video_library');
+        $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::all();
 
@@ -67,7 +68,8 @@ class SettingController extends MainController
                 'tencent_app_id',
                 'tencent_server_secret',
                 'soundLibrary',
-                'videoLibrary'
+                'videoLibrary',
+                'gamesLibrary'
             ])));
     }
 
