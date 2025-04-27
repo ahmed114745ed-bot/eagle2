@@ -232,7 +232,7 @@ class TargetController extends MainController
         ->default(0)
         ->required();
 
-    $form->decimal('usd', __('agent Percentage').'(%)')
+    $form->decimal('usd', __('Host Percentage').'(%)')
         ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>')
         ->rules('min:0')
         ->default(0)

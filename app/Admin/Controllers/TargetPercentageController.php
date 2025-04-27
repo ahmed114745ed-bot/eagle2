@@ -60,7 +60,7 @@ class TargetPercentageController extends MainController
             } else {
                 $form .= '<label for="'.$field['id'].'" class="col-sm-2 control-label" style="text-align: '.$labelAlign.';">'.$field['label'].'</label>';
                 $form .= '<div class="col-sm-10">';
-                $form .= '<input min="0" type="number" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control" required>';
+                $form .= '<input min="0" ' . ($field['id'] == 'diamonds' ? 'max="100" ' : '') . 'type="number" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control" required>';
                 $form .= '</div>';
             }
             $form .= '</div>';

@@ -1304,4 +1304,14 @@ class Common
         });
         return $value;
     }
+
+    public  static function getDiamondsPercentage()
+    {
+       $num= settings()->get('diamonds');
+       $per = $num / 100;
+       return $per;
+    }
+
+ 
+
 }

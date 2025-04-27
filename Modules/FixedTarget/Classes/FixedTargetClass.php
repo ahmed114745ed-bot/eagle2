@@ -90,4 +90,24 @@ class FixedTargetClass implements TargetInterface
             'closestElement' => $closestElement,
         ];
     }
+
+    public function calculatePercentageAchieved(Model $target, float $hours, int $days, array $extra = null): float
+    {
+       
+        $per = 0.50;
+        if ($target->hours <= $hours) {
+            $per += 0.20;
+        }
+        if ($target->days <= $days) {
+            $per += 0.30;
+        }
+        if (Common::getConf('all_target_or_nothing') == 'true') {
+            if ($per < 1) {
+                $per = 0;
+            }
+        }
+
+        
+        return  $per;
+    }
 }

@@ -23,6 +23,10 @@ class MusicService
         return $this->musicRepository->getByUser($userId);
     }
 
+    public function destroyUserMusic($userId, $musicId)
+    {
+        return $this->musicRepository->deleteByUser($userId, $musicId);
+    }
     public function create($userId, $url)
     {
         $data = [
