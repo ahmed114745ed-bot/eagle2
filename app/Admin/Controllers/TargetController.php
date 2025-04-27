@@ -74,7 +74,7 @@ class TargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Target);
-        $grid->model()->orderBy('diamonds', 'desc');
+        $grid->model()->orderBy('diamonds', 'asc');
         $coins = Common::getMaxCoins();
 
         // $grid->id(__('ID'));
@@ -94,7 +94,7 @@ class TargetController extends MainController
 
         $grid->usd(__('agent Percentage'))
         ->display(function ($value) use ($coins) {
-            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+            $endFormatted =$this->diamonds / $coins;
 
             $userUsd = floatval($endFormatted) * floatval($value) / 100;
             $userPercentage = number_format($value);
@@ -152,7 +152,7 @@ class TargetController extends MainController
         // });
         $grid->agency_share(__('agency share'))
         ->display(function ($value) use ($coins) {
-            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+            $endFormatted =$this->diamonds ;
             $userUsd = floatval($endFormatted) * floatval($value) / 100;
             $userPercentage = number_format($value);
             return "
@@ -164,7 +164,7 @@ class TargetController extends MainController
         });
         $grid->db_percentage(__('DB  Percentage'))
         ->display(function ($value) use ($coins) {
-            $endFormatted = $coins ? number_format($this->diamonds / $coins) : 0;
+            $endFormatted =$this->diamonds / $coins;
             $userUsd = floatval($endFormatted) * floatval($value) / 100;
             $userPercentage = number_format($value);
             return "
