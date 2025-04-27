@@ -19,6 +19,7 @@ class TargetPercentageController extends MainController
         $days = settings()->get('days');
         $moments = settings()->get('moments');
         $reels = settings()->get('reels');
+        $diamonds = settings()->get('diamonds');
 
         $errors = session()->get('errors');
         $errorMessage = $errors ? $errors->first('msg') : null;
@@ -46,19 +47,20 @@ class TargetPercentageController extends MainController
             ['id' => 'days', 'value' => $days, 'label' => __('Days')],
             ['id' => 'moments', 'value' => $moments, 'label' => __('Moments')],
             ['id' => 'reels', 'value' => $reels, 'label' => __('Reels')],
+            ['id' => 'diamonds', 'value' => $diamonds, 'label' => __('Diamonds')],
         ];
 
         foreach ($fields as $field) {
             $form .= '<div class="form-group">';
             if ($isRTL) {
                 $form .= '<div class="col-sm-10">';
-                $form .= '<input type="text" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control">';
+                $form .= '<input min="0" type="number" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control" required>';
                 $form .= '</div>';
                 $form .= '<label for="'.$field['id'].'" class="col-sm-2 control-label" style="text-align: '.$labelAlign.';">'.$field['label'].'</label>';
             } else {
                 $form .= '<label for="'.$field['id'].'" class="col-sm-2 control-label" style="text-align: '.$labelAlign.';">'.$field['label'].'</label>';
                 $form .= '<div class="col-sm-10">';
-                $form .= '<input type="text" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control">';
+                $form .= '<input min="0" type="number" id="'.$field['id'].'" name="'.$field['id'].'" placeholder="'.$field['label'].'" value="'.$field['value'].'" class="form-control" required>';
                 $form .= '</div>';
             }
             $form .= '</div>';
