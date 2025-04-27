@@ -254,62 +254,108 @@ class VipController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Vip());
+
+        // Sort by type desc then exp asc
         $grid->model()->orderByDesc('type')->orderBy('exp');
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            $filter->expand();
-            $filter->where(function ($query) {
-                switch ($this->input) {
-                    case 'sender':
-                        // custom complex query if the 'yes' option is selected
-                        $query->where('type', 2);
-                        break;
-                    case 'received':
-                        $query->where('type', 1);
-                        break;
-                    case 'cp':
-                        $query->where('type', 3);
-                        break;
-                    case 'room':
-                        $query->where('type', 4);
-                        break;
-                    case 'charge':
-                        $query->where('type', 5);
-                        break;
-                }
-            }, __('Select type'), 'name_for_url_shortcut')->radio([
-                '' => __('All'),
-                'sender' => __('Sender'),
-                'received' => __('Received'),
-                'cp' => __('cp'),
-                'room' => __('room'),
-                'charge' => __('charge'),
-            ]);
+
+        // Filter model by selected tab
+        $grid->model()->when(request('tab'), function ($query) {
+            switch (request('tab')) {
+                case 'Appsender':
+                    $query->where('type', 2);
+                    break;
+                case 'Appreceived':
+                    $query->where('type', 1);
+                    break;
+                case 'Appcp':
+                    $query->where('type', 3);
+                    break;
+                case 'Approom':
+                    $query->where('type', 4);
+                    break;
+                case 'Appcharge':
+                    $query->where('type', 5);
+                    break;
+            }
         });
 
+        // Tabs at top
+        $grid->header(function () {
+            $tabs = [
+                '' => __('All'),
+                'Appsender' => __('AppSender'),
+                'Appreceived' => __('AppReceived'),
+                'Appcp' => __('AppCP'),
+                'Approom' => __('AppRoom'),
+                'Appcharge' => __('AppCharge'),
+            ];
+
+            $currentTab = request('tab', '');
+
+            $html = '<div style="margin-bottom: 10px;">
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">';
+
+            foreach ($tabs as $key => $label) {
+                // Clean URL: keep only needed query params
+                $query = request()->except('tab');
+                if ($key !== '') {
+                    $query['tab'] = $key;
+                }
+                $url = url()->current() . '?' . http_build_query($query);
+
+                // Detect active tab
+                $isActive = ($currentTab === $key);
+
+                // Inline style for active/inactive tabs
+                $style = $isActive
+                    ? 'background: white; color: black; border: 1px solid;'
+                    : 'background: none; color: white; border: 1px solid;';
+
+                $html .= "<a href='$url'
+                            style='padding: 6px 12px; font-size: 14px; border-radius: 4px;
+                                   text-decoration: none; display: inline-block; $style'>
+                            $label
+                          </a>";
+            }
+
+            $html .= '</div></div>';
+
+            return $html;
+        });
+
+        // Other grid settings
         $grid->quickSearch();
+
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5=>__ ('charge'),
-            ]
-        );
+
+        $grid->column('type', __('Type'))->select([
+            1 => __('broadcaster'),
+            2 => __('honor'),
+            3 => __('cp'),
+            4 => __('room'),
+            5 => __('charge'),
+        ]);
+
         $grid->column('level', __('Level'))->editable();
+
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
+            return number_format($value->getOriginal());
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
+
         $grid->column('img', __('Image'))->image('', '30');
+
+        // Any custom grid extensions
         $this->extendGrid($grid);
+
+        // No export button
         $grid->disableExport();
+
         return $grid;
     }
+
+
+
+
 
     /**
      * Make a show builder.
