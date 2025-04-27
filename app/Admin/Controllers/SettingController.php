@@ -30,6 +30,7 @@ class SettingController extends MainController
         $library = Common::getConfig('library');
         $soundLibrary = Common::getConfig('sound_library');
         $videoLibrary = Common::getConfig('video_library');
+        $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::all();
 
@@ -42,7 +43,7 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
-        return $content
+        return parent::index($content
             ->header(__('Settings'))
             ->description('')
             ->body(view('admin.settings_new', compact([
@@ -67,8 +68,9 @@ class SettingController extends MainController
                 'tencent_app_id',
                 'tencent_server_secret',
                 'soundLibrary',
-                'videoLibrary'
-            ])));
+                'videoLibrary',
+                'gamesLibrary'
+            ]))));
     }
 
     public function save_image(Request $request){

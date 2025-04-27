@@ -16,15 +16,15 @@ class RoomSettingsController extends Controller
      * @var string
      */
     protected $title = 'Room-setting';
-    public $permission_name = 'settings';
+    public $permission_name = 'room-settings';
     public function index(Content $content)
     {
         $settings = Config::pluck('value', 'name')->toArray();
-        return $content
+        return parent::index($content
             ->header(__('Settings'))
             ->description('')
 
-            ->body(view('admin.room_settings', compact('settings')));
+            ->body(view('admin.room_settings', compact('settings'))));
     }
 
     public function store(Request $request): RedirectResponse

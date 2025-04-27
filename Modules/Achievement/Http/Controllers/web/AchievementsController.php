@@ -51,7 +51,12 @@ class AchievementsController extends MainController
             $prefix = request()->route()->getPrefix();
             $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/gift-achievements') : url('admin/gift-achievements');
 
-            $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary"> اضف هدايا مستخدمين </a>';
+            $lang = app()->getLocale();
+            $add = 'اضف هدايا مستخدمين ';
+            if($lang == 'en'){
+                $add = 'Add gifts users ';
+            }
+            $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary">'. $add . '</a>';
             $button2 = ($value === 'gift_target') ? $button : null;
 
             return $value . '<br>' . $button2;
@@ -76,9 +81,16 @@ class AchievementsController extends MainController
            // $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/achievement-levels/') :
             $baseUrl =   url('admin/achievements-levels/');
             $url1 = url($baseUrl .'/'. $this->id);
+            $lang = app()->getLocale();
+            $add = 'اضف انواع';
+
+            if($lang == 'en'){
+                $add = 'add types';
+            }
+
             $button =
                 //'<a href="' . $baseUrl . '/' . $this->id . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
-                "<a href='{$url1}' class='btn btn-xs btn-primary'>اضافة انواع </a>";
+                "<a href='{$url1}' class='btn btn-xs btn-primary'>". $add . "</a>";
             return $button;
         });
 

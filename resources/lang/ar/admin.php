@@ -211,6 +211,8 @@ return [
     "public_key" => 'المفتاح العام',
     "country_code" => 'رمز الدولة',
     "Tencent" => 'تينسينت',
+    "lucky_flex" => "لاكي فليكس",
+    "guess_the_word" => "خمن الكلمة",
     "charge_level" => "مستوي الشحن",
 
 
