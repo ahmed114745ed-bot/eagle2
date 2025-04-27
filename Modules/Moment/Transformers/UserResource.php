@@ -78,7 +78,8 @@ class UserResource extends JsonResource
             'is_friend'            => $this->isFriends(),
             'image_color'          => @$this->color_image ?? '',
             'special_color'    => @$this->color_id ?? '',
-            'color_name'   => common::wareUserVip($this->id, 18, 'color') ?? ''
+            'color_name'   => common::wareUserVip($this->id, 18, 'color') ?? '',
+            'color_name_id'   => common::wareUserVip($this->id, 18, 'id') ?? 0
 
         ];
     }
