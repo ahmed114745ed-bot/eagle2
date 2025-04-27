@@ -1059,6 +1059,14 @@
             </div>
 
 
+            <div id="notificationSettings" class="settings-section">
+            </div>
+
+
+            <div id="workSettings" class="settings-section">
+            </div>
+
+
             <div id="paymentCredentialSettings" class="settings-section">
 
                     <div class="form">

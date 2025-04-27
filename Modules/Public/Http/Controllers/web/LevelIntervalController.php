@@ -77,7 +77,7 @@ class LevelIntervalController extends MainController
         });
         $grid->column('min', __('min'));
         $grid->column('max', __('max'));
-        $grid->column('الاجرائات')->display(function () {
+        $grid->column(__('Procedures'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/reward_level_interval/' . $this->id);
 

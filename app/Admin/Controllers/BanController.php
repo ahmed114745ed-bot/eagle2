@@ -165,14 +165,15 @@ class BanController extends MainController
         ");
 
         $grid->column('ban_type_id', __('ban_type'))->display(function ($row) {
-
             $banType = BanType::find($this->ban_type_id);
             $name_ar = $banType->name_ar ?? '';
             $name_en = $banType->name_en ?? '';
 
-            return "$name_ar <br>
-         <span style=\"color: #aaa; font-size: smaller;\">  $name_en</span>" ?? "";
+            $locale = app()->getLocale(); // get current language
+
+            return $locale === 'ar' ? $name_ar : $name_en;
         });
+
         $grid->column('img', trans('image'))->image('', 30);
 
         $grid->device_number(__('device_number'));

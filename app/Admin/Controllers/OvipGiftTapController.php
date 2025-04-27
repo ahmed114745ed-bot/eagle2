@@ -71,7 +71,7 @@ class OvipGiftTapController extends MainController
 
     public function edit($id, Content $content)
     {
-       
+
         return $content
             ->title(trans('gift'))
             ->body($this->form()->edit($id));
@@ -249,7 +249,7 @@ class OvipGiftTapController extends MainController
         $form->saving(function (Form $form) {
 
             $id = $form->model()->id;
-         
+
             $exists = Ware::where('level', $form->level)
                 ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
@@ -295,7 +295,12 @@ class OvipGiftTapController extends MainController
         $content = new Row();
 
         // Fetch distinct privilege types and names
-        $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+        if(app()->getLocale() == 'en'){
+
+            $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
+        } else {
+            $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+        }
 
         // Default to the first type if none is selected
         $currentType = request()->get('type', $privilegeTypes->keys()->first());

@@ -259,13 +259,13 @@ class FreeUserController extends MainController
             );
         });
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+        $grid->column('custom_button2', __('Accounts number'))->display(function () {
             $id           = $this->id;
             $device_token = $this->device_token;
             $count        = User::where('device_token', $device_token)->where('device_token', '!=', null)->count();
             $class        = 1 == 0 ? 'btn-danger' : 'btn-success';
             return $count;
-        })->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+        })->modal(__('Other Accounts on the same device'), function ($model) {
             $device_token  = $this->device_token;
             $users         =
                 User::select("name", 'uuid', 'phone')->where('device_token', $device_token)->where('device_token', '!=', null)->get();
@@ -294,7 +294,7 @@ class FreeUserController extends MainController
             return (new Table([__('Id'), __('target'), __('image')], $filtered->toArray()));
         });
 
-        $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+        $grid->column('custom_button3', __('Change account'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
             $device_token  = $this->device_token;
             $users = UserAccount::where('device_token', $device_token)->get();
             $parentUserIds = $users->pluck('parent_user_id');

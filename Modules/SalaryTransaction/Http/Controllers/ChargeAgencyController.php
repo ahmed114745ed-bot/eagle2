@@ -63,11 +63,11 @@ class ChargeAgencyController extends MainController
     {
         $grid = new Grid(new EntitiesChargeAgency());
 
-        $grid->id(__('admin.ID'));
+        $grid->id(__('ID'));
         $grid->column('agency.name',trans('name'));
         $grid->column('agency.phone',trans('phone'));
         $grid->column('agency.image',trans ('image'))->image ('',30);
-        
+
         $this->extendGrid ($grid);
 
         return $grid;
@@ -104,7 +104,7 @@ class ChargeAgencyController extends MainController
             if (!$id = $form->model()->id) {
                 return 'unique:charge_agencies,agency_id';
             }
-        
+
         });
         return $form;
     }
