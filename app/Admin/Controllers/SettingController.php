@@ -28,6 +28,8 @@ class SettingController extends MainController
         $tencent_app_id = Common::getConfig('tencent_app_id');
         $app_sign = Common::getConfig('app_sign');
         $library = Common::getConfig('library');
+        $soundLibrary = Common::getConfig('sound_library');
+        $videoLibrary = Common::getConfig('video_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::all();
 
@@ -40,8 +42,6 @@ class SettingController extends MainController
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
-        $audio_library = Setting::where('key', 'sound_library')->value('value') ?? '0';
-        $video_library = Setting::where('key', 'video_library')->value('value') ?? '0';
         return $content
             ->header(__('Settings'))
             ->description('')
@@ -66,8 +66,8 @@ class SettingController extends MainController
                 'supabase_service_role_key',
                 'tencent_app_id',
                 'tencent_server_secret',
-                'audio_library',
-                'video_library'
+                'soundLibrary',
+                'videoLibrary'
             ])));
     }
 

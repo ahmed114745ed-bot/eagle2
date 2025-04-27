@@ -456,6 +456,14 @@
         margin-top: 33px;
 
     }
+
+    .no-background-form {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
 </style>
 
 </head>
@@ -711,130 +719,140 @@
                 </form>
             </div>
             <div id="realTimeSetting" class="settings-section">
-                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                <form>
                     @csrf
                     <div class="form">
                         <label class="d-block">{{ __('Sound & Video System Setting:') }}</label>
 
                         <div class="row mt-4">
-                            <!-- Agora Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center  ">
-                                        <h4 class="m-0">{{ __('admin.Agora') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
-                                        </div>
-                                        <!-- <div class="d-flex align-items-center">
-                                            <input type="radio" id="agoraRadio"
-                                                class="custom-radio libraryRealTime" name="library" value="0"
-                                                {{ $library == '0' ? 'checked' : '' }}>
-                                            <label for="agoraRadio" class="switch"></label>
-                                        </div> -->
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="agora_app_id" name="app_id"
-                                                    placeholder="app_id" value="{{ $agora_app_id }}"
-                                                    class="form-control" required>
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Agora Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center  ">
+                                            <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                            <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="agoraRadio"
+                                                       class="custom-radio libraryRealTime" name="library" value="0"
+                                                    {{ $library == '0' ? 'checked' : '' }}>
+                                                <label for="agoraRadio" class="switch"></label>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="agora_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="agora_app_id" name="app_id"
+                                                           placeholder="app_id" value="{{ $agora_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
 
-                            <!-- Zego Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                        <!-- <div class="d-flex align-items-center">
-                                            <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
-                                                name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                            <label for="zegoRadio" class="switch"></label>
-                                        </div> -->
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Zego Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
+                                                       name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                                <label for="zegoRadio" class="switch"></label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                    <input type="text" id="zego_server_secret"
+                                                           name="zego_server_secret" placeholder="server_secret"
+                                                           value="{{ $zego_server_secret }}" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="zego_app_id" name="zego_app_id"
+                                                           placeholder="app_id" value="{{ $zego_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                    <input type="text" id="app_sign" name="app_sign"
+                                                           placeholder="app_sign" value="{{ $app_sign }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="zego_server_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="zego_server_secret"
-                                                    name="zego_server_secret" placeholder="server_secret"
-                                                    value="{{ $zego_server_secret }}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="zego_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="zego_app_id" name="zego_app_id"
-                                                    placeholder="app_id" value="{{ $zego_app_id }}"
-                                                    class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
-                                                <input type="text" id="app_sign" name="app_sign"
-                                                    placeholder="app_sign" value="{{ $app_sign }}"
-                                                    class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
 
-                            <!-- Tencent Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <div class="card p-3 shadow" style="height: 300px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
+                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <!-- Tencent Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                            <div class="ribbon-banner-card">
+                                                <span>{{ __('soon') }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
+                                                       name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                                                <label for="tencentRadio" class="switch"></label>
+                                            </div>
                                         </div>
-                                        <!-- <div class="d-flex align-items-center">
-                                            <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
-                                                   name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                                            <label for="tencentRadio" class="switch"></label>
-                                        </div> -->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
+                                                    <input type="text" id="tencent_server_secret"
+                                                           name="tencent_server_secret" placeholder="server_secret"
+                                                           value="{{ $tencent_server_secret }}" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
+                                                    <input type="text" id="tencent_app_id" name="tencent_app_id"
+                                                           placeholder="app_id" value="{{ $tencent_app_id }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="app_sign">{{ __('admin.app_sign') }}:</label>
+                                                    <input type="text" id="app_sign" name="app_sign"
+                                                           placeholder="app_sign" value="{{ $app_sign }}"
+                                                           class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                                class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="tencent_server_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="tencent_server_secret"
-                                                       name="tencent_server_secret" placeholder="server_secret"
-                                                       value="{{ $tencent_server_secret }}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="tencent_app_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="tencent_app_id" name="tencent_app_id"
-                                                       placeholder="app_id" value="{{ $tencent_app_id }}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="app_sign">{{ __('admin.app_sign') }}:</label>
-                                                <input type="text" id="app_sign" name="app_sign"
-                                                       placeholder="app_sign" value="{{ $app_sign }}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                 </div>
-                            </div>
+                            </form>
+
                         </div>
                         {{-- <div class="row">
                             <!-- Pusher Fields -->
@@ -855,96 +873,97 @@
                     </div>
                 </form>
 
-<!-- إعدادات النظام الصوتي -->
-<form id="audioForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
-    @csrf
-    <div class="form mb-5">
-        <label class="d-block">{{ __('Sound System Setting:') }}</label>
-        <div class="row mt-4">
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Agora</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio audio-option"
-                               name="audio_library" value="0"
-                               {{ $audio_library == '0' ? 'checked' : '' }}>
-                        <label for="audio_agora" class="switch"></label>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Zego</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio audio-option"
-                               name="audio_library" value="1"
-                               {{ $audio_library == '1' ? 'checked' : '' }}>
-                        <label for="audio_zego" class="switch"></label>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Tencent</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio audio-option"
-                               name="audio_library" value="2"
-                               {{ $audio_library == '2' ? 'checked' : '' }}>
-                        <label for="audio_tencent" class="switch"></label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Sound System Setting:') }}</label>
 
-<!-- إعدادات النظام المرئي -->
-<form id="videoForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
-    @csrf
-    <div class="form">
-        <label class="d-block">{{ __('Video System Setting:') }}</label>
-        <div class="row mt-4">
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Agora</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio video-option"
-                               name="video_library" value="0"
-                               {{ $video_library == '0' ? 'checked' : '' }}>
-                        <label for="video_agora" class="switch"></label>
+                        <div class="row mt-4">
+                            <!-- Agora Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="agoraSoundRadio"
+                                               class="custom-radio libraryRealTime" name="sound_library" value="0"
+                                            {{ $soundLibrary == '0' ? 'checked' : '' }}>
+                                        <label for="agoraSoundRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zego Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="zegoSoundRadio" class="custom-radio libraryRealTime"
+                                               name="sound_library" value="1" {{ $soundLibrary == '1' ? 'checked' : '' }}>
+                                        <label for="zegoSoundRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tencent Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="tencentSoundRadio" class="custom-radio libraryRealTime"
+                                               name="sound_library" value="2" {{ $soundLibrary == '2' ? 'checked' : '' }}>
+                                        <label for="tencentSoundRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Zego</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio video-option"
-                               name="video_library" value="1"
-                               {{ $video_library == '1' ? 'checked' : '' }}>
-                        <label for="video_zego" class="switch"></label>
+                </form>
+
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <label class="d-block">{{ __('Video System Setting:') }}</label>
+
+                        <div class="row mt-4">
+                            <!-- Agora Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Agora') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="agoraVideoRadio"
+                                               class="custom-radio libraryRealTime" name="video_library" value="0"
+                                            {{ $videoLibrary == '0' ? 'checked' : '' }}>
+                                        <label for="agoraVideoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zego Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Zego') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="zegoVideoRadio" class="custom-radio libraryRealTime"
+                                               name="video_library" value="1" {{ $videoLibrary == '1' ? 'checked' : '' }}>
+                                        <label for="zegoVideoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tencent Fields -->
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
+                                    <div class="d-flex align-items-center">
+                                        <input type="radio" id="tencentVideoRadio" class="custom-radio libraryRealTime"
+                                               name="video_library" value="2" {{ $videoLibrary == '2' ? 'checked' : '' }}>
+                                        <label for="tencentVideoRadio" class="switch"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Tencent</h4>
-                    <div class="d-flex align-items-center">
-                        <input type="radio" id="custom-radio" class="custom-radio video-option"
-                               name="video_library" value="2"
-                               {{ $video_library == '2' ? 'checked' : '' }}>
-                        <label for="video_tencent" class="switch"></label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-
-
-
-
+                </form>
 
             </div>
 
@@ -1420,7 +1439,7 @@
 
 
 
-                        {{-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="background_type">{{ __('Background Type') }}</label>
                                 <select id="background_type" name="background_type" class="form-control"
@@ -1442,9 +1461,9 @@
                                 <input type="color" id="background_color" name="background_color"
                                     class="form-control" value="{{ $settings['background_color'] ?? '#ffffff' }}">
                             </div>
-                        </div> --}}
+                        </div>
 
-                        {{-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-group" id="background_image_group"
                                 style="display: {{ ($settings['background_type'] ?? '') === 'image' ? 'block' : 'none' }};">
                                 <label for="background_image">{{ __('Background Image') }}</label>
@@ -1457,7 +1476,7 @@
                                     </div>
                                 @endif
                             </div>
-                        </div> --}}
+                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
@@ -1470,7 +1489,7 @@
             </div>
             <div id="pusherSettings" class="settings-section">
                 <h3>{{ __('Real Time Setting') }}</h3>
-             
+
                 <div class="row" style="
                 background-color:var(--box-background-color)!important;
 
@@ -1637,14 +1656,16 @@
                 }
             </script>
             <script>
-                function updateLibrary(selectedLibrary) {
+                function updateLibrary(selectedLibrary, inputName) {
+                    let data = {
+                        _token: "{{ csrf_token() }}",
+                    };
+                    data[inputName] = selectedLibrary;
+
                     $.ajax({
                         url: "{{ route('admin.update-agora-zego') }}",
                         type: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            library: selectedLibrary
-                        },
+                        data: data,
                         success: function(response) {
                             console.log("Library updated via AJAX:", response);
                             toastr.success('Library preference saved!');
@@ -1665,7 +1686,7 @@
                         }
                     });
                 }
-                
+
                 function updatePaymentSwitches() {
                     $(".custom-payment-radio").each(function() {
                         if ($(this).is(":checked")) {
@@ -1679,58 +1700,14 @@
                 // Handle change event on radio buttons
                 $(document).on("change", ".custom-radio", function() {
                     let selectedLibrary = $(this).val();
+                    let inputName= $(this).attr('name');
                     console.log("Selected library:", selectedLibrary);
-                    updateLibrary(selectedLibrary);
+                    console.log("library Name:", inputName);
+                    updateLibrary(selectedLibrary, inputName);
                     updateSwitches();
-                    updateSwitchescustam(this);
-                
                 });
-                function updateSwitchescustam(radioElement) {
-
-                    let form = radioElement.closest("form"); // الفورم الذي يحتوي على الزر
-                    let formData = new FormData();
-                      let selectedLibrary = radioElement.value;
-            
-
-
-                    formData.append("_token", form.querySelector('[name="_token"]').value);
-                    formData.append(radioElement.name, radioElement.value); // اسم وقيمة الزر المضغوط
-
-                    console.log(`⚙️ تم اختيار: ${radioElement.name} = ${radioElement.value}`); // عرض القيمة في الـ console
-
-                    fetch(form.action, {
-                        method: "POST",
-                        body: formData,
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(`✅ تم إرسال ${radioElement.name} = ${radioElement.value}`);
-                        // هنا ممكن تضيف Toast أو رسالة نجاح
-                    })
-                    .catch(error => {
-                        console.error("❌ حصل خطأ أثناء الإرسال:", error);
-                    });
-                }
 
                 $(document).on("change", ".custom-payment-radio", function() {
-                    let isActive = $(this).is(":checked") ? 1 : 0;
-                    let fieldName = $(this).attr("name");
-                    $.ajax({
-                        url: "{{ route('admin.settings.update') }}",
-                        type: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            [fieldName]: isActive
-                        },
-                        success: function(response) {
-                            console.log("Payment switch updated via AJAX:", response);
-                            toastr.success('Payment preference saved!');
-                        },
-                        error: function(xhr) {
-                            console.error("AJAX Error:", xhr.responseText);
-                            toastr.error('Failed to update payment preference');
-                        }
-                    });
                     updatePaymentSwitches();
                 });
 
@@ -1740,7 +1717,7 @@
 
                     if (!radio.prop("checked")) {
                         // Uncheck all radios in the same group
-                        $("input[name='" + radio.attr("name") + "']").prop("checked", false);
+                        $("input[name='library']").prop("checked", false);
                         // Remove active class from all switches
                         $(".switch").removeClass("active");
 
@@ -1993,11 +1970,6 @@
                         });
                     });
                 });
-
-
-      
-
-  
             </script>
 
         </div>
