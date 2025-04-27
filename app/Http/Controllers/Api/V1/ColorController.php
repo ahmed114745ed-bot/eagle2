@@ -20,7 +20,7 @@ class ColorController extends Controller
             'grey_color' => Cache::get('app_grey_color')??'',
             'yellow_color' => Cache::get('app_yellow_color')??'',
             'background_color' => Cache::get('background_color') ?? '',
-            'background_image' => Cache::get('background_image') ?? ''
+            'background_image' => Cache::get('app_background') ?? ''
         ];
         settings()->set('colors_updated_at', false);
         return Common::apiResponse (true,'',$data,200);
