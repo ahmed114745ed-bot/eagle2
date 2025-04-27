@@ -72,7 +72,13 @@ Route::get('update-need',function(){
     $ten->en_name = 'Mystery man just entered the room';
     $ten->save();
 
+    $eleven = VipPrivilege::find(15);
+    $eleven->en_name = 'Colorful nickname';
+    $eleven->save();
 
+    $twelve = VipPrivilege::find(16);
+    $twelve->en_name = 'Hide the viewing history';
+    $twelve->save();
 });
 Route::prefix('payment')->group(function () {
     Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
