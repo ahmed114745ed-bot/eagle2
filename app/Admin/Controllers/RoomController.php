@@ -327,7 +327,7 @@ class RoomController extends MainController
                     <div style="display: inline-block; text-align: center; margin-right: 12px;">
                         <img src="'.$url.'" 
                              title="'.$username.'" 
-                             style="width: 60px; height: 60px; border-radius: 50%; 
+                             style="width: 50px; height: 50px; border-radius: 50%; 
                                     object-fit: cover; border: 2px solid white;
                                     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                                     transition: transform 0.2s ease;"/>
