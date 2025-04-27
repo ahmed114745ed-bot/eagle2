@@ -205,6 +205,6 @@ return [
     "opay" => 'Opay',
     "public_key" => 'Genel Anahtar',
     "country_code" => 'Ülke Kodu',
-
+    "Tencent" => 'Tencent',
     "charge_level" => "şarj seviyesi",
 ];
