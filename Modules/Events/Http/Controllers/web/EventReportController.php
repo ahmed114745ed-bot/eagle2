@@ -82,7 +82,7 @@ class EventReportController extends MainOldController
 
         $grid->column('reward.level', __('level'));
         $grid->column('reward.type', __('type'));
-        $grid->column(__('الهديه'))->display(function () {
+        $grid->column(__('Gifts'))->display(function () {
             if ($this->reward != null) {
                 $target = '';
                 if ($this->reward->type == 'coins') {
