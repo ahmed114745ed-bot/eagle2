@@ -189,7 +189,7 @@ class RoomController extends MainController
                 $username = htmlspecialchars($user->name ?? 'Unknown');
                 
                 $html .= '
-                    <div style="display: inline-block; text-align: center; margin-right: 12px;">
+                    <div style="display: inline-block; text-align: center; margin-right: -12px;">
                         <img src="'.$url.'" 
                              title="'.$username.'" 
                              style="width: 50px; height: 50px; border-radius: 50%; 
