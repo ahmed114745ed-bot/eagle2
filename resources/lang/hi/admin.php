@@ -202,5 +202,6 @@ return [
     "country_code" => 'देश कोड',
     "Tencent" => 'Tencent',
     "lucky_flex" => "लकी फ्लेक्स",
+    "guess_the_word" => "शब्द का अनुमान लगाएं",
     "charge_level" => "चार्ज स्तर",
 ];

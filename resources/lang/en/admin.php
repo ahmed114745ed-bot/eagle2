@@ -210,6 +210,7 @@ return [
     "country_code" => 'Country Code',
     "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
+    "guess_the_word" => "Guess The Word",
     'creator' => 'admin'
 
 
