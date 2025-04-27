@@ -813,16 +813,17 @@ class UserController extends MainController
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
-        $form->select('type_user', trans('User Type'))->options([
-            $form->model()->type_user => $form->model()->type_user,
-            0                         => 'مستخدم',
-            1                         => 'مضيف',
-            2                         => 'وكيل مضيفين',
-            3                         => 'وكيل شحن',
-            4                         => ' وكيل مصيفين ووكيل شحن',
-            5                         => 'اداري',
-
-        ])->default(0);
+        $form->select('type_user', trans('User Type'))
+        ->options([
+            0 => 'مستخدم',
+            1 => 'مضيف',
+            2 => 'وكيل مضيفين',
+            3 => 'وكيل شحن',
+            4 => 'وكيل مصيفين ووكيل شحن',
+            5 => 'اداري',
+        ])
+        ->default(0)
+        ->rules('required|in:0,1,2,3,4,5');
 
         if (Session::has('show_alert')) {
             $form->html('<script>

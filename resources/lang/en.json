@@ -697,5 +697,6 @@
      "firebase_database_url": "database url firebase",
      "Real Time Setting": "Real Time Setting",
      "Real Time system Setting": "Real Time system Setting",
-     "Payment Credential Settings": "Payment Credential Settings"
+     "Payment Credential Settings": "Payment Credential Settings",
+     "Charge-agency":"Charge Agency"
     }

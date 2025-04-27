@@ -423,7 +423,7 @@ Route::group(
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
         $router->resource('core-wallets', CoreWalletsController::class);
         $router->resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        $router->resource('appear-charger-agency', AppearChargerAgencyController::class);
+        $router->resource('charge-agencies', AppearChargerAgencyController::class);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
