@@ -804,7 +804,27 @@ trait CalcsTrait
 
         if (!$vip) return new \stdClass();
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
-        return @$ware?->{$item} ?? '';
+        return optional($ware)->{$item} ?? '';
+    }
+
+    public static function wareUserVipColor($user_id, $type)
+    {
+        if (gettype($user_id) == 'integer') {
+            $user = User::query()->find($user_id);
+            if (!$user) return new \stdClass();
+        } else {
+            $user = $user_id;
+        }
+        if (!isset($user->UserVip)) return '';
+        $uvip = $user?->UserVip;
+        if (!$uvip) return new \stdClass();
+
+        $vip = OVip::query()->find($uvip->vip_id);
+
+        if (!$vip) return new \stdClass();
+        $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
+        if(!$ware) return '';
+        return @$ware?->color ?? '';
     }
 
 
