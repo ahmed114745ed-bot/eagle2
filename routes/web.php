@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
 use App\Models\RoomVisitor;
+use App\Models\VipPrivilege;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,59 @@ use App\Models\RoomVisitor;
 |
 */
 
+Route::get('update-need',function(){
+
+    $two = VipPrivilege::find(2);
+    $two->en_name = 'Special frame';
+    $two->save();
+
+    $three = VipPrivilege::find(3);
+    $three->en_name = 'Get the car';
+    $three->save();
+
+    $four = VipPrivilege::find(4);
+    $four->en_name = 'Special entry effect';
+    $four->save();
+
+
+    $four = VipPrivilege::find(7);
+    $four->en_name = 'Colorful message';
+    $four->save();
+
+
+    $five = VipPrivilege::find(8);
+    $five->en_name = 'Flying comment';
+    $five->save();
+
+
+    $six = VipPrivilege::find(10);
+    $six->en_name = 'Exclusive gift';
+    $six->save();
+
+    $seven = VipPrivilege::find(11);
+    $seven->en_name = 'Prevent from being kicked';
+    $seven->save();
+
+    $eight = VipPrivilege::find(12);
+    $eight->en_name = 'Anti ban';
+    $eight->save();
+
+    $nine = VipPrivilege::find(13);
+    $nine->en_name = 'Hidden';
+    $nine->save();
+
+    $ten = VipPrivilege::find(14);
+    $ten->en_name = 'Mystery man just entered the room';
+    $ten->save();
+
+    $eleven = VipPrivilege::find(15);
+    $eleven->en_name = 'Colorful nickname';
+    $eleven->save();
+
+    $twelve = VipPrivilege::find(16);
+    $twelve->en_name = 'Hide the viewing history';
+    $twelve->save();
+});
 Route::prefix('payment')->group(function () {
     Route::get('payment-success', [\App\Http\Controllers\Web\PaymentController::class, 'success']);
     Route::get('payment-fail', [\App\Http\Controllers\Web\PaymentController::class, 'fail']);
@@ -146,7 +200,7 @@ Route::group(
 
     }
 
-    
+
 );
 Route::get('/update-rooms', function(){
     RoomVisitor::whereDate('created_at','<',date("Y-m-d"))->delete();

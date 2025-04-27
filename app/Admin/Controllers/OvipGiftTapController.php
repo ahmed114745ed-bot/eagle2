@@ -7,6 +7,7 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
+use App\Models\VipPrivilege;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -37,7 +38,6 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-
 
         return parent::index($content
             ->title(trans('Privileges'))
