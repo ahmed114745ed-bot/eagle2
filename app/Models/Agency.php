@@ -193,7 +193,46 @@ class Agency extends Model
     {
         parent::boot();
 
-        // Listen for the 'deleting' event of the Agency model
+        static::saving(function ($model) {
+           
+            if (request()->has('charge_agency')) { 
+                if (request('charge_agency') == 1) { 
+                    ChargeAgency::firstOrCreate([
+                        'agency_id' => $model->id
+                    ]);
+                } else {
+                    ChargeAgency::where('agency_id', $model->id)->delete();
+                }
+            }
+
+            if (request()->has('appear_charger_agency')) { 
+                $user = User::find($model->app_owner_id);
+
+                if ($user) {
+                    if (request('appear_charger_agency') == 1) {
+                        $user->update(['appear_charger_agency' => 1]);
+                    } else {
+                        $user->update(['appear_charger_agency' => 0]);
+                    }
+                }
+            }
+
+            
+          
+             
+
+           
+        
+        
+        
+        });
+
+        static::updating(function ($agency) {
+            if (isset($agency->is_frozen)) {
+                $agency->is_frozen = (bool) $agency->is_frozen;
+            }
+        });
+
         static::deleting(function ($agency) {
             // Update the related user model (change type to 0)
             if ($agency->app_owner_id) {
@@ -206,6 +245,7 @@ class Agency extends Model
                     ]);
                 }
             }
+
         });
     }
 
@@ -338,4 +378,11 @@ class Agency extends Model
     {
         return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
     }
+
+    public function getIsFrozenAttribute($value)
+    {
+        return $value ?? 0; 
+    }
+
+ 
 }
