@@ -12,8 +12,8 @@
     @if(!is_null($favicon = Admin::favicon()))
     <link rel="shortcut icon" href="{{$favicon}}">
     @endif
-
     {!! Admin::css() !!}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
 
     <script src="{{ Admin::jQuery() }}"></script>
     {!! Admin::headerJs() !!}
@@ -107,5 +107,17 @@ document.addEventListener("DOMContentLoaded", function () {
 <!-- REQUIRED JS SCRIPTS -->
 {!! Admin::js() !!}
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.querySelector("#phone-input");
+        window.intlTelInput(input, {
+            separateDialCode: true,
+            preferredCountries: ["eg"],
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        });
+    });
+</script>
 </body>
 </html>
