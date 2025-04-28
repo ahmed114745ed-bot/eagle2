@@ -1,7 +1,7 @@
 @php
     $agencyMenu = null;
     foreach (Admin::menu() as $item) {
-        if ($item['title'] == 'Agency System') {
+        if ($item['title'] == __('Agency System')) {
             $agencyMenu = $item;
             break;
         }
