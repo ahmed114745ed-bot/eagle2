@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\RoomPinAction;
 use App\Helpers\Common;
 use App\Models\Room;
 use App\Http\Controllers\Controller;
@@ -115,10 +116,20 @@ class RoomController extends MainController
             });
         });
 
+        $grid->disableRowSelector();
+
+        $grid->column('pin', __('Pin Status'))->display(function ($pin) {
+            return $pin == 1 
+                ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
+                : '<span class="text-muted"> </span>';
+        })->sortable();
+
         $grid->id(__('ID'));
+
         $grid->column('room_name', __('room'))->display(function ($name) {
 
             $path = @$this->room_cover;
+            $id = @$this->id;
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -133,7 +144,8 @@ class RoomController extends MainController
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                        <span  cursor: pointer;'>$name</span>
+                        <span  cursor: pointer;'>$name</span><br>
+                        <span  cursor: pointer;'>ID: $id</span>
                         </a>
                     </div>
 
@@ -142,6 +154,7 @@ class RoomController extends MainController
         });
         $grid->column('owner.name', __('room owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
+            $id = @$this->owner->id;
             $path = @$this->owner?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -157,6 +170,7 @@ class RoomController extends MainController
                 $image
                 <div>
                     <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>ID: $id</span><br>
                     <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
                 </div>
             </div>
@@ -164,20 +178,20 @@ class RoomController extends MainController
         });
 
 
-        $grid->column('pin', __('Pin'))->display(function ($pin) {
-            $roomId = $this->id;
-            $isPinned = $pin ? 'true' : 'false';
-            $pinIcon = $pin ? 'fa-check-circle' : 'fa-thumb-tack';
-            $pinColor = $pin ? 'text-success' : 'text-muted';
+    //     $grid->column('pin', __('Pin'))->display(function ($pin) {
+    //         $roomId = $this->id;
+    //         $isPinned = $pin ? 'true' : 'false';
+    //         $pinIcon = $pin ? 'fa-check-circle' : 'fa-thumb-tack';
+    //         $pinColor = $pin ? 'text-success' : 'text-muted';
 
-            return <<<HTML
-    <button class="btn btn-sm {$pinColor} pin-room-btn"
-            data-room="{$roomId}"
-            data-pinned="{$isPinned}">
-        <i class="fa {$pinIcon}"></i>
-    </button>
-    HTML;
-        });
+    //         return <<<HTML
+    // <button class="btn btn-sm {$pinColor} pin-room-btn"
+    //         data-room="{$roomId}"
+    //         data-pinned="{$isPinned}">
+    //     <i class="fa {$pinIcon}"></i>
+    // </button>
+    // HTML;
+    //     });
         /*         $grid->column(__('status'))->display(function () {
             return (new \App\Admin\Actions\RoomAction(
                 $this->id,
@@ -282,6 +296,12 @@ class RoomController extends MainController
 
         $grid->actions(function ($action) {
             $action->disableView();
+            $pin = $action->row->pin;
+    
+            // إضافة الفعل مع تمرير الـ pin
+            $action->add(new RoomPinAction($action->row->id, $pin));
+        
+
         });
         $grid->disableCreateButton();
         $grid->disableExport();
