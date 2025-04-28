@@ -106,7 +106,6 @@ class TargetController extends MainController
                 $userUsd = $endFormatted * $value / 100;
                 $userUsd = common::roundToTwoDecimalPlaces($userUsd);
 
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
@@ -185,7 +184,7 @@ class TargetController extends MainController
                 $value = is_numeric($value) ? floatval($value) : 0;
                 $userUsd = $endFormatted * $value / 100;
                 $userUsd = common::roundToTwoDecimalPlaces($userUsd);
-                
+
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
