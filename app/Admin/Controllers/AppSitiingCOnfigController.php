@@ -237,7 +237,7 @@ class AppSitiingCOnfigController extends MainController
 
         $form .= '</div>'; // Close form-row
         $form .= '<div class="col-sm-12" style="'.$buttonAlignStyle.'">';
-        $form .= '<button type="submit" class="btn btn-primary">' . __('admin.submit') . '</button>';
+        $form .= '<button type="submit" class="btn btn-primary" style=" margin-top:-20px;">' . __('admin.submit') . '</button>';
         $form .= '</div>';
 
         $form .= '</form>';
