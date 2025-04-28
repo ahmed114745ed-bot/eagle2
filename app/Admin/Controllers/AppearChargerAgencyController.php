@@ -246,7 +246,7 @@ class AppearChargerAgencyController extends MainController
         $form->text('phone', __('phone'))->rules('required');
         $form->url('url', __('url'));
         $form->textarea('contents', __('contents'));
-        $form->hidden('is_frozen', __('is_frozen'));
+        $form->hidden('is_frozen', __('is_frozen'))->default(0);
     
        
     
