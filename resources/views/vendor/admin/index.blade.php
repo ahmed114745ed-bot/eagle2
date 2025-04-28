@@ -112,11 +112,23 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const input = document.querySelector("#phone-input");
-        window.intlTelInput(input, {
-            separateDialCode: true,
-            preferredCountries: ["eg"],
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-        });
+        if (input) {
+            const iti = window.intlTelInput(input, {
+                separateDialCode: true,
+                preferredCountries: ["eg"],
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+            });
+
+            const form = input.closest('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    if (iti) {
+                        // Get number in E.164 format (example: +2015458)
+                        input.value = iti.getNumber();
+                    }
+                });
+            }
+        }
     });
 </script>
 </body>

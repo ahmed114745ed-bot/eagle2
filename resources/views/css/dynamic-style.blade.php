@@ -153,6 +153,22 @@
         float: right !important;
     }
 
+    .iti { position: relative; z-index: 1050 !important; }
+    .iti__country-list {
+        z-index: 3000 !important;
+    }
+
+    .iti__country-list, .iti__country {
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    .rtl .iti--allow-dropdown .iti__flag-container,
+    .rtl .iti--separate-dial-code .iti__flag-container {
+        left: auto;
+        right: 0;
+    }
+
     .box {
         background: var(--secondary-color) !important;
         filter: brightness(0.85);
