@@ -2109,7 +2109,13 @@
 "gateway_ready" : "الدفع جاهز للاستخدام",
 "edit_credentials" : "يرجى تعديل إعدادات الدفع",
 "Real Time Setting": "إعدادات الوقت الحقيقي",
-"Charge-agency":"وكالة شحن موثوقة"
+"Charge-agency":"وكالة شحن موثوقة",
+"Pinned": "مثبت",
+"Unpinned": "غير مثبت",
+"Unpin": "إلغاء التثبيت",
+"Pin Status": "حالة التثبيت"
+
+
 
 
 
