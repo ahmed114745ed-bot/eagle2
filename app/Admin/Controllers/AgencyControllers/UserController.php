@@ -178,7 +178,7 @@ class UserController extends MainController
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
             if ($form->isEditing()) {
                 $form->number('di', __('Coins'))->default(0)
-                ->disable($form->isEditing());
+                    ->disable($form->isEditing());
             } else {
                 $form->number('di', __('Coins'))->default(0);
             }
@@ -270,14 +270,14 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-        $grid->model()->ofAgency()->with("ownerRoom")->where('is_host',1);
+        $grid->model()->ofAgency()->with("ownerRoom")->where('is_host', 1);
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
 
-                $filter->column(1/2, function ($filter) {
+                $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
                         $query->where('name', 'like', "%$input%")
@@ -299,19 +299,19 @@ class UserController extends MainController
                 : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
         });
         $grid->column('name', __('Name'))
-        ->display(function ($name) {
-            $uid = @$this->uuid;
-            $path = @$this->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            return "
+                return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
@@ -320,7 +320,7 @@ class UserController extends MainController
                 </div>
             </div>
         ";
-        });
+            });
         $grid->column('return', __('status user'))->display(function () {
             $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
             return (new \App\Admin\Actions\UserAction(
@@ -362,29 +362,45 @@ class UserController extends MainController
         $grid->column('agency_id', __('agency id'))->modal(__('admin info'), function () {
             $agency =  Agency::query()->find(@$this->agency_id);
             $path = @$agency?->img;
-                $defaultImage = asset("images/icon-agency.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-                 // Check if the image exists
-                 if (!isImageExists($url)) {
-                     $url = $defaultImage;
-                 }
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             $showUrl = $agency ? url("admin/agencies/profile/{$agency->id}") : 0;
-                 $agencyName = $agency->name ?? '';
+            $agencyName = $agency->name ?? '';
             $results = [
-             __('name') => "  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                __('name') => "  <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                          <span style='text-decoration: underline; cursor: pointer;'>$agencyName</span>
                         </a>",
-             __('img') => "<img src='" . $url ."' style='width:100px;height:100px' class='img img-thumbnail'$ />" ,
+                __('img') => "<img src='" . $url . "' style='width:100px;height:100px' class='img img-thumbnail'$ />",
 
-         ];
+            ];
 
-         return new Table([__('Field Name'), __('Value')], $results);
-         });
+            return new Table([__('Field Name'), __('Value')], $results);
+        });
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
-            $targets = $model->targets()->orderBy('created_at', 'desc')->get()->map(function ($target) {
+            $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
+                $data = json_decode($target->extras, true);
+    
+                $moment_upload = $data['moment']['upload'] ?? '';
+                $moment_likes = $data['moment']['likes'] ?? '';
+                $moment_comments = $data['moment']['comments'] ?? '';
+
+                // For "reel"
+                $reel_upload = $data['reel']['upload'] ?? '';
+                $reel_likes = $data['reel']['likes'] ?? '';
+                $reel_comments = $data['reel']['comments'] ?? '';
+
+                // Combine moment fields
+                $moment_info = "Upload: {$moment_upload} | Likes: {$moment_likes} | Comments: {$moment_comments}";
+
+                // Combine reel fields
+                $reel_info = "Upload: {$reel_upload} | Likes: {$reel_likes} | Comments: {$reel_comments}";
                 $target =
                     [
                         'id' => $target->id,
@@ -394,6 +410,8 @@ class UserController extends MainController
                         'user_diamonds' => $target->user_diamonds,
                         'user_hours' => $target->user_hours,
                         'user_days' => $target->user_days,
+                        'moment' => $moment_info,
+                        'real' => $reel_info,
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
                     ];
@@ -405,12 +423,14 @@ class UserController extends MainController
             return new \App\Admin\Widgets\Table(
                 [
                     'ID',
-                    __('month') .'/'.__('year') ,
-                    __('usd') . ' ' . __('deserved'),
+                    __('month') . '/' . __('year'),
+                    __('usd') . ' ' . __('deserved') . '(%)',
                     __('agency share') . '(%)',
                     __('user diamonds'),
                     __('user hours'),
                     __('user days'),
+                    __('moment'),
+                    __('real'),
                     __('user obtain'),
                     __('at time'),
                 ],
@@ -504,13 +524,13 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $model = $actions->row;
 
-/*             if ($model->agency_id >= 1) {
+            /*             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
             } */
         });
 
 
-       // $grid->disableActions();
+        // $grid->disableActions();
         $grid->disableCreateButton();
 
         return $grid;

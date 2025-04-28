@@ -1205,7 +1205,7 @@ class Common
             'role_id' => $role->id,
         ]);
         if ($user->email != null) {
-            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+         Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
         }
         return true;
     }
@@ -1310,7 +1310,25 @@ class Common
        $num= settings()->get('diamonds');
        $per = $num / 100;
        return $per;
+    }   
+
+
+    public static function ifRoomHasband($owner_id)
+    {
+        $room = Room::where('uid', $owner_id)->first();
+    
+        if ($room) {
+            $ban = $room->bans()
+                ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
+                ->first();  
+            return $ban ? true : false;
+        }
+    
+        return false; 
     }
+
+
+
 
  
 
