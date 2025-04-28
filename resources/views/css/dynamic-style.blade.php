@@ -153,6 +153,27 @@
         float: right !important;
     }
 
+    .iti { position: relative; z-index: 1050 !important; }
+    .iti__country-list {
+        z-index: 3000 !important;
+    }
+
+    .iti {
+        direction: ltr !important;
+        text-align: left !important; /* optional, for consistent alignment */
+    }
+
+    .iti__country-list, .iti__country {
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    .rtl .iti--allow-dropdown .iti__flag-container,
+    .rtl .iti--separate-dial-code .iti__flag-container {
+        left: auto;
+        right: 0;
+    }
+
     .box {
         background: var(--secondary-color) !important;
         filter: brightness(0.85);
@@ -361,9 +382,14 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
-    .rtl [class*="col-md-12"] {
-        float: none !important;
+    .rtl .box-body .fields-group [class*="col-md-12"] {
+        float: left; !important;
     }
+
+    .rtl [class*="col-md-12"] {
+        float: none; !important;
+    }
+
 
     .rtl [class*="col-md-6"] {
         float: right;
