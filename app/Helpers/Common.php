@@ -1276,6 +1276,7 @@ class Common
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
 
+        $usd =Common::roundToTwoDecimalPlaces($userUsd);
         return $userUsd;
     }
 
@@ -1328,6 +1329,13 @@ class Common
     }
 
 
+    public static function roundToTwoDecimalPlaces($number)
+    {
+        return floor($number * 100) / 100;
+    }
+
+
+    
 
 
  

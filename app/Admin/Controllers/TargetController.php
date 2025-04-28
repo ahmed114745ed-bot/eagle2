@@ -87,8 +87,8 @@ class TargetController extends MainController
 
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
-                $endFormatted = $coins ? number_format($value / $coins) : 0;
-
+                $endFormatted = $coins ? ($value / $coins) : 0;
+                $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
                 return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>💎 {$value}</span>
@@ -100,6 +100,11 @@ class TargetController extends MainController
         $grid->usd(__('Host Percentage'))
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
+
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
 
                 $userUsd = floatval($endFormatted) * floatval($value) / 100;
                 $userPercentage = number_format($value);
@@ -158,7 +163,12 @@ class TargetController extends MainController
         $grid->agency_share(__('agency share'))
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
+
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
@@ -170,7 +180,12 @@ class TargetController extends MainController
         $grid->db_percentage(__('DB  Percentage'))
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
+                
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
