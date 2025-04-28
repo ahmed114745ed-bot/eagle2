@@ -83,7 +83,8 @@ class AppearChargerAgencyController extends MainController
     {
         $grid = new Grid(new Agency());
     
-        $grid->model()->with('owner.profile'); // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
+        // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
+        $grid->model()->with('owner.profile');
     
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -116,11 +117,9 @@ class AppearChargerAgencyController extends MainController
                 $url = $defaultImage;
             }
     
-            $image = handleShowImageWithTypes($this->owner->id, $url, 40, 40);
-    
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
+                    <img src='{$url}' alt='Agency Image' width='40' height='40'>
                     <div>
                         <strong>$name</strong><br>
                         <span style='color: green;'> Coins: $coins</span>
@@ -133,10 +132,11 @@ class AppearChargerAgencyController extends MainController
         });
     
         $grid->column('owner_id', __('Owner'))->display(function () {
-            $name = $this->owner->name ?? 'Unknown Owner';
-            $uid = $this->owner->uuid ?? 'N/A';
-            $phone = $this->owner->phone ?? '-';
-            $path = $this->owner->profile->avatar ?? '';
+            // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
+            $name = $this->owner ? $this->owner->name ?? 'Unknown Owner' : 'Unknown Owner';
+            $uid = $this->owner ? $this->owner->uuid ?? 'N/A' : 'N/A';
+            $phone = $this->owner ? $this->owner->phone ?? '-' : '-';
+            $path = $this->owner && $this->owner->profile ? $this->owner->profile->avatar : '';
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
     
@@ -144,7 +144,8 @@ class AppearChargerAgencyController extends MainController
                 $url = $defaultImage;
             }
     
-            $image = handleShowImageWithTypes($this->owner->id, $url, 40, 40);
+            // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
+            $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
     
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -166,17 +167,15 @@ class AppearChargerAgencyController extends MainController
     
         $grid->column('appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
-                return $this->owner->appear_charger_agency ? 1 : 0;
+                return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
     
-
         $grid->column('is_frozen', __("frozen"))
             ->display(function () {
                 return $this->is_frozen ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
-       
     
         $grid->disableActions();
     
@@ -247,7 +246,7 @@ class AppearChargerAgencyController extends MainController
         $form->text('phone', __('phone'))->rules('required');
         $form->url('url', __('url'));
         $form->textarea('contents', __('contents'));
-        $form->hidden('is_frozen', __('is_frozen'));
+        $form->hidden('is_frozen', __('is_frozen'))->default(0);
     
        
     
