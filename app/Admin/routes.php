@@ -348,6 +348,13 @@ Route::group(
                 // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
             $router->resource('ware-gifts', 'OvipGiftTapController');
+            Route::prefix('ware-gifts')->group(function () {
+
+               
+                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+            });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
