@@ -18,6 +18,12 @@ use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
+
+    public function downloadApp(){
+
+        $url = env('DOWNLOAD_URL');
+        return view('downloadApp', compact('url'));
+    }
     public function index()
     {
         $timezones = Timezone::all();
@@ -31,7 +37,7 @@ class SettingsController extends Controller
     {
         $data = $request->except('_token');
 
-        
+
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -44,7 +50,7 @@ class SettingsController extends Controller
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
             if ($zoneSetting && $superAdminSetting && $shippingSetting ) {
-               
+
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 
                         // if ($userSalary) {
@@ -54,33 +60,33 @@ class SettingsController extends Controller
 
                         //             admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                         //             return back();
-                                
-                        //     } 
+
+                        //     }
                         // }
 
                 if ($request->zones_coins < $request->super_admin_coins) {
                     admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
                     return back();
-                }      
+                }
 
                 if ($request->super_admin_coins < $request->shipping_coins) {
                     admin_toastr(__('super admin coins must be greater than  agancy coins'), 'error');
                     return back();
-                }     
+                }
 
                 if ($request->shipping_coins < $request->user_coins) {
                     admin_toastr(__('agancy coins must be greater than  user coins'), 'error');
                     return back();
-                }   
-                
-                
+                }
 
-               
-              
+
+
+
+
             }
 
-          
-          
+
+
         }
 
         if ($request->background_type === 'color') {
