@@ -95,10 +95,12 @@
                 @else
                     <span>{{ admin_trans($item['title']) }}</span>
                 @endif
-                @if ($item['title'] == 'Wallet')
-                    <span class="pull-right">Soon</span>
-                @endif
-                <i class="fa fa-angle-left pull-right"></i>
+                <span class="d-flex flex-row-reverse align-items-center">
+                    <i class="fa fa-angle-left pull-right"></i>
+                    @if ($item['title'] == 'Wallet')
+                        <span class="pull-right">Soon</span>
+                    @endif
+                </span>
             </a>
             <ul class="treeview-menu">
                 @foreach($item['children'] as $item)
