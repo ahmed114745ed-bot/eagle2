@@ -1105,9 +1105,13 @@
   "amount usd": "राशि (USD)",
   "shipping date": "शिपिंग तिथि",
   "charges-settings": "शुल्क सेटिंग्स",
-  "Charges settings": "शुल्क सेटिंग्स",
-  "Agency Coins": "एजेंसी सिक्के",
-  "User Coins": "उपयोगकर्ता सिक्के",
+    "Charges settings": "शुल्क सेटिंग्स",
+      "Agency Coins": "एजेंसी सिक्के",
+    "Zones": "क्षेत्र",
+    "Super Admin": "सुपर एडमिन",
+    "Agency Charge": "एजेंसी शुल्क",
+    "The User": "उपयोगकर्ता",
+    "User Coins": "उपयोगकर्ता सिक्के",
   "Confirm Update": "अपडेट की पुष्टि करें",
   "Are you sure you want to update the target settings? This action cannot be undone.": "क्या आप वाकई लक्ष्य सेटिंग्स अपडेट करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती.",
   "Cancel": "रद्द करें",
@@ -1174,7 +1178,12 @@
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
    "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
    "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
-"Charge-agency": "चार्ज एजेंसी"
+"Charge-agency": "चार्ज एजेंसी",
+"Pinned": "पिन किया हुआ",
+        "Unpinned": "पिन नहीं किया हुआ",
+        "Unpin": "पिन हटाना",
+        "Pin Status": "पिन स्थिति"
+
 
 
 

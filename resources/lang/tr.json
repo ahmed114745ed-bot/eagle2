@@ -1958,8 +1958,12 @@
   "recipient": "alıcı",
   "amount usd": "tutar (USD)",
   "shipping date": "gönderim tarihi",
-  "Charges settings": "Ücret Ayarları",
-  "Agency Coins": "Ajans Parası",
+    "Charges settings": "Ücret Ayarları",
+    "Zones": "Bölgeler",
+    "Super Admin": "Süper Yönetici",
+    "Agency Charge": "Ajans Ücreti",
+    "The User": "Kullanıcı",
+    "Agency Coins": "Ajans Parası",
   "User Coins": "Kullanıcı Parası",
   "Confirm Update": "Güncellemeyi Onayla",
   "Are you sure you want to update the target settings? This action cannot be undone.": "Hedef ayarlarını güncellemek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
@@ -2029,6 +2033,11 @@
   "Real Time Setting": "Gerçek Zamanlı Ayarlar",
   "Real Time system Setting": "Gerçek Zamanlı Sistem Ayarları",
   "Payment Credential Settings": "Ödeme Kimlik Bilgileri Ayarları",
-"Charge-agency": "Şarj Ajansı"
+"Charge-agency": "Şarj Ajansı",
+"Pinned": "Sabitlenmiş",
+"Unpinned": "Sabitlenmemiş",
+"Unpin": "Sabitlemeyi Kaldır",
+"Pin Status": "Sabitlenme Durumu"
+
 
 }

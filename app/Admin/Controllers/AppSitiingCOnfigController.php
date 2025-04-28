@@ -181,31 +181,6 @@ class AppSitiingCOnfigController extends MainController
             }
         </style>';
 
-        // Invitation Code Date
-        $form .= '<div class="form-group">';
-        $form .= '<label for="invitation_code_date" class="control-label">' . __('admin.invitation_code_date') . '</label>';
-        $form .= '<input type="number" id="invitation_code_date" name="invitation_code_date" placeholder="' . __('admin.invitation_code_date_placeholder') . '" value="' . $settings['invitation_code_date'] . '" class="inputs_cus_form">';
-        $form .= '</div>';
-
-        // Toggle Switches
-        $form .= '<div class="form-row">';
-        $form .= '<div class="switch-container">';
-        $form .= '<label for="show_welcom_enmation" class="control-label">' . __('admin.show_welcome_animation') . '</label>';
-        $form .= '<label class="switch">';
-        $form .= '<input type="checkbox" name="show_welcom_enmation"' . ($settings['show_welcom_enmation'] ? "checked" : "") . '>';
-        $form .= '<span class="slider"></span>';
-        $form .= '</label>';
-        $form .= '</div>';
-
-        $form .= '<div class="switch-container">';
-        $form .= '<label for="chat_status" class="control-label">' . __('admin.enable_chat') . '</label>';
-        $form .= '<label class="switch">';
-        $form .= '<input type="checkbox" name="chat_status"' . ($settings['chat_status'] ? "checked" : "") . '>';
-        $form .= '<span class="slider"></span>';
-        $form .= '</label>';
-        $form .= '</div>';
-        $form .= '</div>';
-
         // Platform Settings
         $form .= '<div class="form-row">';
 

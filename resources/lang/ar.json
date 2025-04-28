@@ -2039,7 +2039,11 @@
   "recipient": "االمستلم",
   "amount $": "المبلغ $",
   "shipping date": "تاريخ الشحن",
-  "Charges settings": "إعدادات الرسوم",
+  "Charges settings": "إعدادات الشحن",
+  "Zones": "المناطق",
+  "Super Admin": "سوبر ادمن",
+  "Agency Charge": "وكالة الشحن",
+  "The User": "المستخدم",
   "Brand settings": "إعدادات العلامة التجارية",
   "Agency Coins": "عملات الوكالة",
   "User Coins": "عملات المستخدم",
@@ -2105,7 +2109,13 @@
 "gateway_ready" : "الدفع جاهز للاستخدام",
 "edit_credentials" : "يرجى تعديل إعدادات الدفع",
 "Real Time Setting": "إعدادات الوقت الحقيقي",
-"Charge-agency":"وكالة شحن موثوقة"
+"Charge-agency":"وكالة شحن موثوقة",
+"Pinned": "مثبت",
+"Unpinned": "غير مثبت",
+"Unpin": "إلغاء التثبيت",
+"Pin Status": "حالة التثبيت"
+
+
 
 
 
