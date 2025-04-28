@@ -1178,7 +1178,13 @@
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
    "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
    "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
-"Charge-agency": "चार्ज एजेंसी"
+"Charge-agency": "चार्ज एजेंसी",
+"event period": "घटना की अवधि",
+"Pinned": "पिन किया हुआ",
+        "Unpinned": "पिन नहीं किया हुआ",
+        "Unpin": "पिन हटाना",
+        "Pin Status": "पिन स्थिति"
+
 
 
 
