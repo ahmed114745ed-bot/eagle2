@@ -85,85 +85,27 @@
 
     <div class="box-body no-padding">
         <div class="switch-container">
-            {{-- <div class="switch-item">
+            <div class="switch-item">
                 <label for="stopChargeCheckbox" class="switch-label">{{ __("dashboard.roomOn") }}</label>
                 <label class="switch">
                     <input type="checkbox" id="stopChargeCheckbox" {{ $make_rooms_top == 1 ? 'checked' : '' }}>
                     <span class="slider round"></span>
                 </label>
-            </div> --}}
-
-            <div class="switch-item">
-                <label for="stopCharge" class="switch-label">{{ __('dashboard.frazeCharge') }}</label>
-                <label class="switch">
-                    <input type="checkbox" id="stopCharge" {{ $stop_charge == 1 ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
             </div>
 
-            <div class="switch-item">
-                <label for="stopInviteCode" class="switch-label">{{ __("dashboard.closeCose") }}</label>
-                <label class="switch">
-                    <input type="checkbox" id="stopInviteCode" {{ $stop_invite_code == 1 ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
-            </div>
 
-            <div class="switch-item">
-                <label for="stopTransferSalary" class="switch-label">{{ __("dashboard.transSalary") }}</label>
-                <label class="switch">
-                    <input type="checkbox" id="stopTransferSalary" {{ $transfer_salary == 1 ? 'checked' : '' }}>
-                    <span class="slider round"></span>
-                </label>
-            </div>
         </div>
     </div>
 
     <script>
         $(document).ready(function() {
             // Handle change event for stopChargeCheckbox
-            /* $('#stopChargeCheckbox').on('change', function() {
+            $('#stopChargeCheckbox').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
                     url: '/admin/send-request-make-rooms-top',
                     method: 'POST',
                     data: { make_rooms_top: isChecked },
-                    success: function(response) { console.log(response); },
-                    error: function(error) { console.error(error); }
-                });
-            }); */
-
-            // Handle change event for stopCharge
-            $('#stopCharge').on('change', function() {
-                var isChecked = $(this).is(':checked');
-                $.ajax({
-                    url: '/admin/send-request-stop-charge',
-                    method: 'POST',
-                    data: { stop_charge: isChecked },
-                    success: function(response) { console.log(response); },
-                    error: function(error) { console.error(error); }
-                });
-            });
-
-            // Handle change event for stopInviteCode
-            $('#stopInviteCode').on('change', function() {
-                var isChecked = $(this).is(':checked');
-                $.ajax({
-                    url: '/send-request-invite-code',
-                    method: 'POST',
-                    data: { stop_invite_code: isChecked },
-                    success: function(response) { console.log(response); },
-                    error: function(error) { console.error(error); }
-                });
-            });
-
-            // Handle change event for stopTransferSalary
-            $('#stopTransferSalary').on('change', function() {
-                var isChecked = $(this).is(':checked');
-                $.ajax({
-                    url: '/admin/send-request-transfer-salary',
-                    method: 'POST',
-                    data: { transfer_salary: isChecked },
                     success: function(response) { console.log(response); },
                     error: function(error) { console.error(error); }
                 });

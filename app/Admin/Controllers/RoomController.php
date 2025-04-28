@@ -13,7 +13,9 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Support\Facades\Request;
 
@@ -25,6 +27,9 @@ class RoomController extends MainController
     {
         return parent::index($content
             ->title(trans('Rooms'))
+            ->row(function (Row $row) {
+                $row->column(12, $this->grid2());
+            })
             ->body($this->grid()));
     }
 
@@ -69,6 +74,16 @@ class RoomController extends MainController
             ->body($this->form()));
     }
 
+    protected function grid2()
+    {
+        $make_rooms_top = settings()->get('make_rooms_top');
+
+
+        return (new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
+        ));
+    }
 
     /**
      * Make a grid builder.
