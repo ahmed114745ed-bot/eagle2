@@ -160,6 +160,9 @@ class RoomRepoService
     {
         $room  = $this->findRoomUser($ownerId);
 
+        if(!$room){
+            return null;
+        }
         $isToZegoCharisma = false;
         //reset user charisma
         if (isset($room->charizma_status)) {

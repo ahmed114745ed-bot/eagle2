@@ -8,6 +8,7 @@ use App\Models\OVip;
 use App\Models\Ware;
 use App\Models\Emoji;
 
+use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -142,23 +143,8 @@ class RewardTargetController extends MainOldController
         $form = new Form(new RewardTarget());
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
-            ->when("ware" ,function () use ($form){
-                $form->select('target1', trans('wares'))->options(function (){
-                    $ops = [0=>''];
-                    $wares = Ware::query()->select(['id','name', 'type'])->whereIn('type',[4,5,6])->get();
-                    foreach ($wares as  $ware){
-                        $ops[$ware->id]=$ware->name.'_'.$ware->id;
-
-                        if ($ware->type == 4) {
-                            $ops[$ware->id] .='_' .'bubble';
-                        } elseif ($ware->type == 5) {
-                            $ops[$ware->id] .= '_' .'intro';
-                        } elseif ($ware->type == 6) {
-                            $ops[$ware->id] .= '_' .'frame';
-                        }
-                    }
-                    return $ops;
-                });
+            ->when("ware", function () use ($form) {
+                $form->belongsTo('target1', Wares::class, trans('wares'));
             })
         ->when("vip",function () use ($form){
             $form->select('target2', trans('vips'))->options(function (){

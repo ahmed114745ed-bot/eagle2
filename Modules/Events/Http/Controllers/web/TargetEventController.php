@@ -80,7 +80,7 @@ class TargetEventController extends MainOldController
                         <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        $grid->column('الاجرائات')->display(function () {
+        $grid->column(__('procedures'))->display(function () {
             // توليد الروابط
             $url1 = url('admin/target-events-gift/' . $this->id);
             $gifts = __('gifts');

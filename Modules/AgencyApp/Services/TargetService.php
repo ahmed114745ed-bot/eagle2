@@ -104,7 +104,9 @@ class TargetService
 
     public function calculateUsdFromTarget(Model $target, float $hours, int $days): float
     {
-        $per = 0.50;
+        // $per = 0.50;
+        $per =common::getDiamondsPercentage();
+
         if ($target->hours <= $hours) {
             $per += 0.20;
         }

@@ -475,55 +475,55 @@
             <div class="form row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>{{ __('Zones Coins') }}</label>
+                        <label>{{ __('Zones') }}</label>
                         <input type="text" name="zones_coins" id="zones_coins"
                                value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
                         <small id="zones_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value  :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small> 
+                        </small>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>{{ __('Super Admin Coins') }}</label>
+                        <label>{{ __('Super Admin') }}</label>
                         <input type="text" name="super_admin_coins" id="super_admin_coins"
                                value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
                         <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>   
+                        </small>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>{{ __('Agency Coins') }}</label>
+                        <label>{{ __('Agency Charge') }}</label>
                         <input type="text" name="shipping_coins" id="shipping_coins"
                                value="{{ $shipping_coins }}" class="form-control">
                         <small id="shipping_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small>     
+                        </small>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>{{ __('User Coins') }}</label>
+                        <label>{{ __('The User') }}</label>
                         <input type="text" name="user_coins" id="user_coins"
                                value="{{ $user_coins }}" class="form-control">
                         <small id="user_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
-                        </small> 
+                        </small>
                     </div>
                 </div>
 
                 <button type="button" onclick="showConfirmationModal()">{{ __('save') }}</button>
             </div>
-        </form>   
+        </form>
             </div>
 
             <!-- Bootstrap Modal -->
@@ -705,12 +705,12 @@
                 }
 
 
-                
+
     document.addEventListener('DOMContentLoaded', function () {
         function updateHint(inputId) {
             const input = document.getElementById(inputId);
             const hint = document.getElementById(inputId + '_hint');
-            const template = hint.getAttribute('data-template'); 
+            const template = hint.getAttribute('data-template');
 
             function update() {
                 // نحصل على القيمة المدخلة من المستخدم

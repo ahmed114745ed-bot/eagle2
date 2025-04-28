@@ -32,10 +32,11 @@ class VipController extends MainController
             ->title(trans('charge level'))
             ->body($this->grid());
     }
-    public function senderIndex(Content $content){
+    public function senderIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->senderGrid());
+            ->title(trans('charge level'))
+            ->body($this->senderGrid());
     }
     protected function senderGrid()
     {
@@ -49,7 +50,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -67,10 +68,11 @@ class VipController extends MainController
         return $grid;
     }
 
-    public function receiverIndex(Content $content){
+    public function receiverIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->receiverGrid());
+            ->title(trans('charge level'))
+            ->body($this->receiverGrid());
     }
     protected function receiverGrid()
     {
@@ -84,7 +86,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -101,10 +103,11 @@ class VipController extends MainController
 
         return $grid;
     }
-    public function cpIndex(Content $content){
+    public function cpIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->cpGrid());
+            ->title(trans('charge level'))
+            ->body($this->cpGrid());
     }
 
     protected function cpGrid()
@@ -119,7 +122,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -138,10 +141,11 @@ class VipController extends MainController
     }
 
 
-    public function roomIndex(Content $content){
+    public function roomIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->roomGrid());
+            ->title(trans('charge level'))
+            ->body($this->roomGrid());
     }
 
     protected function roomGrid()
@@ -156,7 +160,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -174,10 +178,11 @@ class VipController extends MainController
         return $grid;
     }
 
-    public function chargeIndex(Content $content){
+    public function chargeIndex(Content $content)
+    {
         return $content
-        ->title(trans('charge level'))
-        ->body($this->chargeGrid());
+            ->title(trans('charge level'))
+            ->body($this->chargeGrid());
     }
 
     protected function chargeGrid()
@@ -192,7 +197,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         );
         $grid->column('level', __('Level'))->editable();
@@ -254,62 +259,81 @@ class VipController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Vip());
+
+        // Sort by type desc then exp asc
         $grid->model()->orderByDesc('type')->orderBy('exp');
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->disableIdFilter();
-            $filter->expand();
-            $filter->where(function ($query) {
-                switch ($this->input) {
-                    case 'sender':
-                        // custom complex query if the 'yes' option is selected
-                        $query->where('type', 2);
-                        break;
-                    case 'received':
-                        $query->where('type', 1);
-                        break;
-                    case 'cp':
-                        $query->where('type', 3);
-                        break;
-                    case 'room':
-                        $query->where('type', 4);
-                        break;
-                    case 'charge':
-                        $query->where('type', 5);
-                        break;
-                }
-            }, __('Select type'), 'name_for_url_shortcut')->radio([
-                '' => __('All'),
-                'sender' => __('Sender'),
-                'received' => __('Received'),
-                'cp' => __('cp'),
-                'room' => __('room'),
-                'charge' => __('charge'),
-            ]);
+
+        // Filter model by selected tab
+        $grid->model()->when(request('tab'), function ($query) {
+            switch (request('tab')) {
+                case 'Appsender':
+                    $query->where('type', 2);
+                    break;
+                case 'Appreceived':
+                    $query->where('type', 1);
+                    break;
+                case 'Appcp':
+                    $query->where('type', 3);
+                    break;
+                case 'Approom':
+                    $query->where('type', 4);
+                    break;
+                case 'Appcharge':
+                    $query->where('type', 5);
+                    break;
+            }
         });
 
+        // Tabs at top rendered from the Blade view
+        $grid->header(function () {
+            $tabs = [
+                '' => __('All'),
+                'Appsender' => __('AppSender'),
+                'Appreceived' => __('AppReceived'),
+                'Appcp' => __('AppCP'),
+                'Approom' => __('AppRoom'),
+                'Appcharge' => __('AppCharge'),
+            ];
+
+            // Render the Blade view with tabs data
+            return view('admin.tabs', compact('tabs'));
+        });
+
+        // Other grid settings
         $grid->quickSearch();
+
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5=>__ ('charge'),
-            ]
-        );
+
+        $grid->column('type', __('Type'))->select([
+            1 => __('broadcaster'),
+            2 => __('honor'),
+            3 => __('cp'),
+            4 => __('room'),
+            5 => __('charge'),
+        ]);
+
         $grid->column('level', __('Level'))->editable();
+
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
+            return number_format($value->getOriginal());
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
+
         $grid->column('img', __('Image'))->image('', '30');
+
+        // Any custom grid extensions
         $this->extendGrid($grid);
+
+        // No export button
         $grid->disableExport();
+
         return $grid;
     }
+
+
+
+
+
+
 
     /**
      * Make a show builder.
@@ -349,7 +373,7 @@ class VipController extends MainController
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
-                5=>__ ('charge'),
+                5 => __('charge'),
             ]
         )->default(2);
         $form->textarea('name_ar', __('name_ar'));

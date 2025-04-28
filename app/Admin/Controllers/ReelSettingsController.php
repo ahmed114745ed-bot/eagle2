@@ -17,12 +17,12 @@ class ReelSettingsController extends AdminController
      * @var string
      */
     protected $title = 'Reel Settings';
-    public $permission_name = 'settings';
+    public $permission_name = 'reel-settings';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
         ->title(__('reel settings'))
-        ->view('reel_settings');
+        ->view('reel_settings'));
     }
 }

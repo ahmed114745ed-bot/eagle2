@@ -259,6 +259,14 @@
     "Missing parameters": "Missing parameters",
     "Empty successfully": "Successfully emptied",
     "Empty failed": "Failed to empty",
+    "return": "return",
+    "AppSender": "Sender",
+    "AppReceived" : "Received",
+    "AppCP": "Cp",
+    "AppRoom" : "Room",
+    "AppCharge": "Charge",
+    "Confirm Pin Room": "تأكيد تثبيت الغرفة",
+
     "config returned success": "Configuration returned successfully",
     "anonymous icon": "Anonymous icon",
     "user_id , room_id are required": "User ID, Room ID are required",
@@ -266,6 +274,7 @@
     "Insufficient balance, please go to recharge!": "Insufficient balance, please go to recharge!",
     "already have family": "You already have a family",
     "created": "Created",
+    "Procedures" : "Procedures",
     "not allowed": "Not allowed",
     "success": "Success",
     "failed": "Failed",
@@ -690,5 +699,13 @@
      "firebase_database_url": "database url firebase",
      "Real Time Setting": "Real Time Setting",
      "Real Time system Setting": "Real Time system Setting",
-     "Payment Credential Settings": "Payment Credential Settings"
+     "Payment Credential Settings": "Payment Credential Settings",
+     "Charge-agency":"Charge Agency",
+     "Pinned": "Pinned",
+     "Unpinned": "Unpinned",
+     "Unpin": "Unpin",
+     "Pin Status": "Pin Status",
+     "diamonds target":"diamonds target"
+
+
     }

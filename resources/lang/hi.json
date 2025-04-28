@@ -16,6 +16,13 @@
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
+    "Badges": "बैज",
+
+    "Supporter" : "समर्थक",
+    "Shipping": "शिपिंग",
+    "Hosting" : "मेज़बान",
+    "Agency_owner" : "एजेंसी मालिक",
+
     "Enter amount in dollars": "राशि डॉलर में दर्ज करें",
     "Please set agency coins in configs": "कृपया shipping_coins को कॉन्फ़िग में सेट करें",
     "Charged by app": "ऐप के माध्यम से चार्ज",
@@ -303,8 +310,13 @@
     "Payment": "भुगतान",
     "Sound & Video System Setting:": "ध्वनि और वीडियो प्रणाली सेटिंग:",
     "Sound System Setting:": "ध्वनि प्रणाली सेटिंग:",
+    "Agencies Menu": "एजेंसियों मेनू",
     "Video System Setting:": "वीडियो प्रणाली सेटिंग:",
     "soon": "जल्द ही",
+    "Games" : "गेम्स",
+    "Games Settings:": "गेम सेटिंग्स:",
+    "Notifications": "सूचनाएँ",
+    "Work": "काम",
     "gateway_ready" : "भुगतान गेटवे उपयोग के लिए तैयार है",
     "edit_credentials" : "कृपया भुगतान प्रमाण पत्र सेटिंग्स संपादित करें",
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
@@ -1100,9 +1112,13 @@
   "amount usd": "राशि (USD)",
   "shipping date": "शिपिंग तिथि",
   "charges-settings": "शुल्क सेटिंग्स",
-  "Charges settings": "शुल्क सेटिंग्स",
-  "Agency Coins": "एजेंसी सिक्के",
-  "User Coins": "उपयोगकर्ता सिक्के",
+    "Charges settings": "शुल्क सेटिंग्स",
+      "Agency Coins": "एजेंसी सिक्के",
+    "Zones": "क्षेत्र",
+    "Super Admin": "सुपर एडमिन",
+    "Agency Charge": "एजेंसी शुल्क",
+    "The User": "उपयोगकर्ता",
+    "User Coins": "उपयोगकर्ता सिक्के",
   "Confirm Update": "अपडेट की पुष्टि करें",
   "Are you sure you want to update the target settings? This action cannot be undone.": "क्या आप वाकई लक्ष्य सेटिंग्स अपडेट करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती.",
   "Cancel": "रद्द करें",
@@ -1168,7 +1184,17 @@
    "firebase_database_url": "फायरबेस डेटाबेस url",
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
    "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
-   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स"
+   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
+"Charge-agency": "चार्ज एजेंसी",
+"event period": "घटना की अवधि",
+"Pinned": "पिन किया हुआ",
+        "Unpinned": "पिन नहीं किया हुआ",
+        "Unpin": "पिन हटाना",
+        "Pin Status": "पिन स्थिति",
+        "diamonds target":"हीरे लक्ष्य"
+
+      
+
 
 
 

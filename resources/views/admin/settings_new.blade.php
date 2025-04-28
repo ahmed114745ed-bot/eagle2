@@ -271,7 +271,7 @@
     }
 
     .settings-menu {
-        display: flex;
+        display: block;
         gap: 4px;
         color: var(--text-secondary-color);
         overflow-x: auto;
@@ -487,6 +487,24 @@
             <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
             <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
                 {{ __('Payment') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
+            <button onclick="showSection('gamesSettings')" class="position-relative">
+                {{ __('Games') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
+            <button onclick="showSection('notificationSettings')" class="position-relative">
+                {{ __('Notifications') }}
+                <div class="ribbon-banner">
+                    <span>{{ __('soon') }}</span>
+                </div>
+            </button>
+            <button onclick="showSection('workSettings')" class="position-relative">
+                {{ __('Work') }}
                 <div class="ribbon-banner">
                     <span>{{ __('soon') }}</span>
                 </div>
@@ -964,8 +982,90 @@
                         </div>
                     </div>
                 </form>
-
             </div>
+
+            <div id="gamesSettings" class="settings-section">
+
+                <div class="form">
+                    <label class="d-block">{{ __('Games Settings:') }}</label>
+
+                    <div class="row mt-4">
+                        <!-- Lucky Flex -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.lucky_flex') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="luckyFlexRadio"
+                                                   class="custom-radio libraryRealTime" name="games_library" value="0"
+                                                {{ $gamesLibrary == '0' ? 'checked' : '' }}>
+                                            <label for="luckyFlexRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_secret"--}}
+{{--                                                       name="fawry_secret" placeholder="secret"--}}
+{{--                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Guess The Word -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.guess_the_word') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" id="guessTheWordRadio"
+                                                   class="custom-radio libraryRealTime" name="games_library" value="1"
+                                                {{ $gamesLibrary == '1' ? 'checked' : '' }}>
+                                            <label for="guessTheWordRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        {{--                                        <div class="col-md-6">--}}
+                                        {{--                                            <div class="form-group">--}}
+                                        {{--                                                <label--}}
+                                        {{--                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label>--}}
+                                        {{--                                                <input type="text" id="fawry_secret"--}}
+                                        {{--                                                       name="fawry_secret" placeholder="secret"--}}
+                                        {{--                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>--}}
+                                        {{--                                            </div>--}}
+                                        {{--                                        </div>--}}
+                                    </div>
+                                    <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="notificationSettings" class="settings-section">
+            </div>
+
+
+            <div id="workSettings" class="settings-section">
+            </div>
+
 
             <div id="paymentCredentialSettings" class="settings-section">
 
@@ -1324,26 +1424,8 @@
                                 </form>
                             </div>
                         </div>
-                        {{-- <div class="row">
-                            <!-- Pusher Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" >
-                                <div class="card p-3 shadow" style="height: 200px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('pusher') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="radio" id="pusherRadio" class="custom-radio" name="library" value="2"
-                                                {{ $library == '2' ? 'checked' : '' }}>
-                                            <label for="pusherRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                            </div>
-                        </div> --}}
                     </div>
             </div>
-
-
 
 
             <div id="appSettings" class="settings-section">

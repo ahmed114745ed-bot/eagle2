@@ -3,16 +3,20 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Config;
-use Illuminate\Support\HtmlString;
+use App\Models\Language;
+use Encore\Admin\Auth\Permission;
 
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\HtmlString;
 
 class MangerSettingController extends MainController
 {
     public $permission_name = 'updates_group_chat';
+    public $permission_setting = 'agency-manger-setting';
 
 
-    
+
     public function index1(Content $content)
     {
         $route = 'admin.update-config-group-chat';
@@ -88,7 +92,7 @@ class MangerSettingController extends MainController
 
         $form .= '<div style="display: flex; flex-direction: row;">';
 
-        $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;"> 
+        $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;">
         <button type="submit" class="button_form_cus">' . __('admin.submit') . '</button>
       </div>';
 
@@ -105,10 +109,15 @@ class MangerSettingController extends MainController
 
     public function index(Content $content)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_setting);
+        }
 
         $config = Config::where('name', 'system_default_manger')->first();
+        $configAll = Config::all();
+        $languages = Language::all();
         $configValue = $config->value ?? '';
-        return  parent::index($content
-            ->view('mangerSetting', compact('config', 'configValue')));
+        return  $content
+            ->view('mangerSetting', compact('config', 'configValue', 'languages', 'configAll'));
     }
 }

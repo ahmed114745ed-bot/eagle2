@@ -74,7 +74,8 @@ class EventReportAction extends Action
 
     public function html()
     {
-        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" class="btn btn-sm btn-danger salary_action ">إرجاع</a>
+        $return = __('return');
+        return '<a href="javascript:void(0);" onclick="pu('.$this->id.')" class="btn btn-sm btn-danger salary_action ">' .$return. '</a>
         <script>
         function pu(val) {
           $("#vid").val(val)

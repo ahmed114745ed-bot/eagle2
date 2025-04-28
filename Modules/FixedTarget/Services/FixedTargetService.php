@@ -2,6 +2,7 @@
 
 namespace Modules\FixedTarget\Services;
 
+use App\Helpers\Common;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -129,8 +130,13 @@ class FixedTargetService
         return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
     }
 
-    private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null, $appProfit, $db): void
+    private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null, $appProfit, $db,$percentageAchieved=0): void
     {
+        $agency_usd              =Common::getTargetUsd($target->diamonds,$target->agency_share);
+        $app_profit_usd               =Common::getTargetUsd($target->diamonds,$target->app_profit_percentage);
+        $db_usd         =Common::getTargetUsd($target->diamonds,$target->db_percentage);
+
+
         try {
             $values = [
                 'user_id'             => $user->id,
@@ -152,7 +158,7 @@ class FixedTargetService
             ];
             if (0.0 <= $t) {
                 $values['user_obtain']   = $t;
-                $values['agency_obtain'] = $t * $ap;
+                $values['agency_obtain'] = $agency_usd * $percentageAchieved;
             }
             UserTarget::query()->updateOrCreate([
                 'user_id' => $user->id,
@@ -164,14 +170,14 @@ class FixedTargetService
         }
 
         $values = [
-            'agency_sallary' => $t * $ap,
+            'agency_sallary' => $agency_usd *$percentageAchieved,
             'hours' => $hours . ' / ' . (@$target->hours ?? 0),
             'days' => $days . ' / ' . ($target->days ?? 0),
             'diamond' => $month_received . ' / ' . @$target->diamonds ?? 0,
             'target_id' =>  @$target->id,
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
-            'app_profit' => $t * $appProfit,
-            'dB' => $t * $db,
+            'app_profit' =>$app_profit_usd * $percentageAchieved,
+            'dB' =>  $db_usd * $percentageAchieved,
         ];
         if (0 < $t) $values['sallary'] = $t;
 
@@ -223,37 +229,35 @@ class FixedTargetService
                     $days  = $user->monthly_days;
                 }
 
-                $targetReel  = explode(' ', $target->reel);
-                $targetMoment = explode(' ', $target->moment);
-
+                $targetReel  = explode(',', $target->reel);
+                $targetMoment = explode(',', $target->moment);
 
                 $extra = UserCommon::UserStatistic($user->id, 1);
 
 
                 $t                = $this->targetInstance->calculateUsdFromTarget($target, $hours ?? 0, $days, $extra);
+                $percentageAchieved  =$this->targetInstance->calculatePercentageAchieved($target, $hours ?? 0, $days, $extra);;
                 $ap               = $target->agency_share / 100;
-                $appProfit               = $target->app_profit_percentage / 100;
+                $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
                 $user->target_usd = $t;
-                $extras = [
 
+                $extras = [
                     "moment" => [
-                        "upload" => $extra['moment']['upload'] . '/' . @$targetMoment[0] ?? 0,
-                        "likes" => $extra['moment']['likes'] . '/' . @$targetMoment[1] ?? 0,
-                        "comments" => $extra['moment']['comments'] . '/' . @$targetMoment[2] ?? 0,
+                        "upload" => (isset($extra['moment']['upload']) ? $extra['moment']['upload'] : 0) . '/' . (@$targetMoment[0] ?? 0),
+                        "likes" => (isset($extra['moment']['likes']) ? $extra['moment']['likes'] : 0) . '/' . (@$targetMoment[1] ?? 0),
+                        "comments" => (isset($extra['moment']['comments']) ? $extra['moment']['comments'] : 0) . '/' . (@$targetMoment[2] ?? 0),
                     ],
                     "reel" => [
-                        "upload" => $extra['reel']['upload'] . '/' . @$targetReel[0] ?? 0,
-                        "likes" =>  $extra['reel']['likes'] . '/' . @$targetReel[1] ?? 0,
-                        "comments" => $extra['reel']['comments'] . '/' . @$targetReel[2] ?? 0,
-
+                        "upload" => (isset($extra['reel']['upload']) ? $extra['reel']['upload'] : 0) . '/' . (@$targetReel[0] ?? 0),
+                        "likes" => (isset($extra['reel']['likes']) ? $extra['reel']['likes'] : 0) . '/' . (@$targetReel[1] ?? 0),
+                        "comments" => (isset($extra['reel']['comments']) ? $extra['reel']['comments'] : 0) . '/' . (@$targetReel[2] ?? 0),
                     ],
-
                 ];
 
 
 
-                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db);
+                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db,$percentageAchieved);
             }
         }
         return $user;

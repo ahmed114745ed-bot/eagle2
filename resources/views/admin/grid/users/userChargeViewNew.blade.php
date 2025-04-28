@@ -85,13 +85,13 @@
 
     <div class="box-body no-padding">
         <div class="switch-container">
-            <div class="switch-item">
+            {{-- <div class="switch-item">
                 <label for="stopChargeCheckbox" class="switch-label">{{ __("dashboard.roomOn") }}</label>
                 <label class="switch">
                     <input type="checkbox" id="stopChargeCheckbox" {{ $make_rooms_top == 1 ? 'checked' : '' }}>
                     <span class="slider round"></span>
                 </label>
-            </div>
+            </div> --}}
 
             <div class="switch-item">
                 <label for="stopCharge" class="switch-label">{{ __('dashboard.frazeCharge') }}</label>
@@ -122,7 +122,7 @@
     <script>
         $(document).ready(function() {
             // Handle change event for stopChargeCheckbox
-            $('#stopChargeCheckbox').on('change', function() {
+            /* $('#stopChargeCheckbox').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
                     url: '/admin/send-request-make-rooms-top',
@@ -131,7 +131,7 @@
                     success: function(response) { console.log(response); },
                     error: function(error) { console.error(error); }
                 });
-            });
+            }); */
 
             // Handle change event for stopCharge
             $('#stopCharge').on('change', function() {

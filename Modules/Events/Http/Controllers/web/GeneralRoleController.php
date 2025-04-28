@@ -67,7 +67,7 @@ class GeneralRoleController extends MainOldController
     {
         $grid = new Grid(new GeneralRole());
         $grid->model()->orderByDesc('id');
-        $grid->id(__('admin.ID'));
+        $grid->id(__('ID'));
         $grid->type(__('type'));
         $grid->url(__('url'));
         $grid->sub_type(__('subType'));

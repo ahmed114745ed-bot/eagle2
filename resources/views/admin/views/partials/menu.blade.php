@@ -28,15 +28,10 @@
                     return $permissions;
                 }
                 }
-
-
-
 @endphp
 
 @if(isset($item['children']))
     @php
-
-
         $data = getPermissions(@$item);
 
                     $rolesL = $data['roles'];
@@ -48,35 +43,24 @@
 
                         if (!$permission)  continue;
 
-
                         $permissionExists =   ( Admin::user()->can($permission));
 
                         if ($permissionExists) break;
                     }
 
-
-
-
                     if (@$permissionExists || $isRoleVisible ){
                         $anyChild = true;
                     }
-
     @endphp
 @endif
 
 
 @php
-
-
-
-
-
     $hasRoles = $roles && Admin::user()->visible($roles);
     $hasPermission = !empty(Arr::get($item, 'permission')) && Admin::user()->can(Arr::get($item, 'permission'));
     $anyChildExists = $anyChild ?? false;
     $allPermission = Admin::user()->can('*');
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
-
 
     // if (Arr::get($item, 'id') == '13'){
     //     dump(Admin::user()->can(Arr::get($item, 'permission')));
@@ -84,7 +68,6 @@
     //         dump($isVisible, $hasRoles , $hasPermission, $allPermission , $anyChildExists);
     //     }
 @endphp
-
 
 @if($isVisible)
     @if(!isset($item['children']))
@@ -101,7 +84,6 @@
                                 <span>{{ admin_trans($item['title']) }}</span>
                             @endif
                         </a>
-
         </li>
     @else
         <li class="treeview">
@@ -112,6 +94,13 @@
                 @else
                     <span>{{ admin_trans($item['title']) }}</span>
                 @endif
+                @if ($item['title'] == 'المحفظة')
+                    <i class="pull-left" style="margin-right: 2px;">{{ __('soon') }}</i>
+                @endif
+                @if ($item['title'] == 'Wallet')
+                    <i class="pull-right" style="margin-right: 2px;">{{ __('soon') }}</i>
+                @endif
+
                 <i class="fa fa-angle-left pull-right"></i>
             </a>
             <ul class="treeview-menu">
@@ -122,14 +111,3 @@
         </li>
     @endif
 @endif
-
-
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Room;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -85,6 +86,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\RoomController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -217,6 +219,7 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        $router->put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         $router->resource('all-games', AllGameController::class);
         $router->resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         $router->resource('blacks', 'BlackListController');
@@ -339,7 +342,7 @@ Route::group(
             Route::prefix('ware-gift')->group(function () {
 
                 Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-                Route::post('/', [OvipGiftTapController::class, 'store']);
+                Route::post('/{level}', [OvipGiftTapController::class, 'store']);
                 // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
                 // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
                 // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
@@ -423,7 +426,7 @@ Route::group(
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
         $router->resource('core-wallets', CoreWalletsController::class);
         $router->resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        $router->resource('appear-charger-agency', AppearChargerAgencyController::class);
+        $router->resource('charge-agencies', AppearChargerAgencyController::class);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
@@ -469,6 +472,14 @@ Route::group(
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
 
+
+        Route::post('rooms/{room}/pin', function (Room $room) {
+            $room->update(['pin' => !$room->pin]);
+            
+            return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
+        })->name('rooms.pin');
+
+
         $router->resource('notification-templates', NotificationsTemplatesController::class);
        // Route::get('ware-management', [WareTabController::class, 'index']);
       //  $router->resource('ware-management', WareTabController::class);
@@ -483,6 +494,8 @@ Route::group(
         });
 
     }
+
+
 
 
 
