@@ -229,9 +229,8 @@ class FixedTargetService
                     $days  = $user->monthly_days;
                 }
 
-                $targetReel  = explode(' ', $target->reel);
-                $targetMoment = explode(' ', $target->moment);
-
+                $targetReel  = explode(',', $target->reel);
+                $targetMoment = explode(',', $target->moment);
 
                 $extra = UserCommon::UserStatistic($user->id, 1);
 
@@ -242,20 +241,18 @@ class FixedTargetService
                 $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
                 $user->target_usd = $t;
-                $extras = [
 
+                $extras = [
                     "moment" => [
-                        "upload" => $extra['moment']['upload'] . '/' . @$targetMoment[0] ?? 0,
-                        "likes" => $extra['moment']['likes'] . '/' . @$targetMoment[1] ?? 0,
-                        "comments" => $extra['moment']['comments'] . '/' . @$targetMoment[2] ?? 0,
+                        "upload" => (isset($extra['moment']['upload']) ? $extra['moment']['upload'] : 0) . '/' . (@$targetMoment[0] ?? 0),
+                        "likes" => (isset($extra['moment']['likes']) ? $extra['moment']['likes'] : 0) . '/' . (@$targetMoment[1] ?? 0),
+                        "comments" => (isset($extra['moment']['comments']) ? $extra['moment']['comments'] : 0) . '/' . (@$targetMoment[2] ?? 0),
                     ],
                     "reel" => [
-                        "upload" => $extra['reel']['upload'] . '/' . @$targetReel[0] ?? 0,
-                        "likes" =>  $extra['reel']['likes'] . '/' . @$targetReel[1] ?? 0,
-                        "comments" => $extra['reel']['comments'] . '/' . @$targetReel[2] ?? 0,
-
+                        "upload" => (isset($extra['reel']['upload']) ? $extra['reel']['upload'] : 0) . '/' . (@$targetReel[0] ?? 0),
+                        "likes" => (isset($extra['reel']['likes']) ? $extra['reel']['likes'] : 0) . '/' . (@$targetReel[1] ?? 0),
+                        "comments" => (isset($extra['reel']['comments']) ? $extra['reel']['comments'] : 0) . '/' . (@$targetReel[2] ?? 0),
                     ],
-
                 ];
 
 
