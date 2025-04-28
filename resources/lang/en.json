@@ -266,6 +266,7 @@
     "AppRoom" : "Room",
     "AppCharge": "Charge",
     "Confirm Pin Room": "تأكيد تثبيت الغرفة",
+
     "config returned success": "Configuration returned successfully",
     "anonymous icon": "Anonymous icon",
     "user_id , room_id are required": "User ID, Room ID are required",
@@ -695,5 +696,12 @@
      "Real Time Setting": "Real Time Setting",
      "Real Time system Setting": "Real Time system Setting",
      "Payment Credential Settings": "Payment Credential Settings",
-     "Charge-agency":"Charge Agency"
+     "Charge-agency":"Charge Agency",
+     "Pinned": "Pinned",
+     "Unpinned": "Unpinned",
+     "Unpin": "Unpin",
+     "Pin Status": "Pin Status",
+     "diamonds target":"diamonds target"
+
+
     }

@@ -39,7 +39,7 @@ class EventPeriodController extends MainOldController
     public function index ( Content $content )
     {
         return $content
-            ->title(__($this->title))
+            ->title(__('event period'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })

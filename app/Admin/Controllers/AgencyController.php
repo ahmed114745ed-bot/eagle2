@@ -438,8 +438,8 @@ class AgencyController extends MainController
                 $row->width(12)->text('notice', __('notice'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->url('url', __('url'));
-                $row->width(2)->text('phone_code', __('Phone Code'))->rules('required');
-                $row->width(9)->text('phone', __('Phone'))->rules('required');
+                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+
                 // $row->width(12)->image('img', __('img'))->rules('required');
                 $row->width(12)->textarea('contents', __('contents'));
                 $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
@@ -466,8 +466,7 @@ class AgencyController extends MainController
                 $row->width(12)->text('name', __('name'))->rules('required');
                 $row->width(12)->text('notice', __('notice'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(2)->text('phone_code', __('Phone Code'))->rules('required');
-                $row->width(9)->text('phone', __('Phone'))->rules('required');
+                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
                 $row->width(12)->url('url', __('url'));
                 $row->width(12)->textarea('contents', __('contents'));
                 $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
@@ -575,6 +574,12 @@ class AgencyController extends MainController
                 ]);
             }
         });
+        // Add this to your admin view
+        $form->footer(function ($footer) {
+            $footer->disableEditingCheck();
+            $footer->disableCreatingCheck();
+        });
+
         return $form;
     }
 

@@ -82,10 +82,10 @@ class AppearChargerAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-    
+
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile');
-    
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column('1/2', function ($filter) {
@@ -99,11 +99,11 @@ class AppearChargerAgencyController extends MainController
                 }, __('User'))->placeholder(__('Search by name , UUID , phone'));
             });
         });
-    
+
         $grid->model()->where('Shipping_agency', 1);
-    
+
         $grid->column('id', __('Id'));
-    
+
         $grid->column('name', __('Agency'))->display(function () {
             $name = $this->name ?? 'Unknown Agency';
             $id = $this->id ?? '';
@@ -112,11 +112,11 @@ class AppearChargerAgencyController extends MainController
             $defaultImage = asset("images/agency-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
             $icon = asset('images/coin.jpg');
-    
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-    
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='{$url}' alt='Agency Image' width='40' height='40'>
@@ -130,7 +130,7 @@ class AppearChargerAgencyController extends MainController
                 </div>
             ";
         });
-    
+
         $grid->column('owner_id', __('Owner'))->display(function () {
             // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
             $name = $this->owner ? $this->owner->name ?? 'Unknown Owner' : 'Unknown Owner';
@@ -139,14 +139,14 @@ class AppearChargerAgencyController extends MainController
             $path = $this->owner && $this->owner->profile ? $this->owner->profile->avatar : '';
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-    
+
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-    
+
             // التأكد من أن الـ owner موجود قبل استدعاء دالة `handleShowImageWithTypes`
             $image = $this->owner ? handleShowImageWithTypes($this->owner->id, $url, 40, 40) : '';
-    
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -158,27 +158,27 @@ class AppearChargerAgencyController extends MainController
                 </div>
             ";
         });
-    
+
         $grid->column('charge_agency', __("Charge-agency"))
             ->display(function () {
                 return ChargeAgency::where('agency_id', $this->id)->exists() ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
-    
+
         $grid->column('appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
                 return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
-    
+
         $grid->column('is_frozen', __("frozen"))
             ->display(function () {
                 return $this->is_frozen ? 1 : 0;
             })
             ->switch(Common::getSwitchStates());
-    
+
         $grid->disableActions();
-    
+
         return $grid;
     }
 
@@ -209,25 +209,25 @@ class AppearChargerAgencyController extends MainController
     protected function form()
     {
         $form = new Form(new Agency);
-    
+
         $ops = [];
         foreach ($this->getAgencies() as $user) {
             $ops[$user->id] = $user->name;
         }
-    
+
         $opsAgencyManger = [];
         foreach (User::where('is_manger', 1)->get() as $user) {
             $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
         }
-    
+
         $opsAgencyMangerDash = [];
         foreach (DB::table('admin_users')->get() as $user) {
             $opsAgencyMangerDash[$user->id] = $user->name;
         }
-    
+
         // --- الحقول المشتركة ---
         $form->display('ID');
-        
+
         $form->select('app_owner_id', __('app owner id'))
             ->options(function ($value) {
                 $ops2 = [];
@@ -237,19 +237,19 @@ class AppearChargerAgencyController extends MainController
                 return $ops2;
             })
             ->ajax('/api/search/users3', 'id', 'name');
-    
+
         $form->hidden('agency_manger_id', __('app manger id'));
-    
+
         $form->text('name', __('name'))->rules('required');
         $form->text('notice', __('notice'))->rules('required');
         $form->switch('status', __('status'));
-        $form->text('phone', __('phone'))->rules('required');
+        $form->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
         $form->url('url', __('url'));
         $form->textarea('contents', __('contents'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
-    
-       
-    
+
+
+
         // --- عرض تنبيه لو موجود في السيشن ---
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -258,34 +258,34 @@ class AppearChargerAgencyController extends MainController
                 });
             </script>');
         }
-    
+
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-    
+
             if (!$form->model()->exists) {
                 Common::createUserAdmin($appOwnerId);
             }
-    
+
             if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
-    
+
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
-    
+
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
-    
+
                 Admin::where('username', $user->uuid)->delete();
-    
+
                 $user->update([
                     'type_user' => 0,
                     'agency_id' => 0,
                     'monthly_diamond_received' => 0,
                 ]);
             }
-    
+
             $newType = 4;
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => $newType,
@@ -293,14 +293,14 @@ class AppearChargerAgencyController extends MainController
                 'agency_id' => $form->model()->id,
             ]);
         });
-    
+
         $form->saved(function (Form $form) {
             $checkAgencyUser = UsersJoinedAgency::where([
                 'user_id' => $form->model()->app_owner_id,
                 'agency_id' => $form->model()->id,
                 'type' => 1,
             ])->whereNull('leave_date')->exists();
-    
+
             if (!$checkAgencyUser) {
                 UsersJoinedAgency::create([
                     'user_id' => $form->model()->app_owner_id,
@@ -310,9 +310,9 @@ class AppearChargerAgencyController extends MainController
                 ]);
             }
         });
-    
+
         return $form;
     }
-    
+
 
 }
