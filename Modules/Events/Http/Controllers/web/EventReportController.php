@@ -306,7 +306,7 @@ class EventReportController extends MainOldController
             });
 
         
-        $grid->column('ChargeEvents.tile', __('tile'));
+        $grid->column('ChargeEvents.tile', __('title'));
         $grid->column('ChargeEvents.value', __('value'));
             $grid->column('rewards', __('Gifts'))->display(function () {
                 if (!$this->rewardCharges || count($this->rewardCharges) == 0) {
@@ -343,7 +343,7 @@ class EventReportController extends MainOldController
 
                 return $html;
             });
-            $grid->column('created_at', __('Created At'))->display(function ($date) {
+            $grid->column('created_at', __('Created at'))->display(function ($date) {
                 return date('Y-m', strtotime($date)); // فقط السنة والشهر
             });
         
