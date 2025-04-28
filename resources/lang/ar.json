@@ -2120,7 +2120,9 @@
 "Unpin": "إلغاء التثبيت",
 "Pin Status": "حالة التثبيت",
 "diamonds target":"الالماس المحقق",
-"event period":"فترة الحدث"
+"event period":"فترة الحدث",
+ "withdrawn": "تم السحب",
+  "remaining": "المتبقي"
 
 
 
