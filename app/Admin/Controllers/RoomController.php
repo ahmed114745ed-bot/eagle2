@@ -235,6 +235,9 @@ class RoomController extends MainController
                     align-items: center;
                     gap: -10px; /* Overlap the images slightly */
                     padding: 8px 0;
+                    overflow-y: overlay;
+                    width: 218px;
+                    padding-right: 16px;
                 }
         
                 .image-wrapper {
