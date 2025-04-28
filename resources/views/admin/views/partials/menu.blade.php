@@ -95,7 +95,7 @@
                     <span>{{ admin_trans($item['title']) }}</span>
                 @endif
                 @if ($item['title'] == 'Wallet' || $item['title'] == 'المحفظة')
-                    <i class="pull-right" style="margin-right: 5px;"> Soon</i>
+                    <i class="pull-right" style="margin-right: 2px;"> Soon</i>
                 @endif
                 <i class="fa fa-angle-left pull-right"></i>
             </a>
