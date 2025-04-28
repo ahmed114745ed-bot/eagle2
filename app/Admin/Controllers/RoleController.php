@@ -85,14 +85,14 @@ class RoleController extends MainController
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $admin = Auth::user();
-                $actions->row->slug == 'administrator' ||
-                $actions->row->slug == 'agency' ||
-                $actions->row->slug == 'charger'
-            ) {
+            
+            if ($actions->row->slug == 'administrator' || 
+                $actions->row->slug == 'agency' || 
+                $actions->row->slug == 'charger') {
+                
                 $actions->disableDelete();
             } elseif ($admin->username == 'demo') {
-
-
+                
                 $actions->disableEdit();
                 $actions->disableDelete();
             }
