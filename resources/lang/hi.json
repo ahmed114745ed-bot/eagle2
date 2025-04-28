@@ -16,6 +16,13 @@
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
+    "Badges": "बैज",
+
+    "Supporter" : "समर्थक",
+    "Shipping": "शिपिंग",
+    "Hosting" : "मेज़बान",
+    "Agency_owner" : "एजेंसी मालिक",
+
     "Enter amount in dollars": "राशि डॉलर में दर्ज करें",
     "Please set agency coins in configs": "कृपया shipping_coins को कॉन्फ़िग में सेट करें",
     "Charged by app": "ऐप के माध्यम से चार्ज",
@@ -1179,6 +1186,7 @@
    "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
    "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
 "Charge-agency": "चार्ज एजेंसी",
+"event period": "घटना की अवधि",
 "Pinned": "पिन किया हुआ",
         "Unpinned": "पिन नहीं किया हुआ",
         "Unpin": "पिन हटाना",

@@ -75,36 +75,41 @@ class TargetController extends MainController
     {
         $grid = new Grid(new Target);
         $grid->model()->orderBy('diamonds', 'asc');
+       
         $coins = Common::getMaxCoins();
-
         // $grid->id(__('ID'));
-        $grid->level(__('target no'));
+
+        $grid->column(__('target no'))->display(function () {
+            $TargetCount = Target::where('diamonds','<',$this->diamonds)->count();
+           
+            return  $TargetCount + 1;
+        });
 
         $grid->diamonds(__('diamonds'))
-        ->display(function ($value) use ($coins) {
-            $endFormatted = $coins ? number_format($value / $coins) : 0;
+            ->display(function ($value) use ($coins) {
+                $endFormatted = $coins ? number_format($value / $coins) : 0;
 
-            return "
+                return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>💎 {$value}</span>
                     <span style='color: #888; font-size: smaller;'>\$ {$endFormatted}</span>
                 </div>
             ";
-        });
+            });
 
         $grid->usd(__('Host Percentage'))
-        ->display(function ($value) use ($coins) {
-            $endFormatted =$this->diamonds / $coins;
+            ->display(function ($value) use ($coins) {
+                $endFormatted = $this->diamonds / $coins;
 
-            $userUsd = floatval($endFormatted) * floatval($value) / 100;
-            $userPercentage = number_format($value);
-            return "
+                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+                $userPercentage = number_format($value);
+                return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>% {$userPercentage}</span>
                     <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
                 </div>
             ";
-        });
+            });
 
 
 
@@ -151,29 +156,29 @@ class TargetController extends MainController
         //     return number_format($value, 2);
         // });
         $grid->agency_share(__('agency share'))
-        ->display(function ($value) use ($coins) {
-            $endFormatted =$this->diamonds /$coins ;
-            $userUsd = floatval($endFormatted) * floatval($value) / 100;
-            $userPercentage = number_format($value);
-            return "
+            ->display(function ($value) use ($coins) {
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+                $userPercentage = number_format($value);
+                return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>% {$userPercentage}</span>
                     <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
                 </div>
             ";
-        });
+            });
         $grid->db_percentage(__('DB  Percentage'))
-        ->display(function ($value) use ($coins) {
-            $endFormatted =$this->diamonds / $coins;
-            $userUsd = floatval($endFormatted) * floatval($value) / 100;
-            $userPercentage = number_format($value);
-            return "
+            ->display(function ($value) use ($coins) {
+                $endFormatted = $this->diamonds / $coins;
+                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+                $userPercentage = number_format($value);
+                return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>% {$userPercentage}</span>
                     <span style='color: #888; font-size: smaller;'>\$ {$userUsd}</span>
                 </div>
             ";
-        });
+            });
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
@@ -226,35 +231,35 @@ class TargetController extends MainController
 
 
         $form->decimal('diamonds', __('diamonds'))
-        ->help('
+            ->help('
                 <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>')
-        ->rules('min:0')
-        ->default(0)
-        ->required();
+            ->rules('min:0')
+            ->default(0)
+            ->required();
 
-    $form->decimal('usd', __('Host Percentage').'(%)')
-        ->help('<span id="usd_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0')
-        ->default(0)
-        ->required();
+        $form->decimal('usd', __('Host Percentage') . '(%)')
+            ->help('<span id="usd_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->rules('min:0')
+            ->default(0)
+            ->required();
 
-    $form->decimal('agency_share',  __('agency share') . '(%)')
-        ->help('<span id="agency_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0')
-        ->default(0)
-        ->required();
+        $form->decimal('agency_share',  __('agency share') . '(%)')
+            ->help('<span id="agency_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->rules('min:0')
+            ->default(0)
+            ->required();
 
-    $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
-        ->help('<span id="super_admin_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0')
-        ->default(0)
-        ->required();
+        $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
+            ->help('<span id="super_admin_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->rules('min:0')
+            ->default(0)
+            ->required();
 
-    $form->decimal('app_profit_percentage', __('app profit Percentage').'(%)')
-        ->help('<span id="zone_amount">' . __('Amount will be: ')  .' USD</span>')
-        ->rules('min:0')
-        ->default(100)
-        ->disable();
+        $form->decimal('app_profit_percentage', __('app profit Percentage') . '(%)')
+            ->help('<span id="zone_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->rules('min:0')
+            ->default(100)
+            ->disable();
         $form->html('
         <script>
             $(document).ready(function () {
@@ -379,7 +384,7 @@ class TargetController extends MainController
 
             return @explode(',', $moment)[2] ?? 0;
         });
-       
+
         $form->saving(function (Form $form) {
             $fields = [
                 'usd' => request()->usd,
@@ -387,7 +392,7 @@ class TargetController extends MainController
                 'app_profit_percentage' => request()->app_profit_percentage,
                 'db_percentage' => request()->db_percentage,
             ];
-        
+
             $total = 0;
             foreach ($fields as $key => $value) {
                 if ($value < 0) {
@@ -399,7 +404,7 @@ class TargetController extends MainController
                     );
                     return back()->with(compact('error'));
                 }
-        
+
                 $total += $value;
             }
             if ($total > 100) {
@@ -412,7 +417,7 @@ class TargetController extends MainController
                 return back()->with(compact('error'));
             }
         });
-        
+
         return $form;
     }
 
