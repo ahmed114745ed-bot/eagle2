@@ -342,7 +342,7 @@ Route::group(
             Route::prefix('ware-gift')->group(function () {
 
                 Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-                Route::post('/', [OvipGiftTapController::class, 'store']);
+                Route::post('/{level}', [OvipGiftTapController::class, 'store']);
                 // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
                 // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
                 // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
