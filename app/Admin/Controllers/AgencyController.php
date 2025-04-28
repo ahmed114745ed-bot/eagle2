@@ -47,9 +47,15 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('Agencies'))
-            ->body($this->grid()));
+        return $content
+            ->title(__('Agencies'))
+            ->description(__('List of Agencies'))
+            ->row(function ($row) {
+
+                $row->column(3, view('agency.settings'));
+
+                $row->column(9, $this->grid());
+            });
     }
 
     public function edit($id, Content $content)
@@ -177,7 +183,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
 
         $cacheKey = "agencies_grid_" . md5(json_encode(request()->all()));
-        $grid->model()->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+        $grid->model()->select('id', 'name', 'app_owner_id', 'phone_code', 'phone', 'salary', 'coins', 'img')
             ->where(function ($query) {
                 $query->WhereDoesntHave('additionalInfo')
                     ->orWhereHas('additionalInfo', function ($query) {
@@ -196,7 +202,6 @@ class AgencyController extends MainController
             });
         }
 
-        $grid->id(__('ID'));
         $grid->column('name', __('Agency'))
             ->display(function ($name) {
                 $cacheKey = "agency_image_{$this->id}";
@@ -214,10 +219,15 @@ class AgencyController extends MainController
                 return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
-                <span>$name</span>
+                <div style='display: flex; flex-direction: column;'>
+
+                    <span>$name</span>
+                    <span>ID: {$this->id}</span>
+                </div>
             </div>
-            ";
+        ";
             });
+
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
@@ -248,11 +258,11 @@ class AgencyController extends MainController
             if (!$number) return '-';
 
             $iconUrl = asset('images/phone.jpg'); // Adjust the path based on your actual file location
-
+            $phoneCode = $this->phone_code;
             // Return an image with a WhatsApp link
             return "<div style='display: flex; align-items: center; '>
 
-            <span>{$number} </span>
+             <span>{$phoneCode}{$number}</span>
 
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
@@ -414,55 +424,59 @@ class AgencyController extends MainController
 
         $form->display('ID');
         if (!$form->isEditing()) {
+            $form->row(function ($row) {
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users3', 'id', 'name');
 
-            $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                $row->width(12)->hidden('agency_manger_id', __('app manger id'));
+                $row->width(12)->text('name', __('name'))->rules('required');
+                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->switch('status', __('status'));
+                $row->width(12)->url('url', __('url'));
+                $row->width(2)->text('phone_code', __('Phone Code'))->rules('required');
+                $row->width(9)->text('phone', __('Phone'))->rules('required');
+                // $row->width(12)->image('img', __('img'))->rules('required');
+                $row->width(12)->textarea('contents', __('contents'));
+                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+
+                if (!Auth::user()->isRole('Agencies Managers')) {
+                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
                 }
-                return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name');
-            if ($form->isEditing()) {
-                $form->hidden('agency_manger_id', __('app manger id'));
-            }
-
-            $form->text('name', __('name'))->rules('required');
-            // $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
-            $form->text('notice', __('notice'))->rules('required');
-            $form->switch('status', __('status'));
-            $form->text('phone', __('phone'))->rules('required');
-            $form->url('url', __('url'));
-           // $form->image('img', __('img'))->rules('required');
-            $form->textarea('contents', __('contents'));
-            $form->switch('Host_agency', trans('Host agency'))->default(true);
-            if (!Auth::user()->isRole('Agencies Managers')) {
-                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false);
-            }
+        });
         } else {
 
-            $form->select('app_owner_id', __('app owner id'))->options(function ($value) {
-                $ops2 = [];
-                foreach (User::Where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+            $form->row(function ($row) {
+                $row->width(12)->select('app_owner_id', __('app owner id'))->options(function ($value) {
+                    $ops2 = [];
+                    foreach (User::Where('id', $value)->get() as $user) {
+                        $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    }
+                    return $ops2;
+                })->ajax('/api/search/users3', 'id', 'name');
+
+                // if (request()->route('form')->isEditing()) {
+                //     $row->hidden('agency_manger_id', __('app manger id'));
+                // }
+
+                $row->width(12)->text('name', __('name'))->rules('required');
+                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->switch('status', __('status'));
+                $row->width(2)->text('phone_code', __('Phone Code'))->rules('required');
+                $row->width(9)->text('phone', __('Phone'))->rules('required');
+                $row->width(12)->url('url', __('url'));
+                $row->width(12)->textarea('contents', __('contents'));
+                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+                $row->image('img', __('img'))->rules('required');
+
+                if (!Auth::user()->isRole('Agencies Managers')) {
+                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
                 }
-                return $ops2;
-            })->ajax('/api/search/users3', 'id', 'name');
-
-            if ($form->isEditing()) {
-                $form->hidden('agency_manger_id', __('app manger id'));
-            }
-
-            $form->text('name', __('name'))->rules('required');
-            $form->text('notice', __('notice'))->rules('required');
-            $form->switch('status', __('status'));
-            $form->text('phone', __('phone'))->rules('required');
-            $form->url('url', __('url'));
-            $form->image('img', __('img'))->rules('required');
-            $form->textarea('contents', __('contents'));
-            $form->switch('Host_agency', trans('Host agency'))->default(true);
-            if (!Auth::user()->isRole('Agencies Managers')) {
-                $form->switch('Shipping_agency', trans('Shipping agency'))->default(false);
-            }
+            });
         }
 
         if (Session::has('show_alert')) {

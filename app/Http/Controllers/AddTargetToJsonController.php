@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Modules\Tasks\Selectable\Days;
 
 class AddTargetToJsonController extends Controller
 {
@@ -16,16 +17,17 @@ class AddTargetToJsonController extends Controller
         $days =  $request->days;
         $reels =  $request->reels;
         $moments =  $request->moments;
+        $diamonds = $request->diamonds;
+        $total = $hours + $days + $reels + $moments + $diamonds;
+        if ($total > 100) {
 
-        $total = $hours + $days + $reels + $moments;
-        if ($total != 50) {
-
-            return   Redirect::back()->withErrors(['msg' => 'يجب المجموع يكون 50']);
+            return   Redirect::back()->withErrors(['msg' => 'يجب ان يكون المجموع ليس اكبر من 100']);
         }
         settings()->set("hours", $hours);
         settings()->set("days", $days);
         settings()->set("reels", $reels);
         settings()->set("moments", $moments);
+        settings()->set("diamonds", $diamonds);
 
         return Redirect::back();
     }

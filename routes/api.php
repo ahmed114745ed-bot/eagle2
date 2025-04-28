@@ -532,6 +532,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::prefix('music')->group(function () {
                 Route::get('/all', [MusicController::class, 'index']);
                 Route::get('/user', [MusicController::class, 'userMusic']);
+                Route::delete('{id}/user', [MusicController::class, 'destroyUserMusic']);
                 Route::post('/create', [MusicController::class, 'store']);
             });
         }

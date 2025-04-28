@@ -86,12 +86,14 @@
     <div class="box-body no-padding">
         <div class="switch-container">
             <div class="switch-item">
-                <label for="stopChargeCheckbox" class="switch-label">ايقاف ارسال الهدايا للجميع</label>
+                <label for="stopChargeCheckbox" class="switch-label">{{ __("dashboard.roomOn") }}</label>
                 <label class="switch">
                     <input type="checkbox" id="stopChargeCheckbox" {{ $make_rooms_top == 1 ? 'checked' : '' }}>
                     <span class="slider round"></span>
                 </label>
             </div>
+
+
         </div>
     </div>
 
@@ -101,7 +103,7 @@
             $('#stopChargeCheckbox').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
-                    url: '/admin/close-open-gift',
+                    url: '/admin/send-request-make-rooms-top',
                     method: 'POST',
                     data: { make_rooms_top: isChecked },
                     success: function(response) { console.log(response); },

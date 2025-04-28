@@ -96,10 +96,18 @@ class PkEventController extends MainOldController
             $url2 = url('admin/pk-events-gift/pk-king/' . $this->id);
             $url3 = url('admin/pk-events-gift/pk-room/' . $this->id);
 
+            $pk_star = 'النجم PK  هداية ';
+            $pk_king = 'الملك PK  هداية ';
+            $pk_owner = 'الغرفة pk هداية ';
+            if(app()->getLocale() == 'en'){
+                $pk_star = 'star PK gift';
+                $pk_king = 'king PK gift';
+                $pk_owner = 'room PK gift';
+            }
             // إنشاء أزرار HTML
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>  النجم PK  هداية </a>";
-            $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'> الملك PK  هداية  </a>";
-            $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'> الغرفة pk هداية  </a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". $pk_star . "  </a>";
+            $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'>". $pk_king. " </a>";
+            $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'>". $pk_owner. " </a>";
 
             // دمج الأزرار في سلسلة واحدة وإرجاعها
             return $button1 . ' ' . $button2 . ' ' . $button3;

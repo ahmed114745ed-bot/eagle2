@@ -119,10 +119,7 @@ class GiftController extends MainController
             $filter->expand();
         });
         $grid->id(__('ID'));
-        $grid->column('name', __('Name'))
-            ->display(function () {
-                return "ar: {$this->name} <br> en: {$this->e_name}";
-            });
+        $grid->name(__('Name'));
 
         if (Admin::user()->can('edit_gift_price') || Admin::user()->can('*')) {
             $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
@@ -229,7 +226,6 @@ class GiftController extends MainController
         $form = new Form(new Gift);
         $form->display(__('ID'));
         $form->text('name', __('name'));
-        $form->text('e_name', __('e_name'));
         $form->select('type', __('type'))->options(
             translate(TYPE_GIFT)
         )->attribute(['id' => 'type'])->required();

@@ -26,7 +26,7 @@ class OVipController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'ovip';
-    public $permission_setting = 'settings';
+    public $permission_setting = 'ovip-settings';
 
 
     public $hiddenColumns = [];
@@ -98,13 +98,13 @@ class OVipController extends MainController
      *
      * @return Grid
      */
-    protected function grid2()
-    {
-        $form = new Box();
-        $form->view('admin.grid.common.ovip');
+    // protected function grid2()
+    // {
+    //     $form = new Box();
+    //     $form->view('admin.grid.common.ovip');
 
-        return $form;
-    }
+    //     return $form;
+    // }
 
 
     protected function grid()

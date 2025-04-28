@@ -85,6 +85,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\NotificationsTemplatesController;
+use App\Admin\Controllers\RoomController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -217,6 +218,7 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        $router->put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         $router->resource('all-games', AllGameController::class);
         $router->resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
         $router->resource('blacks', 'BlackListController');
@@ -423,7 +425,7 @@ Route::group(
         $router->resource('agency-manger-users', AgencyMangerUsers::class);
         $router->resource('core-wallets', CoreWalletsController::class);
         $router->resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        $router->resource('appear-charger-agency', AppearChargerAgencyController::class);
+        $router->resource('charge-agencies', AppearChargerAgencyController::class);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])

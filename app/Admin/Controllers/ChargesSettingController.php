@@ -18,11 +18,11 @@ class ChargesSettingController extends MainController
     {
         $settings = Setting::pluck('value', 'key')->toArray();
 
-        return $content
+        return parent::index($content
             ->header(__('Settings'))
             ->description('')
 
-            ->body(view('admin.charges_settings', compact('settings')));
+            ->body(view('admin.charges_settings', compact('settings'))));
     }
 
     public function saveSettings(Request $request)

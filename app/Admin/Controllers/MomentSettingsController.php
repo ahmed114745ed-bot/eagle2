@@ -13,13 +13,13 @@ class MomentSettingsController extends AdminController
      * @var string
      */
     protected $title = 'Moment Settings';
-    public $permission_name = 'settings';
+    public $permission_name = 'moment-settings';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
         ->title(__('Moment settings'))
-        ->view('moment_settings');
+        ->view('moment_settings'));
     }
 
 }

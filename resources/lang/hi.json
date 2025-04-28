@@ -303,8 +303,13 @@
     "Payment": "भुगतान",
     "Sound & Video System Setting:": "ध्वनि और वीडियो प्रणाली सेटिंग:",
     "Sound System Setting:": "ध्वनि प्रणाली सेटिंग:",
+    "Agencies Menu": "एजेंसियों मेनू",
     "Video System Setting:": "वीडियो प्रणाली सेटिंग:",
     "soon": "जल्द ही",
+    "Games" : "गेम्स",
+    "Games Settings:": "गेम सेटिंग्स:",
+    "Notifications": "सूचनाएँ",
+    "Work": "काम",
     "gateway_ready" : "भुगतान गेटवे उपयोग के लिए तैयार है",
     "edit_credentials" : "कृपया भुगतान प्रमाण पत्र सेटिंग्स संपादित करें",
     "you have this item in your pack no need to buy it": "आपके पास इस आइटम को अपने पैक में है, इसे खरीदने की कोई आवश्यकता नहीं है",
@@ -1142,7 +1147,7 @@
    "AgencyUserLog": "एजेंसी उपयोगकर्ता लॉग",
    "agency-user-logs": "एजेंसी उपयोगकर्ता लॉग्स",
    "days and hours": "दिन और घंटे",
-   "agent Percentage": "एजेंट प्रतिशत",
+   "Host Percentage": "एजेंट प्रतिशत",
    "Total USD: ": "कुल यूएसडी: ",
    "Amount will be: ": "राशि होगी: ",
    "duration in seconds": "सेकंड में अवधि",
@@ -1167,7 +1172,8 @@
    "firebase_database_url": "फायरबेस डेटाबेस url",
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
    "Real Time system Setting": "वास्तविक समय सिस्टम सेटिंग्स",
-   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स"
+   "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
+"Charge-agency": "चार्ज एजेंसी"
 
 
 

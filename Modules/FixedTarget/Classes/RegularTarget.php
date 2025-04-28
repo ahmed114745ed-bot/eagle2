@@ -21,21 +21,24 @@ class RegularTarget implements TargetInterface
         $targetReel =  explode(',', $target->reel);
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
-        $per = 0.50;
+        // $per = 0.50;
+        $per =common::getDiamondsPercentage();
         if ($target->hours <= $hours) {
             $per += (settings()->get('hours') ?? 0)/100;
         }
+        
+
         if ($target->days <= $days) {
             $per +=  (settings()->get('days')?? 0) /100;
         }
-
-
+       
+        
         if((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1]??0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments'] )
         {
 
             $per += (settings()->get('moments')??0) /100;
         }
-
+      
         if((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0 )<= $extras['reel']['comments'] )
         {
             $per += (settings()->get('reels') ?? 0) /100;
@@ -47,6 +50,39 @@ class RegularTarget implements TargetInterface
 //        }
           $usd = Common::getTargetUsd($target->diamonds,$target->usd);
           
+          
           return $usd * $per;
+    }
+
+    public function calculatePercentageAchieved(Model $target, float $hours, int $days , array $extra): float
+    {
+        $targetReel =  explode(',', $target->reel);
+        $targetMoment = explode(',', $target->moment);
+        $extras = $extra;
+        // $per = 0.50;
+        $per =common::getDiamondsPercentage();
+        if ($target->hours <= $hours) {
+            $per += (settings()->get('hours') ?? 0)/100;
+        }
+        
+
+        if ($target->days <= $days) {
+            $per +=  (settings()->get('days')?? 0) /100;
+        }
+       
+        
+        if((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1]??0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments'] )
+        {
+
+            $per += (settings()->get('moments')??0) /100;
+        }
+      
+        if((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0 )<= $extras['reel']['comments'] )
+        {
+            $per += (settings()->get('reels') ?? 0) /100;
+        }
+
+          
+          return $per;
     }
 }

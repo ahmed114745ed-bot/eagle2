@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Exception;
 use App\Helpers\Common;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Tik\Services\MusicService;
 use App\Http\Controllers\Controller;
@@ -25,6 +26,12 @@ class MusicController extends Controller
     {
         $data = $this->musicService->userMusic($request->user()->id);
         return Common::apiResponse(1, '', MusicResource::collection($data));
+    }
+
+    public function destroyUserMusic($id): JsonResponse
+    {
+        $this->musicService->destroyUserMusic(auth()->id(), $id);
+        return Common::apiResponse(1, 'deleted successfully');
     }
 
     public function store(Request $request)
