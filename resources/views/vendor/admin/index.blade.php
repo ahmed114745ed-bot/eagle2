@@ -110,25 +110,37 @@ document.addEventListener("DOMContentLoaded", function () {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    function initPhoneInput() {
         const input = document.querySelector("#phone-input");
-        if (input) {
+        if (input && !input.classList.contains('iti-initialized')) {
             const iti = window.intlTelInput(input, {
                 separateDialCode: true,
                 preferredCountries: ["eg"],
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
             });
-
+            // Mark as initialized so it's not called twice
+            input.classList.add('iti-initialized');
+            // On submit, format the value
             const form = input.closest('form');
             if (form) {
                 form.addEventListener('submit', function() {
                     if (iti) {
-                        // Get number in E.164 format (example: +2015458)
                         input.value = iti.getNumber();
                     }
                 });
             }
         }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initPhoneInput, 100); // Wait 100ms to ensure rendering
+    });
+    // On Laravel-Admin: If you use tabs, modals, or custom reloads,
+    // re-init on AJAX finished events:
+    $(document).on('pjax:complete', function() {
+        setTimeout(initPhoneInput, 100);
+    });
+    $(document).on('click', '.add-form-row', function() {
+        setTimeout(initPhoneInput, 100);
     });
 </script>
 </body>

@@ -158,6 +158,11 @@
         z-index: 3000 !important;
     }
 
+    .iti {
+        direction: ltr !important;
+        text-align: left !important; /* optional, for consistent alignment */
+    }
+
     .iti__country-list, .iti__country {
         direction: ltr !important;
         text-align: left !important;
@@ -377,9 +382,14 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
-    .rtl [class*="col-md-12"] {
-        float: none !important;
+    .rtl .box-body .fields-group [class*="col-md-12"] {
+        float: left; !important;
     }
+
+    .rtl [class*="col-md-12"] {
+        float: none; !important;
+    }
+
 
     .rtl [class*="col-md-6"] {
         float: right;
