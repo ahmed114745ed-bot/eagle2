@@ -47,9 +47,17 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index($content
-            ->title(trans('Agencies'))
-            ->body($this->grid()));
+        return $content
+            ->title(__('Agencies'))
+            ->description(__('List of Agencies'))
+            ->row(function ($row) {
+
+                // ---- LEFT: Settings panel ----
+                $row->column(3, view('agency.settings'));
+
+                // ---- RIGHT: The agencies Grid ----
+                $row->column(9, $this->grid());
+            });
     }
 
     public function edit($id, Content $content)
