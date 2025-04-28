@@ -1205,7 +1205,7 @@ class Common
             'role_id' => $role->id,
         ]);
         if ($user->email != null) {
-        //  Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+         Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
         }
         return true;
     }
