@@ -17,8 +17,15 @@
     "Agency name": "Ajans adı",
     "charge-reports": "Şarj raporları",
     "Achievement Id" : "Başarı Kimliği",
+    "Badges" : "rozetler",
     "Owner uuid": "Sahip Kimlik Numarası",
     "Roles": "Roller",
+
+    "Supporter" : "Destekçi",
+    "Shipping": "Nakliye",
+    "Hosting" : "Ev sahibi",
+    "Agency_owner" : "Acente sahibi",
+
     "Charged by dash": "Sistemden şarj",
     "Enter amount in dollars": "Tutarı dolar olarak girin",
     "Please set agency coins in configs": "Lütfen shipping_coins ayarlarını yapılandırın",

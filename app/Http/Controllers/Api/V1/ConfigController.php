@@ -26,6 +26,21 @@ class ConfigController extends Controller
         $this->configService = $configService;
     }
 
+    public function uploadBadges(Request $request){
+
+        foreach($request->allFiles() as $input => $file){
+
+            $value = Common::upload('images', $file);
+            //$value = '3.jpg';
+
+                Config::updateOrCreate(['name' =>$input],[
+                    'value' => $value
+                ]);
+
+        }
+        return back();
+    }
+
     public function getConfigValues(ConfigValuesRequest $request)
     {
         $configs = [];
