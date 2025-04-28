@@ -815,6 +815,7 @@ class UserController extends MainController
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
         $form->select('type_user', trans('User Type'))
         ->options([
+            '' => '', // <-- Empty option first
             0 => 'مستخدم',
             1 => 'مضيف',
             2 => 'وكيل مضيفين',
@@ -822,7 +823,7 @@ class UserController extends MainController
             4 => 'وكيل مصيفين ووكيل شحن',
             5 => 'اداري',
         ])
-        ->default(0)
+        ->default('')
         ->rules('required|in:0,1,2,3,4,5');
 
         if (Session::has('show_alert')) {

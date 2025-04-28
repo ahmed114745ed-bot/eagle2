@@ -278,7 +278,9 @@
     "AppCP": "مستوي ال cp",
     "AppRoom" : "مستوي الغرفه",
     "AppCharge": "مستوي الشحن",
-
+    "Pin": "تثبيت",
+    "Confirm": "تأكيد",
+    "Do you want to pin this room to the top?": "هل ترغب فى تثبيت الغرفة فى الاعلى؟",
     "config returned success": "تم إعادة تكوين الإعدادات بنجاح",
     "anonymous icon": "أيقونة مجهول",
     "user_id , room_id are required": "مطلوب معرف المستخدم ومعرف الغرفة",
@@ -880,6 +882,7 @@
     "Games Settings:": "إعدادات الألعاب:",
     "Notifications": "الإشعارات",
     "Work": "العمل",
+    "Agencies Menu": "قائمة الوكالات",
     "login_from_only_one_device" :"تسجيل الدخول من جهاز واحد فقط" ,
  "one_usd_value_in_coins" : "قيمة الدولار الواحد بالعملات" ,
  "zego_server_secret" : "سر خادم زيغو",

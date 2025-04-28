@@ -134,6 +134,25 @@
         color: var(--primary-color) !important;
     }
 
+    .rtl .col-md-1,
+    .rtl .col-md-2,
+    .rtl .col-md-3,
+    .rtl .col-md-4,
+    .rtl .col-md-5,
+    .rtl .col-md-6,
+    .rtl .col-md-7,
+    .rtl .col-md-8,
+    .rtl .col-md-9,
+    .rtl .col-md-10,
+    .rtl .col-md-11,
+    .rtl .col-md-12 {
+        float: right;
+    }
+
+    .rtl .box-header .pull-left {
+        float: right !important;
+    }
+
     .box {
         background: var(--secondary-color) !important;
         filter: brightness(0.85);

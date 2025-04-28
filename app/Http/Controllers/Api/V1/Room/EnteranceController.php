@@ -240,9 +240,14 @@ class EnteranceController extends Controller
 
     public function enter_room(Request $request): JsonResponse
     {
+        
         $room_pass = $request['room_pass'];
         $owner_id = $request['owner_id'];
         $user = $request->user();
+        $ban = Common::ifRoomHasband($owner_id);
+        if ($ban) {
+            return Common::apiResponse(0, 'ban active for this room.', ['ban' => true]);
+        }
         request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
 
         return $this->enteranceRoomService->enterRoom($user, $request, $room_pass, $owner_id);
