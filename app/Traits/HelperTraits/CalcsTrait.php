@@ -758,6 +758,15 @@ trait CalcsTrait
 
     public static function ovip_center_rank_img($user_id)
     {
+     
+     
+        if (is_object($user_id)) {
+            if (isset($user_id->userId)) {
+                $user_id = $user_id->userId;
+            } else {
+                return new \stdClass();
+            }
+        }
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
             if (!$user) return new \stdClass();
@@ -790,10 +799,9 @@ trait CalcsTrait
 
     public static function wareUserVip($user_id, $type, $item)
     {
-        
-        if (is_object($user_id) && !($user_id instanceof User)) {
-            return new \stdClass();
-        }
+       
+
+   
 
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
