@@ -65,7 +65,7 @@
     <div class="settings-menu">
         @foreach ($tabs as $key => $label)
             @php
-                $isActive = request('tab') === $key;
+                $isActive = request('tab') === $key || (empty(request('tab')) && $key == '') ;
                 $url =
                     request()->url() . '?' . http_build_query(array_merge(request()->except('tab'), ['tab' => $key]));
             @endphp
