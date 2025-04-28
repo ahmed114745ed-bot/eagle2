@@ -239,9 +239,14 @@ class RoomController extends Controller
                     'data' => $userDataWithCharisma
                 ]
             ];
+
             $json = json_encode($ms);
 
             Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
+        }
+
+        if(!isset($roomId)){
+            Common::apiResponse(false, '');
         }
         $this->handleLeaveCp($user, $roomId);
 
