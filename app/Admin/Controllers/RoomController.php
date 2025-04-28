@@ -194,62 +194,81 @@ class RoomController extends MainController
         });
         $grid->column('count_room_socket', __('Number of users'));
 
-
         $grid->column(__('microphone'))->display(function () {
             $ids = explode(',', $this->microphone);
             $cachedUsers = \App\Models\User::whereIn('id', $ids)
                 ->with(['profile:user_id,avatar'])
                 ->get(['id', 'name']);
-
+        
             if ($cachedUsers->isEmpty()) {
                 return '';
             }
-
-            $html = '
-            <div class="scroll" style="
-                overflow-x: auto;
-                white-space: nowrap;
-                padding: 8px 0;
-                max-width: calc(4 * 72px); /* 4 images with 12px margin each */
-            ">';
-
+        
+            $html = '<div class="image-container">';
+        
             foreach ($cachedUsers as $user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                 $username = htmlspecialchars($user->name ?? 'Unknown');
-
+                $userUrl = route('admin.users.show', $user->id); // Assuming you have a route like this
+        
                 $html .= '
-                    <div style="display: inline-block; text-align: center; margin-right: -12px;">
+                    <div class="image-wrapper" onclick="window.location.href=\'' . $userUrl . '\'">
                         <img src="' . $url . '"
                              title="' . $username . '"
-                             style="width: 50px; height: 50px; border-radius: 50%;
+                             style="width: 40px; height: 40px; border-radius: 50%;
                                     object-fit: cover; border: 2px solid white;
                                     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                                    transition: transform 0.2s ease;"/>
-
+                                    transition: transform 0.3s ease;"/>
                     </div>';
             }
-
+        
             $html .= '</div>';
-
-            // Hover effect
+        
+            // CSS for styling
             $html .= '
-            <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                document.querySelectorAll(".scroll img").forEach(img => {
-                    img.addEventListener("mouseenter", function() {
-                        this.style.transform = "scale(1.3)";
-                        this.style.zIndex = "10";
-                    });
-                    img.addEventListener("mouseleave", function() {
-                        this.style.transform = "scale(1)";
-                        this.style.zIndex = "1";
-                    });
-                });
-            });
-            </script>';
-
+            <style>
+                .image-container {
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: -10px; /* Overlap the images slightly */
+                    padding: 8px 0;
+                }
+        
+                .image-wrapper {
+                    display: inline-block;
+                    position: relative;
+                        margin-right: -12px;
+                }
+        
+                .image-wrapper img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #fff; /* White border for better contrast */
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    cursor: pointer;
+                }
+        
+                .image-wrapper img:hover {
+                    transform: scale(1.2); /* Slightly enlarge image on hover */
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
+                }
+        
+                /* Optional: If you want to add a tooltip style for the images */
+                .image-wrapper img[title] {
+                    cursor: pointer; /* Change cursor to indicate interactivity */
+                }
+        
+                .image-wrapper img[title]:hover {
+                    opacity: 0.8; /* Slight opacity change on hover */
+                }
+            </style>';
+        
             return $html;
         });
 
