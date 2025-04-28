@@ -293,4 +293,9 @@ class Room extends Model
                     ->where('microphone', '!=', '0,0,0,0,0,0,0,0,0,0');
     }
 
+    public function bans()
+    {
+        return $this->hasMany(BanRoom::class);
+    }
+
 }
