@@ -18,11 +18,6 @@
             @endforeach
         </ul>
     @endif
-{{--    <div class="settings-menu">--}}
-{{--        <button onclick="window.location.href='{{ admin_url('') }}'" style="background: var(--primary-color); color: var(--text-secondary-color);">--}}
-{{--            {{ __('family') }}--}}
-{{--        </button>--}}
-{{--    </div>--}}
 </div>
 <style>
     body {
@@ -96,10 +91,22 @@
     }
 </style>
 <script>
-    $(document).on('click', '.settings-sidebar .treeview > a', function (e) {
-        e.preventDefault();
-        var $parent = $(this).parent();
-        $parent.toggleClass('active');
-        // $parent.find('.treeview-menu').first().slideToggle();
+    function setupSettingsSidebarMenu() {
+        $(document).on('click.settingsSidebar', '.settings-sidebar .treeview > a', function (e) {
+            e.preventDefault();
+            var $parent = $(this).parent();
+            $parent.toggleClass('active');
+        });
+    }
+
+    $(function () {
+        setupSettingsSidebarMenu();
+    });
+
+    $(document).on('pjax:script', function () {
+        setupSettingsSidebarMenu();
+    });
+    $(document).on('pjax:end', function () {
+        setupSettingsSidebarMenu();
     });
 </script>

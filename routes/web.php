@@ -209,10 +209,10 @@ Route::get('/update-rooms', function(){
 
 
 Route::get('/update-rooms-microphone', function(){
-    
+
     Room::withoutVisitorsAndActiveMic()->update([
         'microphone' => '0,0,0,0,0,0,0,0,0,0'
-    ]);    
+    ]);
     return "done";
 });
 

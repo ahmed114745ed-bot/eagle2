@@ -43,13 +43,13 @@ class DailyPrizeController extends AdminController
                 6 => __('sixth_day'),
                 7 => __('seventh_day'),
             ];
-            return $days[$order] ?? $order; 
+            return $days[$order] ?? $order;
         });
-       
-    
 
-    
-    
+
+
+
+
 
         $grid->column('gift_type', __('gifts'));
         $grid->column('image', __('image'))->display(function ($path) {
@@ -146,7 +146,7 @@ class DailyPrizeController extends AdminController
             6 => __('sixth_day'),
             7 => __('seventh_day'),
         ])->required();
-        
+
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
