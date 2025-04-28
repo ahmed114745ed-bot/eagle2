@@ -358,7 +358,7 @@
                                         @endphp
                                         @if ($row)
                                             <img id="preview_{{ $language->code }}_{{ $type }}"
-                                                 src="{{ $row?->value }}"
+                                                 src="{{ getImagePath($row?->value) }}"
                                                  alt="{{ $type }} badge"
                                                  onclick="openFullScreen(this)">
                                         @else
