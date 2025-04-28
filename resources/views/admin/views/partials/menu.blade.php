@@ -91,8 +91,12 @@
                 <i class="fa {{ $item['icon'] }}"></i>
                 @if (Lang::has($titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])))))
                     <span>{{ __($titleTranslation) }}</span>
+
                 @else
                     <span>{{ admin_trans($item['title']) }}</span>
+                @endif
+                @if ($item['title'] == 'Wallet')
+                    <span class="pull-right">Soon</span>
                 @endif
                 <i class="fa fa-angle-left pull-right"></i>
             </a>
