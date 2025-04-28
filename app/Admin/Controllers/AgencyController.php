@@ -52,10 +52,8 @@ class AgencyController extends MainController
             ->description(__('List of Agencies'))
             ->row(function ($row) {
 
-                // ---- LEFT: Settings panel ----
                 $row->column(3, view('agency.settings'));
 
-                // ---- RIGHT: The agencies Grid ----
                 $row->column(9, $this->grid());
             });
     }
@@ -222,7 +220,7 @@ class AgencyController extends MainController
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div style='display: flex; flex-direction: column;'>
-                    
+
                     <span>$name</span>
                     <span>ID: {$this->id}</span>
                 </div>
@@ -434,7 +432,7 @@ class AgencyController extends MainController
                     }
                     return $ops2;
                 })->ajax('/api/search/users3', 'id', 'name');
-            
+
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('name'))->rules('required');
                 $row->width(12)->text('notice', __('notice'))->rules('required');
@@ -445,7 +443,7 @@ class AgencyController extends MainController
                 // $row->width(12)->image('img', __('img'))->rules('required');
                 $row->width(12)->textarea('contents', __('contents'));
                 $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
-            
+
                 if (!Auth::user()->isRole('Agencies Managers')) {
                     $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
                 }
