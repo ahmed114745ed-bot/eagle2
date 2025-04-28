@@ -265,6 +265,7 @@
     "AppCP": "Cp",
     "AppRoom" : "Room",
     "AppCharge": "Charge",
+    "Confirm Pin Room": "تأكيد تثبيت الغرفة",
     "config returned success": "Configuration returned successfully",
     "anonymous icon": "Anonymous icon",
     "user_id , room_id are required": "User ID, Room ID are required",
