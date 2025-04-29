@@ -81,7 +81,7 @@
                             @if (Lang::has($titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])))))
                                 <span>{{ __($titleTranslation) }}</span>
                                 @if ($item['uri'] == 'soon' || $item['uri'] == '/soon')
-                                    <i class="pull-right">{{ __('soon') }}</i>
+                                    <i style="float: left;">{{ __('soon') }}</i>
                                 @endif
                             @else
                                 <span>{{ admin_trans($item['title']) }}</span>
