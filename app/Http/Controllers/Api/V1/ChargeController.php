@@ -76,7 +76,7 @@ class ChargeController extends Controller
     {
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
-            return Common::apiResponse(0, __('api_responses.freez_charge_settings'), 404);
+            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
         }
         $toId = $request->to_id;
         $from = $request->user();
@@ -84,10 +84,10 @@ class ChargeController extends Controller
         $to = User::find($toId);
 
         if(!$from->transfer_salary){
-            return Common::apiResponse(0, __('api.freez_charge_from_salary'), 404);
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
         if(!$to->transfer_salary){
-            return Common::apiResponse(0, __('api.freez_charge_to'), 404);
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
 
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
@@ -96,7 +96,7 @@ class ChargeController extends Controller
        
 
         if ($from->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge_stat'), 404);
+            return Common::apiResponse(0, __('api.freez_charge'), 404);
         }
         $usd = $request->usd;
 
