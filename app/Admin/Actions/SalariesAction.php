@@ -48,7 +48,6 @@ class SalariesAction extends Action
             DB::beginTransaction();
             $type = \request('type') ?? 'user';
             if (\request('id') && $type == 'agency') {
-                info('yes');
                 $agency = Agency::query()->find(\request('id'));
                 if ($agency) {
                     if ($request->select_type == 'decrement') {
