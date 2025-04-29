@@ -448,8 +448,28 @@
     .soon{
 
     }
-    .soon::before{
-        content: '';
+    .rtl .soon::before{
+        content: '{{ __("soon") }}';
+    top: 37px;
+    position: absolute;
+    left: 16px;
+    background: green;
+    width: 19px;
+    text-align: center;
+    -webkit-writing-mode: vertical-rl;
+    height: 31px;
+    }
+    .ltr .soon::before{
+        content: '{{ __("soon") }}';
+        top: 36px;
+        position: absolute;
+        right: 15px;
+        background: green;
+        width: 19px;
+        text-align: center;
+        -webkit-writing-mode: vertical-rl;
+        height: 31px;
+
     }
 </style>
 
