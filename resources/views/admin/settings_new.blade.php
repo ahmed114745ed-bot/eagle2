@@ -660,10 +660,7 @@
                                         {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'selected' : '' }}>
                                         {{ __('Image') }}
                                     </option>
-                                    <option value="gradient"
-                                        {{ ($settings['brand_background_type'] ?? '') === 'gradient' ? 'selected' : '' }}>
-                                        {{ __('gradient') }}
-                                    </option>
+
                                 </select>
                             </div>
                         </div>
@@ -710,24 +707,7 @@
                                 @endif --}}
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group" id="gradient_group"
-                                style="display: {{ ($settings['brand_background_type'] ?? 'gradient') === 'gradient' ? 'block' : 'none' }};">
-                                <label for="box_background_color">{{ __('gradient First Color:') }}</label>
-                                <input type="color" id="graident_1" name="gradient_1"
-                                    value="{{ $settings['gradient_1'] ?? '#F8F9FA' }}"
-                                    style="background: {{ $settings['gradient_1'] ?? '#F8F9FA' }};"
-                                    title="لون التدرج">
 
-
-                                    <label for="box_background_color">{{ __('gradient Second Color:') }}</label>
-                                    <input type="color" id="gradient_2" name="gradient_2"
-                                        value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
-                                        style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
-                                        title="لون  التدرج">
-                            </div>
-
-                        </div>
                     </div>
 
                     <div class="col-12 d-flex gap-3 mt-3">
@@ -1555,6 +1535,10 @@
                                     <option value="image"
                                         {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>
                                         {{ __('Image') }}</option>
+                                    <option value="gradient"
+                                        {{ ($settings['background_type'] ?? '') === 'gradient' ? 'selected' : '' }}>
+                                        {{ __('gradient') }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -1581,6 +1565,25 @@
                                     </div>
                                 @endif
                             </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="gradient_group"
+                                style="display: {{ ($settings['background_type'] ?? 'gradient') === 'gradient' ? 'block' : 'none' }};">
+                                <label for="box_background_color">{{ __('gradient First Color:') }}</label>
+                                <input type="color" id="graident_1" name="gradient_1"
+                                    value="{{ $settings['gradient_1'] ?? '#F8F9FA' }}"
+                                    style="background: {{ $settings['gradient_1'] ?? '#F8F9FA' }};"
+                                    title="لون التدرج">
+
+
+                                    <label for="box_background_color">{{ __('gradient Second Color:') }}</label>
+                                    <input type="color" id="gradient_2" name="gradient_2"
+                                        value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
+                                        style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
+                                        title="لون  التدرج">
+                            </div>
+
                         </div>
                     </div>
 
@@ -1929,13 +1932,14 @@
                     const type = document.getElementById("background_type").value;
                     document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
                     document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
+                    document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
+
                 }
 
                 function toggleBrandBackgroundInput() {
                     const type = document.getElementById("brand_background_type").value;
                     document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
                     document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
-                    document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
                 }
 
                 async function updateBackgroundValue() {
