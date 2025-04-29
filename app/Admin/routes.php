@@ -353,7 +353,7 @@ Route::group(
             $router->resource('ware-gifts', 'OvipGiftTapController');
             Route::prefix('ware-gifts')->group(function () {
 
-               
+
                 Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
                 Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
                 Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
@@ -485,7 +485,7 @@ Route::group(
 
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
-            
+
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
 
