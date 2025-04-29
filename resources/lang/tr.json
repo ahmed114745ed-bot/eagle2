@@ -591,6 +591,8 @@
     "total_days": "Gün sayısı",
     "total_hours": "Saat sayısı",
     "image_type": "Resim türü",
+    "profile_frame_type":"Profile Resim türü",
+
     "User Report": "Kullanıcı raporu",
     "canPlay": "Oynayabilir",
     "ban_type": "Yasak türü",
@@ -2047,6 +2049,13 @@
 "Pin Status": "Sabitlenme Durumu",
 
 "diamonds target":"Elmas Hedef",
+"export pdf": "PDF Dışa Aktar",
+  "Diamond Target": "Elmas Hedef",
+  "Day & Hours": "Gün ve Saatler",
+  "Host Salary": "Ev Sahibi Maaşı",
+  "Agents Salary": "Ajanlar Maaşı",
+  "BD Admin": "BD Yöneticisi",
+  "Honor": "Onur",
 
 
 "event period": "Etkinlik süresi"

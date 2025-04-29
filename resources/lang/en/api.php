@@ -64,6 +64,7 @@ return [
 
     'remove_from_family'  => 'Sorry! You are removed from family :name ',
     'accept_agency'       => 'Congrats! Your request to join :name agency is accepted',
+    'agencyJoinRequest'       => ':name want to join your agency :agencyName',
     'got_coin'            => 'Congrats :name !   :coins coins are added to your account',
     'sender_level'        => 'Congratulations you reach sender level :level',
     'receiver_level'      => 'Congratulations you reach receiver level :level',

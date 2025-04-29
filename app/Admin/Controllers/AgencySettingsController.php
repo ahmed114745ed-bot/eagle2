@@ -4,6 +4,8 @@ namespace App\Admin\Controllers;
 
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Models\Config;
+use App\Models\Language;
 use Encore\Admin\Controllers\AdminController;
 
 class AgencySettingsController extends MainController
@@ -22,9 +24,11 @@ class AgencySettingsController extends MainController
         $days =  settings()->get('days');
         $moments =  settings()->get('moments');
         $reels = settings()->get('reels');
-
+        $diamonds = settings()->get('diamonds');
+        $languages = Language::all();
+        $configAll = Config::all();
         return parent::index($content
-        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels')));
+        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels','diamonds', 'languages', 'configAll')));
     }
 
 

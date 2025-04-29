@@ -29,7 +29,7 @@ class UserRepository extends AbstractRepository
 
     public function searchUser($userUuId)
     {
-        return $this->model->searchByUuid($userUuId)->first();
+        return $this->model->where('uuid', 'like', '%' . $userUuId . '%')->first();
     }
 
 

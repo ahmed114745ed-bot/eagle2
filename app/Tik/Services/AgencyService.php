@@ -94,6 +94,7 @@ class AgencyService
         $this->agencyJoinRequestRepository->create($data);
 
         $requests = $this->agencyJoinRequestRepository->getByUser($user->id);
+        CustomNotification::agencyJoinRequest($agency, $user);
         return $requests;
     }
 
@@ -388,6 +389,7 @@ class AgencyService
             $user->type_user = 2;
             $user->agency_id = $agency->id;
             $user->monthly_diamond_received = 0;
+            $user->is_host = 1;
             $user->save();
         }
         if ($agency->additionalInfo->gmail) {

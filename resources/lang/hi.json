@@ -1187,11 +1187,20 @@
    "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
 "Charge-agency": "चार्ज एजेंसी",
 "event period": "घटना की अवधि",
+"export pdf": "पीडीएफ निर्यात",
+  "Diamond Target": "डायमंड टार्गेट",
+  "Day & Hours": "दिन और घंटे",
+  "Host Salary": "होस्ट वेतन",
+  "Agents Salary": "एजेंट्स वेतन",
+  "BD Admin": "BD व्यवस्थापक",
+  "Honor": "सम्मान",
 "Pinned": "पिन किया हुआ",
         "Unpinned": "पिन नहीं किया हुआ",
         "Unpin": "पिन हटाना",
         "Pin Status": "पिन स्थिति",
-        "diamonds target":"हीरे लक्ष्य"
+        "diamonds target":"हीरे लक्ष्य",
+        "profile_frame_type":"Profile Frame Type"
+
 
       
 

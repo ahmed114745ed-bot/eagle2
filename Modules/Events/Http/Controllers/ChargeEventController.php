@@ -16,10 +16,45 @@ use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Transformers\TargetsResource;
 use Modules\Events\Transformers\UserChargeResource;
 use Modules\Achievement\Entities\UserAchievementLevel;
-
+use Modules\Events\Transformers\TopUserChargeResource;
 
 class ChargeEventController extends Controller
 {
+    public function wonEvent()
+    {
+        $fromDate = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+        $tillDate = Carbon::now()->subMonth()->endOfMonth()->toDateString();
+
+
+        $user =  User::query()
+        ->leftJoinSub(
+            function ($query) use ($fromDate,$tillDate) {
+                $query->select('user_id', \DB::raw('SUM(amount) as charges_sum_amount'))
+                      ->from('charges')
+                     -> whereBetween('created_at',[$fromDate,$tillDate])
+                      ->groupBy('user_id');
+            },
+            'charges',
+            'users.id',
+            'charges.user_id'
+        )
+        ->leftJoinSub(
+            function ($query) use ($fromDate,$tillDate) {
+                $query->select('user_id', \DB::raw('SUM(obtained_coins) as coin_logs_sum_obtained_coins'))
+                      ->from('coin_logs')
+                      ->whereBetween('created_at',[$fromDate,$tillDate])
+                      ->groupBy('user_id');
+            },
+            'coin_logs',
+            'users.id',
+            'coin_logs.user_id'
+        )
+        ->select(['users.*', \DB::raw('IFNULL(charges_sum_amount, 0) + IFNULL(coin_logs_sum_obtained_coins, 0) as total_sum')])
+        ->orderBy('total_sum', 'desc')->limit(1)->first();
+
+        return Common::apiResponse(1, '', new TopUserChargeResource($user));
+    }
+
     public function chargeEventRole(Request $request)
     {
         $start =  Carbon::now()->startOfMonth();

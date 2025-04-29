@@ -292,8 +292,8 @@
                 <button onclick="showSection('PercentageTarget')"
                 style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Manger') }}</button>
 
-                <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
-
+{{--                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
+ --}}
             </div>
         </div>
 

@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Helpers\Common;
-use App\Models\Admin;
+use Encore\Admin\Facades\Admin;
 use App\Models\Agency;
 use App\Models\Ban;
 use App\Models\Charge;
@@ -16,15 +16,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Facades\CustomNotification;
+use Encore\Admin\Auth\Permission;
 
 class RemoveBanUser extends Action
 {
     public $name;
 
     protected $selector = '.remove_ban_user_action';
+    public $permission_name = 'bans';
 
     public function handle(Request $request)
     {
+
+        if (!Admin::user()->can('*')) {
+            Permission::check('delete-' . $this->permission_name);
+        }
         $user = User::query()->where('uuid', $request->uid)->first();
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
