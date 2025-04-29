@@ -452,7 +452,7 @@ Route::group(
         $router->resource('agency-settings', AgencySettingsController::class);
         $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-        $router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
+        //$router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         $router->get('convert-is_gold', function () {
             $users = \App\Models\User::where("is_gold_id", 1)->get();
             foreach ($users as $user) {
