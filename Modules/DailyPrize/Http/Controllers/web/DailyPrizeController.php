@@ -162,6 +162,12 @@ class DailyPrizeController extends AdminController
                 $form->number('expir', __('expire'));
             })->required();
 
+        $form->saving(function (Form $form) {
+            if ($form->gift_type === 'coins') {
+                $form->expir = null;
+            }
+        });
+
         return $form;
     }
 }
