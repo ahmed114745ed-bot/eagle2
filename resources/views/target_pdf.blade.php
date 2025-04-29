@@ -76,9 +76,9 @@
                         <td><strong>{{ __('Honor') }}</strong></td>
                         <td>{{ $honor->diamonds }}</td>
                         <td>{{ $honor->days }} D / {{ $honor->hours }} h</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0) }}</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0) }}</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0) }}</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0)$ }}</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0)$ }}</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0 ) $ }}</td>
                     </tr>
 
                     @foreach($targets->skip(1) as $index => $target)
