@@ -111,7 +111,6 @@ class ConfigController extends Controller
     public function updateConfigAgoraZego(Request $request)
     {
         Artisan::call('cache:clear');
-        Artisan::call('config:cache');
 
         $keys = array_keys($request->all());
 
@@ -128,6 +127,9 @@ class ConfigController extends Controller
 
             $config->save();
         }
+
+        Artisan::call('config:cache');
+
         return Redirect::back();
     }
 }
