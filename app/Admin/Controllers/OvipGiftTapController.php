@@ -79,6 +79,8 @@ class OvipGiftTapController extends MainController
 
     protected function gridDynamic($level, $firstType)
     {
+
+
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
@@ -171,6 +173,8 @@ class OvipGiftTapController extends MainController
     protected function form()
     {
         $form = new Form(new Ware());
+        $form->setAction(admin_url("ware-gift/" . request('level') ));
+
         $form->hidden('level')->value(request('level'));
         $form->hidden('type')->value(request('type'));
         $form->hidden('is_active_for_vip')->value(1);
