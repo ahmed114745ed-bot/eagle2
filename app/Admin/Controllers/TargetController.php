@@ -3,18 +3,17 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
-use App\Models\Setting;
 use App\Models\Target;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Cache;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\MessageBag;
+
 
 class TargetController extends MainController
 {
@@ -504,5 +503,15 @@ class TargetController extends MainController
 
         //        Target::create($data);
         return $this->form()->store();
+    }
+
+
+    public function downloadTargetPdf()
+    {
+        $targets = Target::orderBy('diamonds', 'asc')->get();
+        $pdf = Pdf::loadView('pdf.target', compact('targets'));
+
+        // Download the PDF
+        return $pdf->download('target_data.pdf');
     }
 }

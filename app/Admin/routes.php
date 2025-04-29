@@ -9,6 +9,7 @@ use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
+use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -19,6 +20,7 @@ use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
+use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
@@ -51,9 +53,9 @@ use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
-
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
@@ -86,7 +88,6 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\NotificationsTemplatesController;
-use App\Admin\Controllers\RoomController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -174,6 +175,7 @@ Route::group(
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
+
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
         $router->resource('payment-with-method', PaymentMethodController::class);
@@ -250,6 +252,7 @@ Route::group(
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
+        Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
         $router->resource('polices', PoliceController::class);
         $router->resource('offers', OfferController::class);
         $router->resource('payment-gateways', PaymentGetWayController::class);
