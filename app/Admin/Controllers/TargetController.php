@@ -192,6 +192,24 @@ class TargetController extends MainController
                 </div>
             ";
             });
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = '/admin/download-target-pdf';
+            $create_new = __('export pdf');
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success" target="_blank">
+              <i class="fa fa-download"></i>&nbsp;&nbsp;' . $create_new . '</a>';
+            $tools->append($button);
+        });
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $url = route('download.target.pdf');
+        //     $button = <<<HTML
+        //         <a href="{$url}" class="btn btn-sm btn-success" target="_blank">
+        //             <i class="fa fa-file-pdf-o"></i> {{ __('Export PDF') }}
+        //         </a>
+        //     HTML;
+
+        //     $tools->append($button);
+        // });
+
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
@@ -508,10 +526,13 @@ class TargetController extends MainController
 
     public function downloadTargetPdf()
     {
-        $targets = Target::orderByDesc('diamonds')->get();
-        $pdf = Pdf::loadView('target_pdf', compact('targets'));
+        try {
+            $targets = Target::orderByDesc('diamonds')->get();
+            $pdf = Pdf::loadView('target_pdf', compact('targets'));
+            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+        } catch (\Exception $e) {
 
-        // Download the PDF
-        return $pdf->download('target_data.pdf');
+            return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 }
