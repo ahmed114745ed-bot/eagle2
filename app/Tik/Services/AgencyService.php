@@ -94,6 +94,7 @@ class AgencyService
         $this->agencyJoinRequestRepository->create($data);
 
         $requests = $this->agencyJoinRequestRepository->getByUser($user->id);
+        CustomNotification::agencyJoinRequest($agency, $user);
         return $requests;
     }
 

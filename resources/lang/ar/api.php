@@ -66,6 +66,7 @@ return [
     'removeBan_user_id'                => 'مبروك انت الان تستطيع استخدام الصفوة',
     'remove_from_family'               => 'تم حظرك من عائله :name',
     'accept_agency'                    => 'مبروك لقد تم قبول طلب الانضمام وكاله :name',
+    'agencyJoinRequest'       => ':name  يريد الانضمام الى وكالتك :agencyName',
     'got_coin'                         => 'تهانينا يا :name . لقد تم اضافة :coins كوين الى حسابك',
     'level'                            => 'تهنينا لقد حصلت عاى وسام جديد',
     'send_level'                       => 'لقد ارسلت :level مستوى ',
