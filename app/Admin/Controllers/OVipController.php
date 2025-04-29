@@ -19,6 +19,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
+use Illuminate\Support\Str;
+
 
 class OVipController extends MainController
 {
@@ -187,7 +189,10 @@ class OVipController extends MainController
         $form->display(__('ID'));
         $form->number('level', __('level'))->creationRules(['required', "unique:o_vips,level,{{id}}"])->updateRules(['required', "unique:o_vips,level,{{id}}"]);;
         $form->text('name', __('name'));
-        $form->file('img', __('img'));
+        // $form->file('img', __('img'));
+        $form->file('img', trans('img'))->name(function ($file) {
+            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        });
         $form->number('exp', __('exp'));
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_vip_price') || Admin::user()->can('*')) {
