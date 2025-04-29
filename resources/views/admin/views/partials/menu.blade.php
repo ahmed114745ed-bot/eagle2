@@ -80,8 +80,14 @@
                             <i class="fa {{$item['icon']}}"></i>
                             @if (Lang::has($titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])))))
                                 <span>{{ __($titleTranslation) }}</span>
+                                @if ($item['uri'] == 'soon' || $item['uri'] == '/soon')
+                                    <i>{{ __('soon') }}</i>
+                                @endif
                             @else
                                 <span>{{ admin_trans($item['title']) }}</span>
+                                @if ($item['uri'] == 'soon' || $item['uri'] == '/soon')
+                                    <i>{{ __('soon') }}</i>
+                                @endif
                             @endif
                         </a>
         </li>
