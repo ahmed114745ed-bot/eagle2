@@ -315,6 +315,24 @@ class ChargeRepoService
         ];
         $this->create($data);
     }
+
+    public function userAgencySearch($request)
+    {
+        try {
+            if ($request->type === 'agency') {
+                $user = $this->agencyRepository->find($request->id);
+            } else {
+                $user = $this->userRepository->searchUser($request->id);
+            }
+            $data = [
+                'id' => $user?->id,
+                'name' => $user?->name,
+            ];
+            return $data;
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    } 
     
     
 }

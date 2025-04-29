@@ -379,4 +379,11 @@ class ChargeController extends Controller
         $trx = $this->chargeService->getCoinLogs($user->id, $searchKey);
         return Common::apiResponse(1, '', TrxResource::collection($trx), 200);
     }
+
+
+    public function getUserAgency(Request $request)
+    {
+        $data = $this->chargeService->userAgencySearch($request);
+        return Common::apiResponse(1, '', $data, 200);
+    }
 }
