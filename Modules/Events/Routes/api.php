@@ -23,6 +23,8 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(fun
         Route::get('top-weekly-events', [WeeklyStarController::class, 'topUsersEvent']);
         Route::get('role-event', [WeeklyStarController::class, 'roleEvent']);
         Route::get('top-details', [WeeklyStarController::class, 'topDetails']);
+        Route::get('previous-event', [WeeklyStarController::class, 'previousWeeklyEvent']);
+
     });
 
     Route::prefix ('event-periods')->middleware(['appFeatureEnable:period_event'])->group (function (){
