@@ -410,10 +410,10 @@ if (!function_exists('adjustColor')) {
 if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
-        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
-            if (!isSubdomain()) {
-                return null;
-            }
+//        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
+//            if (!isSubdomain()) {
+//                return null;
+//            }
 
             $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');
@@ -429,7 +429,7 @@ if (!function_exists('getPusherConfig')) {
                 'app_secret' => $appSecret,
                 'app_cluster' => $appCluster,
             ];
-        });
+//        });
     }
 }
 if (!function_exists('nameRoute')) {

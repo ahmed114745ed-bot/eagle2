@@ -19,6 +19,7 @@ use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;
 use App\Services\LuckyGiftService;
 use App\Traits\Gifts\WinLuckyGift;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Services\Gifts\GiftService;
