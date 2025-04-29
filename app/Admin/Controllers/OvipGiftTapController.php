@@ -173,7 +173,7 @@ class OvipGiftTapController extends MainController
     protected function form()
     {
         $form = new Form(new Ware());
-        $form->setAction(admin_url("ware-gift/" . request('level') ));
+         $form->setAction(admin_url("ware-gift/store". "/" . request('level') . "/" . request('type')));
 
         $form->hidden('level')->value(request('level'));
         $form->hidden('type')->value(request('type'));

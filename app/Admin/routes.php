@@ -342,14 +342,16 @@ Route::group(
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
             Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-            Route::prefix('ware-gift')->group(function () {
 
+            Route::prefix('ware-gift')->group(function () {
+                Route::post('/store/{level}/{type}', [OvipGiftTapController::class, 'store']);
                 Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
                 Route::post('/{level}', [OvipGiftTapController::class, 'store']);
                 // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
                 // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
                 // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
+
             $router->resource('ware-gifts', 'OvipGiftTapController');
             Route::prefix('ware-gifts')->group(function () {
 
@@ -510,3 +512,4 @@ Route::group(
 
 
 );
+
