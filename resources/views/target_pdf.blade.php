@@ -1,138 +1,143 @@
 <!-- resources/views/pdf/target.blade.php -->
+
+@php
+    use Illuminate\Support\Facades\Schema;
+    use Illuminate\Support\Facades\DB;
+
+    $logo = asset('images/app-logo.png'); // Default logo
+
+    if (Schema::hasTable('settings')) {
+        $logoDb = DB::table('settings')->where('key', 'app_logo')->value('value');
+
+        
+        if ($logoDb) {
+            $logo = getImagePath( $logoDb);
+        }
+    }
+@endphp
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Target Data PDF</title>
+    <title>{{ config('app.name') }} - {{ __('Salary Policy') }}</title>
     <style>
+        :root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --green-color: {{ config('themes.greenColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+        --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
         body {
-            font-family: Arial, sans-serif;
+            font-family: DejaVu Sans, sans-serif;
+        }
+        thead.custom-header {
+            background-color: var(--primary-color) !important;
+            color: var(--text-secondary-color) !important;
+        }
+        h1.green-bordered {
+            border: 2px solid green;
+            padding: 10px;
+            display: inline-block;
+            margin-bottom: 20px;
         }
         table {
-            width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #000;
+            width: 100%;
         }
         th, td {
+            border: 1px solid #333;
             padding: 8px;
-            text-align: left;
+            text-align: center;
         }
-        th {
-            background-color: #f4f4f4;
+        /* th {
+            background-color: #f2f2f2;
+        } */
+        .content-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
         }
+        .app-logo img {
+            max-width: 160px;
+        }
+
+        .tbody-colored tr:nth-child(even) {
+                background-color: var(--box-background-color) !important;
+                color: var(--text-secondary-color) !important;
+            }
+            .tbody-colored tr:nth-child(odd) {
+                background-color: var(--box-background-color) !important;
+                color: var(--text-secondary-color) !important;
+            }
+            .tbody-colored tr:first-child {
+                background-color: var(--box-background-color) !important; /* light blue for "Honor" */
+                color: var(--text-secondary-color) !important;
+            }
     </style>
 </head>
 <body>
 
-    <h1>Target Data</h1>
+    <h1 class="green-bordered">{{ config('app.name') }} {{ __('Salary Policy') }}</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>{{__('Level')}}</th>
-                <th>{{__('Diamond Target')}}</th>
-                <th>{{__("Day & Hours")}}</th>
-                <th>{{__("Host Salary")}}</th>
-                <th>{{__("Agents Salary")}}</th>
-                <th>{{__("BD Admin")}}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{-- First row: Honor --}}
-            @if(count($targets) > 0)
-                @php $honor = $targets->first(); @endphp
+    <div class="content-wrapper">
+        <table>
+            <thead class="custom-header">
                 <tr>
-                    <td>Honor</td>
-                    <td>{{ $honor->diamonds }}</td>
-                    <td>{{ $honor->days }} D / {{ $honor->hours }} h</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0) }}</td>
+                    <th>{{ __('Level') }}</th>
+                    <th>{{ __('Diamond Target') }}</th>
+                    <th>{{ __('Day & Hours') }}</th>
+                    <th>{{ __('Host Salary') }}</th>
+                    <th>{{ __('Agents Salary') }}</th>
+                    <th>{{ __('BD Admin') }}</th>
                 </tr>
-            @endif
-    
-            {{-- Rest of rows: S1, S2, S3... --}}
-            @foreach($targets->skip(1) as $index => $target)
-                <tr>
-                    <td>S{{ $index + 1 }}</td>
-                    <td>{{ $target->diamonds }}</td>
-                    <td>{{ $target->days }} D / {{ $target->hours }} h</td>
-                    <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
-    👇 What This Does:
-    First row = Honor, with real values.
-    
-    Then loop through the remaining targets as S1, S2, etc.
-    
-    Let me know if the Honor row comes from somewhere else instead of $targets->first().
-    
-    
-    
-    
-    
-    
-    
-    You said:
-    write this with clean code 
-    
-    
-    ChatGPT said:
-    Certainly! Here's a clean and readable Blade version of your table, displaying the first row as "Honor", followed by "S1", "S2", "S3", etc., using a helper function for the salary calculations.
-    
-    ✅ Blade View: Clean Version
-    blade
-    Copy
-    Edit
-    <table>
-        <thead>
-            <tr>
-                <th>{{ __('Level') }}</th>
-                <th>{{ __('Diamond Target') }}</th>
-                <th>{{ __('Day & Hours') }}</th>
-                <th>{{ __('Host Salary') }}</th>
-                <th>{{ __('Agents Salary') }}</th>
-                <th>{{ __('BD Admin') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if($targets->isNotEmpty())
-                @php $honor = $targets->first(); @endphp
-    
-                {{-- Honor Row --}}
-                <tr>
-                    <td>{{__('Honor')}}</td>
-                    <td>{{ $honor->diamonds }}</td>
-                    <td>{{ "{$honor->days} D / {$honor->hours} h" }}</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0) }}</td>
-                    <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0) }}</td>
-                </tr>
-    
-                {{-- S1, S2, S3... --}}
-                @foreach($targets->skip(1)->values() as $index => $target)
+            </thead>
+            <tbody class="tbody-colored">
+                @if($targets->count())
+                    @php $honor = $targets->first(); @endphp
                     <tr>
-                        <td>S{{ $index + 1 }}</td>
-                        <td>{{ $target->diamonds }}</td>
-                        <td>{{ "{$target->days} D / {$target->hours} h" }}</td>
-                        <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }}</td>
-                        <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }}</td>
-                        <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}</td>
+                        <td><strong>{{ __('Honor') }}</strong></td>
+                        <td>{{ $honor->diamonds }}</td>
+                        <td>{{ $honor->days }} D / {{ $honor->hours }} h</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0) }} $</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0) }} $</td>
+                        <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0 )  }}$</td>
                     </tr>
-                @endforeach
-            @endif
-        </tbody>
-    
-    </table>
+
+                    @foreach($targets->skip(1) as $index => $target)
+                        <tr>
+                            <td>{{ 'S' . ($index + 1) }}</td>
+                            <td>{{ $target->diamonds }}</td>
+                            <td>{{ $target->days }} D / {{ $target->hours }} h</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }} $</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }} $</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}$</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="6">{{ __('No data available.') }}</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>
+

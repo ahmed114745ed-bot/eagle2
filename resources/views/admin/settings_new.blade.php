@@ -1553,7 +1553,7 @@
                                     class="form-control">
                                 @if (!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
                                     <div class="mt-2">
-                                        <img src="{{ asset($settings['app_background']) }}" width="100"
+                                        <img src="{{ getImagePath($settings['app_background']) }}" width="100"
                                             class="img-thumbnail">
                                     </div>
                                 @endif
