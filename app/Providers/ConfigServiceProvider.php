@@ -33,6 +33,7 @@ class ConfigServiceProvider extends ServiceProvider
          }
         $requestPath = \Request::path();
 
+
          if (\Str::startsWith($requestPath, 'preview')){//admin.route.prefix,admin.auth.controller
              Config::set('session.cookie', 'laravel_preview');
              Config::set('admin.route.prefix', 'preview/admin');
