@@ -19,15 +19,22 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin as AuthAdmin;
+
 
 class BanUser extends Action
 {
     public $name;
 
     protected $selector = '.ban_user_action';
+    public $permission_name = 'bans';
 
     public function handle(Request $request)
     {
+        if (!AuthAdmin::user()->can('*')){
+            Permission::check('create-'.$this->permission_name);
+        }
         $user = User::query()->searchByUuid($request->uuid)->first();
         $userUuid  = $user->original_uuid;
         $now = now();

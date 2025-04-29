@@ -145,9 +145,9 @@ class RoleController extends MainController
         $form = new Form(new $roleModel());
 
 
-        $form->text('slug', trans('admin.slug'))->rules('required');
+        $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug');
 
-        $form->text('name', trans('admin.name'))->rules('required');
+        $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name');
         $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
@@ -166,7 +166,9 @@ class RoleController extends MainController
 
         $form = new Form(new $roleModel());
 
-        $form->text('name', trans('admin.name'))->rules('required');
+        $roleId = request()->route('role');
+
+        $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name,' . $roleId);
         $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         $form->display('created_at', trans('admin.created_at'));

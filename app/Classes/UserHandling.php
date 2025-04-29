@@ -2,19 +2,20 @@
 
 namespace App\Classes;
 
-use App\Models\OVip;
-use App\Models\UserVip;
-use App\Models\Vip;
 use Carbon\Carbon;
 use App\Models\Ban;
+use App\Models\Vip;
+use App\Models\Gift;
+use App\Models\OVip;
 use App\Models\User;
 use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\BanType;
-use App\Models\Gift;
 use App\Models\GiftLog;
+use App\Models\UserVip;
 use App\Models\LiveTime;
 use App\Models\UserSallary;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Modules\AgencyApp\Entities\AgencyUserJob;
 
@@ -181,6 +182,8 @@ class UserHandling
         DB::table('agency_sallaries')->where('agency_id', $agency_id)->delete();
 
         AgencyUserJob::where(['agency_id' => $agency_id])->delete();
+        $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $agency->id])->get();
+        if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
 
     }
 

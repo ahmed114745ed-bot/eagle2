@@ -283,7 +283,23 @@ class UserController extends MainController
 
         $grid->column('target', __('target'))->expand(function ($model) {
 
-            $targets = $model->targets()->orderByDesc('created_at')->get()->map(function ($target) {
+            $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
+                $data = json_decode($target->extras, true);
+    
+                $moment_upload = $data['moment']['upload'] ?? '';
+                $moment_likes = $data['moment']['likes'] ?? '';
+                $moment_comments = $data['moment']['comments'] ?? '';
+
+                // For "reel"
+                $reel_upload = $data['reel']['upload'] ?? '';
+                $reel_likes = $data['reel']['likes'] ?? '';
+                $reel_comments = $data['reel']['comments'] ?? '';
+
+                // Combine moment fields
+                $moment_info = "Upload: {$moment_upload} | Likes: {$moment_likes} | Comments: {$moment_comments}";
+
+                // Combine reel fields
+                $reel_info = "Upload: {$reel_upload} | Likes: {$reel_likes} | Comments: {$reel_comments}";
                 $target =
                     [
                         'id' => $target->id,
@@ -293,28 +309,29 @@ class UserController extends MainController
                         'user_diamonds' => $target->user_diamonds,
                         'user_hours' => $target->user_hours,
                         'user_days' => $target->user_days,
+                        'moment' => $moment_info,
+                        'real' => $reel_info,
                         'user_obtain' => $target->user_obtain,
                         'updated_at' => $target->updated_at,
                     ];
 
 
-
                 return $target;
             });
 
-            return new TableWidget(
+            return new \App\Admin\Widgets\Table(
                 [
                     'ID',
                     __('month') . '/' . __('year'),
-                    __('usd') . ' ' . __('deserved'),
+                    __('usd') . ' ' . __('deserved') . '(%)',
                     __('agency share') . '(%)',
                     __('user diamonds'),
                     __('user hours'),
                     __('user days'),
+                    __('moment'),
+                    __('real'),
                     __('user obtain'),
                     __('at time'),
-                    __('updated at'),
-
                 ],
                 $targets->toArray()
             );

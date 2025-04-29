@@ -149,6 +149,21 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
+    public function agencyJoinRequest(Agency $agency, User $user)
+    {
+        $tokens_notification[] = DB::table('users')->where('id', $agency->app_owner_id)->value('notification_id');
+        $body_ar = __('api.agencyJoinRequest', ['name' => $user->name, 'agencyName' => $agency->name],  'ar');
+        $body_en = __('api.agencyJoinRequest', ['name' => $user->name, 'agencyName' => $agency->name],  'en');
+        $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
+        $data['image'] = getDriverUrl() . '/' . $user->profile->avatar;
+        $data['user_id'] = $agency->app_owner_id;
+        $icon = $data['image'];
+
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'agency-join-request');
+        Common::sendOfficialMessage($agency->app_owner_id, title: $body_en, content: $agency->name, titleAr: $body_ar);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
     public function visitProfile(User $user, User $visitor)
     {
         $tokens_notification = $user?->notification_id;
@@ -233,9 +248,9 @@ class CustomNotification
 
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
-               
-              Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
-            // dd($data);
+
+                Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+                // dd($data);
             }
             (new UserCounterServices)->eventUsers('system-messages');
             // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {
@@ -392,7 +407,7 @@ class CustomNotification
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['coins'] = $request->amount;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'charge-action-notifaction');
-        Common::sendOfficialMessage($user->id,  title:$body_en,  titleAr: $body_ar);
+        Common::sendOfficialMessage($user->id,  title: $body_en,  titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 

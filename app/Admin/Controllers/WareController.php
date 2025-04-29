@@ -260,27 +260,27 @@ class WareController extends MainController
         if (!$form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+                // $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         if ($form->isEditing()) {
             if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'));
-                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+                // $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
         //        $form->number('score', trans('score'));
-        $form->number('level', trans('level'));
+        // $form->number('level', trans('level'));
         $states = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
-        $form->switch('is_active_for_vip', __("active vip"))->states($states);
-        $form->number('exp', __('exp'));
+        // $form->switch('is_active_for_vip', __("active vip"))->states($states);
+        // $form->number('exp', __('exp'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
-        $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
+        // $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
         //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
@@ -295,7 +295,7 @@ class WareController extends MainController
             ]
         )->attribute(['id' => 'image_type1']);
     
-        $form->select('profile_frame_type', __('image_type'))->options(
+        $form->select('profile_frame_type', __('profile_frame_type'))->options(
             [
                 'svga' => __('svga'),
                 'png' => __('png'),
@@ -334,12 +334,21 @@ class WareController extends MainController
          </script>');
         }
         //        $form->file('img3', trans('video'));
-        $form->color('color', trans('color'));
+        // $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
 
         //        $form->number('sort', 'sort');
-        $form->number('num', __('num'));
-
+        // $form->number('num', __('num'));
+        if (!$form->isEditing()) {
+            if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default('on');
+            }
+        }
+        if ($form->isEditing()) {
+            if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
+                $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
+            }
+        }
         $form->saving(function (Form $form) {
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');
@@ -358,6 +367,7 @@ class WareController extends MainController
 
             (new UserCounterServices)->eventUsers('ware');
         });
+        $form->disableReset();
 
 
         return $form;
