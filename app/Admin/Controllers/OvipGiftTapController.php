@@ -272,7 +272,7 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
-            dd('test');
+           
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -280,10 +280,10 @@ class OvipGiftTapController extends MainController
             if (is_null($imageType1) && is_null($profileFrameType)) {
 
                 session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
+                // return redirect()->back();
             }
 
-
+         
             (new UserCounterServices)->eventUsers('ware');
         });
 
