@@ -270,7 +270,7 @@ class OvipGiftTapController extends MainController
                     'message' => __('This level and type combination already exists'),
                 ]);
 
-                return back()->with(compact('error'));
+                // return back()->with(compact('error'));
             }
            
             $imageType1 = $form->input('image_type1');
@@ -284,7 +284,7 @@ class OvipGiftTapController extends MainController
             }
 
          
-            (new UserCounterServices)->eventUsers('ware');
+            // (new UserCounterServices)->eventUsers('ware');
         });
 
         $form->saved(function (Form $form) {
