@@ -445,6 +445,12 @@
         background-color: #dc3545 !important;
         border: none !important;
     }
+    .soon{
+
+    }
+    .soon::before{
+        content: '';
+    }
 </style>
 
 <!-- Add SweetAlert2 JS -->
@@ -474,10 +480,11 @@
             @csrf
             <div class="form row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="form-group soon">
                         <label>{{ __('Zones') }}</label>
                         <input type="text" name="zones_coins" id="zones_coins"
-                               value="{{ $settings['zones_coins'] ?? '' }}" class="form-control">
+                               value="00000" class="form-control" disabled>
+                               <!-- value="{{ $settings['zones_coins'] ?? '' }}" class="form-control"> -->
                         <small id="zones_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value  :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
@@ -486,10 +493,11 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="form-group soon">
                         <label>{{ __('Super Admin') }}</label>
                         <input type="text" name="super_admin_coins" id="super_admin_coins"
-                               value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control">
+                               value="00000" class="form-control" disabled>
+                               <!-- value="{{ $settings['super_admin_coins'] ?? '' }}" class="form-control"> -->
                         <small id="super_admin_coins_hint" class="form-text text-muted mt-1"
                                data-template="{{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}">
                             {{ __('1 :dollar = :value :coins', ['dollar' => __('Dollar'), 'coins' => __('Coins')]) }}
