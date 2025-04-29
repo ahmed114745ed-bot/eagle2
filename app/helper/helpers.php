@@ -415,13 +415,13 @@ if (!function_exists('getPusherConfig')) {
                 return null;
             }
 
-            $Keys = ['app_id', 'app_key', 'app_secret', 'app_cluster'];
+            $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');
 
-            $appId = !empty($configs->get('app_id')) ? $configs->get('app_id') : Config::get('broadcasting.pusher-default.app_id');
-            $appKey = !empty($configs->get('app_key')) ? $configs->get('app_key') : Config::get('broadcasting.pusher-default.key');
-            $appSecret = !empty($configs->get('app_secret')) ? $configs->get('app_secret') : Config::get('broadcasting.pusher-default.secret');
-            $appCluster = !empty($configs->get('app_cluster')) ? $configs->get('app_cluster') : Config::get('broadcasting.pusher-default.options.cluster');
+            $appId = !empty($configs->get('pusher_app_id')) ? $configs->get('pusher_app_id') : Config::get('broadcasting.pusher-default.app_id');
+            $appKey = !empty($configs->get('pusher_app_key')) ? $configs->get('pusher_app_key') : Config::get('broadcasting.pusher-default.key');
+            $appSecret = !empty($configs->get('pusher_app_secret')) ? $configs->get('pusher_app_secret') : Config::get('broadcasting.pusher-default.secret');
+            $appCluster = !empty($configs->get('pusher_app_cluster')) ? $configs->get('pusher_app_cluster') : Config::get('broadcasting.pusher-default.options.cluster');
 
             return [
                 'app_id' => $appId,

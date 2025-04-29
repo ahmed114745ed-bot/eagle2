@@ -1179,7 +1179,8 @@
    "pusher_app_id": "पुशर ऐप आईडी",
    "pusher_app_key": "पुशर ऐप की कुंजी",
    "pusher_app_secret": "पुशर ऐप सर्केट",
-   "firebase_api_key": "फायरबेस api कुंजी",
+    "pusher_app_cluster" : "पुशर क्लस्टर",
+    "firebase_api_key": "फायरबेस api कुंजी",
    "firebase_auth_domain": "फायरबेस एथेंटिकेशन डोमेन",
    "firebase_database_url": "फायरबेस डेटाबेस url",
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
@@ -1202,7 +1203,7 @@
         "profile_frame_type":"Profile Frame Type"
 
 
-      
+
 
 
 

@@ -702,6 +702,7 @@
     "Text ar" : "نص عربي",
     "Text en":"نص انجليش",
     "pusher_app_secret" : "معرف سر بشر",
+    "pusher_app_cluster" : "عنقود بشر",
     "WhatsappMessages":"رسائل الوتساب",
     "whatsapp-messages":"رسائل الوتساب",
     "create":"انشاء",

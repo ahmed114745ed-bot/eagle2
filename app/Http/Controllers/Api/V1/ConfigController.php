@@ -7,6 +7,7 @@ use App\Http\Requests\Api\ConfigValuesRequest;
 use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\Pack;
+use Artisan;
 use Illuminate\Http\Request;
 use App\Services\ConfigService;
 use Doctrine\DBAL\Schema\Index;
@@ -109,6 +110,9 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
+        Artisan::call('cache:clear');
+        Artisan::call('config:cache');
+
         $keys = array_keys($request->all());
 
         foreach ($keys as $key) {
