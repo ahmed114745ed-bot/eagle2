@@ -43,10 +43,10 @@ class OvipGiftTapController extends MainController
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip->privilegs));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs));
             })
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->gridDynamic($ovip->level, $ovip->privilegs->first()->type));
+                $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
             }));
 
 
@@ -212,7 +212,7 @@ class OvipGiftTapController extends MainController
             ]
         )->attribute(['id' => 'image_type1']);
 
-        $form->select('profile_frame_type', __('image_type'))->options(
+        $form->select('profile_frame_type', __('profile_frame_type'))->options(
             [
                 'svga' => __('svga'),
                 'png' => __('png'),
@@ -264,7 +264,6 @@ class OvipGiftTapController extends MainController
                 ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
-
             if ($exists) {
                 $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
@@ -273,6 +272,7 @@ class OvipGiftTapController extends MainController
 
                 return back()->with(compact('error'));
             }
+            dd('test');
             $imageType1 = $form->input('image_type1');
             $profileFrameType = $form->input('profile_frame_type');
             $form->model()->image_type = $imageType1 ?? $profileFrameType;
@@ -289,9 +289,12 @@ class OvipGiftTapController extends MainController
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
+
             $type = $form->model()->type; // Get the saved model's ID
+            
             $ovip = Ovip::where('level', $level)->first();
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
+         
             return redirect()->to($url);
         });
 
@@ -305,11 +308,14 @@ class OvipGiftTapController extends MainController
         $content = new Row();
 
         // Fetch distinct privilege types and names
-        if (app()->getLocale() == 'en') {
-
-            $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
+        if ($privileges) {
+            if (app()->getLocale() == 'en') {
+                $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
+            } else {
+                $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+            }
         } else {
-            $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+            $privilegeTypes = collect(); 
         }
 
         // Default to the first type if none is selected
