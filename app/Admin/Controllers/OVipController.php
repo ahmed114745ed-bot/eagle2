@@ -38,8 +38,6 @@ class OVipController extends MainController
             Permission::check('browse-'.$this->permission_setting);
         }
 
-        return redirect('/admin/soon');
-
         $config = Config::pluck('value', 'name')->toArray();
         $config['enable_vip_auto'] = true; // make default is true
         return $content->view('vip_settings', compact('config'));

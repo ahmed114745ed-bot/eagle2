@@ -1334,9 +1334,21 @@ class Common
         return floor($number * 100) / 100;
     }
 
+    public static function searchAgency($id)
+    {
+        $agency = Agency::where('id', $id)
+            ->where('Shipping_agency', true) 
+            ->whereHas('chargeAgency' )
+            ->first();
+    
+        return $agency ?: false; 
+    }
+    
+
 
     
 
+ 
 
  
 
