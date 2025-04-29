@@ -32,11 +32,11 @@ class BanController extends MainController
     {
         return $content
             ->title(trans('bans'))
-          ->body($this->grid());
-            // ->row(function ($row) {
-            //     $row->column(10, $this->grid());
-            //     $row->column(2, view('admin.grid.users.ban'));
-            // });
+            ->body($this->grid());
+        // ->row(function ($row) {
+        //     $row->column(10, $this->grid());
+        //     $row->column(2, view('admin.grid.users.ban'));
+        // });
     }
 
     /**
@@ -204,10 +204,11 @@ class BanController extends MainController
             $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
             return now()->diffForHumans($banExpiration, true);
         });
-
-        $grid->column('return', __('delete'))->display(function () {
-            return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
-        });
+        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
+            $grid->column('return', __('delete'))->display(function () {
+                return (new \App\Admin\Actions\DeleteBans($this->uid, $this->type, $this->ban_type_id))->render();
+            });
+        }
 
         $grid->disableExport();
         $grid->disableRowSelector();
@@ -223,10 +224,17 @@ class BanController extends MainController
 
         // $grid->disableTools(); // Disable default tools
         $grid->tools(function (Grid\Tools $tools) {
-            $buttons = '<span style="display: inline-flex; gap: 10px;">'
-                . (new BanUser())->render()
-                . (new RemoveBanUser())->render()
-                . '</span>';
+            $buttons = '<span style="display: inline-flex; gap: 10px;">';
+
+            if (Admin::user()->can('create-' . $this->permission_name) || Admin::user()->can('*')) {
+                $buttons .= (new BanUser())->render();
+            }
+
+            if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
+                $buttons .= (new RemoveBanUser())->render();
+            }
+
+            $buttons .= '</span>';
 
             $tools->append($buttons);
         });
