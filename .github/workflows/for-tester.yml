@@ -1,0 +1,23 @@
+name: SSh-for-tester-pipline
+on:
+  push:
+    branches: ["for-tester"]
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out for-tester Eagle
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        script: |
+          echo "$USER"
+          cd /var/www/for-tester
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          php artisan migrate
+          php artisan optimize:clear
