@@ -130,6 +130,8 @@ class DailyPrizeController extends AdminController
     {
         $form = new Form(new DailyGift());
 
+        $typeId = request()->route('type');
+        $orderId = request()->route('id');
         $form->hidden('type')->value(request('type'));
         // $form->select('order', __('order'))->options([1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7])->required();
         $form->select('order', __('order'))->options([
@@ -140,14 +142,16 @@ class DailyPrizeController extends AdminController
             5 => __('fifth_day'),
             6 => __('sixth_day'),
             7 => __('seventh_day'),
-        ])->rules('required|unique:daily_gifts,order,' . request()->route('id'));
+        ])->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
 
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
+                $form->number('expir', __('expire'));
             })
             ->when("vip", function () use ($form) {
                 $form->belongsTo('target2', OVips::class, trans('vips'));
+                $form->number('expir', __('expire'));
             })
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
@@ -155,8 +159,8 @@ class DailyPrizeController extends AdminController
                 $form->image("target4", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
                 });
+                $form->number('expir', __('expire'));
             })->required();
-        $form->number('expir', __('expire'));
 
         return $form;
     }
