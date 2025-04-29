@@ -37,6 +37,7 @@ class SettingController extends MainController
         $pusher_app_id = Common::getConf('pusher_app_id');
         $pusher_app_key = Common::getConf('pusher_app_key');
         $pusher_app_secret = Common::getConf('pusher_app_secret');
+        $pusher_app_cluster = Common::getConf('pusher_app_cluster');
         $firebase_api_key = Common::getConf('firebase_api_key');
         $firebase_auth_domain = Common::getConf('firebase_auth_domain');
         $firebase_database_url = Common::getConf('firebase_database_url');
@@ -50,6 +51,7 @@ class SettingController extends MainController
                 'pusher_app_secret',
                 'pusher_app_key',
                 'pusher_app_id',
+                'pusher_app_cluster',
                 'settings',
                 'timezones',
                 'agora_app_id',
