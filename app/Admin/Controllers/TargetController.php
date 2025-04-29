@@ -74,13 +74,13 @@ class TargetController extends MainController
     {
         $grid = new Grid(new Target);
         $grid->model()->orderBy('diamonds', 'asc');
-       
+
         $coins = Common::getMaxCoins();
         // $grid->id(__('ID'));
 
         $grid->column(__('target no'))->display(function () {
-            $TargetCount = Target::where('diamonds','<',$this->diamonds)->count();
-           
+            $TargetCount = Target::where('diamonds', '<', $this->diamonds)->count();
+
             return  $TargetCount + 1;
         });
 
@@ -508,8 +508,8 @@ class TargetController extends MainController
 
     public function downloadTargetPdf()
     {
-        $targets = Target::orderBy('diamonds', 'asc')->get();
-        $pdf = Pdf::loadView('pdf.target', compact('targets'));
+        $targets = Target::orderByDesc('diamonds')->get();
+        $pdf = Pdf::loadView('target_pdf', compact('targets'));
 
         // Download the PDF
         return $pdf->download('target_data.pdf');
