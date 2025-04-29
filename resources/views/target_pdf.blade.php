@@ -22,8 +22,33 @@
     <meta charset="UTF-8">
     <title>{{ config('app.name') }} - {{ __('Salary Policy') }}</title>
     <style>
+        :root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --green-color: {{ config('themes.greenColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+        --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
         body {
             font-family: DejaVu Sans, sans-serif;
+        }
+        thead.custom-header {
+            background-color: var(--primary-color) !important;
+            color: var(--text-secondary-color) !important;
         }
         h1.green-bordered {
             border: 2px solid green;
@@ -40,9 +65,9 @@
             padding: 8px;
             text-align: center;
         }
-        th {
+        /* th {
             background-color: #f2f2f2;
-        }
+        } */
         .content-wrapper {
             display: flex;
             align-items: flex-start;
@@ -51,6 +76,19 @@
         .app-logo img {
             max-width: 160px;
         }
+
+        .tbody-colored tr:nth-child(even) {
+                background-color: var(--box-background-color) !important;
+                color: var(--text-secondary-color) !important;
+            }
+            .tbody-colored tr:nth-child(odd) {
+                background-color: var(--box-background-color) !important;
+                color: var(--text-secondary-color) !important;
+            }
+            .tbody-colored tr:first-child {
+                background-color: var(--box-background-color) !important; /* light blue for "Honor" */
+                color: var(--text-secondary-color) !important;
+            }
     </style>
 </head>
 <body>
@@ -59,7 +97,7 @@
 
     <div class="content-wrapper">
         <table>
-            <thead>
+            <thead class="custom-header">
                 <tr>
                     <th>{{ __('Level') }}</th>
                     <th>{{ __('Diamond Target') }}</th>
@@ -69,7 +107,7 @@
                     <th>{{ __('BD Admin') }}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="tbody-colored">
                 @if($targets->count())
                     @php $honor = $targets->first(); @endphp
                     <tr>
@@ -86,9 +124,9 @@
                             <td>{{ 'S' . ($index + 1) }}</td>
                             <td>{{ $target->diamonds }}</td>
                             <td>{{ $target->days }} D / {{ $target->hours }} h</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }}</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }}</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }} $</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }} $</td>
+                            <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}$</td>
                         </tr>
                     @endforeach
                 @else
