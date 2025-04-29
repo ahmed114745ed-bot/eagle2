@@ -591,6 +591,8 @@
     "total_days": "Gün sayısı",
     "total_hours": "Saat sayısı",
     "image_type": "Resim türü",
+    "profile_frame_type":"Profile Resim türü",
+
     "User Report": "Kullanıcı raporu",
     "canPlay": "Oynayabilir",
     "ban_type": "Yasak türü",
