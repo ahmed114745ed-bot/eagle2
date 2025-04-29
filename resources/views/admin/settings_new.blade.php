@@ -7,7 +7,7 @@
     </head>  -->
 <!--
 <body>
-    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('POST')
         @php
@@ -519,7 +519,7 @@
 
                 <h3> {{ __('Brand settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
 
@@ -578,7 +578,7 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST"
+                <form id="themeSettingsForm" action="{{ route('admin.setting.update') }}" method="POST"
                     enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
@@ -718,7 +718,7 @@
 
             <div id="timeSettings" class="settings-section">
                 <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST">
+                <form action="{{ route('admin.setting.update') }}" method="POST">
                     @csrf
                     <div class="form">
 
@@ -1075,7 +1075,7 @@
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                <form action="{{ route('admin.setting.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -1163,7 +1163,7 @@
 
                             <!-- skyPay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                <form action="{{ route('admin.setting.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -1241,7 +1241,7 @@
 
                             <!-- stripe Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                <form action="{{ route('admin.setting.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -1327,7 +1327,7 @@
 
                             <!-- opay Fields -->
                             <div class="col-md-6 mb-3 ms-0 me-auto">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                <form action="{{ route('admin.setting.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -1430,7 +1430,7 @@
 
             <div id="appSettings" class="settings-section">
                 <h3>{{ __('App settings') }}</h3>
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
                         <div class="col-md-6">

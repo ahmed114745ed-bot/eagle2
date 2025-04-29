@@ -171,9 +171,9 @@ Route::group(
         Route::post("send-request-transfer-salary", [UserController::class, "transferSalary"]);
         Route::post("send-request-stop-charge", [UserController::class, "stop_charge"]);
 
-        Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::get('/app-settings', [SettingsController::class, 'index'])->name('settings.index2');
         Route::get('/gift-ovip', [MallController::class, 'giftOVip'])->name('gift.ovip');
-        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('settings.update');
+        Route::post('/app-settings/update', [SettingsController::class, 'update'])->name('setting.update');
         Route::put('/notification-templates', [SettingsController::class, 'edit_notification_templates']);
 
         // Route::put('/notification-templates/{id}', [SettingsController::class, 'edit_notification_templates'])->name('notification-templates.update');

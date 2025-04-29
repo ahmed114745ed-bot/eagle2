@@ -470,7 +470,7 @@
 
                 <h3> {{ __('Charges settings') }}</h3>
 
-                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
+                <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data" id="targetSettingsForm">
             @csrf
             <div class="form row">
                 <div class="col-md-6">
