@@ -23,6 +23,8 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(fun
         Route::get('top-weekly-events', [WeeklyStarController::class, 'topUsersEvent']);
         Route::get('role-event', [WeeklyStarController::class, 'roleEvent']);
         Route::get('top-details', [WeeklyStarController::class, 'topDetails']);
+        Route::get('previous-event', [WeeklyStarController::class, 'previousWeeklyEvent']);
+
     });
 
     Route::prefix ('event-periods')->middleware(['appFeatureEnable:period_event'])->group (function (){
@@ -41,6 +43,8 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(fun
         Route::get('role-events', [ChargeEventController::class, 'chargeEventRole']);
         Route::get('targets', [ChargeEventController::class, 'targets']);
         Route::post('received-rewards', [ChargeEventController::class, 'received_rewards']);
+        Route::get('won_event', [ChargeEventController::class, 'wonEvent']);
+
     });
 
 });

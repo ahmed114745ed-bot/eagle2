@@ -12,6 +12,7 @@
             <li class="{{ request()->name == 'weekly_star' || request()->name == null ? 'active' : '' }}"><a href="?name=weekly_star" class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{__('admin.weekly_star')}}</a></li>
             <li class="{{ request()->name == 'event_period' ? 'active' : '' }}"><a href="?name=event_period" class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{__('admin.event_period')}}</a></li>
             <li class="{{ request()->name == 'pk_event' ? 'active' : '' }}"><a href="?name=pk_event" class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{__('admin.pk_event')}}</a></li>
+            <li class="{{ request()->name == 'charges_reports' ? 'active' : '' }}"><a href="?name=charges_reports" class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{__('charges reports')}}</a></li>
         </ul>
     </div>
     <style>

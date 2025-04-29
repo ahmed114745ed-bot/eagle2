@@ -145,6 +145,145 @@
         width: 200px;
 
     }
+
+    /* Tab styling */
+    .tab-buttons {
+        display: flex;
+        border-bottom: 1px solid #444;
+        margin-bottom: 20px;
+    }
+
+    .tab-button {
+        padding: 10px 20px;
+        background: #333;
+        border: none;
+        color: white;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .tab-button:hover {
+        background: #555;
+    }
+
+    .tab-button.active {
+        background: #ff9800;
+        color: #121212;
+    }
+
+    .tab-content {
+        display: none;
+        padding: 20px;
+        background: #222;
+        border-radius: 0 5px 5px 5px;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .tab-content form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .tab-content label {
+        grid-column: 1;
+    }
+
+    .tab-content input[type="file"] {
+        grid-column: 2;
+    }
+
+    .tab-content button {
+        grid-column: 1 / span 2;
+        justify-self: center;
+    }
+
+
+
+    /* Badge Upload Section Specific Styles */
+    .badge-upload-container {
+        display: grid;
+        width: 200%;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .badge-upload-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 15px;
+        background: #333;
+        border-radius: 5px;
+        min-height: 200px;
+        /* Ensures consistent height */
+    }
+
+    .badge-upload-item label {
+        font-weight: bold;
+        color: #ff9800;
+        margin-bottom: 5px;
+    }
+
+    .badge-upload-item input[type="file"] {
+        padding: 8px;
+        background: #444;
+        border: 1px solid #555;
+        color: white;
+        width: 100%;
+    }
+
+    .badge-preview {
+        margin-top: 10px;
+        text-align: center;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .badge-preview img {
+        max-width: 100%;
+        max-height: 100px;
+        cursor: pointer;
+        border: 2px solid #555;
+        transition: transform 0.3s;
+    }
+
+    .badge-preview img:hover {
+        transform: scale(1.05);
+        border-color: #ff9800;
+    }
+
+    .upload-button {
+        display: block;
+        width: auto;
+        margin: 20px auto 0;
+        padding: 10px 30px;
+        background: #ff9800;
+        color: #121212;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: background 0.3s;
+        grid-column: 1 / -1;
+        /* Span full width */
+    }
+
+    .upload-button:hover {
+        background: #ffab40;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 2000px) {
+        .badge-upload-container {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 </head>
 
@@ -154,7 +293,9 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
-                style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
+                    style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Percentage target') }}</button>
+                <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
+
             </div>
         </div>
 
@@ -165,6 +306,13 @@
 
                 <form action="{{ route('admin.target-percentage') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @php
+                        $errorMessage = $errors ? $errors->first('msg') : null;
+                    @endphp
+                    @if ($errorMessage)
+                        <div class="alert alert-danger text-center" style="margin-bottom: 20px;"> {{ $errorMessage }}
+                        </div>;
+                    @endif
                     <div class="form">
                         <label>{{ __('Hours:') }} </label>
                         <input type="text" name="hours" value="{{ $hours }}" class="form-control">
@@ -174,59 +322,221 @@
                         <input type="text" name="moments" value="{{ $moments }}" class="form-control">
                         <label>{{ __('Reels:') }} </label>
                         <input type="text" name="reels" value="{{ $reels }}" class="form-control">
+                        <label>{{ __('Diamonds') }} </label>
+                        <input type="text" name="diamonds" value="{{ $diamonds }}" class="form-control">
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
 
                 </form>
             </div>
+
+            <div id="Badges" class="settings-section">
+                <h3>{{ __('Badges') }}</h3>
+
+                <!-- Language Tabs Navigation -->
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="openLanguageTab(event, 'defaultInput')">
+                        Default <div>
+                            English
+                        </div>
+                    </button>
+                    @foreach ($languages as $index => $language)
+                        <button class="tab-button" onclick="openLanguageTab(event, '{{ $language->code }}')">
+                            {{ $language->name }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <div id="defaultInput" class="tab-content">
+                    <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="language" value="defaultInput">
+
+                        <div class="badge-upload-container">
+                            @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                                <div class="badge-upload-item">
+                                    <label for="default_{{ $type }}">
+                                        @if ($type == 'host')
+                                            {{ __('Hosting') }} Default:
+                                        @else
+                                            {{ __(ucfirst($type)) }} Default:
+                                        @endif
+                                    </label>
+                                    <input type="file" id="default_{{ $type }}"
+                                        name="default_{{ $type }}"
+                                        onchange="previewImage(this, 'preview_default_{{ $type }}')">
+
+                                    <div class="badge-preview">
+                                        @php
+                                            $row = $configAll->where('name', 'default' . '_' . $type)->first();
+                                        @endphp
+                                        @if ($row)
+                                            <img id="preview_default_{{ $type }}"
+                                                src="{{ getImagePath($row?->value) }}" alt="{{ $type }} badge"
+                                                onclick="openFullScreen(this)">
+                                        @else
+                                            <img id="preview_default_{{ $type }}" src=""
+                                                alt="No image uploaded" style="display: none;">
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <button type="submit" class="upload-button">
+                            {{ __('Submit') }}
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Language Tab Contents -->
+                @foreach ($languages as $index => $language)
+                    <div id="{{ $language->code }}" class="tab-content">
+                        <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="language" value="{{ $language->code }}">
+
+                            <div class="badge-upload-container">
+                                @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                                    <div class="badge-upload-item">
+                                        <label for="{{ $language->code }}_{{ $type }}">
+                                            @if ($type == 'host')
+                                                {{ __('Hosting') }} ({{ strtoupper($language->code) }}):
+                                            @else
+                                                {{ __(ucfirst($type)) }} ({{ strtoupper($language->code) }}):
+                                            @endif
+                                        </label>
+                                        <input type="file" id="{{ $language->code }}_{{ $type }}"
+                                            name="{{ $language->code }}_{{ $type }}"
+                                            onchange="previewImage(this, 'preview_{{ $language->code }}_{{ $type }}')">
+
+                                        <div class="badge-preview">
+                                            @php
+                                                $row = $configAll
+                                                    ->where('name', $language->code . '_' . $type)
+                                                    ->first();
+                                            @endphp
+                                            @if ($row)
+                                                <img id="preview_{{ $language->code }}_{{ $type }}"
+                                                    src="{{ getImagePath($row?->value) }}"
+                                                    alt="{{ $type }} badge" onclick="openFullScreen(this)">
+                                            @else
+                                                <img id="preview_{{ $language->code }}_{{ $type }}"
+                                                    src="" alt="No image uploaded" style="display: none;">
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <button type="submit" class="upload-button">
+                                {{ __('Submit') }}
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+
         </div>
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>
             <img class="modal-content" id="fullImage">
         </div>
+
+
+        <script>
+            function previewImage(input, previewId) {
+                const preview = document.getElementById(previewId);
+                const file = input.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            function openFullScreen(imgElement) {
+                var modal = document.getElementById("imageModal");
+                var modalImg = document.getElementById("fullImage");
+
+                modal.style.display = "block";
+                modalImg.src = imgElement.src;
+            }
+
+            function openLanguageTab(evt, languageCode) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                // Show the current tab and mark button as active
+                document.getElementById(languageCode).classList.add('active');
+                evt.currentTarget.classList.add('active');
+            }
+        </script>
+
         <!-- كود JavaScript -->
         <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Function to get query parameter by name
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
+            document.addEventListener("DOMContentLoaded", function() {
+                // Function to get query parameter by name
+                function getQueryParam(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
 
-    // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-    const activeTab = getQueryParam("firsttab") || "PercentageTarget";
+                // Get the 'firsttab' parameter from URL or default to 'brandSettings'
+                const activeTab = getQueryParam("firsttab") || "PercentageTarget";
 
-    // Show the selected tab
-    showSection(activeTab);
-});
+                // Show the selected tab
+                showSection(activeTab);
+            });
 
-function showSection(sectionId) {
-    // Remove active class from all sections
-    document.querySelectorAll('.settings-section').forEach(section => {
-        section.classList.remove('active');
-    });
+            function showSection(sectionId) {
+                // Remove active class from all sections
+                document.querySelectorAll('.settings-section').forEach(section => {
+                    section.classList.remove('active');
+                });
 
-    // Add active class to the selected section
-    document.getElementById(sectionId).classList.add('active');
+                // Add active class to the selected section
+                document.getElementById(sectionId).classList.add('active');
 
-    // Reset button styles
-    document.querySelectorAll('.settings-menu button').forEach(button => {
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    });
+                // Reset button styles
+                document.querySelectorAll('.settings-menu button').forEach(button => {
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+                });
 
-    // Highlight the active button
-    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-    if (activeButton) {
-        activeButton.style.backgroundColor = 'var(--primary-color)';
-        activeButton.style.color = 'var(--text-secondary-color)';
-    }
+                // Highlight the active button
+                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                if (activeButton) {
+                    activeButton.style.backgroundColor = 'var(--primary-color)';
+                    activeButton.style.color = 'var(--text-secondary-color)';
+                }
 
-    // Update the URL with the selected tab without reloading
-    const url = new URL(window.location);
-    url.searchParams.set("firsttab", sectionId);
-    window.history.pushState({}, "", url);
-}
+
+                if (sectionId === 'Badges') {
+                    const defaultTabBtn = document.querySelector('.tab-button[onclick*="defaultInput"]');
+                    if (defaultTabBtn) {
+                        defaultTabBtn.click(); // fire real click event
+                    }
+                }
+
+                // Update the URL with the selected tab without reloading
+                const url = new URL(window.location);
+                url.searchParams.set("firsttab", sectionId);
+                window.history.pushState({}, "", url);
+            }
 
 
             function openFullScreen(imgElement) {

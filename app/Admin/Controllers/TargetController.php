@@ -3,18 +3,17 @@
 namespace App\Admin\Controllers;
 
 use App\Helpers\Common;
-use App\Models\Setting;
 use App\Models\Target;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Support\Facades\Cache;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\MessageBag;
+
 
 class TargetController extends MainController
 {
@@ -75,20 +74,20 @@ class TargetController extends MainController
     {
         $grid = new Grid(new Target);
         $grid->model()->orderBy('diamonds', 'asc');
-       
+
         $coins = Common::getMaxCoins();
         // $grid->id(__('ID'));
 
         $grid->column(__('target no'))->display(function () {
-            $TargetCount = Target::where('diamonds','<',$this->diamonds)->count();
-           
+            $TargetCount = Target::where('diamonds', '<', $this->diamonds)->count();
+
             return  $TargetCount + 1;
         });
 
         $grid->diamonds(__('diamonds'))
             ->display(function ($value) use ($coins) {
-                $endFormatted = $coins ? number_format($value / $coins) : 0;
-
+                $endFormatted = $coins ? ($value / $coins) : 0;
+                $endFormatted = common::roundToTwoDecimalPlaces($endFormatted);
                 return "
                 <div style='display: flex; flex-direction: column;'>
                     <span style='font-weight: bold;'>💎 {$value}</span>
@@ -101,7 +100,11 @@ class TargetController extends MainController
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
 
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
+
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
@@ -158,7 +161,12 @@ class TargetController extends MainController
         $grid->agency_share(__('agency share'))
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
+
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
@@ -170,7 +178,12 @@ class TargetController extends MainController
         $grid->db_percentage(__('DB  Percentage'))
             ->display(function ($value) use ($coins) {
                 $endFormatted = $this->diamonds / $coins;
-                $userUsd = floatval($endFormatted) * floatval($value) / 100;
+
+                $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+                $value = is_numeric($value) ? floatval($value) : 0;
+                $userUsd = $endFormatted * $value / 100;
+                $userUsd = common::roundToTwoDecimalPlaces($userUsd);
+
                 $userPercentage = number_format($value);
                 return "
                 <div style='display: flex; flex-direction: column;'>
@@ -179,6 +192,24 @@ class TargetController extends MainController
                 </div>
             ";
             });
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = '/admin/download-target-pdf';
+            $create_new = __('export pdf');
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success" target="_blank">
+              <i class="fa fa-download"></i>&nbsp;&nbsp;' . $create_new . '</a>';
+            $tools->append($button);
+        });
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $url = route('download.target.pdf');
+        //     $button = <<<HTML
+        //         <a href="{$url}" class="btn btn-sm btn-success" target="_blank">
+        //             <i class="fa fa-file-pdf-o"></i> {{ __('Export PDF') }}
+        //         </a>
+        //     HTML;
+
+        //     $tools->append($button);
+        // });
+
         $this->extendGrid($grid);
         $grid->disableExport();
         return $grid;
@@ -490,5 +521,18 @@ class TargetController extends MainController
 
         //        Target::create($data);
         return $this->form()->store();
+    }
+
+
+    public function downloadTargetPdf()
+    {
+        try {
+            $targets = Target::orderByDesc('diamonds')->get();
+            $pdf = Pdf::loadView('target_pdf', compact('targets'));
+            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+        } catch (\Exception $e) {
+
+            return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
+        }
     }
 }

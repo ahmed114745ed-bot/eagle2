@@ -16,6 +16,13 @@
     "Agency name": "एजेंसी का नाम",
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
+    "Badges": "बैज",
+
+    "Supporter" : "समर्थक",
+    "Shipping": "शिपिंग",
+    "Hosting" : "मेज़बान",
+    "Agency_owner" : "एजेंसी मालिक",
+
     "Enter amount in dollars": "राशि डॉलर में दर्ज करें",
     "Please set agency coins in configs": "कृपया shipping_coins को कॉन्फ़िग में सेट करें",
     "Charged by app": "ऐप के माध्यम से चार्ज",
@@ -1172,7 +1179,8 @@
    "pusher_app_id": "पुशर ऐप आईडी",
    "pusher_app_key": "पुशर ऐप की कुंजी",
    "pusher_app_secret": "पुशर ऐप सर्केट",
-   "firebase_api_key": "फायरबेस api कुंजी",
+    "pusher_app_cluster" : "पुशर क्लस्टर",
+    "firebase_api_key": "फायरबेस api कुंजी",
    "firebase_auth_domain": "फायरबेस एथेंटिकेशन डोमेन",
    "firebase_database_url": "फायरबेस डेटाबेस url",
    "Real Time Setting": "वास्तविक समय सेटिंग्स",
@@ -1180,10 +1188,22 @@
    "Payment Credential Settings": "भुगतान प्रमाणपत्र सेटिंग्स",
 "Charge-agency": "चार्ज एजेंसी",
 "event period": "घटना की अवधि",
+"export pdf": "पीडीएफ निर्यात",
+  "Diamond Target": "डायमंड टार्गेट",
+  "Day & Hours": "दिन और घंटे",
+  "Host Salary": "होस्ट वेतन",
+  "Agents Salary": "एजेंट्स वेतन",
+  "BD Admin": "BD व्यवस्थापक",
+  "Honor": "सम्मान",
 "Pinned": "पिन किया हुआ",
         "Unpinned": "पिन नहीं किया हुआ",
         "Unpin": "पिन हटाना",
-        "Pin Status": "पिन स्थिति"
+        "Pin Status": "पिन स्थिति",
+        "diamonds target":"हीरे लक्ष्य",
+        "profile_frame_type":"Profile Frame Type"
+
+
+
 
 
 

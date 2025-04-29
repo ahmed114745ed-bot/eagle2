@@ -660,6 +660,7 @@
                                         {{ ($settings['brand_background_type'] ?? '') === 'image' ? 'selected' : '' }}>
                                         {{ __('Image') }}
                                     </option>
+
                                 </select>
                             </div>
                         </div>
@@ -675,6 +676,8 @@
                                     title="لون خلفية الصناديق أو الكروت داخل التطبيق.">
                             </div>
                         </div>
+
+
                         <input type="hidden" name="brand_image" id="brand_image">
 
                         <!-- Background Image Input -->
@@ -1532,6 +1535,10 @@
                                     <option value="image"
                                         {{ @$settings['background_type'] === 'image' ? 'selected' : '' }}>
                                         {{ __('Image') }}</option>
+                                    <option value="gradient"
+                                        {{ ($settings['background_type'] ?? '') === 'gradient' ? 'selected' : '' }}>
+                                        {{ __('gradient') }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -1553,11 +1560,30 @@
                                     class="form-control">
                                 @if (!empty($settings['app_background']) && ($settings['background_type'] ?? '') === 'image')
                                     <div class="mt-2">
-                                        <img src="{{ asset($settings['app_background']) }}" width="100"
+                                        <img src="{{ getImagePath($settings['app_background']) }}" width="100"
                                             class="img-thumbnail">
                                     </div>
                                 @endif
                             </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group" id="gradient_group"
+                                style="display: {{ ($settings['background_type'] ?? 'gradient') === 'gradient' ? 'block' : 'none' }};">
+                                <label for="box_background_color">{{ __('gradient First Color:') }}</label>
+                                <input type="color" id="graident_1" name="gradient_1"
+                                    value="{{ $settings['gradient_1'] ?? '#F8F9FA' }}"
+                                    style="background: {{ $settings['gradient_1'] ?? '#F8F9FA' }};"
+                                    title="لون التدرج">
+
+
+                                    <label for="box_background_color">{{ __('gradient Second Color:') }}</label>
+                                    <input type="color" id="gradient_2" name="gradient_2"
+                                        value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
+                                        style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
+                                        title="لون  التدرج">
+                            </div>
+
                         </div>
                     </div>
 
@@ -1578,111 +1604,114 @@
                 ">
                 <div class="col-md-6 mb-3 ms-0 me-auto">
 
-    <!-- Pusher Form -->
-    <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
-        @csrf
-        <div class="card p-3 shadow" style="height: 400px;">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="m-0">{{ __('pusher') }}</h4>
-                <div class="d-flex align-items-center">
-                    <input type="radio" id="pusherRadio" class="custom-radio pusherLib" name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
-                    <label for="pusherRadio" class="switch"></label>
-                </div>
+                <!-- Pusher Form -->
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+                    @csrf
+                    <div class="card p-3 shadow" style="height: 450px;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="m-0">{{ __('pusher') }}</h4>
+                            <div class="d-flex align-items-center">
+                                <input type="radio" id="pusherRadio" class="custom-radio pusherLib" name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
+                                <label for="pusherRadio" class="switch"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
+                                    <input type="text" id="pusher_app_id" name="pusher_app_id" placeholder="pusher_app_id" value="{{ $pusher_app_id }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
+                                    <input type="text" id="pusher_app_key" name="pusher_app_key" placeholder="pusher_app_key" value="{{ $pusher_app_key }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
+                                    <input type="text" id="pusher_app_secret" name="pusher_app_secret" placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pusher_app_cluster">{{ __('pusher_app_cluster') }}:</label>
+                                    <input type="text" id="pusher_app_cluster" name="pusher_app_cluster" placeholder="pusher_app_cluster" value="{{ $pusher_app_cluster }}" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="pusher_app_id">{{ __('pusher_app_id') }}:</label>
-                        <input type="text" id="pusher_app_id" name="pusher_app_id" placeholder="pusher_app_id" value="{{ $pusher_app_id }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pusher_app_key">{{ __('pusher_app_key') }}:</label>
-                        <input type="text" id="pusher_app_key" name="pusher_app_key" placeholder="pusher_app_key" value="{{ $pusher_app_key }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="pusher_app_secret">{{ __('pusher_app_secret') }}:</label>
-                        <input type="text" id="pusher_app_secret" name="pusher_app_secret" placeholder="pusher_app_secret" value="{{ $pusher_app_secret }}" class="form-control" required>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
-        </div>
-    </form>
-</div>
-<div class="col-md-6 mb-3 ms-0 me-auto">
+            <div class="col-md-6 mb-3 ms-0 me-auto">
 
-    <!-- Firebase Form -->
-    <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
-        @csrf
-        <div class="card p-3 shadow" style="height: 400px;">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="m-0">{{ __('firebase') }}</h4>
-                <div class="ribbon-banner-card">
-                    <span>{{ __('soon') }}</span>
-                </div>
-                <div class="d-flex align-items-center">
-                    <input type="radio" id="firebaseRadio" class="custom-radio firebaseLib" name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
-                    <label for="firebaseRadio" class="switch"></label>
-                </div>
+                <!-- Firebase Form -->
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+                    @csrf
+                    <div class="card p-3 shadow" style="height: 450px;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="m-0">{{ __('firebase') }}</h4>
+                            <div class="ribbon-banner-card">
+                                <span>{{ __('soon') }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <input type="radio" id="firebaseRadio" class="custom-radio firebaseLib" name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
+                                <label for="firebaseRadio" class="switch"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="firebase_api_key">{{ __('firebase_api_key') }}:</label>
+                                    <input type="text" id="firebase_api_key" name="firebase_api_key" placeholder="{{ __('firebase_api_key') }}" value="{{ $firebase_api_key }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="firebase_auth_domain">{{ __('firebase_auth_domain') }}:</label>
+                                    <input type="text" id="firebase_auth_domain" name="firebase_auth_domain" placeholder="{{ __('firebase_auth_domain') }}" value="{{ $firebase_auth_domain }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="firebase_database_url">{{ __('firebase_database_url') }}:</label>
+                                    <input type="text" id="firebase_database_url" name="firebase_database_url" placeholder="{{ __('firebase_database_url') }}" value="{{ $firebase_database_url }}" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="firebase_api_key">{{ __('firebase_api_key') }}:</label>
-                        <input type="text" id="firebase_api_key" name="firebase_api_key" placeholder="{{ __('firebase_api_key') }}" value="{{ $firebase_api_key }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="firebase_auth_domain">{{ __('firebase_auth_domain') }}:</label>
-                        <input type="text" id="firebase_auth_domain" name="firebase_auth_domain" placeholder="{{ __('firebase_auth_domain') }}" value="{{ $firebase_auth_domain }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="firebase_database_url">{{ __('firebase_database_url') }}:</label>
-                        <input type="text" id="firebase_database_url" name="firebase_database_url" placeholder="{{ __('firebase_database_url') }}" value="{{ $firebase_database_url }}" class="form-control" required>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
-        </div>
-    </form>
-</div>
-<div class="col-md-6 mb-3 ms-0 me-auto card-top">
+            <div class="col-md-6 mb-3 ms-0 me-auto card-top">
 
-    <!-- Supabase Form -->
-    <form action="{{ route('admin.update-agora-zego') }}" method="POST">
-        @csrf
-        <div class="card p-3 shadow" style="height: 400px;">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="m-0">{{ __('supabase') }}</h4>
-                <div class="ribbon-banner-card">
-                    <span>{{ __('soon') }}</span>
-                </div>
-                <div class="d-flex align-items-center">
-                    <input type="radio" id="supabaseRadio" class="custom-radio supabaseLib" name="library" value="3" {{ $library == '3' ? 'checked' : '' }}>
-                    <label for="supabaseRadio" class="switch"></label>
-                </div>
+                <!-- Supabase Form -->
+                <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+                    @csrf
+                    <div class="card p-3 shadow" style="height: 450px;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4 class="m-0">{{ __('supabase') }}</h4>
+                            <div class="ribbon-banner-card">
+                                <span>{{ __('soon') }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <input type="radio" id="supabaseRadio" class="custom-radio supabaseLib" name="library" value="3" {{ $library == '3' ? 'checked' : '' }}>
+                                <label for="supabaseRadio" class="switch"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="supabase_url">{{ __('supabase_url') }}:</label>
+                                    <input type="text" id="supabase_url" name="supabase_url" placeholder="{{ __('supabase_url') }}" value="{{ $supabase_url }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="supabase_key">{{ __('supabase_key') }}:</label>
+                                    <input type="text" id="supabase_key" name="supabase_key" placeholder="{{ __('supabase_key') }}" value="{{ $supabase_key }}" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="supabase_service_role_key">{{ __('supabase_service_role_key') }}:</label>
+                                    <input type="text" id="supabase_service_role_key" name="supabase_service_role_key" placeholder="{{ __('supabase_service_role_key') }}" value="{{ $supabase_service_role_key }}" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="supabase_url">{{ __('supabase_url') }}:</label>
-                        <input type="text" id="supabase_url" name="supabase_url" placeholder="{{ __('supabase_url') }}" value="{{ $supabase_url }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="supabase_key">{{ __('supabase_key') }}:</label>
-                        <input type="text" id="supabase_key" name="supabase_key" placeholder="{{ __('supabase_key') }}" value="{{ $supabase_key }}" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="supabase_service_role_key">{{ __('supabase_service_role_key') }}:</label>
-                        <input type="text" id="supabase_service_role_key" name="supabase_service_role_key" placeholder="{{ __('supabase_service_role_key') }}" value="{{ $supabase_service_role_key }}" class="form-control" required>
-                    </div>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
         </div>
-    </form>
-
-</div>
-</div>
 </div>
 
 
@@ -1903,6 +1932,8 @@
                     const type = document.getElementById("background_type").value;
                     document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
                     document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
+                    document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
+
                 }
 
                 function toggleBrandBackgroundInput() {
@@ -1929,7 +1960,7 @@
                                 hiddenInput.value = "";
                             }
                         } else {
-                            hiddenInput.value = "";
+                            hiddenInput.value = '';
                         }
                     }
                 }
@@ -2018,11 +2049,11 @@
                             });
 
                             // Reset background type to color
-                            document.getElementById('brand_background_type').value = "color";
+                            document.getElementById('brand_background_type').value = "image";
 
                             // Show color input, hide image input
-                            document.getElementById('brand_background_color_group').style.display = 'block';
-                            document.getElementById('brand_background_image_group').style.display = 'none';
+                            document.getElementById('brand_background_color_group').style.display = 'none';
+                            document.getElementById('brand_background_image_group').style.display = 'block';
 
                             // Add a hidden input to explicitly set the background image to null
                             let hiddenInput = document.createElement('input');
@@ -2035,7 +2066,7 @@
                             const imagePreviewContainer = document.querySelector(
                                 '#brand_background_image_group .mt-2');
                             if (imagePreviewContainer) {
-                                imagePreviewContainer.style.display = 'none';
+                                imagePreviewContainer.style.display = 'block';
                             }
 
                             // Submit the form to save changes and reload the page

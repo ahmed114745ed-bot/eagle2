@@ -25,6 +25,9 @@ class AgencyRepository extends AbstractRepository
         return  $data->first();
     }
 
+    public function find($id){
+        return $this->model->find($id);
+    }
     public function findById($id)
     {
        

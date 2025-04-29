@@ -139,6 +139,7 @@
     "puser_app_id": "pusher app id",
     "pusher_app_secret" : "pusher app secret",
     "pusher_app_key": "pusher app key",
+    "pusher_app_cluster" : "pusher app cluster",
     "Enable Vip Auto" : "Enable Vip Auto",
     "big": "VIP",
     "user obtain": "User Obtained",
@@ -266,6 +267,7 @@
     "AppRoom" : "Room",
     "AppCharge": "Charge",
     "Confirm Pin Room": "تأكيد تثبيت الغرفة",
+
     "config returned success": "Configuration returned successfully",
     "anonymous icon": "Anonymous icon",
     "user_id , room_id are required": "User ID, Room ID are required",
@@ -703,6 +705,8 @@
      "Pinned": "Pinned",
      "Unpinned": "Unpinned",
      "Unpin": "Unpin",
-     "Pin Status": "Pin Status"
+     "Pin Status": "Pin Status",
+     "diamonds target":"diamonds target"
+
 
     }

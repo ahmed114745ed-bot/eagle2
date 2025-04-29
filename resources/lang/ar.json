@@ -280,6 +280,14 @@
     "AppCharge": "مستوي الشحن",
     "Pin": "تثبيت",
     "Confirm": "تأكيد",
+    "Badges" : "شارات",
+    "Supporter" : "داعم",
+    "Shipping": "وكيل شحن",
+    "Hosting" : "مضيف",
+    "gradient First Color:" : "اللون الاول للتدرج",
+    "gradient Second Color:" : "اللون الثانى للتدرج",
+    "Agency_owner" : "وكيل",
+    "gradient" : "التدرج",
     "Do you want to pin this room to the top?": "هل ترغب فى تثبيت الغرفة فى الاعلى؟",
     "config returned success": "تم إعادة تكوين الإعدادات بنجاح",
     "anonymous icon": "أيقونة مجهول",
@@ -607,6 +615,7 @@
     "total_days": "عدد الايام",
     "total_hours": "عدد الساعات",
     "image_type": "نوع الصورة",
+    "profile_frame_type":"نوع اطار الملف الشخصي",
     "User Report": " تقرير المستخدمين",
     "canPlay": "يستطيع ان يلعب",
     "ban_type": "نوع الحظر",
@@ -696,6 +705,7 @@
     "Text ar" : "نص عربي",
     "Text en":"نص انجليش",
     "pusher_app_secret" : "معرف سر بشر",
+    "pusher_app_cluster" : "عنقود بشر",
     "WhatsappMessages":"رسائل الوتساب",
     "whatsapp-messages":"رسائل الوتساب",
     "create":"انشاء",
@@ -2114,7 +2124,11 @@
 "Unpinned": "غير مثبت",
 "Unpin": "إلغاء التثبيت",
 "Pin Status": "حالة التثبيت",
-"event period":"فترة الحدث"
+"diamonds target":"الالماس المحقق",
+"event period":"فترة الحدث",
+ "withdrawn": "تم السحب",
+  "remaining": "المتبقي"
+
 
 
 

@@ -156,6 +156,16 @@ class OvipGiftTapController extends MainController
         ");
         return $grid;
     }
+    public function destroy($id)
+    {
+        $ware = Ware::where('id', $id)->first();
+        $ovip = Ovip::where('level', $ware->level)->first();
+        $type = $ware->type;
+        $ware->delete();
+        $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
+        return redirect()->to($url);
+        return $this->form()->destroy($id);
+    }
 
 
     protected function form()
@@ -295,7 +305,7 @@ class OvipGiftTapController extends MainController
         $content = new Row();
 
         // Fetch distinct privilege types and names
-        if(app()->getLocale() == 'en'){
+        if (app()->getLocale() == 'en') {
 
             $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
         } else {

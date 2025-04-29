@@ -8,30 +8,81 @@ use App\Models\User;
 use App\Models\UserSallary;
 use Cache;
 use App\Helpers\Common;
+use App\Models\BrandImage;
 use App\Models\Setting;
 use App\Models\Timezone;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\NotificationTranslation;
+use App\Models\PaymentCoin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
+
+    public function downloadApp(){
+
+        $url = env('DOWNLOAD_URL');
+        return view('downloadApp', compact('url'));
+    }
     public function index()
     {
+        $settings = Setting::pluck('value', 'key')->toArray();
         $timezones = Timezone::all();
-        $settings = Setting::all();
+        $agora_app_id = Common::getConfig('app_id');
+        $zego_server_secret = Common::getConfig('zego_server_secret');
+        $zego_app_id = Common::getConfig('zego_app_id');
+        $tencent_server_secret = Common::getConfig('tencent_server_secret');
+        $tencent_app_id = Common::getConfig('tencent_app_id');
+        $app_sign = Common::getConfig('app_sign');
+        $library = Common::getConfig('library');
+        $soundLibrary = Common::getConfig('sound_library');
+        $videoLibrary = Common::getConfig('video_library');
+        $gamesLibrary = Common::getConfig('games_library');
+        $brand_images = BrandImage::all();
+        $paymentCoins = PaymentCoin::all();
 
-        return view('admin.settings', compact('timezones', 'settings'));
+        $pusher_app_id = Common::getConf('pusher_app_id');
+        $pusher_app_key = Common::getConf('pusher_app_key');
+        $pusher_app_secret = Common::getConf('pusher_app_secret');
+        $firebase_api_key = Common::getConf('firebase_api_key');
+        $firebase_auth_domain = Common::getConf('firebase_auth_domain');
+        $firebase_database_url = Common::getConf('firebase_database_url');
+        $supabase_url = Common::getConf('supabase_url');
+        $supabase_key = Common::getConf('supabase_key');
+        $supabase_service_role_key = Common::getConf('supabase_service_role_key');
+        return view('admin.settings', compact('pusher_app_secret',
+                'pusher_app_key',
+                'pusher_app_id',
+                'settings',
+                'timezones',
+                'agora_app_id',
+                'zego_server_secret',
+                'zego_app_id',
+                'app_sign',
+                'library',
+                'brand_images',
+                'paymentCoins',
+                'firebase_api_key',
+                'firebase_auth_domain',
+                'firebase_database_url',
+                'supabase_url',
+                'supabase_key',
+                'supabase_service_role_key',
+                'tencent_app_id',
+                'tencent_server_secret',
+                'soundLibrary',
+                'videoLibrary',
+                'gamesLibrary'));
     }
 
 
     public function update(Request $request)
     {
-        $data = $request->except('_token');
+        $data = $request->except('_token','zones_coins','super_admin_coins');
 
-        
+
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -44,7 +95,7 @@ class SettingsController extends Controller
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
             if ($zoneSetting && $superAdminSetting && $shippingSetting ) {
-               
+
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 
                         // if ($userSalary) {
@@ -54,40 +105,44 @@ class SettingsController extends Controller
 
                         //             admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
                         //             return back();
-                                
-                        //     } 
+
+                        //     }
                         // }
 
-                if ($request->zones_coins < $request->super_admin_coins) {
-                    admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
-                    return back();
-                }      
+                // if ($request->zones_coins < $request->super_admin_coins) {
+                //     admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
+                //     return back();
+                // }
 
-                if ($request->super_admin_coins < $request->shipping_coins) {
-                    admin_toastr(__('super admin coins must be greater than  agancy coins'), 'error');
-                    return back();
-                }     
+                // if ($request->super_admin_coins < $request->shipping_coins) {
+                //     admin_toastr(__('super admin coins must be greater than  agancy coins'), 'error');
+                //     return back();
+                // }
 
                 if ($request->shipping_coins < $request->user_coins) {
                     admin_toastr(__('agancy coins must be greater than  user coins'), 'error');
                     return back();
-                }   
-                
-                
+                }
 
-               
-              
+
+
+
+
             }
 
-          
-          
+
+
         }
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
-        } elseif ($request->brand_background_type === 'image') {
+        } else if($request->background_type == 'gradient'){
+            $data['gradient_1'] = $request->gradient_1;
+            $data['gradient_2'] = $request->gradient_2;
+        }
+        elseif ($request->brand_background_type === 'image') {
             if(!empty($request->brand_image)){
                 $data['brand_background'] = $request->brand_image;
                 $data['brand_background_image'] = $request->brand_image;

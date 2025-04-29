@@ -31,7 +31,7 @@ const TYPE_GIFT =
 
 const TYPE_WARE =
 [
-    1 => 'Gemstone',
+    // 1 => 'Gemstone',
     3 => 'Card Scroll',
     4 => 'Avatar Frame',
     5 => 'Bubble Frame',
@@ -45,9 +45,9 @@ const TYPE_WARE =
     13 => 'hide country',
     14 => 'vip gifts',
     15 => 'no pan',
-    16 => 'hidden room',
-    17 => 'anonymous man',
-    18 => 'colored name',
+    // 16 => 'hidden room',
+    // 17 => 'anonymous man',
+    // 18 => 'colored name',
     19 => 'profile visitors hide in',
     20 => 'hide last active',
     28 => 'profile frame',
@@ -100,6 +100,6 @@ const WARE_DEDICATE =
 const  GET_TYPE_WARE =
 [
     4 => 'purchase',
-    6 => 'limited time purchase',
+    // 6 => 'limited time purchase',
 
 ];

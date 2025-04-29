@@ -6,6 +6,7 @@ use Encore\Admin\Controllers\AdminController;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
+use App\Admin\Controllers\ConfigController as ControllersConfigController;
 use App\Admin\Controllers\UserController;
 use App\Facades\CustomNotification;
 use App\Http\Controllers\addTOjesonController;
@@ -153,6 +154,8 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+        Route::get('download-app', [SettingsController::class, 'downloadApp']);
+
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
         Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
         Route::post('ios-setting', [addTOjesonController::class, 'ios'])->name('ios-setting');
@@ -160,6 +163,7 @@ Route::group(
 
         Route::post('postAddSitin', [addTOjesonController::class, 'postAddSitin'])->name('postAddSitin');
         Route::post('update-config-group-chat', [ConfigController::class, 'updateConfigChatGroup'])->name('update-config-group-chat');
+        Route::post('upload-badges-setting', [ConfigController::class, 'uploadBadges'])->name('upload.badges');
         Route::post('update-agora-zego', [ConfigController::class, 'updateConfigAgoraZego'])->name('update-agora-zego');
         Route::post("send-request-make-rooms-top", [UserController::class, "make_rooms_top"]);
         Route::post("close-open-gift", [UserController::class, "close_open_gift"]);

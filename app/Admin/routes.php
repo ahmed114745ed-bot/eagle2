@@ -9,6 +9,7 @@ use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
+use App\Admin\Controllers\RoomController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -19,6 +20,7 @@ use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\PoliceController;
+use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
@@ -51,9 +53,9 @@ use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
 use App\Admin\Controllers\ReportRealsController;
+
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
-
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
 use App\Admin\Controllers\AgencySettingController;
@@ -86,7 +88,6 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\NotificationsTemplatesController;
-use App\Admin\Controllers\RoomController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
 Route::group(
@@ -174,6 +175,7 @@ Route::group(
         $router->get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
         $router->get('agency-statistic', 'AgencyStatisticController@index');
         $router->get('agency-settings', 'AgencySettingController@index');
+
         $router->resource('test-test', 'TestTestController');
         $router->get('profile', [AdminAuthController::class, 'index']);
         $router->resource('payment-with-method', PaymentMethodController::class);
@@ -250,6 +252,7 @@ Route::group(
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
+        Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
         $router->resource('polices', PoliceController::class);
         $router->resource('offers', OfferController::class);
         $router->resource('payment-gateways', PaymentGetWayController::class);
@@ -342,12 +345,19 @@ Route::group(
             Route::prefix('ware-gift')->group(function () {
 
                 Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-                Route::post('/', [OvipGiftTapController::class, 'store']);
+                Route::post('/{level}', [OvipGiftTapController::class, 'store']);
                 // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
                 // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
                 // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
             });
             $router->resource('ware-gifts', 'OvipGiftTapController');
+            Route::prefix('ware-gifts')->group(function () {
+
+
+                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+            });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -442,7 +452,7 @@ Route::group(
         $router->resource('agency-settings', AgencySettingsController::class);
         $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-        $router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
+        //$router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         $router->get('convert-is_gold', function () {
             $users = \App\Models\User::where("is_gold_id", 1)->get();
             foreach ($users as $user) {
@@ -475,7 +485,7 @@ Route::group(
 
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
-            
+
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
 

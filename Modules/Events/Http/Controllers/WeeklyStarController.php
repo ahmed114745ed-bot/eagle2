@@ -23,6 +23,28 @@ use Modules\Events\Transformers\WeeklyStarGift;
 class WeeklyStarController extends Controller
 {
 
+    public function previousWeeklyEvent(Request $request)
+    {
+        $weeklyEvent = WeeklyStar::previousEvent()->weeklyStar()->latest()->first();
+        if (!$weeklyEvent) return Common::apiResponse(0, __('no weekly star '), null, 422);
+        $giftIds             = $weeklyEvent->gifts->pluck('id')->toArray();
+        $authenticatedUserId = Auth::user();
+        $data                =
+            GiftLog::whereIn('giftId', $giftIds)->with('sender')->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'sender_id')
+            ->groupBy('sender_id')->whereBetween('created_at', [
+                $weeklyEvent->start_date, $weeklyEvent->end_date
+            ])->orWhere(fn ($q) => $q->where('sender_id', $authenticatedUserId->id)->whereBetween('created_at', [
+                $weeklyEvent->start_date, $weeklyEvent->end_date
+            ]))
+            ->orderByDesc('totalGiftNum')->get();
+        $firstTenQueries     = $data->take(10);
+        $existsInArray       = $firstTenQueries->contains('sender_id', $authenticatedUserId->id);
+        $data                = [
+            'top'  => TopWeeklyStarUsersResource::collection($firstTenQueries),
+            'user' => $existsInArray == true ? [] : new UserWeeklyStar($authenticatedUserId, $data->where('sender_id', $request->user()->id)->first()),
+        ];
+        return Common::apiResponse(1, '', $data);
+    }
     public function topUsersEvent(Request $request)
     {
         $timezone = config('app.owner_timezone');

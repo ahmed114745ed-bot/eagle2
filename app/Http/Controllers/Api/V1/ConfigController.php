@@ -7,6 +7,7 @@ use App\Http\Requests\Api\ConfigValuesRequest;
 use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\Pack;
+use Artisan;
 use Illuminate\Http\Request;
 use App\Services\ConfigService;
 use Doctrine\DBAL\Schema\Index;
@@ -24,6 +25,21 @@ class ConfigController extends Controller
     public function __construct(ConfigService $configService)
     {
         $this->configService = $configService;
+    }
+
+    public function uploadBadges(Request $request){
+
+        foreach($request->allFiles() as $input => $file){
+
+            $value = Common::upload('images', $file);
+            //$value = '3.jpg';
+
+                Config::updateOrCreate(['name' =>$input],[
+                    'value' => $value
+                ]);
+
+        }
+        return back();
     }
 
     public function getConfigValues(ConfigValuesRequest $request)
@@ -94,6 +110,9 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
+//        Artisan::call('cache:clear');
+//        \Cache::forget('pusher_config');
+
         $keys = array_keys($request->all());
 
         foreach ($keys as $key) {
@@ -109,6 +128,9 @@ class ConfigController extends Controller
 
             $config->save();
         }
+
+//        Artisan::call('config:cache');
+
         return Redirect::back();
     }
 }
