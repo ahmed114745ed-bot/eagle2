@@ -1,14 +1,14 @@
 <?php
 
-use App\Services\AgoraRtmTokenBuilder;
-use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
+use App\Helpers\Common;
 use Encore\Admin\Admin;
 use App\Classes\AppSetting;
-use BoogieFromZk\AgoraToken\RtcTokenBuilder2;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
-use Carbon\Carbon;
+use App\Services\AgoraRtmTokenBuilder;
 use Yasser\AgoraToken\RtmTokenBuilder;
-;
+use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
@@ -58,8 +58,6 @@ function generateAgoraRtmToken($channelName, $rtmUid)
 
 
     return $token;
-
-
 }
 
 
@@ -111,6 +109,21 @@ if (!function_exists('check')) {
                 return auth()->guard($guard);
             }
         }
+    }
+}
+
+if (!function_exists('calculateUserUsd')) {
+    function calculateUserUsd($diamonds,  $value)
+    {
+        $coins = Common::getMaxCoins() ?? 1;
+
+        $endFormatted = $diamonds / $coins;
+        $endFormatted = is_numeric($endFormatted) ? floatval($endFormatted) : 0;
+        $value = is_numeric($value) ? floatval($value) : 0;
+
+        $userUsd = ($endFormatted * $value) / 100;
+
+        return common::roundToTwoDecimalPlaces($userUsd);
     }
 }
 
@@ -449,9 +462,8 @@ if (!function_exists('handleShowImageWithTypes')) {
         if ($imageType == 'svga' || $imageType == 'zz') {
             $model = showSvgaImage($url, $uniqueId);
 
-       return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
-
-    } elseif ($imageType == 'mp4') {
+            return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
+        } elseif ($imageType == 'mp4') {
             return "
                 <video width='$width' height='$height' controls autoplay muted loop>
                     <source src='$url' type='video/mp4'>
