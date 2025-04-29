@@ -50,6 +50,7 @@ class AgencyObserver
         if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
         $user = User::find($agency->app_owner_id);
         Admin::where('username', $user->uuid)->delete();
+        //check delete agency action 
     }
 
     /**
