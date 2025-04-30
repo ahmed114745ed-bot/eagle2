@@ -20,7 +20,7 @@ use Encore\Admin\Facades\Admin;
 class DedicateWareController extends MainController
 {
     use HasResourceActions;
-    public $permission_name = 'vips-dedicate';
+    public $permission_name = 'wares-dedicate';
 
     public function index(Content $content)
     {

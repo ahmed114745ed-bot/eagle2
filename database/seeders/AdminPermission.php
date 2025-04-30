@@ -122,6 +122,9 @@ class AdminPermission extends Seeder
             'reel-settings',
             'agency-manger-setting',
             'chat-setting',
+            'achievement_dedicate',
+            'charge',
+            'ticket'
             
 
 
@@ -148,7 +151,7 @@ class AdminPermission extends Seeder
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level'],
             'moment' => ['moment',],
-            'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate'],
+            'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate','achievement_dedicate'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
             'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting','agency-settings'],
@@ -180,8 +183,9 @@ class AdminPermission extends Seeder
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
             'updates_family-config' => ['updates_family-config'],
-            'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting']
-          
+            'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting'],
+             'charge' => ['charge'],
+             'ticket' => ['ticket'],
 
         ];
 
