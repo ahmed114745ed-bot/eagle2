@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 class SettingsController extends Controller
 {
 
-    public function downloadApp(){
+    public function downloadApp($id){
 
         $url = env('DOWNLOAD_URL');
         return view('downloadApp', compact('url'));
