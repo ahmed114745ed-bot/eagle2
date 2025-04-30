@@ -35,7 +35,7 @@
     "Description Ar": "विवरण अरबी",
     "Email": "ईमेल",
     "action": "कार्रवाई",
-    "All Managers": "सभी प्रबंधक",
+    "All Managers": "(डीबी) सभी प्रबंधक",
     "male": "पुरुष",
     "registered successfully": "सफलतापूर्वक पंजीकृत",
     "required": "आवश्यक",
@@ -1167,6 +1167,7 @@
    "Delete": "हटाएं",
    "Add": "जोड़ें",
    "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
+   
    "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
    "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
    "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए",
