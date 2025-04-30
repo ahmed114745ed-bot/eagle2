@@ -20,13 +20,14 @@ class NowPaymentsController extends Controller
             'price_amount' => 100, // Amount in fiat currency
             'price_currency' => 'usd',
             'pay_currency' => 'btc', // Cryptocurrency to receive
-            'ipn_callback_url' => '/now-payments-callback', // Callback URL for IPN
+            'ipn_callback_url' => 'http://127.0.0.1:8000/api/now-payments-callback', // Callback URL for IPN
             'order_id' => uniqid(), // Unique order ID
             'order_description' => 'Test Payment',
         ];
 
         $payment = $this->nowPayments->createPayment($data);
 
+        dd($payment);
         return redirect($payment['invoice_url']); // Redirect user to payment page
     }
 
