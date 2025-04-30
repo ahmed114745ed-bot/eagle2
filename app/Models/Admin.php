@@ -28,7 +28,8 @@ class Admin extends \App\Models\Administrator
     }
     public function getImageAttribute(){
          
-        return  admin_asset($this->attributes['avatar']);
+        
+        return  getImagePath($this->attributes['avatar']);
     }
     
 
