@@ -179,9 +179,9 @@ class EncorUsersController extends AdminController
 
         $grid = new Grid(new $userModel());
         $admin = Auth::user();
-        if ($admin->username == 'demo') {
-            $grid->model()->where('id', '!=', 1);
-        }
+        // if ($admin->username == 'demo') {
+        //     $grid->model()->where('id', '!=', 1);
+        // }
 
         $grid->model()->where('is_preview', 0);
         $grid->column('id', 'ID')->sortable();
