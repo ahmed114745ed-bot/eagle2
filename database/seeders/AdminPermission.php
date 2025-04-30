@@ -124,7 +124,8 @@ class AdminPermission extends Seeder
             'chat-setting',
             'achievement_dedicate',
             'charge',
-            'ticket'
+            'ticket',
+            'users-hunters'
             
 
 
@@ -147,7 +148,7 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target','free-users'],
+            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level'],
             'moment' => ['moment',],
