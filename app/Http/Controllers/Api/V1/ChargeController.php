@@ -108,7 +108,7 @@ class ChargeController extends Controller
             return Common::apiResponse(0, 'not found', 404);
         }
         // $rate = Common::getConf('one_usd_value_in_coins');
-        $rate = Common::getCoinsValue($to->type_user == 0 ? 'user_coins' : 'shipping_coins');
+        $rate = Common::getCoinsValue( 'user_coins' );
 
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
