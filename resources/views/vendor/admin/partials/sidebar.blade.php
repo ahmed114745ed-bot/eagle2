@@ -14,8 +14,11 @@
                 <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>
             </div>
             <div class="pull-role">
-            {{ Auth::user()->roles[0]->name }}
-            <!-- Status -->
+                @if(Auth::user()->roles->isNotEmpty())
+                    {{ Auth::user()->roles[0]->name }}
+                @else
+                    {{ __('No role assigned') }} <!-- Or any fallback message -->
+                @endif
             </div>
         </div>
 
