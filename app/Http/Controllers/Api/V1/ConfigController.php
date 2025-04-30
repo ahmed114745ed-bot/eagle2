@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
 
 class ConfigController extends Controller
@@ -110,8 +111,7 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-//        Artisan::call('cache:clear');
-//        \Cache::forget('pusher_config');
+        Cache::forget('pusher_config');
 
         $keys = array_keys($request->all());
 
@@ -128,8 +128,6 @@ class ConfigController extends Controller
 
             $config->save();
         }
-
-//        Artisan::call('config:cache');
 
         return Redirect::back();
     }

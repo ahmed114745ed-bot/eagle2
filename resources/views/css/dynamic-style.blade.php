@@ -692,6 +692,15 @@
         color: var(--text-secondary-color) !important;
     }
 
+    .ltr .pull-role{
+            width: 70px;
+            position: relative;
+            font-size: 10px;
+            
+            position: relative;
+            right: -91px;
+            top: 6px;
+           }
 
             .rtl {
                 direction: rtl;
@@ -848,6 +857,15 @@
            .rtl .column-__actions__ .grid-dropdown-actions .dropdown-menu{
              left: 29px !important;
            }
+           .rtl .pull-role{
+            width: 70px;
+            position: relative;
+            top: 7px;
+            font-size: 10px;
+            left: -30px;
+           }
+
+          
 
 
 
