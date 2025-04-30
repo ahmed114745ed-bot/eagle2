@@ -22,7 +22,8 @@ class ColorController extends Controller
             'background_color' => Cache::get('background_color') ?? '',
             'background_image' => Cache::get('app_background') ?? '',
             'gradient_1' => Cache::get('gradient_1') ?? '',
-            'gradient_2' => Cache::get('gradient_2') ?? ''
+            'gradient_2' => Cache::get('gradient_2') ?? '',
+            'gradient_3' => Cache::get('gradient_3') ?? ''
         ];
         settings()->set('colors_updated_at', false);
         return Common::apiResponse (true,'',$data,200);

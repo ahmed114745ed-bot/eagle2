@@ -141,6 +141,7 @@ class SettingsController extends Controller
         } else if($request->background_type == 'gradient'){
             $data['gradient_1'] = $request->gradient_1;
             $data['gradient_2'] = $request->gradient_2;
+            $data['gradient_3'] = $request->gradient_3;
         }
         elseif ($request->brand_background_type === 'image') {
             if(!empty($request->brand_image)){

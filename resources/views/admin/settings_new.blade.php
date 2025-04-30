@@ -1582,6 +1582,12 @@
                                         value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
                                         style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
                                         title="لون  التدرج">
+
+                                        <label for="box_background_color">{{ __('gradient Third Color:') }}</label>
+                                    <input type="color" id="gradient_3" name="gradient_3"
+                                        value="{{ $settings['gradient_3'] ?? '#F8F9FA' }}"
+                                        style="background: {{ $settings['gradient_3'] ?? '#F8F9FA' }};"
+                                        title="لون  التدرج">
                             </div>
 
                         </div>

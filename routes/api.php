@@ -487,7 +487,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
             });
 
-            Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);  
+            Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
             Route::prefix('payment-gateway')->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
