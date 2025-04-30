@@ -263,11 +263,13 @@ class EncorUsersController extends AdminController
 
         $form->text('name', trans('admin.name'))->rules('required');
         $form->image('avatar', trans('admin.avatar'));
+        if (!$form->isEditing()) {
         $form->password('password', trans('admin.password'))->rules('required|confirmed');
         $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
             ->default(function ($form) {
                 return $form->model()->password;
             });
+        }
 
         $form->ignore(['password_confirmation']);
 
