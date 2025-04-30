@@ -225,6 +225,12 @@ class EncorUsersController extends AdminController
 
         $show = new Show($userModel::findOrFail($id));
 
+        $show->panel()
+            ->tools(function ($tools) {
+                $tools->disableEdit();
+                $tools->disableDelete();
+            });
+
         $show->field('id', 'ID');
         $show->field('username', trans('admin.username'));
         $show->field('name', trans('admin.name'));

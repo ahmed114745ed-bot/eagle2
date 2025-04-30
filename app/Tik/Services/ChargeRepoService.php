@@ -100,7 +100,7 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
-            $this->charge($fromUser, $toUser, $chargeType, $coins, $coins);
+            $this->charge($fromUser, $toUser, $chargeType, $coins, $usd);
 
             if ($toUser instanceof User) {
                 (new UserAchievementService())->insertCharging($toUser, $coins);
@@ -155,9 +155,9 @@ class ChargeRepoService
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
     {
         try {
-            $receiver = $this->userRepository->searchUser($receiverUuid);
+            $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
-
+    
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('agency not founded');
@@ -175,7 +175,7 @@ class ChargeRepoService
             // $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
             $coinPrise = Common::getCoinsValue('user_coins');
             $numDi = $coinPrise * $count;
-            $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
+            $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi,usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
@@ -286,7 +286,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('shipping_coins');
             $numDi = $coinPrise * $count;
-            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
+            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {

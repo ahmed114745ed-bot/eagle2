@@ -379,6 +379,14 @@ class Common
         return null;
     }
 
+    public static function getSettingValue($key)
+    {
+        if ($conf = Setting::query()->where('key', $key)->first()) {
+            return $conf->value;
+        }
+        return null;
+    }
+
     public static function getConfFromKey(array $keys)
     {
         $confs = Config::query()->whereIn('name', $keys)->select(['name', 'value'])->get();

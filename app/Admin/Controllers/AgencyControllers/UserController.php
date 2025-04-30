@@ -32,7 +32,7 @@ class UserController extends MainController
      * @var string
      */
     protected $title;
-    public $permission_name = 'agent-user';
+    public $permission_name = 'users-hunters';
 
 
 

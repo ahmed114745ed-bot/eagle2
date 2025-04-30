@@ -13,7 +13,7 @@ class Charge extends Model
     protected $casts = [
         'created_at' => 'datetime',
     ];
-    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred'];
+    protected $fillable = ['id', 'charger_id', 'charger_type', 'user_id', 'user_type', 'amount', 'amount_type', 'balance_before', 'agency_id', 'is_used_transferred','usd'];
 
     public function getCreatedAtAttribute($value)
     {
