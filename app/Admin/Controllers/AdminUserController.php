@@ -39,6 +39,10 @@ class AdminUserController extends EncorUsersController
 
     public function update ( $id )
     {
+
+        if (!Admin::user()->can('*')) {
+            Permission::check('update-' . $this->permission_name);
+        }
         $user = Admin::query ()->findOrFail ($id);
         if (\request ('password') != $user->password || \request ('username') != $user->username){
             Agent::where("id",$user->id)->update([
@@ -51,6 +55,10 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
+        if (!Admin::user()->can('*')) {
+            Permission::check('delete-' . $this->permission_name);
+        }
+
         $user = $this->model->find($id);
         if ($user){
             if ($user->isRole('admin') || $user->isRole('developer')){
