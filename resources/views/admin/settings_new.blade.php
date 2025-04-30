@@ -2024,7 +2024,8 @@
                             document.getElementById('app_black_color').value = "#000000";
                             document.getElementById('app_grey_color').value = "#a5a7a4"; // Grey color
                             document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
-
+                            document.getElementById('background_type').value = "image";
+                            document.getElementById('background_type').value = "image";
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });
