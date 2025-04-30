@@ -1676,6 +1676,7 @@ class RoomController extends Controller
         $validator = Validator::make($request->all(), [
             'room_id' => 'required|integer|exists:rooms,id',
             'user_id' => 'required|integer|exists:users,id',
+            'duration' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -1709,8 +1710,9 @@ class RoomController extends Controller
                 }
             }
 
-            // Add the user to the blacklist
-            $blacklist[] = $userToBlock . '#' . time(); // Add a timestamp or additional info if needed
+            $banDuration = $request->duration; 
+            $blacklist[] = $userToBlock . '#' . time() . '#'. $banDuration ;
+            
             $room->room_black = implode(',', $blacklist);
             $room->save();
 
