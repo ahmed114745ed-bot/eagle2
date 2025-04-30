@@ -336,9 +336,9 @@ class RoomRepoService
         $jsons[] = $json;
         //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
-        if ($lastMode == '3' && $currentMode != '3') {
+        
             $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
-        }
+    
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {
