@@ -10,6 +10,7 @@ use Encore\Admin\Auth\Permission;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use function Doctrine\Common\Cache\Psr6\get;
+use Encore\Admin\Facades\Admin as AuthAdmin;
 
 class AdminUserController extends EncorUsersController
 {
@@ -29,7 +30,7 @@ class AdminUserController extends EncorUsersController
     {
        // Permission::check('developer');
 
-       if (!Admin::user()->can('*')) {
+       if (!AuthAdmin::user()->can('*')) {
         Permission::check('edit-' . $this->permission_name);
     }
 
@@ -40,7 +41,7 @@ class AdminUserController extends EncorUsersController
     public function update ( $id )
     {
 
-        if (!Admin::user()->can('*')) {
+        if (!AuthAdmin::user()->can('*')) {
             Permission::check('update-' . $this->permission_name);
         }
         $user = Admin::query ()->findOrFail ($id);
@@ -55,7 +56,7 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
-        if (!Admin::user()->can('*')) {
+        if (!AuthAdmin::user()->can('*')) {
             Permission::check('delete-' . $this->permission_name);
         }
 
