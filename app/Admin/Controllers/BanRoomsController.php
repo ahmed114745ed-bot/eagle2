@@ -31,9 +31,9 @@ class BanRoomsController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Close room'))
-            ->body($this->grid());
+            ->body($this->grid()));
             // ->row(function ($row) {
             //     $row->column(10, $this->grid());
             //     $row->column(2, view('admin.grid.users.ban'));
@@ -49,9 +49,9 @@ class BanRoomsController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('bans'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -63,9 +63,9 @@ class BanRoomsController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('bans'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -76,9 +76,9 @@ class BanRoomsController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('bans'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 
