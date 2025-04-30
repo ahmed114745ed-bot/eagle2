@@ -2,10 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Gift;
-use App\Models\Room;
 use App\Models\User;
-use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -15,11 +12,8 @@ use App\Models\UserTarget;
 use App\Models\AgencySallary;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +41,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index( $content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -55,7 +49,7 @@ class AgencyController extends MainController
                 $row->column(3, view('agency.settings'));
 
                 $row->column(9, $this->grid());
-            });
+            }));
     }
 
     public function edit($id, Content $content)

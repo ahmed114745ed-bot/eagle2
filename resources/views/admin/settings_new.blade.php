@@ -1526,7 +1526,12 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="background_type">{{ __('Background Type') }}</label>
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <label for="background_type">{{ __('Background Type') }}</label>
+                                    <span onclick="reseting('background_type', 'image')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
                                 <select id="background_type" name="background_type" class="form-control"
                                     onchange="toggleBackgroundInput()">
                                     <option value="color"
@@ -1731,7 +1736,16 @@
 
             <script>
                 function reseting(colorid, value) {
-                    $('#' + colorid).val(value)
+                    $('#' + colorid).val(value);
+
+                    if (colorid === 'background_type') {
+                        if (value === 'image') {
+                            $('#background_image_group').show();
+                            $('#background_image_preview').show();
+                            $('#background_color_group').hide();
+                            $('#gradient_group').hide();
+                        } 
+                    }
                 }
             </script>
             <script>
@@ -2030,7 +2044,8 @@
                             document.getElementById('app_black_color').value = "#000000";
                             document.getElementById('app_grey_color').value = "#a5a7a4"; // Grey color
                             document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
-
+                            document.getElementById('background_type').value = "image";
+                            document.getElementById('background_type').value = "image";
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });

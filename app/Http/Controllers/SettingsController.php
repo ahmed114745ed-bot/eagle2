@@ -80,7 +80,7 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except('_token');
+        $data = $request->except('_token','zones_coins','super_admin_coins');
 
 
 
@@ -109,15 +109,15 @@ class SettingsController extends Controller
                         //     }
                         // }
 
-                if ($request->zones_coins < $request->super_admin_coins) {
-                    admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
-                    return back();
-                }
+                // if ($request->zones_coins < $request->super_admin_coins) {
+                //     admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
+                //     return back();
+                // }
 
-                if ($request->super_admin_coins < $request->shipping_coins) {
-                    admin_toastr(__('super admin coins must be greater than  agancy coins'), 'error');
-                    return back();
-                }
+                // if ($request->super_admin_coins < $request->shipping_coins) {
+                //     admin_toastr(__('super admin coins must be greater than  agancy coins'), 'error');
+                //     return back();
+                // }
 
                 if ($request->shipping_coins < $request->user_coins) {
                     admin_toastr(__('agancy coins must be greater than  user coins'), 'error');
@@ -136,6 +136,7 @@ class SettingsController extends Controller
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
+            $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
         } else if($request->background_type == 'gradient'){

@@ -108,6 +108,19 @@ Route::get('/clear', function () {
     return "Cleared!";
 });
 
+Route::get('/clear_clear', function () {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return "Cleared!";
+});
+
+Route::get('/config_cache', function () {
+    return Artisan::call('config:cache');
+});
 
 Route::get('/admin/custom-export-users', [
     \App\Admin\Controllers\ExportController::class,
