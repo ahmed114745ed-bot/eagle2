@@ -155,7 +155,7 @@ class ChargeRepoService
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
     {
         try {
-            $receiver = $this->userRepository->searchUser($receiverUuid);
+            $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);

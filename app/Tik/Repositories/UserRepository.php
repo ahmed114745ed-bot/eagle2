@@ -32,6 +32,11 @@ class UserRepository extends AbstractRepository
         return $this->model->where('uuid', 'like', '%' . $userUuId . '%')->first();
     }
 
+    public function searchUserById($userUuId)
+    {
+        return $this->model->find($userUuId);
+    }
+
 
     public function incrementCoins($userUuIdOrId, $coins)
     {
