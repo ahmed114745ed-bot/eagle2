@@ -1661,7 +1661,7 @@
     "Charging Agencies": "Şarj Ajansları",
     "Verified Charging Agents": "Doğrulanmış Şarj Temsilcileri",
     "Payment Methods for Charging Agents": "Şarj Temsilcileri için Ödeme Yöntemleri",
-    "Agency Manager": "Ajans Yöneticisi",
+    "Agency Manager": "बीडी",
     "VIP Privileges": "VIP Ayrıcalıkları",
     "Managers": "Yöneticiler",
     "Charging Events": "Şarj Etkinlikleri",
@@ -2057,6 +2057,7 @@
   "Agents Salary": "Ajanlar Maaşı",
   "BD Admin": "BD Yöneticisi",
   "Honor": "Onur",
+  "All Managers": "(DB)",
 
 
 "event period": "Etkinlik süresi"
