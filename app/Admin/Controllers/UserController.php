@@ -189,8 +189,15 @@ class UserController extends MainController
             $filter->expand();
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
+                // $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
 
+                $filter->where(function ($query) {
+                    $input = $this->input; // adjust as per your framework
+                    $query->where('family_id', $input)
+                        ->orWhereHas('family', function ($q) use ($input) {
+                            $q->where('name', 'like', "%{$input}%");
+                        });
+                }, __('Family ID or Name'));
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
