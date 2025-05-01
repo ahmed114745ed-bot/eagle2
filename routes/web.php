@@ -250,7 +250,7 @@ Route::get('/update-rooms-microphone', function(){
 
 
 Route::get('/test-fcm/{userid}', function($userId) {
-    $testToken = 'czhg-TwETMe-c5hZvDAFeh:APA91bGTNB5bCNaE2rtJXK-bxs-Uz9YtvPzCijBuGaWPk_QJsV33c6y7oeHMNVewQbWkIWlOGWW1y2_zf1wMt1BlIq1CJ-7l0HMIS4PD4ZjTHr_-shU-ud4';
+    $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
 
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار
@@ -261,7 +261,7 @@ Route::get('/test-fcm/{userid}', function($userId) {
     $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
     $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
     
-    // صورة افتراضية (يمكنك تغيير الرابط)
+    // صورة افتراضية 
     $icon = "https://example.com/images/vip_badge.png";
     $data = [
         'image' => $icon,
