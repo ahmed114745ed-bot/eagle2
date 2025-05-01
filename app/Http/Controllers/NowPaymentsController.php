@@ -129,10 +129,15 @@ class NowPaymentsController extends Controller
         $status = $request->input('payment_status');
 
         if ($status === 'paid') {
-            NowpaymentOrder::where('payment_id', $paymentId)->update([
+           $order = NowpaymentOrder::where('payment_id', $paymentId)->update([
                 'payment_status' => 'paid'
             ]);
+            if ($order) {
                 return redirect()->route('payment.success');
+
+            }
+            return redirect()->route('payment.cancel');
+
             } else {
                 return redirect()->route('payment.cancel');
             
