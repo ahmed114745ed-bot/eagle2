@@ -17,7 +17,7 @@ use Modules\Events\Entities\PkReward;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class PkEventGiftController extends MainOldController
+class PkEventGiftController extends MainController
 {
 
     use HasResourceActions;
@@ -37,7 +37,7 @@ class PkEventGiftController extends MainOldController
     </a>
     HTML;
 
-        return $content
+        return parent::index($content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
             ->breadcrumb(
@@ -46,14 +46,14 @@ class PkEventGiftController extends MainOldController
             ->row($buttonHTML) // Add the button row
             ->row($this->grid1()) // First grid
             ->row($this->grid2()) // Second grid
-            ->row($this->grid3()); // Third grid
+            ->row($this->grid3())); // Third grid
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -65,18 +65,18 @@ class PkEventGiftController extends MainOldController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return $content
+        return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->header(trans('admin.detail'))
             ->description(trans('admin.description'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
 
@@ -367,10 +367,10 @@ class PkEventGiftController extends MainOldController
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'));
-        
+
         $form->saved(function (Form $form) {
-            
-            $route = url('admin/pk-events-gift/'.request('pk_type') . '/' . request('pk_event_id'));
+
+            $route = url('admin/pk-events-gift/' . request('pk_type') . '/' . request('pk_event_id'));
             return redirect($route);
         });
         return $form;

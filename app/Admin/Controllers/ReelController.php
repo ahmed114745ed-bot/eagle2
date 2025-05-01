@@ -28,11 +28,31 @@ class ReelController extends MainController
     public $permission_name = 'Real';
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__('reels'))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
+    }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('reels'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('reels'))
+            ->body($this->form()));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('reels'))
+            ->body($this->detail($id)));
     }
     protected function grid2()
     {

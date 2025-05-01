@@ -1209,7 +1209,11 @@
         "Unpin": "पिन हटाना",
         "Pin Status": "पिन स्थिति",
         "diamonds target":"हीरे लक्ष्य",
-        "profile_frame_type":"Profile Frame Type"
+        "profile_frame_type":"Profile Frame Type",
+        "Old Total Sender Level": "पुराना कुल प्रेषक स्तर",
+    "New Total Sender Level": "नया कुल प्रेषक स्तर",
+    "Old Total Received Level": "पुराना कुल प्राप्तकर्ता स्तर",
+    "New Total Received Level": "नया कुल प्राप्तकर्ता स्तर"
 
 
 
