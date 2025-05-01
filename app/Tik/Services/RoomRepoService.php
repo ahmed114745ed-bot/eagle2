@@ -326,6 +326,8 @@ class RoomRepoService
             $room->game_id = $request->game_id;
             $room->save();
             $map['game_url'] = $game->mini_url;
+        } elseif ($currentMode == '8') {
+            $mode = 'eight';
         } else {
             $mode = 'topCenter';
         }
