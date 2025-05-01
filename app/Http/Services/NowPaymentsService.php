@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use Database\Seeders\config;
 use GuzzleHttp\Client;
+use Log;
 
 class NowPaymentsService
 {

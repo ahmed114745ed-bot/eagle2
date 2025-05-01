@@ -502,18 +502,14 @@ class AgencyController extends MainController
                 })->ajax('/api/search/users3', 'id', 'name');
 
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(12)->url('url', __('url'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                 $row->width(12)->image('img', __('img'))->rules('required');
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -531,17 +527,14 @@ class AgencyController extends MainController
                 //     $row->hidden('agency_manger_id', __('app manger id'));
                 // }
 
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
-                $row->width(12)->url('url', __('url'));
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
-                $row->image('img', __('img'))->rules('required');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         }
