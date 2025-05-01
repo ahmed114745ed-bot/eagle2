@@ -26,6 +26,7 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Illuminate\Support\Arr;
 
 /**
  * @method static withoutAppends()
@@ -1193,16 +1194,21 @@ class User extends Authenticatable
 
             $originalProfile = $model->profile;
             $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
-       
+
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-                // $newCount = $model->profile_count + 1;
-                // $model->profile_count = $newCount;
-        
+                $newCount = $model->profile_count + 1;
+                $model->profile_count = $newCount;
+
                 // Upload and update avatar
-                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, 4);
-                dd( $newImagePath);
+                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+               // dd($newImagePath);
                 $originalProfile->avatar = $newImagePath;
                 $originalProfile->save();
+
+                $request = request();
+                $input = $request->all();
+                Arr::forget($input, 'profile.avatar');
+                $request->replace($input);
             }
         });
 
@@ -1210,14 +1216,13 @@ class User extends Authenticatable
             // Check if coins increased
             $originalCoins = $user->getOriginal('di');
             $newCoins = $user->di;
-        
+
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
-        
+
             // Handle profile.avatar update
-            
+
         });
-        
     }
 }
