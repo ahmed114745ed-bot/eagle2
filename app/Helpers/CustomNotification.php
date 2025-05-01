@@ -20,7 +20,8 @@ class CustomNotification
 {
     public function appName($lang)
     {
-        return $lang == app()->getLocale() == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
+        $locale = $lang ?? app()->getLocale();
+        return $locale == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
     }
 
     public function senderLevel(int $userId)

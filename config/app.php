@@ -33,6 +33,7 @@ return [
     'utd_client_id' => env('UTDCLIENTID','3030'),
     'google_client_id' => env('GOOGLE_CLIENT_ID','790444932875-co6ri5d8e3m59ktv73h7eana2gfqbv34.apps.googleusercontent.com'),
 
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

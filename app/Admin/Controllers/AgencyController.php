@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -157,9 +158,6 @@ class AgencyController extends MainController
             }));
     }
 
-
-
-
     /**
      * Make a grid builder.
      *
@@ -269,51 +267,6 @@ class AgencyController extends MainController
                 </div>
             ";
         });
-        $grid->column('members', __('members'))->expand(function ($model) {
-            $mempers = $model->mempers()
-                ->orderBy('monthly_diamond_received', 'desc')
-                ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-                }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar'); // assuming 'avatar' is the column name for the image in 'profile'
-                }])
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received',]) // selecting specific fields from `mempers`
-                ->map(function ($memper) {
-                    $memper->image = @$memper->profile?->avatar ?? null;
-                    $imageHtml = $memper->profile && $memper->profile->avatar
-                        ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
-                        : 'No Image';
-                    $salary = $memper->userSallary->sallary ?? 0;
-                    return [
-                        'id' => $memper->id ?? 0,
-                        'uuid' => $memper->uuid ?? 0,
-                        'name' => $memper->name ?? '',
-                        'reals_count' => $memper->reals()->count() ?? 0,
-                        'total_days' => $memper->total_days ?? 0,
-                        'total_hours' => $memper->liveTime->sum("hours"),
-                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
-                        'image' => $imageHtml,
-                        'salary' => $salary ?? 0,
-
-                    ];
-                });
-
-            // Using the mapped data to create a new table
-            return new TableWidget(
-                [
-                    'ID',
-                    'UID',
-                    __('name'),
-                    __('reals_count'),
-                    __('total_days'),
-                    __('total_hours'),
-                    __('Monthly DI'),
-                    __('img'),
-                    __('salary'),
-                ],
-                $mempers->toArray() // Convert the collection to an array for the table
-            );
-        });
 
         $grid->actions(function ($actions) {
             $model = $actions->row;
@@ -403,18 +356,14 @@ class AgencyController extends MainController
                 })->ajax('/api/search/users3', 'id', 'name');
 
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(12)->url('url', __('url'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                 $row->width(12)->image('img', __('img'))->rules('required');
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -432,17 +381,14 @@ class AgencyController extends MainController
                 //     $row->hidden('agency_manger_id', __('app manger id'));
                 // }
 
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
-                $row->width(12)->url('url', __('url'));
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
-                $row->image('img', __('img'))->rules('required');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         }
