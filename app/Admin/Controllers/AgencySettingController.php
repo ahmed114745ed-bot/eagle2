@@ -37,7 +37,7 @@ class  AgencySettingController extends MainController
 
         
 
-        $tab->add(__("targets"), view('admin.targets.targets', ["targets" => $targets]));
+        $tab->add(__("targets"), view('admin.t  argets.targets', ["targets" => $targets]));
         $tab->add('Settings', "هنا هيكون حاجه جميله انتظر");
 
         return parent::index($content

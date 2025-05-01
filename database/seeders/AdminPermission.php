@@ -115,7 +115,6 @@ class AdminPermission extends Seeder
             'notification',
             'charge-settings',
             'room-settings',
-            'agency-settings',
             'ovip-settings',
             'box-settings',
             'moment-settings',
@@ -129,7 +128,11 @@ class AdminPermission extends Seeder
             'action-trashed',
             'gift',
             'wares',
-            'vip-privilege'
+            'vip-privilege',
+            'family',
+            'family-level',
+            'user-status'
+            
             
 
 
@@ -152,7 +155,7 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters','action-trashed'],
+            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters','action-trashed','user-status'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
             'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level','vip-privilege'],
             'moment' => ['moment',],
@@ -191,7 +194,8 @@ class AdminPermission extends Seeder
             'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting'],
              'charge' => ['charge'],
              'ticket' => ['ticket'],
-             'products' => ['wares','gift']
+             'products' => ['wares','gift'],
+             'family' => ['family','family-level'],
 
         ];
 
