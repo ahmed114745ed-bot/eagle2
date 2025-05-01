@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\NowPaymentsService;
+use Database\Seeders\config;
 use Illuminate\Http\Request;
 
 class NowPaymentsController extends Controller
@@ -17,18 +18,35 @@ class NowPaymentsController extends Controller
     public function createPayment(Request $request)
     {
         $data = [
-            'price_amount' => 100, // Amount in fiat currency
+            'price_amount' => $request->amount, // Amount in fiat currency
             'price_currency' => 'usd',
-            'pay_currency' => 'btc', // Cryptocurrency to receive
-            'ipn_callback_url' => 'http://127.0.0.1:8000/api/now-payments-callback', // Callback URL for IPN
+            'pay_currency' => $request->currency, // Cryptocurrency to receive
+            'ipn_callback_url' => config('services.now_payments.callback_url'), // Callback URL for IPN
             'order_id' => uniqid(), // Unique order ID
-            'order_description' => 'Test Payment',
+            'order_description' => 'Payment',
         ];
 
         $payment = $this->nowPayments->createPayment($data);
 
-        dd($payment);
-        return redirect($payment['invoice_url']); // Redirect user to payment page
+        return response()->json([
+            'payment' => $payment
+        ]); // Redirect user to payment page
+    }
+
+    public function getCurrencies(){
+        $data = $this->nowPayments->getCurrencies();
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    public function paymentStatus($payment){
+        $data = $this->nowPayments->getPaymentStatus($payment);
+
+        return response()->json([
+            'data' => $data
+        ]);
     }
 
     public function paymentCallback(Request $request)
