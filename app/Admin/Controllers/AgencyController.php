@@ -85,8 +85,18 @@ class AgencyController extends MainController
                 'owner' => function ($query) {
                     $query->select('id', 'name', 'uuid');
                 }
-            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
+            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
+
+            $path = @$agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $imageUrl = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($imageUrl)) {
+                $imageUrl = $defaultImage;
+            }
+
+            $agency->display_image = $imageUrl;
 
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
@@ -278,6 +288,90 @@ class AgencyController extends MainController
         $grid->disableExport();
 
         $this->extendGrid($grid);
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->disableIdFilter();
+
+            $filter->where(function ($query) {
+                $query->whereHas('owner', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, 'UUID')->placeholder('search for agency or host by UUID');
+        });
+
+        Admin::style("
+    .box-footer {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .pagination-info {
+        margin: 5px 0;
+        white-space: nowrap;
+        text-align: right;
+        width: auto;
+        order: 2;
+    }
+
+    .box-footer .pull-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+        order: 1;
+    }
+
+    .box-footer .pull-right .dropdown {
+        margin-left: 5px;
+    }
+
+    .pagination > li > a,
+    .pagination > li > span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pagination-info,
+        .box-footer .pull-right {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
+        }
+    }
+");
 
         return $grid;
     }

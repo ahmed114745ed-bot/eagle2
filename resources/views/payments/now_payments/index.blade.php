@@ -76,53 +76,73 @@
 <div class="container">
     <h2>إجراء الدفع</h2>
 
-    <form action="{{ route('now_payment_create') }}" method="POST">
-        @csrf
+<form action="{{ route('now_payment_create') }}" method="POST">
+    @csrf
 
-        <label for="currency">اختر العملة الرقمية</label>
-        <select name="currency" id="currency" required>
-            <option value="">-- اختر عملة --</option>
-            @foreach($currencies as $currency)
-                <option 
-                    value="{{ $currency['currency'] }}" 
-                    data-min="{{ $currency['min_amount'] }}">
-                    {{ strtoupper($currency['currency']) }} (Min: {{ $currency['min_amount'] }}, Max: {{ $currency['max_amount'] }})
-                </option>
-            @endforeach
-        </select>
+    <label for="currency">اختر العملة الرقمية</label>
+    <select name="currency" id="currency" required>
+        <option value="">-- اختر عملة --</option>
+        @foreach($currencies as $currency)
+            <option 
+                value="{{ $currency['currency'] }}" 
+                data-min="{{ $currency['min_amount'] }}" 
+                data-max="{{ $currency['max_amount'] }}">
+                {{ strtoupper($currency['currency']) }} (Min: {{ $currency['min_amount'] }}, Max: {{ $currency['max_amount'] }})
+            </option>
+        @endforeach
+    </select>
 
-        <label for="amount">المبلغ (بالدولار الأمريكي)</label>
-        <input type="number" name="amount" id="amount" required min="1" step="0.01">
+    <label for="amount">المبلغ (بالدولار الأمريكي)</label>
+    <input type="number" name="amount" id="amount" required min="1" step="0.01">
 
-        <small id="min-amount-info"></small>
+    <small id="min-amount-info" style="color: #555; display: block; margin-top: 5px;"></small>
 
-       <br>
+    <br>
 
-        <button style="margin-top: 36px;"type="submit">إنشاء الدفع</button>
-    </form>
-</div>
+    <button style="margin-top: 36px;" type="submit">إنشاء الدفع</button>
+</form>
 
 <script>
- const currencySelect = document.getElementById('currency');
+ 
+    const currencySelect = document.getElementById('currency');
     const minAmountInfo = document.getElementById('min-amount-info');
     const amountInput = document.getElementById('amount');
 
+    function getDecimalPlaces(number) {
+        const str = number.toString();
+        if (str.includes('.')) {
+            return str.split('.')[1].length;
+        }
+        return 0;
+    }
+
     currencySelect.addEventListener('change', function () {
         const selectedOption = this.options[this.selectedIndex];
-        const minAmount = selectedOption.getAttribute('data-min');
+        const minAmount = parseFloat(selectedOption.getAttribute('data-min'));
+        const maxAmount = parseFloat(selectedOption.getAttribute('data-max'));
 
-        if (minAmount) {
-            const min = parseFloat(minAmount);
-            minAmountInfo.textContent = `الحد الأدنى للدفع بهذه العملة هو ${min.toFixed(2)} دولار أمريكي.`;
-            amountInput.min = min;
+        if (!isNaN(minAmount) && !isNaN(maxAmount)) {
+            amountInput.min = minAmount;
+            amountInput.max = maxAmount;
 
-            // إذا كانت القيمة الحالية أقل من الحد الأدنى، يتم تعيينها تلقائيًا
-            if (!amountInput.value || parseFloat(amountInput.value) < min) {
-                amountInput.value = min;
+            // تحديد step بناءً على عدد الأرقام العشرية في الحد الأدنى
+            const decimals = Math.max(
+                getDecimalPlaces(minAmount),
+                getDecimalPlaces(maxAmount)
+            );
+            amountInput.step = (1 / Math.pow(10, decimals)).toFixed(decimals);
+
+            minAmountInfo.textContent = `يمكنك الدفع بين ${minAmount} و ${maxAmount} دولار أمريكي.`;
+
+            // تعديل القيمة لتكون ضمن النطاق
+            if (!amountInput.value || parseFloat(amountInput.value) < minAmount || parseFloat(amountInput.value) > maxAmount) {
+                amountInput.value = minAmount;
             }
         } else {
-            minAmountInfo.textContent = '';
             amountInput.min = 1;
+            amountInput.removeAttribute('max');
+            amountInput.step = "0.01";
+            minAmountInfo.textContent = '';
         }
     });
 </script>

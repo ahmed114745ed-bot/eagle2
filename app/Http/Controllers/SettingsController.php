@@ -23,7 +23,7 @@ use Encore\Admin\Facades\Admin;
 class SettingsController extends Controller
 {
     public $permission_name = 'settings';
-    public function downloadApp(){
+    public function downloadApp($id){
 
         $url = env('DOWNLOAD_URL');
         return view('downloadApp', compact('url'));

@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Common;
 use App\Models\DeleteAccount;
 use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
@@ -174,7 +175,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::get('download-app', [SettingsController::class, 'downloadApp']);
+        Route::get('download-app/{id}', [SettingsController::class, 'downloadApp']);
 
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
         Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
@@ -239,5 +240,50 @@ Route::get('/update-rooms-microphone', function(){
     ]);
     return "done";
 });
+
+
+
+Route::get('/test-fcm/{userid}', function($userId) {
+    $testToken = DB::table('users')->where('uuid', $userId)->value('notification_id');
+
+    $language = 'ar'; // أو 'en'
+    $userLevel = 5; // مستوى افتراضي للاختبار
+    
+    // نصوص الإشعار
+    $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
+    $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
+    $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
+    $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
+    
+    // صورة افتراضية (يمكنك تغيير الرابط)
+    $icon = "https://example.com/images/vip_badge.png";
+    $data = [
+        'image' => $icon,
+        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        'type' => 'level_upgrade'
+    ];
+    
+    // إرسال الإشعار
+    $result = Common::send_firebase_notification(
+        $testToken, 
+        $title,
+        $firebaseBody, 
+        icon: $icon, 
+        data: $data
+    );
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'تم إرسال الإشعار التجريبي',
+        'notification_data' => [
+            'title' => $title,
+            'body' => $firebaseBody,
+            'icon' => $icon,
+            'data' => $data
+        ],
+        'fcm_response' => $result
+    ]);
+});
+
 
 
