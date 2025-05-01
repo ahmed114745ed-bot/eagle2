@@ -776,9 +776,10 @@ class UserController extends MainController
         $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
-        $form->image('profile.avatar', __('image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        });
+        $form->image('profile.avatar', __('image'));
+        // ->name(function ($file) {
+        //     return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        // });
 
         $form->image('profile.image_id', __('image Id'));
         $state = [
