@@ -28,9 +28,7 @@ class NowPaymentsController extends Controller
 
         $payment = $this->nowPayments->createPayment($data);
 
-        return response()->json([
-            'payment' => $payment
-        ]); // Redirect user to payment page
+        return view('admin.views.payments.now_payments.view',compact('payment')); // Redirect user to payment page
     }
 
     public function getCurrencies(){
