@@ -8,6 +8,8 @@ use Encore\Admin\Actions\Action;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 
 class RestoreUserAccount extends RowAction
@@ -15,6 +17,7 @@ class RestoreUserAccount extends RowAction
     public $name;
     public $id;
     protected $selector = '.restore_user_account';
+    public $permission_name = 'action-trashed';
 
     public function __construct($id = 0)
     {
@@ -25,6 +28,9 @@ class RestoreUserAccount extends RowAction
 
     public function handle(Model $model,Request $request)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         $user = User::query()->onlyTrashed()->find($request->id);
         $user->restore();
         return $this->response()->success('success')->refresh();

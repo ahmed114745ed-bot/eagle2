@@ -28,19 +28,41 @@ class ImageColorController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('ID color'))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('image-color'))
-            ->body($this->form());
+            ->body($this->form()));
     }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('image-color'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id,$content
+            ->title(trans('image-color'))
+            ->body($this->form()->edit($id)));
+    }
+
 
 
     /**
