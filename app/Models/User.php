@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 /**
  * @method static withoutAppends()
@@ -1192,7 +1194,31 @@ class User extends Authenticatable
                 }
             }
 
-           
+            $originalProfile = $model->profile;
+            $newAvatar = request()->input('avatar'); // still okay if tightly coupled
+
+
+            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+
+
+                $newCount = $model->profile_count + 1;
+                $model->profile_count = $newCount;
+
+                $file       = request('avatar',  $model->profile->avatar);
+                if ($file instanceof  UploadedFile) {
+                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+                    Storage::delete($model->profile->avatar);
+                }
+                $model->profile->avatar = $url ?? '';
+            } else {
+                $file       = request('avatar',  $model->profile->avatar);
+                if ($file instanceof  UploadedFile) {
+                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+                    Storage::delete($model->profile->avatar);
+                }
+                $model->profile->avatar = $url ?? '';
+            }
+            unset($model->avatar);
         });
 
         static::updating(function ($user) {
