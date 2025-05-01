@@ -1192,24 +1192,7 @@ class User extends Authenticatable
                 }
             }
 
-            $originalProfile = $model->profile;
-            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
-
-            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-                $newCount = $model->profile_count + 1;
-                $model->profile_count = $newCount;
-
-                // Upload and update avatar
-                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
-               // dd($newImagePath);
-                $originalProfile->avatar = $newImagePath;
-                $originalProfile->save();
-
-                $request = request();
-                $input = $request->all();
-                Arr::forget($input, 'profile.avatar');
-                $request->replace($input);
-            }
+           
         });
 
         static::updating(function ($user) {
