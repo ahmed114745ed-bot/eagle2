@@ -289,6 +289,86 @@ class AgencyController extends MainController
 
         $this->extendGrid($grid);
 
+
+        Admin::style("
+    /* Fix for pagination container */
+    .box-footer {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    /* Fix for pagination text */
+    .pagination-info {
+        margin: 5px 0;
+        white-space: nowrap;
+        text-align: right;
+        width: auto;
+        order: 2;
+    }
+
+    /* Fix for pagination controls */
+    .box-footer .pull-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+        order: 1;
+    }
+
+    /* Fix dropdown positioning */
+    .box-footer .pull-right .dropdown {
+        margin-left: 5px;
+    }
+
+    /* Ensure pagination buttons have consistent sizing */
+    .pagination > li > a,
+    .pagination > li > span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    /* Fix for RTL languages if needed */
+    .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    /* Mobile view adjustments */
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pagination-info,
+        .box-footer .pull-right {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
+        }
+    }
+");
+
         return $grid;
     }
 
