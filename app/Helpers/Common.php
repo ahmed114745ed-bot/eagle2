@@ -689,11 +689,10 @@ class Common
         
         $projectId = 'temopo-2cba7';
 
-        // $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
-        //     'message' => $payload
-        // ]);
-        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", $payload);
-
+        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+            'message' => $payload
+        ]);
+        
 
         $result = json_decode($result);
 
