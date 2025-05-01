@@ -214,11 +214,11 @@ class UserController extends MainController
             });
         }
 
-        $grid->column('uuid', __('uuid'))->display(function () {
-            return $this->uuid == $this->original_uuid
-                ? __("uuid") . ' : ' . $this->uuid
-                : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
-        });
+        // $grid->column('uuid', __('uuid'))->display(function () {
+        //     return $this->uuid == $this->original_uuid
+        //         ? __("uuid") . ' : ' . $this->uuid
+        //         : __("uuid") . ' : ' . $this->uuid . '<br>' . __("special uuid") . ' : ' . $this->original_uuid;
+        // });
         $grid->column('name', __('Name'));
 
         $grid->column('return', __('status user'))->display(function () {
