@@ -117,6 +117,11 @@ class NowPaymentsController extends Controller
 
     public function paymentCallback(Request $request)
     {
+
+        Log::info('Payment Callback all Data', [
+            'all' => $request->all(),
+           
+        ]);
         // تسجيل المدخلات الواردة من الـ IPN
     Log::info('Payment Callback received', [
         'payment_id' => $request->input('payment_id'),
