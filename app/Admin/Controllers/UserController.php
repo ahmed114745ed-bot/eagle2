@@ -854,6 +854,22 @@ class UserController extends MainController
             $type_user = request()->type_user;
             $model     = $form->model();
             $user_id   = $model->id;
+
+            $originalProfile = $form->model()->profile;
+            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
+
+            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+                $newCount = $model->profile_count + 1;
+                $model->profile_count = $newCount;
+
+                // Upload and update avatar
+                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+               // dd($newImagePath);
+                $originalProfile->avatar = $newImagePath;
+                $originalProfile->save();
+
+                unset($newAvatar);
+            }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }
