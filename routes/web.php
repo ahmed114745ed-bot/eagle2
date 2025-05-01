@@ -36,7 +36,13 @@ Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
 Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
 // Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
 Route::get('payment-status/{payment}',[NowPaymentsController::class, 'paymentStatus']);
+Route::get('/payment-success', function () {
+    return 'Payment was successful!';
+})->name('payment.success');
 
+Route::get('/payment-cancel', function () {
+    return 'Payment was cancelled.';
+})->name('payment.cancel');
 Route::get('update-need',function(){
 
     $two = VipPrivilege::find(2);

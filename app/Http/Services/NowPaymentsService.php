@@ -5,6 +5,8 @@ namespace App\Http\Services;
 use Database\Seeders\config;
 use GuzzleHttp\Client;
 use Log;
+use Illuminate\Support\Facades\Http;
+
 
 class NowPaymentsService
 {
@@ -23,6 +25,28 @@ class NowPaymentsService
         ]);
     }
 
+    public function createInvoice($request)
+    {
+        $response = Http::withHeaders([
+            'x-api-key' => 'ENA8TVX-ZS147FP-PPJG02X-W6X4C9F',
+            'Content-Type' => 'application/json',
+        ])->post('https://api.nowpayments.io/v1/invoice', [
+            'price_amount' => $request->amount,
+            'price_currency' => 'usd',
+            'pay_currency' => $request->currency,
+            'order_id' => uniqid(),
+            'order_description' => 'Wallet top-up',
+            'ipn_callback_url' => 'http://127.0.0.1:8000/api/now-payments-callback',
+            'success_url' => route('payment.success'),
+            'cancel_url' => route('payment.cancel'),
+        ]);
+    
+        if ($response->successful()) {
+            return $response->json(); // يحتوي على  وغيره
+        }
+    
+        throw new \Exception('Invoice creation failed: ' . $response->body());
+    }
     public function getCurrencies(){
         $response = $this->client->get('currencies', [
             'query' => [
@@ -46,5 +70,15 @@ class NowPaymentsService
         $response = $this->client->get("payment/{$paymentId}");
 
         return json_decode($response->getBody(), true);
+    }
+
+    public function paymentSuccess()
+    {
+        return view('payments.now_payments.success');
+    }
+
+    public function paymentCancel()
+    {
+        return view('payments.now_payments.cancel');
     }
 }
