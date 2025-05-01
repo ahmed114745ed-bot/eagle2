@@ -17,6 +17,8 @@ use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
 use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
+use App\Http\Controllers\NowPaymentsController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +30,11 @@ use App\Models\VipPrivilege;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
+Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
+// Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
+Route::get('payment-status/{payment}',[NowPaymentsController::class, 'paymentStatus']);
 
 Route::get('update-need',function(){
 

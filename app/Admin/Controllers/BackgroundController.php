@@ -14,6 +14,7 @@ use Encore\Admin\Show;
 class BackgroundController extends Controller
 {
     use HasResourceActions;
+    public $permission_name = 'room-background';
 
     /**
      * Index interface.
@@ -23,9 +24,9 @@ class BackgroundController extends Controller
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('backgrounds'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -37,9 +38,9 @@ class BackgroundController extends Controller
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('backgrounds'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -51,9 +52,9 @@ class BackgroundController extends Controller
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('backgrounds'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -64,9 +65,9 @@ class BackgroundController extends Controller
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('backgrounds'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**

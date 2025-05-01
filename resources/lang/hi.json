@@ -17,7 +17,7 @@
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
     "Badges": "बैज",
-
+    "Agency wallet": "एजेंसी वॉलेट",
     "Supporter" : "समर्थक",
     "Shipping": "शिपिंग",
     "Hosting" : "मेज़बान",
@@ -601,6 +601,12 @@
     "Created at": "बनाया गया",
     "moment_count": "लम्हों की संख्या",
     "reals_count": "वीडियो की संख्या",
+    "reals_uploads": "रील्स अपलोड करें",
+    "real_likes": "रील्स लाइक्स",
+    "real_comments": "रील्स टिप्पणियाँ",
+    "uploads": "अपलोड्स",
+    "like": "पसंद",
+    "comment": "टिप्पणी",
     "total_days": "कुल दिन",
     "total_hours": "कुल घंटे",
     "image_type": "छवि प्रकार",
@@ -746,6 +752,8 @@
     "Advertising Space": "विज्ञापन स्थान",
     "Products": "उत्पाद",
     "Levels": "स्तर",
+    "agency name": "एजेंसी का नाम",
+    "agency whatsApp number": "एजेंसी व्हाट्सएप नंबर",
     "Level Gifts": "स्तर उपहार",
     "All Boxes": "सभी बॉक्स",
     "Room Settings": "कक्ष सेटिंग्स",
@@ -1167,7 +1175,7 @@
    "Delete": "हटाएं",
    "Add": "जोड़ें",
    "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
-   
+
    "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
    "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
    "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए",
@@ -1201,7 +1209,11 @@
         "Unpin": "पिन हटाना",
         "Pin Status": "पिन स्थिति",
         "diamonds target":"हीरे लक्ष्य",
-        "profile_frame_type":"Profile Frame Type"
+        "profile_frame_type":"Profile Frame Type",
+        "Old Total Sender Level": "पुराना कुल प्रेषक स्तर",
+    "New Total Sender Level": "नया कुल प्रेषक स्तर",
+    "Old Total Received Level": "पुराना कुल प्राप्तकर्ता स्तर",
+    "New Total Received Level": "नया कुल प्राप्तकर्ता स्तर"
 
 
 

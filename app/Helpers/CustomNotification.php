@@ -9,6 +9,7 @@ use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Family;
 use App\Models\OfficialMessage;
+use Illuminate\Support\Facades\Cache;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
@@ -19,7 +20,8 @@ class CustomNotification
 {
     public function appName($lang)
     {
-        return $lang == 'ar' ? config('app.name_ar') : config('app.name_en');
+        $locale = $lang ?? app()->getLocale();
+        return $locale == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
     }
 
     public function senderLevel(int $userId)

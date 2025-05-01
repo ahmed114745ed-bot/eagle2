@@ -37,9 +37,9 @@ class WareTabController extends MainController
 
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('wares'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -57,26 +57,26 @@ class WareTabController extends MainController
         // // Get type from request or fall back to warehouse's type
         // $currentType = request('type', $ware->type);
 
-        return $content
+        return parent::edit($id,$content
             ->title(trans('wares'))
             // ->row(function (Row $row) use ($id, $currentType) {
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
             // })
             ->row(function (Row $row) use ($id) {
                 $row->column(12, $this->form()->edit($id));
-            });
+            }));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return  parent::create($content
             ->title(trans('wares'))
             ->row(function (Row $row) {
                 $row->column(12, $this->tabsComponentCreate());
             })
             ->row(function (Row $row) {
                 $row->column(12, $this->form());
-            });
+            }));
         //  ->body($this->form());
     }
 

@@ -146,5 +146,6 @@ return [
     'reserved' => 'The phone is reserved',
     'notSend' => 'ypu can not send to yourself',
     'notFound' => 'user not found',
-    'ownerNotFound' => 'owner not found'
+    'ownerNotFound' => 'owner not found',
+    'shippingAgency' => ' you can\'t join this shipping agency',
 ];
