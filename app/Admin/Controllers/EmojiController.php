@@ -19,9 +19,9 @@ class EmojiController extends MainController
     public $permission_name = 'emoji';
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Emojis'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -33,9 +33,9 @@ class EmojiController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('Emojis'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -47,9 +47,9 @@ class EmojiController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('Emojis'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -60,9 +60,9 @@ class EmojiController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Emojis'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 

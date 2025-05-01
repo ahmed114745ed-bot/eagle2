@@ -2060,7 +2060,11 @@
   "All Managers": "(DB) Tüm Yöneticiler",
 
 
-"event period": "Etkinlik süresi"
+"event period": "Etkinlik süresi",
+"Old Total Sender Level": "Eski Toplam Gönderici Seviyesi",
+"New Total Sender Level": "Yeni Toplam Gönderici Seviyesi",
+"Old Total Received Level": "Eski Toplam Alıcı Seviyesi",
+"New Total Received Level": "Yeni Toplam Alıcı Seviyesi"
 
 
 }
