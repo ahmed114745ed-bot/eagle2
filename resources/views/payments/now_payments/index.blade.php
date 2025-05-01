@@ -1,8 +1,4 @@
 
-      
- 
-
-@section('content')
 <style>
     body {
         font-family: 'Cairo', sans-serif;
@@ -39,7 +35,7 @@
         padding: 12px;
         border: 1px solid #ccc;
         border-radius: 8px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         transition: border-color 0.3s;
         font-size: 16px;
     }
@@ -69,6 +65,12 @@
     option {
         font-size: 15px;
     }
+
+    #min-amount-info {
+        color: #888;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
 </style>
 
 <div class="container">
@@ -77,19 +79,44 @@
     <form action="{{ route('now_payment_create') }}" method="POST">
         @csrf
 
-        <label for="amount">المبلغ (بالدولار الأمريكي)</label>
-        <input type="number" name="amount" id="amount" required min="1" step="0.01">
-
         <label for="currency">اختر العملة الرقمية</label>
         <select name="currency" id="currency" required>
             <option value="">-- اختر عملة --</option>
             @foreach($currencies as $currency)
-                <option value="{{ $currency['currency'] }}">
+                <option 
+                    value="{{ $currency['currency'] }}" 
+                    data-min="{{ $currency['min_amount'] }}">
                     {{ strtoupper($currency['currency']) }} (Min: {{ $currency['min_amount'] }}, Max: {{ $currency['max_amount'] }})
                 </option>
             @endforeach
         </select>
 
-        <button type="submit">إنشاء الدفع</button>
+        <label for="amount">المبلغ (بالدولار الأمريكي)</label>
+        <input type="number" name="amount" id="amount" required min="1" step="0.01">
+
+        <small id="min-amount-info"></small>
+
+       <br>
+
+        <button style="margin-top: 36px;"type="submit">إنشاء الدفع</button>
     </form>
 </div>
+
+<script>
+    const currencySelect = document.getElementById('currency');
+    const minAmountInfo = document.getElementById('min-amount-info');
+    const amountInput = document.getElementById('amount');
+
+    currencySelect.addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const minAmount = selectedOption.getAttribute('data-min');
+
+        if (minAmount) {
+            minAmountInfo.textContent = `الحد الأدنى للدفع بهذه العملة هو ${minAmount} دولار أمريكي.`;
+            amountInput.min = parseFloat(minAmount);
+        } else {
+            minAmountInfo.textContent = '';
+            amountInput.min = 1;
+        }
+    });
+</script>
