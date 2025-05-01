@@ -2036,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
+                            document.getElementById('app_primary_color').value = "#aee6cf";
+                            document.getElementById('app_second_color').value = "#eff7f5";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";
