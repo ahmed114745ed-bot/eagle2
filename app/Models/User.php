@@ -88,7 +88,7 @@ class User extends Authenticatable
         'original_uuid',
         'is_frozen',
         'total_charge_level',
-        'avatar1'
+        // 'avatar1'
     ];
 
     /* protected $appends = [
@@ -1169,10 +1169,10 @@ class User extends Authenticatable
     }
 
 
-    public function getAvatar1Attribute()
-    {
-        return @$this->profile()->first()->avatar;
-    }
+    // public function getAvatar1Attribute()
+    // {
+    //     return @$this->profile()->first()->avatar;
+    // }
     protected static function boot()
     {
         parent::boot();
@@ -1200,31 +1200,31 @@ class User extends Authenticatable
                 }
             }
 
-            $originalProfile = $model->profile;
-            $newAvatar = request()->input('avatar1'); // still okay if tightly coupled
+            // $originalProfile = $model->profile;
+            // $newAvatar = request()->input('avatar1'); // still okay if tightly coupled
 
 
-            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+            // if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
 
-                $newCount = $model->profile_count + 1;
-                $model->profile_count = $newCount;
+            //     $newCount = $model->profile_count + 1;
+            //     $model->profile_count = $newCount;
 
-                $file       = request('avatar',  $model->profile->avatar);
-                if ($file instanceof  UploadedFile) {
-                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
-                    Storage::delete($model->profile->avatar);
-                }
-                $model->profile->avatar = $url ?? '';
-            } else {
-                $file       = request('avatar1',  $model->profile->avatar);
-                if ($file instanceof  UploadedFile) {
-                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
-                    Storage::delete($model->profile->avatar);
-                }
-                $model->profile->avatar = $url ?? '';
-            }
-            unset($model->avatar1);
+            //     $file       = request('avatar',  $model->profile->avatar);
+            //     if ($file instanceof  UploadedFile) {
+            //         $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+            //         Storage::delete($model->profile->avatar);
+            //     }
+            //     $model->profile->avatar = $url ?? '';
+            // } else {
+            //     $file       = request('avatar1',  $model->profile->avatar);
+            //     if ($file instanceof  UploadedFile) {
+            //         $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+            //         Storage::delete($model->profile->avatar);
+            //     }
+            //     $model->profile->avatar = $url ?? '';
+            // }
+            // unset($model->avatar1);
         });
 
      
