@@ -861,20 +861,20 @@ class UserController extends MainController
             //  dd($form->model()->profile->avatar);
             $model     = $form->model();
             $user_id   = $model->id;
-            $user = User::find($user_id);
-            $originalProfile = $user->profile;
-            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
+            // $user = User::find($user_id);
+            // $originalProfile = $user->profile;
+            // $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
 
-            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-                $newCount = $user->profile_count + 1;
-                $user->profile_count = $newCount;
-                $user->save();
+            // if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+            //     $newCount = $user->profile_count + 1;
+            //     $user->profile_count = $newCount;
+            //     $user->save();
 
-                // Upload and update avatar
-                $form->model()->profile->avatar =  Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
-                // dd($newImagePath);
+            //     // Upload and update avatar
+            //     $form->model()->profile->avatar =  Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+            //     // dd($newImagePath);
 
-            }
+            // }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }
