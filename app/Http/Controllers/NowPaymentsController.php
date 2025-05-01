@@ -51,8 +51,8 @@ class NowPaymentsController extends Controller
                 'price_amount' => $payment['price_amount'],
                 'price_currency' => $payment['price_currency'],
                 'order_id' => $payment['order_id'],
-                'user_id' => Auth::id() ?? 1, 
-            
+                'user_id' => Auth::id() ?? 1,
+
             ]);
         }
         return view('payments.now_payments.view',compact('payment')); // Redirect user to payment page
@@ -68,7 +68,7 @@ class NowPaymentsController extends Controller
                 'min_amount'  => $currency['min_amount'],
                 'max_amount'  => $currency['max_amount'],
             ];
-        })->sortBy('currency')->values();     
+        })->sortBy('currency')->values();
         return response()->json([
             'data' => $currencies
         ]);
@@ -91,11 +91,12 @@ class NowPaymentsController extends Controller
         Log::info($status);
 
         // Update your database or trigger actions based on payment status
-        if($status['data']['payment_status'] == 'paid'){
+        if($status['payment_status'] == 'paid'){
             NowpaymentOrder::where('payment_id', $paymentId)->update([
                 'payment_status' => 'paid'
             ]);
         }
+        Log::info('callback end now payments');
         // Example: Mark order as paid
 
         return response()->json(['status' => 'success']);
