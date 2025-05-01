@@ -250,7 +250,7 @@ Route::get('/update-rooms-microphone', function(){
 
 
 Route::get('/test-fcm/{userid}', function($userId) {
-    $testToken = DB::table('users')->where('uuid', $userId)->value('notification_id');
+    $testToken = 'czhg-TwETMe-c5hZvDAFeh:APA91bGTNB5bCNaE2rtJXK-bxs-Uz9YtvPzCijBuGaWPk_QJsV33c6y7oeHMNVewQbWkIWlOGWW1y2_zf1wMt1BlIq1CJ-7l0HMIS4PD4ZjTHr_-shU-ud4';
 
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار
