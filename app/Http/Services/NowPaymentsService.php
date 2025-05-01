@@ -36,7 +36,7 @@ class NowPaymentsService
             'pay_currency' => $request->currency,
             'order_id' => uniqid(),
             'order_description' => 'Wallet top-up',
-            'ipn_callback_url' => 'http://127.0.0.1:8000/api/now-payments-callback',
+            'ipn_callback_url' => 'https://eagle.utdsoftware.com/api/now-payments-callback',
             'success_url' => route('payment.success'),
             'cancel_url' => route('payment.cancel'),
         ]);
