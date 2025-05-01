@@ -1195,11 +1195,12 @@ class User extends Authenticatable
             $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
        
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-                $newCount = $model->profile_count + 1;
-                $model->profile_count = $newCount;
+                // $newCount = $model->profile_count + 1;
+                // $model->profile_count = $newCount;
         
                 // Upload and update avatar
-                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, 4);
+                dd( $newImagePath);
                 $originalProfile->avatar = $newImagePath;
                 $originalProfile->save();
             }
