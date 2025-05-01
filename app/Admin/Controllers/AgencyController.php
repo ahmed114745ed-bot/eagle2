@@ -2,10 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Gift;
-use App\Models\Room;
+use App\Helpers\UserCommon;
 use App\Models\User;
-use App\Models\Ware;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -15,11 +13,8 @@ use App\Models\UserTarget;
 use App\Models\AgencySallary;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +42,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index( $content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -55,7 +50,7 @@ class AgencyController extends MainController
                 $row->column(3, view('agency.settings'));
 
                 $row->column(9, $this->grid());
-            });
+            }));
     }
 
     public function edit($id, Content $content)
@@ -90,8 +85,18 @@ class AgencyController extends MainController
                 'owner' => function ($query) {
                     $query->select('id', 'name', 'uuid');
                 }
-            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
+            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
+
+            $path = @$agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $imageUrl = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($imageUrl)) {
+                $imageUrl = $defaultImage;
+            }
+
+            $agency->display_image = $imageUrl;
 
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
@@ -163,9 +168,6 @@ class AgencyController extends MainController
             }));
     }
 
-
-
-
     /**
      * Make a grid builder.
      *
@@ -206,20 +208,25 @@ class AgencyController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
+
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div style='display: flex; flex-direction: column;'>
+                $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
-                    <span>$name</span>
-                    <span>ID: {$this->id}</span>
-                </div>
-            </div>
-        ";
+                return "
+                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->id}</span>
+                            </div>
+                        </div>
+                    </a>
+                ";
             });
+
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
@@ -260,17 +267,7 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('coins', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
-        });
-        $grid->column('salary', __('salary'))->display(function ($coin) {
+        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -279,57 +276,6 @@ class AgencyController extends MainController
 
                 </div>
             ";
-        });
-        $grid->column('target', trans('target'))->display(function () {
-            $target = $this->getTargetsAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
-
-            return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
-                "></span>" : "";
-        });
-        $grid->column('members', __('members'))->expand(function ($model) {
-            $mempers = $model->mempers()
-                ->orderBy('monthly_diamond_received', 'desc')
-                ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-                }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar'); // assuming 'avatar' is the column name for the image in 'profile'
-                }])
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received',]) // selecting specific fields from `mempers`
-                ->map(function ($memper) {
-                    $memper->image = @$memper->profile?->avatar ?? null;
-                    $imageHtml = $memper->profile && $memper->profile->avatar
-                        ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
-                        : 'No Image';
-                    $salary = $memper->userSallary->sallary ?? 0;
-                    return [
-                        'id' => $memper->id ?? 0,
-                        'uuid' => $memper->uuid ?? 0,
-                        'name' => $memper->name ?? '',
-                        'reals_count' => $memper->reals()->count() ?? 0,
-                        'total_days' => $memper->total_days ?? 0,
-                        'total_hours' => $memper->liveTime->sum("hours"),
-                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
-                        'image' => $imageHtml,
-                        'salary' => $salary ?? 0,
-
-                    ];
-                });
-
-            // Using the mapped data to create a new table
-            return new TableWidget(
-                [
-                    'ID',
-                    'UID',
-                    __('name'),
-                    __('reals_count'),
-                    __('total_days'),
-                    __('total_hours'),
-                    __('Monthly DI'),
-                    __('img'),
-                    __('salary'),
-                ],
-                $mempers->toArray() // Convert the collection to an array for the table
-            );
         });
 
         $grid->actions(function ($actions) {
@@ -343,12 +289,89 @@ class AgencyController extends MainController
 
         $this->extendGrid($grid);
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
 
-        $grid->column('agency profile', __('agency profile'))->display(function () {
-            $url = route('admin.agency.profile', ['id' => $this->id]);
-            $name = __('agency profile');
-            return "<a href='{$url}' class='btn btn-primary btn-sm'>{$name}</a>";
+            $filter->disableIdFilter();
+
+            $filter->where(function ($query) {
+                $query->whereHas('owner', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, 'UUID')->placeholder('search for agency or host by UUID');
         });
+
+        Admin::style("
+    .box-footer {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .pagination-info {
+        margin: 5px 0;
+        white-space: nowrap;
+        text-align: right;
+        width: auto;
+        order: 2;
+    }
+
+    .box-footer .pull-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+        order: 1;
+    }
+
+    .box-footer .pull-right .dropdown {
+        margin-left: 5px;
+    }
+
+    .pagination > li > a,
+    .pagination > li > span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pagination-info,
+        .box-footer .pull-right {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
+        }
+    }
+");
 
         return $grid;
     }
@@ -427,18 +450,14 @@ class AgencyController extends MainController
                 })->ajax('/api/search/users3', 'id', 'name');
 
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(12)->url('url', __('url'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                 $row->width(12)->image('img', __('img'))->rules('required');
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -456,17 +475,14 @@ class AgencyController extends MainController
                 //     $row->hidden('agency_manger_id', __('app manger id'));
                 // }
 
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
-                $row->width(12)->url('url', __('url'));
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
-                $row->image('img', __('img'))->rules('required');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         }

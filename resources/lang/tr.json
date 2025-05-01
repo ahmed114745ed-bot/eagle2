@@ -20,7 +20,7 @@
     "Badges" : "rozetler",
     "Owner uuid": "Sahip Kimlik Numarası",
     "Roles": "Roller",
-
+    "Agency wallet": "Ajans cüzdanı",
     "Supporter" : "Destekçi",
     "Shipping": "Nakliye",
     "Hosting" : "Ev sahibi",
@@ -588,11 +588,19 @@
     "Created at": "Oluşturulma tarihi",
     "moment_count": "Anı sayısı",
     "reals_count": "Video sayısı",
+    "reals_uploads": "Reels yükleme",
+    "real_likes": "Reels beğenileri",
+    "real_comments": "Reels yorumları",
+    "uploads": "Yüklemeler",
+    "like": "Beğeni",
+    "comment": "Yorum",
     "total_days": "Gün sayısı",
     "total_hours": "Saat sayısı",
     "image_type": "Resim türü",
     "profile_frame_type":"Profile Resim türü",
-
+    "agency name": "Ajans adı",
+    "agency whatsApp number": "Ajans WhatsApp numarası",
+    "search for agency or host by UUID": "UUID ile ajans veya sunucuyu ara",
     "User Report": "Kullanıcı raporu",
     "canPlay": "Oynayabilir",
     "ban_type": "Yasak türü",
@@ -1661,7 +1669,7 @@
     "Charging Agencies": "Şarj Ajansları",
     "Verified Charging Agents": "Doğrulanmış Şarj Temsilcileri",
     "Payment Methods for Charging Agents": "Şarj Temsilcileri için Ödeme Yöntemleri",
-    "Agency Manager": "Ajans Yöneticisi",
+    "Agency Manager": "बीडी",
     "VIP Privileges": "VIP Ayrıcalıkları",
     "Managers": "Yöneticiler",
     "Charging Events": "Şarj Etkinlikleri",
@@ -2057,9 +2065,14 @@
   "Agents Salary": "Ajanlar Maaşı",
   "BD Admin": "BD Yöneticisi",
   "Honor": "Onur",
+  "All Managers": "(DB) Tüm Yöneticiler",
 
 
-"event period": "Etkinlik süresi"
+"event period": "Etkinlik süresi",
+"Old Total Sender Level": "Eski Toplam Gönderici Seviyesi",
+"New Total Sender Level": "Yeni Toplam Gönderici Seviyesi",
+"Old Total Received Level": "Eski Toplam Alıcı Seviyesi",
+"New Total Received Level": "Yeni Toplam Alıcı Seviyesi"
 
 
 }

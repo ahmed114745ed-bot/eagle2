@@ -17,11 +17,13 @@ use App\Models\NotificationTranslation;
 use App\Models\PaymentCoin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 class SettingsController extends Controller
 {
-
-    public function downloadApp(){
+    public $permission_name = 'settings';
+    public function downloadApp($id){
 
         $url = env('DOWNLOAD_URL');
         return view('downloadApp', compact('url'));
@@ -80,6 +82,10 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         $data = $request->except('_token','zones_coins','super_admin_coins');
 
 
@@ -136,11 +142,13 @@ class SettingsController extends Controller
 
         if ($request->background_type === 'color') {
             $data['app_background'] = $request->background_color;
+            $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
         } else if($request->background_type == 'gradient'){
             $data['gradient_1'] = $request->gradient_1;
             $data['gradient_2'] = $request->gradient_2;
+            $data['gradient_3'] = $request->gradient_3;
         }
         elseif ($request->brand_background_type === 'image') {
             if(!empty($request->brand_image)){

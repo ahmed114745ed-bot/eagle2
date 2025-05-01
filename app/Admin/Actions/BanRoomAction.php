@@ -20,15 +20,22 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin as AdminAuth;
 
 class BanRoomAction extends Action
 {
     public $name;
+    public $permission_name = 'ban-rooms';
 
     protected $selector = '.ban_user_action';
 
     public function handle(Request $request)
     {
+
+        if (!AdminAuth::user()->can('*')){
+            Permission::check('create-'.$this->permission_name);
+        }
         $room = Room::find($request->room_id);
         if (!$room) {
             return $this->response()->error(__('room not found'))->refresh();

@@ -13,6 +13,7 @@ use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
+const BaCKGROUND_IMAGE_MODE_8 = 'arab.jpeg';
 const CINEMA_IMAGE = 'custom_image/back-black.png';
 const GAME_COINS_PLAY = 'game_coins_play_#';
 
@@ -411,9 +412,9 @@ if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
         return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
-            if (!isSubdomain()) {
-                return null;
-            }
+//            if (!isSubdomain()) {
+//                return null;
+//            }
 
             $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');

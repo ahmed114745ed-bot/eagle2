@@ -24,13 +24,13 @@ class EventReportController extends MainOldController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('reports'))
             ->description(__(request('desc') ?: 'users'))
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.event-reports'));
                 $row->column(10, $this->grid());
-            });
+            }));
     }
 
     protected function grid()

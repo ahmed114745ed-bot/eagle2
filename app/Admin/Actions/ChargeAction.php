@@ -104,7 +104,7 @@ class ChargeAction extends Action
             $agency->coins += $coins;
             $agency->save();
 
-            $this->createChargeRecord($request, $user, $agency, $amount, $coins);
+            $this->createChargeRecord($request, $user, $agency, $amount, $coins,$request->amount);
 
             if ($request->charge_type == "increment") {
                 CustomNotification::chargeAction($user, $request);
@@ -137,7 +137,7 @@ class ChargeAction extends Action
             if ($request->charge_type == "increment") {
                 CustomNotification::chargeAction($user, $request);
             }
-            $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
+            $this->createChargeRecord($request, $user, null, $amount, $usdAmount,$request->amount);
 
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
@@ -145,8 +145,9 @@ class ChargeAction extends Action
         return $this->response()->success('Success')->refresh();
     }
 
-    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0)
+    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount )
     {
+       
         //        $shippingCoins = cache()->get('shipping_coins');
         $charge = new Charge();
         $charge->charger_id = Auth::id();
@@ -155,7 +156,7 @@ class ChargeAction extends Action
         $charge->agency_id = $agency->id ?? null;
         $charge->user_type = 'agency';
         $charge->amount = $coins;
-        $charge->usd = $amount;
+        $charge->usd = $usdAmount;
         $charge->balance_before = ($agency ? $agency->coins : $user->di) - $amount;
         //dd($charge);
         $charge->save();

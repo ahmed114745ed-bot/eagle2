@@ -1179,8 +1179,8 @@ class User extends Authenticatable
                 }
                 request()->request->remove('is_frozen');
             }
-            if (request()->has('charge_agency')) { 
-                if (request('charge_agency') == 1) { 
+            if (request()->has('charge_agency')) {
+                if (request('charge_agency') == 1) {
                     // لو مش موجود، أضيف
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->agency_id
@@ -1192,7 +1192,7 @@ class User extends Authenticatable
             }
 
     });
-    
+
         static::updating(function ($user) {
             $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
             $newCoins = $user->di;

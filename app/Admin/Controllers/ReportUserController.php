@@ -37,9 +37,9 @@ class ReportUserController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('Hosts Reports'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -51,9 +51,9 @@ class ReportUserController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('Hosts Reports'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -64,9 +64,9 @@ class ReportUserController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Hosts Reports'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**

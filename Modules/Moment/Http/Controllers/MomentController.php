@@ -16,10 +16,12 @@ use Modules\Moment\Transformers\MomentResource;
 use DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Moment\Http\Services\MomentService;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
 
 class MomentController extends Controller
 {
-
+    public $permission_name = 'report-moment';
     public function __construct(public MomentService $momentService) {}
 
     public function index(Request $request)
@@ -119,6 +121,9 @@ class MomentController extends Controller
 
     public function destroy_dash($moment_id, $id)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('delete-'.$this->permission_name);
+        }
         $result = $this->momentService->deleteMomentAndReport($moment_id, $id);
 
         // Check result and return the appropriate response

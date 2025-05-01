@@ -39,11 +39,11 @@ class ConfigController extends MainController
         if (! \Encore\Admin\Facades\Admin::user()->can('*')) {
             Permission::check('browse-' . $this->permission_name);
         }
-        return $content
+        return parent::index($content
             ->title(trans('configs'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
-
+    
     /**
      * Show interface.
      *
