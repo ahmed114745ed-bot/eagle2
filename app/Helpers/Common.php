@@ -685,7 +685,6 @@ class Common
         ];
 
 
-        dd($api_access_key );
 
         $projectId = 'temopo-2cba7';
 
