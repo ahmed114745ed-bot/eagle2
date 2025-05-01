@@ -4,6 +4,7 @@ namespace App\Http\Services;
 
 use Database\Seeders\config;
 use GuzzleHttp\Client;
+use Log;
 
 class NowPaymentsService
 {
@@ -44,6 +45,7 @@ class NowPaymentsService
     {
         $response = $this->client->get("payment/{$paymentId}");
 
+        Log::info('now payments body: '. $response->getBody());
         return json_decode($response->getBody(), true);
     }
 }
