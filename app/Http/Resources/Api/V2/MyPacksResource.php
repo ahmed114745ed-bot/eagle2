@@ -74,7 +74,7 @@ class MyPacksResource extends JsonResource
             'is_dress' => $is_dress ?? 0,
             'title' => $title,
             'color' => $color,
-            'using' => $this->using,
+            'using' => @(bool)$this->using,
         ];
     }
 }
