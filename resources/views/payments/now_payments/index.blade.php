@@ -103,7 +103,7 @@
 </div>
 
 <script>
-    const currencySelect = document.getElementById('currency');
+ const currencySelect = document.getElementById('currency');
     const minAmountInfo = document.getElementById('min-amount-info');
     const amountInput = document.getElementById('amount');
 
@@ -112,8 +112,14 @@
         const minAmount = selectedOption.getAttribute('data-min');
 
         if (minAmount) {
-            minAmountInfo.textContent = `الحد الأدنى للدفع بهذه العملة هو ${minAmount} دولار أمريكي.`;
-            amountInput.min = parseFloat(minAmount);
+            const min = parseFloat(minAmount);
+            minAmountInfo.textContent = `الحد الأدنى للدفع بهذه العملة هو ${min.toFixed(2)} دولار أمريكي.`;
+            amountInput.min = min;
+
+            // إذا كانت القيمة الحالية أقل من الحد الأدنى، يتم تعيينها تلقائيًا
+            if (!amountInput.value || parseFloat(amountInput.value) < min) {
+                amountInput.value = min;
+            }
         } else {
             minAmountInfo.textContent = '';
             amountInput.min = 1;
