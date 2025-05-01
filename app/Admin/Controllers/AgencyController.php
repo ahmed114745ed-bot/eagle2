@@ -158,9 +158,6 @@ class AgencyController extends MainController
             }));
     }
 
-
-
-
     /**
      * Make a grid builder.
      *
@@ -277,7 +274,7 @@ class AgencyController extends MainController
                     $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
                 }, 'profile' => function ($query) {
                     $query->select('id', 'user_id', 'avatar');
-                }, 'reals.likes', 'reals.comments'])
+                }, 'reals.likes', 'reals.comments', 'moments.likes', 'moments.comments'])
                 ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
                 ->map(function ($memper) {
                     // Handle image path with fallback to default
@@ -298,48 +295,99 @@ class AgencyController extends MainController
 
                     // Create the display HTML for name and UUID with styling similar to the owner column
                     $nameDisplay = "
-                        <div style='display: flex; align-items: center; gap: 10px;'>
-                            $image
-                            <div>
-                               <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                                 <span style='text-decoration: underline; cursor: pointer;'>{$memper->name}</span>
-                                </a>
-                                <span style='font-size: smaller;'>UUID: {$memper->uuid}</span>
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>{$memper->name}</span>
+                        </a>
+                        <span style='font-size: smaller;'>UUID: {$memper->uuid}</span>
+                    </div>
+                </div>
+            ";
+
+                    $salary = $memper->userSallary->sallary ?? 0;
+
+                    $reelsLikes = $memper->reals->sum(function ($real) {
+                        return $real->likes->count();
+                    });
+
+                    $reelsComments = $memper->reals->sum(function ($real) {
+                        return $real->comments->count();
+                    });
+
+                    $momentsLikes = $memper->moments->sum(function ($real) {
+                        return $real->likes->count();
+                    });
+
+                    $momentsComments = $memper->moments->sum(function ($real) {
+                        return $real->comments->count();
+                    });
+
+                    // Creating a split display for reals and moments similar to the image
+                    $realsCount = $memper->reals()->count() ?? 0;
+                    $momentsCount = $memper->moments()->count() ?? 0;
+
+                    $uploadsDisplay = "
+                        <div style='display: flex; width: 100%;'>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='margin-top: 5px;'>{$realsCount}</div>
+                            </div>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='margin-top: 5px;'>{$momentsCount}</div>
                             </div>
                         </div>
                     ";
 
-                    $salary = $memper->userSallary->sallary ?? 0;
+                    $likesDisplay = "
+                        <div style='display: flex; width: 100%;'>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='margin-top: 5px;'>{$reelsLikes}</div>
+                            </div>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='margin-top: 5px;'>{$momentsLikes}</div>
+                            </div>
+                        </div>
+                    ";
 
-                    $totalLikes = $memper->reals->sum(function ($real) {
-                        return $real->likes->count();
-                    });
-
-                    $totalComments = $memper->reals->sum(function ($real) {
-                        return $real->comments->count();
-                    });
+                    $commentsDisplay = "
+                        <div style='display: flex; width: 100%;'>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='margin-top: 5px;'>{$reelsComments}</div>
+                            </div>
+                            <div style='flex: 1; padding: 5px; text-align: center;'>
+                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='margin-top: 5px;'>{$momentsComments}</div>
+                            </div>
+                        </div>
+                    ";
 
                     return [
-                        'name' => $nameDisplay, // Using the styled HTML for name column
+                        'name' => $nameDisplay,
                         'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
                         'salary' => $salary ?? 0,
-                        'reals_count' => $memper->reals()->count() ?? 0,
-                        'real_likes' => $totalLikes ?? 0,
-                        'real_comments' => $totalComments ?? 0,
+                        'uploads' => $uploadsDisplay,
+                        'likes' => $likesDisplay,
+                        'comments' => $commentsDisplay,
                         'total_days' => $memper->total_days ?? 0,
                         'total_hours' => $memper->liveTime->sum("hours") ?? 0,
                     ];
                 });
 
-            // Using the mapped data to create a new table (removed 'img' column since it's now embedded in 'name')
+            // Using the mapped data to create a new table
             return new TableWidget(
                 [
                     __('name'),
                     __('Monthly DI'),
                     __('salary'),
-                    __('reals_uploads'),
-                    __('real_likes'),
-                    __('real_comments'),
+                    __('uploads'),
+                    __('like'),
+                    __('comment'),
                     __('total_days'),
                     __('total_hours'),
                 ],
@@ -358,6 +406,7 @@ class AgencyController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
+            // Define date filters
             $filter->where(function ($query) {
                 $date = UserCommon::arabicToEnglishNumbers($this->input);
                 $query->whereDate('created_at', '>=', $date);
@@ -368,6 +417,11 @@ class AgencyController extends MainController
                 $query->whereDate('created_at', '<=', $date);
             }, __('to_date'), 'to_date')->date();
         });
+
+        if (!request()->has('from_date') && !request()->has('to_date')) {
+            $grid->model()->whereDate('created_at', '>=', now()->startOfMonth())
+                ->whereDate('created_at', '<=', now()->endOfMonth());
+        }
 
         $this->extendGrid($grid);
 
