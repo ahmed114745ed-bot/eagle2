@@ -125,7 +125,11 @@ class AdminPermission extends Seeder
             'achievement_dedicate',
             'charge',
             'ticket',
-            'users-hunters'
+            'users-hunters',
+            'action-trashed',
+            'gift',
+            'wares',
+            'vip-privilege'
             
 
 
@@ -148,9 +152,9 @@ class AdminPermission extends Seeder
             'roles' => ['roles', 'Permissions',],
             'cp' => ['level-cp'],
             'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters'],
+            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters','action-trashed'],
             'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
-            'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level'],
+            'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level','vip-privilege'],
             'moment' => ['moment',],
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate','achievement_dedicate'],
             'version' => ['version'],
@@ -187,6 +191,7 @@ class AdminPermission extends Seeder
             'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting'],
              'charge' => ['charge'],
              'ticket' => ['ticket'],
+             'products' => ['wares','gift']
 
         ];
 

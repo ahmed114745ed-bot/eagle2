@@ -20,9 +20,9 @@ class SpecialHistoryController extends AdminController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('special-histories'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**

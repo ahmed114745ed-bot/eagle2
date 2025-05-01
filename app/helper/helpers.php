@@ -13,6 +13,7 @@ use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
 const PK_IMAGE = 'custom_image/pk.png';
+const BaCKGROUND_IMAGE_MODE_8 = 'arab.jpeg';
 const CINEMA_IMAGE = 'custom_image/back-black.png';
 const GAME_COINS_PLAY = 'game_coins_play_#';
 
