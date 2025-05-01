@@ -85,8 +85,18 @@ class AgencyController extends MainController
                 'owner' => function ($query) {
                     $query->select('id', 'name', 'uuid');
                 }
-            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
+            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
+
+            $path = @$agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $imageUrl = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($imageUrl)) {
+                $imageUrl = $defaultImage;
+            }
+
+            $agency->display_image = $imageUrl;
 
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
