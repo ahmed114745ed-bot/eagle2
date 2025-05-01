@@ -13,7 +13,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class PageController extends MainController
 {
     use HasResourceActions;
-
+    public $permission_name = 'page';
     /**
      * Index interface.
      *
