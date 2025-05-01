@@ -1212,7 +1212,7 @@ class User extends Authenticatable
 
                 $file       = request('photo');
                 if ($file instanceof  UploadedFile) {
-                    dd(123);
+                   
                     $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
                     Storage::delete($model->profile->avatar);
                 }
