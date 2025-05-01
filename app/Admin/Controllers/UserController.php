@@ -37,7 +37,6 @@ use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
-use Illuminate\Support\Arr;
 
 
 class UserController extends MainController
@@ -744,21 +743,20 @@ class UserController extends MainController
         $loggedInUserId = Admin::user()->id;
         $form->display('id', __('id'));
         if (!$form->isEditing()) {
-            $form->text('uuid', __('uuid'))
-                ->creationRules([
-                    'required',
-                    Rule::unique('users', 'uuid'),
-                    function ($attribute, $value, $fail) {
-                        if (DB::table('wares')->where('value', $value)->exists()) {
-                            return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
-                        }
+            // Add a hidden field for 'uuid' in the edit form
+            $form->text('uuid', __('uuid'))->creationRules([
+                'required',
+                Rule::unique('users', 'uuid'),
+                function ($attribute, $value, $fail) {
+                    if (DB::table('wares')->where('value', $value)->exists()) {
+                        return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
                     }
-                ]);
-        } else {
-            $form->text('uuid', __('uuid'))
+                }
+            ])
                 ->updateRules([
                     'required',
                     Rule::unique('users', 'uuid')->ignore(request()->route('id')),
+                    // نفس الشيء هنا مع التحقق من عدم وجود القيمة في جدول wares
                     function ($attribute, $value, $fail) {
                         if (DB::table('wares')->where('value', $value)->exists()) {
                             return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
@@ -775,13 +773,12 @@ class UserController extends MainController
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        // $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
-        $form->image('profile.avatar', __('image'));
-        // ->name(function ($file) {
-        //     return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        // });
+        $form->image('profile.avatar', __('image'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
 
         $form->image('profile.image_id', __('image Id'));
         $state = [
@@ -856,25 +853,6 @@ class UserController extends MainController
             $type_user = request()->type_user;
             $model     = $form->model();
             $user_id   = $model->id;
-           $user = User::Find($user_id);
-            $originalProfile = $form->model()->profile;
-            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
-
-            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
-                $newCount = $model->profile_count + 1;
-                $user->profile_count = $newCount;
-                $user->save();
-                // Upload and update avatar
-                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
-               // dd($newImagePath);
-                $originalProfile->avatar = $newImagePath;
-                $originalProfile->save();
-
-                $request = request();
-                $input = $request->all();
-                Arr::forget($input, 'profile.avatar');
-                $request->replace($input);
-            }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }
@@ -882,7 +860,6 @@ class UserController extends MainController
             if ($form->oldDiamoundValue != $oldDiamoundValue) {
                 $form->user_diamond = $oldDiamoundValue;
             }
-            unset($newAvatar);
 
             $agancy = Agency::where('app_owner_id', $user_id)->first();
             if ($agancy) {
@@ -893,7 +870,7 @@ class UserController extends MainController
                     return redirect()->back();
                 }
 
-                
+
                 switch ($type_user) {
 
 
