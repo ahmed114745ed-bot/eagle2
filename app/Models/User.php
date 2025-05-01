@@ -88,6 +88,7 @@ class User extends Authenticatable
         'original_uuid',
         'is_frozen',
         'total_charge_level',
+        'avatar1'
     ];
 
     /* protected $appends = [
@@ -1167,6 +1168,11 @@ class User extends Authenticatable
         return optional($this->agency)->is_frozen;
     }
 
+
+    public function getAvatar1Attribute()
+    {
+        return @$this->profile()->first()->avatar;
+    }
     protected static function boot()
     {
         parent::boot();
@@ -1195,7 +1201,7 @@ class User extends Authenticatable
             }
 
             $originalProfile = $model->profile;
-            $newAvatar = request()->input('avatar'); // still okay if tightly coupled
+            $newAvatar = request()->input('avatar1'); // still okay if tightly coupled
 
 
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
@@ -1211,15 +1217,17 @@ class User extends Authenticatable
                 }
                 $model->profile->avatar = $url ?? '';
             } else {
-                $file       = request('avatar',  $model->profile->avatar);
+                $file       = request('avatar1',  $model->profile->avatar);
                 if ($file instanceof  UploadedFile) {
                     $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
                     Storage::delete($model->profile->avatar);
                 }
                 $model->profile->avatar = $url ?? '';
             }
-            unset($model->avatar);
+            unset($model->avatar1);
         });
+
+     
 
         static::updating(function ($user) {
             // Check if coins increased
