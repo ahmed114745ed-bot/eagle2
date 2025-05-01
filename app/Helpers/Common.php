@@ -620,7 +620,6 @@ class Common
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
-
         $isGroup = false;
         $userData = [];
         $key = time();
@@ -686,7 +685,8 @@ class Common
         ];
 
 
-        
+        dd($api_access_key );
+
         $projectId = 'temopo-2cba7';
 
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
