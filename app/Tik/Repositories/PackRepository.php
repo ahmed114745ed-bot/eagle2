@@ -127,7 +127,7 @@ class PackRepository extends AbstractRepository
 
     public function updateIsUsedByPackId($userId, $packId)
     {
-        $this->model->query()->where(['user_id' => $userId, 'id' => $packId])->update(['is_used' => 1, 'use_num' => 1]);
+        $this->model->query()->where(['user_id' => $userId, 'id' => $packId])->update(['is_used' => 1, 'use_num' => 1, 'using'=> 1]);
         return true;
     }
 
