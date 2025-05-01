@@ -6,7 +6,10 @@ use App\Http\Services\NowPaymentsService;
 use App\Models\NowpaymentOrder;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
+
 use Log;
+
+use Illuminate\Support\Facades\Auth;
 
 class NowPaymentsController extends Controller
 {
@@ -17,6 +20,12 @@ class NowPaymentsController extends Controller
         $this->nowPayments = $nowPayments;
     }
 
+    public function rechargeForm()
+    {
+        $data = $this->nowPayments->getCurrencies();
+
+        return view('payments.now_payments.index', ['currencies' => $data['currencies']]);
+    }
     public function createPayment(Request $request)
     {
         $data = [
@@ -31,14 +40,37 @@ class NowPaymentsController extends Controller
 
         $payment = $this->nowPayments->createPayment($data);
 
-        return view('admin.views.payments.now_payments.view',compact('payment')); // Redirect user to payment page
+        if (isset($payment['payment_id'])) {
+            NowpaymentOrder::create([
+                'payment_id' => $payment['payment_id'],
+                'pay_address' => $payment['pay_address'],
+                'payment_status' => $payment['payment_status'],
+                'pay_currency' => $payment['pay_currency'],
+                'pay_amount' => $payment['pay_amount'],
+                'amount_received' => $payment['amount_received'],
+                'price_amount' => $payment['price_amount'],
+                'price_currency' => $payment['price_currency'],
+                'order_id' => $payment['order_id'],
+                'user_id' => Auth::id() ?? 1,
+
+            ]);
+        }
+        return view('payments.now_payments.view',compact('payment')); // Redirect user to payment page
     }
 
     public function getCurrencies(){
-        $data = $this->nowPayments->getCurrencies();
 
+        $response = $this->nowPayments->getCurrencies();
+
+        $currencies = collect($response['currencies'] ?? [])->map(function ($currency) {
+            return [
+                'currency'    => strtoupper($currency['currency']),
+                'min_amount'  => $currency['min_amount'],
+                'max_amount'  => $currency['max_amount'],
+            ];
+        })->sortBy('currency')->values();
         return response()->json([
-            'data' => $data
+            'data' => $currencies
         ]);
     }
 
@@ -59,11 +91,12 @@ class NowPaymentsController extends Controller
         Log::info($status);
 
         // Update your database or trigger actions based on payment status
-        if($status['data']['payment_status'] == 'paid'){
+        if($status['payment_status'] == 'paid'){
             NowpaymentOrder::where('payment_id', $paymentId)->update([
                 'payment_status' => 'paid'
             ]);
         }
+        Log::info('callback end now payments');
         // Example: Mark order as paid
 
         return response()->json(['status' => 'success']);
