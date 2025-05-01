@@ -161,7 +161,7 @@ class CustomNotification
         $data['user_id'] = $agency->app_owner_id;
         $icon = $data['image'];
 
-      dd(  Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'agency-join-request'));
+        Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, icon: $icon, data: $data, messageType: 'agency-join-request');
         Common::sendOfficialMessage($agency->app_owner_id, title: $body_en, content: $agency->name, titleAr: $body_ar);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
