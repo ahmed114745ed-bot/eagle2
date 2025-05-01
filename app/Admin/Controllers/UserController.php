@@ -229,16 +229,16 @@ class UserController extends MainController
         $grid->column('name', __('Name'));
 
         $grid->column('return', __('status user'))->display(function () {
-                $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-                return (new \App\Admin\Actions\UserAction(
-                    $this->id,
-                    $this->charge_status,
-                    $this->transfer_salary,
-                    $userSetting->show_invite_code ?? 0,  // Extra fallback
-                    $userSetting->hide_chat ?? 0,        // Extra fallback
-                    $this->can_play
-                ))->render();
-            });
+            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+            return (new \App\Admin\Actions\UserAction(
+                $this->id,
+                $this->charge_status,
+                $this->transfer_salary,
+                $userSetting->show_invite_code ?? 0,  // Extra fallback
+                $userSetting->hide_chat ?? 0,        // Extra fallback
+                $this->can_play
+            ))->render();
+        });
 
 
         $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
@@ -289,7 +289,7 @@ class UserController extends MainController
 
             $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
                 $data = json_decode($target->extras, true);
-    
+
                 $moment_upload = $data['moment']['upload'] ?? '';
                 $moment_likes = $data['moment']['likes'] ?? '';
                 $moment_comments = $data['moment']['comments'] ?? '';
@@ -822,7 +822,7 @@ class UserController extends MainController
         if ($loggedInUserId == 1 || $loggedInUserId == 2) {
             if ($form->isEditing()) {
                 $form->number('di', __('Coins'))->default(0)
-                ->disable($form->isEditing());
+                    ->disable($form->isEditing());
             } else {
                 $form->number('di', __('Coins'))->default(0);
             }
@@ -858,8 +858,23 @@ class UserController extends MainController
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
+            //  dd($form->model()->profile->avatar);
             $model     = $form->model();
             $user_id   = $model->id;
+            $user = User::find($user_id);
+            $originalProfile = $user->profile;
+            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
+
+            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+                $newCount = $user->profile_count + 1;
+                $user->profile_count = $newCount;
+                $user->save();
+
+                // Upload and update avatar
+                $form->model()->profile->avatar =  Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+                // dd($newImagePath);
+
+            }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }
