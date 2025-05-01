@@ -131,8 +131,28 @@ class AdminPermission extends Seeder
             'vip-privilege',
             'family',
             'family-level',
-            'user-status'
-            
+            'user-status',
+            'salary-history',
+            'agency-join-requests',
+            'request-agency-history',
+            'target',
+            'update_setting_button',
+            'rooms',
+            'categories',
+            'room-background',
+            'emoji',
+            'event-period',
+            'gift-target-event',
+            'report-real',
+            'delete-account-details',
+            'questions',
+            'country',
+            'page',
+            'payment-coin',
+            'coins',
+            'gold-coins',
+            'config',
+            'level-user-history'
             
 
 
@@ -149,7 +169,7 @@ class AdminPermission extends Seeder
 
         $categories = [
 
-            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles','weekly_cp'],
+            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles','weekly_cp','event-period','gift-target-event'],
             'special_id' => ['special-history', 'special-Ware', 'special-frame', 'special-id-request'],
             'daily-prize' => ['daily-prize'],
             'roles' => ['roles', 'Permissions',],
@@ -162,15 +182,15 @@ class AdminPermission extends Seeder
             'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate','achievement_dedicate'],
             'version' => ['version'],
             'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting','agency-settings'],
+            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting','agency-settings','agency-join-requests','request-agency-history','appear-charger-agency'],
             'agent' => ['agent-user', 'agent-request', 'agent-target','user-agent-target','charges-agency','agent-home'],
             'payment-gat-way' => ['payment-gat-way',],
             'box' => ['boxes', 'box-use',],
             'exchange' => ['exchange'],
-            'rooms' => ['room-vip', 'room-target',],
+            'rooms' => ['room-vip', 'room-target','rooms','categories','room-background'],
             'image-color' => ['image-color'],
-            'sailer' => ['sailer'],
-            'real' => ['Real',],
+            'sailer' => ['sailer','salary-history'],
+            'real' => ['Real','report-real'],
             'user-parent' => ['user-parent',],
             'level-interval' => ['level-interval'],
             'all-statistic' => ['all-statistic'],
@@ -191,11 +211,21 @@ class AdminPermission extends Seeder
             'agora-zego' => ['agora-zego'],
             'users-family' => ['users-family'],
             'updates_family-config' => ['updates_family-config'],
-            'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting'],
+            'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting','update_setting_button'],
              'charge' => ['charge'],
              'ticket' => ['ticket'],
              'products' => ['wares','gift'],
              'family' => ['family','family-level'],
+             'target' => ['target'],
+             'emoji'=> ['emoji'],
+             'delete-account-details'=>['delete-account-details'],
+             'questions' =>['questions'],
+             'country' => ['country'],
+             'page' => ['page'],
+             'coin' => ['payment-coin','coins'],
+             'gold-coins'=> ['gold-coins'],
+             'config' => ['config'],
+             'level-user-history' => ['level-user-history']
 
         ];
 

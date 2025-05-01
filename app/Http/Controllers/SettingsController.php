@@ -17,11 +17,13 @@ use App\Models\NotificationTranslation;
 use App\Models\PaymentCoin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 class SettingsController extends Controller
 {
-
-    public function downloadApp(){
+    public $permission_name = 'settings';
+    public function downloadApp($id){
 
         $url = env('DOWNLOAD_URL');
         return view('downloadApp', compact('url'));
@@ -80,6 +82,10 @@ class SettingsController extends Controller
 
     public function update(Request $request)
     {
+
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         $data = $request->except('_token','zones_coins','super_admin_coins');
 
 

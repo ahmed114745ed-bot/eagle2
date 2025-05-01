@@ -206,7 +206,7 @@
     <div class="main-content">
         <div class="container">
             <div class="avatar">
-                <img src="{{ getImagePath(@$agency->img) }}" alt="Agency Logo">
+                <img src="{{ $agency->display_image }}" alt="Agency Logo">
             </div>
             <h2>{{ @$agency?->name ?? ''}}</h2>
             <div class="details">

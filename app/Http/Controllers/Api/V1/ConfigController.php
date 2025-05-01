@@ -25,6 +25,7 @@ class ConfigController extends Controller
 
     protected $configService;
     public $permission_name = 'agency-settings';
+    public $permission_config_name = 'update_setting_button';
 
     public function __construct(ConfigService $configService)
     {
@@ -108,6 +109,10 @@ class ConfigController extends Controller
 
     public function updateConfigChatGroup(Request $request)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_config_name);
+        }
+
         $config = Config::find($request->id);
         $config->value = $request->value;
         $config->save();

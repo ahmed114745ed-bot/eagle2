@@ -750,8 +750,11 @@
     "Banner": "बैनर",
     "Splash": "स्प्लैश",
     "Advertising Space": "विज्ञापन स्थान",
+    "search for agency or host by UUID": "UUID द्वारा एजेंसी या होस्ट खोजें",
     "Products": "उत्पाद",
     "Levels": "स्तर",
+    "agency name": "एजेंसी का नाम",
+    "agency whatsApp number": "एजेंसी व्हाट्सएप नंबर",
     "Level Gifts": "स्तर उपहार",
     "All Boxes": "सभी बॉक्स",
     "Room Settings": "कक्ष सेटिंग्स",
@@ -1207,7 +1210,11 @@
         "Unpin": "पिन हटाना",
         "Pin Status": "पिन स्थिति",
         "diamonds target":"हीरे लक्ष्य",
-        "profile_frame_type":"Profile Frame Type"
+        "profile_frame_type":"Profile Frame Type",
+        "Old Total Sender Level": "पुराना कुल प्रेषक स्तर",
+    "New Total Sender Level": "नया कुल प्रेषक स्तर",
+    "Old Total Received Level": "पुराना कुल प्राप्तकर्ता स्तर",
+    "New Total Received Level": "नया कुल प्राप्तकर्ता स्तर"
 
 
 

@@ -12,7 +12,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\ChargeTargetEvent;
 
-class TargetEventController extends MainOldController
+class TargetEventController extends MainController
 {
     /**
      * Title for current resource.
@@ -27,9 +27,9 @@ class TargetEventController extends MainOldController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Charging Events'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -41,9 +41,9 @@ class TargetEventController extends MainOldController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('Charging Events'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -55,16 +55,16 @@ class TargetEventController extends MainOldController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('Charging Events'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('Charging Events'))
-            ->body($this->form());
+            ->body($this->form()));
     }
     protected function grid()
     {

@@ -85,8 +85,18 @@ class AgencyController extends MainController
                 'owner' => function ($query) {
                     $query->select('id', 'name', 'uuid');
                 }
-            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins')
+            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
+
+            $path = @$agency->img;
+            $defaultImage = asset("images/icon-agency.jpg");
+            $imageUrl = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($imageUrl)) {
+                $imageUrl = $defaultImage;
+            }
+
+            $agency->display_image = $imageUrl;
 
             $members = $agency->mempers()
                 ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
@@ -267,133 +277,7 @@ class AgencyController extends MainController
                 </div>
             ";
         });
-        $grid->column('members', __('members'))->expand(function ($model) {
-            $mempers = $model->mempers()
-                ->orderBy('monthly_diamond_received', 'desc')
-                ->with(['userSallary' => function ($query) {
-                    $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
-                }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar');
-                }, 'reals.likes', 'reals.comments', 'moments.likes', 'moments.comments'])
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
-                ->map(function ($memper) {
-                    // Handle image path with fallback to default
-                    $path = @$memper->profile?->avatar;
-                    $defaultImage = asset("images/businessman-icon.jpg");
-                    $url = getImagePath($path) ?? $defaultImage;
 
-                    // Check if the image exists
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
-
-                    // Generate the image HTML with specified dimensions
-                    $image = handleShowImageWithTypes($memper->id, $url, 40, 40);
-
-                    // Link to member's profile (adjust the URL as per your routing)
-                    $showUrl = $memper ? url("admin/users/{$memper->id}") : 0;
-
-                    // Create the display HTML for name and UUID with styling similar to the owner column
-                    $nameDisplay = "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>{$memper->name}</span>
-                        </a>
-                        <span style='font-size: smaller;'>UUID: {$memper->uuid}</span>
-                    </div>
-                </div>
-            ";
-
-                    $salary = $memper->userSallary->sallary ?? 0;
-
-                    $reelsLikes = $memper->reals->sum(function ($real) {
-                        return $real->likes->count();
-                    });
-
-                    $reelsComments = $memper->reals->sum(function ($real) {
-                        return $real->comments->count();
-                    });
-
-                    $momentsLikes = $memper->moments->sum(function ($real) {
-                        return $real->likes->count();
-                    });
-
-                    $momentsComments = $memper->moments->sum(function ($real) {
-                        return $real->comments->count();
-                    });
-
-                    // Creating a split display for reals and moments similar to the image
-                    $realsCount = $memper->reals()->count() ?? 0;
-                    $momentsCount = $memper->moments()->count() ?? 0;
-
-                    $uploadsDisplay = "
-                        <div style='display: flex; width: 100%;'>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('reals')."</div>
-                                <div style='margin-top: 5px;'>{$realsCount}</div>
-                            </div>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('moments')."</div>
-                                <div style='margin-top: 5px;'>{$momentsCount}</div>
-                            </div>
-                        </div>
-                    ";
-
-                    $likesDisplay = "
-                        <div style='display: flex; width: 100%;'>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('reals')."</div>
-                                <div style='margin-top: 5px;'>{$reelsLikes}</div>
-                            </div>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('moments')."</div>
-                                <div style='margin-top: 5px;'>{$momentsLikes}</div>
-                            </div>
-                        </div>
-                    ";
-
-                    $commentsDisplay = "
-                        <div style='display: flex; width: 100%;'>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('reals')."</div>
-                                <div style='margin-top: 5px;'>{$reelsComments}</div>
-                            </div>
-                            <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('moments')."</div>
-                                <div style='margin-top: 5px;'>{$momentsComments}</div>
-                            </div>
-                        </div>
-                    ";
-
-                    return [
-                        'name' => $nameDisplay,
-                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
-                        'salary' => $salary ?? 0,
-                        'uploads' => $uploadsDisplay,
-                        'likes' => $likesDisplay,
-                        'comments' => $commentsDisplay,
-                        'total_days' => $memper->total_days ?? 0,
-                        'total_hours' => $memper->liveTime->sum("hours") ?? 0,
-                    ];
-                });
-
-            // Using the mapped data to create a new table
-            return new TableWidget(
-                [
-                    __('name'),
-                    __('Monthly DI'),
-                    __('salary'),
-                    __('uploads'),
-                    __('like'),
-                    __('comment'),
-                    __('total_days'),
-                    __('total_hours'),
-                ],
-                $mempers->toArray() // Convert the collection to an array for the table
-            );
-        });
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action
@@ -403,27 +287,91 @@ class AgencyController extends MainController
         });
         $grid->disableExport();
 
+        $this->extendGrid($grid);
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
-            // Define date filters
-            $filter->where(function ($query) {
-                $date = UserCommon::arabicToEnglishNumbers($this->input);
-                $query->whereDate('created_at', '>=', $date);
-            }, __('from_date'), 'from_date')->date();
+            $filter->disableIdFilter();
 
             $filter->where(function ($query) {
-                $date = UserCommon::arabicToEnglishNumbers($this->input);
-                $query->whereDate('created_at', '<=', $date);
-            }, __('to_date'), 'to_date')->date();
+                $query->whereHas('owner', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, 'UUID')->placeholder('search for agency or host by UUID');
         });
 
-        if (!request()->has('from_date') && !request()->has('to_date')) {
-            $grid->model()->whereDate('created_at', '>=', now()->startOfMonth())
-                ->whereDate('created_at', '<=', now()->endOfMonth());
+        Admin::style("
+    .box-footer {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .pagination-info {
+        margin: 5px 0;
+        white-space: nowrap;
+        text-align: right;
+        width: auto;
+        order: 2;
+    }
+
+    .box-footer .pull-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+        order: 1;
+    }
+
+    .box-footer .pull-right .dropdown {
+        margin-left: 5px;
+    }
+
+    .pagination > li > a,
+    .pagination > li > span {
+        min-width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    .pagination {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+    @media (max-width: 576px) {
+        .box-footer {
+            flex-direction: column;
+            align-items: center;
         }
 
-        $this->extendGrid($grid);
+        .pagination-info,
+        .box-footer .pull-right {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .pagination-info {
+            order: 1;
+            margin-bottom: 10px;
+        }
+
+        .box-footer .pull-right {
+            order: 2;
+        }
+    }
+");
 
         return $grid;
     }
@@ -502,18 +450,14 @@ class AgencyController extends MainController
                 })->ajax('/api/search/users3', 'id', 'name');
 
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(12)->url('url', __('url'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                 $row->width(12)->image('img', __('img'))->rules('required');
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         } else {
@@ -531,17 +475,14 @@ class AgencyController extends MainController
                 //     $row->hidden('agency_manger_id', __('app manger id'));
                 // }
 
-                $row->width(12)->text('name', __('name'))->rules('required');
-                $row->width(12)->text('notice', __('notice'))->rules('required');
+                $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
-                $row->width(12)->url('url', __('url'));
-                $row->width(12)->textarea('contents', __('contents'));
-                $row->width(12)->switch('Host_agency', trans('Host agency'))->default(true);
-                $row->image('img', __('img'))->rules('required');
+                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+
+                $row->width(12)->hidden('Host_agency')->default(1);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', trans('Shipping agency'))->default(false);
+                    $row->width(12)->hidden('Shipping_agency')->default(0);
                 }
             });
         }

@@ -502,8 +502,11 @@
     "from uid": "معرف مستخدم المرسل",
     "get_type": "النوع الاساسي",
     "color": "اللون",
-    "app owner id": "معرف المالك",
+    "app owner id": "معرف مالك الوكالة في التطبيق",
     "purchase": "مدفوع",
+    "agency name": "اسم الوكالة",
+    "agency whatsApp number": "رقم واتساب الوكالة",
+    "search for agency or host by UUID": "ابحث عن وكالة أو مضيق بواسطة المعرف المميز للمستخدم",
     "expire(in days)": "مدة الانتهاء بالايام",
     "num": "العدد",
     "Gemstone": "الجوهرة",
@@ -2136,7 +2139,11 @@
 "diamonds target":"الالماس المحقق",
 "event period":"فترة الحدث",
  "withdrawn": "تم السحب",
-  "remaining": "المتبقي"
+  "remaining": "المتبقي",
+  "Old Total Sender Level": "مستوى المرسل الإجمالي القديم",
+    "New Total Sender Level": "مستوى المرسل الإجمالي الجديد",
+    "Old Total Received Level": "مستوى المستلم الإجمالي القديم",
+    "New Total Received Level": "مستوى المستلم الإجمالي الجديد"
 
 
 

@@ -9,6 +9,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Services\AppFeatureService;
+use Encore\Admin\Layout\Content;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use Encore\Admin\Controllers\AdminController;
@@ -21,11 +22,15 @@ class RequestAgencyFilterationController extends AdminController
     {
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
+    public $permission_name = 'request-agency-history';
+
+
+    public function index(Content $content)
+    {
+        return parent::index($content
+            ->title(trans('Agency'))
+            ->body($this->grid()));
+    }
     protected $title = 'Agency';
 
     /**

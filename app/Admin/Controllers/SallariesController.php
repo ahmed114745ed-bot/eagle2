@@ -59,7 +59,6 @@ class SallariesController extends MainController
                 $filter->equal('uuid', __('uuid'));
             });
         });
-        $grid->column('id', __('id'));
 
         $grid->column('name', __('name'))->display(function ($name) {
             $uid = @$this->uuid;
@@ -89,17 +88,17 @@ class SallariesController extends MainController
         $grid->column('total', __('salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         })->default(0);
-        $grid->column('cashing', __('cashing'))->display(function () {
-            return (new SalariesAction($this->id, 'user'))->render();
-        });
-        $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
-        });
+//        $grid->column('cashing', __('cashing'))->display(function () {
+//            return (new SalariesAction($this->id, 'user'))->render();
+//        });
+//        $grid->column('pay', __('pay'))->display(function () {
+//            return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
+//        });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
@@ -161,7 +160,7 @@ class SallariesController extends MainController
         $grid->column('total', __('salary'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

@@ -1,8 +1,4 @@
 
-      
- 
-
-@section('content')
 <style>
     body {
         font-family: 'Cairo', sans-serif;
@@ -39,7 +35,7 @@
         padding: 12px;
         border: 1px solid #ccc;
         border-radius: 8px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         transition: border-color 0.3s;
         font-size: 16px;
     }
@@ -69,27 +65,84 @@
     option {
         font-size: 15px;
     }
+
+    #min-amount-info {
+        color: #888;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
 </style>
 
 <div class="container">
     <h2>إجراء الدفع</h2>
 
-    <form action="{{ route('now_payment_create') }}" method="POST">
-        @csrf
+<form action="{{ route('now_payment_create') }}" method="POST">
+    @csrf
 
-        <label for="amount">المبلغ (بالدولار الأمريكي)</label>
-        <input type="number" name="amount" id="amount" required min="1" step="0.01">
+    <label for="currency">اختر العملة الرقمية</label>
+    <select name="currency" id="currency" required>
+        <option value="">-- اختر عملة --</option>
+        @foreach($currencies as $currency)
+            <option 
+                value="{{ $currency['currency'] }}" 
+                data-min="{{ $currency['min_amount'] }}" 
+                data-max="{{ $currency['max_amount'] }}">
+                {{ strtoupper($currency['currency']) }}
+            </option>
+        @endforeach
+    </select>
 
-        <label for="currency">اختر العملة الرقمية</label>
-        <select name="currency" id="currency" required>
-            <option value="">-- اختر عملة --</option>
-            @foreach($currencies as $currency)
-                <option value="{{ $currency['currency'] }}">
-                    {{ strtoupper($currency['currency']) }} (Min: {{ $currency['min_amount'] }}, Max: {{ $currency['max_amount'] }})
-                </option>
-            @endforeach
-        </select>
+    <label for="amount">المبلغ (بالدولار الأمريكي)</label>
+    <input type="number" name="amount" id="amount" required min="1" step="0.01">
 
-        <button type="submit">إنشاء الدفع</button>
-    </form>
-</div>
+    <small id="min-amount-info" style="color: #555; display: block; margin-top: 5px;"></small>
+
+    <br>
+
+    <button style="margin-top: 36px;" type="submit">إنشاء الدفع</button>
+</form>
+
+<script>
+ 
+    const currencySelect = document.getElementById('currency');
+    const minAmountInfo = document.getElementById('min-amount-info');
+    const amountInput = document.getElementById('amount');
+
+    function getDecimalPlaces(number) {
+        const str = number.toString();
+        if (str.includes('.')) {
+            return str.split('.')[1].length;
+        }
+        return 0;
+    }
+
+    currencySelect.addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        const minAmount = parseFloat(selectedOption.getAttribute('data-min'));
+        const maxAmount = parseFloat(selectedOption.getAttribute('data-max'));
+
+        if (!isNaN(minAmount) && !isNaN(maxAmount)) {
+            amountInput.min = minAmount;
+            amountInput.max = maxAmount;
+
+            // تحديد step بناءً على عدد الأرقام العشرية في الحد الأدنى
+            const decimals = Math.max(
+                getDecimalPlaces(minAmount),
+                getDecimalPlaces(maxAmount)
+            );
+            amountInput.step = (1 / Math.pow(10, decimals)).toFixed(decimals);
+
+            minAmountInfo.textContent = `يمكنك الدفع بين ${minAmount} و ${maxAmount} دولار أمريكي.`;
+
+            // تعديل القيمة لتكون ضمن النطاق
+            if (!amountInput.value || parseFloat(amountInput.value) < minAmount || parseFloat(amountInput.value) > maxAmount) {
+                amountInput.value = minAmount;
+            }
+        } else {
+            amountInput.min = 1;
+            amountInput.removeAttribute('max');
+            amountInput.step = "0.01";
+            minAmountInfo.textContent = '';
+        }
+    });
+</script>

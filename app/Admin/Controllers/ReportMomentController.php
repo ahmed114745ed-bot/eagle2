@@ -26,9 +26,9 @@ class ReportMomentController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('report-moments'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**

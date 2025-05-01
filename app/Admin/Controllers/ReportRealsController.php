@@ -22,6 +22,7 @@ class ReportRealsController extends AdminController
      * @var string
      */
     protected $title = 'ReportReals';
+    public $permission_name = 'report-real';
 
     /**
      * Make a grid builder.
@@ -31,9 +32,9 @@ class ReportRealsController extends AdminController
 
      public function index(Content $content)
      {
-        return $content
+        return parent::index($content
         ->title(trans('Report Reel'))
-        ->body($this->grid());
+        ->body($this->grid()));
      }
 
 
