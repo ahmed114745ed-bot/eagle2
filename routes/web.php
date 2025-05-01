@@ -181,7 +181,7 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::get('download-app', [SettingsController::class, 'downloadApp']);
+        Route::get('download-app/{id}', [SettingsController::class, 'downloadApp']);
 
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
         Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');

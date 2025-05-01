@@ -1997,36 +1997,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                    // Updated selector to match your new class
-                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                    const fieldsContainers = {
-                                                                                                        '0': document.getElementById('agora-fields'),
-                                                                                                        '1': document.getElementById('zego-fields'),
-                                                                                                        '2': document.getElementById('pusher-fields')
-                                                                                                    };
+                    // Updated selector to match your new class
+                    const radioButtons = document.querySelectorAll('.radio-input');
+                    const fieldsContainers = {
+                        '0': document.getElementById('agora-fields'),
+                        '1': document.getElementById('zego-fields'),
+                        '2': document.getElementById('pusher-fields')
+                    };
 
-                                                                                                    function toggleFields() {
-                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                    function toggleFields() {
+                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                        // Hide all fields first
-                                                                                                        Object.values(fieldsContainers).forEach(container => {
-                                                                                                            container.style.display = 'none';
-                                                                                                        });
+                        // Hide all fields first
+                        Object.values(fieldsContainers).forEach(container => {
+                            container.style.display = 'none';
+                        });
 
-                                                                                                        // Show the selected one
-                                                                                                        if (fieldsContainers[selectedValue]) {
-                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                        }
-                                                                                                    }
+                        // Show the selected one
+                        if (fieldsContainers[selectedValue]) {
+                            fieldsContainers[selectedValue].style.display = 'flex';
+                        }
+                    }
 
-                                                                                                    // Add event listeners to radio buttons
-                                                                                                    radioButtons.forEach(radio => {
-                                                                                                        radio.addEventListener('change', toggleFields);
-                                                                                                    });
+                    // Add event listeners to radio buttons
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', toggleFields);
+                    });
 
-                                                                                                    // Initialize the fields visibility
-                                                                                                    toggleFields();
-                                                                                                });*/
+                    // Initialize the fields visibility
+                    toggleFields();
+                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
@@ -2036,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
+                            document.getElementById('app_primary_color').value = "#aee6cf";
+                            document.getElementById('app_second_color').value = "#eff7f5";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";
