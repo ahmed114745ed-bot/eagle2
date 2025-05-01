@@ -8,7 +8,7 @@
     }
 @endphp
 
-<div class="settings-sidebar" style="margin-bottom: 24px;">
+<div class="settings-sidebar" style="margin-bottom: 24px; margin-left: 400px;">
     <h2>{{ __('Agencies Menu') }}</h2>
     @if($agencyMenu)
         <ul class="sidebar-menu">
