@@ -1193,7 +1193,7 @@ class User extends Authenticatable
 
             $originalProfile = $model->profile;
             $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
-        dd( $newAvatar);
+       
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
                 $newCount = $model->profile_count + 1;
                 $model->profile_count = $newCount;
