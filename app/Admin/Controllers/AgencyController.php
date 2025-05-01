@@ -289,9 +289,19 @@ class AgencyController extends MainController
 
         $this->extendGrid($grid);
 
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->disableIdFilter();
+
+            $filter->where(function ($query) {
+                $query->whereHas('owner', function ($subQuery) {
+                    $subQuery->where('uuid', 'like', "%{$this->input}%");
+                });
+            }, 'UUID')->placeholder('search for agency or host by UUID');
+        });
 
         Admin::style("
-    /* Fix for pagination container */
     .box-footer {
         display: flex;
         flex-direction: row-reverse;
@@ -301,7 +311,6 @@ class AgencyController extends MainController
         padding: 10px;
     }
 
-    /* Fix for pagination text */
     .pagination-info {
         margin: 5px 0;
         white-space: nowrap;
@@ -310,7 +319,6 @@ class AgencyController extends MainController
         order: 2;
     }
 
-    /* Fix for pagination controls */
     .box-footer .pull-right {
         display: flex;
         align-items: center;
@@ -320,12 +328,10 @@ class AgencyController extends MainController
         order: 1;
     }
 
-    /* Fix dropdown positioning */
     .box-footer .pull-right .dropdown {
         margin-left: 5px;
     }
 
-    /* Ensure pagination buttons have consistent sizing */
     .pagination > li > a,
     .pagination > li > span {
         min-width: 35px;
@@ -336,14 +342,12 @@ class AgencyController extends MainController
         padding: 5px;
     }
 
-    /* Fix for RTL languages if needed */
     .pagination {
         margin: 0;
         padding: 0;
         display: flex;
     }
 
-    /* Mobile view adjustments */
     @media (max-width: 576px) {
         .box-footer {
             flex-direction: column;

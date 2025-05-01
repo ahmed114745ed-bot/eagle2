@@ -8,7 +8,7 @@
     }
 @endphp
 
-<div class="settings-sidebar" style="margin-bottom: 24px; margin-left: 400px;">
+<div class="settings-sidebar" style="margin-bottom: 24px;">
     <h2>{{ __('Agencies Menu') }}</h2>
     @if($agencyMenu)
         <ul class="sidebar-menu">
@@ -35,6 +35,14 @@
         min-height: 400px;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .rtl .settings-sidebar {
+        margin-left: 400px;
+    }
+
+    .ltr .settings-sidebar {
+        margin-right: 400px;
     }
 
     .settings-sidebar h2 {
