@@ -200,20 +200,25 @@ class AgencyController extends MainController
                     if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
+
                     return handleShowImageWithTypes($this->id, $url, 40, 40);
                 });
 
-                return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                <div style='display: flex; flex-direction: column;'>
+                $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
 
-                    <span>$name</span>
-                    <span>ID: {$this->id}</span>
-                </div>
-            </div>
-        ";
+                return "
+                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->id}</span>
+                            </div>
+                        </div>
+                    </a>
+                ";
             });
+
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
             $uid = @$this->owner->uuid;
@@ -254,17 +259,7 @@ class AgencyController extends MainController
               <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
         </div>";
         });
-        $grid->column('coins', __('coins'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
-            return "
-                <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
-                    <img src='{$icon}' alt='Coin' width='20' height='20'>
-
-                </div>
-            ";
-        });
-        $grid->column('salary', __('salary'))->display(function ($coin) {
+        $grid->column('salary', __('Agency wallet'))->display(function ($coin) {
             $icon = asset('images/dollar.jpg'); // تأكد من وجود الصورة في هذا المسار
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
@@ -273,12 +268,6 @@ class AgencyController extends MainController
 
                 </div>
             ";
-        });
-        $grid->column('target', trans('target'))->display(function () {
-            $target = $this->getTargetsAttribute(); // استخدم الشهر والسنة كمعاملات إذا لزم الأمر
-
-            return $target ? "<span class='label-success' " . 'style="width: 8px;height: 8px;padding: 0;border-radius: 50%;display: inline-block;"' .
-                "></span>" : "";
         });
         $grid->column('members', __('members'))->expand(function ($model) {
             $mempers = $model->mempers()
@@ -336,13 +325,6 @@ class AgencyController extends MainController
         $grid->disableExport();
 
         $this->extendGrid($grid);
-
-
-        $grid->column('agency profile', __('agency profile'))->display(function () {
-            $url = route('admin.agency.profile', ['id' => $this->id]);
-            $name = __('agency profile');
-            return "<a href='{$url}' class='btn btn-primary btn-sm'>{$name}</a>";
-        });
 
         return $grid;
     }

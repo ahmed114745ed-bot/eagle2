@@ -686,8 +686,10 @@ class Common
         ];
 
 
-        $projectName = app()->getLocale() == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
-        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/' . $projectName . '/messages:send', [
+        
+        $projectId = env('FIREBASE_PROJECT_NAME');
+
+        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
 
@@ -1345,8 +1347,8 @@ class Common
     public static function searchAgency($id)
     {
         $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true) 
-            ->whereHas('chargeAgency' )
+            // ->where('Shipping_agency', true) 
+            // ->whereHas('chargeAgency' )
             ->first();
     
         return $agency ?: false; 
