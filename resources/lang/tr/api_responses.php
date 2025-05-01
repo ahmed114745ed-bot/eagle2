@@ -145,6 +145,7 @@ return [
     'notSend'                                                    => 'Kendinize gönderemezsiniz',
     'notFound'                                                   => 'Kullanıcı bulunamadı',
     'ownerNotFound' => 'Sahip bulunamadı',
+    'shippingAgency' => 'Bu kargo ajansına katılamazsınız',
 
 
 ];
