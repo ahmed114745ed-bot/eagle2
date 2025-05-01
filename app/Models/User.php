@@ -1191,15 +1191,32 @@ class User extends Authenticatable
                 }
             }
 
-    });
+            $originalProfile = $model->profile;
+            $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
+       
+            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+                $newCount = $model->profile_count + 1;
+                $model->profile_count = $newCount;
+        
+                // Upload and update avatar
+                $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+                $originalProfile->avatar = $newImagePath;
+                $originalProfile->save();
+            }
+        });
 
         static::updating(function ($user) {
-            $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
+            // Check if coins increased
+            $originalCoins = $user->getOriginal('di');
             $newCoins = $user->di;
-
+        
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
+        
+            // Handle profile.avatar update
+            
         });
+        
     }
 }
