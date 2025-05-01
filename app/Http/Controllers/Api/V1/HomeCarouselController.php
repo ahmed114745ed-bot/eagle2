@@ -12,7 +12,7 @@ class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
-        $items = HomeCarousel::query()ك
+        $items = HomeCarousel::query();
         
         $user =Auth::user();
         if ($request->has('notification_id')) {  // تحقق من وجود notification_id في الطلب
