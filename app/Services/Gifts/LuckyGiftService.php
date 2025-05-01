@@ -300,7 +300,7 @@ class LuckyGiftService
 
             [$commentMessage, $sendMessage] =
                 $this->getSendMessage($giftPrice, $message ?? null, $receiverName, $number, isToRoom: $isToRoom);
-            // UPDATE user win 
+            // UPDATE user win
             (new LuckyStrategyService())->getUpdateUserStatistic($user, $totalGiftPrice, (int)($totalGiftPrice * $cashback_percentage));
             $responseData['combo'][] = [
                 'status'        => 0,
@@ -429,7 +429,7 @@ class LuckyGiftService
         ->whereIn('name', ['app_wallet', 'owner_wallet'])
         ->get();
 
-        $wallets = $collection->sortBy('id')->values(); 
+        $wallets = $collection->sortBy('id')->values();
 
         $ownerWallet = $wallets->firstWhere('name', 'owner_wallet') ?? null;
         $appWallet = $wallets->firstWhere('name', 'app_wallet') ?? null;
@@ -567,7 +567,7 @@ class LuckyGiftService
         // \DB::table('core_wallets')->setBindings([$diffOwnerWallet, $diffAppWallet])->whereIn('id', [1, 2])->update([
         //     'coins' => \DB::raw('CASE WHEN id = 2 THEN coins + ? WHEN id = 1 THEN coins + ? END'),
         // ]);
-        
+
         $sql = '
         UPDATE core_wallets
         SET coins = CASE
@@ -581,7 +581,7 @@ class LuckyGiftService
                 'owner_wallet' => $diffOwnerWallet,
                 'app_wallet' => $diffAppWallet,
             ]);
-       
+
     }
 
     /**
