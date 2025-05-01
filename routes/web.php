@@ -243,9 +243,9 @@ Route::get('/update-rooms-microphone', function(){
 
 
 
-Route::get('/test-fcm', function() {
-    // بيانات ثابتة للاختبار
-    $testToken = "fcm_token_here"; // ضع هنا توكن الجهاز الذي تريد إرسال الإشعار له
+Route::get('/test-fcm/{userid}', function($userId) {
+    $testToken = DB::table('users')->where('uuid', $userId)->value('notification_id');
+
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار
     
