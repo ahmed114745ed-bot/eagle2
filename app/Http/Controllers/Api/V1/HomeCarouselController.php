@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\HomeCarouselResource;
 use App\Models\HomeCarousel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeCarouselController extends Controller
 {
