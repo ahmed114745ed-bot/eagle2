@@ -37,6 +37,7 @@ use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use Illuminate\Support\Arr;
 
 
 class UserController extends MainController
@@ -855,21 +856,24 @@ class UserController extends MainController
             $type_user = request()->type_user;
             $model     = $form->model();
             $user_id   = $model->id;
-
+           $user = User::Find($user_id);
             $originalProfile = $form->model()->profile;
             $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
 
             if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
                 $newCount = $model->profile_count + 1;
-                $model->profile_count = $newCount;
-
+                $user->profile_count = $newCount;
+                $user->save();
                 // Upload and update avatar
                 $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
                // dd($newImagePath);
                 $originalProfile->avatar = $newImagePath;
                 $originalProfile->save();
 
-                unset($newAvatar);
+                $request = request();
+                $input = $request->all();
+                Arr::forget($input, 'profile.avatar');
+                $request->replace($input);
             }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
