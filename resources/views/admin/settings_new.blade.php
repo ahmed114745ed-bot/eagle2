@@ -1744,7 +1744,7 @@
                             $('#background_image_preview').show();
                             $('#background_color_group').hide();
                             $('#gradient_group').hide();
-                        } 
+                        }
                     }
                 }
             </script>
@@ -2054,11 +2054,11 @@
                     if (resetButton) {
                         resetButton.addEventListener('click', function() {
                             let colorInputs = {
-                                'primary_color': "#FF9428",
-                                'secondary_color': "#1A1A1A",
+                                'primary_color': "#00FFCC",
+                                'secondary_color': "#FFFFFF",
                                 'text_primary_color': "#fdf8f8",
-                                'text_secondary_color': "#c1b9b9",
-                                'box_background_color': "#222222",
+                                'text_secondary_color': "#000000",
+                                'box_background_color': "#969696",
                                 'table_background_color': "#c88213"
                             };
 
