@@ -876,6 +876,7 @@ class UserController extends MainController
             if ($form->oldDiamoundValue != $oldDiamoundValue) {
                 $form->user_diamond = $oldDiamoundValue;
             }
+            unset($newAvatar);
 
             $agancy = Agency::where('app_owner_id', $user_id)->first();
             if ($agancy) {
@@ -886,7 +887,7 @@ class UserController extends MainController
                     return redirect()->back();
                 }
 
-
+                
                 switch ($type_user) {
 
 
