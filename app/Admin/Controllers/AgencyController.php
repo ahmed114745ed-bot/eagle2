@@ -277,21 +277,6 @@ class AgencyController extends MainController
         });
         $grid->disableExport();
 
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-
-            // Define date filters
-            $filter->where(function ($query) {
-                $date = UserCommon::arabicToEnglishNumbers($this->input);
-                $query->whereDate('created_at', '>=', $date);
-            }, __('from_date'), 'from_date')->date();
-
-            $filter->where(function ($query) {
-                $date = UserCommon::arabicToEnglishNumbers($this->input);
-                $query->whereDate('created_at', '<=', $date);
-            }, __('to_date'), 'to_date')->date();
-        });
-
         $this->extendGrid($grid);
 
         return $grid;
