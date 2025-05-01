@@ -258,6 +258,7 @@ class AppearChargerAgencyController extends MainController
                 });
             </script>');
         }
+        $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
