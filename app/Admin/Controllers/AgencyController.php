@@ -331,11 +331,11 @@ class AgencyController extends MainController
                     $uploadsDisplay = "
                         <div style='display: flex; width: 100%;'>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='font-weight: bold;'>".__('reals')."</div>
                                 <div style='margin-top: 5px;'>{$realsCount}</div>
                             </div>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='font-weight: bold;'>".__('moments')."</div>
                                 <div style='margin-top: 5px;'>{$momentsCount}</div>
                             </div>
                         </div>
@@ -344,11 +344,11 @@ class AgencyController extends MainController
                     $likesDisplay = "
                         <div style='display: flex; width: 100%;'>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='font-weight: bold;'>".__('reals')."</div>
                                 <div style='margin-top: 5px;'>{$reelsLikes}</div>
                             </div>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='font-weight: bold;'>".__('moments')."</div>
                                 <div style='margin-top: 5px;'>{$momentsLikes}</div>
                             </div>
                         </div>
@@ -357,11 +357,11 @@ class AgencyController extends MainController
                     $commentsDisplay = "
                         <div style='display: flex; width: 100%;'>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Reals')."</div>
+                                <div style='font-weight: bold;'>".__('reals')."</div>
                                 <div style='margin-top: 5px;'>{$reelsComments}</div>
                             </div>
                             <div style='flex: 1; padding: 5px; text-align: center;'>
-                                <div style='font-weight: bold;'>".__('Moments')."</div>
+                                <div style='font-weight: bold;'>".__('moments')."</div>
                                 <div style='margin-top: 5px;'>{$momentsComments}</div>
                             </div>
                         </div>
