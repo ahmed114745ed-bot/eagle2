@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -275,46 +276,76 @@ class AgencyController extends MainController
                 ->with(['userSallary' => function ($query) {
                     $query->select('id', 'user_id', 'sallary')->where('month', now()->month)->where('year', now()->year);
                 }, 'profile' => function ($query) {
-                    $query->select('id', 'user_id', 'avatar'); // assuming 'avatar' is the column name for the image in 'profile'
-                }])
-                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received',]) // selecting specific fields from `mempers`
+                    $query->select('id', 'user_id', 'avatar');
+                }, 'reals.likes', 'reals.comments'])
+                ->get(['id', 'uuid', 'total_days', 'name', 'monthly_diamond_received'])
                 ->map(function ($memper) {
-                    $memper->image = @$memper->profile?->avatar ?? null;
-                    $imageHtml = $memper->profile && $memper->profile->avatar
-                        ? '<img src="' . getImagePath($memper->image) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
-                        : 'No Image';
-                    $salary = $memper->userSallary->sallary ?? 0;
-                    return [
-                        'id' => $memper->id ?? 0,
-                        'uuid' => $memper->uuid ?? 0,
-                        'name' => $memper->name ?? '',
-                        'reals_count' => $memper->reals()->count() ?? 0,
-                        'total_days' => $memper->total_days ?? 0,
-                        'total_hours' => $memper->liveTime->sum("hours"),
-                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
-                        'image' => $imageHtml,
-                        'salary' => $salary ?? 0,
+                    // Handle image path with fallback to default
+                    $path = @$memper->profile?->avatar;
+                    $defaultImage = asset("images/businessman-icon.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
 
+                    // Check if the image exists
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                    // Generate the image HTML with specified dimensions
+                    $image = handleShowImageWithTypes($memper->id, $url, 40, 40);
+
+                    // Link to member's profile (adjust the URL as per your routing)
+                    $showUrl = $memper ? url("admin/users/{$memper->id}") : 0;
+
+                    // Create the display HTML for name and UUID with styling similar to the owner column
+                    $nameDisplay = "
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            $image
+                            <div>
+                               <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                                 <span style='text-decoration: underline; cursor: pointer;'>{$memper->name}</span>
+                                </a>
+                                <span style='font-size: smaller;'>UUID: {$memper->uuid}</span>
+                            </div>
+                        </div>
+                    ";
+
+                    $salary = $memper->userSallary->sallary ?? 0;
+
+                    $totalLikes = $memper->reals->sum(function ($real) {
+                        return $real->likes->count();
+                    });
+
+                    $totalComments = $memper->reals->sum(function ($real) {
+                        return $real->comments->count();
+                    });
+
+                    return [
+                        'name' => $nameDisplay, // Using the styled HTML for name column
+                        'monthly_diamond_received' => $memper->monthly_diamond_received ?? 0,
+                        'salary' => $salary ?? 0,
+                        'reals_count' => $memper->reals()->count() ?? 0,
+                        'real_likes' => $totalLikes ?? 0,
+                        'real_comments' => $totalComments ?? 0,
+                        'total_days' => $memper->total_days ?? 0,
+                        'total_hours' => $memper->liveTime->sum("hours") ?? 0,
                     ];
                 });
 
-            // Using the mapped data to create a new table
+            // Using the mapped data to create a new table (removed 'img' column since it's now embedded in 'name')
             return new TableWidget(
                 [
-                    'ID',
-                    'UID',
                     __('name'),
-                    __('reals_count'),
+                    __('Monthly DI'),
+                    __('salary'),
+                    __('reals_uploads'),
+                    __('real_likes'),
+                    __('real_comments'),
                     __('total_days'),
                     __('total_hours'),
-                    __('Monthly DI'),
-                    __('img'),
-                    __('salary'),
                 ],
                 $mempers->toArray() // Convert the collection to an array for the table
             );
         });
-
         $grid->actions(function ($actions) {
             $model = $actions->row;
             $actions->disableView(); // Disable the "View" action
@@ -323,6 +354,20 @@ class AgencyController extends MainController
             $actions->add(new ChangeUsersAgencyAction($model->id));
         });
         $grid->disableExport();
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+
+            $filter->where(function ($query) {
+                $date = UserCommon::arabicToEnglishNumbers($this->input);
+                $query->whereDate('created_at', '>=', $date);
+            }, __('from_date'), 'from_date')->date();
+
+            $filter->where(function ($query) {
+                $date = UserCommon::arabicToEnglishNumbers($this->input);
+                $query->whereDate('created_at', '<=', $date);
+            }, __('to_date'), 'to_date')->date();
+        });
 
         $this->extendGrid($grid);
 
