@@ -472,7 +472,7 @@ class UserController extends MainController
         // $grid->disableExport();
         // $this->extendGrid($grid);
 
-        // return $grid;
+        return $grid;
     }
 
     public function stop_charge(Request $request)
