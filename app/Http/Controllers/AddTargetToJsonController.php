@@ -7,12 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Modules\Tasks\Selectable\Days;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
 
 class AddTargetToJsonController extends Controller
 {
+    public $permission_name = 'agency-settings';
     public function targetPercentage(Request $request)
     {
-
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         $hours =  $request->hours;
         $days =  $request->days;
         $reels =  $request->reels;

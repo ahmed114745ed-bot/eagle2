@@ -10,6 +10,8 @@ use Encore\Admin\Actions\Action;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
 
 
 class UserAction extends Action
@@ -20,6 +22,7 @@ class UserAction extends Action
     public $show_invite_code;
     public $hide_chat;
     public $can_play;
+    public $permission_name = 'user-status';
 
 
     protected $selector = '.delete-ban';
@@ -47,6 +50,10 @@ class UserAction extends Action
 
     public function handle(\Illuminate\Http\Request $request)
     { 
+
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         
         $user = User::find($request->id);
         if (!$user) {

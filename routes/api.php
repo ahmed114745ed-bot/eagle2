@@ -62,8 +62,10 @@ use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
-Route::get('/create-payment', [NowPaymentsController::class, 'createPayment']);
+Route::post('/create-payment', [NowPaymentsController::class, 'createPayment']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
+Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
+Route::get('payment-status/{payment}',[NowPaymentsController::class, 'paymentStatus']);
 
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
