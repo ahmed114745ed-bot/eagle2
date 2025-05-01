@@ -1200,6 +1200,7 @@ class User extends Authenticatable
         
                 // Upload and update avatar
                 $newImagePath = Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+                dd( $newImagePath);
                 $originalProfile->avatar = $newImagePath;
                 $originalProfile->save();
             }
