@@ -287,7 +287,7 @@ class AppearChargerAgencyController extends MainController
                 ]);
             }
 
-            $newType = 4;
+            $newType = 3;
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => $newType,
                 'monthly_diamond_received' => 0,

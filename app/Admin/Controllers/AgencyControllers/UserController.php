@@ -386,7 +386,7 @@ class UserController extends MainController
 
             $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
                 $data = json_decode($target->extras, true);
-    
+
                 $moment_upload = $data['moment']['upload'] ?? '';
                 $moment_likes = $data['moment']['likes'] ?? '';
                 $moment_comments = $data['moment']['comments'] ?? '';

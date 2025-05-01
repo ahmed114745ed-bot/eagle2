@@ -628,7 +628,6 @@ class Common
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
-
         $isGroup = false;
         $userData = [];
         $key = time();
@@ -700,6 +699,7 @@ class Common
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
+        
 
         $result = json_decode($result);
 
