@@ -743,20 +743,21 @@ class UserController extends MainController
         $loggedInUserId = Admin::user()->id;
         $form->display('id', __('id'));
         if (!$form->isEditing()) {
-            // Add a hidden field for 'uuid' in the edit form
-            $form->text('uuid', __('uuid'))->creationRules([
-                'required',
-                Rule::unique('users', 'uuid'),
-                function ($attribute, $value, $fail) {
-                    if (DB::table('wares')->where('value', $value)->exists()) {
-                        return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
+            $form->text('uuid', __('uuid'))
+                ->creationRules([
+                    'required',
+                    Rule::unique('users', 'uuid'),
+                    function ($attribute, $value, $fail) {
+                        if (DB::table('wares')->where('value', $value)->exists()) {
+                            return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
+                        }
                     }
-                }
-            ])
+                ]);
+        } else {
+            $form->text('uuid', __('uuid'))
                 ->updateRules([
                     'required',
                     Rule::unique('users', 'uuid')->ignore(request()->route('id')),
-                    // نفس الشيء هنا مع التحقق من عدم وجود القيمة في جدول wares
                     function ($attribute, $value, $fail) {
                         if (DB::table('wares')->where('value', $value)->exists()) {
                             return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
@@ -773,7 +774,7 @@ class UserController extends MainController
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        // $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
         $form->image('profile.avatar', __('image'));
