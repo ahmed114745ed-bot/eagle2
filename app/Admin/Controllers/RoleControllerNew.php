@@ -133,27 +133,79 @@ class RoleControllerNew extends MainController
      *
      * @return Form
      */
+    // public function form()
+    // {
+    //     $permissionModel = config('admin.database.permissions_model');
+    //     $permissions = $permissionModel::all();
+    //     $roleModel = config('admin.database.roles_model');
+
+    //     $form = new Form(new $roleModel());
+
+
+    //     $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug');
+
+    //     $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name');
+    //     $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
+    //     $form->html(view('admin.permissions-tabs', [
+    //         'permissions' => $permissions,
+    //         //'selectedPermissions' => $selectedPermissions
+    //     ])->render());
+        
+    //     $form->text('desc_en', __('Description en'));
+    //     $form->text('desc_ar', __('Description ar'));
+    //     $form->image('image', __('Image'))->help('Image will appear beside user in app');
+
+    //     $form->display('created_at', trans('admin.created_at'));
+    //     $form->display('updated_at', trans('admin.updated_at'));
+
+    //     return $form;
+    // }
+
     public function form()
-    {
-        $permissionModel = config('admin.database.permissions_model');
-        $roleModel = config('admin.database.roles_model');
+{
+    $permissionModel = config('admin.database.permissions_model');
+    $permissions = $permissionModel::all();
+    $roleModel = config('admin.database.roles_model');
 
-        $form = new Form(new $roleModel());
+    $form = new Form(new $roleModel());
 
+    // Current permissions for edit mode
+    $selectedPermissions = request()->route()->parameter('role')
+        ? $form->model()->permissions->pluck('id')->toArray()
+        : [];
 
-        $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug');
+    $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
-        $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name');
-        $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
-        $form->text('desc_en', __('Description en'));
-        $form->text('desc_ar', __('Description ar'));
-        $form->image('image', __('Image'))->help('Image will appear beside user in app');
+    $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name,{{id}}');
 
-        $form->display('created_at', trans('admin.created_at'));
-        $form->display('updated_at', trans('admin.updated_at'));
+    // Hide default listbox and use custom tabbed permission UI
+    // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
-        return $form;
-    }
+    // Custom tabbed view
+    $form->html(view('admin.permissions-tabs', [
+        'permissions' => $permissions,
+        'selectedPermissions' => $selectedPermissions,
+    ])->render());
+
+    $form->text('desc_en', __('Description en'));
+    $form->text('desc_ar', __('Description ar'));
+    $form->image('image', __('Image'))->help('Image will appear beside user in app');
+
+    $form->display('created_at', trans('admin.created_at'));
+    $form->display('updated_at', trans('admin.updated_at'));
+
+    // Save permissions
+    $form->saving(function (Form $form) {
+        $form->ignore('permissions'); // handled manually
+    });
+
+    $form->saved(function (Form $form) {
+        $form->model()->permissions()->sync(request('permissions', []));
+    });
+
+    return $form;
+}
+
 
     public function form1()
     {
