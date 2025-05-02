@@ -24,6 +24,7 @@ use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
@@ -52,8 +53,8 @@ use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
-use App\Admin\Controllers\ReportRealsController;
 
+use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -192,6 +193,8 @@ Route::group(
         ]);
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);
         $router->resource('auth/roles', 'RoleController');
+        $router->resource('auth/rolesTest', 'RoleControllerNew');
+        $router->get('permission_category/{category}', [RoleControllerNew::class,'permissionByCategory']);
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
         $router->post('app-setting', [ColorController::class, 'appSetting'])->name("app-setting");
