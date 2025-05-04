@@ -11,7 +11,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class SallariesHistoryController extends Controller
+class SallariesHistoryController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'salary-history';

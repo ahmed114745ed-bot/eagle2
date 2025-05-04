@@ -141,6 +141,7 @@ return [
     "diamond" => "الماس",
     "target" => "الهدف",
     "salary" => "الراتب",
+    "total" => "الاجمالي",
     "payments" => "المدفوعات",
     "totalGiftPrice" => " الإجمالي سعر الهدييا ",
     "weekly_star" => "النجم الاسبوعي",
