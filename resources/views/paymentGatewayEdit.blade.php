@@ -56,9 +56,9 @@
 
     /* تنسيق النماذج */
     form {
-        background: #222;
         padding: 20px;
         border-radius: 5px;
+        background-color: var(--box-background-color) !important;
     }
 
     label {
