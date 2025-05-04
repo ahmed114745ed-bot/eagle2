@@ -160,6 +160,18 @@
     "you achieve new target": "لقد حققت تارجت جديد",
     "congratulations": "تهانينا",
     "you are accepted in family": "تم قبولك في العائلة",
+
+    "Toggle Can Play": "تبديل إمكانية اللعب",
+    "Can play has been enabled!": "تم تفعيل إمكانية اللعب!",
+    "Can play has been disabled!": "تم تعطيل إمكانية اللعب!",
+    "Toggle Show Invite Code": "تبديل ظهور رمز الدعوة",
+    "User settings not found!": "إعدادات المستخدم غير موجودة!",
+    "Show invite code has been enabled!": "تم تفعيل ظهور رمز الدعوة!",
+    "Show invite code has been disabled!": "تم تعطيل ظهور رمز الدعوة!",
+    "Toggle Transfer Salary": "تبديل تحويل الراتب",
+    "Transfer salary has been enabled!": "تم تفعيل تحويل الراتب!",
+    "Transfer salary has been disabled!": "تم تعطيل تحويل الراتب!",
+
     "your recharge success": "تم الشحن بنجاح",
     "your exchange done": "تم الشحن بنجاح",
     "recharge process": "عملية شحن",
