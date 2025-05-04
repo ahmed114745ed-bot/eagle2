@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Resources\Api\V1;
+
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 use App\Models\Agency;
 use App\Models\Target;
@@ -17,7 +18,7 @@ class AllDataAgencyResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
 
-   
+
 
     public function toArray($request)
     {
@@ -30,9 +31,9 @@ class AllDataAgencyResource extends JsonResource
             ->first();
 
         $result = (@$minValue->agency_share / 100) * @$target;
-       
-        
-         $authUser = Auth::user();
+
+
+        $authUser = Auth::user();
         $owner = @$authUser->ownAgency;
         $admin = @$authUser->agencyUserJob;
 
@@ -42,28 +43,29 @@ class AllDataAgencyResource extends JsonResource
         // $All=$target->usd* $Theratio ;
         /** @var Agency $this*/
         return [
-            'id'=>$this->id?:0,
-            'target'=>$result?:0,
-            'name'=>$this->name?:'',
-            'notice'=>$this->notice?:'',
+            'id' => $this->id ?: 0,
+            'target' => $result ?: 0,
+            'name' => $this->name ?: '',
+            'notice' => $this->notice ?: '',
             // 'status'=>$this->status,
-            'phone'=>$this->phone?:0,
+            'phone' => $this->phone ?: 0,
             // 'url'=>$this->url,
-            'img'=>$this->img?:'',
+            'img' => $this->img ?: '',
+            'agency_type' => $this->Shipping_agency == 1 ? 'shipping' : 'hosts',
             'num_of_hosts'      => $this->mempers->count(),
             // 'contents'=>$this->contents,
-            'owner'=>new MyDataForAgancyResource($this->owner)?:[
+            'owner' => new MyDataForAgancyResource($this->owner) ?: [
                 "id" => 0,
                 "uuid" => '',
                 "target_usd" => 0,
                 'name' => '',
                 "profile" => [
-                "image" => ''
+                    "image" => ''
                 ]
             ],
-            'mempers_count'=>$this->mempers_count,
+            'mempers_count' => $this->mempers_count,
             // 'mempers'=>$this->mempers ?? (object)[], 
-            'members'=>MyDataForAgancyNewResource::collection($this->mempers),
+            'members' => MyDataForAgancyNewResource::collection($this->mempers),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
         ];
     }
