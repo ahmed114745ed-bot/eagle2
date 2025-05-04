@@ -35,7 +35,7 @@ class UserAction extends Action
         if ($can_play == 0) {
             $can_play = 3;
         } elseif ($can_play == 1) {
-            $can_play = 2;  
+            $can_play = 2;
         }
         $this->id = $id;
         $this->charge_status = $charge_status;
@@ -49,28 +49,28 @@ class UserAction extends Action
     }
 
     public function handle(\Illuminate\Http\Request $request)
-    { 
+    {
 
         if (!Admin::user()->can('*')){
             Permission::check('edit-'.$this->permission_name);
         }
-        
+
         $user = User::find($request->id);
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
 
         if($user->online){
-            $can_play = $request->can_play ?? 0;  
-            $show_invite_code = $request->show_invite_code ?? 0;  
+            $can_play = $request->can_play ?? 0;
+            $show_invite_code = $request->show_invite_code ?? 0;
             broadcast(new UserStatus(
-                $can_play == 2 ? true : false, 
-                $show_invite_code == 1 ? true : false, 
+                $can_play == 2 ? true : false,
+                $show_invite_code == 1 ? true : false,
                 $request->id
             ));
         }
 
-        
+
         $user->update([
             'charge_status'   => $request->charge_status,
             'transfer_salary'  => $request->transfer_salary,
@@ -91,24 +91,26 @@ class UserAction extends Action
     {
         $this->hidden('id', __('ID'))->attribute('id', 'id');
 
-        $this->radio('charge_status', __('Charge Status'))
-            ->options([1 => __('on'), 0 => __('off')])
-            ->value($this->charge_status);
+        $this->hidden('charge_status')->default(1);
+//        $this->radio('charge_status', __('Charge Status'))
+//            ->options([1 => __('on'), 0 => __('off')])
+//            ->value($this->charge_status);
 
         $this->radio('transfer_salary', __('Transfer Salary'))
             ->options([1 => __('on'), 0 => __('off')])->value($this->transfer_salary);
 
-        $this->radio('show_invite_code', __('Show Invite Code'))
-            ->options([1 => __('on'), 0 => __('off')])->value($this->show_invite_code);
-
-            $this->hidden('hide_chat', __('ID'))->attribute('hide_chat', 'id');
+//        $this->radio('show_invite_code', __('Show Invite Code'))
+//            ->options([1 => __('on'), 0 => __('off')])->value($this->show_invite_code);
+//
+//            $this->hidden('hide_chat', __('ID'))->attribute('hide_chat', 'id');
 
         /* $this->radio('hide_chat', __('Hide Chat'))
             ->options([1 => __('on'), 0 => __('off')])->value($this->hide_chat); */
-            $this->hidden('hide_chat')->default(0); // false == 0
-
-        $this->radio('can_play', __('Can Play'))
-            ->options([2 => __('yes'), 3 => __('no')])->value($this->can_play);
+//            $this->hidden('hide_chat')->default(0); // false == 0
+//
+        $this->hidden('can_play')->default(0); // false == 0
+//        $this->radio('can_play', __('Can Play'))
+//            ->options([2 => __('yes'), 3 => __('no')])->value($this->can_play);
     }
 
 
@@ -117,11 +119,11 @@ class UserAction extends Action
     {
         return '<a href="#" onclick="openUserForm(' .
             '\'' . $this->id . '\', ' .
-            '\'' . $this->charge_status . '\', ' .
+//            '\'' . $this->charge_status . '\', ' .
             '\'' . $this->transfer_salary . '\', ' .
-            '\'' . $this->show_invite_code . '\', ' .
-            '\'' . $this->hide_chat . '\', ' .
-            '\'' . $this->can_play . '\'' .
+//            '\'' . $this->show_invite_code . '\', ' .
+//            '\'' . $this->hide_chat . '\', ' .
+//            '\'' . $this->can_play . '\'' .
             ')" class="btn btn-sm btn-info delete-ban">
             <i class="fa fa-edit"></i> ' . ' '. __('status') . '
         </a>
@@ -130,11 +132,11 @@ class UserAction extends Action
                 console.log(id, charge_status, transfer_salary, show_invite_code, hide_chat, can_play);
 
                 $("#id").val(id);
-                $("#charge_status").val(charge_status);
+//                $("#charge_status").val(charge_status);
                 $("#transfer_salary").val(transfer_salary);
-                $("#show_invite_code").val(show_invite_code);
-                $("#hide_chat").val(hide_chat);
-                $("#can_play").val(can_play);
+//                $("#show_invite_code").val(show_invite_code);
+//                $("#hide_chat").val(hide_chat);
+//                $("#can_play").val(can_play);
             }
         </script>';
     }

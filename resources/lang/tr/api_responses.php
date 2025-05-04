@@ -118,6 +118,11 @@ return [
     'agency_updated'                                             => 'Ajans Başarıyla Güncellendi',
     'closedRoom'                                                 => 'Üzgünüm, oda şu an kapalı',
     'freez_charge'                                               => 'Cüzdanınız dondurulmuş. Yönetimle iletişime geçin!',
+
+    'freeze_charge_settings' => 'Yükleme şu anda yönetici tarafından devre dışı bırakıldı.',
+    'freeze_transfer_charger' => 'Transferleriniz donduruldu. Lütfen yönetimle iletişime geçin!',
+    'freeze_transfer_receiver' => 'Alıcının transferleri donduruldu. Şu anda transfer alamaz.',
+
     'agencyDown'                                                 => 'Üzgünüm! Ajans şu an kapalı, katılamazsınız',
     'canNotCharge'                                               => 'Yükleme yapamazsınız, ajansınız kapalı',
     'disabled_version'                                           => 'Lütfen uygulamayı silin ve Google Play\'den tekrar indirin, anlayışınız için teşekkür ederiz',
