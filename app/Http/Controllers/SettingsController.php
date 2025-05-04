@@ -140,6 +140,7 @@ class SettingsController extends Controller
             $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
+            $data['images_background'] = Common::upload('images', $request->file('app_background_image'));
         } else if ($request->background_type == 'gradient') {
             $data['gradient_1'] = $request->gradient_1;
             $data['gradient_2'] = $request->gradient_2;
@@ -170,6 +171,19 @@ class SettingsController extends Controller
 
         // Process and save settings
         foreach ($data as $key => $value) {
+
+
+            if (Str::contains($key, ['color']) && (common::getSettingValue('app_primary_color') != $request->app_primary_color || common::getSettingValue('app_second_color') != $request->app_second_color || common::getSettingValue('app_white_color') != $request->app_white_color || common::getSettingValue('app_black_color') != $request->app_black_color || common::getSettingValue('app_grey_color') != $request->app_grey_color || common::getSettingValue('app_yellow_color') != $request->app_yellow_color)) {
+                $cacheKey = 'colors_updated_at';
+                settings()->set($cacheKey, true);
+            } elseif ((common::getSettingValue('background_type') != $request->background_type || common::getSettingValue('images_background') != $request->images_background || common::getSettingValue('background_color') != $request->background_color || common::getSettingValue('gradient_2') != $request->gradient_2 || common::getSettingValue('gradient_3') != $request->gradient_3 || common::getSettingValue('gradient_1') != $request->gradient_1)) {
+
+                $cacheKey = 'ground_updated_at';
+                settings()->set($cacheKey, true);
+            } else {
+                $cacheKey = $key . '_updated_at';
+                settings()->set($cacheKey, true);
+            }
             if ($value instanceof \Illuminate\Http\UploadedFile) {
                 $value = Common::upload('images', $value);
             }
@@ -183,15 +197,15 @@ class SettingsController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
-            //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
-            if (Str::contains($key, ['color'])) {
-                $key = 'colors_updated_at';
-            } elseif (Str::contains($key, ['app_background', 'image1', 'image2', 'image3'])) {
-                $key = 'app_background_updated_at';
-            } else {
-                $key . '_updated_at';
-            }
-            settings()->set($key, true);
+            // //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
+            // if (Str::contains($key, ['color'])) {
+            //     $key = 'colors_updated_at';
+            // } elseif (Str::contains($key, ['app_background', 'image1', 'image2', 'image3'])) {
+            //     $key = 'app_background_updated_at';
+            // } else {
+            //     $key . '_updated_at';
+            // }
+
         }
 
 
