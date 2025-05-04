@@ -245,7 +245,7 @@ class RoomController extends Controller
             Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
         }
 
-        if(!isset($roomId)){
+        if (!isset($roomId)) {
             Common::apiResponse(false, '');
         }
         $this->handleLeaveCp($user, $roomId);
@@ -1234,15 +1234,24 @@ class RoomController extends Controller
         $adm_arr = array_merge($adm_arr, [$admin_id]);
         $str     = implode(",", $adm_arr);
 
-        $res  = DB::table('rooms')->where(['uid' => $uid])->update(['room_admin' => $str]);
-
+        $res  =  $room->update(['room_admin' => $str]);
+        $adm_arr = explode(",", $room->room_admin) ?? [];
         $a    = User::find($admin_id);
         $n    = 'nan';
         if ($a) {
             $n = $a->name ?: 'nan';
         }
         Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
+        $ms   = [
+            'messageContent' => [
+                'message' => 'updateAdmins',
+                'admins' => array_values($adm_arr)
+            ]
+        ];
+       
         if ($res) {
+
+            $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
             return Common::apiResponse(1, 'Set administrator successfully', $adm_arr, 200);
         } else {
             return Common::apiResponse(0, 'Failed to set administrator', null, 400);
@@ -1258,21 +1267,31 @@ class RoomController extends Controller
             return Common::apiResponse(0, 'not allowed', null, 403);
         }
         if (!$uid || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        $roomAdmin = DB::table('rooms')->where('uid', $uid)->value('room_admin');
+        $room = Room::where('uid', $uid)->first();
+        if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
+        $roomAdmin = $room->room_admin;
         $adm_arr   = !$roomAdmin ? [] : explode(",", $roomAdmin);
         if (!in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is not an administrator of this room', null, 404);
         $key = array_search($admin_id, $adm_arr);
         unset($adm_arr[$key]);
         $str  = implode(",", $adm_arr);
-        $res  = DB::table('rooms')->where(['uid' => $uid])->update(['room_admin' => $str]);
-        $rid  = DB::table('rooms')->where(['uid' => $uid])->value('id');
+        $res  = $room->update(['room_admin' => $str]);
+        $adm_arr = explode(",", $room->room_admin) ?? [];
+
+
+        $a    = User::find($admin_id);
+        $n    = 'nan';
+        if ($a) {
+            $n = $a->name ?: 'nan';
+        }
+        Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
         $ms   = [
             'messageContent' => [
                 'message' => 'updateAdmins',
                 'admins' => array_values($adm_arr)
             ]
         ];
-        $resu = Common::sendToZego('SendCustomCommand', $rid, $uid, json_encode($ms));
+        $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
         if ($res) {
             return Common::apiResponse(1, 'Cancel administrator successfully', $adm_arr, 200);
         } else {
@@ -1710,9 +1729,9 @@ class RoomController extends Controller
                 }
             }
 
-            $banDuration = $request->duration; 
-            $blacklist[] = $userToBlock . '#' . time() . '#'. $banDuration ;
-            
+            $banDuration = $request->duration;
+            $blacklist[] = $userToBlock . '#' . time() . '#' . $banDuration;
+
             $room->room_black = implode(',', $blacklist);
             $room->save();
 
@@ -1764,31 +1783,31 @@ class RoomController extends Controller
         }
     }
 
-    public function roomGifts($id){
+    public function roomGifts($id)
+    {
 
-        $perPage = request('per_page',10);
+        $perPage = request('per_page', 10);
 
-        $result = Room::where('uid',$id)->first()?->gifts()->paginate($perPage);
-        return Common::apiResponse(true, 'done',GiftRoomResource::collection($result) );
+        $result = Room::where('uid', $id)->first()?->gifts()->paginate($perPage);
+        return Common::apiResponse(true, 'done', GiftRoomResource::collection($result));
     }
 
 
-    public function check_room(Request $request){
+    public function check_room(Request $request)
+    {
 
         $request['show'] = true;
         $id = $request->room_id;
         $room = $this->roomService->findRoom($id);
         if (!$room) {
             return Common::apiResponse(0, 'Room not found', null, 404);
-
         }
 
         $data = [
             'is_live' => $room->is_live ? true : false,
-            'is_locked' => empty($room->room_pass) ? false : true  ,
+            'is_locked' => empty($room->room_pass) ? false : true,
 
         ];
-            return Common::apiResponse(true, '', $data, 200);
-
+        return Common::apiResponse(true, '', $data, 200);
     }
 }
