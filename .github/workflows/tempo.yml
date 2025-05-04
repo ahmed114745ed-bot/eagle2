@@ -15,7 +15,7 @@ jobs:
         port: ${{ secrets.PORT }}
         command_timeout: 22m
         script: |
-          threshold=75
+          threshold=60
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
@@ -30,7 +30,7 @@ jobs:
           docker build -t tempo:${{ github.sha }} .
           docker service update --image tempo:${{ github.sha }} tempo-app
           # check again
-          threshold=75
+          threshold=60
           current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
           if [ $current -gt $threshold ]; then
             echo "Disk space is more than $threshold% utilized"
