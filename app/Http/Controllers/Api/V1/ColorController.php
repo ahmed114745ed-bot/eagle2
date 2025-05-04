@@ -28,6 +28,7 @@ class ColorController extends Controller
             'gradient_3' => $settingBackGroundType == 'gradient' ? (Cache::get('gradient_3') ?? ''): "",
         ];
         settings()->set('colors_updated_at', false);
+        settings()->set('app_background_updated_at', false);
         return Common::apiResponse (true,'',$data,200);
     }
 }
