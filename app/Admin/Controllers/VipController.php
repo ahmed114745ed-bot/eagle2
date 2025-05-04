@@ -35,7 +35,7 @@ class VipController extends MainController
             ->body($this->grid()));
     }
 
-    
+
     public function senderIndex(Content $content)
     {
         if (!Admin::user()->can('*')){
@@ -271,8 +271,8 @@ class VipController extends MainController
         $grid->model()->orderByDesc('type')->orderBy('exp');
 
         // Filter model by selected tab
-        $grid->model()->when(request('tab'), function ($query) {
-            switch (request('tab')) {
+        $grid->model()->when(request('tab', 'Appsender'), function ($query, $tab) {
+            switch ($tab) {
                 case 'Appsender':
                     $query->where('type', 2);
                     break;
@@ -294,7 +294,6 @@ class VipController extends MainController
         // Tabs at top rendered from the Blade view
         $grid->header(function () {
             $tabs = [
-                '' => __('All'),
                 'Appsender' => __('AppSender'),
                 'Appreceived' => __('AppReceived'),
                 'Appcp' => __('AppCP'),
@@ -309,7 +308,7 @@ class VipController extends MainController
         // Other grid settings
         $grid->quickSearch();
 
-        $grid->column('id', __('Id'));
+        /* $grid->column('id', __('Id'));
 
         $grid->column('type', __('Type'))->select([
             1 => __('broadcaster'),
@@ -317,7 +316,7 @@ class VipController extends MainController
             3 => __('cp'),
             4 => __('room'),
             5 => __('charge'),
-        ]);
+        ]); */
 
         $grid->column('level', __('Level'))->editable();
 
@@ -374,7 +373,7 @@ class VipController extends MainController
     {
         $form = new Form(new Vip());
 
-        $form->select('type', __('Type'))->options(
+        /* $form->select('type', __('Type'))->options(
             [
                 1 => __('broadcaster'),
                 2 => __('honor'),
@@ -384,13 +383,20 @@ class VipController extends MainController
             ]
         )->default(2);
         $form->textarea('name_ar', __('name_ar'));
-        $form->textarea('name_en', __('name_en'));
+        $form->textarea('name_en', __('name_en')); */
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));
         //        $form->number('co', __('Coins'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+
+        $form->footer(function ($footer) {
+            $footer->disableReset();        // Disables the "Reset" button
+            $footer->disableViewCheck();    // Disables the "View" checkbox
+            $footer->disableEditingCheck(); // Disables the "Continue editing" checkbox
+            $footer->disableCreatingCheck();// Disables the "Continue creating" checkbox
         });
 
         return $form;

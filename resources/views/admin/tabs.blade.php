@@ -65,9 +65,8 @@
     <div class="settings-menu">
         @foreach ($tabs as $key => $label)
             @php
-                $isActive = request('tab') === $key || (empty(request('tab')) && $key == '') ;
-                $url =
-                    request()->url() . '?' . http_build_query(array_merge(request()->except('tab'), ['tab' => $key]));
+                $isActive = request('tab') === $key || (empty(request('tab')) && $key === 'Appsender');
+                $url = request()->url() . '?' . http_build_query(array_merge(request()->except('tab'), ['tab' => $key]));
             @endphp
             <button onclick="fire('{{ $url }}')" class="{{ $isActive? 'active' : '' }}">
                 {{ $label }}
