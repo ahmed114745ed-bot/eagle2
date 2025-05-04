@@ -103,9 +103,9 @@ class AgentSalaryTransactionController extends Controller
         }
 
         $user      = $request->user();
-        if ($user->charge_status == 0) {
-            return Common::apiResponse(0, __('api_responses.'), 404);
-        }
+//        if ($user->charge_status == 0) {
+//            return Common::apiResponse(0, __('api_responses.'), 404);
+//        }
 
         $count     = $request->amount;
         $user_uuid = $request->user_id;

@@ -321,18 +321,17 @@ class UserController extends MainController
             </div>
         ";
             });
-        $grid->column('return', __('status user'))->display(function () {
-            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-            return (new \App\Admin\Actions\UserAction(
-                $this->id,
-                $this->charge_status,
-                $this->transfer_salary,
-                $userSetting->show_invite_code,
-                $userSetting->hide_chat,
-                $this->can_play
-            ))->render();
-        });
-
+//        $grid->column('return', __('status user'))->display(function () {
+//            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+//            return (new \App\Admin\Actions\UserAction(
+//                $this->id,
+//                $this->charge_status,
+//                $this->transfer_salary,
+//                $userSetting->show_invite_code,
+//                $userSetting->hide_chat,
+//                $this->can_play
+//            ))->render();
+//        });
 
         $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
 
@@ -523,6 +522,24 @@ class UserController extends MainController
 
         $grid->actions(function ($actions) {
             $model = $actions->row;
+
+            $actions->add(new class extends \Encore\Admin\Actions\RowAction {
+                public $name = 'Status User';
+
+                public function render()
+                {
+                    $model = $this->row;
+                    $userSetting = $model->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+                    return (new \App\Admin\Actions\UserAction(
+                        $model->id,
+//                        $model->charge_status,
+                        $model->transfer_salary,
+//                        $userSetting->show_invite_code,
+//                        $userSetting->hide_chat,
+//                        $model->can_play
+                    ))->render();
+                }
+            });
 
             /*             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
