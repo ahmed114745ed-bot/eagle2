@@ -84,7 +84,6 @@ class ChargeController extends Controller
         $to = User::find($toId);
 
         if(!$from->transfer_salary){
-            info('yes');
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
