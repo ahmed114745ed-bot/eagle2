@@ -56,7 +56,7 @@
 
     /* تنسيق النماذج */
     form {
-        background: #222;
+        background-color: var(--box-background-color) !important;
         padding: 20px;
         border-radius: 5px;
     }
