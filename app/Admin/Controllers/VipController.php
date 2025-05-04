@@ -331,15 +331,14 @@ class VipController extends MainController
 
         // No export button
         $grid->disableExport();
-
+        $currentTab = request('tab', 'Appsender');
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) use ($currentTab) {
+            $tools->append('<a href="' . admin_url('vips/create?tab=' . $currentTab) . '" class="btn btn-sm btn-success">
+            <i class="fa fa-plus"></i>&nbsp;' . trans('admin.new') . '</a>');
+        });
         return $grid;
     }
-
-
-
-
-
-
 
     /**
      * Make a show builder.
@@ -373,17 +372,40 @@ class VipController extends MainController
     {
         $form = new Form(new Vip());
 
-        /* $form->select('type', __('Type'))->options(
-            [
+        $tabToTypeMap = [
+            'Appsender' => 2,   // honor
+            'Appreceived' => 1, // broadcaster
+            'Appcp' => 3,       // cp
+            'Approom' => 4,     // room
+            'Appcharge' => 5,   // charge
+        ];
+
+        $currentTab = request('tab', 'Appsender');
+        $currentType = $tabToTypeMap[$currentTab] ?? 2; // Default to 2 if tab not found
+
+        if ($form->isCreating()) {
+            $form->hidden('type')->default($currentType);
+
+            $typeLabels = [
                 1 => __('broadcaster'),
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
                 5 => __('charge'),
-            ]
-        )->default(2);
-        $form->textarea('name_ar', __('name_ar'));
-        $form->textarea('name_en', __('name_en')); */
+            ];
+            $form->display('type_display', __('Type'))->default($typeLabels[$currentType]);
+        } else {
+            $form->select('type', __('Type'))->options([
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5 => __('charge'),
+            ]);
+        }
+
+//        $form->textarea('name_ar', __('name_ar'));
+//        $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));

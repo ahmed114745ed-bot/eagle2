@@ -301,6 +301,8 @@
         <div class="settings-content">
 
             <div id="PaymentGateways" class="settings-section active">
+                <a href="{{ URL::previous() }}" class="btn btn-primary">{{ __('back') }}</a>
+
                 <h3>{{ __('Payment Gateways') }}</h3>
 
                 <form action="{{ route('admin.store-payment-gateway') }}" method="POST" enctype="multipart/form-data">
