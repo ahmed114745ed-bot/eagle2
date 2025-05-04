@@ -2,13 +2,16 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
 use App\Models\Config;
 use App\Models\Language;
+use App\Models\PaymentGateway;
 use Encore\Admin\Auth\Permission;
 
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
+use Request;
 
 class MangerSettingController extends MainController
 {
@@ -109,15 +112,66 @@ class MangerSettingController extends MainController
 
     public function index(Content $content)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_setting);
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_setting);
         }
 
         $config = Config::where('name', 'system_default_manger')->first();
         $configAll = Config::all();
         $languages = Language::all();
         $configValue = $config->value ?? '';
+
+        $payment_gateways = PaymentGateway::all();
         return  $content
-            ->view('mangerSetting', compact('config', 'configValue', 'languages', 'configAll'));
+            ->view('mangerSetting', compact('config', 'configValue', 'languages', 'configAll', 'payment_gateways'));
+    }
+
+    public function deletePaymentGateway($id)
+    {
+        $result = PaymentGateway::findOrFail($id);
+        $result->delete();
+        return back();
+    }
+    public function editPaymentGateway($id,Content $content)
+    {
+        $gateway = PaymentGateway::findOrFail($id);
+
+        return $content->view('paymentGatewayEdit', compact('gateway'));
+    }
+
+    public function updatePaymentGateway($id)
+    {
+        $gateway = PaymentGateway::findOrFail($id);
+
+        $title = request('title');
+
+        if (request()->hasFile('photo')) {
+            $uploaded = Common::upload('images', request('photo'));
+            $gateway->update([
+                'photo' => $uploaded
+            ]);
+        }
+        $gateway->update([
+            'title' => $title
+        ]);
+
+        return redirect('/admin/agency-setting-manger');
+    }
+
+    public function createPaymentGateway(Content $content){
+        return $content->view('paymentGatewayCreate');
+    }
+
+    public function storePaymentGateway(){
+
+        $title = request('title');
+        $photo = Common::upload('images', request('photo'));
+
+        PaymentGateway::create([
+            'title' => $title,
+            'photo' => $photo
+        ]);
+
+        return redirect('/admin/agency-setting-manger');
     }
 }
