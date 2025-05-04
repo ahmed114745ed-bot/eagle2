@@ -24,9 +24,9 @@ class GeneralRoleController extends MainOldController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('General rules'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -38,9 +38,9 @@ class GeneralRoleController extends MainOldController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('General rules'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -52,16 +52,16 @@ class GeneralRoleController extends MainOldController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('General rules'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('General rules'))
-            ->body($this->form());
+            ->body($this->form()));
     }
     protected function grid()
     {

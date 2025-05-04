@@ -17,7 +17,7 @@
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
     "Badges": "बैज",
-
+    "Agency wallet": "एजेंसी वॉलेट",
     "Supporter" : "समर्थक",
     "Shipping": "शिपिंग",
     "Hosting" : "मेज़बान",
@@ -601,6 +601,12 @@
     "Created at": "बनाया गया",
     "moment_count": "लम्हों की संख्या",
     "reals_count": "वीडियो की संख्या",
+    "reals_uploads": "रील्स अपलोड करें",
+    "real_likes": "रील्स लाइक्स",
+    "real_comments": "रील्स टिप्पणियाँ",
+    "uploads": "अपलोड्स",
+    "like": "पसंद",
+    "comment": "टिप्पणी",
     "total_days": "कुल दिन",
     "total_hours": "कुल घंटे",
     "image_type": "छवि प्रकार",
@@ -744,8 +750,26 @@
     "Banner": "बैनर",
     "Splash": "स्प्लैश",
     "Advertising Space": "विज्ञापन स्थान",
+    "search for agency or host by UUID": "UUID द्वारा एजेंसी या होस्ट खोजें",
     "Products": "उत्पाद",
+    "Agencies Wallet": "एजेंसियों की वॉलेट",
+    "agencies wallet": "एजेंसियों की वॉलेट",
+    "wallet balance": "वॉलेट शेष राशि",
+
+    "Toggle Can Play": "खेलने की अनुमति बदलें",
+    "Can play has been enabled!": "खेलने की अनुमति सक्षम कर दी गई है!",
+    "Can play has been disabled!": "खेलने की अनुमति अक्षम कर दी गई है!",
+    "Toggle Show Invite Code": "निमंत्रण कोड दिखाने की अनुमति बदलें",
+    "User settings not found!": "यूज़र सेटिंग्स नहीं पाई गईं!",
+    "Show invite code has been enabled!": "निमंत्रण कोड दिखाना सक्षम किया गया है!",
+    "Show invite code has been disabled!": "निमंत्रण कोड दिखाना अक्षम किया गया है!",
+    "Toggle Transfer Salary": "ट्रांसफर सैलरी को टॉगल करें",
+    "Transfer salary has been enabled!": "ट्रांसफर सैलरी सक्षम की गई है!",
+    "Transfer salary has been disabled!": "ट्रांसफर सैलरी अक्षम की गई है!",
+
     "Levels": "स्तर",
+    "agency name": "एजेंसी का नाम",
+    "agency whatsApp number": "एजेंसी व्हाट्सएप नंबर",
     "Level Gifts": "स्तर उपहार",
     "All Boxes": "सभी बॉक्स",
     "Room Settings": "कक्ष सेटिंग्स",
@@ -1166,7 +1190,7 @@
    "Delete": "हटाएं",
    "Add": "जोड़ें",
    "Add Users Count": "उपयोगकर्ता संख्या जोड़ें",
-   
+
    "Zones coins must be greater than super admin coins": "क्षेत्र सिक्के सुपर एडमिन सिक्के से अधिक होने चाहिए",
    "super admin coins must be greater than agancy coins": "सुपर एडमिन सिक्के एजेंसी सिक्के से अधिक होने चाहिए",
    "agancy coins must be greater than user coins": "एजेंसी सिक्के उपयोगकर्ता सिक्के से अधिक होने चाहिए",
@@ -1200,7 +1224,11 @@
         "Unpin": "पिन हटाना",
         "Pin Status": "पिन स्थिति",
         "diamonds target":"हीरे लक्ष्य",
-        "profile_frame_type":"Profile Frame Type"
+        "profile_frame_type":"Profile Frame Type",
+        "Old Total Sender Level": "पुराना कुल प्रेषक स्तर",
+    "New Total Sender Level": "नया कुल प्रेषक स्तर",
+    "Old Total Received Level": "पुराना कुल प्राप्तकर्ता स्तर",
+    "New Total Received Level": "नया कुल प्राप्तकर्ता स्तर"
 
 
 

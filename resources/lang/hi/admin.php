@@ -11,6 +11,7 @@ return [
     'password_confirmation' => 'पासवर्ड पुष्टि',
     'remember_me'           => 'मुझे याद रखें',
     'user_setting'          => 'उपयोगकर्ता सेटिंग',
+    "total" => "कुल",
     'avatar'                => 'अवतार',
     'list'                  => 'सूची',
     'new'                   => 'नया',

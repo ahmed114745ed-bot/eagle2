@@ -113,34 +113,63 @@ document.addEventListener("DOMContentLoaded", function () {
     function initPhoneInput() {
         const input = document.querySelector("#phone-input");
         if (input && !input.classList.contains('iti-initialized')) {
+            // Add custom styling to fix the overlap
+            const parentDiv = input.parentElement;
+            parentDiv.style.position = 'relative';
+
             const iti = window.intlTelInput(input, {
                 separateDialCode: true,
                 preferredCountries: ["eg"],
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
             });
+
+            // Add additional CSS to fix the layout
+            document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                .iti {
+                    width: 100%;
+                    margin-bottom: 15px;
+                }
+                .iti__flag-container {
+                    z-index: 99;
+                }
+                #phone-input {
+                    padding-left: 90px !important; /* Make room for the country code */
+                    width: 50%;
+                }
+                /* Fix any Encore Admin specific styling conflicts */
+                .fields-group .form-group {
+                    overflow: visible;
+                }
+            </style>
+        `);
+
             input.classList.add('iti-initialized');
 
             const form = input.closest('form');
             if (form) {
                 form.addEventListener('submit', function() {
                     if (iti) {
-                        const dialCode = iti.getSelectedCountryData().dialCode; // +20
-                        const nationalNumber = input.value.replace(/\s/g, ''); // remove spaces if needed
-                        input.value = `+${dialCode} - ${nationalNumber}`;
+                        const dialCode = iti.getSelectedCountryData().dialCode;
+                        const nationalNumber = input.value.replace(/\s/g, '');
+
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'phone_code';
+                        hiddenInput.value = `+${dialCode}`;
+                        form.appendChild(hiddenInput);
+
+                        input.value = nationalNumber;
                     }
                 });
             }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(initPhoneInput, 100); // Wait 100ms to ensure rendering
-    });
-    // On Laravel-Admin: If you use tabs, modals, or custom reloads,
-    // re-init on AJAX finished events:
-    $(document).on('pjax:complete', function() {
-        setTimeout(initPhoneInput, 100);
-    });
+    document.addEventListener('DOMContentLoaded', initPhoneInput);
+
+    document.addEventListener('pjax:complete', initPhoneInput);
+
     $(document).on('click', '.add-form-row', function() {
         setTimeout(initPhoneInput, 100);
     });

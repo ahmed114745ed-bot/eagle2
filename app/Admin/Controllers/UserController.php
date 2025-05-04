@@ -2,6 +2,9 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Actions\CanPlaySwitchAction;
+use App\Admin\Actions\ChargeSwitchAction;
+use App\Admin\Actions\InviteSwitchAction;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
@@ -192,8 +195,15 @@ class UserController extends MainController
             $filter->expand();
 
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
+                // $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
 
+                $filter->where(function ($query) {
+                    $input = $this->input; // adjust as per your framework
+                    $query->where('family_id', $input)
+                        ->orWhereHas('family', function ($q) use ($input) {
+                            $q->where('name', 'like', "%{$input}%");
+                        });
+                }, __('Family ID or Name'));
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $input = $this->input;
@@ -224,17 +234,17 @@ class UserController extends MainController
         });
         $grid->column('name', __('Name'));
 
-        $grid->column('return', __('status user'))->display(function () {
-                $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-                return (new \App\Admin\Actions\UserAction(
-                    $this->id,
-                    $this->charge_status,
-                    $this->transfer_salary,
-                    $userSetting->show_invite_code ?? 0,  // Extra fallback
-                    $userSetting->hide_chat ?? 0,        // Extra fallback
-                    $this->can_play
-                ))->render();
-            });
+//        $grid->column('return', __('status user'))->display(function () {
+//            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+//            return (new \App\Admin\Actions\UserAction(
+//                $this->id,
+//                $this->charge_status,
+//                $this->transfer_salary,
+//                $userSetting->show_invite_code ?? 0,  // Extra fallback
+//                $userSetting->hide_chat ?? 0,        // Extra fallback
+//                $this->can_play
+//            ))->render();
+//        });
 
 
         $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
@@ -285,7 +295,7 @@ class UserController extends MainController
 
             $targets = $model->targets()->where('agency_id', $this->agency_id)->orderBy('created_at', 'desc')->get()->map(function ($target) {
                 $data = json_decode($target->extras, true);
-    
+
                 $moment_upload = $data['moment']['upload'] ?? '';
                 $moment_likes = $data['moment']['likes'] ?? '';
                 $moment_comments = $data['moment']['comments'] ?? '';
@@ -461,6 +471,11 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $actions->disableDelete();
             $model = $actions->row;
+
+            $actions->add(new ChargeSwitchAction());
+            $actions->add(new InviteSwitchAction());
+            $actions->add(new CanPlaySwitchAction());
+
             if ($model->agency_id >= 1) {
                 $actions->add(new KickOfAgencyAction());
             }
@@ -785,7 +800,7 @@ class UserController extends MainController
         $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
-        $form->image('profile.avatar', __('image'))->name(function ($file) {
+        $form->image('photo', __('image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
 
@@ -795,10 +810,10 @@ class UserController extends MainController
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
 
-        $form->switch('charge_status', __("charge status"))->states($state);
-        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
+//        $form->switch('charge_status', __("charge status"))->states($state);
+//        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
+//        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
+//        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $countries = Country::all();
@@ -807,48 +822,48 @@ class UserController extends MainController
             }
             return $ops;
         });
-        $states = [
-            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-        ];
-        if ($form->isCreating()) {
-            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
-        } elseif ($form->isEditing()) {
-            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
-                $can_play = UserHandling::chickLevelToPlay($this);
-                return $can_play ? 'on' : 'off';
-            })->states($states);
-        }
+//        $states = [
+//            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
+//            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+//            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
+//        ];
+//        if ($form->isCreating()) {
+//            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
+//        } elseif ($form->isEditing()) {
+//            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
+//                $can_play = UserHandling::chickLevelToPlay($this);
+//                return $can_play ? 'on' : 'off';
+//            })->states($states);
+//        }
 
-        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-            if ($form->isEditing()) {
-                $form->number('di', __('Coins'))->default(0)
-                ->disable($form->isEditing());
-            } else {
-                $form->number('di', __('Coins'))->default(0);
-            }
-            $form->number('user_diamond', __('Diamonds'))->default(0);
-            $form->number('total_sender_level', __('Sender Level'))->default(0);
-            $form->number('total_received_level', __('Received Level'))->default(0);
-            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
-            $form->number('salary', __('salary'))->disable();
-        }
+//        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
+//            if ($form->isEditing()) {
+//                $form->number('di', __('Coins'))->default(0)
+//                    ->disable($form->isEditing());
+//            } else {
+//                $form->number('di', __('Coins'))->default(0);
+//            }
+//            $form->number('user_diamond', __('Diamonds'))->default(0);
+//            $form->number('total_sender_level', __('Sender Level'))->default(0);
+//            $form->number('total_received_level', __('Received Level'))->default(0);
+//            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
+//            $form->number('salary', __('salary'))->disable();
+//        }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
-        $form->select('type_user', trans('User Type'))->options([
-            $form->model()->type_user => $form->model()->type_user,
-            0                         => 'مستخدم',
-            1                         => 'مضيف',
-            2                         => 'وكيل مضيفين',
-            3                         => 'وكيل شحن',
-            4                         => ' وكيل مصيفين ووكيل شحن',
-            5                         => 'اداري',
-
-        ])->default(0);
+//        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
+//        $form->select('type_user', trans('User Type'))->options([
+//            $form->model()->type_user => $form->model()->type_user,
+//            0                         => 'مستخدم',
+//            1                         => 'مضيف',
+//            2                         => 'وكيل مضيفين',
+//            3                         => 'وكيل شحن',
+//            4                         => ' وكيل مصيفين ووكيل شحن',
+//            5                         => 'اداري',
+//
+//        ])->default(0);
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -860,8 +875,23 @@ class UserController extends MainController
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
+            //  dd($form->model()->profile->avatar);
             $model     = $form->model();
             $user_id   = $model->id;
+            // $user = User::find($user_id);
+            // $originalProfile = $user->profile;
+            // $newAvatar = request()->input('profile.avatar'); // still okay if tightly coupled
+
+            // if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+            //     $newCount = $user->profile_count + 1;
+            //     $user->profile_count = $newCount;
+            //     $user->save();
+
+            //     // Upload and update avatar
+            //     $form->model()->profile->avatar =  Common::uploadProfileUser('profile', $newAvatar, $originalProfile->id, $newCount);
+            //     // dd($newImagePath);
+
+            // }
             if ($form->oldDiValue != $oldDiValue) {
                 $form->di = $oldDiValue;
             }

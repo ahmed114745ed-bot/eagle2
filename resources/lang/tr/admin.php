@@ -13,6 +13,7 @@ return [
     'password_confirmation' => 'Şifre Onayı',
     'remember_me'           => 'Beni Hatırla',
     'user_setting'          => 'Kullanıcı Ayarları',
+    "total" => "toplam",
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',
     'new'                   => 'Yeni',

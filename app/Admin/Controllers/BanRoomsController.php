@@ -31,13 +31,13 @@ class BanRoomsController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Close room'))
-            ->body($this->grid());
-            // ->row(function ($row) {
-            //     $row->column(10, $this->grid());
-            //     $row->column(2, view('admin.grid.users.ban'));
-            // });
+            ->body($this->grid()));
+        // ->row(function ($row) {
+        //     $row->column(10, $this->grid());
+        //     $row->column(2, view('admin.grid.users.ban'));
+        // });
     }
 
     /**
@@ -49,9 +49,9 @@ class BanRoomsController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('bans'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -63,9 +63,9 @@ class BanRoomsController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('bans'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     /**
@@ -76,9 +76,9 @@ class BanRoomsController extends MainController
      */
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('bans'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 
@@ -90,7 +90,7 @@ class BanRoomsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BanRoom());
-    
+
         $grid->model()->whereHas('room')
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
             // ->select('id','room_id', 'duration', 'staff_id',  
@@ -98,9 +98,9 @@ class BanRoomsController extends MainController
             // )
             // ->groupBy(['room_id', 'duration', 'staff_id'])
             ->orderByDesc('created_at');
-            $grid->column('id', __('Id'));
-            
-            $grid->column('room_id', __('Room'))->display(function () {
+        $grid->column('id', __('Id'));
+
+        $grid->column('room_id', __('Room'))->display(function () {
             $room = $this->room;
 
             if (!$room) return '-';
@@ -109,13 +109,13 @@ class BanRoomsController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $avatarPath = @$room->room_cover;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-    
+
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-    
+
             $userUrl = admin_url('rooms/' . $room->id);
-    
+
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -172,39 +172,40 @@ class BanRoomsController extends MainController
                         </div>
                     </div>";
         });
-    
+
         $grid->duration(__('Duration'));
-    
+
         $grid->column('created_at', __('Expire'))->display(function () {
             $banExpiration = \Carbon\Carbon::parse($this->created_at)->addHours($this->duration);
             return now()->diffForHumans($banExpiration, true);
         });
-    
-        $grid->column('return', __('Delete'))->display(function () {
-            return (new \App\Admin\Actions\DeleteBansRoom( $this->id))->render();
-        });
-     
-    
+        if (Admin::user()->can('delete-' . $this->permission_name)) {
+            $grid->column('return', __('Delete'))->display(function () {
+                return (new \App\Admin\Actions\DeleteBansRoom($this->id))->render();
+            });
+        }
+
+
         $grid->disableExport();
         $grid->disableRowSelector();
         // $grid->disableActions();
         $grid->disableCreateButton();
-    
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('room_id', __('Room Id'));
             });
         });
-     
-    
+
+
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append((new BanRoomAction())->render());
         });
-    
+
         return $grid;
     }
-    
+
 
     /**
      * Make a show builder.

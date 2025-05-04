@@ -77,6 +77,7 @@ class AgencyService
         $agency = $this->agencyRepository->findById($agencyId);
         if (!$agency) throw new Exception(__('api_responses.agency'));
         if ($agency->status == 0) throw new \Exception(__('api_responses.agencyDown'));
+        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
 
         $joined = $user->agency_id;
         if ($joined) throw new \Exception(__('api_responses.you_are_already_under_agency'));

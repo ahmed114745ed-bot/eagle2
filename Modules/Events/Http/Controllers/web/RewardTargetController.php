@@ -24,26 +24,27 @@ use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Entities\RewardTarget;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class RewardTargetController extends MainOldController
+class RewardTargetController extends MainController
 {
     use HasResourceActions;
+    public $permission_name = 'gift-target-event';
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("target_events");
     }
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -55,18 +56,18 @@ class RewardTargetController extends MainOldController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return $content
+        return parent::edit($id,$content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->header(trans('admin.detail'))
             ->description(trans('admin.description'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
     protected function grid()
     {

@@ -17,11 +17,14 @@ use App\Models\NotificationTranslation;
 use App\Models\PaymentCoin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 class SettingsController extends Controller
 {
-
-    public function downloadApp(){
+    public $permission_name = 'settings';
+    public function downloadApp($id)
+    {
 
         $url = env('DOWNLOAD_URL');
         return view('downloadApp', compact('url'));
@@ -52,35 +55,41 @@ class SettingsController extends Controller
         $supabase_url = Common::getConf('supabase_url');
         $supabase_key = Common::getConf('supabase_key');
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
-        return view('admin.settings', compact('pusher_app_secret',
-                'pusher_app_key',
-                'pusher_app_id',
-                'settings',
-                'timezones',
-                'agora_app_id',
-                'zego_server_secret',
-                'zego_app_id',
-                'app_sign',
-                'library',
-                'brand_images',
-                'paymentCoins',
-                'firebase_api_key',
-                'firebase_auth_domain',
-                'firebase_database_url',
-                'supabase_url',
-                'supabase_key',
-                'supabase_service_role_key',
-                'tencent_app_id',
-                'tencent_server_secret',
-                'soundLibrary',
-                'videoLibrary',
-                'gamesLibrary'));
+        return view('admin.settings', compact(
+            'pusher_app_secret',
+            'pusher_app_key',
+            'pusher_app_id',
+            'settings',
+            'timezones',
+            'agora_app_id',
+            'zego_server_secret',
+            'zego_app_id',
+            'app_sign',
+            'library',
+            'brand_images',
+            'paymentCoins',
+            'firebase_api_key',
+            'firebase_auth_domain',
+            'firebase_database_url',
+            'supabase_url',
+            'supabase_key',
+            'supabase_service_role_key',
+            'tencent_app_id',
+            'tencent_server_secret',
+            'soundLibrary',
+            'videoLibrary',
+            'gamesLibrary'
+        ));
     }
 
 
     public function update(Request $request)
     {
-        $data = $request->except('_token','zones_coins','super_admin_coins');
+
+        if (!Admin::user()->can('*')) {
+            Permission::check('edit-' . $this->permission_name);
+        }
+        $data = $request->except('_token', 'zones_coins', 'super_admin_coins');
 
 
 
@@ -94,20 +103,20 @@ class SettingsController extends Controller
             $zoneSetting = Setting::where('key', 'zones_coins')->first();
             $superAdminSetting = Setting::where('key', 'super_admin_coins')->first();
             $shippingSetting = Setting::where('key', 'shipping_coins')->first();
-            if ($zoneSetting && $superAdminSetting && $shippingSetting ) {
+            if ($zoneSetting && $superAdminSetting && $shippingSetting) {
 
                 $userSalary = UserSallary::select('sallary', 'cut_amount')->first();
 
-                        // if ($userSalary) {
-                        //     $calculatedValue = $userSalary->sallary - $userSalary->cut_amount;
+                // if ($userSalary) {
+                //     $calculatedValue = $userSalary->sallary - $userSalary->cut_amount;
 
-                        //     if ($calculatedValue > 0) {
+                //     if ($calculatedValue > 0) {
 
-                        //             admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
-                        //             return back();
+                //             admin_toastr(__('We can`t update the target system right now because some users still have active targets.'), 'error');
+                //             return back();
 
-                        //     }
-                        // }
+                //     }
+                // }
 
                 // if ($request->zones_coins < $request->super_admin_coins) {
                 //     admin_toastr(__('Zones coins must be greater than  super admin coins'), 'error');
@@ -123,15 +132,7 @@ class SettingsController extends Controller
                     admin_toastr(__('agancy coins must be greater than  user coins'), 'error');
                     return back();
                 }
-
-
-
-
-
             }
-
-
-
         }
 
         if ($request->background_type === 'color') {
@@ -139,16 +140,16 @@ class SettingsController extends Controller
             $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
-        } else if($request->background_type == 'gradient'){
+            $data['images_background'] = Common::upload('images', $request->file('app_background_image'));
+        } else if ($request->background_type == 'gradient') {
             $data['gradient_1'] = $request->gradient_1;
             $data['gradient_2'] = $request->gradient_2;
-        }
-        elseif ($request->brand_background_type === 'image') {
-            if(!empty($request->brand_image)){
+            $data['gradient_3'] = $request->gradient_3;
+        } elseif ($request->brand_background_type === 'image') {
+            if (!empty($request->brand_image)) {
                 $data['brand_background'] = $request->brand_image;
                 $data['brand_background_image'] = $request->brand_image;
-            }
-            else if($request->hasFile('brand_background_image')){
+            } else if ($request->hasFile('brand_background_image')) {
                 $data['brand_background'] = Common::upload('images', $request->file('brand_background_image'));
                 $data['brand_background_image'] = $data['brand_background'];
             }
@@ -158,11 +159,11 @@ class SettingsController extends Controller
             $data['brand_background_image'] = null;
         }
 
-        if ($request->brand_background_type == 'color'){
+        if ($request->brand_background_type == 'color') {
             $data['brand_background_image'] = null;
         }
 
-        if ($request->app_title_en || $request->app_title_ar){
+        if ($request->app_title_en || $request->app_title_ar) {
             Cache::forget('app_title');
         }
 
@@ -170,29 +171,47 @@ class SettingsController extends Controller
 
         // Process and save settings
         foreach ($data as $key => $value) {
+
+
+            if (Str::contains($key, ['color']) && (common::getSettingValue('app_primary_color') != $request->app_primary_color || common::getSettingValue('app_second_color') != $request->app_second_color || common::getSettingValue('app_white_color') != $request->app_white_color || common::getSettingValue('app_black_color') != $request->app_black_color || common::getSettingValue('app_grey_color') != $request->app_grey_color || common::getSettingValue('app_yellow_color') != $request->app_yellow_color)) {
+                $cacheKey = 'colors_updated_at';
+                settings()->set($cacheKey, true);
+            } elseif ((common::getSettingValue('background_type') != $request->background_type || common::getSettingValue('images_background') != $request->images_background || common::getSettingValue('background_color') != $request->background_color || common::getSettingValue('gradient_2') != $request->gradient_2 || common::getSettingValue('gradient_3') != $request->gradient_3 || common::getSettingValue('gradient_1') != $request->gradient_1)) {
+
+                $cacheKey = 'ground_updated_at';
+                settings()->set($cacheKey, true);
+            } else {
+                $cacheKey = $key . '_updated_at';
+                settings()->set($cacheKey, true);
+            }
             if ($value instanceof \Illuminate\Http\UploadedFile) {
                 $value = Common::upload('images', $value);
             }
 
             if (!is_null($value)) {
-                    Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                    if (!$value instanceof \Illuminate\Http\UploadedFile) {
-                        Cache::put($key, $value);
-                     }
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                if (!$value instanceof \Illuminate\Http\UploadedFile) {
+                    Cache::put($key, $value);
+                }
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
 
-          //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
-            $key = Str::contains($key, ['color', 'app_background','image1','image2','image3']) ? 'colors_updated_at' : $key.'_updated_at';
-            settings()->set($key, true);
+            // //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
+            // if (Str::contains($key, ['color'])) {
+            //     $key = 'colors_updated_at';
+            // } elseif (Str::contains($key, ['app_background', 'image1', 'image2', 'image3'])) {
+            //     $key = 'app_background_updated_at';
+            // } else {
+            //     $key . '_updated_at';
+            // }
 
         }
 
-        if( $request->has('user_coins')){
-            Config::query()->where('name', '=','one_usd_value_in_coins')->update(['value' => $request->user_coins]);
 
-       }
+        if ($request->has('user_coins')) {
+            Config::query()->where('name', '=', 'one_usd_value_in_coins')->update(['value' => $request->user_coins]);
+        }
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

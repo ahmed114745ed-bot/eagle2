@@ -20,6 +20,11 @@ return [
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
 
+    'now_payments' =>[
+        'api_key' => env('NOWPAYMENTS_API_KEY'),
+        'callback_url' => env('NOWPAYMENTS_CALLBACK_URL'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

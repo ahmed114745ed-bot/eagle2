@@ -1587,6 +1587,12 @@
                                         value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
                                         style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
                                         title="لون  التدرج">
+
+                                        <label for="box_background_color">{{ __('gradient Third Color:') }}</label>
+                                    <input type="color" id="gradient_3" name="gradient_3"
+                                        value="{{ $settings['gradient_3'] ?? '#F8F9FA' }}"
+                                        style="background: {{ $settings['gradient_3'] ?? '#F8F9FA' }};"
+                                        title="لون  التدرج">
                             </div>
 
                         </div>
@@ -1738,7 +1744,7 @@
                             $('#background_image_preview').show();
                             $('#background_color_group').hide();
                             $('#gradient_group').hide();
-                        } 
+                        }
                     }
                 }
             </script>
@@ -1991,36 +1997,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                    // Updated selector to match your new class
-                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                    const fieldsContainers = {
-                                                                                                        '0': document.getElementById('agora-fields'),
-                                                                                                        '1': document.getElementById('zego-fields'),
-                                                                                                        '2': document.getElementById('pusher-fields')
-                                                                                                    };
+                    // Updated selector to match your new class
+                    const radioButtons = document.querySelectorAll('.radio-input');
+                    const fieldsContainers = {
+                        '0': document.getElementById('agora-fields'),
+                        '1': document.getElementById('zego-fields'),
+                        '2': document.getElementById('pusher-fields')
+                    };
 
-                                                                                                    function toggleFields() {
-                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                    function toggleFields() {
+                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                        // Hide all fields first
-                                                                                                        Object.values(fieldsContainers).forEach(container => {
-                                                                                                            container.style.display = 'none';
-                                                                                                        });
+                        // Hide all fields first
+                        Object.values(fieldsContainers).forEach(container => {
+                            container.style.display = 'none';
+                        });
 
-                                                                                                        // Show the selected one
-                                                                                                        if (fieldsContainers[selectedValue]) {
-                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                        }
-                                                                                                    }
+                        // Show the selected one
+                        if (fieldsContainers[selectedValue]) {
+                            fieldsContainers[selectedValue].style.display = 'flex';
+                        }
+                    }
 
-                                                                                                    // Add event listeners to radio buttons
-                                                                                                    radioButtons.forEach(radio => {
-                                                                                                        radio.addEventListener('change', toggleFields);
-                                                                                                    });
+                    // Add event listeners to radio buttons
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', toggleFields);
+                    });
 
-                                                                                                    // Initialize the fields visibility
-                                                                                                    toggleFields();
-                                                                                                });*/
+                    // Initialize the fields visibility
+                    toggleFields();
+                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
@@ -2030,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
+                            document.getElementById('app_primary_color').value = "#aee6cf";
+                            document.getElementById('app_second_color').value = "#eff7f5";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";
@@ -2048,11 +2054,11 @@
                     if (resetButton) {
                         resetButton.addEventListener('click', function() {
                             let colorInputs = {
-                                'primary_color': "#FF9428",
-                                'secondary_color': "#1A1A1A",
+                                'primary_color': "#00FFCC",
+                                'secondary_color': "#FFFFFF",
                                 'text_primary_color': "#fdf8f8",
-                                'text_secondary_color': "#c1b9b9",
-                                'box_background_color': "#222222",
+                                'text_secondary_color': "#000000",
+                                'box_background_color': "#969696",
                                 'table_background_color': "#c88213"
                             };
 

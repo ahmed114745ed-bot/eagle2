@@ -291,6 +291,10 @@ class RankingService
             $vip_level = 0;
         }
 
+        if (is_object($vip_level_img) && get_class($vip_level_img) === 'stdClass') {
+            $vip_level_img = 0;
+        }
+
         $userData = $data->where($key, $user->id)->first();
 
         $arr['user']['exp'] = ($userExp != null) ? (@$userExp->exp ?? '0') : (@$userData->exp ?? '0');

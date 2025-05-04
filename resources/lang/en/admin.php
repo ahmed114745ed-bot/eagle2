@@ -138,6 +138,9 @@ return [
     'delete' => "delete",
     "diamond" => "Diamonds",
     "target" => "Target",
+
+    "total" => "total",
+
     "salary" => "Salary",
     "payments" => "Payments",
     "totalGiftPrice" => "Total gift price",

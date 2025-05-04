@@ -40,6 +40,7 @@ class CoinController extends MainOldController
     }
 
 
+
     protected function grid()
     {
         $paymentGatwayId = request('paymentGatwayId');
@@ -105,10 +106,16 @@ class CoinController extends MainOldController
     {
         $id = request()->route('id');
         $form = $this->form()->edit($id);
-        return $content
+        return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($form);
+            ->body($form));
+    }
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('coins'))
+            ->body($this->detail($id)));
     }
 
     public function update($id)

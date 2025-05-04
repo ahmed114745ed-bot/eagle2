@@ -63,18 +63,25 @@ class OvipGiftTapController extends MainController
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
+    }
+
+    public function show($id, Content $content)
+    {
+        return parent::show($id,$content
+            ->title(trans('gift'))
+            ->body($this->detail($id)));
     }
 
     public function edit($id, Content $content)
     {
 
-        return $content
+        return parent::edit($id,$content
             ->title(trans('gift'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     protected function gridDynamic($level, $firstType)

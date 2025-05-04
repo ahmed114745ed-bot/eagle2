@@ -18,7 +18,7 @@ class ChangeLevelHistoryController extends MainController
      * @var string
      */
     protected $title = 'ChangeLevelHistory';
-
+    public $permission_name = 'level-user-history';
     /**
      * Make a grid builder.
      *
@@ -48,7 +48,7 @@ class ChangeLevelHistoryController extends MainController
             $path = @$this->user?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
-            $editUrl = url("admin/users/{$this->user->id}"); // Using named route
+            $this->user->id?$editUrl = url("admin/users/{$this->user->id }") :$editUrl = ''; // Using named route
 
             // Check if the image exists
             if (!isImageExists($url)) {
@@ -80,7 +80,7 @@ class ChangeLevelHistoryController extends MainController
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = url("admin/auth/users/{$this->admin->id}");
+                $this->admin->id? $showUrl = url("admin/auth/users/{$this->admin->id}") : $showUrl = "";
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>

@@ -27,9 +27,9 @@ class WareController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('Products'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**
@@ -41,9 +41,9 @@ class WareController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id, $content
             ->title(trans('wares'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -55,16 +55,16 @@ class WareController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id, $content
             ->title(trans('wares'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('wares'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -294,7 +294,7 @@ class WareController extends MainController
 
             ]
         )->attribute(['id' => 'image_type1']);
-    
+
         $form->select('profile_frame_type', __('profile_frame_type'))->options(
             [
                 'svga' => __('svga'),
@@ -302,8 +302,8 @@ class WareController extends MainController
 
             ]
         )->attribute(['id' => 'profile_frame']);
-   
-       
+
+
 
         $script = <<<SCRIPT
              $(document).ready(function() {
@@ -359,10 +359,6 @@ class WareController extends MainController
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
             }
-            if ($form->isCreating()) {
-                $form->model()->created_by = auth()->id();
-            }
-            $form->model()->updated_by = auth()->id();
 
 
             (new UserCounterServices)->eventUsers('ware');

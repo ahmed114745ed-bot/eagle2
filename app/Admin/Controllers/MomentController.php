@@ -34,11 +34,11 @@ class MomentController extends MainController
      */
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
     protected function grid2()
     {

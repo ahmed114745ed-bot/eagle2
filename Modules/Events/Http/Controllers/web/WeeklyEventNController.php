@@ -24,31 +24,42 @@ use App\Admin\Controllers\MainController;
 use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class WeeklyEventNController extends MainOldController
+class WeeklyEventNController extends MainController
 {
     use HasResourceActions;
 
-        public $permission_name = 'weekly-star';
-    public $hiddenColumns = [
-
-    ];
+    public $permission_name = 'weekly-star';
+    public $hiddenColumns = [];
 
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("weekly_star");
     }
 
-    public function index ( Content $content )
+    public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__('weekly-events-new'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function (Row $row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('weekly-events-new'))
+            ->body($this->form()->edit($id)));
+    }
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('weekly-events-new'))
+            ->body($this->form()));
+    }
+
     protected function grid2()
     {
         $form = new Box();
@@ -64,14 +75,14 @@ class WeeklyEventNController extends MainOldController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        $grid->column( __ ('procedures'))->display(function () {
+        $grid->column(__('procedures'))->display(function () {
             // توليد الروابط
-            $url1 = url('admin/weekly-events-gift/'.$this->id);
+            $url1 = url('admin/weekly-events-gift/' . $this->id);
 
             // إنشاء أزرار HTML
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('winners gifts') . "</a>";
             // دمج الأزرار في سلسلة واحدة وإرجاعها
-            return $button1 ;
+            return $button1;
         });
 
 
@@ -91,26 +102,26 @@ class WeeklyEventNController extends MainOldController
         $form = new Form(new WeeklyStar);
         $form->display(__('admin.ID'));
         $form = new Form(new WeeklyStar());
-        $form->hidden('type','Type')->default('weekly_star');
-        $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type",'weekly_star')->max('start_date');
+        $form->hidden('type', 'Type')->default('weekly_star');
+        $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date', __('Start Date'))->default($minStartDate??date("Y-m-d"))
-         ->rules(function ($form) {
+        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+            ->rules(function ($form) {
 
-             $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type",'weekly_star')->max('start_date');
+                $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_star')->max('start_date');
 
-             $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-           if ($minStartDate) {
-                if (!$id = $form->model()->id) {
-                    return 'required|after:'.$minStartDate;
+                $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
+                if ($minStartDate) {
+                    if (!$id = $form->model()->id) {
+                        return 'required|after:' . $minStartDate;
+                    } else {
+                        return 'required';
+                    }
                 } else {
-                    return 'required';
+                    return 'required|date';
                 }
-           }else {
-               return 'required|date';
-           }
-        });
+            });
         $form->belongsToMany('gifts', Gifts::class)
             ->rules('required|array|size:3', [
                 'size' => __('choose only 3 gifts.'),
@@ -126,105 +137,102 @@ class WeeklyEventNController extends MainOldController
         $show->field('id', __('Id'));
         $show->field('start_date', __('Start date'));
         $show->field('type', __('Type'))->as(function ($type) {
-            return  $type == 1?"gifts": ($type == 0?"charges":"PK" );
+            return  $type == 1 ? "gifts" : ($type == 0 ? "charges" : "PK");
         });
 
 
-        $this->extendShow ($show);
+        $this->extendShow($show);
 
         return $show;
     }
 
-    public function show ( $id , Content $content )
+    public function show($id, Content $content)
     {
-        return $content
-        ->row ("<h3>".__('weekly Star')."</h3>")->row (function ($row) use ($id){
-            $row->column(12, $this->weeklyStar($id));
-        })
-        ->row ("<h3>".__('gifts')."</h3>")->row (function ($row) use ($id){
-            $row->column(12, $this->giftList($id));
-        })
-            ->row ("<h3>".__('Rewards')."</h3>")->row (function ($row) use ($id){
-                $row->column(12, $this->rewardList($id));
+        return parent::show($id, $content
+            ->row("<h3>" . __('weekly Star') . "</h3>")->row(function ($row) use ($id) {
+                $row->column(12, $this->weeklyStar($id));
             })
-        ;
-
+            ->row("<h3>" . __('gifts') . "</h3>")->row(function ($row) use ($id) {
+                $row->column(12, $this->giftList($id));
+            })
+            ->row("<h3>" . __('Rewards') . "</h3>")->row(function ($row) use ($id) {
+                $row->column(12, $this->rewardList($id));
+            }));
     }
 
 
-    protected function weeklyStar($id){
+    protected function weeklyStar($id)
+    {
 
         $grid = new Grid(new WeeklyStar());
-        $grid->model()->where('id',$id);
+        $grid->model()->where('id', $id);
 
         $grid->column('start_date', __('Start date'));
         $grid->column('end_date', __('End date'));
         $grid->column('type', __('Type'))->display(function ($type) {
 
-        return  $type == 1?"gifts": ($type == 0?"charges":"PK" );
-
+            return  $type == 1 ? "gifts" : ($type == 0 ? "charges" : "PK");
         });
 
         $grid->disableActions();
-        $grid->disableCreateButton ();
-        $grid->disableFilter ();
-        $grid->disableRowSelector ();
-        $grid->disableExport ();
+        $grid->disableCreateButton();
+        $grid->disableFilter();
+        $grid->disableRowSelector();
+        $grid->disableExport();
 
         return $grid;
     }
-    protected function rewardList($id){
+    protected function rewardList($id)
+    {
 
         $grid = new Grid(new Reward);
-        $grid->model()->where('weekly_star_id',$id);
+        $grid->model()->where('weekly_star_id', $id);
 
-        $grid->column('level',trans ('level'));
-         $grid->column('type',trans ('type'))->display(function ($type) {
+        $grid->column('level', trans('level'));
+        $grid->column('type', trans('type'))->display(function ($type) {
 
-            return   $type == "coins"?"coins": ($type == "ware"?"ware": ($type=="vip"? "vip":'achievement') );
-
+            return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
-        $grid->column('target',trans ('target'))->display(function ($target){
+        $grid->column('target', trans('target'))->display(function ($target) {
 
-                if($this->type == "coins"){
-                    return $target;
-                }elseif($this->type =="ware" ){
-                    $ware = Ware::find($target);
-                    return $ware->name;
-                }elseif($this->type =="vip" ){
-                  $vip = OVip::find($target);
-                  return $vip->name;
-                }else{
-                    $value = getDriverUrl() . '/'. @$this->target;
-                    return "<img src='$value' width='80' height='80'>";
-                }
-
-
+            if ($this->type == "coins") {
+                return $target;
+            } elseif ($this->type == "ware") {
+                $ware = Ware::find($target);
+                return $ware->name;
+            } elseif ($this->type == "vip") {
+                $vip = OVip::find($target);
+                return $vip->name;
+            } else {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
         });
 
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
-        $grid->disableFilter ();
-        $grid->disableRowSelector ();
-        $grid->disableExport ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        $grid->disableFilter();
+        $grid->disableRowSelector();
+        $grid->disableExport();
 
         return $grid;
     }
 
 
-    protected function giftList($id){
+    protected function giftList($id)
+    {
         $weeklyEvent = WeeklyStar::find($id);
         $giftIds = $weeklyEvent->gifts->pluck('id')->toArray();
         $grid = new Grid(new Gift);
-        $grid->model()->whereIn('id',$giftIds);
+        $grid->model()->whereIn('id', $giftIds);
         $grid->name(__('name'));
-        $grid->column('img',trans ('image'))->image ('','30');
+        $grid->column('img', trans('image'))->image('', '30');
 
-        $grid->disableActions ();
-        $grid->disableCreateButton ();
-        $grid->disableFilter ();
-        $grid->disableRowSelector ();
-        $grid->disableExport ();
+        $grid->disableActions();
+        $grid->disableCreateButton();
+        $grid->disableFilter();
+        $grid->disableRowSelector();
+        $grid->disableExport();
 
         return $grid;
     }

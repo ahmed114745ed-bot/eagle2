@@ -180,8 +180,7 @@ class MyDataResource extends JsonResource
             'number_of_friends' => $this->friends()->count(),
             'profile_visitors' => $this->profileVisits()->count(),
 
-            'profile' => new ProfileResource(@$this->profile),
-
+            'profile' => $this->profile ? new ProfileResource($this->profile) : null,
             'level' => Common::level_center(@$this),
             'charge_level' => Common::chargeLevel(@$this->id),
             'game_available' => (bool)UserHandling::chickLevelToPlay($this->resource),
