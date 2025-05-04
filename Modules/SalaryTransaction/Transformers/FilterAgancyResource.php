@@ -22,6 +22,7 @@ class FilterAgancyResource extends JsonResource
             'image' => @$this->img,
             'total_members' => $this->mempers->count(),
             'members' => AgencyMemberResource::collection($this->mempers),
+            'agency_type' => $this->Shipping_agency == 1 ? 'shipping' : 'hosts',
             'owner' => [
                 'id' => $this->owner->id ?? 0,
                 'uuid' => $this->owner->uuid ?? '',

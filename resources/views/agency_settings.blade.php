@@ -356,7 +356,7 @@
                         <input type="hidden" name="language" value="defaultInput">
 
                         <div class="badge-upload-container">
-                            @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                            @foreach (['shipping', 'host', 'agency_owner'] as $type)
                                 <div class="badge-upload-item">
                                     <label for="default_{{ $type }}">
                                         @if ($type == 'host')
@@ -400,7 +400,7 @@
                             <input type="hidden" name="language" value="{{ $language->code }}">
 
                             <div class="badge-upload-container">
-                                @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                                @foreach (['shipping', 'host', 'agency_owner'] as $type)
                                     <div class="badge-upload-item">
                                         <label for="{{ $language->code }}_{{ $type }}">
                                             @if ($type == 'host')
