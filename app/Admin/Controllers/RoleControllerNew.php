@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Models\Role;
 
 class RoleControllerNew extends MainController
 {
@@ -31,7 +32,7 @@ class RoleControllerNew extends MainController
         return parent::edit($id, $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
-            ->body($this->form()->edit($id)));
+            ->body($this->form($id)->edit($id)));
     }
     public function create(Content $content)
     {
@@ -161,7 +162,7 @@ class RoleControllerNew extends MainController
     //     return $form;
     // }
 
-    public function form()
+    public function form($id = null)
     {
         $permissionModel = config('admin.database.permissions_model');
         $permissions = $permissionModel::all();
@@ -170,9 +171,16 @@ class RoleControllerNew extends MainController
         $form = new Form(new $roleModel());
 
         // Current permissions for edit mode
-        $selectedPermissions = request()->route()->parameter('role')
-            ? $form->model()->permissions->pluck('id')->toArray()
-            : [];
+        if ($form->isEditing()) {
+           
+           
+            $roleModel = config('admin.database.roles_model');
+           
+            $selectedPermissions=  Role::where('id',$id)->first()->permissions->pluck('id')->toArray();
+        } else {
+            $selectedPermissions = [];
+        }
+
 
         $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
@@ -197,7 +205,12 @@ class RoleControllerNew extends MainController
         });
 
         $form->saved(function (Form $form) {
-            $form->model()->permissions()->sync(request('permissions', []));
+            $all = request('permissions_all'); // comma-separated string
+           
+            $permissions = array_filter(explode(',', $all));
+         
+            $form->model()->permissions()->sync($permissions);
+          //  $form->model()->permissions()->sync(request('permissions', []));
         });
 
         return $form;
@@ -223,9 +236,19 @@ class RoleControllerNew extends MainController
     }
 
 
-    public function permissionByCategory($category)
+    public function getPermissionsByCategory($category)
     {
         $permissionModelClass = config('admin.database.permissions_model');
-        return $permissionModelClass::where('category', $category)->get();
+
+        $permissions = $permissionModelClass::where('category', $category)->get();
+        $data = $permissions->map(function ($perm) {
+            return [
+                'id' => $perm->id,
+                'name' => $perm->name,
+                'name_ar' => $perm->name_ar,
+            ];
+        });
+    
+        return response()->json(['permissions' => $data]);
     }
 }

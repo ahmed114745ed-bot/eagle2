@@ -289,96 +289,59 @@
         <div class="settings-sidebar">
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
-                <button onclick="showSection('PercentageTarget')"
-                style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Manger') }}</button>
-
-{{--                 <button onclick="showSection('Badges')">{{ __('Badges') }}</button>
- --}}
+                <button onclick="showSection('PaymentGateways')"
+                style="background: var(--primary-color); color: var(--text-secondary-color);">
+            {{ __('Payment Gateways') }}
+        </button>
             </div>
         </div>
 
         <div class="settings-content">
-            <div id="PercentageTarget" class="settings-section active">
 
-                <h3> {{ __('admin.value')  }}</h3>
+            <div id="PaymentGateways" class="settings-section active">
+                <h3>{{ __('Payment Gateways') }}</h3>
 
-                <form action="{{ route('admin.update-config-group-chat') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="form">
-                        <input type="hidden" name="id" value="{{ $config->id ?? '' }}">
+                <div class="table-responsive">
+                    <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
+                        {{ __('Add') }}
+                    </a>
+                    <table class="table" style="background-color: var(--secondary-color);">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Photo') }}</th>
+                                <th>{{ __('Title') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($payment_gateways as $gateway)
+                            <tr>
+                                <td>{{ $gateway->id }}</td>
+                                <td>
+                                    <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="width: 100px; height: 50px;">
+                                </td>
+                                <td>{{ $gateway->title }}</td>
+                                <td>
+                                    <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
+                                       class="btn btn-sm btn-primary">
+                                        {{ __('Edit') }}
+                                    </a>
 
-                        <label for="android_min_version" class="control-label">{{ __('admin.value')  }} :</label>
-
-                        <input type="text" id="android_min_version" name="value"  placeholder="android_min_version" value="{{ $configValue }}"  min="1" class="inputs_cus_form">
-                        <button type="submit">{{ __('Save') }}</button>
-
-                    </div>
-
-                </form>
-            </div>
-
-            <div id="Badges" class="settings-section">
-                <h3>{{ __('Badges') }}</h3>
-
-                <!-- Language Tabs Navigation -->
-                <div class="tab-buttons">
-                    @foreach($languages as $index => $language)
-                        <button class="tab-button {{ $index === 0 ? 'active' : '' }}"
-                                onclick="openLanguageTab(event, '{{ $language->code }}')">
-                            {{ $language->name }}
-                        </button>
-                    @endforeach
-                </div>
-
-                <!-- Language Tab Contents -->
-                @foreach($languages as $index => $language)
-                <div id="{{ $language->code }}" class="tab-content {{ $index === 0 ? 'active' : '' }}">
-                    <form action="{{ route('admin.upload.badges') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="language" value="{{ $language->code }}">
-
-                        <div class="badge-upload-container">
-                            @foreach(['supporter', 'shipping', 'host', 'agency_owner'] as $type)
-                                <div class="badge-upload-item">
-                                    <label for="{{ $language->code }}_{{ $type }}">
-                                        @if($type == 'host')
-                                            {{ __('Hosting') }} ({{ strtoupper($language->code) }}):
-                                        @else
-                                            {{ __(ucfirst($type)) }} ({{ strtoupper($language->code) }}):
-                                        @endif
-                                    </label>
-                                    <input type="file"
-                                           id="{{ $language->code }}_{{ $type }}"
-                                           name="{{ $language->code }}_{{ $type }}"
-                                           onchange="previewImage(this, 'preview_{{ $language->code }}_{{ $type }}')">
-
-                                    <div class="badge-preview">
-                                        @php
-                                            $row = $configAll->where('name', $language->code . '_' . $type)->first();
-                                        @endphp
-                                        @if ($row)
-                                            <img id="preview_{{ $language->code }}_{{ $type }}"
-                                                 src="{{ getImagePath($row?->value) }}"
-                                                 alt="{{ $type }} badge"
-                                                 onclick="openFullScreen(this)">
-                                        @else
-                                            <img id="preview_{{ $language->code }}_{{ $type }}"
-                                                 src=""
-                                                 alt="No image uploaded"
-                                                 style="display: none;">
-                                        @endif
-                                    </div>
-                                </div>
+                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure?')">
+                                            {{ __('Delete') }}
+                                        </a>
+                                </td>
+                            </tr>
                             @endforeach
-                        </div>
-
-                        <button type="submit" class="upload-button">
-                            {{ __('Submit') }}
-                        </button>
-                    </form>
+                        </tbody>
+                    </table>
                 </div>
-                @endforeach
+
+
             </div>
+
         </div>
         <div id="imageModal" class="modal" onclick="closeFullScreen()">
             <span class="close">&times;</span>

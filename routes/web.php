@@ -8,6 +8,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\ConfigController as ControllersConfigController;
+use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\UserController;
 use App\Facades\CustomNotification;
 use App\Http\Controllers\addTOjesonController;
@@ -181,6 +182,13 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
+
+
+        Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
+        Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
+        Route::post('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
+        Route::get('edit-payment-gateways/{id}', [MangerSettingController::class, 'editPaymentGateway'])->name('edit-payment-gateway');
+        Route::get('delete-payment-gateways/{id}', [MangerSettingController::class, 'deletePaymentGateway'])->name('delete-payment-gateway');
         Route::get('download-app/{id}', [SettingsController::class, 'downloadApp']);
 
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
@@ -254,30 +262,30 @@ Route::get('/test-fcm/{userid}', function($userId) {
 
     $language = 'ar'; // أو 'en'
     $userLevel = 5; // مستوى افتراضي للاختبار
-    
+
     // نصوص الإشعار
     $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
     $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
     $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
     $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
-    
-    // صورة افتراضية 
+
+    // صورة افتراضية
     $icon = "https://example.com/images/vip_badge.png";
     $data = [
         'image' => $icon,
         'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
         'type' => 'level_upgrade'
     ];
-    
+
     // إرسال الإشعار
     $result = Common::send_firebase_notification(
-        $testToken, 
+        $testToken,
         $title,
-        $firebaseBody, 
-        icon: $icon, 
+        $firebaseBody,
+        icon: $icon,
         data: $data
     );
-    
+
     return response()->json([
         'success' => true,
         'message' => 'تم إرسال الإشعار التجريبي',
