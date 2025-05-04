@@ -319,7 +319,7 @@
                             <tr>
                                 <td>{{ $gateway->id }}</td>
                                 <td>
-                                    <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" width="50">
+                                    <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="width: 10px; height: 5px;">
                                 </td>
                                 <td>{{ $gateway->title }}</td>
                                 <td>
