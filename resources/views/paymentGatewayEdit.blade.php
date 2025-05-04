@@ -303,7 +303,7 @@
             <div id="PaymentGateways" class="settings-section active">
                 <h3>{{ __('Payment Gateways') }}</h3>
 
-
+                <a href="{{ URL::previous() }}" class="btn btn-primary">{{ __('back') }}</a>
                 <form action="{{ route('admin.update-payment-gateway', $gateway->id) }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
