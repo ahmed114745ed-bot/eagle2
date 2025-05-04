@@ -305,7 +305,7 @@
                     <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
                         {{ __('Add') }}
                     </a>
-                    <table class="table" style="background-color: var(--secondary-color);">
+                    <table class="table" style="background-color: #d8d8d9;">
                         <thead>
                             <tr>
                                 <th>#</th>
