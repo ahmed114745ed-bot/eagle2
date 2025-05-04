@@ -9,7 +9,7 @@
     if (Schema::hasTable('settings')) {
         $logoDb = DB::table('settings')->where('key', 'app_logo')->value('value');
 
-        
+
         if ($logoDb) {
             $logo = getImagePath( $logoDb);
         }
