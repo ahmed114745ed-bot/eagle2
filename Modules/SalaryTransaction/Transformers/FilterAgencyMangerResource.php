@@ -28,6 +28,7 @@ class FilterAgencyMangerResource extends JsonResource
                 'id' => $this->ownAgency?->id ?? 0,
                 'name' => @$this->ownAgency?->name ?? '',
                 'image' => @$this->ownAgency?->img ?? '',
+                'agency_type' => $this->ownAgency?->Shipping_agency == 1 ? 'shipping' : 'hosts',
             ],
         ];
     }
