@@ -180,7 +180,7 @@ class RoleControllerNew extends MainController
         // Custom tabbed view
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
-            'selectedPermissions' =>  Role::where('id', $id)->first()->permissions->pluck('id')->toArray() ?? [],
+            'selectedPermissions' =>$id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray(): [],
         ])->render());
 
         $form->text('desc_en', __('Description en'));
