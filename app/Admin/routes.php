@@ -193,8 +193,18 @@ Route::group(
         ]);
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);
         $router->resource('auth/roles', 'RoleController');
-        $router->resource('auth/rolesTest', 'RoleControllerNew');
-        $router->get('permission_category/{category}', [RoleControllerNew::class,'permissionByCategory']);
+      //  $router->resource('auth/rolesTest', 'RoleControllerNew');
+        Route::prefix('auth/rolesTest')->group(function () {
+            Route::get('/', [RoleControllerNew::class, 'index']);
+            Route::get('/create', [RoleControllerNew::class, 'create']);
+            Route::post('/', [RoleControllerNew::class, 'store']);
+            Route::get('/{id}', [RoleControllerNew::class, 'show']);
+            Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
+            Route::put('/{id}', [RoleControllerNew::class, 'update']);
+            Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
+        });
+        Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
+       
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
         $router->post('app-setting', [ColorController::class, 'appSetting'])->name("app-setting");
