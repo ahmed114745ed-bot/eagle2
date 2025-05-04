@@ -170,18 +170,6 @@ class RoleControllerNew extends MainController
 
         $form = new Form(new $roleModel());
 
-        // Current permissions for edit mode
-        if ($form->isEditing()) {
-           
-           
-            $roleModel = config('admin.database.roles_model');
-           
-            $selectedPermissions=  Role::where('id',$id)->first()->permissions->pluck('id')->toArray();
-        } else {
-            $selectedPermissions = [];
-        }
-
-
         $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
         $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name,{{id}}');
@@ -192,7 +180,7 @@ class RoleControllerNew extends MainController
         // Custom tabbed view
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
-            'selectedPermissions' => $selectedPermissions,
+            'selectedPermissions' =>  Role::where('id', $id)->first()->permissions->pluck('id')->toArray() ?? [],
         ])->render());
 
         $form->text('desc_en', __('Description en'));
@@ -206,11 +194,11 @@ class RoleControllerNew extends MainController
 
         $form->saved(function (Form $form) {
             $all = request('permissions_all'); // comma-separated string
-           
+
             $permissions = array_filter(explode(',', $all));
-         
+
             $form->model()->permissions()->sync($permissions);
-          //  $form->model()->permissions()->sync(request('permissions', []));
+            //  $form->model()->permissions()->sync(request('permissions', []));
         });
 
         return $form;
@@ -248,7 +236,7 @@ class RoleControllerNew extends MainController
                 'name_ar' => $perm->name_ar,
             ];
         });
-    
+
         return response()->json(['permissions' => $data]);
     }
 }
