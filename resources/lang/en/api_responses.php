@@ -119,6 +119,11 @@ return [
     'agency_updated'       => 'Agency Updated Successfully',
     'closedRoom' => "Sorry, room is closed now",
     'freez_charge' => 'Your wallet has been frozen. Contact the administration!',
+
+    'freeze_charge_settings' => 'Charging is currently disabled by the administrator.',
+    'freeze_transfer_charger' => 'Your transfers has been frozen. Contact the administration!',
+    'freeze_transfer_receiver' => 'The receiver transfers has been frozen. he cannot receive transfers at this time.',
+
     'agencyDown' => 'Sorry!The agency is down now, you can\'t join it',
     'canNotCharge' =>'You can\'t charge,  your agency down',
     'disabled_version' => 'Kindly delete the application and re-download it from Google Play, than you for understanding',
