@@ -290,7 +290,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('PaymentGateways')"
-                style="background: var(--primary-color); color: var(--text-secondary-color);">
+                style="background: var(--box-background-color); color: var(--text-secondary-color);">
             {{ __('Payment Gateways') }}
         </button>
             </div>
@@ -305,7 +305,7 @@
                     <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
                         {{ __('Add') }}
                     </a>
-                    <table class="table" style="background-color: #d8d8d9;">
+                    <table class="table" style="background-color: var(--box-background-color) !important;">
                         <thead>
                             <tr>
                                 <th>#</th>
