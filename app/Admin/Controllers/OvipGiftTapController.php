@@ -33,6 +33,7 @@ class OvipGiftTapController extends MainController
         <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
+        $ovip=null;
         if (request('ovip_id')) {
             $ovip = OVip::find(request('ovip_id'));
         } elseif (request('level')) {
@@ -43,10 +44,10 @@ class OvipGiftTapController extends MainController
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip->privilegs));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs));
             })
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->gridDynamic($ovip->level, $ovip->privilegs->first()->type));
+                $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()->type));
             }));
 
 
@@ -314,13 +315,13 @@ class OvipGiftTapController extends MainController
         // Fetch distinct privilege types and names
         if (app()->getLocale() == 'en') {
 
-            $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
+            $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
         } else {
-            $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
+            $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
 
         // Default to the first type if none is selected
-        $currentType = request()->get('type', $privilegeTypes->keys()->first());
+        $currentType = request()->get('type', $privilegeTypes?->keys()->first());
 
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
             'types' => $privilegeTypes,
