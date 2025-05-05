@@ -766,6 +766,12 @@
     "Toggle Transfer Salary": "ट्रांसफर सैलरी को टॉगल करें",
     "Transfer salary has been enabled!": "ट्रांसफर सैलरी सक्षम की गई है!",
     "Transfer salary has been disabled!": "ट्रांसफर सैलरी अक्षम की गई है!",
+    "Enable Can Play": "खेल की अनुमति सक्षम करें",
+    "Disable Can Play": "खेल की अनुमति अक्षम करें",
+    "Enable Show Invite Code": "आमंत्रण कोड दिखाना सक्षम करें",
+    "Disable Show Invite Code": "आमंत्रण कोड दिखाना अक्षम करें",
+    "Enable Transfer Salary": "वेतन ट्रांसफर सक्षम करें",
+    "Disable Transfer Salary": "वेतन ट्रांसफर अक्षम करें",
 
     "Levels": "स्तर",
     "agency name": "एजेंसी का नाम",

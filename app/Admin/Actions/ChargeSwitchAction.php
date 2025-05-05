@@ -16,11 +16,12 @@ use Encore\Admin\Auth\Permission;
 
 class ChargeSwitchAction extends RowAction
 {
-    public $name;
 
-    public function __construct()
+    public function name()
     {
-        $this->name = __('Toggle Transfer Salary');
+        return $this->row->transfer_salary
+            ? __('Disable Transfer Salary')
+            : __('Enable Transfer Salary');
     }
 
     public function handle(Model $model)
@@ -40,5 +41,14 @@ class ChargeSwitchAction extends RowAction
     public function icon()
     {
         return $this->row->transfer_salary ? 'fa-toggle-on' : 'fa-toggle-off';
+    }
+
+    public function dialog()
+    {
+        $msg = $this->row->transfer_salary
+            ? __('dashboard.confirm_disable_transfer_salary')
+            : __('dashboard.confirm_enable_transfer_salary');
+
+        $this->confirm($msg, '', []);
     }
 }
