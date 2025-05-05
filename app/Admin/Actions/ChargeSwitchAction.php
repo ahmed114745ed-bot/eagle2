@@ -20,8 +20,8 @@ class ChargeSwitchAction extends RowAction
     public function name()
     {
         return $this->row->transfer_salary
-            ? __('Disable Transfer Salary')
-            : __('Enable Transfer Salary');
+            ? __('Enable Transfer Salary')
+            : __('Disable Transfer Salary');
     }
 
     public function handle(Model $model)
@@ -30,24 +30,24 @@ class ChargeSwitchAction extends RowAction
         $model->save();
 
         $message = $model->transfer_salary
-            ? __('Transfer salary has been enabled!')
-            : __('Transfer salary has been disabled!');
+            ? __('Transfer salary has been disabled!')
+            : __('Transfer salary has been enabled!');
 
-        $response = $model->transfer_salary ? 'success' : 'error';
+        $response = $model->transfer_salary ? 'error' : 'success';
 
         return $this->response()->$response($message)->refresh();
     }
 
     public function icon()
     {
-        return $this->row->transfer_salary ? 'fa-toggle-on' : 'fa-toggle-off';
+        return $this->row->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on';
     }
 
     public function dialog()
     {
         $msg = $this->row->transfer_salary
-            ? __('dashboard.confirm_disable_transfer_salary')
-            : __('dashboard.confirm_enable_transfer_salary');
+            ? __('dashboard.confirm_enable_transfer_salary')
+            : __('dashboard.confirm_disable_transfer_salary');
 
         $this->confirm($msg, '', []);
     }
