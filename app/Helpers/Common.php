@@ -1218,10 +1218,12 @@ class Common
             'name' => $user->name,
         ]);
         $role = Role::where('slug', 'agency-owner')->first();
-        DB::table('admin_role_users')->insert([
-            'user_id' =>  $admin->id,
-            'role_id' => $role->id,
-        ]);
+        if ($admin && $role) {
+            DB::table('admin_role_users')->insert([
+                'user_id' => $admin->id,
+                'role_id' => $role->id,
+            ]);
+        }
         if ($user->email != null) {
             Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
         }
