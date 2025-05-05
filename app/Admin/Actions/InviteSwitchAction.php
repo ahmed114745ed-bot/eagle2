@@ -19,7 +19,7 @@ class InviteSwitchAction extends RowAction
 
     public function name()
     {
-        return $this->row->userSetting->show_invite_code
+        return @$this->row->userSetting->show_invite_code
             ? __('Disable Show Invite Code')
             : __('Enable Show Invite Code');
     }
@@ -42,13 +42,13 @@ class InviteSwitchAction extends RowAction
 
     public function icon()
     {
-        $userSetting = $this->row->userSetting;
+        $userSetting = @$this->row->userSetting;
         return ($userSetting && $userSetting->show_invite_code) ? 'fa-toggle-on' : 'fa-toggle-off';
     }
 
     public function dialog()
     {
-        $msg = $this->row->userSetting->show_invite_code
+        $msg = @$this->row->userSetting->show_invite_code
             ? __('dashboard.confirm_disable_invite_code')
             : __('dashboard.confirm_enable_invite_code');
 
