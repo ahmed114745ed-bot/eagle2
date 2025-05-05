@@ -1216,11 +1216,13 @@ class User extends Authenticatable
                     $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
                     Storage::delete($model->profile->avatar);
                 }
-                $model->profile->avatar = $url ?? '';
+                if ($model->profile) {
+                    $model->profile->avatar = $url ?? '';
+                }
             } else {
-                
-                
-                $model->profile->avatar =  $model->profile->avatar;
+                if ($model->profile) {
+                    $model->profile->avatar = $model->profile->avatar;
+                }
             }
             unset($model->photo);
         });
@@ -1240,4 +1242,21 @@ class User extends Authenticatable
 
         });
     }
+
+
+    public function wallet()
+    {
+        return $this->hasOne(UserWallet::class);
+    }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function walletTransactionBackups()
+    {
+        return $this->hasMany(WalletTransactionBackup::class);
+    }
+
 }
