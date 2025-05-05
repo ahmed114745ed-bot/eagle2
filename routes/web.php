@@ -32,6 +32,7 @@ use App\Http\Controllers\NowPaymentsController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 
 Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
 Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
@@ -189,7 +190,6 @@ Route::group(
         Route::post('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
         Route::get('edit-payment-gateways/{id}', [MangerSettingController::class, 'editPaymentGateway'])->name('edit-payment-gateway');
         Route::get('delete-payment-gateways/{id}', [MangerSettingController::class, 'deletePaymentGateway'])->name('delete-payment-gateway');
-        Route::get('download-app/{id}', [SettingsController::class, 'downloadApp']);
 
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
         Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
