@@ -50,10 +50,10 @@ class DailyPrizeController extends AdminController
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
                 $ware = Ware::find($this->target);
-                $path = $ware->img2 ?? $ware->show_img;
+                $path = $ware->img2 ?? $ware?->show_img;
             } elseif ($this->gift_type == 'vip') {
                 $vips = OVip::find($this->target);
-                $path = $vips->img;
+                $path = $vips?->img;
             } elseif ($this->gift_type == 'achievement') {
                 $path = $this->target;
             } else {
@@ -146,19 +146,19 @@ class DailyPrizeController extends AdminController
 
         $form->select('gift_type', __('Gift type'))->options(["ware" => __('ware'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                $form->belongsTo('target1', Wares::class, trans('wares'));
+                $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
                 $form->number('expir', __('expire'));
             })
             ->when("vip", function () use ($form) {
-                $form->belongsTo('target2', OVips::class, trans('vips'));
+                $form->belongsTo('target2', OVips::class, trans('vips'))->rules('required');
                 $form->number('expir', __('expire'));
             })
             ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
+                $form->number("target3", __("coins"))->rules('required');
             })->when("achievement", function () use ($form) {
                 $form->image("target4", __('image'))->name(function ($file) {
                     return now()->timestamp . '.' . $file->guessExtension();
-                });
+                })->rules('required')   ;
                 $form->number('expir', __('expire'));
             })->required();
 
