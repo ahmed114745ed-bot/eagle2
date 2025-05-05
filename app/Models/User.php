@@ -1242,4 +1242,21 @@ class User extends Authenticatable
 
         });
     }
+
+
+    public function wallet()
+    {
+        return $this->hasOne(UserWallet::class);
+    }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function walletTransactionBackups()
+    {
+        return $this->hasMany(WalletTransactionBackup::class);
+    }
+
 }
