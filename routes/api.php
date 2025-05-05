@@ -476,6 +476,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
+                Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
                 Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
                 Route::get('show_request', [AgencyController::class, 'show_request']);
