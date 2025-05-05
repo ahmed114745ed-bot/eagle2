@@ -118,7 +118,7 @@ class UserController extends Controller
     }
     public function image_intro($id)
     {
-
+        if(!$id) return Common::apiResponse(false, 'messing user id parameter', 400);
         $user = User::find($id);
         if (! $user) return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
