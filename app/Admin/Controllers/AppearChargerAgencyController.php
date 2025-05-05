@@ -236,7 +236,7 @@ class AppearChargerAgencyController extends MainController
                 }
                 return $ops2;
             })
-            ->ajax('/api/search/users3', 'id', 'name');
+            ->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
         $form->hidden('agency_manger_id', __('app manger id'));
 

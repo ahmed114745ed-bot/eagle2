@@ -185,9 +185,11 @@ class AgencyController extends MainController
                         $query->where('status', 1);
                     });
             })
+
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
+            ->where('Shipping_agency','!=',1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
