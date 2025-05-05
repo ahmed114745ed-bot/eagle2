@@ -275,7 +275,7 @@ class Common
         ];
     }
 
-    public static function          getPaginates($collection)
+    public static function getPaginates($collection)
     {
         return [
             'per_page' => $collection->perPage(),
@@ -699,7 +699,7 @@ class Common
         $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
-        
+
 
         $result = json_decode($result);
 
