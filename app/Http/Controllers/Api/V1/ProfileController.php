@@ -33,6 +33,7 @@ class ProfileController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'country_id'       => 'nullable|numeric|exists:countries,id',
+            
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
