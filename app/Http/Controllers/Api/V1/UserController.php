@@ -118,28 +118,28 @@ class UserController extends Controller
     }
     public function image_intro($id)
     {
-
+        if(!$id) return Common::apiResponse(false, 'messing user id parameter', 400);
         $user = User::find($id);
-
+        if (! $user) return Common::apiResponse(false, 'user not found', 400);
         $dr = '';
         $pack = self::checkPack($user->id, 6, $user->dress_3);
-        $pack->where('is_used', 1);
-        $pack = $pack->exists();
-        if ($pack) {
-            $ware = Ware::query()
-                ->where('id', $user->dress_3)
-                ->where('type', 6)
-                ->get();
+        $pack->where('is_used', 1)->exists();
 
-            if (!$ware->isEmpty()) {
-                $dr = $ware->map(function ($w) {
-                    return [
-                        'image' => $w->show_img,
-                        'id' => $w->id,
-                    ];
-                });
-            }
+        if (!$pack) return Common::apiResponse(false, 'active product not found', 400);
+        $ware = Ware::query()
+            ->where('id', $user->dress_3)
+            ->where('type', 6)
+            ->get();
+        if (! $ware) return Common::apiResponse(false, ' not found', 400);
+        if (!$ware->isEmpty()) {
+            $dr = $ware->map(function ($w) {
+                return [
+                    'image' => $w->show_img,
+                    'id' => $w->id,
+                ];
+            });
         }
+
 
         if ($dr == '') {
             return Common::apiResponse(true, 'Success', []);
