@@ -31,7 +31,7 @@ class AgencyRepository extends AbstractRepository
     public function findById($id)
     {
        
-        return $this->model->with(['additionalInfo', 'mempers'])
+        return $this->model->with(['additionalInfo', 'mempers','admins'])
         ->withCount('mempers')
         ->where('id', $id)->first();
     }
