@@ -16,11 +16,12 @@ use Encore\Admin\Auth\Permission;
 
 class InviteSwitchAction extends RowAction
 {
-    public $name;
 
-    public function __construct()
+    public function name()
     {
-        $this->name = __('Toggle Show Invite Code');
+        return @$this->row->userSetting->show_invite_code
+            ? __('Disable Show Invite Code')
+            : __('Enable Show Invite Code');
     }
 
     public function handle(Model $model)
@@ -41,7 +42,16 @@ class InviteSwitchAction extends RowAction
 
     public function icon()
     {
-        $userSetting = $this->row->userSetting;
+        $userSetting = @$this->row->userSetting;
         return ($userSetting && $userSetting->show_invite_code) ? 'fa-toggle-on' : 'fa-toggle-off';
+    }
+
+    public function dialog()
+    {
+        $msg = @$this->row->userSetting->show_invite_code
+            ? __('dashboard.confirm_disable_invite_code')
+            : __('dashboard.confirm_enable_invite_code');
+
+        $this->confirm($msg, '', []);
     }
 }
