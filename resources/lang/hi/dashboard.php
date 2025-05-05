@@ -228,5 +228,13 @@ return [
 'changeAgency' => 'एजेंसी बदलें',
 'ban' => 'प्रतिबंधित करें',
 'acceptAgency' => 'एजेंसी स्वीकार करें',
+
+'confirm_enable_can_play' => 'क्या आप वाकई "Can Play" सक्षम करना चाहते हैं?',
+'confirm_disable_can_play' => 'क्या आप वाकई "Can Play" अक्षम करना चाहते हैं?',
+'confirm_enable_invite_code' => 'क्या आप वाकई Invite Code सक्षम करना चाहते हैं?',
+'confirm_disable_invite_code' => 'क्या आप वाकई Invite Code अक्षम करना चाहते हैं?',
+'confirm_enable_transfer_salary' => 'क्या आप वाकई Transfer Salary सक्षम करना चाहते हैं?',
+'confirm_disable_transfer_salary' => 'क्या आप वाकई Transfer Salary अक्षम करना चाहते हैं?',
+
 'remove_bans' => 'प्रतिबंध हटाएं',
 ];

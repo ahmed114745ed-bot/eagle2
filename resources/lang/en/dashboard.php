@@ -232,6 +232,14 @@ return [
     'reelValue' => 'Video value settings:',
     'update' => 'Updated successfully!',
 
+    'confirm_enable_can_play' => 'Are you sure you want to enable Can Play?',
+    'confirm_disable_can_play' => 'Are you sure you want to disable Can Play?',
+    'confirm_enable_invite_code' => 'Are you sure you want to enable Invite Code?',
+    'confirm_disable_invite_code' => 'Are you sure you want to disable Invite Code?',
+    'confirm_enable_transfer_salary' => 'Are you sure you want to enable Transfer Salary?',
+    'confirm_disable_transfer_salary' => 'Are you sure you want to disable Transfer Salary?',
+
+
     'min_tx_num'                       => 'The minimum withdrawal for a regular user',
     'login_from_only_one_device'       => 'Allow login from only one device when the value is true',
     'one_usd_value_in_coins'           => 'One dollar equals how many coins',

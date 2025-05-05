@@ -272,6 +272,14 @@ return [
     'kick_out_greater_than_day' => 'Bir müşteriyi ajansdan atmak için izin verilen en geç gün',
     'system_default_manager' => 'Bir müşterinin uygulama yöneticisi olması için UUID değeri',
     'add_coins' => "Madeni para ekle",
+
+    'confirm_enable_can_play' => 'Oynama iznini etkinleştirmek istediğinizden emin misiniz?',
+    'confirm_disable_can_play' => 'Oynama iznini devre dışı bırakmak istediğinizden emin misiniz?',
+    'confirm_enable_invite_code' => 'Davet kodunu etkinleştirmek istediğinizden emin misiniz?',
+    'confirm_disable_invite_code' => 'Davet kodunu devre dışı bırakmak istediğinizden emin misiniz?',
+    'confirm_enable_transfer_salary' => 'Maaş transferini etkinleştirmek istediğinizden emin misiniz?',
+    'confirm_disable_transfer_salary' => 'Maaş transferini devre dışı bırakmak istediğinizden emin misiniz?',
+
     'remove_bans' => 'Yasakları kaldır',
 
 ];

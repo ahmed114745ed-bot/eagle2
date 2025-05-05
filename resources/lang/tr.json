@@ -616,6 +616,12 @@
     "Toggle Transfer Salary": "Maaş Transferini Değiştir",
     "Transfer salary has been enabled!": "Maaş transferi etkinleştirildi!",
     "Transfer salary has been disabled!": "Maaş transferi devre dışı bırakıldı!",
+    "Enable Can Play": "Oynama İzni Ver",
+    "Disable Can Play": "Oynama İznini Kaldır",
+    "Enable Show Invite Code": "Davet Kodunu Göster'i Etkinleştir",
+    "Disable Show Invite Code": "Davet Kodunu Göster'i Devre Dışı Bırak",
+    "Enable Transfer Salary": "Maaş Transferini Etkinleştir",
+    "Disable Transfer Salary": "Maaş Transferini Devre Dışı Bırak",
 
     "wallet balance": "Cüzdan Bakiyesi",
     "ban_type": "Yasak türü",
