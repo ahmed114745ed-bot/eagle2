@@ -1207,6 +1207,7 @@ class Common
 
     public static  function createUserAdmin($appOwnerId)
     {
+        if(!$appOwnerId) return;
         $user = User::find($appOwnerId);
         if (!$user) return true;
         $password = Str::random(8);
