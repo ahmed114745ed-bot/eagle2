@@ -269,7 +269,7 @@ class OvipGiftTapController extends MainController
             $id = $form->model()->id;
 
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
 
