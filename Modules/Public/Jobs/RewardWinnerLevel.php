@@ -25,7 +25,7 @@ class RewardWinnerLevel implements ShouldQueue
     protected $level;
     protected $type;
 
-    public function __construct($userId, $level ,$type)
+    public function __construct($userId, $level, $type)
     {
         $this->userId = $userId;
         $this->level = $level;
@@ -35,7 +35,7 @@ class RewardWinnerLevel implements ShouldQueue
     public function handle()
     {
 
-        $levelInterval = LevelInterval::where('min', '<=', $this->level)->where('type',$this->type)
+        $levelInterval = LevelInterval::where('min', '<=', $this->level)->where('type', $this->type)
             ->where('max', '>=', $this->level)
             ->first();
 
@@ -43,6 +43,7 @@ class RewardWinnerLevel implements ShouldQueue
         if ($levelInterval) {
             $rewards = RewardLevelInterval::where('level_interval_id', $levelInterval->id)->get();
             $user = User::query()->find($this->userId);
+            if (!$user) return;
             foreach ($rewards as $rewad) {
 
                 if ($rewad->type == "coins") {
@@ -50,9 +51,11 @@ class RewardWinnerLevel implements ShouldQueue
                     $user->save();
                 } elseif ($rewad->type == "vip") {
                     $vip = OVip::query()->find($rewad->target);
+                    if (!$vip) return;
                     UserCommon::addVipToUser($user, $vip, $rewad->expire);
                 } elseif ($rewad->type == "ware") {
                     $ware = Ware::query()->find($rewad->target);
+                    if (!$ware) return;
                     UserCommon::addWareToUser($user, $ware, $rewad->expire);
                 } elseif ($rewad->type == "achievement") {
                     $attributes = [
