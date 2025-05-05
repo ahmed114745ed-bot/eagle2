@@ -16,37 +16,35 @@ use Encore\Admin\Auth\Permission;
 
 class CanPlaySwitchAction extends RowAction
 {
-    public $name;
-
     public function name()
     {
-        return $this->row->can_play
+        return $this->row->can_play == 2
             ? __('Disable Can Play')
             : __('Enable Can Play');
     }
 
     public function handle(Model $model)
     {
-        $model->can_play = !$model->can_play;
+        $model->can_play = $model->can_play == 2 ? 3 : 2;
         $model->save();
 
-        $msg = $model->can_play
+        $msg = $model->can_play == 2
             ? __('Can play has been enabled!')
             : __('Can play has been disabled!');
 
-        $response = $model->can_play ? 'success' : 'error';
+        $response = $model->can_play == 2 ? 'success' : 'error';
 
         return $this->response()->$response($msg)->refresh();
     }
 
     public function icon()
     {
-        return $this->row->can_play ? 'fa-toggle-on' : 'fa-toggle-off';
+        return $this->row->can_play == 2 ? 'fa-toggle-on' : 'fa-toggle-off';
     }
 
     public function dialog()
     {
-        $msg = $this->row->can_play
+        $msg = $this->row->can_play == 2
             ? __('dashboard.confirm_disable_can_play')
             : __('dashboard.confirm_enable_can_play');
 
