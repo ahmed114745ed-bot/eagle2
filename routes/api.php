@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Admin\Controllers\WareController;
+use App\Http\Controllers\Api\BadgeController;
 use App\Http\Controllers\PaySkyController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\VersionController;
@@ -63,8 +64,8 @@ use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
+Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
-
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
 Route::post('/check-phone', [UserController::class, 'checkPhone']);
 Route::prefix(config('app.api_prefix'))->group(function () {
@@ -475,6 +476,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
+                Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
                 Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
                 Route::get('show_request', [AgencyController::class, 'show_request']);

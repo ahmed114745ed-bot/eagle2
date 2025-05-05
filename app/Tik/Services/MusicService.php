@@ -27,13 +27,18 @@ class MusicService
     {
         return $this->musicRepository->deleteByUser($userId, $musicId);
     }
-    public function create($userId, $url)
+    public function create($userId, $url, $image)
     {
         $data = [
             'user_id' => $userId,
             'url' => $url,
+            'image' => $image
         ];
 
+        if($image){
+            $image_name = Common::upload('images', $image);
+            $data['image'] = $image_name;
+        }
         $this->musicRepository->create($data);
         return true;
     }

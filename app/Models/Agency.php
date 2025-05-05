@@ -86,6 +86,11 @@ class Agency extends Model
         return $this->hasMany(User::class);
     }
 
+    public function admins()
+    {
+        return $this->hasMany(AgencyUserJob::class, 'agency_id')->where('type', 'requestManger');
+    }
+
     public function scopeOfOwner($query, $owner_id)
     {
         return $query->where('owner_id', $owner_id);
@@ -216,15 +221,6 @@ class Agency extends Model
                     }
                 }
             }
-
-
-
-
-
-
-
-
-
         });
 
         static::updating(function ($agency) {
@@ -245,7 +241,6 @@ class Agency extends Model
                     ]);
                 }
             }
-
         });
     }
 
@@ -383,6 +378,4 @@ class Agency extends Model
     {
         return $value ?? 0;
     }
-
-
 }

@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Admin\Actions;
+
+use App\Events\UserStatus;
+use App\Facades\CustomNotification;
+use App\Models\Ban;
+use App\Models\User;
+use Encore\Admin\Actions\Action;
+use Encore\Admin\Actions\RowAction;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
+
+
+class ChargeSwitchAction extends RowAction
+{
+
+    public function name()
+    {
+        return $this->row->transfer_salary
+            ? __('Enable Transfer Salary')
+            : __('Disable Transfer Salary');
+    }
+
+    public function handle(Model $model)
+    {
+        $model->transfer_salary = !$model->transfer_salary;
+        $model->save();
+
+        $message = $model->transfer_salary
+            ? __('Transfer salary has been disabled!')
+            : __('Transfer salary has been enabled!');
+
+        $response = $model->transfer_salary ? 'error' : 'success';
+
+        return $this->response()->$response($message)->refresh();
+    }
+
+    public function icon()
+    {
+        return $this->row->transfer_salary ? 'fa-toggle-off' : 'fa-toggle-on';
+    }
+
+    public function dialog()
+    {
+        $msg = $this->row->transfer_salary
+            ? __('dashboard.confirm_enable_transfer_salary')
+            : __('dashboard.confirm_disable_transfer_salary');
+
+        $this->confirm($msg, '', []);
+    }
+}

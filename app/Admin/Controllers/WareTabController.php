@@ -185,9 +185,12 @@ class WareTabController extends MainController
         // Define your type mapping
         $typeMap = TYPE_WARE;
 
-        $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
-            return [$type => $typeMap[$type] ?? "Type $type"];
-        });
+        // $types = Ware::whereIn('type', array_keys($typeMap))->distinct()->pluck('type')->sort()->mapWithKeys(function ($type) use ($typeMap) {
+        //     return [$type => $typeMap[$type] ?? "Type $type"];
+        // });
+
+        $types = collect($typeMap);
+  
 
         $currentType = request()->get('type', $types->keys()->first());
 

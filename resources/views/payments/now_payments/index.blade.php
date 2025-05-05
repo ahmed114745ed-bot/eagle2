@@ -87,7 +87,7 @@
                 value="{{ $currency['currency'] }}" 
                 data-min="{{ $currency['min_amount'] }}" 
                 data-max="{{ $currency['max_amount'] }}">
-                {{ strtoupper($currency['currency']) }} (Min: {{ $currency['min_amount'] }}, Max: {{ $currency['max_amount'] }})
+                {{ strtoupper($currency['currency']) }}
             </option>
         @endforeach
     </select>

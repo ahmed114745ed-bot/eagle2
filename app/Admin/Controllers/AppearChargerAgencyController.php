@@ -258,6 +258,7 @@ class AppearChargerAgencyController extends MainController
                 });
             </script>');
         }
+        $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
@@ -286,7 +287,7 @@ class AppearChargerAgencyController extends MainController
                 ]);
             }
 
-            $newType = 4;
+            $newType = 3;
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => $newType,
                 'monthly_diamond_received' => 0,

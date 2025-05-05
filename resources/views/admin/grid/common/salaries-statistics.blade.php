@@ -62,22 +62,22 @@
         </div>
         <br>
         <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.target') }}</label>
+            <label class="form-label">{{ __('admin.total') }}</label>
 
             <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
         </div>
-        <br>
-        <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.salary') }}</label>
+{{--        <br>--}}
+{{--        <div class=" col  my-1 form-Roles">--}}
+{{--            <label class="form-label">{{ __('admin.salary') }}</label>--}}
 
-            <input type="text" class="form-control " id="salary" name="salary" value="{{ $salary }}" readonly>
-        </div>
-        <br>
-        <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.payments') }}</label>
+{{--            <input type="text" class="form-control " id="salary" name="salary" value="{{ $salary }}" readonly>--}}
+{{--        </div>--}}
+{{--        <br>--}}
+{{--        <div class=" col  my-1 form-Roles">--}}
+{{--            <label class="form-label">{{ __('admin.payments') }}</label>--}}
 
-            <input type="text" class="form-control " id="payments" name="payments" value="{{ $payments }}"readonly>
-        </div>
+{{--            <input type="text" class="form-control " id="payments" name="payments" value="{{ $payments }}"readonly>--}}
+{{--        </div>--}}
     @else
         @php
             $year = request('year') == null ? now()->year : request('year');
@@ -95,22 +95,22 @@
             $payments = $agencySallary->totalPayments ?? 0;
         @endphp
         <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.target') }}</label>
+            <label class="form-label">{{ __('admin.total') }}</label>
 
             <input type="text" class="form-control " id="target" name="target" value="{{ $targe }}" readonly>
         </div>
-        <br>
-        <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.salary') }}</label>
+{{--        <br>--}}
+{{--        <div class=" col  my-1 form-Roles">--}}
+{{--            <label class="form-label">{{ __('admin.salary') }}</label>--}}
 
-            <input type="text" class="form-control " id="sender" name="sender" value="{{ $salary }}" readonly>
-        </div>
-        <br>
-        <div class=" col  my-1 form-Roles">
-            <label class="form-label">{{ __('admin.payments') }}</label>
+{{--            <input type="text" class="form-control " id="sender" name="sender" value="{{ $salary }}" readonly>--}}
+{{--        </div>--}}
+{{--        <br>--}}
+{{--        <div class=" col  my-1 form-Roles">--}}
+{{--            <label class="form-label">{{ __('admin.payments') }}</label>--}}
 
-            <input type="text" class="form-control " id="sender" name="sender" value="{{ $payments }}" readonly>
-        </div>
+{{--            <input type="text" class="form-control " id="sender" name="sender" value="{{ $payments }}" readonly>--}}
+{{--        </div>--}}
     @endif
 
 

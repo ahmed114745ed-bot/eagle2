@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Helpers\Common;
-use App\Http\Resources\Api\V1\UserVisitorResource;
-use App\Services\ProfileService;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Profile\ProfileRequest;
-use App\Http\Resources\Api\V1\NewProfileResource;
-use App\Http\Resources\Api\V1\UserRelationsResource;
-use App\Models\Follow;
-use App\Models\User;
-use App\Services\UserService;
-use Illuminate\Support\Facades\Validator;
 use Auth;
+use Exception;
+use App\Models\User;
+use App\Models\Follow;
+use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Services\UserService;
+use App\Services\ProfileService;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\V1\NewProfileResource;
+use App\Http\Resources\Api\V1\UserVisitorResource;
+use App\Http\Requests\Api\V1\Profile\ProfileRequest;
+use App\Http\Resources\Api\V1\UserRelationsResource;
 
 class ProfileController extends Controller
 {
@@ -32,13 +33,20 @@ class ProfileController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'country_id'       => 'nullable|numeric|exists:countries,id',
+            
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
+        try{
         $out = $this->profileService->updateProfile($request);
 
         return Common::apiResponse(true, 'profile updated successfully', $out, 200);
+        }catch(Exception $e)
+        {
+           
+            return Common::apiResponse(false, $e->getMessage(),null, 500);
+        }
     }
 
     public function show(Request $request, $id)

@@ -335,14 +335,17 @@
 
                 <!-- Language Tabs Navigation -->
                 <div class="tab-buttons">
-                    <button class="tab-button active" onclick="openLanguageTab(event, 'defaultInput')">
+                    {{-- <button class="tab-button active" onclick="openLanguageTab(event, 'defaultInput')">
                         Default <div>
                             English
                         </div>
-                    </button>
+                    </button> --}}
                     @foreach ($languages as $index => $language)
                         <button class="tab-button" onclick="openLanguageTab(event, '{{ $language->code }}')">
                             {{ $language->name }}
+                            @if ($language->name == 'English')
+                               <small>(Default)</small>
+                            @endif
                         </button>
                     @endforeach
                 </div>
@@ -353,7 +356,7 @@
                         <input type="hidden" name="language" value="defaultInput">
 
                         <div class="badge-upload-container">
-                            @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                            @foreach (['shipping', 'host', 'agency_owner'] as $type)
                                 <div class="badge-upload-item">
                                     <label for="default_{{ $type }}">
                                         @if ($type == 'host')
@@ -397,7 +400,7 @@
                             <input type="hidden" name="language" value="{{ $language->code }}">
 
                             <div class="badge-upload-container">
-                                @foreach (['supporter', 'shipping', 'host', 'agency_owner'] as $type)
+                                @foreach (['shipping', 'host', 'agency_owner'] as $type)
                                     <div class="badge-upload-item">
                                         <label for="{{ $language->code }}_{{ $type }}">
                                             @if ($type == 'host')
@@ -484,6 +487,7 @@
                 document.getElementById(languageCode).classList.add('active');
                 evt.currentTarget.classList.add('active');
             }
+
         </script>
 
         <!-- كود JavaScript -->
@@ -526,9 +530,9 @@
 
 
                 if (sectionId === 'Badges') {
-                    const defaultTabBtn = document.querySelector('.tab-button[onclick*="defaultInput"]');
-                    if (defaultTabBtn) {
-                        defaultTabBtn.click(); // fire real click event
+                    const EnglishTabBtn = document.querySelector('.tab-button[onclick*="en"]');
+                    if (EnglishTabBtn) {
+                        EnglishTabBtn.click(); // fire real click event
                     }
                 }
 

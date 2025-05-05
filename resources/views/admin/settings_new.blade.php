@@ -756,12 +756,12 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="agoraRadio"
                                                        class="custom-radio libraryRealTime" name="library" value="0"
                                                     {{ $library == '0' ? 'checked' : '' }}>
                                                 <label for="agoraRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -786,11 +786,11 @@
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                                 <label for="zegoRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -835,11 +835,11 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
                                                 <label for="tencentRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -1997,36 +1997,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                    // Updated selector to match your new class
-                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                    const fieldsContainers = {
-                                                                                                        '0': document.getElementById('agora-fields'),
-                                                                                                        '1': document.getElementById('zego-fields'),
-                                                                                                        '2': document.getElementById('pusher-fields')
-                                                                                                    };
+                    // Updated selector to match your new class
+                    const radioButtons = document.querySelectorAll('.radio-input');
+                    const fieldsContainers = {
+                        '0': document.getElementById('agora-fields'),
+                        '1': document.getElementById('zego-fields'),
+                        '2': document.getElementById('pusher-fields')
+                    };
 
-                                                                                                    function toggleFields() {
-                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                    function toggleFields() {
+                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                        // Hide all fields first
-                                                                                                        Object.values(fieldsContainers).forEach(container => {
-                                                                                                            container.style.display = 'none';
-                                                                                                        });
+                        // Hide all fields first
+                        Object.values(fieldsContainers).forEach(container => {
+                            container.style.display = 'none';
+                        });
 
-                                                                                                        // Show the selected one
-                                                                                                        if (fieldsContainers[selectedValue]) {
-                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                        }
-                                                                                                    }
+                        // Show the selected one
+                        if (fieldsContainers[selectedValue]) {
+                            fieldsContainers[selectedValue].style.display = 'flex';
+                        }
+                    }
 
-                                                                                                    // Add event listeners to radio buttons
-                                                                                                    radioButtons.forEach(radio => {
-                                                                                                        radio.addEventListener('change', toggleFields);
-                                                                                                    });
+                    // Add event listeners to radio buttons
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', toggleFields);
+                    });
 
-                                                                                                    // Initialize the fields visibility
-                                                                                                    toggleFields();
-                                                                                                });*/
+                    // Initialize the fields visibility
+                    toggleFields();
+                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
@@ -2036,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
+                            document.getElementById('app_primary_color').value = "#aee6cf";
+                            document.getElementById('app_second_color').value = "#eff7f5";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";

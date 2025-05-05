@@ -107,7 +107,7 @@ class Family extends Model
             'next_exp' => @(int)$next_level->exp,
             'next_name' => @$next_level->name,
             'next_img' => @$next_level->img,
-            'per' => $diff < 0 ? 0 : (($over > $diff) ? 1 : (float)($over / $diff)),
+            'per' => $diff <= 0 ? 0 : (($over > $diff) ? 1 : (float)($over / $diff)),
             'rem' => ($over > $diff) ? 0 : (int)($diff - $over),
             'is_last_level' => (bool)($next == null)
         ];
