@@ -31,8 +31,12 @@ class ProfileController extends Controller
 
     public function update(ProfileRequest $request)
     {
+        $request->merge([
+            'birthday' => convertArabicToEnglishNumbers($request->input('birthday'))
+        ]);
         $validator = Validator::make($request->all(), [
             'country_id'       => 'nullable|numeric|exists:countries,id',
+             'birthday'   => 'required|date_format:Y-m-d'
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
