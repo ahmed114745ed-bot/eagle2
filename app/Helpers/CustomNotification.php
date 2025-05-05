@@ -406,11 +406,11 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request)
+    public function chargeAction(User $user, $request, $admin="Admin")
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-        $body_ar = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name],  'ar');
-        $body_en = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name],  'en');
+        $body_ar = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name, 'admin' => $admin],  'ar');
+        $body_en = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name, 'admin' => $admin],  'en');
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['coins'] = $request->amount;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'charge-action-notifaction');
