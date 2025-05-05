@@ -10,11 +10,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\MessageBag;
-
-
+use PDF;
 class TargetController extends MainController
 {
     use HasResourceActions;
@@ -296,41 +294,41 @@ class TargetController extends MainController
             $(document).ready(function () {
                 var debounceTimer;
                 var coins = ' . $coins . ';
-        
+
                 function floor2(num) {
                     return Math.floor(num * 100) / 100;
                 }
-        
+
                 function calculateUsdAmount() {
                     var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
                     var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
                     var agency = parseFloat($("input[name=\'agency_share\']").val()) || 0;
                     var db = parseFloat($("input[name=\'db_percentage\']").val()) || 0;
                     var app = parseFloat($("input[name=\'app_profit_percentage\']").val()) || 0;
-        
+
                     var totalUsd = diamonds / coins;
                     var userAmount = floor2(totalUsd * usd / 100);
                     var agencyAmount = floor2(totalUsd * agency / 100);
                     var zoneAmount = floor2(totalUsd * app / 100);
                     var superAdminAmount = floor2(totalUsd * db / 100);
-        
+
                     $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
                     $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
                     $("#zone_amount").text("' . __('Amount will be: ') . '" + zoneAmount + " USD");
                     $("#super_admin_amount").text("' . __('Amount will be: ') . '" + superAdminAmount + " USD");
                     $("#total_usd_amount").text("' . __('Total USD: ') . '" + floor2(totalUsd) + " USD");
                 }
-        
+
                 function enforceTotalPercentageLimit(changedField) {
                     var fields = ["usd", "agency_share", "db_percentage"];
                     var values = {};
                     var total = 0;
-        
+
                     fields.forEach(function (field) {
                         values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
                         total += values[field];
                     });
-        
+
                     var remaining = floor2(100 - total);
                     if (remaining < 0) {
                         // لو المجموع أكبر من 100، نقص القيمة المدخلة نفسها
@@ -339,21 +337,21 @@ class TargetController extends MainController
                         $("input[name=\'" + changedField + "\']").val(floor2(newValue));
                         remaining = 0;
                     }
-        
+
                     $("input[name=\'app_profit_percentage\']").val(remaining);
                 }
-        
+
                 var allFields = ["diamonds", "usd", "agency_share", "app_profit_percentage", "db_percentage"];
                 allFields.forEach(function (field) {
                     $(document).on("input", "input[name=\'" + field + "\']", function () {
                         var val = parseFloat($(this).val());
-        
+
                         // منع القيم السالبة
                         if (val < 0) {
                             $(this).val(0);
                             val = 0;
                         }
-        
+
                         clearTimeout(debounceTimer);
                         debounceTimer = setTimeout(function () {
                             if (["usd", "agency_share", "db_percentage"].includes(field)) {
@@ -363,7 +361,7 @@ class TargetController extends MainController
                         }, 500);
                     });
                 });
-        
+
                 calculateUsdAmount();
             });
         </script>');
@@ -528,7 +526,8 @@ class TargetController extends MainController
     {
         try {
             $targets = Target::orderByDesc('diamonds')->get();
-            $pdf = Pdf::loadView('target_pdf', compact('targets'));
+            //$pdf = Pdf::loadView('target_pdf', compact('targets'));
+            $pdf = PDF::loadView('target_pdf', compact('targets'));
             return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
         } catch (\Exception $e) {
 
