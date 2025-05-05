@@ -192,7 +192,7 @@ class UserController extends Controller
             $invite_code = true;
         } else {
             $invite_code = false;
-            if ($user->userSetting->show_invite_code == 1) {
+            if ( $user->userSetting && $user->userSetting->show_invite_code == 1) {
                 $invite_code = true;
             }
         }
