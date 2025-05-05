@@ -231,7 +231,7 @@ class UserCommon{
         $user_statistic['losed']['packs'] = $totalPacksPrice ?? 0;
         $user_statistic['losed']['coin_games']=$user->coinGameUser?->where("type",0)->sum("coins");
         $user_statistic['losed']['request_background_images']=$user->requestBackgroundImages?->where("status",'!=',2)->sum("price");
-        $user_statistic['losed']['vip_price'] = $totalVipPrice ?? 0; 
+        $user_statistic['losed']['vip_price'] = $totalVipPrice ?? 0;
         // total
         $user_statistic['total']['earned']=array_sum($user_statistic['earned']);
         $user_statistic['total']['losed']=array_sum($user_statistic['losed']);
@@ -467,8 +467,8 @@ class UserCommon{
                         break;
                 }
             }
-            
+
         }
-           
+
     }
 }
