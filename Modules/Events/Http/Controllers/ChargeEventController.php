@@ -77,6 +77,9 @@ class ChargeEventController extends Controller
             $query->whereMonth('created_at', $currentMonth);
         }], 'obtained_coins')->find(auth()->user()->id);
 
+        foreach ($targets as $target){
+            info($target['rewards']);
+        }
         return Common::apiResponse(1, '', new TargetsResource(
             $targets,
             $user->charges_sum_amount ?? 0,
