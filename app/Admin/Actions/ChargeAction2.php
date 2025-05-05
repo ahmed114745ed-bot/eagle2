@@ -85,7 +85,8 @@ class ChargeAction2 extends Action
             $this->createChargeRecord($request, $user, $agency, $amount);
 
             if ($request->charge_type == "increment") {
-                CustomNotification::chargeAction($user, $request);
+                $admin = Auth::user()->username ?? 'Admin';
+                CustomNotification::chargeAction($user, $request,$admin);
             }
         });
 
@@ -106,7 +107,9 @@ class ChargeAction2 extends Action
             $user->di += $amount;
             $user->save();
             if ($request->charge_type == "increment") {
-                CustomNotification::chargeAction($user, $request);
+                $admin = Auth::user()->username ?? 'Admin';
+
+                CustomNotification::chargeAction($user, $request, $admin);
             }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
             (new UserAchievementService())->insertCharging($user, $request->amount);
@@ -149,7 +152,7 @@ class ChargeAction2 extends Action
     {
         $title = __('dashboard.add_coins');
         return <<<HTML
-            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white" 
+            <a href="javascript:void(0);" class="charge_action btn btn-sm  text-white"
        style="background-color: #28a745; border-color: #28a745; color: white;">
         {$title}
     </a>

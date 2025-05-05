@@ -67,7 +67,7 @@ return [
     'remove_from_family'               => 'تم حظرك من عائله :name',
     'accept_agency'                    => 'مبروك لقد تم قبول طلب الانضمام وكاله :name',
     'agencyJoinRequest'       => ':name  يريد الانضمام الى وكالتك :agencyName',
-    'got_coin'                         => 'تهانينا يا :name . لقد تم اضافة :coins كوين الى حسابك',
+    'got_coin' => 'تهانينا يا :name، لقد تم إضافة :coins كوين إلى حسابك بواسطة: :admin من الداشبورد',
     'level'                            => 'تهنينا لقد حصلت عاى وسام جديد',
     'send_level'                       => 'لقد ارسلت :level مستوى ',
     'enter_room'                       => 'قام :name بفتح الغرفه الصوتية  . هيا اضغط هنا و انضم الينا وامرح معنا',

@@ -107,7 +107,8 @@ class ChargeAction extends Action
             $this->createChargeRecord($request, $user, $agency, $amount, $coins,$request->amount);
 
             if ($request->charge_type == "increment") {
-                CustomNotification::chargeAction($user, $request);
+                $admin = Auth::user()->username ?? 'Admin';
+                CustomNotification::chargeAction($user, $request, $admin);
             }
         });
 
@@ -135,7 +136,8 @@ class ChargeAction extends Action
             $user->di += $amount;
             $user->save();
             if ($request->charge_type == "increment") {
-                CustomNotification::chargeAction($user, $request);
+                $admin = Auth::user()->username ?? 'Admin';
+                CustomNotification::chargeAction($user, $request,$admin);
             }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount,$request->amount);
 
@@ -147,7 +149,7 @@ class ChargeAction extends Action
 
     private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount )
     {
-       
+
         //        $shippingCoins = cache()->get('shipping_coins');
         $charge = new Charge();
         $charge->charger_id = Auth::id();
@@ -201,5 +203,5 @@ function pu(val) {
 HTML;
     }
 
-   
+
 }
