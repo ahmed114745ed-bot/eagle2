@@ -756,12 +756,12 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="agoraRadio"
                                                        class="custom-radio libraryRealTime" name="library" value="0"
                                                     {{ $library == '0' ? 'checked' : '' }}>
                                                 <label for="agoraRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -786,11 +786,11 @@
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                                 <label for="zegoRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -835,11 +835,11 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
                                                 <label for="tencentRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
