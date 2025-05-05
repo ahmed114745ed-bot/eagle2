@@ -18,9 +18,11 @@ class CanPlaySwitchAction extends RowAction
 {
     public $name;
 
-    public function __construct()
+    public function name()
     {
-        $this->name = __('Toggle Can Play');
+        return $this->row->can_play
+            ? __('Disable Can Play')
+            : __('Enable Can Play');
     }
 
     public function handle(Model $model)
@@ -40,5 +42,14 @@ class CanPlaySwitchAction extends RowAction
     public function icon()
     {
         return $this->row->can_play ? 'fa-toggle-on' : 'fa-toggle-off';
+    }
+
+    public function dialog()
+    {
+        $msg = $this->row->can_play
+            ? __('dashboard.confirm_disable_can_play')
+            : __('dashboard.confirm_enable_can_play');
+
+        $this->confirm($msg, '', []);
     }
 }
