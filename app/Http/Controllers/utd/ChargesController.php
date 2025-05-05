@@ -107,7 +107,8 @@ class ChargesController extends Controller
             $this->createChargeRecord($request, $user, $agency, $amount);
 
             if ($request->charge_type == "increment") {
-                CustomNotification::chargeAction($user, $request);
+                $admin = Auth::user()->username ?? 'Admin';
+                CustomNotification::chargeAction($user, $request, $admin);
             }
         });
 

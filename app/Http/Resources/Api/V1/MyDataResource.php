@@ -64,7 +64,7 @@ class MyDataResource extends JsonResource
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
                 'status' => $agency_joined->status,
-                'image' =>$agency_joined->img,
+                'image' => $agency_joined->img,
                 'member_count' => count($agency_joined->mempers),
                 'owner' => $owner,
             ];
@@ -93,7 +93,7 @@ class MyDataResource extends JsonResource
         $dress_3_data = $this->getUserDress(6, $this->dress_3, 'img2');
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img2', true);
         $dress_3_fallback = $this->getUserDress(6, $this->dress_3, 'img1');
-    
+
 
         // Common::getUserDress($this->id, $this->dress_3, 6, 'img1', true);
         $intro = $dress_3_data ?: $dress_3_fallback;
@@ -143,7 +143,7 @@ class MyDataResource extends JsonResource
             'phone' => (string)@$this->phone ?: '',
             //'manger' => new MangerTypeResource(@$this->manager),
             'frame' => $frame,
-            'intro' => $intro ,
+            'intro' => $intro,
             'intro_type' => $intro !== '' ? ($introType !== '' ? $introType : 'svga') : '',
             'bubble' => $bubble,
             'bubble_id' => @$bubble ? $this->dress_2 : 0,
@@ -200,7 +200,7 @@ class MyDataResource extends JsonResource
             "change_room_effect" => new ShowUserSettingResource(@$show_user_setting),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
             'achievement_images' => $achievement_images,
-            "multi_images" => $this->images?->select('id',"img"),
+            "multi_images" => $this->images?->select('id', "img"),
             "family_price" =>  Common::getConfig('family_price') ?? 0,
             'image_color'          => @$this->color_image,
             $this->mergeWhen($request->show_counter == true, [
@@ -212,7 +212,7 @@ class MyDataResource extends JsonResource
             'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
             'new_gift'          => (bool)$this->new_gift,
-            'show_invite_code' => (bool)$this->userSetting->show_invite_code
+            'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
 
 
         ];
@@ -247,6 +247,4 @@ class MyDataResource extends JsonResource
             ->first();
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
-
-
 }
