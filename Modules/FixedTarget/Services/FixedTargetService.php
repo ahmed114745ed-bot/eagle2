@@ -131,20 +131,20 @@ class FixedTargetService
         return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
     }
 
-    private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null, $appProfit, $db,$percentageAchieved=0): void
+    private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null, $appProfit, $db, $percentageAchieved = 0): void
     {
-        $agency_usd              =Common::getTargetUsd($target->diamonds,$target->agency_share);
-        $app_profit_usd               =Common::getTargetUsd($target->diamonds,$target->app_profit_percentage);
-        $db_usd         =Common::getTargetUsd($target->diamonds,$target->db_percentage);
-        
-     
+        $agency_usd              = Common::getTargetUsd($target->diamonds, $target->agency_share);
+        $app_profit_usd               = Common::getTargetUsd($target->diamonds, $target->app_profit_percentage);
+        $db_usd         = Common::getTargetUsd($target->diamonds, $target->db_percentage);
+
+        $next_target = Target::where('diamonds', '>', $month_received)->orderBy('diamonds')->first();
         WalletService::storeTransaction(
-                $user->id,
-                'add',
-                $t,
-                'user_transaction',
-                'target_achieved',
-                ['target_id' => $target->id]
+            $user->id,
+            'add',
+            $t,
+            'user_transaction',
+            'target_achieved',
+            ['target_id' => $target->id]
         );
 
         try {
@@ -163,6 +163,7 @@ class FixedTargetService
                 'user_hours'          => $hours,
                 'user_days'           => $days,
                 'extras'              => $extra !== null ? json_encode($extra) : 0,
+                'next_diamond'        => $next_target->diamonds - $month_received,
 
 
             ];
@@ -180,13 +181,13 @@ class FixedTargetService
         }
 
         $values = [
-            'agency_sallary' => $agency_usd *$percentageAchieved,
+            'agency_sallary' => $agency_usd * $percentageAchieved,
             'hours' => $hours . ' / ' . (@$target->hours ?? 0),
             'days' => $days . ' / ' . ($target->days ?? 0),
             'diamond' => $month_received . ' / ' . @$target->diamonds ?? 0,
             'target_id' =>  @$target->id,
             'extras'               => $extra !==  null ? json_encode($extra) : 0,
-            'app_profit' =>$app_profit_usd * $percentageAchieved,
+            'app_profit' => $app_profit_usd * $percentageAchieved,
             'dB' =>  $db_usd * $percentageAchieved,
         ];
         if (0 < $t) $values['sallary'] = $t;
@@ -246,7 +247,7 @@ class FixedTargetService
 
 
                 $t                = $this->targetInstance->calculateUsdFromTarget($target, $hours ?? 0, $days, $extra);
-                $percentageAchieved  =$this->targetInstance->calculatePercentageAchieved($target, $hours ?? 0, $days, $extra);;
+                $percentageAchieved  = $this->targetInstance->calculatePercentageAchieved($target, $hours ?? 0, $days, $extra);;
                 $ap               = $target->agency_share / 100;
                 $appProfit        = $target->app_profit_percentage / 100;
                 $db               = $target->db_percentage / 100;
@@ -267,7 +268,7 @@ class FixedTargetService
 
 
 
-                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db,$percentageAchieved);
+                $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
             }
         }
         return $user;
