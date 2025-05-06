@@ -2087,13 +2087,36 @@
   "BD Admin": "BD Yöneticisi",
   "Honor": "Onur",
   "All Managers": "(DB) Tüm Yöneticiler",
-
-
 "event period": "Etkinlik süresi",
 "Old Total Sender Level": "Eski Toplam Gönderici Seviyesi",
 "New Total Sender Level": "Yeni Toplam Gönderici Seviyesi",
 "Old Total Received Level": "Eski Toplam Alıcı Seviyesi",
-"New Total Received Level": "Yeni Toplam Alıcı Seviyesi"
-
+"New Total Received Level": "Yeni Toplam Alıcı Seviyesi",
+"Id": "Kimlik",
+"user_id": "Kullanıcı Kimliği",
+"User": "Kullanıcı",
+"Value": "Değer",
+"Cut amount": "Kesilen miktar",
+"Pending value": "Bekleyen değer",
+"Created at": "Oluşturulma tarihi",
+"View transactions": "İşlemleri görüntüle",
+"Type": "Tür",
+"Add": "Ekle",
+"Cut": "Kes",
+"Pending": "Beklemede",
+"Unknown": "Bilinmeyen",
+"Description": "Açıklama",
+"Target ID:": "Hedef Kimliği:",
+"Target not found": "Hedef bulunamadı",
+"UUID:": "UUID:",
+"User not found": "Kullanıcı bulunamadı",
+"Agency:": "Ajans:",
+"id:": "Kimlik:",
+"Agency not found": "Ajans bulunamadı",
+"user-wallets": "Kullanıcı Cüzdanları",
+"wallets": "Kullanıcı Cüzdanları",
+"UserWallet": "Kullanıcı Cüzdanı",
+"wallet-transactions": "Cüzdan İşlemleri",
+"WalletTransaction": "Cüzdan İşlemi"
 
 }

@@ -3,6 +3,7 @@
 namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
+use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -135,7 +136,16 @@ class FixedTargetService
         $agency_usd              =Common::getTargetUsd($target->diamonds,$target->agency_share);
         $app_profit_usd               =Common::getTargetUsd($target->diamonds,$target->app_profit_percentage);
         $db_usd         =Common::getTargetUsd($target->diamonds,$target->db_percentage);
-
+        
+     
+        WalletService::storeTransaction(
+                $user->id,
+                'add',
+                $t,
+                'user_transaction',
+                'target_achieved',
+                ['target_id' => $target->id]
+        );
 
         try {
             $values = [
