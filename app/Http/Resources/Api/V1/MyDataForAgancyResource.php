@@ -27,6 +27,8 @@ class MyDataForAgancyResource extends JsonResource
             'uuid' => @$this->uuid, // both
             'diamonds' => @$this->monthly_diamond_received ?: 0,
             'name' => @$this->name ?: '', // both
+            'phone' => @$this->phone ?? '',
+            'country' => $this->country ?? null,
             // 'vip_level' => @$this->UserVip->level,
             'vip'=>@Common::ovip_center ($this->id), // refactor
             'level'=>Common::level_center_min (@$this->id), // refactor

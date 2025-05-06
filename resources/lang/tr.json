@@ -2117,6 +2117,8 @@
 "wallets": "Kullanıcı Cüzdanları",
 "UserWallet": "Kullanıcı Cüzdanı",
 "wallet-transactions": "Cüzdan İşlemleri",
-"WalletTransaction": "Cüzdan İşlemi"
+"WalletTransaction": "Cüzdan İşlemi",
+  "vip_alert_message": "⚠️ Lütfen VIP'ye ayrıcalıkları ekleyin.",
+  "vip_alert_button": "Şimdi"
 
 }

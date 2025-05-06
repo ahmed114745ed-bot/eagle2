@@ -209,7 +209,7 @@ class OVipController extends MainController
         } else {
             $form->number('expire', __('expire'))->max(30);
         }
-        $form->belongsToMany('privilegs', Privileges::class, __('privileges'));
+        $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 
         $form->saving(function (Form $form) {
 

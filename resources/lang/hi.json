@@ -1261,7 +1261,9 @@
   "wallets": "उपयोगकर्ता वॉलेट्स",
   "UserWallet": "उपयोगकर्ता वॉलेट",
   "wallet-transactions": "वॉलेट लेनदेन",
-  "WalletTransaction": "वॉलेट लेनदेन"
+  "WalletTransaction": "वॉलेट लेनदेन",
+  "vip_alert_message": "⚠️ कृपया VIP में विशेषाधिकार जोड़ें।",
+  "vip_alert_button": "अब"
 
 
 

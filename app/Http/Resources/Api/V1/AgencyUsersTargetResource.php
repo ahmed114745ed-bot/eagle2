@@ -22,7 +22,6 @@ class AgencyUsersTargetResource extends JsonResource
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
         $target = $this->targets->first();
-        $next_target = Target::where('diamonds', '>', ($target->user_diamonds ?? 0))->orderBy('diamonds')->first();
         $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
             ->select('id', 'user_diamonds')->get();
 
@@ -43,11 +42,11 @@ class AgencyUsersTargetResource extends JsonResource
 
             'is_host' => $this->is_host,
             'target' => [
-                'id' => $target->target_id ?? 0,
-                'user_diamonds' => $target->user_diamonds ?? 0,
-                'user_hours' => $target->user_hours ?? 0,
-                'user_days' => $target->user_days ?? 0,
-                'diamonds_next_target'   =>  $next_target->diamonds - ($target->user_diamonds ?? 0),
+                'id' => @$target->target_id ?? 0,
+                'user_diamonds' => @$target->user_diamonds ?? 0,
+                'user_hours' => @$target->user_hours ?? 0,
+                'user_days' => @$target->user_days ?? 0,
+                'diamonds_next_target'   => @$target?->next_diamond ?? 0,
                 'old_targets'  => $userTarget,
             ],
             'sender_gifts' => SenderGiftLogResource::collection($giftLog),
