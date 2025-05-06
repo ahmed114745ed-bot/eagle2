@@ -87,7 +87,6 @@ class OvipGiftTapController extends MainController
 
     protected function gridDynamic($level, $firstType)
     {
-        dd($level,$firstType);
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
