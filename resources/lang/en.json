@@ -725,6 +725,7 @@
      "id:": "ID:",
      "Agency not found": "Agency not found",
      "user-wallets": "User Wallets",
+     "wallets": "User Wallets",
      "UserWallet": "User Wallet",
      "wallet-transactions": "Wallet Transactions",
      "WalletTransaction": "Wallet Transaction"
