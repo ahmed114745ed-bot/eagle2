@@ -39,13 +39,12 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-        dd(request('level'),request('ovip_id'));
 
         return parent::index($content
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->level));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->id));
             })
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
