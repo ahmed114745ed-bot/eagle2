@@ -212,7 +212,6 @@ class PkEventGiftController extends MainController
             $gifts = __('winner second gifts');
             $customButtonHTML = <<<HTML
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
-            <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>{$add}
             </a>
             <h3 style="margin-right: 10px;">{$gifts}</h3>
