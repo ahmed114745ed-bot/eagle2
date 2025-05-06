@@ -44,7 +44,7 @@ class AgencyController extends Controller
     }
 
     public function view(Request $request)
-    { 
+    {
         $agencyId = request()->get('id', $request->user()->agency_id);
 
         try {
@@ -65,7 +65,17 @@ class AgencyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         return Common::apiResponse(1, '', new AgencyDetailsResource($agency));
+    }
 
+    public function agencyTargetDetails($id, Request $request)
+    {
+        try {
+            $data = $this->agencyService->agencyTarget($id, $request);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  $data);
     }
 
     public function agencyMembers(Request $request)
