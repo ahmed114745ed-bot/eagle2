@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 use App\Models\Agency;
+use App\Models\GiftLog;
 use App\Models\Target;
 use App\Models\UserSallary;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -22,24 +23,11 @@ class AgencyDetailsResource extends JsonResource
 
     public function toArray($request)
     {
-        $target = UserSallary::where('user_agency_id', $this->agency_id)->sum('agency_sallary');
+        $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
 
-        // Calculate the agency share threshold based on the target
-
-        $minValue = Target::where('usd', '<', $target)
-            ->orderBy('usd', 'desc')
-            ->first();
-
-        $result = (@$minValue->agency_share / 100) * @$target;
-
-
-        $authUser = Auth::user();
-        $owner = @$authUser->ownAgency;
-        $admin = @$authUser->agencyUserJob;
-
-        
         return [
-            'id' => $this->id ?: 0, 
+            'id' => $this->id ?: 0,
             'name' => $this->name ?: '',
             'img' => $this->img ?: '',
             'owner' => new MyDataForAgancyResource($this->owner) ?: [
@@ -52,11 +40,9 @@ class AgencyDetailsResource extends JsonResource
                 ]
             ],
             'admins' => AdminsAgencyResource::collection($this->admins),
-            'target' => $result ?: 0,
-            'mempers_count' => $this->mempers_count,
-            // 'mempers'=>$this->mempers ?? (object)[], 
-            'members' => MyDataForAgancyNewResource::collection($this->mempers),
-          
+            //'members' => MyDataForAgancyNewResource::collection($this->mempers),
+            'star' => ReceiverGiftLogResource::collection($giftLog),
+
         ];
     }
 }
