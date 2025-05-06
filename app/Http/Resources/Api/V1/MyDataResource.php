@@ -213,7 +213,7 @@ class MyDataResource extends JsonResource
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
             'new_gift'          => (bool)$this->new_gift,
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
-
+            'wallet' => $this->wallet?->value ??0
 
         ];
 
