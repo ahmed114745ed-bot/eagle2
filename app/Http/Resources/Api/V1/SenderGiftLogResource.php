@@ -20,7 +20,7 @@ class SenderGiftLogResource extends JsonResource
             'id' => @$this->sender->id ?? 0, // both
             'uuid' => @$this->sender->uuid ?? '', // both
             'name' => @$this->sender->name ?: '', // both
-            'image' => $this->sender->profile->avatar ?: '',
+            'image' => $this->sender->profile->avatar ?? '',
             'exp'   => $this->exp ?? '',
         ];
 
