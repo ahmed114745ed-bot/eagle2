@@ -2203,7 +2203,10 @@
 "wallets": "محافظ المستخدمين",
 "UserWallet": "محفظة المستخدم",
 "wallet-transactions": "معاملات المحفظة",
-"WalletTransaction": "معاملة محفظة"
+"WalletTransaction": "معاملة محفظة",
+  "vip_alert_message": "⚠️ الرجاء إضافة الامتيازات إلى VIP.",
+  "vip_alert_button": "اضافة"
+  
 
 
 

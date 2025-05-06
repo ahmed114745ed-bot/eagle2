@@ -1,5 +1,23 @@
 <div class="box-body no-padding">
     <div class="nav-scroll-container">
+        @if ($alert == true)
+            <div 
+            style=" color: var(--inverse-color) !important;"
+            class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+            <div  style=" color: var(--inverse-color) !important;">
+                {{ __('vip_alert_message') }}
+            </div>
+            <a href="{{ url("admin/ovip/{$level}/edit") }}" class="btn btn-sm btn
+                 style="
+                   background-color: var(--primary-color) !important;
+                       color: var(--inverse-color) !important;
+
+                "
+                >
+                    {{ __('vip_alert_button') }}
+                </a>
+            </div>
+        @endif
         <ul class="nav nav-pills">
             @if ($types)
 

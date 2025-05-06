@@ -44,7 +44,7 @@ class OvipGiftTapController extends MainController
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip?->privilegs));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->level));
             })
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
@@ -87,8 +87,10 @@ class OvipGiftTapController extends MainController
 
     protected function gridDynamic($level, $firstType)
     {
+       
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
+       
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
@@ -142,6 +144,8 @@ class OvipGiftTapController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
+        if ($firstType) {
+          
         $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
             $level = $level ?? request('level');
             $url =    url('admin/ware-gift/' . $level . '/' . $type);
@@ -156,6 +160,8 @@ class OvipGiftTapController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+         
+           }
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -308,7 +314,7 @@ class OvipGiftTapController extends MainController
     }
 
 
-    private function tabsComponent($privileges)
+    private function tabsComponent($privileges ,$level)
     {
         $content = new Row();
 
@@ -320,12 +326,16 @@ class OvipGiftTapController extends MainController
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
 
-        // Default to the first type if none is selected
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
-
+        $alert =false;
+        if (!$currentType) {
+            $alert = true;
+        }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
             'types' => $privilegeTypes,
-            'currentType' => $currentType
+            'currentType' => $currentType,
+            'alert' => $alert,
+            'level' => $level
         ]));
 
         $content->column(12, $box);
