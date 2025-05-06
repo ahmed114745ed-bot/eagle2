@@ -4,7 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReceiverGiftLogResource extends JsonResource
+class SenderGiftLogResource extends JsonResource
 {
 
     /**
@@ -17,10 +17,10 @@ class ReceiverGiftLogResource extends JsonResource
     {
 
         $data = [
-            'id' => @$this->receiver->id ?? 0, // both
-            'uuid' => @$this->receiver->uuid ?? '', // both
-            'name' => @$this->receiver->name ?: '', // both
-            'image' => $this->receiver->profile->avatar ?: '',
+            'id' => @$this->sender->id ?? 0, // both
+            'uuid' => @$this->sender->uuid ?? '', // both
+            'name' => @$this->sender->name ?: '', // both
+            'image' => $this->sender->profile->avatar ?: '',
             'exp'   => $this->exp ?? '',
         ];
 

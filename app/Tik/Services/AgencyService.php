@@ -37,8 +37,10 @@ use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
+use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
@@ -67,6 +69,7 @@ class AgencyService
         private readonly AdminRepository $adminRepository,
         private readonly ChargeAgencyRepository $chargeAgencyRepository,
         private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
+
 
     ) {}
 
@@ -106,7 +109,25 @@ class AgencyService
         return $agency;
     }
 
-    
+    public function agencyTarget($agencyId, $request)
+    {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
+        $minValue = $this->targetRepository->getByUsd($target);
+        $result = (@$minValue->agency_share / 100) * @$target;
+        $hero = $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        $star = $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+
+        $data = [
+            'target' => $target,
+            'rate_percentage' => $result,
+            'stars' => ReceiverGiftLogResource::collection($star),
+            'heroes' => SenderGiftLogResource::collection($hero),
+        ];
+    }
+
+
 
     public function agencyMembers($agencyId)
     {
