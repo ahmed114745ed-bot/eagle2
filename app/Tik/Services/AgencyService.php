@@ -44,6 +44,7 @@ use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
+use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
 
@@ -118,12 +119,14 @@ class AgencyService
         $result = (@$minValue->agency_share / 100) * @$target;
         $hero = $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id');
         $star = $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
-
-        $data = [
+        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year);
+       
+        return [
             'target' => $target,
             'rate_percentage' => $result,
             'stars' => ReceiverGiftLogResource::collection($star),
             'heroes' => SenderGiftLogResource::collection($hero),
+            'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
         ];
     }
 
