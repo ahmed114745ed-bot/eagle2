@@ -67,7 +67,6 @@ class OvipGiftController extends MainController
 
     protected function gridDynamic($level, $type, $name)
     {
-        dd($level, $type, $name);
         $grid = new Grid(new Ware);
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
