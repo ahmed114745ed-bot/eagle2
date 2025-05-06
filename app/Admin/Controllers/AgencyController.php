@@ -42,7 +42,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index( $content
+        return parent::index($content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -189,7 +189,7 @@ class AgencyController extends MainController
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('Shipping_agency','!=',1)
+            ->where('Shipping_agency', '!=', 1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -521,21 +521,21 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
 
-                if ($Host_agency === 'on' && $Shipping_agency === 'off') {
+                if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 2,
                         'agency_id' => $form->model()->id,
                         'monthly_diamond_received' => 0,
                         'is_host' => 1,
                     ]);
-                } elseif ($Host_agency === 'on' && $Shipping_agency === 'on') {
+                } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 4,
                         'agency_id' => $form->model()->id,
                         'monthly_diamond_received' => 0,
                         'is_host' => 1,
                     ]);
-                } elseif ($Host_agency === 'off' && $Shipping_agency === 'on') {
+                } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 3,
                         'agency_id' => $form->model()->id,
@@ -547,7 +547,7 @@ class AgencyController extends MainController
 
 
 
-            if ($Host_agency === 'off' && $Shipping_agency === 'off') {
+            if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
 
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
@@ -555,11 +555,11 @@ class AgencyController extends MainController
 
 
 
-            if ($Host_agency === 'on') {
+            if ($Host_agency == 'on' || $Host_agency == 1) {
                 $host += 2;
             }
 
-            if ($Shipping_agency === 'on') {
+            if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
                 $host += 3;
             }
             if ($host > 3) {
