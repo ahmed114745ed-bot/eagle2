@@ -2200,6 +2200,7 @@
 "id:": "المعرف:",
 "Agency not found": "لم يتم العثور على الوكالة",
 "user-wallets": "محافظ المستخدمين",
+"wallets": "محافظ المستخدمين",
 "UserWallet": "محفظة المستخدم",
 "wallet-transactions": "معاملات المحفظة",
 "WalletTransaction": "معاملة محفظة"

@@ -2114,6 +2114,7 @@
 "id:": "Kimlik:",
 "Agency not found": "Ajans bulunamadı",
 "user-wallets": "Kullanıcı Cüzdanları",
+"wallets": "Kullanıcı Cüzdanları",
 "UserWallet": "Kullanıcı Cüzdanı",
 "wallet-transactions": "Cüzdan İşlemleri",
 "WalletTransaction": "Cüzdan İşlemi"
