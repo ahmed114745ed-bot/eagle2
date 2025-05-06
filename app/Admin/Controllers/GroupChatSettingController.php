@@ -12,92 +12,143 @@ class GroupChatSettingController extends MainController
     public $permission_name = 'updates_group_chat';
 
 
-    
+
     public function index(Content $content)
     {
-        $route = 'admin.update-config-group-chat';
-
         $config = Config::where('name', 'group_chat')->first();
-        $configValue =  $config->value;
-        $form = '<form method="POST" action="' . route($route) . '"  >';
-        $form .= csrf_field();
-        $form .= '<style>
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 60px;
-          height: 34px;
+
+        $form = $this->buildConfigForm(
+            route: 'admin.update-config-group-chat',
+            config: $config,
+            label: __('admin.price'),
+            inputType: 'number',
+            inputAttributes: [
+                'min' => '1',
+                'placeholder' => 'android_min_version',
+                'class' => 'form-input'
+            ]
+        );
+
+        return parent::index(
+            $content->title(trans('Settings'))
+                    ->body(new HtmlString($form))
+        );
+    }
+
+    protected function buildConfigForm(string $route, ?Config $config, string $label, string $inputType, array $inputAttributes = []): string
+    {
+        return <<<HTML
+        <div class="form-wrapper">
+            <form method="POST" action="{$this->escapeHtml(route($route))}" class="config-form">
+                {$this->csrfField()}
+
+                {$this->getHiddenIdField($config)}
+
+                <div class="form-group">
+                    <label class="form-label">{$this->escapeHtml($label)}</label>
+                    {$this->buildFormInput($inputType, $config->value ?? '', $inputAttributes)}
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="submit-btn">{$this->escapeHtml(__('admin.submit'))}</button>
+                </div>
+            </form>
+        </div>
+
+        {$this->getFormStyles()}
+        HTML;
+    }
+
+    protected function csrfField(): string
+    {
+        return csrf_field();
+    }
+
+    protected function getHiddenIdField(?Config $config): string
+    {
+        return $config ? '<input type="hidden" name="id" value="'.$this->escapeHtml($config->id).'">' : '';
+    }
+
+    protected function buildFormInput(string $type, $value, array $attributes = []): string
+    {
+        $attrs = '';
+        foreach ($attributes as $name => $val) {
+            $attrs .= ' '.$name.'="'.$this->escapeHtml($val).'"';
         }
 
-        .switch input {
-          opacity: 0;
-          width: 0;
-          height: 0;
+        return '<input type="'.$this->escapeHtml($type).'" name="value" value="'.$this->escapeHtml($value).'"'.$attrs.'>';
+    }
+
+    protected function escapeHtml($value): string
+    {
+        return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8', true);
+    }
+
+    protected function getFormStyles(): string
+    {
+        return <<<'CSS'
+        <style>
+        .form-wrapper {
+            max-width: 500px;
+            margin: 20px auto 0;
+            padding: 0 15px;
         }
 
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          -webkit-transition: .4s;
-          transition: .4s;
+        .config-form {
+            padding: 25px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
         }
 
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 26px;
-          width: 26px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          -webkit-transition: .4s;
-          transition: .4s;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        input:checked + .slider {
-          background-color: #2196F3;
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
         }
 
-        input:focus + .slider {
-          box-shadow: 0 0 1px #2196F3;
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border 0.2s ease;
         }
 
-        input:checked + .slider:before {
-          -webkit-transform: translateX(26px);
-          -ms-transform: translateX(26px);
-          transform: translateX(26px);
+        .form-input:focus {
+            border-color: #3490dc;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52,144,220,0.1);
         }
 
-        /* Rounded sliders */
-        .slider.round {
-          border-radius: 34px;
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
         }
 
-        .slider.round:before {
-          border-radius: 50%;
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #3490dc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s ease;
         }
-        </style>';
-        $form .= '<input type="hidden" name="id" value="' . ($config->id ?? '') . '">';
-        $form .= '<label for="android_min_version" class="control-label">' . __('admin.price') . ' :</label>';
-        $form .= '<input type="number" id="android_min_version" name="value" placeholder="android_min_version" value="' . $configValue . '" min="1"  class="inputs_cus_form">';
 
-        $form .= '<div style="display: flex; flex-direction: row;">';
-
-        $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;"> 
-        <button type="submit" class="button_form_cus">' . __('admin.submit') . '</button>
-      </div>';
-
-        $form .= '</form>';
-
-
-
-        return parent::index($content
-            ->title(trans('Settings'))
-            ->body(new HtmlString($form)));
+        .submit-btn:hover {
+            background-color: #2779bd;
+        }
+        </style>
+        CSS;
     }
 }
