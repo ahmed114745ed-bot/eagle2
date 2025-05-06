@@ -32,13 +32,13 @@ class AgencyUsersTargetResource extends JsonResource
             ->get()->reject(function ($q) {
                 return $q->exp == 0;
             });
-            
+
         return [
-            'id' => $this->id,
+            'id' => $this->id ?? 0,
 
             'id' => $this->id ?? 0,
             'name' => $this->name ?? '',
-            'uuid' => $this->uuid,
+            'uuid' => $this->uuid ?? '',
             'image' => $this->profile->avatar ?? '',
 
             'is_host' => $this->is_host,
