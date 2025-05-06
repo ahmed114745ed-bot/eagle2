@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\WalletTransactionController;
 use App\Models\Room;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -488,6 +490,8 @@ Route::group(
             //dd("note found data");
         });
 
+        $router->resource('user-wallets', UserWalletController::class);
+        $router->resource('wallet-transactions', WalletTransactionController::class);
 
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);

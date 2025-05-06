@@ -708,7 +708,24 @@
      "Unpinned": "Unpinned",
      "Unpin": "Unpin",
      "Pin Status": "Pin Status",
-     "diamonds target":"diamonds target"
-
+     "diamonds target":"diamonds target",
+     "Cut amount": "Cut amount",
+     "Pending value": "Pending value",
+     "View transactions": "View transactions",
+     "Cut": "Cut",
+     "Target ID:": "Target ID:",
+     "Target not found": "Target not found",
+     "UUID:": "UUID:",
+     "User not found": "User not found",
+     "Agency:": "Agency:",
+     "id:": "ID:",
+     "Agency not found": "Agency not found",
+     "user-wallets": "User Wallets",
+     "wallets": "User Wallets",
+     "UserWallet": "User Wallet",
+     "wallet-transactions": "Wallet Transactions",
+     "WalletTransaction": "Wallet Transaction",
+   "vip_alert_message": "⚠️ Please add privileges to VIP.",
+  "vip_alert_button": "Add Now"
 
     }

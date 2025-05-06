@@ -3,10 +3,11 @@
 namespace Modules\Chat\Http\Services;
 
 use Exception;
-use Illuminate\Support\Facades\Event;
+use Carbon\Carbon;
 use Modules\Chat\Entities\ChatRoom;
-use Modules\Chat\Events\CardDeleteMessage;
+use Illuminate\Support\Facades\Event;
 use Modules\Chat\Events\DeleteMessage;
+use Modules\Chat\Events\CardDeleteMessage;
 use Modules\Chat\Http\Repositories\ChatRepository;
 use Modules\Chat\Http\Repositories\BlacklistRepository;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
@@ -24,7 +25,8 @@ class ChatService
         $this->blacklistRepository = $blacklistRepository;
     }
 
-    public function getUserByUUID($uuid){
+    public function getUserByUUID($uuid)
+    {
         return $this->chatRepository->getUserByUUID($uuid);
     }
     public function isUserBlocked($userId, $fromUserId)
@@ -81,7 +83,7 @@ class ChatService
                 ];
             }
 
-            if (!$message->created_at->greaterThanOrEqualTo(now()->subDay())) {
+            if (!Carbon::parse($message->created_at)->greaterThanOrEqualTo(now()->subDay())) {
                 return [
                     'status' => 404,
                     'message' => 'Deletion is permissible within a day after sending.',

@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\Agency;
 use App\Models\User;
+use App\Services\WalletService;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
@@ -187,6 +188,15 @@ class ChargeRepoService
 
     public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
+        WalletService::storeTransaction(
+            $sender->id,
+            'cut',
+            $usd,
+            'user_transaction',
+            'transfer_to_user',
+            ['receiver_id' => $receiver->id]
+         );
+
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -240,6 +250,15 @@ class ChargeRepoService
         $type = $receiver->owner?->user_type ?? '';
 
         $receiver->increment('coins', $amount);
+
+        WalletService::storeTransaction(
+            $sender->id,
+            'cut',
+            $usd,
+            'user_transaction',
+            'transfer_to_agency',
+            ['agency_id' => $receiver->id]
+         );
 
         $data = [
             'charger_id' => $sender->id,

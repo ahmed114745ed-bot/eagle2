@@ -192,7 +192,6 @@ class GiftLogService
 
     private function gift_event($gift, $receivedUsers, $user, $totalPrice, $receivedUser, $receiversIds, $room, $ownerId, $number)
     {
-
         $gift_data = [
             'show_gift'         => $gift->show_img ?: $gift->show_img2,
             'gift_img'          => $gift->img,
@@ -234,7 +233,6 @@ class GiftLogService
     }
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {
-
         $zigoData   = collect(
             [
                 'show_gift'        => $gift->show_img ?: $gift->show_img2,

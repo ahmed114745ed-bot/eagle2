@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Modules\DailyPrize\Http\Controllers\Api\DailyGiftController;
 
 /*
     |--------------------------------------------------------------------------
@@ -15,6 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('current-day',[\Modules\DailyPrize\Http\Controllers\Api\DailyGiftController::class,'current_day']);
-    Route::post('receive-daily-prize',[\Modules\DailyPrize\Http\Controllers\Api\DailyGiftController::class,'receive_daily_prize']);
+    Route::get('current-day',[DailyGiftController::class,'current_day']);
+    Route::post('receive-daily-prize',[DailyGiftController::class,'receive_daily_prize']);
 });

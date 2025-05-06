@@ -33,6 +33,7 @@ class OvipGiftTapController extends MainController
         <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
+        $ovip=null;
         if (request('ovip_id')) {
             $ovip = OVip::find(request('ovip_id'));
         } elseif (request('level')) {
@@ -43,7 +44,7 @@ class OvipGiftTapController extends MainController
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip?->privilegs));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->id));
             })
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
@@ -86,10 +87,10 @@ class OvipGiftTapController extends MainController
 
     protected function gridDynamic($level, $firstType)
     {
-
-
+       
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
+       
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
@@ -143,6 +144,8 @@ class OvipGiftTapController extends MainController
         $grid->disableCreateButton();
         $this->extendGrid($grid);
         $grid->disableExport();
+        if ($firstType) {
+          
         $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
             $level = $level ?? request('level');
             $url =    url('admin/ware-gift/' . $level . '/' . $type);
@@ -157,6 +160,8 @@ class OvipGiftTapController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+         
+           }
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -271,7 +276,7 @@ class OvipGiftTapController extends MainController
             $id = $form->model()->id;
 
             $exists = Ware::where('level', $form->level)
-                ->where('type', $form->type)->when(isset($id), function ($query) use ($id) {
+                ->where('type', $form->type)->where('get_type', 1)->when(isset($id), function ($query) use ($id) {
                     $query->where('id', "!=", $id);
                 })->exists();
             if ($exists) {
@@ -313,27 +318,28 @@ class OvipGiftTapController extends MainController
     }
 
 
-    private function tabsComponent($privileges)
+    private function tabsComponent($privileges ,$level)
     {
         $content = new Row();
 
         // Fetch distinct privilege types and names
-        if ($privileges) {
-            if (app()->getLocale() == 'en') {
-                $privilegeTypes = $privileges->pluck('en_name', 'type')->sortKeys();
-            } else {
-                $privilegeTypes = $privileges->pluck('name', 'type')->sortKeys();
-            }
+        if (app()->getLocale() == 'en') {
+
+            $privilegeTypes = $privileges?->pluck('en_name', 'type')->sortKeys();
         } else {
-            $privilegeTypes = collect(); 
+            $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
 
-        // Default to the first type if none is selected
-        $currentType = request()->get('type', $privilegeTypes->keys()->first());
-
+        $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+        $alert =false;
+        if (!$currentType) {
+            $alert = true;
+        }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
             'types' => $privilegeTypes,
-            'currentType' => $currentType
+            'currentType' => $currentType,
+            'alert' => $alert,
+            'level' => $level
         ]));
 
         $content->column(12, $box);

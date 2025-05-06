@@ -756,12 +756,12 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="agoraRadio"
                                                        class="custom-radio libraryRealTime" name="library" value="0"
                                                     {{ $library == '0' ? 'checked' : '' }}>
                                                 <label for="agoraRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -786,11 +786,11 @@
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                                 <label for="zegoRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -835,11 +835,11 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
                                                 <label for="tencentRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -1445,7 +1445,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_primary_color" name="app_primary_color"
-                                    value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
+                                    value="{{ $settings['app_primary_color'] ?? '#32e5ac' }}" class="form-control">
                             </div>
                         </div>
 
@@ -1459,7 +1459,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_second_color" name="app_second_color"
-                                    value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
+                                    value="{{ $settings['app_second_color'] ?? '#003FA6' }}" class="form-control">
                             </div>
                         </div>
 
@@ -2036,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#aee6cf";
-                            document.getElementById('app_second_color').value = "#eff7f5";
+                            document.getElementById('app_primary_color').value = "#32e5ac";
+                            document.getElementById('app_second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";

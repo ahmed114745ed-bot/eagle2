@@ -6,6 +6,7 @@ use App\Models\Follow;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\Vip;
+use Str;
 
 class ProfileRepository
 {
@@ -18,6 +19,7 @@ class ProfileRepository
         $this->user = $user;
     }
 
+
     public function updateUser($user, $data)
     {
         $data['is_points_first'] = 0;
@@ -28,8 +30,21 @@ class ProfileRepository
         return $user;
     }
 
+
+    function convertArabicNumbersToEnglish($dateString)
+{
+    $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+    return Str::replace($arabic, $english, $dateString);
+}
+
     public function updateProfile($profile, $data, $userId )
     {
+        if(!empty($data['birthday'])){
+            $data['birthday']  = $this->convertArabicNumbersToEnglish($data['birthday']);
+        }
+
         if($profile)
         {
             $profile->fill($data);
@@ -43,7 +58,7 @@ class ProfileRepository
              'country' => $data->country,
             ]);
         }
-        
+
         return $profile;
     }
 
