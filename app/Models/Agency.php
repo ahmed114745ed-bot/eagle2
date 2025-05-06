@@ -86,6 +86,11 @@ class Agency extends Model
         return $this->hasMany(User::class);
     }
 
+    public function admins()
+    {
+        return $this->hasMany(AgencyUserJob::class, 'agency_id')->where('type', 'requestManger');
+    }
+
     public function scopeOfOwner($query, $owner_id)
     {
         return $query->where('owner_id', $owner_id);
@@ -194,9 +199,9 @@ class Agency extends Model
         parent::boot();
 
         static::saving(function ($model) {
-           
-            if (request()->has('charge_agency')) { 
-                if (request('charge_agency') == 1) { 
+
+            if (request()->has('charge_agency')) {
+                if (request('charge_agency') == 1) {
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->id
                     ]);
@@ -205,7 +210,7 @@ class Agency extends Model
                 }
             }
 
-            if (request()->has('appear_charger_agency')) { 
+            if (request()->has('appear_charger_agency')) {
                 $user = User::find($model->app_owner_id);
 
                 if ($user) {
@@ -216,15 +221,6 @@ class Agency extends Model
                     }
                 }
             }
-
-            
-          
-             
-
-           
-        
-        
-        
         });
 
         static::updating(function ($agency) {
@@ -245,7 +241,6 @@ class Agency extends Model
                     ]);
                 }
             }
-
         });
     }
 
@@ -381,8 +376,6 @@ class Agency extends Model
 
     public function getIsFrozenAttribute($value)
     {
-        return $value ?? 0; 
+        return $value ?? 0;
     }
-
- 
 }

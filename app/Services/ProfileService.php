@@ -35,13 +35,18 @@ class ProfileService
         if ($profileData) $profile = $this->profileRepo->updateProfile($user->profile, $profileData, $user->id);
 
         if ($request->hasFile('image')) {
+            
             $img = $request->file('image');
             $imageType = $img->getClientOriginalExtension();
             if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
-                return Common::apiResponse(0, __('api_responses.gifImage'), 404);
+                throw new \Exception( __('api_responses.gifImage'));
             }
-            $imagePath = Common::upload('profile', $img);
-            $this->profileRepo->updateAvatar($profile, $imagePath);
+           
+            $user->profile_count += 1;
+            $user->save();
+            $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
+            //  $imagePath = Common::upload('profile', $img);
+            $this->profileRepo->updateAvatar($profile, $newImagePass);
         }
 
         // if ($request->hasFile('multi_image')) {

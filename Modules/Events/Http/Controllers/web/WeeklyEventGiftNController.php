@@ -22,7 +22,7 @@ use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Events\Entities\WeeklyStar;
 
-class WeeklyEventGiftNController extends MainOldController
+class WeeklyEventGiftNController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'weekly_star_rewards';
@@ -46,7 +46,7 @@ class WeeklyEventGiftNController extends MainOldController
             <i class="fa fa-arrow-left"></i> {$translation}
         </a>
         HTML;
-        return $content
+        return parent::index($content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
             ->breadcrumb(
@@ -55,16 +55,16 @@ class WeeklyEventGiftNController extends MainOldController
             ->row($buttonHTML)
             ->row($this->grid1()) // First grid
             ->row($this->grid2()) // Second grid
-            ->row($this->grid3()); // Third grid
+            ->row($this->grid3())); // Third grid
 
 
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -76,19 +76,19 @@ class WeeklyEventGiftNController extends MainOldController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return $content
+        return parent::edit($id,$content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
-    public function show($id, Content $content)
-    {
-        return $content
-            ->header(trans('admin.detail'))
-            ->description(trans('admin.description'))
-            ->body($this->detail($id));
-    }
+    // public function show($id, Content $content)
+    // {
+    //     return parent::show($id,$content
+    //         ->header(trans('admin.detail'))
+    //         ->description(trans('admin.description'))
+    //         ->body($this->detail($id)));
+    // }
     protected function grid1()
     {
         $type = 1;
@@ -334,5 +334,20 @@ class WeeklyEventGiftNController extends MainOldController
             return redirect($route);
         });
         return $form;
+    }
+
+    protected function detail($id)
+    {
+        $show = new Show(Reward::findOrFail($id));
+
+//        $show->id('ID');
+//        $show->name('name');
+//        $show->img('img');
+//        $show->exp('exp');
+//        $show->type('type');
+//        $show->created_at(trans('admin.created_at'));
+//        $show->updated_at(trans('admin.updated_at'));
+        $this->extendShow ($show);
+        return $show;
     }
 }

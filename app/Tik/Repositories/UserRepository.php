@@ -32,6 +32,11 @@ class UserRepository extends AbstractRepository
         return $this->model->where('uuid', 'like', '%' . $userUuId . '%')->first();
     }
 
+    public function searchUserById($userUuId)
+    {
+        return $this->model->find($userUuId);
+    }
+
 
     public function incrementCoins($userUuIdOrId, $coins)
     {
@@ -394,5 +399,12 @@ class UserRepository extends AbstractRepository
     public function online()
     {
         return $this->model->where('online', 1)->inRandomOrder()->paginate(10);
+    }
+
+    public function agencyUsers($agencyId, $month, $year)
+    {
+        return $this->model->where('agency_id', $agencyId)->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+            $query->where('target_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        }])->get();
     }
 }

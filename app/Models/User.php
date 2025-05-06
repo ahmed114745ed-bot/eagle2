@@ -26,6 +26,9 @@ use Modules\Achievement\Http\Traits\AchievementUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 /**
  * @method static withoutAppends()
@@ -85,6 +88,7 @@ class User extends Authenticatable
         'original_uuid',
         'is_frozen',
         'total_charge_level',
+         'photo'
     ];
 
     /* protected $appends = [
@@ -381,7 +385,7 @@ class User extends Authenticatable
 
     public function country()
     {
-        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name');
+        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name','phone_code','iso');
     }
 
     public function getLangAttribute()
@@ -1164,6 +1168,11 @@ class User extends Authenticatable
         return optional($this->agency)->is_frozen;
     }
 
+
+    public function getPhotoAttribute()
+    {
+        return @$this->profile->avatar;
+    }
     protected static function boot()
     {
         parent::boot();
@@ -1179,8 +1188,8 @@ class User extends Authenticatable
                 }
                 request()->request->remove('is_frozen');
             }
-            if (request()->has('charge_agency')) { 
-                if (request('charge_agency') == 1) { 
+            if (request()->has('charge_agency')) {
+                if (request('charge_agency') == 1) {
                     // لو مش موجود، أضيف
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->agency_id
@@ -1191,15 +1200,63 @@ class User extends Authenticatable
                 }
             }
 
-    });
-    
+            $originalProfile = $model->profile;
+            $newAvatar = request()->input('photo'); // still okay if tightly coupled
+
+
+            if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
+
+
+                $newCount = $model->profile_count + 1;
+                $model->profile_count = $newCount;
+
+                $file       = request('photo');
+                if ($file instanceof  UploadedFile) {
+                   
+                    $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
+                    Storage::delete($model->profile->avatar);
+                }
+                if ($model->profile) {
+                    $model->profile->avatar = $url ?? '';
+                }
+            } else {
+                if ($model->profile) {
+                    $model->profile->avatar = $model->profile->avatar;
+                }
+            }
+            unset($model->photo);
+        });
+
+     
+
         static::updating(function ($user) {
-            $originalCoins = $user->getOriginal('di'); // تأكد أن coins هو الصحيح
+            // Check if coins increased
+            $originalCoins = $user->getOriginal('di');
             $newCoins = $user->di;
 
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
+
+            // Handle profile.avatar update
+
         });
     }
+
+
+    public function wallet()
+    {
+        return $this->hasOne(UserWallet::class);
+    }
+
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function walletTransactionBackups()
+    {
+        return $this->hasMany(WalletTransactionBackup::class);
+    }
+
 }

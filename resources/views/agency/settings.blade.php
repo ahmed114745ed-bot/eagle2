@@ -37,6 +37,14 @@
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
 
+    .rtl .settings-sidebar {
+        margin-left: 400px;
+    }
+
+    .ltr .settings-sidebar {
+        margin-right: 400px;
+    }
+
     .settings-sidebar h2 {
         text-align: center;
     }

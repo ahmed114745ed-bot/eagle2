@@ -17,9 +17,9 @@ class DedicateVipController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('vips dedicate'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
     /**

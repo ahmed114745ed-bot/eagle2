@@ -83,12 +83,12 @@ class SpecialWareController extends  MainController
                 6 => trans('limited time purchase'),
             ]
         );
-        $grid->column('value', __('value'))->display(function ($coin) {
-            $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
-        });
+        // $grid->column('value', __('value'))->display(function ($coin) {
+        //     $icon = asset('images/coin.png'); // Ensure this path is correct
+        //     return '<img src="'.$icon.'" alt="coin" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin ?? 0);
+        // });
         $grid->column('price', __('price'))->display(function ($coin) {
-            $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
+            $icon = asset('images/coin.png'); // Ensure this path is correct
             return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
         });
         $grid->column('show_img', __('show_img'))->image('', 30);

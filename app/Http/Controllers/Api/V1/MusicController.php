@@ -43,7 +43,7 @@ class MusicController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-            $this->musicService->create($request->user()->id, $request->url);
+            $this->musicService->create($request->user()->id, $request->url, $request->image);
             return Common::apiResponse(1, 'created successfully');
         } catch (Exception $exception) {
 

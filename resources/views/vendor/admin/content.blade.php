@@ -11,7 +11,7 @@
         @if ($breadcrumb)
         <ol class="breadcrumb" style="margin-right: 30px;">
             <li><a href="{{ admin_url('/') }}"><i class="fa fa-dashboard"></i> {{__('Home')}}</a></li><b>/</b>
-            
+
             @foreach($breadcrumb as $item)
                 @if($loop->last)
                     <li class="active">

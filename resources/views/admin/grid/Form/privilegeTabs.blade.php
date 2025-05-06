@@ -1,6 +1,8 @@
 <div class="box-body no-padding">
     <div class="nav-scroll-container">
         <ul class="nav nav-pills">
+            @if ($types)
+
             @foreach($types as $type => $name)
                 @php
                     $selectedType = request()->get('type', $types->keys()->first());
@@ -11,6 +13,7 @@
                     </a>
                 </li>
             @endforeach
+            @endif
         </ul>
     </div>
 </div>

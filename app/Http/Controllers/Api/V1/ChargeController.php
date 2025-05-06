@@ -30,12 +30,13 @@ class ChargeController extends Controller
 
     public function charge_co_for_owner(Request $request)
     {
+        //done
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-        if ($user->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+//        if ($user->charge_status == 0) {
+//            return Common::apiResponse(0, __('api.freez_charge'), 404);
+//        }
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
@@ -54,7 +55,7 @@ class ChargeController extends Controller
 
 
     public function chargeTo(Request $request)
-    {  
+    {
         $types = [
             'user' => [$this, 'chargeToUser'],
             'agency' => [$this, 'chargeToAgency']
@@ -68,15 +69,14 @@ class ChargeController extends Controller
         }
         $data = call_user_func($instance, $request);
         return $data;
-
-
     }
 
     public function chargeToUser(Request $request)
     {
+        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
-            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
+            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
         $toId = $request->to_id;
         $from = $request->user();
@@ -84,20 +84,18 @@ class ChargeController extends Controller
         $to = User::find($toId);
 
         if(!$from->transfer_salary){
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
+
         if(!$to->transfer_salary){
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
         }
 
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
-      
 
-       
-
-        if ($from->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+//        if ($from->charge_status == 0) {
+//            return Common::apiResponse(0, __('api.freez_charge'), 404);
+//        }
         $usd = $request->usd;
 
         if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) != 0) {
@@ -108,13 +106,13 @@ class ChargeController extends Controller
             return Common::apiResponse(0, 'not found', 404);
         }
         // $rate = Common::getConf('one_usd_value_in_coins');
-        $rate = Common::getCoinsValue($to->type_user == 0 ? 'user_coins' : 'shipping_coins');
+        $rate = Common::getCoinsValue( 'user_coins' );
 
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         }
         $coins = $usd * $rate;
-        
+
         $totalSalary = $from->salary;
         $roomSalary = $from->ownerRoom?->salary;
         if ($totalSalary < $usd) {
@@ -140,11 +138,11 @@ class ChargeController extends Controller
 
     public function chargeToAgency(Request $request)
     {
+        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
-            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
+            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
         }
-
 
         $toId = $request->to_id;
         $from = $request->user();
@@ -155,9 +153,9 @@ class ChargeController extends Controller
         if ($to->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen'), 404);
         }
-        if ($from->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+//        if ($from->charge_status == 0) {
+//            return Common::apiResponse(0, __('api.freez_charge'), 404);
+//        }
         $usd = $request->usd;
 
         if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) != 0) {
@@ -196,11 +194,11 @@ class ChargeController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }
     }
-    
+
 
     public function sendMoneyFoeHost(Request $request)
     {
-
+        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
             return Common::apiResponse(0, __('api.freez_charge'), 404);
@@ -208,9 +206,9 @@ class ChargeController extends Controller
 
         $user = $request->user();
 
-        if ($user->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+//        if ($user->charge_status == 0) {
+//            return Common::apiResponse(0, __('api.freez_charge'), 404);
+//        }
         $count = $request->amount;
         $userUuid = $request->user_id;
 
@@ -252,7 +250,7 @@ class ChargeController extends Controller
             'agency' => [$this, 'ChargeDollarForOwner_to_agency']
         ];
 
-        $type = $request->input('type'); 
+        $type = $request->input('type');
         $instance = $types[$type] ?? $types['agency'];
         if (!$instance) {
             return Common::apiResponse(0, 'Type Not Found', 400);
@@ -264,13 +262,14 @@ class ChargeController extends Controller
 
     public function ChargeDollarForOwner_to_users(Request $request)
     {
+        //done
         //        return Common::apiResponse(0, 'try again');
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-        if ($user->charge_status == 0) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+//        if ($user->charge_status == 0) {
+//            return Common::apiResponse(0, __('api.freez_charge'), 404);
+//        }
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
@@ -296,15 +295,14 @@ class ChargeController extends Controller
 
   public function ChargeDollarForOwner_to_agency(Request $request)
   {
+      //done
       //        return Common::apiResponse(0, 'try again');
       $user = $request->user();
       $count = $request->amount;
       $userUuid = $request->id;
-      if ($user->charge_status == 0) {
-          return Common::apiResponse(0, __('api.freez_charge'), 404);
-      }
-
-    
+//      if ($user->charge_status == 0) {
+//          return Common::apiResponse(0, __('api.freez_charge'), 404);
+//      }
 
       if ($count < 0 || !is_numeric($count)) {
           return Common::apiResponse(0, 'this value not allow', 422);

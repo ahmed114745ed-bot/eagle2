@@ -315,7 +315,7 @@ class ChatRoomService
         // Dispatch the event to open the chat room
         try {
             $roomResource = new ChatRoomResourcePusher($checkRoom);
-            event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2, $checkRoom));
+            event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ??$user , $checkRoom));
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
             throw $th;

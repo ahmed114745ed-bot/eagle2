@@ -283,6 +283,14 @@ return [
     'system_default_manager'           => 'قيمة UUID لتعيين العميل كمدير للتطبيق',
     'add_coins' => 'أضافة رصبد',
     'creator' => 'المسؤول',
+
+    'confirm_enable_can_play' => 'هل أنت متأكد أنك تريد تفعيل خاصية اللعب؟',
+    'confirm_disable_can_play' => 'هل أنت متأكد أنك تريد تعطيل خاصية اللعب؟',
+    'confirm_enable_invite_code' => 'هل أنت متأكد أنك تريد تفعيل رمز الدعوة؟',
+    'confirm_disable_invite_code' => 'هل أنت متأكد أنك تريد تعطيل رمز الدعوة؟',
+    'confirm_enable_transfer_salary' => 'هل أنت متأكد أنك تريد تفعيل تحويل الراتب؟',
+    'confirm_disable_transfer_salary' => 'هل أنت متأكد أنك تريد تعطيل تحويل الراتب؟',
+
     'remove_bans' => 'إزالة الحظر',
 
 ];

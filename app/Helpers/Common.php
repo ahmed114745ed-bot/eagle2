@@ -275,7 +275,7 @@ class Common
         ];
     }
 
-    public static function          getPaginates($collection)
+    public static function getPaginates($collection)
     {
         return [
             'per_page' => $collection->perPage(),
@@ -379,6 +379,14 @@ class Common
         return null;
     }
 
+    public static function getSettingValue($key)
+    {
+        if ($conf = Setting::query()->where('key', $key)->first()) {
+            return $conf->value;
+        }
+        return null;
+    }
+
     public static function getConfFromKey(array $keys)
     {
         $confs = Config::query()->whereIn('name', $keys)->select(['name', 'value'])->get();
@@ -390,6 +398,14 @@ class Common
     {
         $extension = $file->getClientOriginalExtension();
         $fileName = Str::random(10) . '.' . $extension;
+        $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
+        return $folder . DIRECTORY_SEPARATOR . $fileName;
+    }
+
+    public static function uploadProfileUser($folder, $file, $id, $count)
+    {
+        $extension = $file->getClientOriginalExtension();
+        $fileName = $id . '_' . $count . '.' . $extension;
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
         return $folder . DIRECTORY_SEPARATOR . $fileName;
     }
@@ -612,7 +628,6 @@ class Common
     {
         if ($tokens == null) return;
         $api_access_key = self::getGoogleAccessToken();
-
         $isGroup = false;
         $userData = [];
         $key = time();
@@ -678,10 +693,13 @@ class Common
         ];
 
 
-        $projectName = app()->getLocale() == 'ar' ? Cache::get('app_title_ar') : Cache::get('app_title_en');
-        $result = Http::withHeaders($headers)->post('https://fcm.googleapis.com/v1/projects/' . $projectName . '/messages:send', [
+
+        $projectId = env('FIREBASE_PROJECT_NAME');
+
+        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
             'message' => $payload
         ]);
+
 
         $result = json_decode($result);
 
@@ -1189,6 +1207,7 @@ class Common
 
     public static  function createUserAdmin($appOwnerId)
     {
+        if(!$appOwnerId) return;
         $user = User::find($appOwnerId);
         if (!$user) return true;
         $password = Str::random(8);
@@ -1200,12 +1219,14 @@ class Common
             'name' => $user->name,
         ]);
         $role = Role::where('slug', 'agency-owner')->first();
-        DB::table('admin_role_users')->insert([
-            'user_id' =>  $admin->id,
-            'role_id' => $role->id,
-        ]);
+        if ($admin && $role) {
+            DB::table('admin_role_users')->insert([
+                'user_id' => $admin->id,
+                'role_id' => $role->id,
+            ]);
+        }
         if ($user->email != null) {
-         Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
         }
         return true;
     }
@@ -1264,7 +1285,7 @@ class Common
     {
         $shipping_coins = Cache::rememberForever('shipping_coins', function () {
             return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        }); 
+        });
         // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
@@ -1276,7 +1297,7 @@ class Common
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
 
-        $usd =Common::roundToTwoDecimalPlaces($userUsd);
+        $usd = Common::roundToTwoDecimalPlaces($userUsd);
         return $userUsd;
     }
 
@@ -1284,7 +1305,7 @@ class Common
     {
         $shipping_coins = Cache::rememberForever('shipping_coins', function () {
             return Setting::where('key', 'shipping_coins')->value('value') ?? 1;
-        }); 
+        });
         // $super_admin_coins = Cache::rememberForever('super_admin_coins', function () {
         //     return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         // });
@@ -1308,24 +1329,24 @@ class Common
 
     public  static function getDiamondsPercentage()
     {
-       $num= settings()->get('diamonds');
-       $per = $num / 100;
-       return $per;
-    }   
+        $num = settings()->get('diamonds');
+        $per = $num / 100;
+        return $per;
+    }
 
 
     public static function ifRoomHasband($owner_id)
     {
         $room = Room::where('uid', $owner_id)->first();
-    
+
         if ($room) {
             $ban = $room->bans()
                 ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
-                ->first();  
+                ->first();
             return $ban ? true : false;
         }
-    
-        return false; 
+
+        return false;
     }
 
 
@@ -1337,19 +1358,10 @@ class Common
     public static function searchAgency($id)
     {
         $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true) 
-            ->whereHas('chargeAgency' )
+            // ->where('Shipping_agency', true) 
+            // ->whereHas('chargeAgency' )
             ->first();
-    
-        return $agency ?: false; 
+
+        return $agency ?: false;
     }
-    
-
-
-    
-
- 
-
- 
-
 }

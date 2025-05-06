@@ -6,10 +6,12 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 class addTOjesonController extends Controller
 {
-
+    public $permission_name = 'updates';
     public function custom(Request $request){
         //chat configs
         $chat_status =  $request->chat_status;
@@ -59,6 +61,9 @@ class addTOjesonController extends Controller
     }
     public function postAddSitin(Request $request)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         //chat configs
         $chat_status =  $request->chat_status;
         $chat_enable_version =  $request->chat_enable_version;

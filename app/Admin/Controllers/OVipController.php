@@ -47,17 +47,17 @@ class OVipController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__('vip'))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     public function show($id, Content $content)
     {
         $oVip = OVip::findOrFail($id);
-        return $content->title(__('OVip'))->view('ovip_profile', compact('oVip'));
+        return parent::show($id,$content->title(__('OVip'))->view('ovip_profile', compact('oVip')));
     }
 
     /**
@@ -69,16 +69,16 @@ class OVipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('vip'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('vip'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     /**

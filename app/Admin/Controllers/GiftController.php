@@ -22,14 +22,14 @@ class GiftController extends MainController
     public $permission_name = 'gift';
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(__($this->title))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
 
     protected function grid2()

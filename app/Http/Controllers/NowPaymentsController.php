@@ -3,7 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\NowPaymentsService;
+use App\Models\NowpaymentOrder;
+use Database\Seeders\config;
 use Illuminate\Http\Request;
+
+use Log;
+
+use Illuminate\Support\Facades\Auth;
 
 class NowPaymentsController extends Controller
 {
@@ -14,31 +20,140 @@ class NowPaymentsController extends Controller
         $this->nowPayments = $nowPayments;
     }
 
+    public function rechargeForm()
+    {
+        $data = $this->nowPayments->getCurrencies();
+        
+        return view('payments.now_payments.index', ['currencies' => $data['currencies']]);
+    }
+
+   
     public function createPayment(Request $request)
     {
-        $data = [
-            'price_amount' => 100, // Amount in fiat currency
-            'price_currency' => 'usd',
-            'pay_currency' => 'btc', // Cryptocurrency to receive
-            'ipn_callback_url' => '/now-payments-callback', // Callback URL for IPN
-            'order_id' => uniqid(), // Unique order ID
-            'order_description' => 'Test Payment',
-        ];
-
-        $payment = $this->nowPayments->createPayment($data);
-
-        return redirect($payment['invoice_url']); // Redirect user to payment page
+   
+        try {
+            $invoice = $this->nowPayments->createInvoice($request);
+    
+            // تحقق أن invoice_url موجود
+            if (isset($invoice['invoice_url'])) {
+    
+                // حفظ الفاتورة في قاعدة البيانات
+                NowpaymentOrder::create([
+                    'payment_id' => $invoice['id'] ?? null,
+                    'pay_currency' => $request->currency,
+                    'pay_amount' => $invoice['pay_amount'] ?? $request->amount,
+                    'price_amount' => $request->amount,
+                    'price_currency' => 'usd',
+                    'payment_status' => 'waiting',
+                    'order_id' => $invoice['order_id'] ?? uniqid(),
+                    'invoice_url' => $invoice['invoice_url'],
+                    'user_id' => Auth::id() ?? 1,
+                    'pay_address' => $invoice['pay_address'] ?? '',
+                    'amount_received' => 0.0,
+                ]);
+    
+                return redirect()->to($invoice['invoice_url']);
+    
+            } elseif (isset($invoice['pay_address'])) {
+                // في حال لم يرجع invoice_url لكن رجع عنوان محفظة، اعرض بيانات الدفع اليدوي
+                return view('manual_payment', [
+                    'address' => $invoice['pay_address'],
+                    'amount' => $invoice['pay_amount'],
+                    'currency' => $invoice['pay_currency'],
+                    'order_id' => $invoice['order_id'] ?? uniqid(),
+                ]);
+            }
+    
+            return back()->with('error', 'لم يتم إنشاء رابط الفاتورة. قد تكون العملة غير مدعومة حالياً.');
+            
+        } catch (\Exception $e) {
+            return back()->with('error', 'خطأ أثناء إنشاء الدفع: ' . $e->getMessage());
+        }
     }
+
+    public function getCurrencies(){
+
+        $response = $this->nowPayments->getCurrencies();
+
+        $currencies = collect($response['currencies'] ?? [])->map(function ($currency) {
+            return [
+                'currency'    => strtoupper($currency['currency']),
+                'min_amount'  => $currency['min_amount'],
+                'max_amount'  => $currency['max_amount'],
+            ];
+        })->sortBy('currency')->values();
+        return response()->json([
+            'data' => $currencies
+        ]);
+    }
+
+    public function paymentStatus($payment){
+        $data = $this->nowPayments->getPaymentStatus($payment);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // public function paymentCallback(Request $request)
+    // {
+    //     // Handle IPN callback from Now Payments
+    //     Log::info('now payments'. $request->payment_id);
+    //     $paymentId = $request->input('payment_id');
+    //     $status = $this->nowPayments->getPaymentStatus($paymentId);
+    //     Log::info($status);
+
+    //     // Update your database or trigger actions based on payment status
+    //     if($status['payment_status'] == 'paid'){
+    //         NowpaymentOrder::where('payment_id', $paymentId)->update([
+    //             'payment_status' => 'paid'
+    //         ]);
+    //     }
+    //     Log::info('callback end now payments');
+    //     // Example: Mark order as paid
+
+    //     return response()->json(['status' => 'success']);
+    // }
 
     public function paymentCallback(Request $request)
     {
-        // Handle IPN callback from Now Payments
-        $paymentId = $request->input('payment_id');
-        $status = $this->nowPayments->getPaymentStatus($paymentId);
 
-        // Update your database or trigger actions based on payment status
-        // Example: Mark order as paid
+        Log::info('Payment Callback all Data', [
+            'all' => $request->all(),
+           
+        ]);
+        // تسجيل المدخلات الواردة من الـ IPN
+    Log::info('Payment Callback received', [
+        'payment_id' => $request->input('payment_id'),
+        'payment_status' => $request->input('payment_status')
+    ]);
 
-        return response()->json(['status' => 'success']);
+    $paymentId = $request->input('payment_id');
+    $status = $request->input('payment_status');
+
+    // تحقق  حالة الدفع
+    if ($status === 'paid') {
+        Log::info('Payment is successful', ['payment_id' => $paymentId]);
+
+        // تحديث حالة الدفع في قاعدة البيانات
+        $order = NowpaymentOrder::where('payment_id', $paymentId)->update([
+            'payment_status' => 'paid'
+        ]);
+
+        // التحقق من نجاح التحديث في قاعدة البيانات
+        if ($order) {
+            Log::info('Order status updated to paid', ['payment_id' => $paymentId]);
+            return redirect()->route('payment.success');
+        } else {
+            Log::error('Failed to update order status', ['payment_id' => $paymentId]);
+            return redirect()->route('payment.cancel');
+        }
+    } else {
+        Log::warning('Payment status is not paid', ['payment_id' => $paymentId, 'status' => $status]);
+        return redirect()->route('payment.cancel');
+    }
+
+    Log::info('Callback status received successfully', ['payment_id' => $paymentId]);
+    return response()->json(['status' => 'received']);
     }
 }

@@ -15,12 +15,17 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Auth\Permission;
 
 class ConfigController extends Controller
 {
 
     protected $configService;
+    public $permission_name = 'agency-settings';
+    public $permission_config_name = 'update_setting_button';
 
     public function __construct(ConfigService $configService)
     {
@@ -28,7 +33,9 @@ class ConfigController extends Controller
     }
 
     public function uploadBadges(Request $request){
-
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_name);
+        }
         foreach($request->allFiles() as $input => $file){
 
             $value = Common::upload('images', $file);
@@ -102,6 +109,10 @@ class ConfigController extends Controller
 
     public function updateConfigChatGroup(Request $request)
     {
+        if (!Admin::user()->can('*')){
+            Permission::check('edit-'.$this->permission_config_name);
+        }
+
         $config = Config::find($request->id);
         $config->value = $request->value;
         $config->save();
@@ -110,8 +121,7 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-//        Artisan::call('cache:clear');
-//        \Cache::forget('pusher_config');
+        Cache::forget('pusher_config');
 
         $keys = array_keys($request->all());
 
@@ -128,8 +138,6 @@ class ConfigController extends Controller
 
             $config->save();
         }
-
-//        Artisan::call('config:cache');
 
         return Redirect::back();
     }

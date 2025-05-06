@@ -1,5 +1,7 @@
 <?php
 
+use App\Admin\Controllers\UserWalletController;
+use App\Admin\Controllers\WalletTransactionController;
 use App\Models\Room;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -24,6 +26,7 @@ use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
@@ -52,8 +55,8 @@ use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
-use App\Admin\Controllers\ReportRealsController;
 
+use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
@@ -191,7 +194,19 @@ Route::group(
             'destroy' => 'auth.users.destroy',
         ]);
         $router->resource('/agencies/managers', AdminAgencyMangerController::class);
-        $router->resource('auth/roles', 'RoleController');
+        $router->resource('auth/roles', 'RoleControllerNew');
+        $router->resource('auth/rolesTest', 'RoleController');
+        // Route::prefix('auth/rolesTest')->group(function () {
+        //     Route::get('/', [RoleControllerNew::class, 'index']);
+        //     Route::get('/create', [RoleControllerNew::class, 'create']);
+        //     Route::post('/', [RoleControllerNew::class, 'store']);
+        //     Route::get('/{id}', [RoleControllerNew::class, 'show']);
+        //     Route::get('/{id}/edit', [RoleControllerNew::class, 'edit']);
+        //     Route::put('/{id}', [RoleControllerNew::class, 'update']);
+        //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
+        // });
+        Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
+       
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
         $router->post('app-setting', [ColorController::class, 'appSetting'])->name("app-setting");
@@ -474,6 +489,8 @@ Route::group(
             //dd("note found data");
         });
 
+        $router->resource('user-wallets', UserWalletController::class);
+        $router->resource('wallet-transactions', WalletTransactionController::class);
 
         $router->resource('banners', BannerController::class);
         $router->resource('languages', LanguageController::class);

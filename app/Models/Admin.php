@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Admin extends \App\Models\Administrator
 {
@@ -25,6 +26,12 @@ class Admin extends \App\Models\Administrator
     public function getImgAttribute(){
         return $this->attributes['avatar'];
     }
+    public function getImageAttribute(){
+         
+        
+        return  getImagePath($this->attributes['avatar']);
+    }
+    
 
     public function agencies() {
         return $this->hasMany(Agency::class, 'agency_manger_id');
@@ -60,6 +67,8 @@ class Admin extends \App\Models\Administrator
     public function per() {
         return $this->hasMany(Agency::class, 'agency_manger_id');
     }
+
+  
 
 
 

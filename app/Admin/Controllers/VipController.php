@@ -7,6 +7,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Services\AppFeatureService;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 
 use Encore\Admin\Layout\Content;
 
@@ -28,15 +30,20 @@ class VipController extends MainController
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->title(trans('charge level'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
+
+
     public function senderIndex(Content $content)
     {
-        return $content
+        if (!Admin::user()->can('*')){
+            Permission::check('browse-'.$this->permission_name);
+        }
+        return parent::index($content
             ->title(trans('charge level'))
-            ->body($this->senderGrid());
+            ->body($this->senderGrid()));
     }
     protected function senderGrid()
     {
@@ -224,9 +231,9 @@ class VipController extends MainController
      */
     public function show($id, Content $content)
     {
-        return $content
+        return parent::show($id,$content
             ->title(trans('charge level'))
-            ->body($this->detail($id));
+            ->body($this->detail($id)));
     }
 
     /**
@@ -238,16 +245,16 @@ class VipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title(trans('charge level'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title(trans('charge level'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
 
@@ -264,8 +271,8 @@ class VipController extends MainController
         $grid->model()->orderByDesc('type')->orderBy('exp');
 
         // Filter model by selected tab
-        $grid->model()->when(request('tab'), function ($query) {
-            switch (request('tab')) {
+        $grid->model()->when(request('tab', 'Appsender'), function ($query, $tab) {
+            switch ($tab) {
                 case 'Appsender':
                     $query->where('type', 2);
                     break;
@@ -287,7 +294,6 @@ class VipController extends MainController
         // Tabs at top rendered from the Blade view
         $grid->header(function () {
             $tabs = [
-                '' => __('All'),
                 'Appsender' => __('AppSender'),
                 'Appreceived' => __('AppReceived'),
                 'Appcp' => __('AppCP'),
@@ -302,7 +308,7 @@ class VipController extends MainController
         // Other grid settings
         $grid->quickSearch();
 
-        $grid->column('id', __('Id'));
+        /* $grid->column('id', __('Id'));
 
         $grid->column('type', __('Type'))->select([
             1 => __('broadcaster'),
@@ -310,7 +316,7 @@ class VipController extends MainController
             3 => __('cp'),
             4 => __('room'),
             5 => __('charge'),
-        ]);
+        ]); */
 
         $grid->column('level', __('Level'))->editable();
 
@@ -325,15 +331,14 @@ class VipController extends MainController
 
         // No export button
         $grid->disableExport();
-
+        $currentTab = request('tab', 'Appsender');
+        $grid->disableCreateButton();
+        $grid->tools(function (Grid\Tools $tools) use ($currentTab) {
+            $tools->append('<a href="' . admin_url('vips/create?tab=' . $currentTab) . '" class="btn btn-sm btn-success">
+            <i class="fa fa-plus"></i>&nbsp;' . trans('admin.new') . '</a>');
+        });
         return $grid;
     }
-
-
-
-
-
-
 
     /**
      * Make a show builder.
@@ -367,23 +372,53 @@ class VipController extends MainController
     {
         $form = new Form(new Vip());
 
-        $form->select('type', __('Type'))->options(
-            [
+        $tabToTypeMap = [
+            'Appsender' => 2,   // honor
+            'Appreceived' => 1, // broadcaster
+            'Appcp' => 3,       // cp
+            'Approom' => 4,     // room
+            'Appcharge' => 5,   // charge
+        ];
+
+        $currentTab = request('tab', 'Appsender');
+        $currentType = $tabToTypeMap[$currentTab] ?? 2; // Default to 2 if tab not found
+
+        if ($form->isCreating()) {
+            $form->hidden('type')->default($currentType);
+
+            $typeLabels = [
                 1 => __('broadcaster'),
                 2 => __('honor'),
                 3 => __('cp'),
                 4 => __('room'),
                 5 => __('charge'),
-            ]
-        )->default(2);
-        $form->textarea('name_ar', __('name_ar'));
-        $form->textarea('name_en', __('name_en'));
+            ];
+            $form->display('type_display', __('Type'))->default($typeLabels[$currentType]);
+        } else {
+            $form->select('type', __('Type'))->options([
+                1 => __('broadcaster'),
+                2 => __('honor'),
+                3 => __('cp'),
+                4 => __('room'),
+                5 => __('charge'),
+            ]);
+        }
+
+//        $form->textarea('name_ar', __('name_ar'));
+//        $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));
         //        $form->number('co', __('Coins'));
         $form->image('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
+
+        $form->footer(function ($footer) {
+            $footer->disableReset();        // Disables the "Reset" button
+            $footer->disableViewCheck();    // Disables the "View" checkbox
+            $footer->disableEditingCheck(); // Disables the "Continue editing" checkbox
+            $footer->disableCreatingCheck();// Disables the "Continue creating" checkbox
         });
 
         return $form;

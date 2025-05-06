@@ -90,4 +90,9 @@ class UserSalaryRepository extends AbstractRepository
             $query->where('month',  $month)->where('year',  $year);
         })->get();
     }
+
+    public function  agencySalary($agencyId, $month, $year)
+    {
+        return $this->model->where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+    }
 }

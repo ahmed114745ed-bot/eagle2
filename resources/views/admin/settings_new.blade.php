@@ -756,12 +756,12 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="agoraRadio"
                                                        class="custom-radio libraryRealTime" name="library" value="0"
                                                     {{ $library == '0' ? 'checked' : '' }}>
                                                 <label for="agoraRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -786,11 +786,11 @@
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
                                             <h4 class="m-0">{{ __('admin.Zego') }}</h4>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="zegoRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="1" {{ $library == '1' ? 'checked' : '' }}>
                                                 <label for="zegoRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -835,11 +835,11 @@
                                             <div class="ribbon-banner-card">
                                                 <span>{{ __('soon') }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center">
+                                            {{-- <div class="d-flex align-items-center">
                                                 <input type="radio" id="tencentRadio" class="custom-radio libraryRealTime"
                                                        name="library" value="2" {{ $library == '2' ? 'checked' : '' }}>
                                                 <label for="tencentRadio" class="switch"></label>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6">
@@ -1526,7 +1526,12 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="background_type">{{ __('Background Type') }}</label>
+                                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                    <label for="background_type">{{ __('Background Type') }}</label>
+                                    <span onclick="reseting('background_type', 'image')">
+                                        <i class="fa fa-repeat"></i>
+                                    </span>
+                                </div>
                                 <select id="background_type" name="background_type" class="form-control"
                                     onchange="toggleBackgroundInput()">
                                     <option value="color"
@@ -1581,6 +1586,12 @@
                                     <input type="color" id="gradient_2" name="gradient_2"
                                         value="{{ $settings['gradient_2'] ?? '#F8F9FA' }}"
                                         style="background: {{ $settings['gradient_2'] ?? '#F8F9FA' }};"
+                                        title="لون  التدرج">
+
+                                        <label for="box_background_color">{{ __('gradient Third Color:') }}</label>
+                                    <input type="color" id="gradient_3" name="gradient_3"
+                                        value="{{ $settings['gradient_3'] ?? '#F8F9FA' }}"
+                                        style="background: {{ $settings['gradient_3'] ?? '#F8F9FA' }};"
                                         title="لون  التدرج">
                             </div>
 
@@ -1725,7 +1736,16 @@
 
             <script>
                 function reseting(colorid, value) {
-                    $('#' + colorid).val(value)
+                    $('#' + colorid).val(value);
+
+                    if (colorid === 'background_type') {
+                        if (value === 'image') {
+                            $('#background_image_group').show();
+                            $('#background_image_preview').show();
+                            $('#background_color_group').hide();
+                            $('#gradient_group').hide();
+                        }
+                    }
                 }
             </script>
             <script>
@@ -1977,36 +1997,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                    // Updated selector to match your new class
-                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                    const fieldsContainers = {
-                                                                                                        '0': document.getElementById('agora-fields'),
-                                                                                                        '1': document.getElementById('zego-fields'),
-                                                                                                        '2': document.getElementById('pusher-fields')
-                                                                                                    };
+                    // Updated selector to match your new class
+                    const radioButtons = document.querySelectorAll('.radio-input');
+                    const fieldsContainers = {
+                        '0': document.getElementById('agora-fields'),
+                        '1': document.getElementById('zego-fields'),
+                        '2': document.getElementById('pusher-fields')
+                    };
 
-                                                                                                    function toggleFields() {
-                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                    function toggleFields() {
+                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                        // Hide all fields first
-                                                                                                        Object.values(fieldsContainers).forEach(container => {
-                                                                                                            container.style.display = 'none';
-                                                                                                        });
+                        // Hide all fields first
+                        Object.values(fieldsContainers).forEach(container => {
+                            container.style.display = 'none';
+                        });
 
-                                                                                                        // Show the selected one
-                                                                                                        if (fieldsContainers[selectedValue]) {
-                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                        }
-                                                                                                    }
+                        // Show the selected one
+                        if (fieldsContainers[selectedValue]) {
+                            fieldsContainers[selectedValue].style.display = 'flex';
+                        }
+                    }
 
-                                                                                                    // Add event listeners to radio buttons
-                                                                                                    radioButtons.forEach(radio => {
-                                                                                                        radio.addEventListener('change', toggleFields);
-                                                                                                    });
+                    // Add event listeners to radio buttons
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', toggleFields);
+                    });
 
-                                                                                                    // Initialize the fields visibility
-                                                                                                    toggleFields();
-                                                                                                });*/
+                    // Initialize the fields visibility
+                    toggleFields();
+                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
@@ -2016,15 +2036,16 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#32e5ac";
-                            document.getElementById('app_second_color').value = "#003FA6";
+                            document.getElementById('app_primary_color').value = "#aee6cf";
+                            document.getElementById('app_second_color').value = "#eff7f5";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";
                             document.getElementById('app_black_color').value = "#000000";
                             document.getElementById('app_grey_color').value = "#a5a7a4"; // Grey color
                             document.getElementById('app_yellow_color').value = "#FFAD38"; // Yellow color
-
+                            document.getElementById('background_type').value = "image";
+                            document.getElementById('background_type').value = "image";
                             // Submit the form
                             document.querySelector('#appSettings form').submit();
                         });
@@ -2033,11 +2054,11 @@
                     if (resetButton) {
                         resetButton.addEventListener('click', function() {
                             let colorInputs = {
-                                'primary_color': "#FF9428",
-                                'secondary_color': "#1A1A1A",
+                                'primary_color': "#00FFCC",
+                                'secondary_color': "#FFFFFF",
                                 'text_primary_color': "#fdf8f8",
-                                'text_secondary_color': "#c1b9b9",
-                                'box_background_color': "#222222",
+                                'text_secondary_color': "#000000",
+                                'box_background_color': "#969696",
                                 'table_background_color': "#c88213"
                             };
 

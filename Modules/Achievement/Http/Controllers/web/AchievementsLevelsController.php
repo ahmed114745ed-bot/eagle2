@@ -26,10 +26,10 @@ class AchievementsLevelsController extends MainController
 
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function update($id)
@@ -41,18 +41,18 @@ class AchievementsLevelsController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
-        return $content
+        return parent::edit($id,$content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
-            ->body($this->form()->edit($id));
+            ->body($this->form()->edit($id)));
     }
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
 
 

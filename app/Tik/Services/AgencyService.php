@@ -37,11 +37,14 @@ use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
+use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Modules\AgencyApp\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
+use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
 
@@ -68,6 +71,7 @@ class AgencyService
         private readonly ChargeAgencyRepository $chargeAgencyRepository,
         private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
 
+
     ) {}
 
 
@@ -77,6 +81,7 @@ class AgencyService
         $agency = $this->agencyRepository->findById($agencyId);
         if (!$agency) throw new Exception(__('api_responses.agency'));
         if ($agency->status == 0) throw new \Exception(__('api_responses.agencyDown'));
+        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
 
         $joined = $user->agency_id;
         if ($joined) throw new \Exception(__('api_responses.you_are_already_under_agency'));
@@ -104,6 +109,28 @@ class AgencyService
         if (!$agency) throw new Exception(__('api_responses.agency'));
         return $agency;
     }
+
+    public function agencyTarget($agencyId, $request)
+    {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
+        $minValue = $this->targetRepository->getByUsd($target);
+        $result = (@$minValue->agency_share / 100) * @$target;
+        $hero = $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        $star = $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year);
+       
+        return [
+            'target' => $target,
+            'rate_percentage' => $result,
+            'stars' => ReceiverGiftLogResource::collection($star),
+            'heroes' => SenderGiftLogResource::collection($hero),
+            'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+        ];
+    }
+
+
 
     public function agencyMembers($agencyId)
     {

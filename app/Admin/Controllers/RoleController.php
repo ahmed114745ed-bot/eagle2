@@ -28,17 +28,17 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
-        return $content
+        return parent::edit($id,$content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
-            ->body($this->form1()->edit($id));
+            ->body($this->form1()->edit($id)));
     }
     public function create(Content $content)
     {
-        return $content
+        return parent::create($content
             ->title($this->title())
             ->description($this->description['create'] ?? trans('admin.create'))
-            ->body($this->form());
+            ->body($this->form()));
     }
 
     public function store()

@@ -3,20 +3,21 @@
 namespace App\Http\Controllers\Api\V2;
 
 
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
+use App\Models\AgencyUserJob;
+use PHPUnit\Framework\Exception;
+use App\Models\AgencyJoinRequest;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
+use App\Http\Resources\Api\V1\AgencyDetailsResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Models\AgencyUserJob;
-use Illuminate\Validation\ValidationException;
-use PHPUnit\Framework\Exception;
 
 class AgencyController extends Controller
 {
@@ -43,7 +44,7 @@ class AgencyController extends Controller
     }
 
     public function view(Request $request)
-    { 
+    {
         $agencyId = request()->get('id', $request->user()->agency_id);
 
         try {
@@ -53,6 +54,28 @@ class AgencyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         return Common::apiResponse(1, '', new AllDataAgencyResource($agency));
+    }
+
+    public function agencyDetails($id)
+    {
+        try {
+            $agency = $this->agencyService->find($id);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', new AgencyDetailsResource($agency));
+    }
+
+    public function agencyTargetDetails($id, Request $request)
+    {
+        try {
+            $data = $this->agencyService->agencyTarget($id, $request);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  $data);
     }
 
     public function agencyMembers(Request $request)

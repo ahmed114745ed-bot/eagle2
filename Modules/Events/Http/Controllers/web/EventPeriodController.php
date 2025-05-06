@@ -28,7 +28,7 @@ class EventPeriodController extends MainOldController
 {
     use HasResourceActions;
 
-        public $permission_name = 'weekly-star';
+        public $permission_name = 'event-period';
     public $hiddenColumns = [
 
     ];
@@ -38,15 +38,30 @@ class EventPeriodController extends MainOldController
     }
     public function index ( Content $content )
     {
-        return $content
+        return parent::index($content
             ->title(__('event period'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
             ->row(function (Row $row) {
                 $row->column(12, $this->grid());
-            });
+            }));
     }
+
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('event period'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('event period'))
+            ->body($this->form()));
+    }
+    
     protected function grid2()
     {
         $form = new Box();
@@ -128,7 +143,7 @@ class EventPeriodController extends MainOldController
 
     public function show ( $id , Content $content )
     {
-        return $content
+        return parent::show($id,$content
         ->row ("<h3>".__('weekly Star')."</h3>")->row (function ($row) use ($id){
             $row->column(12, $this->weeklyStar($id));
         })
@@ -137,8 +152,7 @@ class EventPeriodController extends MainOldController
         })
             ->row ("<h3>".__('Rewards')."</h3>")->row (function ($row) use ($id){
                 $row->column(12, $this->rewardList($id));
-            })
-        ;
+            }));
 
     }
 

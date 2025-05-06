@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Common;
 use App\Models\DeleteAccount;
 use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
@@ -7,6 +8,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\ConfigController as ControllersConfigController;
+use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\UserController;
 use App\Facades\CustomNotification;
 use App\Http\Controllers\addTOjesonController;
@@ -17,6 +19,8 @@ use App\Http\Controllers\RoomSettings;
 use App\Http\Controllers\SettingsController;
 use App\Models\RoomVisitor;
 use App\Models\VipPrivilege;
+use App\Http\Controllers\NowPaymentsController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +32,19 @@ use App\Models\VipPrivilege;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('applications/{id}', [SettingsController::class, 'downloadApp']);
 
+Route::get('/now-payment', [NowPaymentsController::class, 'rechargeForm']);
+Route::post('/create-payment', [NowPaymentsController::class, 'createPayment'])->name('now_payment_create');
+// Route::get('get-avaialble-currencies', [NowPaymentsController::class, 'getCurrencies']);
+Route::get('payment-status/{payment}',[NowPaymentsController::class, 'paymentStatus']);
+Route::get('/payment-success', function () {
+    return 'Payment was successful!';
+})->name('payment.success');
+
+Route::get('/payment-cancel', function () {
+    return 'Payment was cancelled.';
+})->name('payment.cancel');
 Route::get('update-need',function(){
 
     $two = VipPrivilege::find(2);
@@ -108,6 +124,19 @@ Route::get('/clear', function () {
     return "Cleared!";
 });
 
+Route::get('/clear_clear', function () {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return "Cleared!";
+});
+
+Route::get('/config_cache', function () {
+    return Artisan::call('config:cache');
+});
 
 Route::get('/admin/custom-export-users', [
     \App\Admin\Controllers\ExportController::class,
@@ -154,7 +183,13 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function (Router $router) {
-        Route::get('download-app', [SettingsController::class, 'downloadApp']);
+
+
+        Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
+        Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
+        Route::post('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
+        Route::get('edit-payment-gateways/{id}', [MangerSettingController::class, 'editPaymentGateway'])->name('edit-payment-gateway');
+        Route::get('delete-payment-gateways/{id}', [MangerSettingController::class, 'deletePaymentGateway'])->name('delete-payment-gateway');
 
         Route::post('custom-setting', [addTOjesonController::class, 'custom'])->name('custom-setting');
         Route::post('android-setting', [addTOjesonController::class, 'android'])->name('android-setting');
@@ -219,5 +254,50 @@ Route::get('/update-rooms-microphone', function(){
     ]);
     return "done";
 });
+
+
+
+Route::get('/test-fcm/{userid}', function($userId) {
+    $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';
+
+    $language = 'ar'; // أو 'en'
+    $userLevel = 5; // مستوى افتراضي للاختبار
+
+    // نصوص الإشعار
+    $body_ar = "تهانينا! لقد تم ترقيتك إلى مستوى {$userLevel} كمرسل";
+    $body_en = "Congratulations! You've been upgraded to level {$userLevel} as a sender";
+    $firebaseBody = ($language === 'ar') ? $body_ar : $body_en;
+    $title = ($language === 'ar') ? "ترقية مستوى المرسل" : "Sender level upgraded";
+
+    // صورة افتراضية
+    $icon = "https://example.com/images/vip_badge.png";
+    $data = [
+        'image' => $icon,
+        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+        'type' => 'level_upgrade'
+    ];
+
+    // إرسال الإشعار
+    $result = Common::send_firebase_notification(
+        $testToken,
+        $title,
+        $firebaseBody,
+        icon: $icon,
+        data: $data
+    );
+
+    return response()->json([
+        'success' => true,
+        'message' => 'تم إرسال الإشعار التجريبي',
+        'notification_data' => [
+            'title' => $title,
+            'body' => $firebaseBody,
+            'icon' => $icon,
+            'data' => $data
+        ],
+        'fcm_response' => $result
+    ]);
+});
+
 
 

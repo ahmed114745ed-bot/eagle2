@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\Agency;
 use App\Models\User;
+use App\Services\WalletService;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
@@ -100,7 +101,7 @@ class ChargeRepoService
             } else {
                 $this->roomSalaryRepo->incrementCutAmount($fromUser->ownerRoom?->id, $usd);
             }
-            $this->charge($fromUser, $toUser, $chargeType, $coins, $coins);
+            $this->charge($fromUser, $toUser, $chargeType, $coins, $usd);
 
             if ($toUser instanceof User) {
                 (new UserAchievementService())->insertCharging($toUser, $coins);
@@ -155,9 +156,9 @@ class ChargeRepoService
     public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
     {
         try {
-            $receiver = $this->userRepository->searchUser($receiverUuid);
+            $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
-
+    
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('agency not founded');
@@ -175,7 +176,7 @@ class ChargeRepoService
             // $coinPrise = Common::getConf('one_usd_value_in_coins') ?? 50;
             $coinPrise = Common::getCoinsValue('user_coins');
             $numDi = $coinPrise * $count;
-            $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
+            $this->charge(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi,usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {
@@ -187,6 +188,15 @@ class ChargeRepoService
 
     public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
+        WalletService::storeTransaction(
+            $sender->id,
+            'cut',
+            $usd,
+            'user_transaction',
+            'transfer_to_user',
+            ['receiver_id' => $receiver->id]
+         );
+
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -241,6 +251,15 @@ class ChargeRepoService
 
         $receiver->increment('coins', $amount);
 
+        WalletService::storeTransaction(
+            $sender->id,
+            'cut',
+            $usd,
+            'user_transaction',
+            'transfer_to_agency',
+            ['agency_id' => $receiver->id]
+         );
+
         $data = [
             'charger_id' => $sender->id,
             'charger_type' => $chargeType,
@@ -286,7 +305,7 @@ class ChargeRepoService
 
             $coinPrise = Common::getCoinsValue('shipping_coins');
             $numDi = $coinPrise * $count;
-            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, transferred: true);
+            $this->chargeAgency(sender: $sender, receiver: $receiver, chargeType: 'Host agent', amount: $numDi, usd: $count, transferred: true);
             $this->agencySalaryRepository->incrementCutAmount($agency->id, $count);
             return [$receiver, $numDi, $salary];
         } catch (\Exception $e) {

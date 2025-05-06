@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Artisan;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
@@ -56,15 +57,10 @@ class Config extends Model
             if ($model->valueInteger) {
                 unset($model->valueInteger);
             }
-            $Keys = ['app_id', 'app_key', 'app_secret', 'app_cluster'];
-            foreach ($Keys as $key) {
-                if ($model->isDirty('value') && $model->name == $key) {
-                    if ($model->name == $key) {
-                        Cache::forget('pusher_config');
-                        \Artisan::call('config:cache');
-                        break;
-                    }
-                }
+            $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+            if (in_array($model->name, $keys)) {
+                Cache::forget('pusher_config');
+                Artisan::call('config:cache');
             }
         });
     }

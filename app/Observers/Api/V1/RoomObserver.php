@@ -120,8 +120,15 @@ class RoomObserver
                     $m = array_slice ($mics,0,22);
                     $room->microphone = implode (',',$m);
                 }
-            }
-            else{// 8 seats
+            }elseif ($room->mode == '8') { //8 seats
+                if ($count <= 9) {
+                    $m = array_merge($mics, array_fill(0, 9 - $count, '0'));
+                    $room->microphone = implode(',', $m);
+                } else {
+                    $m = array_slice($mics, 0, 10);
+                    $room->microphone = implode(',', $m);
+                }
+            } else{// 8 seats
                 if ($count > 10){
                     $m = array_slice ($mics,0,10);
                     $room->microphone = implode (',',$m);

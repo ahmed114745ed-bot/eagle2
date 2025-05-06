@@ -96,15 +96,16 @@ class AgentSalaryTransactionController extends Controller
 
     public function send_money_for_the_host(Request $request)
     {
+        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
             return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
         }
 
         $user      = $request->user();
-        if ($user->charge_status == 0) {
-            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
-        }
+//        if ($user->charge_status == 0) {
+//            return Common::apiResponse(0, __('api_responses.'), 404);
+//        }
 
         $count     = $request->amount;
         $user_uuid = $request->user_id;

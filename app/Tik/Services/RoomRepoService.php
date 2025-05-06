@@ -326,6 +326,8 @@ class RoomRepoService
             $room->game_id = $request->game_id;
             $room->save();
             $map['game_url'] = $game->mini_url;
+        } elseif ($currentMode == '8') {
+            $mode = 'eight';
         } else {
             $mode = 'topCenter';
         }
@@ -336,9 +338,9 @@ class RoomRepoService
         $jsons[] = $json;
         //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
-        if ($lastMode == '3' && $currentMode != '3') {
+        
             $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
-        }
+    
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {
