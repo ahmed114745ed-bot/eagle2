@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use App\Traits\AdminTraits\AdminUserTrait;
-
+use Illuminate\Support\Facades\Cache;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -104,32 +104,35 @@ class AppearChargerAgencyController extends MainController
 
         $grid->column('id', __('Id'));
 
-        $grid->column('name', __('Agency'))->display(function () {
-            $name = $this->name ?? 'Unknown Agency';
-            $id = $this->id ?? '';
-            $coins = number_format($this->coins ?? 0);
-            $path = $this->img ?? '';
-            $defaultImage = asset("images/agency-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-            $icon = asset('images/coin.jpg');
+        $grid->column('name', __('Agency'))
+            ->display(function ($name) {
+                $cacheKey = "agency_image_{$this->id}";
+                $image = Cache::remember($cacheKey, 3600, function () {
+                    $path = @$this->img;
+                    $defaultImage = asset("images/icon-agency.jpg");
+                    $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
 
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='{$url}' alt='Agency Image' width='40' height='40'>
-                    <div>
-                        <strong>$name</strong><br>
-                        <span style='color: green;'> Coins: $coins</span>
-                        <img src='{$icon}' alt='Coin' width='20' height='20'>
-                        <br>
-                        <span>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
+                    return handleShowImageWithTypes($this->id, $url, 40, 40);
+                });
+
+                $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
+
+                return "
+                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            {$image}
+                            <div style='display: flex; flex-direction: column;'>
+                                <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
+                                <span style='font-size: smaller;'>ID: {$this->id}</span>
+                            </div>
+                        </div>
+                    </a>
+                ";
+            });
 
         $grid->column('owner_id', __('Owner'))->display(function () {
             // التأكد من أن الـ owner موجود قبل الوصول إلى خصائصه
