@@ -47,7 +47,7 @@ class OvipGiftTapController extends MainController
                 $row->column(12, $this->tabsComponent($ovip?->privilegs));
             })
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()->type));
+                $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
             }));
 
 
