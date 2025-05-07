@@ -37,8 +37,8 @@ class SendNotificationToAllFollowers implements ShouldQueue
         $usersTokenAr = $users->where('lan' ,'ar')->pluck('notification_id');
         $OwnerRoom = User::find($this->userId);
 
-        $body_ar =__('api.enter_room', ['name' => $OwnerRoom->name], 'ar');
-        $body_en =__('api.enter_room', ['name' => $OwnerRoom->name], 'en');
+        $body_ar =__('api.enter_room', ['name' => @$OwnerRoom->name], 'ar');
+        $body_en =__('api.enter_room', ['name' => @$OwnerRoom->name], 'en');
         $icon = $OwnerRoom->profile->avatar;
         $data['image'] = getDriverUrl(). '/'. $OwnerRoom->profile->avatar;
         $data['owner_id'] = $this->userId;
