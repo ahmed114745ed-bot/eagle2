@@ -143,26 +143,26 @@ class RewardTargetController extends MainController
     {
         $form = new Form(new RewardTarget());
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
-            ->when("ware", function () use ($form) {
-                $form->belongsTo('target1', Wares::class, trans('wares'));
-            })
-        ->when("vip",function () use ($form){
-            $form->select('target2', trans('vips'))->options(function (){
-                $vips = OVip::query()->select('id','name')->get();
-                foreach ($vips as  $vip){
-                    $ops[$vip->id]=$vip->name;
-                }
-                return $ops;
-            });
-        })
-         ->when("coins",function () use ($form){
-            $form->number("target3",__("coins"));
-        })->when("achievement",function () use ($form){
-            $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp.'.'.$file->guessExtension();
-            })->disk('gcs');
-        });
+        // $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
+        //     ->when("ware", function () use ($form) {
+        //         $form->belongsTo('target1', Wares::class, trans('wares'));
+        //     })
+        // ->when("vip",function () use ($form){
+        //     $form->select('target2', trans('vips'))->options(function (){
+        //         $vips = OVip::query()->select('id','name')->get();
+        //         foreach ($vips as  $vip){
+        //             $ops[$vip->id]=$vip->name;
+        //         }
+        //         return $ops;
+        //     });
+        // })
+        //  ->when("coins",function () use ($form){
+        //     $form->number("target3",__("coins"));
+        // })->when("achievement",function () use ($form){
+        //     $form->image("target4", __('image'))->name(function ($file) {
+        //         return now()->timestamp.'.'.$file->guessExtension();
+        //     })->disk('gcs');
+        // });
         $form->number('expire', __('expire'));
         return $form;
     }
