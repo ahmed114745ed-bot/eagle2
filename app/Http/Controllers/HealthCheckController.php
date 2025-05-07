@@ -42,7 +42,8 @@ class HealthCheckController extends Controller
     {
         try {
             // Example: check if rutorrent web UI is reachable
-            $response = Http::timeout(3)->get('http://localhost/rutorrent/');
+            $response = Http::timeout(3)->get('https://jimo.utdsoftware.com/images/app-logo.png');
+
             return $response->ok(); // true if HTTP 200
         } catch (\Exception $e) {
             return false;
