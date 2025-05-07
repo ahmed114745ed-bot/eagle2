@@ -490,6 +490,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
+                Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
