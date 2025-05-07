@@ -41,6 +41,7 @@ class RewardTargetController extends MainController
     }
     public function create(Content $content)
     {
+        dd(123);
         return parent::create($content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
