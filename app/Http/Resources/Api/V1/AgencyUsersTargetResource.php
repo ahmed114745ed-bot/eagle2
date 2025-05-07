@@ -26,7 +26,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->select('id', 'user_diamonds')->get();
 
         $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
-            ->selectRaw("sum(giftPrice) as exp, 'sender'")
+            ->selectRaw("sum(giftPrice) as exp, sender")
             ->groupBy('sender')->orderByRaw("exp desc")->limit(3)
             ->get()->reject(function ($q) {
                 return $q->exp == 0;
