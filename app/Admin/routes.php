@@ -267,6 +267,7 @@ Route::group(
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         $router->post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
+        $router->post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');

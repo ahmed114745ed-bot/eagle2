@@ -12,6 +12,7 @@ use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\AgencySallary;
+use App\Models\AgencyUserJob;
 use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
@@ -74,7 +75,8 @@ class AgencyController extends MainController
     {
         $cacheKey = "agency_profile_{$id}";
         // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
-        $agency = Agency::with(['admins',
+        $agency = Agency::with([
+            'admins',
             'charges' => function ($query) {
                 $query->select('id', 'agency_id', 'amount', 'created_at')
                     ->latest()
@@ -102,7 +104,7 @@ class AgencyController extends MainController
         $agency->display_image = $imageUrl;
 
         $members = $agency->mempers()
-            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'country_id')->with('country', 'agencyUserJob')
+            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received','agency_id', 'country_id')->with('country', 'agencyUserJob')
             ->paginate(10, ['*'], 'members_page');
 
         $charges = $agency->charges()
@@ -119,10 +121,10 @@ class AgencyController extends MainController
             ->with('user')
             ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
 
-            $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();  
-           
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests','giftLog');
+        $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog');
         // });
 
         return $content->title(__('agency profile'))
@@ -861,6 +863,22 @@ class AgencyController extends MainController
         return  redirect()->back()->with('success', __('Joined successfully'));;
     }
 
+    public function adminAgency($id)
+    {
+
+        $user = User::Find($id);
+        $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->exists();
+        if ($admin) redirect()->back()->with('error', __(' this user admin in  this agency'))->refresh();
+        $data = [
+            'agency_id' => $user->agency_id,
+            'user_id' => $user->id,
+            'type' => "requestManger",
+        ];
+
+
+        return redirect()->back()->with('success', __('successfully'));
+    }
+
     public function rejectJoin($id)
     {
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user')->first();
@@ -945,92 +963,6 @@ class AgencyController extends MainController
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();
-        return $grid;
-    }
-
-    public function stars($agencyId)
-    {
-        $grid = new Grid(new GiftLog);
-
-        // Apply filters BEFORE the selectRaw
-        $year = Request::input('year');
-        $month = Request::input('month');
-
-        $grid->model()
-            ->where('agency_id', $agencyId)
-            ->whereHas('receiver')
-            ->with('receiver')
-            ->when($year, function ($query) use ($year) {
-                $query->whereYear('created_at', $year);
-            })
-            ->when($month, function ($query) use ($month) {
-                $query->whereMonth('created_at', $month);
-            })
-            ->selectRaw("sum(giftPrice) as exp, receiver_id, MAX(created_at) as created_at")
-            ->groupBy('receiver_id')
-            ->orderByRaw("exp desc");
-
-        // Filters
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $year = Request::input('year');
-                    if (!empty($year)) {
-                        $query->whereYear('created_at', $year);
-                    }
-                }, __('Year'), 'year')->integer();
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $month = Request::input('month');
-                    if (!empty($month)) {
-                        $query->whereMonth('created_at', $month);
-                    }
-                }, __('Month'), 'month')->integer();
-            });
-        });
-
-        // Columns
-        $grid->column('receiver.name', __('User'))->display(function ($name) {
-            if (!$this->receiver) return 'user not found';
-            $uid = @$this->receiver->uuid;
-            $path = @$this->receiver->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->receiver->id, $url, 40, 40);
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-
-        $grid->column('exp', __('Total Price'))->display(function () {
-            return number_format($this->exp, 2) . ' Coins';
-        });
-
-        // Optional: Show total sum in footer
-        // $grid->footer(function ($collection) {
-        //     $total = $collection->sum('exp');
-        //     return "<div style='padding: 10px'><strong>Total: " . number_format($total, 2) . " Coins</strong></div>";
-        // });
-
-        $this->extendGrid($grid);
-        $grid->disableCreateButton();
-        $grid->disableExport();
-        $grid->disableActions();
-
         return $grid;
     }
 }

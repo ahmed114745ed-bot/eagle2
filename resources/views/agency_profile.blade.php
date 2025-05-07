@@ -409,6 +409,7 @@
                 <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
                 <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
+                <button onclick="showSection('target')">{{ __('target') }}</button>
             </div>
         </div>
               
@@ -434,10 +435,13 @@
                                                 <th>{{ __('total_hours') }}</th>
                                                 <th>{{ __('Monthly DI') }}</th>
                                                 <th>{{ __('salary') }}</th>
+                                                <th>{{ __('type') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($members as $index => $member)
+                                           
+                                            @endphp
                                                 <tr>
                                                     <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                                     <td>{{ @$member->name ?? '' }}</td>
@@ -451,6 +455,38 @@
                                                     <td>{{ $member->liveTime->sum("hours") }}</td>
                                                     <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
                                                     <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                                  
+                                                    <td>
+                                                        @php
+                                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                                                        ->where('agency_id', $member->agency_id)
+                                                                        ->where('type', 'requestManger')
+                                                                        ->exists();
+                                                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                                                        ->where('id', $member->agency_id)->exists();
+                                                        @endphp
+                                                
+                                                            @if($isOwner)
+                                                            <div class="text-center">
+                                                                <span class="badge badge-dark fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                    {{ __('Owner') }}
+                                                                </span>
+                                                            </div>
+                                                        @elseif($isAdmin)
+                                                        <div class="text-center">
+                                                            <span class="badge badge-success fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                {{ __('Admin') }}
+                                                            </span>
+                                                        </div>
+                                                        @else
+                                                            <form action="{{ url('agencies/admin/' . $member->id) }}" method="POST" style="display:inline-block;">
+                                                                @csrf
+                                                                <button class="btn btn-sm btn-primary" onclick="return confirm('{{ __('Make this user an admin?') }}')">
+                                                                    {{ __('Make Admin') }}
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -668,6 +704,104 @@
                     </div>
                 </div>
             </div>
+
+            {{-- <div id="joinAgency" class="settings-section">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
+            
+                        <div class="table-responsive">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="join">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('User') }}</th>
+                                            <th>{{ __('WhatsApp') }}</th>
+                                            <th>{{ __('Country') }}</th>
+                                            <th>{{ __('Action') }}</th>
+                                        </tr>
+                                    </thead>
+            
+                                    @if($agencyJoinRequests && $agencyJoinRequests->count())
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($agencyJoinRequests as $index => $agencyJoinRequest)
+                                            @php
+                                                $user = $agencyJoinRequest->user;
+                                                $name = $user->name ?? '-';
+                                                $uid = $user->uuid ?? '-';
+                                                $avatarPath = $user->profile?->avatar;
+                                                $defaultImage = asset("images/businessman-icon.jpg");
+                                                $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                if (!isImageExists($avatarUrl)) {
+                                                    $avatarUrl = $defaultImage;
+                                                }
+                                                $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
+            
+                                                $iconUrl = asset('images/whatsapp.png');
+                                                $country = $user->country;
+                                                $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
+                                                $countryFlag = getImagePath($country?->flag ?? '');
+                                            @endphp
+            
+                                            <tr>
+                                                <td>{{ $agencyJoinRequests->firstItem() + $index }}</td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                                        {!! $image !!}
+                                                        <div>
+                                                            <strong>{{ $name }}</strong><br>
+                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center;">
+                                                        <span>{{ $agencyJoinRequest->whatsapp }}</span>
+                                                        <img src="{{ $iconUrl }}" alt="WhatsApp" width="20" height="20" style="margin-left: 5px; filter: invert(1);">
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; align-items: start;">
+                                                        <span>{{ $countryName }}</span>
+                                                        @if($countryFlag)
+                                                            <img src="{{ $countryFlag }}" alt="Flag" width="20" height="20" style="margin-top: 3px; filter: invert(1);">
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                    <td>
+                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
+                                                        </form>
+                                                    
+                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
+                                                        </form>
+                                                    </td>
+                                             
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
+            
+                        <div class="pagination-container mt-3">
+                            {{ $agencyJoinRequests->appends([
+                                'members_page' => $members->currentPage(),
+                                'salaries_page' => $salaries->currentPage(),
+                                'charges_page' => $charges->currentPage()
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
             
         </div>
 
