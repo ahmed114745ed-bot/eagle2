@@ -175,23 +175,23 @@ class RewardTargetController extends MainController
             "vip" => __('vip'),
             "coins" => __('coins'),
             "achievement" => __('achievement')
-        ])
-        ->when("ware", function () use ($form) {
-            $form->belongsTo('target1', Wares::class, trans('wares'));
-        })
-        ->when("vip", function () use ($form) {
-            $form->select('target2', trans('vips'))->options(function () {
-                return OVip::query()->pluck('name', 'id')->toArray();
-            });
-        })
-        ->when("coins", function () use ($form) {
-            $form->number("target3", __("coins"))->min(0);
-        })
-        ->when("achievement", function () use ($form) {
-            $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            })->disk('gcs');
-        });
+        ]);
+        // ->when("ware", function () use ($form) {
+        //     $form->belongsTo('target1', Wares::class, trans('wares'));
+        // })
+        // ->when("vip", function () use ($form) {
+        //     $form->select('target2', trans('vips'))->options(function () {
+        //         return OVip::query()->pluck('name', 'id')->toArray();
+        //     });
+        // })
+        // ->when("coins", function () use ($form) {
+        //     $form->number("target3", __("coins"))->min(0);
+        // })
+        // ->when("achievement", function () use ($form) {
+        //     $form->image("target4", __('image'))->name(function ($file) {
+        //         return now()->timestamp . '.' . $file->guessExtension();
+        //     })->disk('gcs');
+        // });
     
         $form->number('expire', __('expire'))->min(0)->default(30); // Optional default value
     
