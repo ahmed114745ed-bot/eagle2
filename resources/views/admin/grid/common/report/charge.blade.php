@@ -2,7 +2,7 @@
     <div class="nav-scroll-container">
         <ul class="nav nav-pills">
             <li class="{{ request()->name == 'dash' || request()->name == null ? 'active' : '' }}">
-                <a href="?name=dash" class="charge_action">
+                <a href="?name=" class="charge_action">
                     <i class="fa fa-arrow-right text-red"></i> {{ __('dash_repo') }}
                 </a>
             </li>

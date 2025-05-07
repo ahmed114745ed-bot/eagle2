@@ -61,9 +61,11 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
+Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
@@ -145,7 +147,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
                 } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()],500);
+                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
                 }
             });
 
@@ -177,7 +179,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::get('get-users-support', [UserController::class, 'get_users_support']);
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [\App\Http\Controllers\Api\V1\UserController::class, 'user_statistic']);
-            Route::get ('user-levels',[UserController::class,'userLevels']);
+            Route::get('user-levels', [UserController::class, 'userLevels']);
             // rooms api
             Route::post('check-room', [RoomController::class, 'check_room']);
 
@@ -477,6 +479,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
+                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
                 Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
                 Route::get('show_request', [AgencyController::class, 'show_request']);
@@ -487,6 +490,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('charge_to', [ChargeController::class, 'chargeTo']);
                 Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
                 Route::get('charges', [AgencyController::class, 'agenciesCharge']);
+                Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
             });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
@@ -494,7 +498,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/', [PaymentGetWayController::class, 'index']);
                 Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
             });
-            Route::get ('/charge-level',[ChargeLevelController::class,'chargeLevel']);
+            Route::get('/charge-level', [ChargeLevelController::class, 'chargeLevel']);
 
             // coins reports
             Route::get('/coin-reports', [CoinReportController::class, 'index']);
@@ -545,7 +549,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         $Page = \App\Models\Page::where("name", "privacy-policy")->first();
         return response()->json(['html' => $Page]);
     });
-
 });
 
 

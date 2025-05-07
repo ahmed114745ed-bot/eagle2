@@ -26,12 +26,12 @@ class MyDataForAgancyResource extends JsonResource
             'id' => @$this->id, // both
             'uuid' => @$this->uuid, // both
             'diamonds' => @$this->monthly_diamond_received ?: 0,
-
             'name' => @$this->name ?: '', // both
+            'phone' => @$this->phone ?? '',
+            'country' => $this->country ?? null,
             // 'vip_level' => @$this->UserVip->level,
             'vip'=>@Common::ovip_center ($this->id), // refactor
             'level'=>Common::level_center_min (@$this->id), // refactor
-
             'profile' => new ProfileForAjancyResource(@$this->profile), // both
             'has_color_name'=>Common::hasInPack ($this->id,18,true),
             'gender'=>$this->gender,

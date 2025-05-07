@@ -1241,7 +1241,7 @@ class RoomController extends Controller
         if ($a) {
             $n = $a->name ?: 'nan';
         }
-        Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
+      //  Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
         $ms   = [
             'messageContent' => [
                 'message' => 'updateAdmins',
@@ -1284,7 +1284,7 @@ class RoomController extends Controller
         if ($a) {
             $n = $a->name ?: 'nan';
         }
-        Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
+       // Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
         $ms   = [
             'messageContent' => [
                 'message' => 'updateAdmins',

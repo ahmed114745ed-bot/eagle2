@@ -2172,15 +2172,41 @@
 "Pin Status": "حالة التثبيت",
 "diamonds target":"الالماس المحقق",
 "event period":"فترة الحدث",
- "withdrawn": "تم السحب",
-  "remaining": "المتبقي",
-  "Old Total Sender Level": "مستوى المرسل الإجمالي القديم",
-    "New Total Sender Level": "مستوى المرسل الإجمالي الجديد",
-    "Old Total Received Level": "مستوى المستلم الإجمالي القديم",
-    "New Total Received Level": "مستوى المستلم الإجمالي الجديد"
-
-
-
+"withdrawn": "تم السحب",
+"remaining": "المتبقي",
+"Old Total Sender Level": "مستوى المرسل الإجمالي القديم",
+"New Total Sender Level": "مستوى المرسل الإجمالي الجديد",
+"Old Total Received Level": "مستوى المستلم الإجمالي القديم",
+"New Total Received Level": "مستوى المستلم الإجمالي الجديد",
+"Id": "المعرف",
+"user_id": "معرف المستخدم",
+"User": "المستخدم",
+"Value": "القيمة",
+"Cut amount": "المبلغ المقتطع",
+"Pending value": "القيمة المعلقة",
+"Created at": "تاريخ الإنشاء",
+"View transactions": "عرض المعاملات",
+"Type": "النوع",
+"Add": "إضافة",
+"Cut": "خصم",
+"Pending": "معلق",
+"Unknown": "غير معروف",
+"Description": "الوصف",
+"Target ID:": "معرف الهدف:",
+"Target not found": "لم يتم العثور على الهدف",
+"UUID:": "المعرف الفريد:",
+"User not found": "لم يتم العثور على المستخدم",
+"Agency:": "الوكالة:",
+"id:": "المعرف:",
+"Agency not found": "لم يتم العثور على الوكالة",
+"user-wallets": "محافظ المستخدمين",
+"wallets": "محافظ المستخدمين",
+"UserWallet": "محفظة المستخدم",
+"wallet-transactions": "معاملات المحفظة",
+"WalletTransaction": "معاملة محفظة",
+  "vip_alert_message": "⚠️ الرجاء إضافة الامتيازات إلى VIP.",
+  "vip_alert_button": "اضافة"
+  
 
 
 

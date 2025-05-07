@@ -2,20 +2,22 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Models\AgencySallary;
+use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
+use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Widgets\InfoBox;
+use Illuminate\Support\Facades\Request;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use App\Services\AppFeatureService;
@@ -24,10 +26,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
-use App\Admin\Widgets\Table as TableWidget;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
+
 
 class AgencyController extends MainController
 {
@@ -42,7 +43,7 @@ class AgencyController extends MainController
 
     public function index(Content $content)
     {
-        return parent::index( $content
+        return parent::index($content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))
             ->row(function ($row) {
@@ -154,19 +155,20 @@ class AgencyController extends MainController
         return parent::update($id);
     }
 
-    public function show($id, Content $content)
-    {
+    // public function show($id, Content $content)
+    // {
 
-        return parent::show($id, $content
-            ->title(__("agency details"))
-            ->row(function ($row) use ($id) {
-                $agency = Agency::find($id);
-                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-                $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-                $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-                    ->groupByRaw('agency_id,add_month,add_year')->count()));
-            }));
-    }
+    //     return parent::show($id, $content
+    //         ->title(__("agency details"))
+    //         ->row(function ($row) use ($id) {
+    //             $agency = Agency::find($id);
+    //             $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
+    //             $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
+    //             $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
+    //                 ->groupByRaw('agency_id,add_month,add_year')->count()));
+    //         }));
+    // }
+
 
     /**
      * Make a grid builder.
@@ -185,9 +187,11 @@ class AgencyController extends MainController
                         $query->where('status', 1);
                     });
             })
+
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
+            ->where('Shipping_agency', '!=', 1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -280,7 +284,7 @@ class AgencyController extends MainController
 
         $grid->actions(function ($actions) {
             $model = $actions->row;
-            $actions->disableView(); // Disable the "View" action
+            // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
             $actions->add(new DeleteAgencyAction());
             $actions->add(new ChangeUsersAgencyAction($model->id));
@@ -293,6 +297,7 @@ class AgencyController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
+            $filter->equal('id', __('ID'));
 
             $filter->where(function ($query) {
                 $query->whereHas('owner', function ($subQuery) {
@@ -302,76 +307,75 @@ class AgencyController extends MainController
         });
 
         Admin::style("
-    .box-footer {
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
-    }
+            .box-footer {
+                flex-direction: row-reverse;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px;
+            }
 
-    .pagination-info {
-        margin: 5px 0;
-        white-space: nowrap;
-        text-align: right;
-        width: auto;
-        order: 2;
-    }
+            .pagination-info {
+                margin: 5px 0;
+                white-space: nowrap;
+                text-align: right;
+                width: auto;
+                order: 2;
+            }
 
-    .box-footer .pull-right {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin: 5px 0;
-        order: 1;
-    }
+            .box-footer .pull-right {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin: 5px 0;
+                order: 1;
+            }
 
-    .box-footer .pull-right .dropdown {
-        margin-left: 5px;
-    }
+            .box-footer .pull-right .dropdown {
+                margin-left: 5px;
+            }
 
-    .pagination > li > a,
-    .pagination > li > span {
-        min-width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px;
-    }
+            .pagination > li > a,
+            .pagination > li > span {
+                min-width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 5px;
+            }
 
-    .pagination {
-        margin: 0;
-        padding: 0;
-        display: flex;
-    }
+            .pagination {
+                margin: 0;
+                padding: 0;
+                display: flex;
+            }
 
-    @media (max-width: 576px) {
-        .box-footer {
-            flex-direction: column;
-            align-items: center;
-        }
+            @media (max-width: 576px) {
+                .box-footer {
+                    flex-direction: column;
+                    align-items: center;
+                }
 
-        .pagination-info,
-        .box-footer .pull-right {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            text-align: center;
-        }
+                .pagination-info,
+                .box-footer .pull-right {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    text-align: center;
+                }
 
-        .pagination-info {
-            order: 1;
-            margin-bottom: 10px;
-        }
+                .pagination-info {
+                    order: 1;
+                    margin-bottom: 10px;
+                }
 
-        .box-footer .pull-right {
-            order: 2;
-        }
-    }
-");
+                .box-footer .pull-right {
+                    order: 2;
+                }
+            }
+        ");
 
         return $grid;
     }
@@ -447,7 +451,7 @@ class AgencyController extends MainController
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name');
+                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
@@ -469,7 +473,7 @@ class AgencyController extends MainController
                         $ops2[$user->id] = $user->uuid . '_' . $user->name;
                     }
                     return $ops2;
-                })->ajax('/api/search/users3', 'id', 'name');
+                })->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
                 // if (request()->route('form')->isEditing()) {
                 //     $row->hidden('agency_manger_id', __('app manger id'));
@@ -519,21 +523,21 @@ class AgencyController extends MainController
                     'is_host' => 0,
                 ]);
 
-                if ($Host_agency === 'on' && $Shipping_agency === 'off') {
+                if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 2,
                         'agency_id' => $form->model()->id,
                         'monthly_diamond_received' => 0,
                         'is_host' => 1,
                     ]);
-                } elseif ($Host_agency === 'on' && $Shipping_agency === 'on') {
+                } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 4,
                         'agency_id' => $form->model()->id,
                         'monthly_diamond_received' => 0,
                         'is_host' => 1,
                     ]);
-                } elseif ($Host_agency === 'off' && $Shipping_agency === 'on') {
+                } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
                     User::find($newOwnerId)->update([
                         'type_user' => 3,
                         'agency_id' => $form->model()->id,
@@ -545,7 +549,7 @@ class AgencyController extends MainController
 
 
 
-            if ($Host_agency === 'off' && $Shipping_agency === 'off') {
+            if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
 
                 session()->flash('show_alert', 'Your alert message');
                 return redirect()->back();
@@ -553,11 +557,11 @@ class AgencyController extends MainController
 
 
 
-            if ($Host_agency === 'on') {
+            if ($Host_agency == 'on' || $Host_agency == 1) {
                 $host += 2;
             }
 
-            if ($Shipping_agency === 'on') {
+            if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
                 $host += 3;
             }
             if ($host > 3) {
@@ -721,4 +725,347 @@ class AgencyController extends MainController
 
         return $this->response;
     }
+
+
+
+
+    //////////////////show agency ///////////////////////////////
+
+    public function show($id, Content $content)
+    {
+        return $content->row(function ($row) use ($id) {
+
+
+            // Info Boxes
+            // $row->column(12, function ($column)  {
+            //     $column->row(view('admin.grid.users.show', compact('user')));
+
+
+            // });
+
+            $row->column(12, function ($column) use ($id) {
+                $tab = new Tab();
+
+                Admin::style('
+                            .nav-tabs-custom {
+                                background: transparent !important;
+                                box-shadow: none !important;
+                                border: none !important;
+                            }
+                            .nav-tabs-custom>.nav-tabs {
+                                background: transparent;
+                                border: none;
+                                display: flex;
+                                padding: 0;
+                                margin: 0;
+                                width: 100%;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li {
+                                flex: 1;
+                                border: none;
+                                margin: 0;
+                                padding: 0 2px;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li:first-child {
+                                padding-left: 0;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li:last-child {
+                                padding-right: 0;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li > a {
+                                background: #1e1e1e;
+                                color: white;
+                                padding: 8px 24px;
+                                border-radius: 4px;
+                                margin: 0;
+                                border: none;
+                                font-size: 14px;
+                                text-align: center;
+                                width: 100%;
+                                display: block;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li.active > a {
+                                background: #ff9800;
+                                color: white;
+                                border: none;
+                            }
+                            .nav-tabs-custom > .nav-tabs > li > a:hover {
+                                background: #ff9800;
+                                color: white;
+                                border: none;
+                            }
+                            .nav-tabs-custom>.tab-content {
+                                background: transparent;
+                                border: none;
+                                padding: 10px 0;
+                            }
+                           .nav-tabs-custom > .nav-tabs > li.pull-right.header {
+                                display: none !important;
+                            }
+
+                            .nav-tabs-custom > .nav-tabs > li.pull-right {
+                                display: none !important;
+                            }
+                        ');
+                $tab->add(__('Agency Join Requests'), $this->joinRequest($id)->render());
+                $tab->add(__('Assign Admin'), $this->members($id)->render());
+                $tab->add(__('Stars'), $this->stars($id)->render());
+                // $tab->add(__('Heroes'), $this->heroes($id)->render());
+                // $tab->add(__('Target'), $this->targets($id)->render());
+
+                $column->append($tab);
+            });
+        });
+    }
+
+    protected function joinRequest($agencyId)
+    {
+
+        $grid = new Grid(new AgencyJoinRequest);
+        $grid->model()->where(['agency_id' => $agencyId, 'status' => 0])->orderByDesc('id');
+
+
+        $grid->id(__('ID'));
+        $grid->column('user.name', __('User'))
+            ->display(function ($name) {
+                $uid = @$this->user->uuid;
+                $path = @$this->user?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+            });
+
+        $grid->column('whatsapp', __('whatsapp'))->display(function ($number) {
+            if (!$number) return '-';
+
+            $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
+
+            // Return an image with a WhatsApp link
+            return "<div style='display: flex; align-items: center; '>
+
+                <span>{$number} </span>
+
+                  <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+            </div>";
+        });
+
+        $grid->column('user.country.name', __('country'))->display(function ($name) {
+            if (!$name) return '-';
+
+            $name = app()->getLocale() == 'ar' ? $name ?? @$this->user?->country?->e_name : @$this->user?->country?->e_name ?? $name;
+            $path =    @$this->user?->country?->flag ?? '';
+
+            $url = getImagePath($path);
+
+            // Check if the image exists
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            // Return an image with a WhatsApp link
+            return "
+                <div style='display: flex; flex-direction: column; align-items: start;'>
+                    <span>{$name}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
+                </div>
+            ";
+        });
+
+        $grid->column('return', __('action'))->display(function () {
+            $deleteButton = (new \App\Admin\Actions\AcceptAgencyJoinRequestAction($this->id))->render();
+            $customButton =  (new \App\Admin\Actions\RefuseAgencyJoinRequestAction($this->id))->render();
+
+            return <<<HTML
+                        <div style="display: flex; gap: 5px;">
+                            {$deleteButton}
+                            {$customButton}
+                        </div>
+                    HTML;
+        });
+
+        $this->extendGrid($grid);
+
+
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableActions();
+        return $grid;
+    }
+
+    public function members($agencyId)
+    {
+        $grid = new Grid(new User());
+
+        $grid->model()->where('agency_id', $agencyId)->where('type_user', 1)->whereDoesntHave('agencyUserJob');
+        $grid->column('name', __('User'))
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+            });
+
+        $grid->column('whatsapp', __('whatsapp'))->display(function ($number) use ($agencyId) {
+            $joinRequest = AgencyJoinRequest::where(['agency_id' => $agencyId, 'user_id' => $this->id])->first();
+            if (!$joinRequest) return '-';
+            $number = $joinRequest->whatsapp;
+            if (!$number) return '-';
+            $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
+
+            // Return an image with a WhatsApp link
+            return "<div style='display: flex; align-items: center; '>
+
+            <span>{$number} </span>
+
+              <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+        </div>";
+        });
+
+        $grid->column('country.name', __('country'))->display(function ($name) {
+            if (!$name) return '-';
+
+            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
+            $path =    @$this->user?->country?->flag ?? '';
+
+            $url = getImagePath($path);
+
+            // Check if the image exists
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            // Return an image with a WhatsApp link
+            return "
+            <div style='display: flex; flex-direction: column; align-items: start;'>
+                <span>{$name}</span>
+                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
+            </div>
+        ";
+        });
+
+        $grid->column('return', __('action'))->display(function () {
+            return (new \App\Admin\Actions\AgencyAdmin($this->id))->render();
+        });
+
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableActions();
+        return $grid;
+    }
+
+    public function stars($agencyId)
+    {
+        $grid = new Grid(new GiftLog);
+    
+        // Apply filters BEFORE the selectRaw
+        $year = Request::input('year');
+        $month = Request::input('month');
+    
+        $grid->model()
+            ->where('agency_id', $agencyId)
+            ->whereHas('receiver')
+            ->with('receiver')
+            ->when($year, function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
+            })
+            ->when($month, function ($query) use ($month) {
+                $query->whereMonth('created_at', $month);
+            })
+            ->selectRaw("sum(giftPrice) as exp, receiver_id, MAX(created_at) as created_at")
+            ->groupBy('receiver_id')
+            ->orderByRaw("exp desc");
+    
+        // Filters
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $year = Request::input('year');
+                    if (!empty($year)) {
+                        $query->whereYear('created_at', $year);
+                    }
+                }, __('Year'), 'year')->integer();
+            });
+    
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $month = Request::input('month');
+                    if (!empty($month)) {
+                        $query->whereMonth('created_at', $month);
+                    }
+                }, __('Month'), 'month')->integer();
+            });
+        });
+    
+        // Columns
+        $grid->column('receiver.name', __('User'))->display(function ($name) {
+            if (!$this->receiver) return 'user not found';
+            $uid = @$this->receiver->uuid;
+            $path = @$this->receiver->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+    
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+    
+            $image = handleShowImageWithTypes($this->receiver->id, $url, 40, 40);
+    
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+    
+        $grid->column('exp', __('Total Price'))->display(function () {
+            return number_format($this->exp, 2) . ' Coins';
+        });
+    
+        // Optional: Show total sum in footer
+        // $grid->footer(function ($collection) {
+        //     $total = $collection->sum('exp');
+        //     return "<div style='padding: 10px'><strong>Total: " . number_format($total, 2) . " Coins</strong></div>";
+        // });
+    
+        $this->extendGrid($grid);
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableActions();
+    
+        return $grid;
+    }
+    
 }
