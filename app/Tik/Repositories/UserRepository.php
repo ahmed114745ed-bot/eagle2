@@ -54,6 +54,7 @@ class UserRepository extends AbstractRepository
 
     public function incrementUserCoins($user, $coins)
     {
+        
         $user->increment('di', $coins);
         return true;
     }

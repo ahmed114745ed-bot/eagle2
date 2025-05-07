@@ -297,6 +297,7 @@ class AgencyController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
+            $filter->equal('id', __('ID'));
 
             $filter->where(function ($query) {
                 $query->whereHas('owner', function ($subQuery) {
@@ -306,76 +307,75 @@ class AgencyController extends MainController
         });
 
         Admin::style("
-    .box-footer {
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
-    }
+            .box-footer {
+                flex-direction: row-reverse;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px;
+            }
 
-    .pagination-info {
-        margin: 5px 0;
-        white-space: nowrap;
-        text-align: right;
-        width: auto;
-        order: 2;
-    }
+            .pagination-info {
+                margin: 5px 0;
+                white-space: nowrap;
+                text-align: right;
+                width: auto;
+                order: 2;
+            }
 
-    .box-footer .pull-right {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin: 5px 0;
-        order: 1;
-    }
+            .box-footer .pull-right {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin: 5px 0;
+                order: 1;
+            }
 
-    .box-footer .pull-right .dropdown {
-        margin-left: 5px;
-    }
+            .box-footer .pull-right .dropdown {
+                margin-left: 5px;
+            }
 
-    .pagination > li > a,
-    .pagination > li > span {
-        min-width: 35px;
-        height: 35px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px;
-    }
+            .pagination > li > a,
+            .pagination > li > span {
+                min-width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 5px;
+            }
 
-    .pagination {
-        margin: 0;
-        padding: 0;
-        display: flex;
-    }
+            .pagination {
+                margin: 0;
+                padding: 0;
+                display: flex;
+            }
 
-    @media (max-width: 576px) {
-        .box-footer {
-            flex-direction: column;
-            align-items: center;
-        }
+            @media (max-width: 576px) {
+                .box-footer {
+                    flex-direction: column;
+                    align-items: center;
+                }
 
-        .pagination-info,
-        .box-footer .pull-right {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            text-align: center;
-        }
+                .pagination-info,
+                .box-footer .pull-right {
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    text-align: center;
+                }
 
-        .pagination-info {
-            order: 1;
-            margin-bottom: 10px;
-        }
+                .pagination-info {
+                    order: 1;
+                    margin-bottom: 10px;
+                }
 
-        .box-footer .pull-right {
-            order: 2;
-        }
-    }
-");
+                .box-footer .pull-right {
+                    order: 2;
+                }
+            }
+        ");
 
         return $grid;
     }
