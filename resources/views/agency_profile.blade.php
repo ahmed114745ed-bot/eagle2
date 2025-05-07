@@ -441,7 +441,7 @@
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($members as $index => $member)
                                            
-                                            @endphp
+                                           
                                                 <tr>
                                                     <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                                     <td>{{ @$member->name ?? '' }}</td>
