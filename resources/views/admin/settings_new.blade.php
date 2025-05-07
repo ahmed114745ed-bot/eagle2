@@ -1520,6 +1520,104 @@
                                 </div>
                                 </form>
                             </div>
+
+
+                             <!-- Apple Pay Fields -->
+                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.applepay') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_applepay_active" value="0">
+                                            <input type="checkbox" id="applepayRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_applepay_active"
+                                                value="1"
+                                                {{ @$settings['is_applepay_active'] == '1' ? 'checked' : '' }}>
+                                            <label for="applepayRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $applepayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'applepay')
+                                                <img src="{{ asset('images/applepay.jpg') }}"
+                                                     alt="apple Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $applepayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$applepayImageFound)
+                                        <img src="{{ asset('images/applepay.jpg') }}"
+                                        alt="apple Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label>
+                                                <input type="text" id="apple_team_id" name="apple_team_id"
+                                                       placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="apple_key_id">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="apple_key_id" name="apple_key_id"
+                                                    placeholder="apple_key_id"
+                                                    value="{{ $settings['apple_key_id'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_client_id">{{ __('admin.apple_client_id') }}:</label>
+                                                <input type="text" id="apple_client_id"
+                                                       name="apple_client_id" placeholder="apple_client_id"
+                                                       value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
+                                                <input type="text" id="apple_redirect_uri"
+                                                       name="apple_redirect_uri" placeholder="apple_redirect_uri"
+                                                       value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>
+                                                    <input type="file" id="apple_service_file"
+                                                    name="apple_service_file" placeholder="apple_service_file"
+                                                     class="form-control" required>
+
+                                                    <input type="text" id="apple_service_file" disabled
+                                                       name="apple_service_file" placeholder="apple_service_file"
+                                                       value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
             </div>
