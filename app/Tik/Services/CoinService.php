@@ -2,6 +2,8 @@
 
 namespace App\Tik\Services;
 
+use App\Services\FawryPaymentServiceV2;
+use App\Services\FawryService;
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
@@ -58,12 +60,12 @@ class CoinService
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);
             } elseif ($request->pay_method == 'fawry') {
-                $fawryService = new FawryPaymentService();
+                $oldFawryService = new FawryPaymentServiceV2();
                 $exterData = ["type" => 'charge_coin', 'paymentType' => "revenue"];
 
                 //  get url
-                $paymentUrl = $fawryService->makePayment($log->id, $coin->usd, $exterData);
-
+                $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
+                
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
