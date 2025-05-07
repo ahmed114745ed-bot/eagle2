@@ -11,11 +11,20 @@ class HealthCheckController extends Controller
 {
     public function status()
     {
+
+        if($this->checkRedis() && $this->checkSql() && $this->checkRutorrent()){
+            return response()->json([
+                'sql'    => $this->checkSql(),
+                'redis'  => $this->checkRedis(),
+                'rutor'  => $this->checkRutorrent()
+            ]);
+        }
+
         return response()->json([
             'sql'    => $this->checkSql(),
             'redis'  => $this->checkRedis(),
             'rutor'  => $this->checkRutorrent()
-        ]);
+        ],404);
     }
 
     private function checkSql(): bool
