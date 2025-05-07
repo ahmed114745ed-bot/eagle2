@@ -144,14 +144,14 @@ class RewardTargetController extends MainController
         $form = new Form(new RewardTarget());
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
-            // ->when("ware", function () use ($form) {
-            //     $form->belongsTo('target1', Wares::class, trans('wares'));
-            // })
+            ->when("ware", function () use ($form) {
+                $form->belongsTo('target1', Wares::class, trans('wares'));
+            })
         ->when("vip",function () use ($form){
             $form->select('target2', trans('vips'))->options(function (){
                 $vips = OVip::query()->select('id','name')->get();
                 foreach ($vips as  $vip){
-                    $ops[$vip->id]=$vip->name;
+                    $ops[$vip->id]=@$vip?->name ?? '';
                 }
                 return $ops;
             });
