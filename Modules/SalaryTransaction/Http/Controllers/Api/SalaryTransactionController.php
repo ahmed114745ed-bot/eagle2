@@ -42,6 +42,10 @@ class SalaryTransactionController extends Controller
                 return Common::apiResponse(0, __('salaryTransaction::api_responses.un_supported_payment_gateway'), null, 422);
             }
             $host = $request->user();
+            if ($host->transfer_salary == 1) {
+                return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+            }
+    
             if ($host->salary < $request->usd) {
                 return Common::apiResponse(0, __('salaryTransaction::api_responses.dont_have_coin'), null, 422);
             }
@@ -50,6 +54,9 @@ class SalaryTransactionController extends Controller
             if (!$agency instanceof Agency) return Common::apiResponse(false, 'agency not found');
             if ($agency->Shipping_agency != 1 ) {
                 return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
+            }
+            if ($agency->is_frozen == 1) {
+                return Common::apiResponse(0, __('api_responses.frozen'), 404);
             }
             $agency_owner = $agency->owner;
             $percentage_value = Common::getConfig('one_usd_value_in_coins')  ?? 10;
