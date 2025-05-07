@@ -728,6 +728,8 @@
      "wallets": "User Wallets",
      "UserWallet": "User Wallet",
      "wallet-transactions": "Wallet Transactions",
-     "WalletTransaction": "Wallet Transaction"
+     "WalletTransaction": "Wallet Transaction",
+   "vip_alert_message": "⚠️ Please add privileges to VIP.",
+  "vip_alert_button": "Add Now"
 
     }

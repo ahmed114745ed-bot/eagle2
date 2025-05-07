@@ -1445,7 +1445,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_primary_color" name="app_primary_color"
-                                    value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
+                                    value="{{ $settings['app_primary_color'] ?? '#32e5ac' }}" class="form-control">
                             </div>
                         </div>
 
@@ -1459,7 +1459,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_second_color" name="app_second_color"
-                                    value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
+                                    value="{{ $settings['app_second_color'] ?? '#003FA6' }}" class="form-control">
                             </div>
                         </div>
 
@@ -2036,8 +2036,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#aee6cf";
-                            document.getElementById('app_second_color').value = "#eff7f5";
+                            document.getElementById('app_primary_color').value = "#32e5ac";
+                            document.getElementById('app_second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";
