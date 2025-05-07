@@ -45,15 +45,29 @@ class AgencyDataSeeder extends Seeder
         }
 
         // Update UserTargets and related users
-        $targets = UserTarget::with('user')->take(20)->get();
-        foreach ($targets as $target) {
-            $target->update([
-                'agency_id' => $agency->id,
-                'created_at' => now(),
-            ]);
+        $newTargets = UserTarget::with('user')->orderByDesc('id')->take(20)->get();
 
-            $target->user?->update(['agency_id' => $agency->id]);
+        // Get older 20 targets (old)
+        $oldTargets = UserTarget::with('user')->orderBy('id')->take(20)->get();
+
+        foreach ($newTargets as $index => $newTarget) {
+            $oldTarget = $oldTargets[$index] ?? null;
+
+            if ($oldTarget) {
+                // Update newTarget with oldTarget's user_id, set agency and created_at
+                $newTarget->update([
+                    'user_id' => $oldTarget->user_id,
+                    'agency_id' => $agency->id,
+                    'created_at' => Carbon::now()->subMonth(),
+                ]);
+
+                // Optionally also update the related user's agency
+                $newTarget->user?->update([
+                    'agency_id' => $agency->id,
+                ]);
+            }
         }
     }
 }
+
 

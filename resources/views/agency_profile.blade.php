@@ -112,6 +112,45 @@
             border: 3px solid #ff9800;
             margin-bottom: 15px;
         }
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title i {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        .stars-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+        }
+        .stars-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         .details {
             text-align: left;
             margin-top: 10px;
@@ -123,6 +162,42 @@
             margin: 5px 0;
             font-size: 16px;
         }
+        .star-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .star-wrapper:hover .star-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .star-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+            font-weight: bold;
+        }
+
+        .admin-badge {
+            background: var(--success-color);
+        }
+
         /*.details strong {*/
         /*    color: #ff9800;*/
         /*}*/
@@ -134,7 +209,11 @@
             width: 100%;
             margin-top: 15px;
         }
-
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         /* Table styles */
         .table-responsive {
             overflow-x: auto;
@@ -200,6 +279,18 @@
                 max-width: none;
             }
         }
+
+        @media (max-width: 480px) {
+            
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .stars-container {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -236,6 +327,78 @@
                 <p><strong>{{__("salary")}}:</strong> {{ number_format(@$agency->salary) ?? 0 }}</p>
             </div>
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
+        </div>
+
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i>
+                    {{ __('نجوم الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($giftLog && $giftLog->count())
+                <div class="stars-container">
+                    @foreach($giftLog as $log)
+                        @php
+                            $user = $log->receiver;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                            $exp = number_format($log->exp);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }} ({{ $exp }} EXP)">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge">{{ $exp }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('No stars data available') }}</p>
+            @endif
+        </div>
+    
+        <!-- Admins Section -->
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    {{ __('ادمن الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($agency->admins && $agency->admins->count())
+                <div class="stars-container">
+                    @foreach($agency->admins as $admin)
+                        @php
+                            $user = $admin->user;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }}">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge admin-badge"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('لا يوجد ادمن للوكالة') }}</p>
+            @endif
         </div>
 
 
@@ -557,5 +720,3 @@
 
 
     </script>
-</body>
-

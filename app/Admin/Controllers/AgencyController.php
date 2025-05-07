@@ -74,7 +74,7 @@ class AgencyController extends MainController
     {
         $cacheKey = "agency_profile_{$id}";
         // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
-        $agency = Agency::with([
+        $agency = Agency::with(['admins',
             'charges' => function ($query) {
                 $query->select('id', 'agency_id', 'amount', 'created_at')
                     ->latest()
@@ -119,7 +119,10 @@ class AgencyController extends MainController
             ->with('user')
             ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
 
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests');
+            $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();  
+           
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests','giftLog');
         // });
 
         return $content->title(__('agency profile'))
