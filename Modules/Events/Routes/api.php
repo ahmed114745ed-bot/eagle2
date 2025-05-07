@@ -19,7 +19,7 @@ use Modules\Events\Http\Controllers\ChargeEventController;
 */
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan'])->group(function () {
-    Route::prefix ('events')->middleware(['appFeatureEnable:weekly_star'])->group (function (){
+    Route::prefix('events')->middleware(['appFeatureEnable:weekly_star'])->group (function (){
         Route::get('top-weekly-events', [WeeklyStarController::class, 'topUsersEvent']);
         Route::get('role-event', [WeeklyStarController::class, 'roleEvent']);
         Route::get('top-details', [WeeklyStarController::class, 'topDetails']);
