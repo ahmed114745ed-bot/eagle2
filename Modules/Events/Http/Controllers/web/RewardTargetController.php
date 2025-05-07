@@ -157,6 +157,7 @@ class RewardTargetController extends MainController
                     return $options;
                 });
             })
+            
          ->when("coins",function () use ($form){
             $form->number("target3",__("coins"));
         })->when("achievement",function () use ($form){
