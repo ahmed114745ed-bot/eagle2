@@ -141,7 +141,7 @@ class ChargeRepoService
         if (!$agency || $agency->status == 0) throw new \Exception(__('api_responses.canNotCharge'));
 
         if ($agency->is_frozen == 1) {
-            throw new \Exception(__('api_responses.frozen'));
+            throw new \Exception(__('api_responses.frozen_agency'));
         }
 
         $userReceiver = $this->userRepository->searchUser($receiverUuid);
@@ -183,11 +183,14 @@ class ChargeRepoService
 
             $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
-
+            if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge');
+            
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('agency not founded');
 
+            if ($agency->is_frozen == 1) throw new \Exception(__('api_responses.frozen_agency'));
+            
             if ($agency->status == 0 || $agency->app_owner_id != $sender->id)
                 throw new \Exception(__('api_responses.canNotCharge'),);
 
@@ -217,13 +220,15 @@ class ChargeRepoService
             if (!$receiver) throw new \Exception('this  not found');
 
             if ($receiver->is_frozen == 1) {
-                throw new \Exception(__('api_responses.frozen'));
+                throw new \Exception(__('api_responses.frozen_agency'));
             }
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency)) throw new \Exception('agency not founded');
             if ($agency->is_frozen == 1) {
-                throw new \Exception(__('api_responses.AgencyFrozen'));
+                throw new \Exception(__('api_responses.frozen_agency'));
             }
+            if ($agency->is_frozen == 1) throw new \Exception(__('api_responses.frozen_agency'));
+
             if ($agency->status == 0 || $agency->app_owner_id != $sender->id)
                 throw new \Exception(__('api_responses.canNotCharge'),);
 
@@ -360,7 +365,7 @@ class ChargeRepoService
             $authAgency = $this->agencyRepository->find($auth->agency_id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
-            if ($authAgency->is_frozen) throw new \Exception(__('api_responses.AgencyFrozen'));
+            if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));
             if (!$authAgency->status) throw new \Exception(__('api.notCharge'));
             if ($authAgency->app_owner_id != $auth->id) throw new \Exception(__('api.notCharge'));
             if ($authAgency->coins < $request->amount) throw new \Exception(__('api.notHaveAmount'));

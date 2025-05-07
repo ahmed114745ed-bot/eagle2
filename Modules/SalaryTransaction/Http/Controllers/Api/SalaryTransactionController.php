@@ -56,7 +56,7 @@ class SalaryTransactionController extends Controller
                 return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
             }
             if ($agency->is_frozen == 1) {
-                return Common::apiResponse(0, __('api_responses.frozen'), 404);
+                return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
             }
             $agency_owner = $agency->owner;
             $percentage_value = Common::getConfig('one_usd_value_in_coins')  ?? 10;
