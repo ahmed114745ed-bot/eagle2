@@ -19,7 +19,10 @@ class AgencySalaryRepository extends AbstractRepository
 
     public function findByAgencyId($agencyId)
     {
-        return $this->model->query()->where('agency_id', $agencyId)->where('is_paid', 0)->orderByDesc('id')->first();
+        return $this->model->query()->where('agency_id', $agencyId)
+                    ->where('is_paid', 0)
+                    ->orderByDesc('id')
+                    ->first();
     }
 
     public function incrementCutAmount($agencyId, $amount)

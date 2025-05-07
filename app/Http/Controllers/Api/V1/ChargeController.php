@@ -61,7 +61,7 @@ class ChargeController extends Controller
             'agency' => [$this, 'chargeToAgency']
         ];
 
-        $type = $request->input('type'); // هات القيمة من ال request
+        $type = $request->input('type'); 
         $instance = $types[$type] ?? $types['agency'];
 
         if (!$instance) {
@@ -69,11 +69,11 @@ class ChargeController extends Controller
         }
         $data = call_user_func($instance, $request);
         return $data;
+
     }
 
     public function chargeToUser(Request $request)
     {
-        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
@@ -83,19 +83,20 @@ class ChargeController extends Controller
         $isRoomTarget = false;
         $to = User::find($toId);
 
-        if(!$from->transfer_salary){
+        if (!$to) return Common::apiResponse(0, 'User Not Found', 400);
+
+        if ($from->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
         }
 
-        if(!$to->transfer_salary){
+        if ($to->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
         }
 
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
+       
 
-//        if ($from->charge_status == 0) {
-//            return Common::apiResponse(0, __('api.freez_charge'), 404);
-//        }
+
         $usd = $request->usd;
 
         if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) != 0) {
@@ -105,8 +106,7 @@ class ChargeController extends Controller
         if (!$usd || !$to) {
             return Common::apiResponse(0, 'not found', 404);
         }
-        // $rate = Common::getConf('one_usd_value_in_coins');
-        $rate = Common::getCoinsValue( 'user_coins' );
+        $rate = Common::getCoinsValue('user_coins');
 
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
@@ -134,16 +134,18 @@ class ChargeController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }
     }
+    
+    
 
 
     public function chargeToAgency(Request $request)
     {
-        //done
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
-            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
+            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
         }
 
+    
         $toId = $request->to_id;
         $from = $request->user();
         $isRoomTarget = false;
@@ -151,11 +153,9 @@ class ChargeController extends Controller
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
-            return Common::apiResponse(0, __('api_responses.frozen'), 404);
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
-//        if ($from->charge_status == 0) {
-//            return Common::apiResponse(0, __('api.freez_charge'), 404);
-//        }
+
         $usd = $request->usd;
 
         if (!is_numeric($usd) || $usd < 0 || fmod($usd, 1) != 0) {
@@ -165,7 +165,6 @@ class ChargeController extends Controller
         if (!$usd || !$to) {
             return Common::apiResponse(0, 'not found', 404);
         }
-        // $rate = Common::getConf('one_usd_value_in_coins');
         $rate = Common::getCoinsValue('shipping_coins');
 
         if (!$rate) {
@@ -186,29 +185,24 @@ class ChargeController extends Controller
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
 
             DB::commit();
-            // return $data;
             return Common::apiResponse(1, 'success', $data, 201);
         } catch (Exception $exception) {
-            // Log::info('this from charge to - ' . $exception->getMessage());
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }
     }
 
 
+
     public function sendMoneyFoeHost(Request $request)
     {
         //done
-        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
-        if ($stop_all_charge == 1) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+        //        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
+        //        if ($stop_all_charge == 1) {
+        //            return Common::apiResponse(0, __('api.freez_charge'), 404);
+        //        }
 
         $user = $request->user();
-
-//        if ($user->charge_status == 0) {
-//            return Common::apiResponse(0, __('api.freez_charge'), 404);
-//        }
         $count = $request->amount;
         $userUuid = $request->user_id;
 
@@ -225,7 +219,6 @@ class ChargeController extends Controller
             if ($userReceiver instanceof User) {
                 (new UserAchievementService())->insertCharging($userReceiver, $count);
             }
-            // Increment recipient's coins
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
             return Common::apiResponse(1, 'your recharge was successful', $data, 200);
@@ -245,6 +238,10 @@ class ChargeController extends Controller
 
     public function ChargeDollarForOwner(Request $request)
     {
+        $stop_all_charge = settings()->get("stop_charge") ?? 0;
+        if ($stop_all_charge == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
+        }
         $types = [
             'user' => [$this, 'ChargeDollarForOwner_to_users'],
             'agency' => [$this, 'ChargeDollarForOwner_to_agency']
@@ -259,6 +256,7 @@ class ChargeController extends Controller
         $data = call_user_func($instance, $request);
         return $data;
     }
+    
 
     public function ChargeDollarForOwner_to_users(Request $request)
     {
@@ -267,9 +265,9 @@ class ChargeController extends Controller
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-//        if ($user->charge_status == 0) {
-//            return Common::apiResponse(0, __('api.freez_charge'), 404);
-//        }
+        // if ($user->transfer_salary == 1) {
+        //     return Common::apiResponse(0, __('api.freez_charge'), 404);
+        // }
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
@@ -292,42 +290,43 @@ class ChargeController extends Controller
         }
     }
 
+ 
+    public function ChargeDollarForOwner_to_agency(Request $request)
+    {
+        //done
+        //        return Common::apiResponse(0, 'try again');
+        $user = $request->user();
+        $count = $request->amount;
+        $userUuid = $request->id;
+        // if ($user->transfer_salary == 1) {
+        //     return Common::apiResponse(0, __('api.freez_charge'), 404);
+        // }
 
-  public function ChargeDollarForOwner_to_agency(Request $request)
-  {
-      //done
-      //        return Common::apiResponse(0, 'try again');
-      $user = $request->user();
-      $count = $request->amount;
-      $userUuid = $request->id;
-//      if ($user->charge_status == 0) {
-//          return Common::apiResponse(0, __('api.freez_charge'), 404);
-//      }
+        if ($count < 0 || !is_numeric($count)) {
+            return Common::apiResponse(0, 'this value not allow', 422);
+        }
+        if (!$userUuid || !$count) {
+            return Common::apiResponse(0, __('api_responses.missing_params'), 404);
+        }
+        $receiver = Common::searchAgency($userUuid);
+        if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
+        if ($receiver->is_frozen == 1) {
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+        try {
+            [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
 
-      if ($count < 0 || !is_numeric($count)) {
-          return Common::apiResponse(0, 'this value not allow', 422);
-      }
-      if (!$userUuid || !$count) {
-          return Common::apiResponse(0, __('api_responses.missing_params'), 404);
-      }
-      $receiver = Common::searchAgency($userUuid);
-      if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
+            // if ($user instanceof User) {
+            //     (new UserAchievementService())->insertCharging($receiver, $amount);
+            // }
+            // UserCommon::UserEarnedInvitation($receiver->id, $amount);
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
+            return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
+        } catch (Exception $e) {
 
-      try {
-          [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
-
-          // if ($user instanceof User) {
-          //     (new UserAchievementService())->insertCharging($receiver, $amount);
-          // }
-          // UserCommon::UserEarnedInvitation($receiver->id, $amount);
-          $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
-          return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
-      } catch (Exception $e) {
-
-          return Common::apiResponse(0, $e->getMessage(), 400);
-      }
-  }
-
+            return Common::apiResponse(0, $e->getMessage(), 400);
+        }
+    }
 
     public function chargeDollarHistory(Request $request)
     {
@@ -384,4 +383,18 @@ class ChargeController extends Controller
         $data = $this->chargeService->userAgencySearch($request);
         return Common::apiResponse(1, '', $data, 200);
     }
-}
+
+
+
+    public function chargeFromAgencyToAnother(Request $request)
+    {
+        $from = $request->user();
+
+        try {
+            $this->chargeService->chargeAgencyToAnother($from, $request);
+
+            return Common::apiResponse(1, 'your recharge was successful', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+    }}

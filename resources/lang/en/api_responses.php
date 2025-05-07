@@ -153,4 +153,7 @@ return [
     'notFound' => 'user not found',
     'ownerNotFound' => 'owner not found',
     'shippingAgency' => ' you can\'t join this shipping agency',
+    'frozen' => 'Charging has been temporarily frozen. Please contact administration.',
+    'frozen_agency' => 'The agency wallet has been temporarily frozen',
+
 ];

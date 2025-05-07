@@ -151,6 +151,8 @@ return [
     'notFound'                                                   => 'Kullanıcı bulunamadı',
     'ownerNotFound' => 'Sahip bulunamadı',
     'shippingAgency' => 'Bu kargo ajansına katılamazsınız',
+    'frozen' => 'Yükleme geçici olarak durduruldu. Lütfen yönetimle iletişime geçin.',
+    'frozen_agency' => 'Ajans cüzdanı geçici olarak donduruldu',
 
 
 ];

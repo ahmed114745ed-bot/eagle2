@@ -2,32 +2,35 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\GiftLog;
 use App\Models\UserTarget;
+use App\Helpers\UserCommon;
 use App\Models\AgencySallary;
+use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
+use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
-use Encore\Admin\Widgets\InfoBox;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Traits\AdminTraits\AdminUserTrait;
-use App\Admin\Widgets\Table as TableWidget;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use TijsVerkoyen\CssToInlineStyles\Css\Rule\Rule as RuleRule;
+
 
 class AgencyController extends MainController
 {
@@ -70,49 +73,54 @@ class AgencyController extends MainController
     public function profile($id, Content $content)
     {
         $cacheKey = "agency_profile_{$id}";
-        $data = Cache::remember($cacheKey, 3600, function () use ($id) {
-            $agency = Agency::with([
-                'charges' => function ($query) {
-                    $query->select('id', 'agency_id', 'amount', 'created_at')
-                        ->latest()
-                        ->take(10);
-                },
-                'mempers' => function ($query) {
-                    $query->select('id', 'agency_id', 'name', 'created_at')
-                        ->latest()
-                        ->take(10);
-                },
-                'owner' => function ($query) {
-                    $query->select('id', 'name', 'uuid');
-                }
-            ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-                ->findOrFail($id);
-
-            $path = @$agency->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $imageUrl = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($imageUrl)) {
-                $imageUrl = $defaultImage;
+        // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
+        $agency = Agency::with([
+            'charges' => function ($query) {
+                $query->select('id', 'agency_id', 'amount', 'created_at')
+                    ->latest()
+                    ->take(10);
+            },
+            'mempers' => function ($query) {
+                $query->select('id', 'agency_id', 'name', 'created_at')
+                    ->latest()
+                    ->take(10);
+            },
+            'owner' => function ($query) {
+                $query->select('id', 'name', 'uuid');
             }
+        ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+            ->findOrFail($id);
 
-            $agency->display_image = $imageUrl;
+        $path = @$agency->img;
+        $defaultImage = asset("images/icon-agency.jpg");
+        $imageUrl = getImagePath($path) ?? $defaultImage;
 
-            $members = $agency->mempers()
-                ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received')
-                ->paginate(10, ['*'], 'members_page');
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
 
-            $charges = $agency->charges()
-                ->select('id', 'amount', 'created_at')
-                ->paginate(10, ['*'], 'charges_page');
+        $agency->display_image = $imageUrl;
 
-            $salaries = AgencySallary::where('agency_id', $id)
-                ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
-                ->orderByDesc('id')
-                ->paginate(10, ['*'], 'salary_page');
+        $members = $agency->mempers()
+            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'country_id')->with('country', 'agencyUserJob')
+            ->paginate(10, ['*'], 'members_page');
 
-            return compact('agency', 'members', 'charges', 'salaries');
-        });
+        $charges = $agency->charges()
+            ->select('id', 'amount', 'created_at')
+            ->paginate(10, ['*'], 'charges_page');
+
+        $salaries = AgencySallary::where('agency_id', $id)
+            ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'salary_page');
+
+        $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
+            // 
+            ->with('user')
+            ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
+
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests');
+        // });
 
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
@@ -154,19 +162,20 @@ class AgencyController extends MainController
         return parent::update($id);
     }
 
-    public function show($id, Content $content)
-    {
+    // public function show($id, Content $content)
+    // {
 
-        return parent::show($id, $content
-            ->title(__("agency details"))
-            ->row(function ($row) use ($id) {
-                $agency = Agency::find($id);
-                $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
-                $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
-                $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
-                    ->groupByRaw('agency_id,add_month,add_year')->count()));
-            }));
-    }
+    //     return parent::show($id, $content
+    //         ->title(__("agency details"))
+    //         ->row(function ($row) use ($id) {
+    //             $agency = Agency::find($id);
+    //             $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', '?type=users', $agency->users()->count()));
+    //             $row->column(3, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $agency?->salary));
+    //             $row->column(3, new InfoBox(__('Targets'), 'gift', 'yellow', '?type=target', UserTarget::query()->where('agency_id', $id)->where('agency_obtain', '>', 0)->selectRaw('agency_id,add_month,add_year,ROUND(SUM(agency_obtain), 2) as tot')
+    //                 ->groupByRaw('agency_id,add_month,add_year')->count()));
+    //         }));
+    // }
+
 
     /**
      * Make a grid builder.
@@ -282,7 +291,7 @@ class AgencyController extends MainController
 
         $grid->actions(function ($actions) {
             $model = $actions->row;
-            $actions->disableView(); // Disable the "View" action
+            // $actions->disableView(); // Disable the "View" action
             $actions->disableDelete();
             $actions->add(new DeleteAgencyAction());
             $actions->add(new ChangeUsersAgencyAction($model->id));
@@ -722,5 +731,303 @@ class AgencyController extends MainController
         }
 
         return $this->response;
+    }
+
+
+
+
+    //////////////////show agency ///////////////////////////////
+
+    // public function show($id, Content $content)
+    // {
+    //     return $content->row(function ($row) use ($id) {
+
+
+    //         // Info Boxes
+    //         // $row->column(12, function ($column)  {
+    //         //     $column->row(view('admin.grid.users.show', compact('user')));
+
+
+    //         // });
+
+    //         $row->column(12, function ($column) use ($id) {
+    //             $tab = new Tab();
+
+    //             Admin::style('
+    //                         .nav-tabs-custom {
+    //                             background: transparent !important;
+    //                             box-shadow: none !important;
+    //                             border: none !important;
+    //                         }
+    //                         .nav-tabs-custom>.nav-tabs {
+    //                             background: transparent;
+    //                             border: none;
+    //                             display: flex;
+    //                             padding: 0;
+    //                             margin: 0;
+    //                             width: 100%;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li {
+    //                             flex: 1;
+    //                             border: none;
+    //                             margin: 0;
+    //                             padding: 0 2px;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li:first-child {
+    //                             padding-left: 0;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li:last-child {
+    //                             padding-right: 0;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li > a {
+    //                             background: #1e1e1e;
+    //                             color: white;
+    //                             padding: 8px 24px;
+    //                             border-radius: 4px;
+    //                             margin: 0;
+    //                             border: none;
+    //                             font-size: 14px;
+    //                             text-align: center;
+    //                             width: 100%;
+    //                             display: block;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li.active > a {
+    //                             background: #ff9800;
+    //                             color: white;
+    //                             border: none;
+    //                         }
+    //                         .nav-tabs-custom > .nav-tabs > li > a:hover {
+    //                             background: #ff9800;
+    //                             color: white;
+    //                             border: none;
+    //                         }
+    //                         .nav-tabs-custom>.tab-content {
+    //                             background: transparent;
+    //                             border: none;
+    //                             padding: 10px 0;
+    //                         }
+    //                        .nav-tabs-custom > .nav-tabs > li.pull-right.header {
+    //                             display: none !important;
+    //                         }
+
+    //                         .nav-tabs-custom > .nav-tabs > li.pull-right {
+    //                             display: none !important;
+    //                         }
+    //                     ');
+    //             $tab->add(__('Agency Join Requests'), $this->joinRequest($id)->render());
+    //             $tab->add(__('Assign Admin'), $this->members($id)->render());
+    //             $tab->add(__('Stars'), $this->stars($id)->render());
+    //             // $tab->add(__('Heroes'), $this->heroes($id)->render());
+    //             // $tab->add(__('Target'), $this->targets($id)->render());
+
+    //             $column->append($tab);
+    //         });
+    //     });
+    // }
+
+
+
+    public function acceptJoin($id)
+    {
+        $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user', 'agency')->first();
+        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        $user = $agencyJoinRequest->user;
+        if (!$user) return back()->with('error', ('user not found'));
+        $agency = $agencyJoinRequest->agency;
+        if (!$agency) return back()->with('error', __('agency not found'));
+        if ($user->agency_id) return back()->with('error', __('user joined in another agency'));
+        $agencyJoinRequest->status = 1;
+        $agencyJoinRequest->save();
+
+        $user->agency_id = $agencyJoinRequest->agency_id;
+        $user->type_user = 1;
+        $user->save();
+        $checkAgencyUser = UsersJoinedAgency::where('user_id', $user->id)->where('agency_id', $agency->id)->where('leave_date', null)->exists();
+        if (!$checkAgencyUser) {
+            $joinAgencyData = [
+                'user_id' =>  $user->id,
+                'agency_id' => $agency->id,
+                'type' => 2,
+                'join_date' => now(),
+            ];
+            UsersJoinedAgency::create($joinAgencyData);
+        }
+        // add vip to user
+        UserCommon::userVip($user);
+        CustomNotification::acceptAgencyApp($agency, $user);
+        return  redirect()->back()->with('success', __('Joined successfully'));;
+    }
+
+    public function rejectJoin($id)
+    {
+        $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user')->first();
+        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+
+        $agencyJoinRequest->status = 2;
+        $agencyJoinRequest->save();
+
+        return redirect()->back()->with('success', __('Rejected successfully'));
+    }
+
+    public function members($agencyId)
+    {
+        $grid = new Grid(new User());
+
+        $grid->model()->where('agency_id', $agencyId)->where('type_user', 1)->whereDoesntHave('agencyUserJob');
+        $grid->column('name', __('User'))
+            ->display(function ($name) {
+                $uid = @$this->uuid;
+                $path = @$this->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
+
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+                return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+            });
+
+        $grid->column('whatsapp', __('whatsapp'))->display(function ($number) use ($agencyId) {
+            $joinRequest = AgencyJoinRequest::where(['agency_id' => $agencyId, 'user_id' => $this->id])->first();
+            if (!$joinRequest) return '-';
+            $number = $joinRequest->whatsapp;
+            if (!$number) return '-';
+            $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
+
+            // Return an image with a WhatsApp link
+            return "<div style='display: flex; align-items: center; '>
+
+            <span>{$number} </span>
+
+              <img src='{$iconUrl}' alt='USD' width='20' height='20' style='margin-left:3px; filter: invert(1);'>
+        </div>";
+        });
+
+        $grid->column('country.name', __('country'))->display(function ($name) {
+            if (!$name) return '-';
+
+            $name = app()->getLocale() == 'ar' ? $name ?? @$this->country?->e_name : @$this->country?->e_name ?? $name;
+            $path =    @$this->user?->country?->flag ?? '';
+
+            $url = getImagePath($path);
+
+            // Check if the image exists
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            // Return an image with a WhatsApp link
+            return "
+            <div style='display: flex; flex-direction: column; align-items: start;'>
+                <span>{$name}</span>
+                <img src='{$image}' alt='USD' width='20' height='20' style='margin-top: 3px; filter: invert(1);'>
+            </div>
+        ";
+        });
+
+        $grid->column('return', __('action'))->display(function () {
+            return (new \App\Admin\Actions\AgencyAdmin($this->id))->render();
+        });
+
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableActions();
+        return $grid;
+    }
+
+    public function stars($agencyId)
+    {
+        $grid = new Grid(new GiftLog);
+
+        // Apply filters BEFORE the selectRaw
+        $year = Request::input('year');
+        $month = Request::input('month');
+
+        $grid->model()
+            ->where('agency_id', $agencyId)
+            ->whereHas('receiver')
+            ->with('receiver')
+            ->when($year, function ($query) use ($year) {
+                $query->whereYear('created_at', $year);
+            })
+            ->when($month, function ($query) use ($month) {
+                $query->whereMonth('created_at', $month);
+            })
+            ->selectRaw("sum(giftPrice) as exp, receiver_id, MAX(created_at) as created_at")
+            ->groupBy('receiver_id')
+            ->orderByRaw("exp desc");
+
+        // Filters
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $year = Request::input('year');
+                    if (!empty($year)) {
+                        $query->whereYear('created_at', $year);
+                    }
+                }, __('Year'), 'year')->integer();
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $month = Request::input('month');
+                    if (!empty($month)) {
+                        $query->whereMonth('created_at', $month);
+                    }
+                }, __('Month'), 'month')->integer();
+            });
+        });
+
+        // Columns
+        $grid->column('receiver.name', __('User'))->display(function ($name) {
+            if (!$this->receiver) return 'user not found';
+            $uid = @$this->receiver->uuid;
+            $path = @$this->receiver->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->receiver->id, $url, 40, 40);
+
+            return "
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                        <strong>$name</strong><br>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                    </div>
+                </div>
+            ";
+        });
+
+        $grid->column('exp', __('Total Price'))->display(function () {
+            return number_format($this->exp, 2) . ' Coins';
+        });
+
+        // Optional: Show total sum in footer
+        // $grid->footer(function ($collection) {
+        //     $total = $collection->sum('exp');
+        //     return "<div style='padding: 10px'><strong>Total: " . number_format($total, 2) . " Coins</strong></div>";
+        // });
+
+        $this->extendGrid($grid);
+        $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableActions();
+
+        return $grid;
     }
 }
