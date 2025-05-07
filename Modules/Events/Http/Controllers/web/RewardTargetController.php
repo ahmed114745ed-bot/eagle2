@@ -141,6 +141,7 @@ class RewardTargetController extends MainController
 
     protected function form()
     {
+        dd(123456);
         $form = new Form(new RewardTarget());
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
