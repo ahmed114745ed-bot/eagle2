@@ -153,7 +153,7 @@ class ChargeController extends Controller
         $to = Common::searchAgency($toId);
         if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
         if ($to->is_frozen == 1) {
-            return Common::apiResponse(0, __('api_responses.frozen'), 404);
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
 
         $usd = $request->usd;
@@ -265,9 +265,9 @@ class ChargeController extends Controller
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-        if ($user->transfer_salary == 1) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+        // if ($user->transfer_salary == 1) {
+        //     return Common::apiResponse(0, __('api.freez_charge'), 404);
+        // }
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
         }
@@ -298,9 +298,9 @@ class ChargeController extends Controller
         $user = $request->user();
         $count = $request->amount;
         $userUuid = $request->id;
-        if ($user->transfer_salary == 1) {
-            return Common::apiResponse(0, __('api.freez_charge'), 404);
-        }
+        // if ($user->transfer_salary == 1) {
+        //     return Common::apiResponse(0, __('api.freez_charge'), 404);
+        // }
 
         if ($count < 0 || !is_numeric($count)) {
             return Common::apiResponse(0, 'this value not allow', 422);
@@ -310,7 +310,9 @@ class ChargeController extends Controller
         }
         $receiver = Common::searchAgency($userUuid);
         if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
-
+        if ($receiver->is_frozen == 1) {
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
 
