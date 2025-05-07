@@ -83,17 +83,6 @@
         color: white;
     }
 
-    button {
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    button {
-        width: 200px;
-
-    }
     .sidebar-menu>li>a {
         padding-left: 0; !important;
     }

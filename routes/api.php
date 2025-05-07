@@ -61,9 +61,11 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
+Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
 Route::post('/now-payments-callback', [NowPaymentsController::class, 'paymentCallback']);
 Route::post('agora-webhook', [AgoraController::class, 'webhook']);
