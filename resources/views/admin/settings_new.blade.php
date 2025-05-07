@@ -1077,7 +1077,7 @@
 
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
@@ -1165,12 +1165,15 @@
                             </div>
 
                             <!-- skyPay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_skyPay_active" value="0">
                                             <input type="checkbox" id="skyPayRadio"
@@ -1243,7 +1246,7 @@
                             </div>
 
                             <!-- stripe Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
@@ -1329,12 +1332,15 @@
                             </div>
 
                             <!-- opay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_opay_active" value="0">
                                             <input type="checkbox" id="opayRadio"
@@ -1418,6 +1424,94 @@
                                                 <input type="text" id="opay_base_url"
                                                        name="opay_base_url" placeholder="base_url"
                                                        value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                                </form>
+                            </div>
+
+
+
+                            <!-- Cash free Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.cashfree') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_cashfree_active" value="0">
+                                            <input type="checkbox" id="cashfreeRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_cashfree_active"
+                                                value="1"
+                                                {{ @$settings['is_cashfree_active'] == '1' ? 'checked' : '' }}>
+                                            <label for="cashfreeRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $cashfreeImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'cashfree')
+                                                <img src="{{ asset('images/cashfree.png') }}"
+                                                     alt="Opay Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $cashfreeImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$cashfreeImageFound)
+                                        <img src="{{ asset('images/cashfree.png') }}"
+                                        alt="Cahsfree Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="cashfree_currency">{{ __('admin.currency') }}:</label>
+                                                <input type="text" id="cashfree_currency" name="cashfree_currency"
+                                                       placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="opay_secret_key">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="cashfree_app_id" name="cashfree_app_id"
+                                                    placeholder="cashfree_app_id"
+                                                    value="{{ $settings['cashfree_app_id'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_country_code">{{ __('admin.secret_key') }}:</label>
+                                                <input type="text" id="cashfree_secret_key"
+                                                       name="cashfree_secret_key" placeholder="cashfree_secret_key"
+                                                       value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>
+                                                <input type="text" id="cashfree_base_url"
+                                                       name="cashfree_base_url" placeholder="base_url"
+                                                       value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
                                         </div>
                                     </div>

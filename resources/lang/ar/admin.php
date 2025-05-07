@@ -30,6 +30,8 @@ return [
     'batch_delete'          => 'مسح بالجملة',
     'save'                  => 'حفظ',
     'refresh'               => 'تحديث',
+    "secret_key" => 'المفتاح السرى',
+    "cashfree" => "كاش فرى",
     'order'                 => 'ترتيب',
     'expand'                => 'تكبير',
     'collapse'              => 'تصغير',
