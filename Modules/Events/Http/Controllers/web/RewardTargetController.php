@@ -41,11 +41,10 @@ class RewardTargetController extends MainController
     }
     public function create(Content $content)
     {
-        dd(123);
-        return parent::create($content
+        return $content
             ->header(trans('admin.create'))
             ->description(trans('admin.description'))
-            ->body($this->form()));
+            ->body($this->form());
     }
 
     public function update($id)
