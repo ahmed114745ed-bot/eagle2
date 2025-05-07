@@ -10,6 +10,7 @@ use App\Classes\PaymentGateways\Fawry;
 use App\Tik\Repositories\CoinRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Http\Controllers\Web\OPayController;
+use App\Models\Setting;
 use App\Tik\Repositories\PaymentCoinRepository;
 
 class CoinService
@@ -54,6 +55,29 @@ class CoinService
                 'trx' => $log->trx
             ];
             if ($request->pay_method == 'strip') {
+                $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
+                $is_stripe_active = Setting::where('key', 'is_stripe_active')->first();
+                $stripe_success_url = Setting::where('key', 'stripe_success_url')->first();
+                $stripe_cancel_url = Setting::where('key', 'stripe_cancel_url')->first();
+                $stripe_currency = Setting::where('key', 'stripe_currency')->first();
+                $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
+
+                $data['stripe_test_secret_key'] = $stripe_test_secret_key;
+                $data['is_stripe_active'] = $is_stripe_active;
+                $data['stripe_success_url'] = $stripe_success_url;
+                $data['stripe_cancel_url'] = $stripe_cancel_url;
+                $data['stripe_currency'] = $stripe_currency;
+                $data['stripe_webhook_secret'] = $stripe_webhook_secret;
+
+                if(!$stripe_test_secret_key
+                || !$is_stripe_active
+                || !$stripe_success_url
+                || !$stripe_cancel_url
+                || !$stripe_currency
+                || !$stripe_webhook_secret
+                ){
+                    return Common::apiResponse(0, 'Please set strip information', null, 400);
+                }
                 $strip = new \App\Classes\PaymentGateways\Stripe();
                 $res = $strip->make($data);
                 return Common::apiResponse(1, 'ok', $res, 200);

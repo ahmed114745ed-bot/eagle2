@@ -1077,7 +1077,7 @@
 
                         <div class="row mt-4">
                             <!-- Fawry Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
@@ -1165,12 +1165,15 @@
                             </div>
 
                             <!-- skyPay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_skyPay_active" value="0">
                                             <input type="checkbox" id="skyPayRadio"
@@ -1243,7 +1246,7 @@
                             </div>
 
                             <!-- stripe Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
@@ -1329,12 +1332,15 @@
                             </div>
 
                             <!-- opay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto">
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST">
                                     @csrf
                                 <div class="card p-3 shadow" style="height: 495px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('admin.opay') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
                                         <div class="d-flex align-items-center">
                                             <input type="hidden" name="is_opay_active" value="0">
                                             <input type="checkbox" id="opayRadio"
@@ -1426,6 +1432,192 @@
                                 </div>
                                 </form>
                             </div>
+
+
+
+                            <!-- Cash free Fields -->
+                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.cashfree') }}</h4>
+                                        <div class="ribbon-banner-card">
+                                            <span>{{ __('soon') }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_cashfree_active" value="0">
+                                            <input type="checkbox" id="cashfreeRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_cashfree_active"
+                                                value="1"
+                                                {{ @$settings['is_cashfree_active'] == '1' ? 'checked' : '' }}>
+                                            <label for="cashfreeRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $cashfreeImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'cashfree')
+                                                <img src="{{ asset('images/cashfree.png') }}"
+                                                     alt="Opay Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $cashfreeImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$cashfreeImageFound)
+                                        <img src="{{ asset('images/cashfree.png') }}"
+                                        alt="Cahsfree Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="cashfree_currency">{{ __('admin.currency') }}:</label>
+                                                <input type="text" id="cashfree_currency" name="cashfree_currency"
+                                                       placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="opay_secret_key">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="cashfree_app_id" name="cashfree_app_id"
+                                                    placeholder="cashfree_app_id"
+                                                    value="{{ $settings['cashfree_app_id'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_country_code">{{ __('admin.secret_key') }}:</label>
+                                                <input type="text" id="cashfree_secret_key"
+                                                       name="cashfree_secret_key" placeholder="cashfree_secret_key"
+                                                       value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>
+                                                <input type="text" id="cashfree_base_url"
+                                                       name="cashfree_base_url" placeholder="base_url"
+                                                       value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                                </form>
+                            </div>
+
+
+                             <!-- Apple Pay Fields -->
+                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                <form action="{{ route('admin.settings.update') }}" method="POST">
+                                    @csrf
+                                <div class="card p-3 shadow" style="height: 495px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('admin.applepay') }}</h4>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="is_applepay_active" value="0">
+                                            <input type="checkbox" id="applepayRadio"
+                                                class="custom-payment-radio libraryRealTime" name="is_applepay_active"
+                                                value="1"
+                                                {{ @$settings['is_applepay_active'] == '1' ? 'checked' : '' }}>
+                                            <label for="applepayRadio" class="switch"></label>
+                                        </div>
+                                    </div>
+                                    <div class="text-center my-3">
+                                        @php
+                                            $applepayImageFound = false;
+                                        @endphp
+
+                                        @foreach($paymentCoins as $coin)
+                                            @if($coin->title == 'applepay')
+                                                <img src="{{ asset('images/applepay.jpg') }}"
+                                                     alt="apple Payment"
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                @php
+                                                    $applepayImageFound = true;
+                                                @endphp
+                                            @endif
+                                        @endforeach
+
+                                        @if(!$applepayImageFound)
+                                        <img src="{{ asset('images/applepay.jpg') }}"
+                                        alt="apple Payment"
+                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                        @endif
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label>
+                                                <input type="text" id="apple_team_id" name="apple_team_id"
+                                                       placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}"
+                                                       class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="apple_key_id">{{ __('admin.app_id') }}:</label>
+                                                <input type="text" id="apple_key_id" name="apple_key_id"
+                                                    placeholder="apple_key_id"
+                                                    value="{{ $settings['apple_key_id'] ?? '' }}"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_client_id">{{ __('admin.apple_client_id') }}:</label>
+                                                <input type="text" id="apple_client_id"
+                                                       name="apple_client_id" placeholder="apple_client_id"
+                                                       value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
+                                                <input type="text" id="apple_redirect_uri"
+                                                       name="apple_redirect_uri" placeholder="apple_redirect_uri"
+                                                       value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label
+                                                    for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>
+                                                    <input type="file" id="apple_service_file"
+                                                    name="apple_service_file" placeholder="apple_service_file"
+                                                     class="form-control" required>
+
+                                                    <input type="text" id="apple_service_file" disabled
+                                                       name="apple_service_file" placeholder="apple_service_file"
+                                                       value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
             </div>
@@ -1445,7 +1637,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_primary_color" name="app_primary_color"
-                                    value="{{ $settings['app_primary_color'] ?? '#3498db' }}" class="form-control">
+                                    value="{{ $settings['app_primary_color'] ?? '#32e5ac' }}" class="form-control">
                             </div>
                         </div>
 
@@ -1459,7 +1651,7 @@
                                     </span>
                                 </div>
                                 <input type="color" id="app_second_color" name="app_second_color"
-                                    value="{{ $settings['app_second_color'] ?? '#2ecc71' }}" class="form-control">
+                                    value="{{ $settings['app_second_color'] ?? '#003FA6' }}" class="form-control">
                             </div>
                         </div>
 
@@ -2036,8 +2228,8 @@
                     if (resetAppButton) {
                         resetAppButton.addEventListener('click', function() {
                             // Reset color inputs
-                            document.getElementById('app_primary_color').value = "#aee6cf";
-                            document.getElementById('app_second_color').value = "#eff7f5";
+                            document.getElementById('app_primary_color').value = "#32e5ac";
+                            document.getElementById('app_second_color').value = "#003FA6";
 
                             // Reset background (assuming you want color background)
                             document.getElementById('app_white_color').value = "#ffffff";

@@ -203,6 +203,24 @@
     </style>
 </head>
 <body>
+    @if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
     <div class="main-content">
         <div class="container">
             <div class="avatar">
@@ -227,9 +245,10 @@
                 <button onclick="showSection('showMembers')" class="active">{{ __('members') }}</button>
                 <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
+                <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
             </div>
         </div>
-
+              
         <div class="settings-content">
             <!-- Members Section -->
             <div id="showMembers" class="settings-section active">
@@ -336,7 +355,7 @@
                             </div>
 
                             <div class="pagination-container">
-                                {{ $charges->appends(['members_page' => $members->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
                             </div>
 
                     </div>
@@ -380,7 +399,7 @@
 
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
-                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
@@ -388,6 +407,105 @@
                     </div>
                 </div>
             </div>
+
+            <div id="joinAgency" class="settings-section">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
+            
+                        <div class="table-responsive">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="join">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('User') }}</th>
+                                            <th>{{ __('WhatsApp') }}</th>
+                                            <th>{{ __('Country') }}</th>
+                                            <th>{{ __('Action') }}</th>
+                                        </tr>
+                                    </thead>
+            
+                                    @if($agencyJoinRequests && $agencyJoinRequests->count())
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($agencyJoinRequests as $index => $agencyJoinRequest)
+                                            @php
+                                                $user = $agencyJoinRequest->user;
+                                                $name = $user->name ?? '-';
+                                                $uid = $user->uuid ?? '-';
+                                                $avatarPath = $user->profile?->avatar;
+                                                $defaultImage = asset("images/businessman-icon.jpg");
+                                                $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                if (!isImageExists($avatarUrl)) {
+                                                    $avatarUrl = $defaultImage;
+                                                }
+                                                $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
+            
+                                                $iconUrl = asset('images/whatsapp.png');
+                                                $country = $user->country;
+                                                $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
+                                                $countryFlag = getImagePath($country?->flag ?? '');
+                                            @endphp
+            
+                                            <tr>
+                                                <td>{{ $agencyJoinRequests->firstItem() + $index }}</td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                                        {!! $image !!}
+                                                        <div>
+                                                            <strong>{{ $name }}</strong><br>
+                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center;">
+                                                        <span>{{ $agencyJoinRequest->whatsapp }}</span>
+                                                        <img src="{{ $iconUrl }}" alt="WhatsApp" width="20" height="20" style="margin-left: 5px; filter: invert(1);">
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; align-items: start;">
+                                                        <span>{{ $countryName }}</span>
+                                                        @if($countryFlag)
+                                                            <img src="{{ $countryFlag }}" alt="Flag" width="20" height="20" style="margin-top: 3px; filter: invert(1);">
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                    <td>
+                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
+                                                        </form>
+                                                    
+                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
+                                                        </form>
+                                                    </td>
+                                             
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
+            
+                        <div class="pagination-container mt-3">
+                            {{ $agencyJoinRequests->appends([
+                                'members_page' => $members->currentPage(),
+                                'salaries_page' => $salaries->currentPage(),
+                                'charges_page' => $charges->currentPage()
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
 
     </div>
@@ -435,6 +553,7 @@
         window.history.pushState({}, '', url);
     }
 
+// Add this to your JavaScript
 
 
     </script>

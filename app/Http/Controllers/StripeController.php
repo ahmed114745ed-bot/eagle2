@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\StripeService;
 use Database\Seeders\config;
@@ -70,7 +71,10 @@ class StripeController extends Controller
 
     public function handleWebhook(Request $request)
     {
-        $apiKey = config('stripe.test_secret_key');
+        $stripe_test_secret_key = Setting::where('key', 'stripe_test_secret_key')->first();
+        $stripe_webhook_secret = Setting::where('key', 'stripe_webhook_secret')->first();
+
+        $apiKey = $stripe_test_secret_key;
 
         Stripe::setApiKey($apiKey);
 
@@ -78,7 +82,8 @@ class StripeController extends Controller
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
         // Your Stripe webhook secret, which you get from the Stripe dashboard
-        $endpointSecret = config('stripe.webhook_secret'); // Set this in your .env file
+        $endpointSecret = $stripe_webhook_secret?->value; // Set this in your .env file
+        Log::info('strip callback called '. $apiKey . ' '. $stripe_webhook_secret);
         try {
             // Verify the webhook signature to ensure it's coming from Stripe
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);

@@ -2,7 +2,9 @@
 namespace App\Classes\PaymentGateways;
 use App\Helpers\Common;
 use App\Models\CoinLog;
+use App\Models\Setting;
 use Illuminate\Http\Request;
+use Stripe\Stripe as StripeStripe;
 
 class Stripe
 {
@@ -13,25 +15,27 @@ class Stripe
     //Country or region : United States
     //zip : 12345
 
-	 public static function redirect_if_payment_success($trx)
+	 public static function redirect_if_payment_success($data)
      {
-        return url("/payment/payment-success?p_method=strip&&trx=$trx");
+        $trx = $data['trx'];
+        return url($data['stripe_success_url']?->value.$trx);
      }
 
-    public static function redirect_if_payment_faild($trx)
+    public static function redirect_if_payment_faild($data)
     {
-     return url("/payment/payment-fail?p_method=strip&&trx=$trx");
+        $trx = $data['trx'];
+        return url($data['stripe_cancel_url']?->value .$trx);
     }
 
 
     public function make($data){
-        \Stripe\Stripe::setApiKey(Common::getConf ('strip_api_key')?:'sk_test_4eC39HqLyjWDarjtT1zdp7dc');
+        \Stripe\Stripe::setApiKey($data['stripe_test_secret_key']?->value);
         $checkout_session = \Stripe\Checkout\Session::create(
             [
                 'line_items' => [
                     [
                         'price_data' => [
-                            'currency'=>'usd',
+                            'currency'=>$data['stripe_currency']?->value,
                             'product_data'=>[
                                 'name'=>$data['name']
                             ],
@@ -41,8 +45,8 @@ class Stripe
                     ]
                 ],
                 'mode' => 'payment',
-                'success_url' => self::redirect_if_payment_success ($data['trx']),
-                'cancel_url' => self::redirect_if_payment_faild ($data['trx']),
+                'success_url' => self::redirect_if_payment_success ($data),
+                'cancel_url' => self::redirect_if_payment_faild ($data),
             ]
         );
 
@@ -56,9 +60,10 @@ class Stripe
     }
 
 
-    public static function status($session_id) {
+    public static function status($session_id, $secret) {
 
-        $stripe = new \Stripe\StripeClient(Common::getConf ('strip_api_key')?:'sk_test_4eC39HqLyjWDarjtT1zdp7dc');
+        $value = $secret->value;
+        $stripe = new \Stripe\StripeClient($value);
         try {
             $session = $stripe->checkout->sessions->retrieve($session_id);
             return $session;
