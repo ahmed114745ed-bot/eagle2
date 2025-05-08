@@ -6,9 +6,6 @@ use App\Models\UserSallary;
 use Illuminate\Support\Facades\DB;
 
 
-
-
-
 class UserSalaryRepository extends AbstractRepository
 {
 
