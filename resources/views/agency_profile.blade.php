@@ -112,6 +112,45 @@
             border: 3px solid #ff9800;
             margin-bottom: 15px;
         }
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title i {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        .stars-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+        }
+        .stars-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         .details {
             text-align: left;
             margin-top: 10px;
@@ -123,6 +162,42 @@
             margin: 5px 0;
             font-size: 16px;
         }
+        .star-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .star-wrapper:hover .star-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .star-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+            font-weight: bold;
+        }
+
+        .admin-badge {
+            background: var(--success-color);
+        }
+
         /*.details strong {*/
         /*    color: #ff9800;*/
         /*}*/
@@ -134,7 +209,11 @@
             width: 100%;
             margin-top: 15px;
         }
-
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         /* Table styles */
         .table-responsive {
             overflow-x: auto;
@@ -200,6 +279,18 @@
                 max-width: none;
             }
         }
+
+        @media (max-width: 480px) {
+            
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .stars-container {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -238,6 +329,78 @@
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
 
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i>
+                    {{ __('نجوم الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($giftLog && $giftLog->count())
+                <div class="stars-container">
+                    @foreach($giftLog as $log)
+                        @php
+                            $user = $log->receiver;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                            $exp = number_format($log->exp);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }} ({{ $exp }} EXP)">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge">{{ $exp }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('No stars data available') }}</p>
+            @endif
+        </div>
+    
+        <!-- Admins Section -->
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    {{ __('ادمن الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($agency->admins && $agency->admins->count())
+                <div class="stars-container">
+                    @foreach($agency->admins as $admin)
+                        @php
+                            $user = $admin->user;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }}">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge admin-badge"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('لا يوجد ادمن للوكالة') }}</p>
+            @endif
+        </div>
+
 
 
         <div class="settings-sidebar">
@@ -246,6 +409,7 @@
                 <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
                 <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
+                <button onclick="showSection('target')">{{ __('target') }}</button>
             </div>
         </div>
               
@@ -271,10 +435,13 @@
                                                 <th>{{ __('total_hours') }}</th>
                                                 <th>{{ __('Monthly DI') }}</th>
                                                 <th>{{ __('salary') }}</th>
+                                                <th>{{ __('type') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($members as $index => $member)
+                                           
+                                           
                                                 <tr>
                                                     <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                                     <td>{{ @$member->name ?? '' }}</td>
@@ -288,6 +455,38 @@
                                                     <td>{{ $member->liveTime->sum("hours") }}</td>
                                                     <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
                                                     <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                                  
+                                                    <td>
+                                                        @php
+                                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                                                        ->where('agency_id', $member->agency_id)
+                                                                        ->where('type', 'requestManger')
+                                                                        ->exists();
+                                                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                                                        ->where('id', $member->agency_id)->exists();
+                                                        @endphp
+                                                
+                                                            @if($isOwner)
+                                                            <div class="text-center">
+                                                                <span class="badge badge-dark fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                    {{ __('Owner') }}
+                                                                </span>
+                                                            </div>
+                                                        @elseif($isAdmin)
+                                                        <div class="text-center">
+                                                            <span class="badge badge-success fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                {{ __('Admin') }}
+                                                            </span>
+                                                        </div>
+                                                        @else
+                                                            <form action="{{ url('agencies/admin/' . $member->id) }}" method="POST" style="display:inline-block;">
+                                                                @csrf
+                                                                <button class="btn btn-sm btn-primary" onclick="return confirm('{{ __('Make this user an admin?') }}')">
+                                                                    {{ __('Make Admin') }}
+                                                                </button>
+                                                            </form>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -505,6 +704,104 @@
                     </div>
                 </div>
             </div>
+
+            {{-- <div id="joinAgency" class="settings-section">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
+            
+                        <div class="table-responsive">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="join">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('User') }}</th>
+                                            <th>{{ __('WhatsApp') }}</th>
+                                            <th>{{ __('Country') }}</th>
+                                            <th>{{ __('Action') }}</th>
+                                        </tr>
+                                    </thead>
+            
+                                    @if($agencyJoinRequests && $agencyJoinRequests->count())
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($agencyJoinRequests as $index => $agencyJoinRequest)
+                                            @php
+                                                $user = $agencyJoinRequest->user;
+                                                $name = $user->name ?? '-';
+                                                $uid = $user->uuid ?? '-';
+                                                $avatarPath = $user->profile?->avatar;
+                                                $defaultImage = asset("images/businessman-icon.jpg");
+                                                $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                if (!isImageExists($avatarUrl)) {
+                                                    $avatarUrl = $defaultImage;
+                                                }
+                                                $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
+            
+                                                $iconUrl = asset('images/whatsapp.png');
+                                                $country = $user->country;
+                                                $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
+                                                $countryFlag = getImagePath($country?->flag ?? '');
+                                            @endphp
+            
+                                            <tr>
+                                                <td>{{ $agencyJoinRequests->firstItem() + $index }}</td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                                        {!! $image !!}
+                                                        <div>
+                                                            <strong>{{ $name }}</strong><br>
+                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center;">
+                                                        <span>{{ $agencyJoinRequest->whatsapp }}</span>
+                                                        <img src="{{ $iconUrl }}" alt="WhatsApp" width="20" height="20" style="margin-left: 5px; filter: invert(1);">
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; align-items: start;">
+                                                        <span>{{ $countryName }}</span>
+                                                        @if($countryFlag)
+                                                            <img src="{{ $countryFlag }}" alt="Flag" width="20" height="20" style="margin-top: 3px; filter: invert(1);">
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                    <td>
+                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
+                                                        </form>
+                                                    
+                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
+                                                            @csrf
+                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
+                                                        </form>
+                                                    </td>
+                                             
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
+            
+                        <div class="pagination-container mt-3">
+                            {{ $agencyJoinRequests->appends([
+                                'members_page' => $members->currentPage(),
+                                'salaries_page' => $salaries->currentPage(),
+                                'charges_page' => $charges->currentPage()
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            </div> --}}
             
         </div>
 
@@ -557,5 +854,3 @@
 
 
     </script>
-</body>
-

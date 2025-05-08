@@ -3,6 +3,7 @@
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Models\Room;
+use App\Admin\Controllers\AgencyControllers\UserController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -265,6 +266,7 @@ Route::group(
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         $router->post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
+        $router->post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         $router->resource('families', 'FamilyController');
         $router->resource('targets', 'TargetController');
         Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf');
@@ -419,9 +421,9 @@ Route::group(
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->group(function (Router $router) {
             $router->get('/', 'HomeController@infoBox')->name('home');
-            $router->get('/users', 'UserController@index')->name('users');
-            $router->get('/users/{id}/edit', 'UserController@edit');
-            $router->get('/users/{id}', 'UserController@show');
+            $router->resource('/users', UserController::class);
+            // $router->get('/users/{id}/edit', 'UserController@edit');
+            // $router->get('/users/{id}', 'UserController@show');
             $router->get('/userTarget', 'UserTargetController@index')->name('userTarget');
             $router->get('/target', 'AgencyTargetController@index')->name('targets');
             $router->get('/charges', 'ChargeController@index')->name('charges');
