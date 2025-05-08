@@ -52,7 +52,7 @@ class PaymentCoin extends Model
 
     public function settings(): HasMany
     {
-        return $this->hasMany(Setting::class);
+        return $this->hasMany(Setting::class, 'item_id', 'id');
     }
 
     public function coins()

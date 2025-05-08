@@ -1106,7 +1106,7 @@
                                                             <label for="{{ $setting->key }}">
                                                                 {{ __('admin.'.$setting->key) }}
                                                             </label>
-                                                            @if($setting->type == 'input')
+                                                            @if($setting->input_type == 'input')
                                                                 <input type="text"
                                                                        id="{{ $setting->key }}"
                                                                        name="{{ $setting->key }}"
@@ -1114,7 +1114,7 @@
                                                                        value="{{ $settings[$setting->key] ?? $setting->value ?? '' }}"
                                                                        class="form-control"
                                                                        required>
-                                                            @elseif($setting->type == 'file')
+                                                            @elseif($setting->input_type == 'file')
                                                                 <input type="file"
                                                                        id="{{ $setting->key }}"
                                                                        name="{{ $setting->key }}"
@@ -1130,7 +1130,8 @@
                                     </form>
                                 </div>
                             @endforeach
-{{--                            <!-- Fawry Fields -->--}}
+
+                            {{--                            <!-- Fawry Fields -->--}}
 {{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
 {{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
 {{--                                    @csrf--}}
