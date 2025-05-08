@@ -61,10 +61,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($fawry_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $fawry_id,
+                'item_id' => $fawry_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -111,10 +111,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($pay_sky_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $pay_sky_id,
+                'item_id' => $pay_sky_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -165,10 +165,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($strip_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $strip_id,
+                'item_id' => $strip_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -224,10 +224,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($opay_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $opay_id,
+                'item_id' => $opay_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -274,10 +274,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($cashfree_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $cashfree_id,
+                'item_id' => $cashfree_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -330,10 +330,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($applepay_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $applepay_id,
+                'item_id' => $applepay_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -375,10 +375,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($mada_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $mada_id,
+                'item_id' => $mada_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -420,10 +420,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($liqpay_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $liqpay_id,
+                'item_id' => $liqpay_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -465,10 +465,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($paypal_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $paypal_id,
+                'item_id' => $paypal_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -516,10 +516,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($paytm_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $paytm_id,
+                'item_id' => $paytm_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -566,10 +566,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($paytabs_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $paytabs_id,
+                'item_id' => $paytabs_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -622,10 +622,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($bkash_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $bkash_id,
+                'item_id' => $bkash_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -666,10 +666,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($razorpay_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $razorpay_id,
+                'item_id' => $razorpay_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -716,10 +716,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($senangpay_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $senangpay_id,
+                'item_id' => $senangpay_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -777,10 +777,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($paymob_accept_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $paymob_accept_id,
+                'item_id' => $paymob_accept_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -827,10 +827,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($flutterwave_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $flutterwave_id,
+                'item_id' => $flutterwave_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -883,10 +883,10 @@ class PaymentGatewaysSeeder extends Seeder
         foreach ($paystack_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
-                'payment_id' => $paystack_id,
+                'item_id' => $paystack_id,
                 'type' => 'payment'
             ], [
-                'value' => $value['value']
+                'value' => $value['value'],'type' => $value['type']
             ]);
         }
 
@@ -928,10 +928,10 @@ class PaymentGatewaysSeeder extends Seeder
                 foreach ($sslcommerz_fields as $key => $value) {
                     Setting::updateOrCreate([
                         'key' => $value['name'],
-                        'payment_id' => $sslcommerz_id,
+                        'item_id' => $sslcommerz_id,
                         'type' => 'payment'
                     ], [
-                        'value' => $value['value']
+                        'value' => $value['value'],'type' => $value['type']
                     ]);
                 }
     }
