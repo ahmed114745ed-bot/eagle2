@@ -264,7 +264,6 @@ Route::group(
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
         $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-        $router->get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         $router->post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         $router->post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         $router->post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
