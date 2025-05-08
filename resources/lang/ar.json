@@ -2206,8 +2206,27 @@
 "wallet-transactions": "معاملات المحفظة",
 "WalletTransaction": "معاملة محفظة",
   "vip_alert_message": "⚠️ الرجاء إضافة الامتيازات إلى VIP.",
-  "vip_alert_button": "اضافة"
-
+  "vip_alert_button": "اضافة",
+  "Agency Stars": "نجوم الوكالة",
+  "Agency Admins": "مشرفو الوكالة",
+  "Members": "الأعضاء",
+  "Charges": "الشحنات",
+  "Join Requests": "طلبات الانضمام",
+  "Targets": "الأهداف",
+  "Agency Members": "أعضاء الوكالة",
+  "Live Hours": "ساعات البث",
+  "Role": "الدور",
+  "Agency join request": "طلب الانضمام إلى الوكالة",
+  "WhatsApp": "واتساب",
+  "Country": "الدولة",
+  "Action": "الإجراء",
+  "Make Admin": "تعيين كمشرف",
+  "All Months": "جميع الشهور",
+  "All Years": "جميع السنوات",
+  "Agency Rate": "تقييم الوكالة",
+  "Agency Heroes": "أبطال الوكالة",
+  "Supporters": "الداعمون",
+  "Remaining": "المتبقي"
 
 
 
