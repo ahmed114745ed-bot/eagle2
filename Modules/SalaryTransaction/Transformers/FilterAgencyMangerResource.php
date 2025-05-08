@@ -16,6 +16,15 @@ class FilterAgencyMangerResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $type = '';
+        if (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 1)) {
+            $type = 'hosts and shipping';
+        } elseif (($this->ownAgency?->Shipping_agency == 0) && ($this->ownAgency?->Host_agency == 1)) {
+            $type = 'hosts';
+        } elseif (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 0)) {
+            $type = 'shipping';
+        }
         return [
             'id' => $this->id,
             'agency_id' => (string)$this->agency_id ?? '0',
@@ -28,7 +37,7 @@ class FilterAgencyMangerResource extends JsonResource
                 'id' => $this->ownAgency?->id ?? 0,
                 'name' => @$this->ownAgency?->name ?? '',
                 'image' => @$this->ownAgency?->img ?? '',
-                'agency_type' => $this->ownAgency?->Shipping_agency == 1 ? 'shipping' : 'hosts',
+                'agency_type' => $type,
             ],
         ];
     }
