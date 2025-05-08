@@ -1885,6 +1885,7 @@
     "stripe": "ستريب",
     "fawry": "فوري",
     "oPay": "أو باي",
+    "opay": "أو باي",
     "Brand settings" : "إعدادات العلامة التجارية",
     "Theme settings" : "إعدادات اللون",
 
@@ -2206,7 +2207,7 @@
 "WalletTransaction": "معاملة محفظة",
   "vip_alert_message": "⚠️ الرجاء إضافة الامتيازات إلى VIP.",
   "vip_alert_button": "اضافة"
-  
+
 
 
 
