@@ -20,6 +20,9 @@ trait PreventDeleteIfCreatedByDeveloper
         });
 
         static::updating(function ($model) {
+            if (Request::is('admin/login*')) {
+                return;
+            }
             if (self::shouldBlock($model)) {
                 self::failWithToastr(__('update_not_allowed_div'));
                 return false;
