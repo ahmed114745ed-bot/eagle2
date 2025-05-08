@@ -45,11 +45,10 @@ trait PreventDeleteIfCreatedByDeveloper
         $isApi = Request::is('api/*');
         $admin = Admin::user();
         $developerId = env('DEVELOPER_ADMIN_ID', 1); 
-
         return !$isApi &&
             $admin &&
             ($model->created_by == $developerId || is_null($model->created_by)) &&
-            $admin->id !== $developerId;
+           intval( $admin->id) !== intval($developerId);
     }
 
     protected static function failWithToastr($message)
