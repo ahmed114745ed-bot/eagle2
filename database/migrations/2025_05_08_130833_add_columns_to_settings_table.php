@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_coins', function (Blueprint $table) {
-            $table->json('fields')->nullable();
+        Schema::table('settings', function (Blueprint $table) {
+            $table->string('type')->nullable();
+            $table->foreignId('payment_coin_id')->nullable()->constrained('payment_coins')->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('payment_coins', function (Blueprint $table) {
-            $table->dropColumn('fields');
+        Schema::table('settings', function (Blueprint $table) {
+            //
         });
     }
 };

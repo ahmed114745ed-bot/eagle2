@@ -480,6 +480,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
                 Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);
+                Route::get('stars/{id}', [AgencyController::class, 'star']);
+                Route::get('heroes/{id}', [AgencyController::class, 'heroes']);
                 Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
                 Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
                 Route::get('show_request', [AgencyController::class, 'show_request']);

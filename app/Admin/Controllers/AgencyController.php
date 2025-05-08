@@ -78,8 +78,8 @@ class AgencyController extends MainController
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
+        $tab = request('tab') ?? null;
         $cacheKey = "agency_profile_{$id}";
-        // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
         $agency = Agency::with([
             'admins',
             'charges' => function ($query) {
@@ -122,9 +122,9 @@ class AgencyController extends MainController
             ->paginate(10, ['*'], 'salary_page');
 
         $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
-            // 
             ->with('user')
-            ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
+            ->whereHas('user')->orderByDesc('id')
+            ->paginate(10, ['*'], 'join_page');
 
         $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
@@ -135,11 +135,10 @@ class AgencyController extends MainController
 
         $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
         $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes');
-        // });
-
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
         return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);
+            ->view('agency_profile', $data);   
+
     }
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)

@@ -16,7 +16,9 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Resources\Api\V1\AgencyDetailsResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
+use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
+use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 
 class AgencyController extends Controller
@@ -70,12 +72,41 @@ class AgencyController extends Controller
     public function agencyTargetDetails($id, Request $request)
     {
         try {
-            $data = $this->agencyService->agencyTarget($id, $request);
+            $response = $this->agencyService->agencyTarget($id, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '',  $data);
+        return Common::apiResponse(
+            1,
+            $response['message'],
+            $response['data'],
+            $response['status'],
+            '',
+            'users_target'
+        );
+    }
+
+    public function star($id, Request $request)
+    {
+        try {
+            $data = $this->agencyService->stars($id, $request);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  ReceiverGiftLogResource::collection($data) ,200);
+    }
+
+    public function heroes($id, Request $request)
+    {
+        try {
+            $data = $this->agencyService->heroes($id, $request);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '',  SenderGiftLogResource::collection($data), 200);
     }
 
     public function agencyMembers(Request $request)
