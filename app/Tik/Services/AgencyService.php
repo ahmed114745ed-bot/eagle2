@@ -119,10 +119,17 @@ class AgencyService
         $result = (@$minValue->agency_share / 100) * @$target;
         $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year);
 
+        
+
         return [
-            'target' => $target,
+            'success' => true,
+            'message' => 'successfully',
+            'data' => [
+                'target' => $target,
             'rate_percentage' => $result,
             'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+            ],
+            'status' => 200,
         ];
     }
 
