@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Target;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -11,6 +13,7 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
+use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use Encore\Admin\Widgets\Tab;
@@ -71,8 +74,10 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content)
+    public function profile($id, Request $request, Content $content)
     {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
         $cacheKey = "agency_profile_{$id}";
         // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
         $agency = Agency::with([
@@ -102,9 +107,9 @@ class AgencyController extends MainController
         }
 
         $agency->display_image = $imageUrl;
-
+        $agencyId = $agency->id;
         $members = $agency->mempers()
-            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received','agency_id', 'country_id')->with('country', 'agencyUserJob')
+            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
             ->paginate(10, ['*'], 'members_page');
 
         $charges = $agency->charges()
@@ -123,12 +128,36 @@ class AgencyController extends MainController
 
         $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+        $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+            $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        }])->paginate(10, ['*'], 'target_page');
+        [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
 
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog');
+        $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+        $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate','stars','heroes');
         // });
 
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
+    }
+
+    public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
+    {
+        return  GiftLog::where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
+            ->selectRaw("sum(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->get()->reject(function ($q) {
+                return $q->exp == 0;
+            });
+    }
+
+    public function rateAgency($agencyId, $month, $year)
+    {
+        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+        $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
+        $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
+        return [$agencyTarget, $rate];
     }
 
     public function update($id)

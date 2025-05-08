@@ -209,6 +209,9 @@
             width: 100%;
             margin-top: 15px;
         }
+        html {
+            scroll-behavior: smooth;
+        }
         .star-wrapper {
             position: relative;
             transition: all 0.3s ease;
@@ -409,7 +412,7 @@
                 <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
                 <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
-                <button onclick="showSection('target')">{{ __('target') }}</button>
+                <button onclick="showSection('userTargets')">{{ __('targets') }}</button>
             </div>
         </div>
               
@@ -494,7 +497,7 @@
 
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
-                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
@@ -554,7 +557,7 @@
                             </div>
 
                             <div class="pagination-container">
-                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                             </div>
 
                     </div>
@@ -598,7 +601,8 @@
 
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
-                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage(),
+                                        'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
@@ -698,54 +702,197 @@
                             {{ $agencyJoinRequests->appends([
                                 'members_page' => $members->currentPage(),
                                 'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage()
+                                'charges_page' => $charges->currentPage(),
+                                'target_page'  => $memberTargets->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- <div id="joinAgency" class="settings-section">
+            <div id="userTargets" class="settings-section">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
-            
+                        <h4 class="card-title text-left">{{ __('target') }}</h4>
+                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <select name="month" id="month" class="form-select">
+                                            <option value="">All Months</option>
+                                            @for($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <label for="month">{{ __('Month') }}</label>
+                                    </div>
+                                </div>
+                        
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <select name="year" id="year" class="form-select">
+                                            <option value="">All Years</option>
+                                            @for($y = now()->year; $y >= 2020; $y--)
+                                                <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                    {{ $y }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <label for="year">{{ __('Year') }}</label>
+                                    </div>
+                                </div>
+                        
+                                <div class="col-md-2 d-flex">
+                                    <button type="submit" class="btn btn-primary flex-grow-1">
+                                        <i class="fas fa-filter me-2"></i> {{ __('Apply') }}
+                                    </button>
+                                    @if(request()->has('month') || request()->has('year'))
+                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ms-2" title="Reset filters">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                        <br>
+                        <div class="stars-section">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class="fas fa-star"></i>
+                                    {{ __('نجوم الوكالة') }}
+                                </h2>
+                            </div>
+                            
+                            @if($stars && $stars->count())
+                                <div class="stars-container">
+                                    @foreach($stars as $log)
+                                        @php
+                                            $user = $log->receiver;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
+                                        @endphp
+                                        
+                                        <div class="star-wrapper" 
+                                            onclick="window.location.href='{{ $userUrl }}'"
+                                            title="{{ $username }} ({{ $exp }} EXP)">
+                                            <img src="{{ $url }}" 
+                                                alt="{{ $username }}"
+                                                class="star-avatar">
+                                            <div class="star-badge">{{ $exp }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="no-data">{{ __('No stars data available') }}</p>
+                            @endif
+                        </div>
+                    
+                        <!-- Admins Section -->
+                        <div class="stars-section">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class="fas fa-user-shield"></i>
+                                    {{ __('ابطال الوكالة') }}
+                                </h2>
+                            </div>
+                            
+                            @if($heroes && $heroes->count())
+                                <div class="stars-container">
+                                    @foreach($heroes as $log)
+                                        @php
+                                            $user = $log->sender;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
+                                        @endphp
+                                        
+                                        <div class="star-wrapper" 
+                                            onclick="window.location.href='{{ $userUrl }}'"
+                                            title="{{ $username }} ({{ $exp }} EXP)">
+                                            <img src="{{ $url }}" 
+                                                alt="{{ $username }}"
+                                                class="star-avatar">
+                                            <div class="star-badge">{{ $exp }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="no-data">{{ __('لا يوجد ابطال للوكالة') }}</p>
+                            @endif
+                        </div>
+                        <br>
+                        <div class="modal-body">
+
+                            <div class="row">
+                              <!-- Card 1 -->
+                              <div class="col-md-6">
+                                <div class="card">
+     
+                                  <div class="card-body">
+                                    <h3 class="card-title">{{' target'}}</h3>
+                                    <p class="card-text">{{$agencyTarget}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                    
+                              <!-- Card 2 -->
+                              <div class="col-md-6">
+                                <div class="card">
+                                 
+                                  <div class="card-body">
+                                    <h3 class="card-title">{{ 'agency rate'}}</h3>
+                                    <p class="card-text">{{$rate}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                    
+                          
+                        </div>
                         <div class="table-responsive">
                             <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="join">
+                                <table class="table table-hover grid-table" id="target">
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>{{ __('User') }}</th>
-                                            <th>{{ __('WhatsApp') }}</th>
-                                            <th>{{ __('Country') }}</th>
-                                            <th>{{ __('Action') }}</th>
+                                            <th>{{ __('user') }}</th>
+                                            <th>{{ __('diamond') }}</th>
+                                            <th>{{ __('remaining diamonds') }}</th>
+                                            <th>{{ __('days') }}</th>
+                                            <th>{{ __('hours') }}</th>
+                                            <th>{{ __('supporters') }}</th>
                                         </tr>
                                     </thead>
             
-                                    @if($agencyJoinRequests && $agencyJoinRequests->count())
+                                    @if($memberTargets && $memberTargets->count())
                                     <tbody style="color: rgb(208, 115, 43);">
-                                        @foreach($agencyJoinRequests as $index => $agencyJoinRequest)
+                                        @foreach($memberTargets as $index => $memberTarget)
                                             @php
-                                                $user = $agencyJoinRequest->user;
-                                                $name = $user->name ?? '-';
-                                                $uid = $user->uuid ?? '-';
-                                                $avatarPath = $user->profile?->avatar;
+                                                
+                                                $name = $memberTarget->name ?? '-';
+                                                $uid = $memberTarget->uuid ?? '-';
+                                                $avatarPath = $memberTarget->profile?->avatar;
                                                 $defaultImage = asset("images/businessman-icon.jpg");
                                                 $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
                                                 if (!isImageExists($avatarUrl)) {
                                                     $avatarUrl = $defaultImage;
                                                 }
-                                                $image = handleShowImageWithTypes($user->id, $avatarUrl, 40, 40);
+                                                $image = handleShowImageWithTypes($memberTarget->id, $avatarUrl, 40, 40);
             
-                                                $iconUrl = asset('images/whatsapp.png');
-                                                $country = $user->country;
-                                                $countryName = app()->getLocale() == 'ar' ? $country?->name : $country?->e_name;
-                                                $countryFlag = getImagePath($country?->flag ?? '');
+                                               
                                             @endphp
             
                                             <tr>
-                                                <td>{{ $agencyJoinRequests->firstItem() + $index }}</td>
+                                                <td>{{ $memberTargets->firstItem() + $index }}</td>
             
                                                 <td>
                                                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -758,31 +905,21 @@
                                                 </td>
             
                                                 <td>
-                                                    <div style="display: flex; align-items: center;">
-                                                        <span>{{ $agencyJoinRequest->whatsapp }}</span>
-                                                        <img src="{{ $iconUrl }}" alt="WhatsApp" width="20" height="20" style="margin-left: 5px; filter: invert(1);">
-                                                    </div>
+                                                  {{$memberTarget->targets->first()->user_diamonds ?? 0}}
                                                 </td>
             
                                                 <td>
-                                                    <div style="display: flex; flex-direction: column; align-items: start;">
-                                                        <span>{{ $countryName }}</span>
-                                                        @if($countryFlag)
-                                                            <img src="{{ $countryFlag }}" alt="Flag" width="20" height="20" style="margin-top: 3px; filter: invert(1);">
-                                                        @endif
-                                                    </div>
+                                                    {{$memberTarget->targets->first()->next_diamond ?? 0}}
                                                 </td>
-                                                    <td>
-                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
-                                                        </form>
-                                                    
-                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
-                                                        </form>
-                                                    </td>
+                                                <td>
+                                                   {{$memberTarget->targets->first()->user_hours ?? 0}}
+                                                </td>
+                                                <td>
+                                                  {{$memberTarget->targets->first()->user_days ?? 0}}
+                                                </td>
+                                                <td>
+                                                    {{$memberTarget->targets->first()->user_days ?? 0}}
+                                                </td>
                                              
                                             </tr>
                                         @endforeach
@@ -793,15 +930,18 @@
                         </div>
             
                         <div class="pagination-container mt-3">
-                            {{ $agencyJoinRequests->appends([
+                            {{ $memberTargets->appends([
                                 'members_page' => $members->currentPage(),
                                 'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage()
+                                'charges_page' => $charges->currentPage(),
+                                'join_page' => $agencyJoinRequests->currentPage(),
+                                'month' => request('month'),
+                                'year' => request('year'),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
             
         </div>
 
