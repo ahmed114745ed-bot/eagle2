@@ -726,9 +726,13 @@
      "wallet-transactions": "Wallet Transactions",
      "WalletTransaction": "Wallet Transaction",
    "vip_alert_message": "⚠️ Please add privileges to VIP.",
-  "vip_alert_button": "Add Now",
-  "delete_not_allowed_div": "❌ This is a demo version. Operation not allowed.",
-  "update_not_allowed_div": "❌ This is a demo version. Operation not allowed.",
-  "create_not_allowed_dev": "❌ This is a demo version. Operation not allowed.",
-  "error_title_div": "Operation Error"
-    }
+  "vip_alert_button": "Add Now"
+
+  ,
+    "are_you_sure_accept": "Are you sure you want to accept the request?",
+    "are_you_sure_reject": "Are you sure you want to reject the request?",
+    "are_you_sure_make_admin": "Are you sure you want to make this user an admin?",
+    "failed_accept_request": "Failed to accept the request. Please try again.",
+    "failed_reject_request": "Failed to reject the request. Please try again.",
+    "failed_make_admin": "Failed to make the user an admin. Please try again."
+}

@@ -11,7 +11,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 
-class BackgroundController extends Controller
+class BackgroundController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'room-background';

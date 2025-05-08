@@ -32,7 +32,7 @@ class SettingController extends MainController
         $videoLibrary = Common::getConfig('video_library');
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
-        $paymentCoins = PaymentCoin::all();
+        $paymentCoins = PaymentCoin::with('settings')->get();
 
         $pusher_app_id = Common::getConf('pusher_app_id');
         $pusher_app_key = Common::getConf('pusher_app_key');

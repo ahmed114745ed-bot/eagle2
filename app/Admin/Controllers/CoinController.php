@@ -148,11 +148,11 @@ class CoinController extends MainOldController
     {
         //$unique_id = $data['apple_id'];
         $teamId = config('apple.apple_team_id'); // Use the correct environment variable name
-        $keyId = "GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $keyId = config('apple.apple_key_id');//"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
         $redirectUri = config('apple.apple_redirect_uri'); // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
-        $keyContent = file_get_contents(config('apple.service_file'));
+        $keyContent = file_get_contents(config('apple.apple_service_file'));
         $token = JWT::encode([
             'iss' => '732cdce3-47cc-4d3d-ba88-8d2a84701f77',
             'iat' => $iat,
@@ -189,12 +189,12 @@ class CoinController extends MainOldController
         return Common::apiResponse(true, '', $response, 200);
     }
 
-    protected function setPrice(Request $request)
+    protected function setPrice(Request $request): void
     {
-        $keyId = "GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
+        $keyId = config('apple.apple_key_id');//"GNDGZ4LFR4"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
         $iat = strtotime('now');
         $exp = strtotime('+60days');
-        $keyContent = file_get_contents(config('apple.service_file'));
+        $keyContent = file_get_contents(config('apple.apple_service_file'));
         $token = JWT::encode([
             'iss' => '732cdce3-47cc-4d3d-ba88-8d2a84701f77',
             'iat' => $iat,

@@ -2120,9 +2120,27 @@
 "WalletTransaction": "Cüzdan İşlemi",
   "vip_alert_message": "⚠️ Lütfen VIP'ye ayrıcalıkları ekleyin.",
   "vip_alert_button": "Şimdi",
-  "delete_not_allowed_div": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
-  "update_not_allowed_div": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
-  "create_not_allowed_dev": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
-  "error_title_div": "İşlem Hatası"
+  "Agency Stars": "Ajans Yıldızları",
+  "Agency Admins": "Ajans Yöneticileri",
+  "Members": "Üyeler",
+  "Charges": "Ücretler",
+  "Join Requests": "Katılma Talepleri",
+  "Targets": "Hedefler",
+  "Agency Members": "Ajans Üyeleri",
+  "Live Hours": "Canlı Saatler",
+  "Role": "Rol",
+  "Agency join request": "Ajansa Katılma Talebi",
+  "WhatsApp": "WhatsApp",
+  "Country": "Ülke",
+  "Action": "İşlem",
+  "Make Admin": "Yönetici Yap",
+  "All Months": "Tüm Aylar",
+  "All Years": "Tüm Yıllar",
+  "Agency Rate": "Ajans Değerlendirmesi",
+  "Agency Heroes": "Ajans Kahramanları",
+  "Supporters": "Destekçiler",
+  "Remaining": "Kalan"
+  
+
 
 }

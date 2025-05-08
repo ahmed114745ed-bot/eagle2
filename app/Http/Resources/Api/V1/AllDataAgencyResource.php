@@ -36,6 +36,14 @@ class AllDataAgencyResource extends JsonResource
         $authUser = Auth::user();
         $owner = @$authUser->ownAgency;
         $admin = @$authUser->agencyUserJob;
+        $type = '';
+        if (($this->Shipping_agency == 1) && ($this->Host_agency == 1)) {
+            $type = 'hosts and shipping';
+        } elseif (($this->Shipping_agency == 0) && ($this->Host_agency == 1)) {
+            $type = 'hosts';
+        } elseif (($this->Shipping_agency == 1) && ($this->Host_agency == 0)) {
+            $type = 'shipping';
+        }
 
         // $target =Target::where('level',$this->id)->first();
         // // $target_usd =Agency::where('id',$this->id)->sum('target_usd');
@@ -51,7 +59,7 @@ class AllDataAgencyResource extends JsonResource
             'phone' => $this->phone ?: 0,
             // 'url'=>$this->url,
             'img' => $this->img ?: '',
-            'agency_type' => $this->Shipping_agency == 1 ? 'shipping' : 'hosts',
+            'agency_type' => $type,
             'num_of_hosts'      => $this->mempers->count(),
             // 'contents'=>$this->contents,
             'owner' => new MyDataForAgancyResource($this->owner) ?: [

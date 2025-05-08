@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Target;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -11,6 +13,7 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
+use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use Encore\Admin\Widgets\Tab;
@@ -71,10 +74,12 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content)
+    public function profile($id, Request $request, Content $content)
     {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        $tab = request('tab') ?? null;
         $cacheKey = "agency_profile_{$id}";
-        // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
         $agency = Agency::with([
             'admins',
             'charges' => function ($query) {
@@ -102,9 +107,9 @@ class AgencyController extends MainController
         }
 
         $agency->display_image = $imageUrl;
-
+        $agencyId = $agency->id;
         $members = $agency->mempers()
-            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received','agency_id', 'country_id')->with('country', 'agencyUserJob')
+            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
             ->paginate(10, ['*'], 'members_page');
 
         $charges = $agency->charges()
@@ -117,18 +122,41 @@ class AgencyController extends MainController
             ->paginate(10, ['*'], 'salary_page');
 
         $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
-            // 
             ->with('user')
-            ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
+            ->whereHas('user')->orderByDesc('id')
+            ->paginate(10, ['*'], 'join_page');
 
         $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+        $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+            $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        }])->paginate(10, ['*'], 'target_page');
+        [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
 
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog');
-        // });
-
+        $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+        $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
         return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);
+            ->view('agency_profile', $data);   
+
+    }
+
+    public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
+    {
+        return  GiftLog::where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
+            ->selectRaw("sum(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->get()->reject(function ($q) {
+                return $q->exp == 0;
+            });
+    }
+
+    public function rateAgency($agencyId, $month, $year)
+    {
+        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+        $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
+        $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
+        return [$agencyTarget, $rate];
     }
 
     public function update($id)
@@ -834,13 +862,28 @@ class AgencyController extends MainController
 
     public function acceptJoin($id)
     {
+
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user', 'agency')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
         $user = $agencyJoinRequest->user;
-        if (!$user) return back()->with('error', ('user not found'));
+
+        if (!$user) return response()->json([
+            'status' => false,
+            'message' => __(' user Not found')
+        ], 404);
         $agency = $agencyJoinRequest->agency;
-        if (!$agency) return back()->with('error', __('agency not found'));
-        if ($user->agency_id) return back()->with('error', __('user joined in another agency'));
+        if (!$agency) return response()->json([
+            'status' => false,
+            'message' => __(' agency Not found')
+        ], 404);
+        if ($user->agency_id) return response()->json([
+            'status' => false,
+            'message' => __('user joined agency before')
+        ], 404);
+        // dd($agency,$user->agency_id);
         $agencyJoinRequest->status = 1;
         $agencyJoinRequest->save();
 
@@ -860,34 +903,49 @@ class AgencyController extends MainController
         // add vip to user
         UserCommon::userVip($user);
         CustomNotification::acceptAgencyApp($agency, $user);
-        return  redirect()->back()->with('success', __('Joined successfully'));;
+
+        return  response()->json([
+            'status' => true,
+            'message' => __('Joined successfully')
+        ]);
     }
 
     public function adminAgency($id)
     {
-
         $user = User::Find($id);
         $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->exists();
-        if ($admin) redirect()->back()->with('error', __(' this user admin in  this agency'))->refresh();
+        if ($admin) return response()->json([
+            'status' => false,
+            'message' => __('this user admin in  this agency')
+        ], 404);
         $data = [
             'agency_id' => $user->agency_id,
             'user_id' => $user->id,
             'type' => "requestManger",
         ];
+        AgencyUserJob::create($data);
 
-
-        return redirect()->back()->with('success', __('successfully'));
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 
     public function rejectJoin($id)
     {
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) return response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
 
         $agencyJoinRequest->status = 2;
         $agencyJoinRequest->save();
 
-        return redirect()->back()->with('success', __('Rejected successfully'));
+        return response()->json([
+            'status' => true,
+            'message' => __('Rejected successfully')
+        ]);
     }
 
     public function members($agencyId)

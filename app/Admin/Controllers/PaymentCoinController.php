@@ -168,15 +168,36 @@ class PaymentCoinController extends MainController
     {
         $form = new Form(new PaymentCoin());
 
-        $form->select('title', trans('Title'))
-         ->options(PaymentType::getTranslatedOptions())
-         ->creationRules(['required', "unique:payment_coins,title,{{id}}"])->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
+        $form->text('title', __('Title'))
+            ->creationRules(['required', "unique:payment_coins,title,{{id}}"])
+            ->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
+
         $form->image('photo', __('Photo'));
+
+        $form->hasMany('settings', 'Fields', function ($form) {
+            $form->text('key', 'Input Name')
+                ->rules(function ($form) {
+                    $itemId = request()->route('items'); // Or get item id based on your routing
+                    $id = $form->model ? $form->model->id : null;
+
+                    return [
+                        'required',
+                        "unique:settings,key,$id,id,item_id,$itemId"
+                    ];
+                });
+            $form->text('value', 'Input Value')->required();
+            $form->select('input_type', 'Input Type')->options([
+                'input' => 'Input',
+                'file' => 'File',
+            ])->required();
+            $form->hidden('type')->default('payment');
+        });
+
         $status = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
-        $form->switch('status', __('status'))->states($status)->default(1);;
+        $form->switch('status', __('status'))->states($status)->default(1);
 
         return $form;
     }
