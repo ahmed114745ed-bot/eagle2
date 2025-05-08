@@ -138,7 +138,7 @@ return [
     'fakeName' => ' deleted user',
     'vip_not_found' => 'vip not found',
     "feature_not_avilable"=>"This feature has not been activated for you!",
-
+    "whatsapp_inactive" => "The WhatsApp service is currently not active.",
     'updated'                                                   => 'updated successfully',
     'deleted'                                                   => 'deleted successfully',
     'leave_agency'=>"You cannot make a leave agency after 10 per month! ",

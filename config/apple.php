@@ -5,5 +5,4 @@ return [
     'apple_client_id' => env('APPLE_CLIENT_ID'),
     'apple_redirect_uri' => env('APPLE_REDIRECT_URI'),
     'service_file' => env('SERVICE_FILE'),
-    
 ];

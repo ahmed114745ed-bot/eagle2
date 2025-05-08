@@ -112,6 +112,45 @@
             border: 3px solid #ff9800;
             margin-bottom: 15px;
         }
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title i {
+            margin-left: 10px;
+            font-size: 20px;
+        }
+        .stars-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+        }
+        .stars-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         .details {
             text-align: left;
             margin-top: 10px;
@@ -123,6 +162,42 @@
             margin: 5px 0;
             font-size: 16px;
         }
+        .star-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .star-wrapper:hover .star-avatar {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .star-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--card-bg);
+            font-weight: bold;
+        }
+
+        .admin-badge {
+            background: var(--success-color);
+        }
+
         /*.details strong {*/
         /*    color: #ff9800;*/
         /*}*/
@@ -134,7 +209,14 @@
             width: 100%;
             margin-top: 15px;
         }
-
+        html {
+            scroll-behavior: smooth;
+        }
+        .star-wrapper {
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
         /* Table styles */
         .table-responsive {
             overflow-x: auto;
@@ -200,6 +282,18 @@
                 max-width: none;
             }
         }
+
+        @media (max-width: 480px) {
+            
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .stars-container {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -238,6 +332,78 @@
             <button onclick="window.history.back()">{{__("Go Back")}}</button>
         </div>
 
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i>
+                    {{ __('نجوم الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($giftLog && $giftLog->count())
+                <div class="stars-container">
+                    @foreach($giftLog as $log)
+                        @php
+                            $user = $log->receiver;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                            $exp = number_format($log->exp);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }} ({{ $exp }} EXP)">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge">{{ $exp }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('No stars data available') }}</p>
+            @endif
+        </div>
+    
+        <!-- Admins Section -->
+        <div class="stars-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-shield"></i>
+                    {{ __('ادمن الوكالة') }}
+                </h2>
+            </div>
+            
+            @if($agency->admins && $agency->admins->count())
+                <div class="stars-container">
+                    @foreach($agency->admins as $admin)
+                        @php
+                            $user = $admin->user;
+                            $path = $user->profile?->avatar ?? null;
+                            $defaultImage = asset("images/businessman-icon.jpg");
+                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                            $userUrl = route('admin.users.show', $user->id);
+                        @endphp
+                        
+                        <div class="star-wrapper" 
+                            onclick="window.location.href='{{ $userUrl }}'"
+                            title="{{ $username }}">
+                            <img src="{{ $url }}" 
+                                alt="{{ $username }}"
+                                class="star-avatar">
+                            <div class="star-badge admin-badge"><i class="fas fa-shield-alt"></i></div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-data">{{ __('لا يوجد ادمن للوكالة') }}</p>
+            @endif
+        </div>
+
 
 
         <div class="settings-sidebar">
@@ -246,6 +412,7 @@
                 <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
                 <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
                 <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
+                <button onclick="showSection('userTargets')">{{ __('targets') }}</button>
             </div>
         </div>
               
@@ -271,10 +438,13 @@
                                                 <th>{{ __('total_hours') }}</th>
                                                 <th>{{ __('Monthly DI') }}</th>
                                                 <th>{{ __('salary') }}</th>
+                                                <th>{{ __('type') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($members as $index => $member)
+                                           
+                                           
                                                 <tr>
                                                     <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
                                                     <td>{{ @$member->name ?? '' }}</td>
@@ -288,6 +458,35 @@
                                                     <td>{{ $member->liveTime->sum("hours") }}</td>
                                                     <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
                                                     <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                                  
+                                                    <td>
+                                                        @php
+                                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                                                        ->where('agency_id', $member->agency_id)
+                                                                        ->where('type', 'requestManger')
+                                                                        ->exists();
+                                                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                                                        ->where('id', $member->agency_id)->exists();
+                                                        @endphp
+                                                
+                                                            @if($isOwner)
+                                                            <div class="text-center">
+                                                                <span class="badge badge-dark fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                    {{ __('Owner') }}
+                                                                </span>
+                                                            </div>
+                                                        @elseif($isAdmin)
+                                                        <div class="text-center">
+                                                            <span class="badge badge-success fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
+                                                                {{ __('Admin') }}
+                                                            </span>
+                                                        </div>
+                                                        @else
+                                                        <button class="btn btn-sm btn-primary make-admin-btn" data-id="{{ $member->id }}">
+                                                            {{ __('Make Admin') }}
+                                                        </button>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -295,7 +494,7 @@
 
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
-                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
@@ -355,7 +554,7 @@
                             </div>
 
                             <div class="pagination-container">
-                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                             </div>
 
                     </div>
@@ -399,7 +598,8 @@
 
                                     <!-- Pagination Links -->
                                     <div class="pagination-container">
-                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage()])->links('vendor.pagination.bootstrap-4') }}
+                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage(),
+                                        'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
@@ -475,17 +675,15 @@
                                                         @endif
                                                     </div>
                                                 </td>
-                                                    <td>
-                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
-                                                        </form>
-                                                    
-                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
-                                                        </form>
-                                                    </td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm accept-btn" data-id="{{ $agencyJoinRequest->id }}">
+                                                        {{ __('Accept') }}
+                                                    </button>
+                                                
+                                                    <button class="btn btn-danger btn-sm reject-btn" data-id="{{ $agencyJoinRequest->id }}">
+                                                        {{ __('Reject') }}
+                                                    </button>
+                                                </td>
                                              
                                             </tr>
                                         @endforeach
@@ -499,7 +697,241 @@
                             {{ $agencyJoinRequests->appends([
                                 'members_page' => $members->currentPage(),
                                 'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage()
+                                'charges_page' => $charges->currentPage(),
+                                'target_page'  => $memberTargets->currentPage(),
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="userTargets" class="settings-section">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title text-left">{{ __('target') }}</h4>
+                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <select name="month" id="month" class="form-select">
+                                            <option value="">All Months</option>
+                                            @for($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                    {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <label for="month">{{ __('Month') }}</label>
+                                    </div>
+                                </div>
+                        
+                                <div class="col-md-5">
+                                    <div class="form-floating">
+                                        <select name="year" id="year" class="form-select">
+                                            <option value="">All Years</option>
+                                            @for($y = now()->year; $y >= 2020; $y--)
+                                                <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                    {{ $y }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                        <label for="year">{{ __('Year') }}</label>
+                                    </div>
+                                </div>
+                        
+                                <div class="col-md-2 d-flex">
+                                    <button type="submit" class="btn btn-primary flex-grow-1">
+                                        <i class="fas fa-filter me-2"></i> {{ __('Apply') }}
+                                    </button>
+                                    @if(request()->has('month') || request()->has('year'))
+                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ms-2" title="Reset filters">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </form>
+                        <br>
+                        <div class="stars-section">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class="fas fa-star"></i>
+                                    {{ __('نجوم الوكالة') }}
+                                </h2>
+                            </div>
+                            
+                            @if($stars && $stars->count())
+                                <div class="stars-container">
+                                    @foreach($stars as $log)
+                                        @php
+                                            $user = $log->receiver;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
+                                        @endphp
+                                        
+                                        <div class="star-wrapper" 
+                                            onclick="window.location.href='{{ $userUrl }}'"
+                                            title="{{ $username }} ({{ $exp }} EXP)">
+                                            <img src="{{ $url }}" 
+                                                alt="{{ $username }}"
+                                                class="star-avatar">
+                                            <div class="star-badge">{{ $exp }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="no-data">{{ __('No stars data available') }}</p>
+                            @endif
+                        </div>
+                    
+                        <!-- Admins Section -->
+                        <div class="stars-section">
+                            <div class="section-header">
+                                <h2 class="section-title">
+                                    <i class="fas fa-user-shield"></i>
+                                    {{ __('ابطال الوكالة') }}
+                                </h2>
+                            </div>
+                            
+                            @if($heroes && $heroes->count())
+                                <div class="stars-container">
+                                    @foreach($heroes as $log)
+                                        @php
+                                            $user = $log->sender;
+                                            $path = $user->profile?->avatar ?? null;
+                                            $defaultImage = asset("images/businessman-icon.jpg");
+                                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                            $username = htmlspecialchars($user->name ?? 'Unknown');
+                                            $userUrl = route('admin.users.show', $user->id);
+                                            $exp = number_format($log->exp);
+                                        @endphp
+                                        
+                                        <div class="star-wrapper" 
+                                            onclick="window.location.href='{{ $userUrl }}'"
+                                            title="{{ $username }} ({{ $exp }} EXP)">
+                                            <img src="{{ $url }}" 
+                                                alt="{{ $username }}"
+                                                class="star-avatar">
+                                            <div class="star-badge">{{ $exp }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="no-data">{{ __('لا يوجد ابطال للوكالة') }}</p>
+                            @endif
+                        </div>
+                        <br>
+                        <div class="modal-body">
+
+                            <div class="row">
+                              <!-- Card 1 -->
+                              <div class="col-md-6">
+                                <div class="card">
+     
+                                  <div class="card-body">
+                                    <h3 class="card-title">{{' target'}}</h3>
+                                    <p class="card-text">{{$agencyTarget}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                    
+                              <!-- Card 2 -->
+                              <div class="col-md-6">
+                                <div class="card">
+                                 
+                                  <div class="card-body">
+                                    <h3 class="card-title">{{ 'agency rate'}}</h3>
+                                    <p class="card-text">{{$rate}}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                    
+                          
+                        </div>
+                        <div class="table-responsive">
+                            <div class="box-body table-responsive no-padding">
+                                <table class="table table-hover grid-table" id="target">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ __('user') }}</th>
+                                            <th>{{ __('diamond') }}</th>
+                                            <th>{{ __('remaining diamonds') }}</th>
+                                            <th>{{ __('days') }}</th>
+                                            <th>{{ __('hours') }}</th>
+                                            <th>{{ __('supporters') }}</th>
+                                        </tr>
+                                    </thead>
+            
+                                    @if($memberTargets && $memberTargets->count())
+                                    <tbody style="color: rgb(208, 115, 43);">
+                                        @foreach($memberTargets as $index => $memberTarget)
+                                            @php
+                                                
+                                                $name = $memberTarget->name ?? '-';
+                                                $uid = $memberTarget->uuid ?? '-';
+                                                $avatarPath = $memberTarget->profile?->avatar;
+                                                $defaultImage = asset("images/businessman-icon.jpg");
+                                                $avatarUrl = getImagePath($avatarPath) ?? $defaultImage;
+                                                if (!isImageExists($avatarUrl)) {
+                                                    $avatarUrl = $defaultImage;
+                                                }
+                                                $image = handleShowImageWithTypes($memberTarget->id, $avatarUrl, 40, 40);
+            
+                                               
+                                            @endphp
+            
+                                            <tr>
+                                                <td>{{ $memberTargets->firstItem() + $index }}</td>
+            
+                                                <td>
+                                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                                        {!! $image !!}
+                                                        <div>
+                                                            <strong>{{ $name }}</strong><br>
+                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+            
+                                                <td>
+                                                  {{$memberTarget->targets->first()->user_diamonds ?? 0}}
+                                                </td>
+            
+                                                <td>
+                                                    {{$memberTarget->targets->first()->next_diamond ?? 0}}
+                                                </td>
+                                                <td>
+                                                   {{$memberTarget->targets->first()->user_hours ?? 0}}
+                                                </td>
+                                                <td>
+                                                  {{$memberTarget->targets->first()->user_days ?? 0}}
+                                                </td>
+                                                <td>
+                                                    {{$memberTarget->targets->first()->user_days ?? 0}}
+                                                </td>
+                                             
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                    @endif
+                                </table>
+                            </div>
+                        </div>
+            
+                        <div class="pagination-container mt-3">
+                            {{ $memberTargets->appends([
+                                'members_page' => $members->currentPage(),
+                                'salaries_page' => $salaries->currentPage(),
+                                'charges_page' => $charges->currentPage(),
+                                'join_page' => $agencyJoinRequests->currentPage(),
+                                'month' => request('month'),
+                                'year' => request('year'),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     </div>
@@ -553,9 +985,69 @@
         window.history.pushState({}, '', url);
     }
 
-// Add this to your JavaScript
+
+    $(document).ready(function() {
+    $('.accept-btn').click(function() {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to accept this request?")) {
+            $.post(`/admin/agencies/accept_join/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function(response) {
+                if (response.status) {
+                    alert(response.message); // Show success
+                    location.reload();
+                } else {
+                    alert(response.message); // Show error returned by backend
+                }
+            }).fail(function(xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to accept the request.');
+            });
+        }
+    });
+
+    $('.reject-btn').click(function() {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to reject this request?")) {
+            $.post(`/admin/agencies/reject_join/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function(response) {
+                if (response.status) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function(xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to reject the request.');
+            });
+        }
+    });
+
+    $('.make-admin-btn').click(function () {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to make this user an admin?")) {
+            $.post(`/admin/agencies/admin/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function (response) {
+                if (response.status) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function (xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to make user an admin.');
+            });
+        }
+    });
+
+});
+
+
+
 
 
     </script>
-</body>
-
