@@ -2119,6 +2119,10 @@
 "wallet-transactions": "Cüzdan İşlemleri",
 "WalletTransaction": "Cüzdan İşlemi",
   "vip_alert_message": "⚠️ Lütfen VIP'ye ayrıcalıkları ekleyin.",
-  "vip_alert_button": "Şimdi"
+  "vip_alert_button": "Şimdi",
+  "delete_not_allowed_div": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
+  "update_not_allowed_div": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
+  "create_not_allowed_dev": "❌ Bu bir demo sürümüdür. İşlem yapılamaz.",
+  "error_title_div": "İşlem Hatası"
 
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -36,7 +37,8 @@ use Illuminate\Http\UploadedFile;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, FollowTrait, PaymentGetWayTrait, SoftDeletes, AchievementUser, RealRelationshipTrait, MomentRelationshipTrait;
-    use SpecialId, ChatUserTrait, UserTransferTrait;
+    use SpecialId, ChatUserTrait, UserTransferTrait , PreventDeleteIfCreatedByDeveloper;
+    
     /*
      * To enable and disable observer saving and updating methods
      */
@@ -1227,7 +1229,8 @@ class User extends Authenticatable
             unset($model->photo);
         });
 
-     
+        static::preventDeleteByDeveloper();
+
 
         static::updating(function ($user) {
             // Check if coins increased

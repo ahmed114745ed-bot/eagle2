@@ -21,6 +21,7 @@ use App\Facades\UserHandling;
 use App\Models\AgencySallary;
 use App\Models\AgencyJoinRequest;
 use App\Admin\Controllers\BlackListController;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class UserObserver
@@ -88,6 +89,7 @@ class UserObserver
     public function deleted(User $user)
     {
 
+        Log::info('deleted from Observer');
 
         // $user->profile()->delete();
         // AgencyJoinRequest::query()->where('user_id', $user->id)->delete();

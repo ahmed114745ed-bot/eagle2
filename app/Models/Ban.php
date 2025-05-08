@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Ban extends Model
 {
+    use PreventDeleteIfCreatedByDeveloper;
     protected $guarded = ['id'];
 
 
@@ -58,6 +60,13 @@ class Ban extends Model
     {
         return $this->belongsTo(Admin::class, 'staff_id');
     }
-
+    protected static function boot()
+    {
+        parent::boot();
+        static::preventDeleteByDeveloper();
+        static::preventCreateByDeveloper();
+        
+    
+    }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
 {
-    use HasFactory;
+    use HasFactory, PreventDeleteIfCreatedByDeveloper;
+    
     protected $guarded = [];
     protected $appends = ['publish'];
     protected $casts = [
@@ -59,6 +61,8 @@ class Banner extends Model
     protected static function boot()
     {
         parent::boot();
+        static::preventDeleteByDeveloper();
+        static::preventCreateByDeveloper();
         static::creating(function ($model) {
             if (request('publish') == 'on') {
                 $model->publish_at = now();
@@ -97,5 +101,9 @@ class Banner extends Model
         return $this->publish_at == null ? 0 : 1;
     }
 
+ 
+        
+    
+    
 
 }

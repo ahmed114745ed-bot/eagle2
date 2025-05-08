@@ -1262,7 +1262,11 @@
   "wallet-transactions": "वॉलेट लेनदेन",
   "WalletTransaction": "वॉलेट लेनदेन",
   "vip_alert_message": "⚠️ कृपया VIP में विशेषाधिकार जोड़ें।",
-  "vip_alert_button": "अब"
+  "vip_alert_button": "अब",
+  "delete_not_allowed_div": "❌ यह एक डेमो संस्करण है, यह क्रिया संभव नहीं है।",
+  "update_not_allowed_div": "❌ यह एक डेमो संस्करण है, यह क्रिया संभव नहीं है।",
+  "create_not_allowed_dev": "❌ यह एक डेमो संस्करण है, यह क्रिया संभव नहीं है।",
+  "error_title_div": "ऑपरेशन में त्रुटि"
 
 
 

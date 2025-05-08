@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
 class HomeCarousel extends Model
 {
+    use PreventDeleteIfCreatedByDeveloper;
     protected $table = 'home_carousels';
     protected $guarded = ['id'];
 
@@ -60,7 +62,8 @@ class HomeCarousel extends Model
     protected static function boot()
     {
         parent::boot();
-
+        static::preventDeleteByDeveloper();
+        static::preventCreateByDeveloper();
 
         static::creating(function ($model) {
             if ($model->form != null) {

@@ -5,9 +5,12 @@ namespace App\Models;
 use App\Selectables\Privileges;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
 class OVip extends Model
 {
+    use PreventDeleteIfCreatedByDeveloper;
+
     protected $table = 'o_vips';
     protected $fillable = [
         'name',
@@ -113,4 +116,16 @@ class OVip extends Model
                 return trans('Unknown'); // Fallback for unknown keys
         }
     }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($model) {
+        });
+
+        static::preventDeleteByDeveloper();
+    }
+
 }

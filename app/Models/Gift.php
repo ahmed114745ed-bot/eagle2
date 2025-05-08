@@ -6,10 +6,11 @@ use Carbon\Carbon;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Achievement\Http\Traits\AchievementGift;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
 class Gift extends Model
 {
-    use AchievementGift;
+    use AchievementGift ,PreventDeleteIfCreatedByDeveloper;
    // protected $fillable=['use_count'];
    protected $guarded = ['id'];
    public function getCreatedAtAttribute($value)
@@ -64,6 +65,7 @@ class Gift extends Model
     protected static function boot()
     {
         parent::boot();
+        static::preventDeleteByDeveloper();
 
         // static::deleting(function ($gift) {
 

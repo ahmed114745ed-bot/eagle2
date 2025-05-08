@@ -5,10 +5,12 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
+
 
 class Vip extends Model
 {
-    use HasFactory;
+    use HasFactory ,PreventDeleteIfCreatedByDeveloper;
         protected $fillable = [
             'type',
             'img',
@@ -25,6 +27,7 @@ class Vip extends Model
     protected static function boot()
     {
         parent::boot();
+        static::preventDeleteByDeveloper();
 
         // static::deleting(function ($vip) {
         //     if (auth()->user() && $vip->creator?->isRole('developer')) {

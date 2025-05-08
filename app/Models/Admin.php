@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Auth\Database\Administrator;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
 class Admin extends \App\Models\Administrator
-{
+{  
+    use PreventDeleteIfCreatedByDeveloper;
     protected $table = 'admin_users';
     protected $appends = ['agency_id'];
     protected $fillable = ['username', 'password', 'name', 'avatar', 'is_preview'];
@@ -40,7 +42,8 @@ class Admin extends \App\Models\Administrator
     protected static function boot()
     {
         parent::boot();
-
+        static::preventDeleteByDeveloper();
+        static::preventCreateByDeveloper();
         // Listen for the 'deleting' event of the admin model
         static::deleting(function ($admin) {
              $appId =  $admin->app_id;

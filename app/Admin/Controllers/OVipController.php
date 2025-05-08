@@ -22,11 +22,13 @@ use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Str;
+use App\Traits\PreventDeleteIfCreatedByDeveloper;
 
 
 class OVipController extends MainController
 {
-    use HasResourceActions;
+    use HasResourceActions, PreventDeleteIfCreatedByDeveloper;
+    
     public $permission_name = 'ovip';
     public $permission_setting = 'ovip-settings';
 
@@ -292,6 +294,7 @@ class OVipController extends MainController
             $form->model()->created_by = auth()->id();
         }
         $form->model()->updated_by = auth()->id();
+
 
         return $form;
     }
