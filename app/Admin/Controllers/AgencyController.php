@@ -135,7 +135,7 @@ class AgencyController extends MainController
 
         $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
         $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate','stars','heroes');
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes');
         // });
 
         return $content->title(__('agency profile'))
@@ -863,13 +863,28 @@ class AgencyController extends MainController
 
     public function acceptJoin($id)
     {
+
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user', 'agency')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
         $user = $agencyJoinRequest->user;
-        if (!$user) return back()->with('error', ('user not found'));
+
+        if (!$user) return response()->json([
+            'status' => false,
+            'message' => __(' user Not found')
+        ], 404);
         $agency = $agencyJoinRequest->agency;
-        if (!$agency) return back()->with('error', __('agency not found'));
-        if ($user->agency_id) return back()->with('error', __('user joined in another agency'));
+        if (!$agency) return response()->json([
+            'status' => false,
+            'message' => __(' agency Not found')
+        ], 404);
+        if ($user->agency_id) return response()->json([
+            'status' => false,
+            'message' => __('user joined agency before')
+        ], 404);
+        // dd($agency,$user->agency_id);
         $agencyJoinRequest->status = 1;
         $agencyJoinRequest->save();
 
@@ -889,34 +904,49 @@ class AgencyController extends MainController
         // add vip to user
         UserCommon::userVip($user);
         CustomNotification::acceptAgencyApp($agency, $user);
-        return  redirect()->back()->with('success', __('Joined successfully'));;
+
+        return  response()->json([
+            'status' => true,
+            'message' => __('Joined successfully')
+        ]);
     }
 
     public function adminAgency($id)
     {
-
         $user = User::Find($id);
         $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->exists();
-        if ($admin) redirect()->back()->with('error', __(' this user admin in  this agency'))->refresh();
+        if ($admin) return response()->json([
+            'status' => false,
+            'message' => __('this user admin in  this agency')
+        ], 404);
         $data = [
             'agency_id' => $user->agency_id,
             'user_id' => $user->id,
             'type' => "requestManger",
         ];
+        AgencyUserJob::create($data);
 
-
-        return redirect()->back()->with('success', __('successfully'));
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 
     public function rejectJoin($id)
     {
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) return response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
 
         $agencyJoinRequest->status = 2;
         $agencyJoinRequest->save();
 
-        return redirect()->back()->with('success', __('Rejected successfully'));
+        return response()->json([
+            'status' => true,
+            'message' => __('Rejected successfully')
+        ]);
     }
 
     public function members($agencyId)

@@ -482,12 +482,9 @@
                                                             </span>
                                                         </div>
                                                         @else
-                                                            <form action="{{ url('agencies/admin/' . $member->id) }}" method="POST" style="display:inline-block;">
-                                                                @csrf
-                                                                <button class="btn btn-sm btn-primary" onclick="return confirm('{{ __('Make this user an admin?') }}')">
-                                                                    {{ __('Make Admin') }}
-                                                                </button>
-                                                            </form>
+                                                        <button class="btn btn-sm btn-primary make-admin-btn" data-id="{{ $member->id }}">
+                                                            {{ __('Make Admin') }}
+                                                        </button>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -678,17 +675,15 @@
                                                         @endif
                                                     </div>
                                                 </td>
-                                                    <td>
-                                                        <form action="{{ url('admin/agencies/accept_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-success btn-sm">{{ __('Accept') }}</button>
-                                                        </form>
-                                                    
-                                                        <form action="{{ url('admin/agencies/reject_join/' . $agencyJoinRequest->id) }}" method="POST" style="display:inline-block;">
-                                                            @csrf
-                                                            <button class="btn btn-danger btn-sm">{{ __('Reject') }}</button>
-                                                        </form>
-                                                    </td>
+                                                <td>
+                                                    <button class="btn btn-success btn-sm accept-btn" data-id="{{ $agencyJoinRequest->id }}">
+                                                        {{ __('Accept') }}
+                                                    </button>
+                                                
+                                                    <button class="btn btn-danger btn-sm reject-btn" data-id="{{ $agencyJoinRequest->id }}">
+                                                        {{ __('Reject') }}
+                                                    </button>
+                                                </td>
                                              
                                             </tr>
                                         @endforeach
@@ -990,7 +985,69 @@
         window.history.pushState({}, '', url);
     }
 
-// Add this to your JavaScript
+
+    $(document).ready(function() {
+    $('.accept-btn').click(function() {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to accept this request?")) {
+            $.post(`/admin/agencies/accept_join/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function(response) {
+                if (response.status) {
+                    alert(response.message); // Show success
+                    location.reload();
+                } else {
+                    alert(response.message); // Show error returned by backend
+                }
+            }).fail(function(xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to accept the request.');
+            });
+        }
+    });
+
+    $('.reject-btn').click(function() {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to reject this request?")) {
+            $.post(`/admin/agencies/reject_join/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function(response) {
+                if (response.status) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function(xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to reject the request.');
+            });
+        }
+    });
+
+    $('.make-admin-btn').click(function () {
+        const id = $(this).data('id');
+        if (confirm("Are you sure you want to make this user an admin?")) {
+            $.post(`/admin/agencies/admin/${id}`, {
+                _token: '{{ csrf_token() }}'
+            }, function (response) {
+                if (response.status) {
+                    alert(response.message);
+                    location.reload();
+                } else {
+                    alert(response.message);
+                }
+            }).fail(function (xhr) {
+                const res = xhr.responseJSON;
+                alert(res?.message ?? 'Failed to make user an admin.');
+            });
+        }
+    });
+
+});
+
+
+
 
 
     </script>
