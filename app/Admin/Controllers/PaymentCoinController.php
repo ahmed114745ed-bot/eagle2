@@ -176,7 +176,7 @@ class PaymentCoinController extends MainController
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
-        $form->switch('status', __('status'))->states($status)->default(1);;
+        $form->switch('status', __('status'))->states($status)->default(1);
 
         return $form;
     }
