@@ -1095,8 +1095,8 @@
                                                 </div>
                                             </div>
                                             <div class="text-center my-3">
-                                                <img src="{{ asset('images/' . ($coin->title == 'fawry' ? 'fawry.jpeg' : 'dollar.jpg')) }}"
-                                                     alt="{{ $coin->title }} Payment"
+                                                <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
+                                                     alt="{{ $coin->title }}"
                                                      style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                             </div>
                                             <div class="row">
@@ -1104,12 +1104,11 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             @php
-                                                                // strong: fallback in case name is not a string
                                                                 $label = is_string($field['name']) ? $field['name'] : (is_array($field['name']) ? implode(' ', $field['name']) : '');
                                                             @endphp
                                                             <label for="{{ $field['name'] }}">
-{{--                                                                {{ __(ucfirst(str_replace('_', ' ', $label))) }}:--}}
-                                                                :
+                                                                {{ __('admin.'.$field['name']) }}
+{{--                                                                {{ __(ucfirst(str_replace('_', ' ', $field['name']))) }}:--}}
                                                             </label>
                                                             @if($field['type'] == 'input')
                                                                 <input type="text" id="{{ $field['name'] }}" name="{{ $field['name'] }}"
