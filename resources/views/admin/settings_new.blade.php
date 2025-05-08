@@ -1105,7 +1105,6 @@
                                                         <div class="form-group">
                                                             <label for="{{ $setting->key }}">
                                                                 {{ __('admin.'.$setting->key) }}
-                                                                {{-- {{ __(ucfirst(str_replace('_', ' ', $setting->key))) }}: --}}
                                                             </label>
                                                             @if($setting->type == 'input')
                                                                 <input type="text"

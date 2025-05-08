@@ -177,7 +177,6 @@ class PaymentCoinController extends MainController
         $form->hasMany('settings', 'Fields', function ($form) {
             $form->text('key', 'Input Name')
                 ->rules(function ($form) {
-                    // When editing/creating the parent
                     // $form->model() is the Setting model; $form->parent is PaymentCoin
                     $paymentCoinId = request()->route('payment_coins'); // or $form->parent->id in some versions
                     $id = $form->model ? $form->model->id : null;
