@@ -248,7 +248,7 @@ class ChargeController extends Controller
         ];
 
         $type = $request->input('type');
-        $instance = $types[$type] ?? $types['agency'];
+        $instance = $types[$type] ?? $types['user'];
         if (!$instance) {
             return Common::apiResponse(0, 'Type Not Found', 400);
         }
