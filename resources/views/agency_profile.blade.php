@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
 
 .stat-icon {
@@ -224,10 +226,26 @@
     letter-spacing: 0.5px;
 }
 
-.btn-back {
+.rtl .btn-back {
     position: absolute;
-    top: 20px;
+    top: -56px;
     right: 20px;
+    background: #ecf0f1;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ltr .btn-back {
+    position: absolute;
+    top: -56px;
+    left: 20px;
     background: #ecf0f1;
     border: none;
     padding: 8px 15px;
@@ -600,6 +618,9 @@
     }
 }
     </style>
+
+<!-- SweetAlert2 -->
+
 </head>
 <body>
 
@@ -627,14 +648,14 @@
                     </div>
                 </div>
                 <div class="agency-stats">
-                    <div class="stat-card">
+                    <!-- <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
                         <div class="stat-label">{{__("coins")}}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <button class="btn-back" onclick="window.history.back()">
@@ -1284,11 +1305,13 @@
        
 
     </div>
+<!-- jQuery أولاً -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 
-
-    <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -1327,71 +1350,151 @@
         });
 
 
-    $(document).ready(function() {
-    $('.accept-btn').click(function() {
+        $(document).ready(function () {
+            console.log("Document ready");
+
+function showLoader() {
+    console.log("Showing loader");
+    Swal.fire({
+        title: 'Loading...',  // تغيير النص ليوضح الرسالة
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+}
+
+function showSuccess(message, callback = null) {
+    console.log("Showing success:", message);
+    Swal.fire({
+        icon: 'success',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    }).then(() => {
+        console.log("Success confirmed");
+        if (callback) {
+            console.log("Running success callback");
+            callback();
+        }
+    });
+}
+
+function showError(message) {
+    console.log("Showing error:", message);
+    Swal.fire({
+        icon: 'error',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    });
+}
+
+function confirmAction(message, onConfirm) {
+    console.log("Confirm action:", message);
+    Swal.fire({
+        title: message,
+        icon: 'question',  // استبدال type بـ icon
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    }).then(result => {
+        console.log("Confirmation result:", result);
+        console.log("isConfirmed:", result.isConfirmed);
+
+        if (result.value) {
+            console.log("User confirmed action");
+            onConfirm();
+        } else {
+            console.log("User cancelled action");
+        }
+    });
+}
+
+
+    // قبول الطلب
+    $('.accept-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to accept this request?")) {
+        console.log("Accept clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_accept") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/accept_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Accept response:", response);
                 if (response.status) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', 'requests');
-                    window.location.href = url.toString();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message); // Show error returned by backend
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Accept failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to accept the request.');
+                showError(res?.message ?? '{{ __("failed_accept_request") }}');
             });
-        }
+        });
     });
 
-    $('.reject-btn').click(function() {
+    // رفض الطلب
+    $('.reject-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to reject this request?")) {
+        console.log("Reject clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_reject") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/reject_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Reject response:", response);
                 if (response.status) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', 'requests');
-                    window.location.href = url.toString();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Reject failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to reject the request.');
+                showError(res?.message ?? '{{ __("failed_reject_request") }}');
             });
-        }
+        });
     });
 
+    // ترقية إلى Admin
     $('.make-admin-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to make this user an admin?")) {
+        console.log("Make admin clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/admin/${id}`, {
                 _token: '{{ csrf_token() }}'
             }, function (response) {
+                Swal.close();
+                console.log("Make admin response:", response);
                 if (response.status) {
-                    alert(response.message);
-                    location.reload();
+                    showSuccess(response.message, () => {
+                        location.reload();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
             }).fail(function (xhr) {
+                Swal.close();
+                console.error("Make admin failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to make user an admin.');
+                showError(res?.message ?? '{{ __("failed_make_admin") }}');
             });
-        }
+        });
     });
-
 });
 
-
-
-
-
-    </script>
+</script>
 
