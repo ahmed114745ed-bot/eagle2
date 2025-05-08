@@ -852,7 +852,7 @@ class UserController extends MainController
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
-        $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
+        $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
 //        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
 //        $form->select('type_user', trans('User Type'))->options([
 //            $form->model()->type_user => $form->model()->type_user,
