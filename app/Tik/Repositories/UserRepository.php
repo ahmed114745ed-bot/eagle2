@@ -54,7 +54,7 @@ class UserRepository extends AbstractRepository
 
     public function incrementUserCoins($user, $coins)
     {
-        
+
         $user->increment('di', $coins);
         return true;
     }
@@ -406,6 +406,6 @@ class UserRepository extends AbstractRepository
     {
         return $this->model->where('agency_id', $agencyId)->with(['targets' => function ($query) use ($agencyId, $month, $year) {
             $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
-        }])->get();
+        }])->paginate(10);
     }
 }
