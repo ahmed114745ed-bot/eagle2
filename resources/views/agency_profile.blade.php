@@ -5,6 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 20px;
+}
+
+.stat-icon.bg-blue {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.stat-icon.bg-green {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+.section-box {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+.section-header h4 {
+    margin: 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header .text-yellow {
+    color: #f39c12;
+}
+
+.section-header .text-red {
+    color: #e74c3c;
+}
+
+
+.number-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #ecf0f1;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.number-badge.warning {
+    background: #fef9e7;
+    color: #f39c12;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: #95a5a6;
+}
+
+.empty-state i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.empty-table {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #95a5a6;
+    background: white;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.empty-table i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-table p {
+    margin: 0;
+    font-size: 14px;
+}
 .agency-profile-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -176,6 +294,12 @@
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
+}
+
+.stats-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .section-title {
@@ -465,6 +589,16 @@
     justify-content: center;
     border-top: 1px solid #eee;
 }
+
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+    }
+    
+    .avatar-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+}
     </style>
 </head>
 <body>
@@ -749,11 +883,12 @@
             <!-- salary Section -->
             <div class="tab-content" id="salary-tab">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
+                    </div>
                             <div class="table-responsive">
-                                <div class="box-body table-responsive no-padding">
-                                    <table class="table table-hover grid-table" id="salary">
+                                <div class="box-body ">
+                                    <table class="data-table" id="salary">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -788,18 +923,19 @@
                                 </div>
                             </div>
 
-                    </div>
+                   
+
                 </div>
             </div>
 
             <div class="tab-content" id="requests-tab">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
-            
+                    </div>
                         <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="join">
+                            <div class="box-body ">
+                                <table class="data-table" id="join">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -885,19 +1021,29 @@
                                 'target_page'  => $memberTargets->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
-                    </div>
+                    
                 </div>
             </div>
 
             <div class="tab-content" id="targets-tab">
-                <div class="card">
+                <div class="agency-card">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">
+                            <i class="fas fa-bullseye"></i> {{ __('Agency Targets') }}
+                        </h3>
+                        <div class="card-tools">
+                            <span class="badge bg-purple">{{ $memberTargets->total() }}</span>
+                        </div>
+                    </div>
+                    
                     <div class="card-body">
-                        <h4 class="card-title text-left">{{ __('target') }}</h4>
-                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="mb-4">
-                            <div class="row g-3 align-items-end">
+                        <!-- Filter Form -->
+                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="filter-form">
+                            <div class="row">
                                 <div class="col-md-5">
-                                    <div class="form-floating">
-                                        <select name="month" id="month" class="form-select">
+                                    <div class="form-group">
+                                        <label for="month">{{ __('Month') }}</label>
+                                        <select name="month" id="month" class="form-control">
                                             <option value="">All Months</option>
                                             @for($m = 1; $m <= 12; $m++)
                                                 <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
@@ -905,13 +1051,13 @@
                                                 </option>
                                             @endfor
                                         </select>
-                                        <label for="month">{{ __('Month') }}</label>
                                     </div>
                                 </div>
-                        
+                                
                                 <div class="col-md-5">
-                                    <div class="form-floating">
-                                        <select name="year" id="year" class="form-select">
+                                    <div class="form-group">
+                                        <label for="year">{{ __('Year') }}</label>
+                                        <select name="year" id="year" class="form-control">
                                             <option value="">All Years</option>
                                             @for($y = now()->year; $y >= 2020; $y--)
                                                 <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
@@ -919,33 +1065,56 @@
                                                 </option>
                                             @endfor
                                         </select>
-                                        <label for="year">{{ __('Year') }}</label>
                                     </div>
                                 </div>
-                        
-                                <div class="col-md-2 d-flex">
-                                    <button type="submit" class="btn btn-primary flex-grow-1">
-                                        <i class="fas fa-filter me-2"></i> {{ __('Apply') }}
+                                
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> {{ __('Apply') }}
                                     </button>
                                     @if(request()->has('month') || request()->has('year'))
-                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ms-2" title="Reset filters">
+                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
                                         <i class="fas fa-times"></i>
                                     </a>
                                     @endif
                                 </div>
                             </div>
                         </form>
-                        <br>
-                        <div class="stars-section">
+            
+                        <!-- Stats Cards -->
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-blue">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{ $agencyTarget }}</div>
+                                    <div class="stat-label">{{ __('Target') }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon bg-green">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{ $rate }}</div>
+                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <!-- Stars Section -->
+                        <div class="section-box">
                             <div class="section-header">
-                                <h2 class="section-title">
-                                    <i class="fas fa-star"></i>
-                                    {{ __('نجوم الوكالة') }}
-                                </h2>
+                                <h4>
+                                    <i class="fas fa-star text-yellow"></i>
+                                    {{ __('Agency Stars') }}
+                                </h4>
                             </div>
                             
                             @if($stars && $stars->count())
-                                <div class="stars-container">
+                                <div class="avatar-grid">
                                     @foreach($stars as $log)
                                         @php
                                             $user = $log->receiver;
@@ -957,32 +1126,34 @@
                                             $exp = number_format($log->exp);
                                         @endphp
                                         
-                                        <div class="star-wrapper" 
-                                            onclick="window.location.href='{{ $userUrl }}'"
-                                            title="{{ $username }} ({{ $exp }} EXP)">
-                                            <img src="{{ $url }}" 
-                                                alt="{{ $username }}"
-                                                class="star-avatar">
-                                            <div class="star-badge">{{ $exp }}</div>
-                                        </div>
+                                        <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
+                                            <div class="avatar-img-container">
+                                                <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                                <div class="avatar-badge">{{ $exp }}</div>
+                                            </div>
+                                            <div class="avatar-name">{{ $username }}</div>
+                                        </a>
                                     @endforeach
                                 </div>
                             @else
-                                <p class="no-data">{{ __('No stars data available') }}</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-user-slash"></i>
+                                    <p>{{ __('No stars data available') }}</p>
+                                </div>
                             @endif
                         </div>
-                    
-                        <!-- Admins Section -->
-                        <div class="stars-section">
+            
+                        <!-- Heroes Section -->
+                        <div class="section-box">
                             <div class="section-header">
-                                <h2 class="section-title">
-                                    <i class="fas fa-user-shield"></i>
-                                    {{ __('ابطال الوكالة') }}
-                                </h2>
+                                <h4>
+                                    <i class="fas fa-user-shield text-red"></i>
+                                    {{ __('Agency Heroes') }}
+                                </h4>
                             </div>
                             
                             @if($heroes && $heroes->count())
-                                <div class="stars-container">
+                                <div class="avatar-grid">
                                     @foreach($heroes as $log)
                                         @php
                                             $user = $log->sender;
@@ -994,69 +1165,43 @@
                                             $exp = number_format($log->exp);
                                         @endphp
                                         
-                                        <div class="star-wrapper" 
-                                            onclick="window.location.href='{{ $userUrl }}'"
-                                            title="{{ $username }} ({{ $exp }} EXP)">
-                                            <img src="{{ $url }}" 
-                                                alt="{{ $username }}"
-                                                class="star-avatar">
-                                            <div class="star-badge">{{ $exp }}</div>
-                                        </div>
+                                        <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
+                                            <div class="avatar-img-container">
+                                                <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                                <div class="avatar-badge">{{ $exp }}</div>
+                                            </div>
+                                            <div class="avatar-name">{{ $username }}</div>
+                                        </a>
                                     @endforeach
                                 </div>
                             @else
-                                <p class="no-data">{{ __('لا يوجد ابطال للوكالة') }}</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-user-slash"></i>
+                                    <p>{{ __('No heroes available') }}</p>
+                                </div>
                             @endif
                         </div>
-                        <br>
-                        <div class="modal-body">
-
-                            <div class="row">
-                              <!-- Card 1 -->
-                              <div class="col-md-6">
-                                <div class="card">
-     
-                                  <div class="card-body">
-                                    <h3 class="card-title">{{' target'}}</h3>
-                                    <p class="card-text">{{$agencyTarget}}</p>
-                                  </div>
-                                </div>
-                              </div>
-                    
-                              <!-- Card 2 -->
-                              <div class="col-md-6">
-                                <div class="card">
-                                 
-                                  <div class="card-body">
-                                    <h3 class="card-title">{{ 'agency rate'}}</h3>
-                                    <p class="card-text">{{$rate}}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                    
-                          
-                        </div>
-                        <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="target">
+            
+                        <!-- Targets Table -->
+                        <div class="table-section">
+                            <div class="table-responsive">
+                                <table class="agency-table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>{{ __('user') }}</th>
-                                            <th>{{ __('diamond') }}</th>
-                                            <th>{{ __('remaining diamonds') }}</th>
-                                            <th>{{ __('days') }}</th>
-                                            <th>{{ __('hours') }}</th>
-                                            <th>{{ __('supporters') }}</th>
+                                            <th width="5%">#</th>
+                                            <th width="25%">{{ __('User') }}</th>
+                                            <th width="12%">{{ __('Diamonds') }}</th>
+                                            <th width="18%">{{ __('Remaining') }}</th>
+                                            <th width="12%">{{ __('Days') }}</th>
+                                            <th width="12%">{{ __('Hours') }}</th>
+                                            <th width="16%">{{ __('Supporters') }}</th>
                                         </tr>
                                     </thead>
-            
+                                    
                                     @if($memberTargets && $memberTargets->count())
-                                    <tbody style="color: rgb(208, 115, 43);">
+                                    <tbody>
                                         @foreach($memberTargets as $index => $memberTarget)
                                             @php
-                                                
                                                 $name = $memberTarget->name ?? '-';
                                                 $uid = $memberTarget->uuid ?? '-';
                                                 $avatarPath = $memberTarget->profile?->avatar;
@@ -1065,58 +1210,56 @@
                                                 if (!isImageExists($avatarUrl)) {
                                                     $avatarUrl = $defaultImage;
                                                 }
-                                                $image = handleShowImageWithTypes($memberTarget->id, $avatarUrl, 40, 40);
-            
-                                               
                                             @endphp
-            
+                                            
                                             <tr>
                                                 <td>{{ $memberTargets->firstItem() + $index }}</td>
-            
                                                 <td>
-                                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                                        {!! $image !!}
+                                                    <div class="user-info-cell">
+                                                        <img src="{{ $avatarUrl }}" class="user-avatar" alt="{{ $name }}">
                                                         <div>
-                                                            <strong>{{ $name }}</strong><br>
-                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                            <div class="user-name">{{ $name }}</div>
+                                                            <div class="user-uuid">{{ $uid }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-            
                                                 <td>
-                                                  {{$memberTarget->targets->first()->user_diamonds ?? 0}}
-                                                </td>
-            
-                                                <td>
-                                                    {{$memberTarget->targets->first()->next_diamond ?? 0}}
+                                                    <span class="number-badge">
+                                                        {{ $memberTarget->targets->first()->user_diamonds ?? 0 }}
+                                                    </span>
                                                 </td>
                                                 <td>
-                                                   {{$memberTarget->targets->first()->user_hours ?? 0}}
+                                                    <span class="number-badge warning">
+                                                        {{ $memberTarget->targets->first()->next_diamond ?? 0 }}
+                                                    </span>
                                                 </td>
-                                                <td>
-                                                  {{$memberTarget->targets->first()->user_days ?? 0}}
-                                                </td>
-                                                <td>
-                                                    {{$memberTarget->targets->first()->user_days ?? 0}}
-                                                </td>
-                                             
+                                                <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
+                                                <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
+                                                <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     @endif
                                 </table>
                             </div>
-                        </div>
-            
-                        <div class="pagination-container mt-3">
-                            {{ $memberTargets->appends([
-                                'members_page' => $members->currentPage(),
-                                'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage(),
-                                'join_page' => $agencyJoinRequests->currentPage(),
-                                'month' => request('month'),
-                                'year' => request('year'),
-                            ])->links('vendor.pagination.bootstrap-4') }}
+                            
+                            @if($memberTargets->isEmpty())
+                            <div class="empty-table">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>{{ __('No target data available') }}</p>
+                            </div>
+                            @endif
+                            
+                            <div class="pagination-wrapper">
+                                {{ $memberTargets->appends([
+                                    'members_page' => $members->currentPage(),
+                                    'salaries_page' => $salaries->currentPage(),
+                                    'charges_page' => $charges->currentPage(),
+                                    'join_page' => $agencyJoinRequests->currentPage(),
+                                    'month' => request('month'),
+                                    'year' => request('year'),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1211,10 +1354,4 @@
 
 
     </script>
-
-
-
-
-
-
 
