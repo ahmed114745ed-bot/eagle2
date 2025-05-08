@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('settings', function (Blueprint $table) {
             $table->string('type')->nullable();
-            $table->foreignId('payment_coin_id')->nullable()->constrained('payment_coins')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('input_type')->nullable();
+            $table->foreignId('item_id')->nullable();
         });
     }
 
@@ -23,7 +24,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            //
         });
     }
 };
