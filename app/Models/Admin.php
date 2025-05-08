@@ -42,7 +42,7 @@ class Admin extends \App\Models\Administrator
     protected static function boot()
     {
         parent::boot();
-        static::preventDeleteByDeveloper();
+        // static::preventDeleteByDeveloper();
         static::preventCreateByDeveloper();
         // Listen for the 'deleting' event of the admin model
         static::deleting(function ($admin) {
