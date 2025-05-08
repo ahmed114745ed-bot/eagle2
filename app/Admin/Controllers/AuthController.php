@@ -3,14 +3,17 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Agent;
-use App\Models\PreviewAdmin;
-use Encore\Admin\Controllers\AuthController as BaseAuthController;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cookie;
 use KevinSoft\MultiLanguage\MultiLanguage;
-use Illuminate\Support\Facades\Config;
+use Encore\Admin\Controllers\AuthController as BaseAuthController;
 
 class AuthController extends BaseAuthController
 {
@@ -91,6 +94,69 @@ class AuthController extends BaseAuthController
         $request->session()->regenerate();
 
         return redirect()->intended($request->url??$this->redirectPath());
+    }
+
+    public function getSetting(Content $content)
+    {
+        $form = $this->settingForm();
+        $form->tools(
+            function (Form\Tools $tools) {
+                $tools->disableList();
+                $tools->disableDelete();
+                $tools->disableView();
+            }
+        );
+
+        return $content
+            ->title(trans('admin.user_setting'))
+            ->body($form->edit(Admin::user()->id));
+    }
+
+    protected function settingForm()
+    {
+    
+        $class = config('admin.database.users_model');
+
+        $form = new Form(new $class());
+
+        $form->display('username', trans('admin.username'));
+        $form->text('name', trans('admin.name'))->rules('required');
+        $form->image('avatar', trans('admin.avatar'));
+       if(!(Auth::user()->username == 'demo'))
+       {
+        $form->password('password', trans('admin.password'))->rules('confirmed|required');
+        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
+            ->default(function ($form) {
+                return $form->model()->password;
+            });
+        }
+
+        $form->setAction(admin_url('auth/setting'));
+
+        $form->ignore(['password_confirmation']);
+
+        $form->saving(function (Form $form) {
+            if ( $form->model()->password != $form->password && $form->model()->username == 'admin'|| $form->model()->password_confirmation != $form->password_confirmation && $form->model()->username == 'admin'){
+                $error = new MessageBag(
+                    [
+                        'title'   => 'forbidden',
+                        'message' => 'you can not make change',
+                    ]
+                );
+                return back()->with(compact('error'));
+            }
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = Hash::make($form->password);
+            }
+        });
+
+        $form->saved(function () {
+            admin_toastr(trans('admin.update_succeeded'));
+
+            return redirect(admin_url('auth/setting'));
+        });
+
+        return $form;
     }
 
 

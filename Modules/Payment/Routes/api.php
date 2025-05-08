@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Modules\Payment\Http\Controllers\CashFreeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,10 @@ Route::middleware('auth:sanctum')->group (
 );
 
 Route::get('/payment-callback/{reference_id?}',[\Modules\Payment\Http\Controllers\PaymentController::class,'payment_verify'])->name('payment-verify');
+Route::prefix('cashfree')->name('cashfree.')->group(function() {
+    Route::post('webhook', [CashFreeController::class, 'webhook'])->middleware('cashfree.verify');
+    Route::get('process', [CashFreeController::class, 'store'])->middleware('auth:sanctum')->name('store');
+    Route::get('status', [CashFreeController::class,'orderStatus'])->name('status');
+
+//    Route::any('payments/success', [CashFreeController::class, 'success'])->name('success');
+});

@@ -167,6 +167,10 @@ class SettingsController extends Controller
             Cache::forget('app_title');
         }
 
+        if($request->hasFile('apple_service_file')){
+            $file_path = Common::upload('images', $request->apple_service_file);
+            $data['apple_service_file'] = $file_path;
+        }
         unset($data['app_background_image'], $data['brand_background_image_reset']);
 
         // Process and save settings
