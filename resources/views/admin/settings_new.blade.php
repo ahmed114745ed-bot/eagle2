@@ -1076,548 +1076,597 @@
                         <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
 
                         <div class="row mt-4">
-                            <!-- Fawry Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.fawry') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_fawry_active" value="0">
-                                            <input type="checkbox" id="fawryRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_fawry_active"
-                                                value="1"
-                                                {{ @$settings['is_fawry_active'] == '1' ? 'checked' : '' }}>
-                                            <label for="fawryRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $fawryImageFound = false;
-                                        @endphp
-
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'fawry')
-                                            <img src="{{ asset('images/fawry.jpeg') }}"
-                                            alt="Fawry Payment"
-                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-
-                                                @php
-                                                    $fawryImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
-
-                                        @if(!$fawryImageFound)
-                                            <img src="{{ asset('images/dollar.jpg') }}"
-                                                 alt="Fawry Payment"
-                                                 class="img-fluid">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="fawry_secret"
-                                                       name="fawry_secret" placeholder="secret"
-                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>
+                            <!-- dynamic Fields -->
+                            @foreach($paymentCoins as $coin)
+                                <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                                    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="card p-3 shadow" style="height: 495px;">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h4 class="m-0">{{ __($coin->title) }}</h4>
+                                                <div class="d-flex align-items-center">
+                                                    <input type="hidden" name="is_{{ $coin->title }}_active" value="0">
+                                                    <input type="checkbox" id="{{ $coin->title }}Radio"
+                                                           class="custom-payment-radio libraryRealTime"
+                                                           name="is_{{ $coin->title }}_active"
+                                                           value="1"
+                                                        {{ @$settings['is_'.$coin->title.'_active'] == '1' ? 'checked' : '' }}>
+                                                    <label for="{{ $coin->title }}Radio" class="switch"></label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>
-                                                <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"
-                                                       placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
-                                                <input type="text" id="fawry_utd_url" name="fawry_utd_url"
-                                                       placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>
-                                                <input type="text" id="fawry_return_url" name="fawry_return_url"
-                                                       placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>
-                                                <input type="text" id="fawry_url" name="fawry_url"
-                                                       placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                                </form>
-                            </div>
-
-                            <!-- skyPay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.skyPay') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_skyPay_active" value="0">
-                                            <input type="checkbox" id="skyPayRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_skyPay_active"
-                                                value="1" {{ @$settings['is_skyPay_active'] ? 'checked' : '' }}>
-                                            <label for="skyPayRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $skypayImageFound = false;
-                                        @endphp
-
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'sky pay')
-                                                <img src="{{ asset('images/paysky.png') }}"
-                                                     alt="Skypay Payment"
+                                            <div class="text-center my-3">
+                                                <img src="{{ asset('images/' . ($coin->title == 'fawry' ? 'fawry.jpeg' : 'dollar.jpg')) }}"
+                                                     alt="{{ $coin->title }} Payment"
                                                      style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                                @php
-                                                    $skypayImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
-
-                                        @if(!$skypayImageFound)
-                                        <img src="{{ asset('images/paysky.png') }}"
-                                        alt="Skypay Payment"
-                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="paysky_base_url">{{ __('admin.base_url') }}:</label>
-                                                <input type="text" id="paysky_base_url"
-                                                       name="paysky_base_url" placeholder="base_url"
-                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control" required>
                                             </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                <input type="text" id="paysky_merchant_id" name="paysky_merchant_id"
-                                                       placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}"
-                                                       class="form-control" required>
+                                            <div class="row">
+                                                @foreach($coin->fields ?? [] as $field)
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            @php
+                                                                // strong: fallback in case name is not a string
+                                                                $label = is_string($field['name']) ? $field['name'] : (is_array($field['name']) ? implode(' ', $field['name']) : '');
+                                                            @endphp
+                                                            <label for="{{ $field['name'] }}">
+{{--                                                                {{ __(ucfirst(str_replace('_', ' ', $label))) }}:--}}
+                                                                :
+                                                            </label>
+                                                            @if($field['type'] == 'input')
+                                                                <input type="text" id="{{ $field['name'] }}" name="{{ $field['name'] }}"
+                                                                       placeholder="{{ $field['name'] }}"
+                                                                       value="{{ $settings[$field['name']] ?? ($field['value'] ?? '')}}" class="form-control" required>
+                                                            @elseif($field['type'] == 'file')
+                                                                <input type="file" id="{{ $field['name'] }}" name="{{ $field['name'] }}"
+                                                                       class="form-control" required>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
                                             </div>
+                                            <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label>
-                                                <input type="text" id="paysky_terminal_id" name="paysky_terminal_id"
-                                                       placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="paysky_api_key">{{ __('admin.api_key') }}:</label>
-                                                <input type="text" id="paysky_api_key" name="paysky_api_key"
-                                                       placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                    </form>
                                 </div>
-                                </form>
-                            </div>
+                            @endforeach
+{{--                            <!-- Fawry Fields -->--}}
+{{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.fawry') }}</h4>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_fawry_active" value="0">--}}
+{{--                                            <input type="checkbox" id="fawryRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_fawry_active"--}}
+{{--                                                value="1"--}}
+{{--                                                {{ @$settings['is_fawry_active'] == '1' ? 'checked' : '' }}>--}}
+{{--                                            <label for="fawryRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $fawryImageFound = false;--}}
+{{--                                        @endphp--}}
 
-                            <!-- stripe Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.stripe') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_stripe_active" value="0">
-                                            <input type="checkbox" id="stripeRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_stripe_active"
-                                                value="1" {{ @$settings['is_stripe_active'] ? 'checked' : '' }}>
-                                            <label for="stripeRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $stripeImageFound = false;
-                                        @endphp
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'fawry')--}}
+{{--                                            <img src="{{ asset('images/fawry.jpeg') }}"--}}
+{{--                                            alt="Fawry Payment"--}}
+{{--                                            style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
 
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'stripe')
-                                                <img src="{{ asset('images/stripe.png') }}"
-                                                     alt="Stripe Payment"
-                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                                @php
-                                                    $stripeImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
+{{--                                                @php--}}
+{{--                                                    $fawryImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
 
-                                        @if(!$stripeImageFound)
-                                        <img src="{{ asset('images/stripe.png') }}"
-                                        alt="Stripe Payment"
-                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>
-                                                <input type="text" id="stripe_test_secret_key"
-                                                       name="stripe_test_secret_key" placeholder="test_secret_key"
-                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>
-                                                <input type="text" id="stripe_success_url" name="stripe_success_url"
-                                                       placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>
-                                                <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"
-                                                       placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="stripe_currency">{{ __('admin.currency') }}:</label>
-                                                <input type="text" id="stripe_currency" name="stripe_currency"
-                                                       placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>
-                                                <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"
-                                                       placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                                </form>
-                            </div>
+{{--                                        @if(!$fawryImageFound)--}}
+{{--                                            <img src="{{ asset('images/dollar.jpg') }}"--}}
+{{--                                                 alt="Fawry Payment"--}}
+{{--                                                 class="img-fluid">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="fawry_secret">{{ __('admin.server_secret') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_secret"--}}
+{{--                                                       name="fawry_secret" placeholder="secret"--}}
+{{--                                                       value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"--}}
+{{--                                                       placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_utd_url" name="fawry_utd_url"--}}
+{{--                                                       placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_return_url" name="fawry_return_url"--}}
+{{--                                                       placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>--}}
+{{--                                                <input type="text" id="fawry_url" name="fawry_url"--}}
+{{--                                                       placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
 
-                            <!-- opay Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.opay') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_opay_active" value="0">
-                                            <input type="checkbox" id="opayRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_opay_active"
-                                                value="1"
-                                                {{ @$settings['is_opay_active'] == '1' ? 'checked' : '' }}>
-                                            <label for="opayRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $opayImageFound = false;
-                                        @endphp
+{{--                            <!-- skyPay Fields -->--}}
+{{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.skyPay') }}</h4>--}}
+{{--                                        <div class="ribbon-banner-card">--}}
+{{--                                            <span>{{ __('soon') }}</span>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_skyPay_active" value="0">--}}
+{{--                                            <input type="checkbox" id="skyPayRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_skyPay_active"--}}
+{{--                                                value="1" {{ @$settings['is_skyPay_active'] ? 'checked' : '' }}>--}}
+{{--                                            <label for="skyPayRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $skypayImageFound = false;--}}
+{{--                                        @endphp--}}
 
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'opay')
-                                                <img src="{{ asset('images/opay.png') }}"
-                                                     alt="Opay Payment"
-                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                                @php
-                                                    $opayImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'sky pay')--}}
+{{--                                                <img src="{{ asset('images/paysky.png') }}"--}}
+{{--                                                     alt="Skypay Payment"--}}
+{{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                                @php--}}
+{{--                                                    $skypayImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
 
-                                        @if(!$opayImageFound)
-                                        <img src="{{ asset('images/opay.png') }}"
-                                        alt="Opay Payment"
-                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="opay_currency">{{ __('admin.currency') }}:</label>
-                                                <input type="text" id="opay_currency" name="opay_currency"
-                                                       placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="opay_secret_key">{{ __('admin.server_secret') }}:</label>
-                                                <input type="text" id="opay_secret_key" name="opay_secret_key"
-                                                    placeholder="server_secret"
-                                                    value="{{ $settings['opay_secret_key'] ?? '' }}"
-                                                    class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_public_key">{{ __('admin.public_key') }}:</label>
-                                                <input type="text" id="opay_public_key"
-                                                       name="opay_public_key" placeholder="public_key"
-                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>
-                                                <input type="text" id="opay_merchant_id"
-                                                       name="opay_merchant_id" placeholder="merchant_id"
-                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_country_code">{{ __('admin.country_code') }}:</label>
-                                                <input type="text" id="opay_country_code"
-                                                       name="country_code" placeholder="server_secret"
-                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>
-                                                <input type="text" id="opay_base_url"
-                                                       name="opay_base_url" placeholder="base_url"
-                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                                </form>
-                            </div>
+{{--                                        @if(!$skypayImageFound)--}}
+{{--                                        <img src="{{ asset('images/paysky.png') }}"--}}
+{{--                                        alt="Skypay Payment"--}}
+{{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="paysky_base_url">{{ __('admin.base_url') }}:</label>--}}
+{{--                                                <input type="text" id="paysky_base_url"--}}
+{{--                                                       name="paysky_base_url" placeholder="base_url"--}}
+{{--                                                       value="{{ $settings['paysky_base_url'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="paysky_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
+{{--                                                <input type="text" id="paysky_merchant_id" name="paysky_merchant_id"--}}
+{{--                                                       placeholder="merchant_id" value="{{ $settings['paysky_merchant_id'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="paysky_terminal_id">{{ __('admin.terminal_id') }}:</label>--}}
+{{--                                                <input type="text" id="paysky_terminal_id" name="paysky_terminal_id"--}}
+{{--                                                       placeholder="terminal_id" value="{{ $settings['paysky_terminal_id'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="paysky_api_key">{{ __('admin.api_key') }}:</label>--}}
+{{--                                                <input type="text" id="paysky_api_key" name="paysky_api_key"--}}
+{{--                                                       placeholder="api_key" value="{{ $settings['paysky_api_key'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
+
+{{--                            <!-- stripe Fields -->--}}
+{{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.stripe') }}</h4>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_stripe_active" value="0">--}}
+{{--                                            <input type="checkbox" id="stripeRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_stripe_active"--}}
+{{--                                                value="1" {{ @$settings['is_stripe_active'] ? 'checked' : '' }}>--}}
+{{--                                            <label for="stripeRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $stripeImageFound = false;--}}
+{{--                                        @endphp--}}
+
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'stripe')--}}
+{{--                                                <img src="{{ asset('images/stripe.png') }}"--}}
+{{--                                                     alt="Stripe Payment"--}}
+{{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                                @php--}}
+{{--                                                    $stripeImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
+
+{{--                                        @if(!$stripeImageFound)--}}
+{{--                                        <img src="{{ asset('images/stripe.png') }}"--}}
+{{--                                        alt="Stripe Payment"--}}
+{{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>--}}
+{{--                                                <input type="text" id="stripe_test_secret_key"--}}
+{{--                                                       name="stripe_test_secret_key" placeholder="test_secret_key"--}}
+{{--                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>--}}
+{{--                                                <input type="text" id="stripe_success_url" name="stripe_success_url"--}}
+{{--                                                       placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>--}}
+{{--                                                <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"--}}
+{{--                                                       placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="stripe_currency">{{ __('admin.currency') }}:</label>--}}
+{{--                                                <input type="text" id="stripe_currency" name="stripe_currency"--}}
+{{--                                                       placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>--}}
+{{--                                                <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"--}}
+{{--                                                       placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
+
+{{--                            <!-- opay Fields -->--}}
+{{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.opay') }}</h4>--}}
+{{--                                        <div class="ribbon-banner-card">--}}
+{{--                                            <span>{{ __('soon') }}</span>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_opay_active" value="0">--}}
+{{--                                            <input type="checkbox" id="opayRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_opay_active"--}}
+{{--                                                value="1"--}}
+{{--                                                {{ @$settings['is_opay_active'] == '1' ? 'checked' : '' }}>--}}
+{{--                                            <label for="opayRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $opayImageFound = false;--}}
+{{--                                        @endphp--}}
+
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'opay')--}}
+{{--                                                <img src="{{ asset('images/opay.png') }}"--}}
+{{--                                                     alt="Opay Payment"--}}
+{{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                                @php--}}
+{{--                                                    $opayImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
+
+{{--                                        @if(!$opayImageFound)--}}
+{{--                                        <img src="{{ asset('images/opay.png') }}"--}}
+{{--                                        alt="Opay Payment"--}}
+{{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="opay_currency">{{ __('admin.currency') }}:</label>--}}
+{{--                                                <input type="text" id="opay_currency" name="opay_currency"--}}
+{{--                                                       placeholder="currency" value="{{ $settings['opay_currency'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="opay_secret_key">{{ __('admin.server_secret') }}:</label>--}}
+{{--                                                <input type="text" id="opay_secret_key" name="opay_secret_key"--}}
+{{--                                                    placeholder="server_secret"--}}
+{{--                                                    value="{{ $settings['opay_secret_key'] ?? '' }}"--}}
+{{--                                                    class="form-control">--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_public_key">{{ __('admin.public_key') }}:</label>--}}
+{{--                                                <input type="text" id="opay_public_key"--}}
+{{--                                                       name="opay_public_key" placeholder="public_key"--}}
+{{--                                                       value="{{ $settings['opay_public_key'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_merchant_id">{{ __('admin.merchant_id') }}:</label>--}}
+{{--                                                <input type="text" id="opay_merchant_id"--}}
+{{--                                                       name="opay_merchant_id" placeholder="merchant_id"--}}
+{{--                                                       value="{{ $settings['opay_merchant_id'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_country_code">{{ __('admin.country_code') }}:</label>--}}
+{{--                                                <input type="text" id="opay_country_code"--}}
+{{--                                                       name="country_code" placeholder="server_secret"--}}
+{{--                                                       value="{{ $settings['country_code'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>--}}
+{{--                                                <input type="text" id="opay_base_url"--}}
+{{--                                                       name="opay_base_url" placeholder="base_url"--}}
+{{--                                                       value="{{ $settings['opay_base_url'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
+
+{{--                            <!-- Cash free Fields -->--}}
+{{--                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.cashfree') }}</h4>--}}
+{{--                                        <div class="ribbon-banner-card">--}}
+{{--                                            <span>{{ __('soon') }}</span>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_cashfree_active" value="0">--}}
+{{--                                            <input type="checkbox" id="cashfreeRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_cashfree_active"--}}
+{{--                                                value="1"--}}
+{{--                                                {{ @$settings['is_cashfree_active'] == '1' ? 'checked' : '' }}>--}}
+{{--                                            <label for="cashfreeRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $cashfreeImageFound = false;--}}
+{{--                                        @endphp--}}
+
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'cashfree')--}}
+{{--                                                <img src="{{ asset('images/cashfree.png') }}"--}}
+{{--                                                     alt="Opay Payment"--}}
+{{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                                @php--}}
+{{--                                                    $cashfreeImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
+
+{{--                                        @if(!$cashfreeImageFound)--}}
+{{--                                        <img src="{{ asset('images/cashfree.png') }}"--}}
+{{--                                        alt="Cahsfree Payment"--}}
+{{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="cashfree_currency">{{ __('admin.currency') }}:</label>--}}
+{{--                                                <input type="text" id="cashfree_currency" name="cashfree_currency"--}}
+{{--                                                       placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="opay_secret_key">{{ __('admin.app_id') }}:</label>--}}
+{{--                                                <input type="text" id="cashfree_app_id" name="cashfree_app_id"--}}
+{{--                                                    placeholder="cashfree_app_id"--}}
+{{--                                                    value="{{ $settings['cashfree_app_id'] ?? '' }}"--}}
+{{--                                                    class="form-control">--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
 
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_country_code">{{ __('admin.secret_key') }}:</label>--}}
+{{--                                                <input type="text" id="cashfree_secret_key"--}}
+{{--                                                       name="cashfree_secret_key" placeholder="cashfree_secret_key"--}}
+{{--                                                       value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>--}}
+{{--                                                <input type="text" id="cashfree_base_url"--}}
+{{--                                                       name="cashfree_base_url" placeholder="base_url"--}}
+{{--                                                       value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
 
-                            <!-- Cash free Fields -->
-                            <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.cashfree') }}</h4>
-                                        <div class="ribbon-banner-card">
-                                            <span>{{ __('soon') }}</span>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_cashfree_active" value="0">
-                                            <input type="checkbox" id="cashfreeRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_cashfree_active"
-                                                value="1"
-                                                {{ @$settings['is_cashfree_active'] == '1' ? 'checked' : '' }}>
-                                            <label for="cashfreeRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $cashfreeImageFound = false;
-                                        @endphp
+{{--                             <!-- Apple Pay Fields -->--}}
+{{--                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">--}}
+{{--                                <form action="{{ route('admin.settings.update') }}" method="POST">--}}
+{{--                                    @csrf--}}
+{{--                                <div class="card p-3 shadow" style="height: 495px;">--}}
+{{--                                    <div class="card-header d-flex justify-content-between align-items-center">--}}
+{{--                                        <h4 class="m-0">{{ __('admin.applepay') }}</h4>--}}
+{{--                                        <div class="d-flex align-items-center">--}}
+{{--                                            <input type="hidden" name="is_applepay_active" value="0">--}}
+{{--                                            <input type="checkbox" id="applepayRadio"--}}
+{{--                                                class="custom-payment-radio libraryRealTime" name="is_applepay_active"--}}
+{{--                                                value="1"--}}
+{{--                                                {{ @$settings['is_applepay_active'] == '1' ? 'checked' : '' }}>--}}
+{{--                                            <label for="applepayRadio" class="switch"></label>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="text-center my-3">--}}
+{{--                                        @php--}}
+{{--                                            $applepayImageFound = false;--}}
+{{--                                        @endphp--}}
 
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'cashfree')
-                                                <img src="{{ asset('images/cashfree.png') }}"
-                                                     alt="Opay Payment"
-                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                                @php
-                                                    $cashfreeImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
+{{--                                        @foreach($paymentCoins as $coin)--}}
+{{--                                            @if($coin->title == 'applepay')--}}
+{{--                                                <img src="{{ asset('images/applepay.jpg') }}"--}}
+{{--                                                     alt="apple Payment"--}}
+{{--                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                                @php--}}
+{{--                                                    $applepayImageFound = true;--}}
+{{--                                                @endphp--}}
+{{--                                            @endif--}}
+{{--                                        @endforeach--}}
 
-                                        @if(!$cashfreeImageFound)
-                                        <img src="{{ asset('images/cashfree.png') }}"
-                                        alt="Cahsfree Payment"
-                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="cashfree_currency">{{ __('admin.currency') }}:</label>
-                                                <input type="text" id="cashfree_currency" name="cashfree_currency"
-                                                       placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="opay_secret_key">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="cashfree_app_id" name="cashfree_app_id"
-                                                    placeholder="cashfree_app_id"
-                                                    value="{{ $settings['cashfree_app_id'] ?? '' }}"
-                                                    class="form-control">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_country_code">{{ __('admin.secret_key') }}:</label>
-                                                <input type="text" id="cashfree_secret_key"
-                                                       name="cashfree_secret_key" placeholder="cashfree_secret_key"
-                                                       value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="opay_base_url">{{ __('admin.base_url') }}:</label>
-                                                <input type="text" id="cashfree_base_url"
-                                                       name="cashfree_base_url" placeholder="base_url"
-                                                       value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                                </form>
-                            </div>
+{{--                                        @if(!$applepayImageFound)--}}
+{{--                                        <img src="{{ asset('images/applepay.jpg') }}"--}}
+{{--                                        alt="apple Payment"--}}
+{{--                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label>--}}
+{{--                                                <input type="text" id="apple_team_id" name="apple_team_id"--}}
+{{--                                                       placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}"--}}
+{{--                                                       class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label for="apple_key_id">{{ __('admin.app_id') }}:</label>--}}
+{{--                                                <input type="text" id="apple_key_id" name="apple_key_id"--}}
+{{--                                                    placeholder="apple_key_id"--}}
+{{--                                                    value="{{ $settings['apple_key_id'] ?? '' }}"--}}
+{{--                                                    class="form-control">--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
 
-                             <!-- Apple Pay Fields -->
-                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                <form action="{{ route('admin.settings.update') }}" method="POST">
-                                    @csrf
-                                <div class="card p-3 shadow" style="height: 495px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h4 class="m-0">{{ __('admin.applepay') }}</h4>
-                                        <div class="d-flex align-items-center">
-                                            <input type="hidden" name="is_applepay_active" value="0">
-                                            <input type="checkbox" id="applepayRadio"
-                                                class="custom-payment-radio libraryRealTime" name="is_applepay_active"
-                                                value="1"
-                                                {{ @$settings['is_applepay_active'] == '1' ? 'checked' : '' }}>
-                                            <label for="applepayRadio" class="switch"></label>
-                                        </div>
-                                    </div>
-                                    <div class="text-center my-3">
-                                        @php
-                                            $applepayImageFound = false;
-                                        @endphp
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="apple_client_id">{{ __('admin.apple_client_id') }}:</label>--}}
+{{--                                                <input type="text" id="apple_client_id"--}}
+{{--                                                       name="apple_client_id" placeholder="apple_client_id"--}}
+{{--                                                       value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>--}}
+{{--                                                <input type="text" id="apple_redirect_uri"--}}
+{{--                                                       name="apple_redirect_uri" placeholder="apple_redirect_uri"--}}
+{{--                                                       value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        @foreach($paymentCoins as $coin)
-                                            @if($coin->title == 'applepay')
-                                                <img src="{{ asset('images/applepay.jpg') }}"
-                                                     alt="apple Payment"
-                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                                @php
-                                                    $applepayImageFound = true;
-                                                @endphp
-                                            @endif
-                                        @endforeach
+{{--                                        <div class="col-md-6">--}}
+{{--                                            <div class="form-group">--}}
+{{--                                                <label--}}
+{{--                                                    for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>--}}
+{{--                                                    <input type="file" id="apple_service_file"--}}
+{{--                                                    name="apple_service_file" placeholder="apple_service_file"--}}
+{{--                                                     class="form-control" required>--}}
 
-                                        @if(!$applepayImageFound)
-                                        <img src="{{ asset('images/applepay.jpg') }}"
-                                        alt="apple Payment"
-                                        style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
-                                        @endif
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label>
-                                                <input type="text" id="apple_team_id" name="apple_team_id"
-                                                       placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}"
-                                                       class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="apple_key_id">{{ __('admin.app_id') }}:</label>
-                                                <input type="text" id="apple_key_id" name="apple_key_id"
-                                                    placeholder="apple_key_id"
-                                                    value="{{ $settings['apple_key_id'] ?? '' }}"
-                                                    class="form-control">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="apple_client_id">{{ __('admin.apple_client_id') }}:</label>
-                                                <input type="text" id="apple_client_id"
-                                                       name="apple_client_id" placeholder="apple_client_id"
-                                                       value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
-                                                <input type="text" id="apple_redirect_uri"
-                                                       name="apple_redirect_uri" placeholder="apple_redirect_uri"
-                                                       value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label
-                                                    for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>
-                                                    <input type="file" id="apple_service_file"
-                                                    name="apple_service_file" placeholder="apple_service_file"
-                                                     class="form-control" required>
-
-                                                    <input type="text" id="apple_service_file" disabled
-                                                       name="apple_service_file" placeholder="apple_service_file"
-                                                       value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit"
-                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
-                                </div>
-                                </form>
-                            </div>
+{{--                                                    <input type="text" id="apple_service_file" disabled--}}
+{{--                                                       name="apple_service_file" placeholder="apple_service_file"--}}
+{{--                                                       value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control">--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <button type="submit"--}}
+{{--                                        class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>--}}
+{{--                                </div>--}}
+{{--                                </form>--}}
+{{--                            </div>--}}
                         </div>
                     </div>
             </div>

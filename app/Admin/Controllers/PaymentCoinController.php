@@ -168,10 +168,21 @@ class PaymentCoinController extends MainController
     {
         $form = new Form(new PaymentCoin());
 
-        $form->select('title', trans('Title'))
-         ->options(PaymentType::getTranslatedOptions())
-         ->creationRules(['required', "unique:payment_coins,title,{{id}}"])->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
+        $form->text('title', __('Title'))
+            ->creationRules(['required', "unique:payment_coins,title,{{id}}"])
+            ->updateRules(['required', "unique:payment_coins,title,{{id}}"]);
+
         $form->image('photo', __('Photo'));
+
+        $form->table('fields', 'Fields', function ($table) {
+            $table->text('name', 'Input Name');
+            $table->text('value', 'Input Value');
+            $table->select('type', 'Type')->options([
+                'input' => 'Input',
+                'file' => 'File',
+            ]);
+        });
+
         $status = [
             'on' => ['value' => 1, 'text' => 'open', 'color' => 'primary'],
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
