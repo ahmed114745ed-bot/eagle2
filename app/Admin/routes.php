@@ -169,8 +169,6 @@ Route::group(
 
         $router->resource('rooms-preview', TestController::class); //
 
-
-
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
         $router->get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
         $router->get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -206,7 +204,7 @@ Route::group(
         //     Route::delete('/{id}', [RoleControllerNew::class, 'destroy']);
         // });
         Route::get('/permissions/category/{category}', [RoleControllerNew::class, 'getPermissionsByCategory']);
-       
+
         $router->resource('auth/permissions', PermissionController::class);
         $router->resource('colors', ColorController::class);
         $router->post('app-setting', [ColorController::class, 'appSetting'])->name("app-setting");
