@@ -129,7 +129,7 @@ class AgentSalaryTransactionController extends Controller
             return Common::apiResponse(0, __('api_responses.balance_not_enough'));
         }
         if ($agency->is_frozen == 1) {
-            return $this->response()->error(__('frozen'))->refresh();
+            return Common::apiResponse(0, __('api_responses.frozen_agency'));
         }
         $user_type = User::find($user_id);
 
