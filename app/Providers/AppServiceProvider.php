@@ -88,7 +88,6 @@ class AppServiceProvider extends ServiceProvider
             config(['app.name' => $appName]);
 
             $settings = DB::table('settings')->pluck('value', 'key')->toArray();
-            info($settings['apple_service_file']);
 
             config([
                 'themes.primaryColor' => $settings['primary_color'] ?? '#FF9428',

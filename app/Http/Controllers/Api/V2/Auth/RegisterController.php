@@ -67,6 +67,10 @@ class RegisterController extends Controller
     }
     public function sendWhatsAapOtp(Request $request)
     {
+       if (! config('whatsappauth.base_url')){
+           return Common::apiResponse(false, __('api_responses.whatsapp_inactive'));
+       }
+
         $token = $request->header('Authorization');
         $validator = Validator::make($request->all(), [
             'phone'                => ['required', 'string', 'max:255'],
