@@ -5,516 +5,700 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-.settings-sidebar {
-    background-color: var(--table-background-color);
-    display: block;
-    padding: 10px 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: var(--text-primary-color);
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
-    width: 100%;
+.agency-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
-.settings-menu {
+.agency-header {
     display: flex;
-    gap: 4px;
-    color: var(--text-secondary-color);
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
+    align-items: flex-start;
+    gap: 25px;
+    margin-bottom: 30px;
+    position: relative;
+    padding: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.agency-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.agency-avatar .logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.agency-info {
+    flex: 1;
+}
+
+.agency-name {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.agency-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.meta-label {
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+.meta-value {
+    color: #34495e;
+}
+
+.meta-uuid {
+    color: #95a5a6;
+    font-size: 0.9em;
+}
+
+.agency-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.stat-card {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    text-align: center;
+    min-width: 100px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #3498db;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-back {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #ecf0f1;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-back:hover {
+    background: #d6e0e3;
+    color: #34495e;
+}
+
+.notice-section {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 25px;
+}
+
+.notice-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #ff9800;
+    font-weight: 600;
+}
+
+.notice-content {
+    color: #5d4037;
+    line-height: 1.5;
+}
+
+.top-performers-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .top-performers-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+.performers-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-/*.settings-menu button {*/
-/*    background-color: var(--box-background-color);*/
-/*    border: none;*/
-/*    padding: 10px 15px;*/
-/*    font-size: 16px;*/
-/*    cursor: pointer;*/
-/*    transition: all 0.3s ease;*/
-/*    color: var(--text-secondary-color) !important;*/
-/*    border-radius: 4px;*/
-/*}*/
+.section-title {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #2c3e50;
+}
 
-/*.settings-menu button:hover {*/
-/*    background-color: #ff9800;*/
-/*}*/
+.section-badge {
+    background: #3498db;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
 
-/*.settings-menu button.active {*/
-/*    background-color: var(--primary-color);*/
-/*    color: var(--text-secondary-color) !important;*/
-/*}*/
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 15px;
+}
 
-.settings-content {
+.avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s;
+}
+
+.avatar-item:hover {
+    transform: translateY(-3px);
+}
+
+.avatar-img-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 8px;
+}
+
+.avatar-img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.settings-section {
+.avatar-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.avatar-badge.admin {
+    background: #27ae60;
+}
+
+.avatar-name {
+    font-size: 12px;
+    text-align: center;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: #95a5a6;
+}
+
+.empty-state i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.agency-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    color: #3498db;
+    border-bottom-color: #3498db;
+}
+
+.tab-btn:hover:not(.active) {
+    color: #34495e;
+}
+
+.tab-content {
     display: none;
-    width: 100%;
 }
 
-.settings-section.active {
+.tab-content.active {
     display: block;
 }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: white;
-            display: flex;
-            flex-direction: column;
-        }
-        /* .settings-sidebar {
-            width: 250px;
-            background: #222;
-            min-height: 100vh;
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .settings-sidebar h2 {
-            text-align: center;
-            color: #ff9800;
-        } */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background: var(--secondary-color);
-            filter: brightness(0.85);
-            padding: 20px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto 20px;
-            text-align: center;
-        }
-        .agency-container, .charge-container {
-            background: #222;
-            padding: 20px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto 20px;
-            text-align: center;
-        }
-        .avatar img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid #ff9800;
-            margin-bottom: 15px;
-        }
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
 
-        .section-title i {
-            margin-left: 10px;
-            font-size: 20px;
-        }
-        .stars-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 10px 0;
-        }
-        .stars-section {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: var(--box-shadow);
-        }
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
 
-        .star-wrapper {
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .details {
-            text-align: left;
-            margin-top: 10px;
-        }
-        .rtl .details {
-            text-align: right;
-        }
-        .details p {
-            margin: 5px 0;
-            font-size: 16px;
-        }
-        .star-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
+.card-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        .star-wrapper:hover .star-avatar {
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
+.card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #2c3e50;
+}
 
-        .star-badge {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: var(--accent-color);
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--card-bg);
-            font-weight: bold;
-        }
+.count-badge {
+    background: #ecf0f1;
+    color: #7f8c8d;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
 
-        .admin-badge {
-            background: var(--success-color);
-        }
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        /*.details strong {*/
-        /*    color: #ff9800;*/
-        /*}*/
-        button {
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 15px;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .star-wrapper {
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        /* Table styles */
-        .table-responsive {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 8px;
-            background-color: var(--secondary-color);
-            filter: brightness(0.85);
-            text-align: center;
-            border-bottom: 1px solid #444;
-        }
+.data-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
 
-        th {
-            background-color: var(--secondary-color);
-            filter: brightness(0.85);
-        }
+.data-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
+.data-table tr:last-child td {
+    border-bottom: none;
+}
 
+.data-table tr:hover {
+    background: #f8f9fa;
+}
 
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-            .container, .agency-container, .charge-container {
-                padding: 15px;
-            }
-            .avatar img {
-                width: 80px;
-                height: 80px;
-            }
-            table {
-                font-size: 14px;
-            }
-            th, td {
-                padding: 6px 4px;
-            }
-        }
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
 
-        @media (max-width: 480px) {
-            .details p {
-                font-size: 14px;
-            }
-            table {
-                font-size: 12px;
-            }
-            th, td {
-                padding: 4px 2px;
-            }
-        }
-        @media (max-width: 768px) {
-            .settings-menu {
-                flex-wrap: wrap;
-            }
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-            .settings-menu button {
-                flex: 1 0 50%; /* Two buttons per row on small screens */
-                max-width: none;
-            }
-        }
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
 
-        @media (max-width: 480px) {
-            
+.user-info strong {
+    font-size: 14px;
+}
 
-            .section-title {
-                font-size: 20px;
-            }
+.user-info small {
+    font-size: 11px;
+    color: #95a5a6;
+}
 
-            .stars-container {
-                justify-content: center;
-            }
-        }
+.role-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.role-badge.owner {
+    background: #9b59b6;
+}
+
+.role-badge.admin {
+    background: #27ae60;
+}
+
+.btn-action {
+    padding: 5px 10px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-action:hover {
+    background: #2980b9;
+}
+
+.empty-table {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #95a5a6;
+}
+
+.empty-table i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-table p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.pagination-wrapper {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #eee;
+}
     </style>
 </head>
 <body>
-    @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-@endif
 
-@if (session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-@endif
-
-    <div class="main-content">
-        <div class="container">
-            <div class="avatar">
-                <img src="{{ $agency->display_image }}" alt="Agency Logo">
+    <div class="agency-profile-container">
+        <!-- Header Section -->
+        <div class="agency-header">
+            <div class="agency-avatar">
+                <img src="{{ $agency->display_image }}" alt="Agency Logo" class="logo-img">
             </div>
-            <h2>{{ @$agency?->name ?? ''}}</h2>
-            <div class="details">
-                <p><strong>{{__("ID")}}:</strong> {{ $agency->id }}</p>
-                <p><strong>{{__("Phone")}}:</strong> {{ @$agency->phone ?? '' }}</p>
-                <p><strong>{{__("Owner")}}:</strong> {{ @$agency?->owner?->name ?? '' }}, UUID: {{ @$agency?->owner?->uuid ?? '' }}</p>
-                <p><strong>{{__("Notice")}}:</strong> {{ @$agency->notice ?? '' }}</p>
-                <p><strong>{{__("coins")}}:</strong> {{ number_format(@$agency->coins) ?? 0 }}</p>
-                <p><strong>{{__("salary")}}:</strong> {{ number_format(@$agency->salary) ?? 0 }}</p>
-            </div>
-            <button onclick="window.history.back()">{{__("Go Back")}}</button>
-        </div>
-
-        <div class="stars-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-star"></i>
-                    {{ __('نجوم الوكالة') }}
-                </h2>
-            </div>
-            
-            @if($giftLog && $giftLog->count())
-                <div class="stars-container">
-                    @foreach($giftLog as $log)
-                        @php
-                            $user = $log->receiver;
-                            $path = $user->profile?->avatar ?? null;
-                            $defaultImage = asset("images/businessman-icon.jpg");
-                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-                            $username = htmlspecialchars($user->name ?? 'Unknown');
-                            $userUrl = route('admin.users.show', $user->id);
-                            $exp = number_format($log->exp);
-                        @endphp
-                        
-                        <div class="star-wrapper" 
-                            onclick="window.location.href='{{ $userUrl }}'"
-                            title="{{ $username }} ({{ $exp }} EXP)">
-                            <img src="{{ $url }}" 
-                                alt="{{ $username }}"
-                                class="star-avatar">
-                            <div class="star-badge">{{ $exp }}</div>
-                        </div>
-                    @endforeach
+            <div class="agency-info">
+                <h1 class="agency-name">{{ @$agency?->name ?? ''}}</h1>
+                <div class="agency-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">{{__("ID")}}:</span>
+                        <span class="meta-value">{{ $agency->id }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">{{__("Phone")}}:</span>
+                        <span class="meta-value">{{ @$agency->phone ?? 'N/A' }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">{{__("Owner")}}:</span>
+                        <span class="meta-value">{{ @$agency?->owner?->name ?? 'N/A' }}</span>
+                        <span class="meta-uuid">({{ @$agency?->owner?->uuid ?? 'N/A' }})</span>
+                    </div>
                 </div>
-            @else
-                <p class="no-data">{{ __('No stars data available') }}</p>
-            @endif
-        </div>
-    
-        <!-- Admins Section -->
-        <div class="stars-section">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-user-shield"></i>
-                    {{ __('ادمن الوكالة') }}
-                </h2>
-            </div>
-            
-            @if($agency->admins && $agency->admins->count())
-                <div class="stars-container">
-                    @foreach($agency->admins as $admin)
-                        @php
-                            $user = $admin->user;
-                            $path = $user->profile?->avatar ?? null;
-                            $defaultImage = asset("images/businessman-icon.jpg");
-                            $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
-                            $username = htmlspecialchars($user->name ?? 'Unknown');
-                            $userUrl = route('admin.users.show', $user->id);
-                        @endphp
-                        
-                        <div class="star-wrapper" 
-                            onclick="window.location.href='{{ $userUrl }}'"
-                            title="{{ $username }}">
-                            <img src="{{ $url }}" 
-                                alt="{{ $username }}"
-                                class="star-avatar">
-                            <div class="star-badge admin-badge"><i class="fas fa-shield-alt"></i></div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <p class="no-data">{{ __('لا يوجد ادمن للوكالة') }}</p>
-            @endif
-        </div>
-
-
-
-        <div class="settings-sidebar">
-            <div class="settings-menu">
-                <button onclick="showSection('showMembers')" class="active">{{ __('members') }}</button>
-                <button onclick="showSection('showCharges')">{{ __('charge') }}</button>
-                <button onclick="showSection('showSalary')">{{ __('salary') }}</button>
-                <button onclick="showSection('joinAgency')">{{ __('Agency Join Requests') }}</button>
-                <button onclick="showSection('userTargets')">{{ __('targets') }}</button>
-            </div>
-        </div>
-              
-        <div class="settings-content">
-            <!-- Members Section -->
-            <div id="showMembers" class="settings-section active">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title" style="text-align: left;">{{ __('members') }}</h4>
-
-                        @if($members && $members->count())
-                            <div class="table-responsive">
-                                <div class="box-body table-responsive no-padding">
-                                    <table class="table table-hover grid-table" id="member">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>{{ __('Name') }}</th>
-                                                <th>{{ __('uuid') }}</th>
-                                                <th>{{ __('image') }}</th>
-                                                <th>{{ __('reals_count') }}</th>
-                                                <th>{{ __('total_days') }}</th>
-                                                <th>{{ __('total_hours') }}</th>
-                                                <th>{{ __('Monthly DI') }}</th>
-                                                <th>{{ __('salary') }}</th>
-                                                <th>{{ __('type') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody style="color: rgb(208, 115, 43);">
-                                            @foreach($members as $index => $member)
-                                           
-                                           
-                                                <tr>
-                                                    <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
-                                                    <td>{{ @$member->name ?? '' }}</td>
-                                                    <td>{{ @$member->uuid ?? '' }}</td>
-
-                                                    <td>
-                                                        <img src="{{ getImagePath(@$member->profile->avatar) }}" width="50" height="50" style="object-fit: cover; border-radius: 50%;">
-                                                    </td>
-                                                    <td>{{count($member->reals) ?? 0 }}</td>
-                                                    <td>{{ $member->total_days ?? 0 }}</td>
-                                                    <td>{{ $member->liveTime->sum("hours") }}</td>
-                                                    <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
-                                                    <td>{{ $member->userSallary->sallary ?? 0 }}</td>
-                                                  
-                                                    <td>
-                                                        @php
-                                                            $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
-                                                                        ->where('agency_id', $member->agency_id)
-                                                                        ->where('type', 'requestManger')
-                                                                        ->exists();
-                                                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
-                                                                        ->where('id', $member->agency_id)->exists();
-                                                        @endphp
-                                                
-                                                            @if($isOwner)
-                                                            <div class="text-center">
-                                                                <span class="badge badge-dark fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
-                                                                    {{ __('Owner') }}
-                                                                </span>
-                                                            </div>
-                                                        @elseif($isAdmin)
-                                                        <div class="text-center">
-                                                            <span class="badge badge-success fw-bold" style="font-size: 1.5rem; padding: 10px 20px;">
-                                                                {{ __('Admin') }}
-                                                            </span>
-                                                        </div>
-                                                        @else
-                                                        <button class="btn btn-sm btn-primary make-admin-btn" data-id="{{ $member->id }}">
-                                                            {{ __('Make Admin') }}
-                                                        </button>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-
-                                    <!-- Pagination Links -->
-                                    <div class="pagination-container">
-                                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <p>{{ __('No members found.') }}</p>
-                        @endif
+                <div class="agency-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
+                        <div class="stat-label">{{__("coins")}}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
+                        <div class="stat-label">{{__("salary")}}</div>
                     </div>
                 </div>
             </div>
+            <button class="btn-back" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
+            </button>
+        </div>
+    
+        <!-- Notice Section -->
+        @if(@$agency->notice)
+        <div class="notice-section">
+            <div class="notice-header">
+                <i class="fas fa-info-circle"></i>
+                <span>{{__("Notice")}}</span>
+            </div>
+            <div class="notice-content">
+                {{ @$agency->notice }}
+            </div>
+        </div>
+        @endif
+    
+        <!-- Stars & Admins Section -->
+        <div class="top-performers-section">
+            <!-- Stars Section -->
+            <div class="performers-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-star"></i>
+                        {{ __('Agency Stars') }}
+                    </h2>
+                    <div class="section-badge">{{ $giftLog->count() ?? 0 }}</div>
+                </div>
+                
+                @if($giftLog && $giftLog->count())
+                    <div class="avatar-grid">
+                        @foreach($giftLog as $log)
+                            @php
+                                $user = $log->receiver;
+                                $path = $user->profile?->avatar ?? null;
+                                $defaultImage = asset("images/businessman-icon.jpg");
+                                $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                $username = htmlspecialchars($user->name ?? 'Unknown');
+                                $userUrl = route('admin.users.show', $user->id);
+                                $exp = number_format($log->exp);
+                            @endphp
+                            
+                            <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
+                                <div class="avatar-img-container">
+                                    <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                    <div class="avatar-badge">{{ $exp }}</div>
+                                </div>
+                                <div class="avatar-name">{{ $username }}</div>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <p>{{ __('No stars data available') }}</p>
+                    </div>
+                @endif
+            </div>
+    
+            <!-- Admins Section -->
+            <div class="performers-card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-shield"></i>
+                        {{ __('Agency Admins') }}
+                    </h2>
+                    <div class="section-badge">{{ $agency->admins->count() ?? 0 }}</div>
+                </div>
+                
+                @if($agency->admins && $agency->admins->count())
+                    <div class="avatar-grid">
+                        @foreach($agency->admins as $admin)
+                            @php
+                                $user = $admin->user;
+                                $path = $user->profile?->avatar ?? null;
+                                $defaultImage = asset("images/businessman-icon.jpg");
+                                $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
+                                $username = htmlspecialchars($user->name ?? 'Unknown');
+                                $userUrl = route('admin.users.show', $user->id);
+                            @endphp
+                            
+                            <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }}">
+                                <div class="avatar-img-container">
+                                    <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                    <div class="avatar-badge admin"><i class="fas fa-shield-alt"></i></div>
+                                </div>
+                                <div class="avatar-name">{{ $username }}</div>
+                            </a>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <i class="fas fa-user-slash"></i>
+                        <p>{{ __('No admins found') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    
+        <!-- Navigation Tabs -->
+        <div class="agency-tabs">
+            <button class="tab-btn active" data-target="members-tab">{{ __('Members') }}</button>
+            <button class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</button>
+            <button class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</button>
+            <button class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</button>
+            <button class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</button>
+        </div>
+    
+              
+        <div class="tab-content active" id="members-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ __('Agency Members') }}</h3>
+                    <span class="badge count-badge">{{ $members->total() }}</span>
+                </div>
+                
+                @if($members && $members->count())
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{ __('Member') }}</th>
+                                    <th>{{ __('Reals') }}</th>
+                                    <th>{{ __('Live Hours') }}</th>
+                                    <th>{{ __('Monthly DI') }}</th>
+                                    <th>{{ __('Salary') }}</th>
+                                    <th>{{ __('Role') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($members as $index => $member)
+                                    @php
+                                        $isAdmin = \App\Models\AgencyUserJob::where('user_id', $member->id)
+                                                    ->where('agency_id', $member->agency_id)
+                                                    ->where('type', 'requestManger')
+                                                    ->exists();
+                                        $isOwner = \App\Models\Agency::where('app_owner_id', $member->id)
+                                                    ->where('id', $member->agency_id)->exists();
+                                    @endphp
+                                
+                                    <tr>
+                                        <td>{{ $index + 1 + (($members->currentPage() - 1) * $members->perPage()) }}</td>
+                                        <td class="user-cell">
+                                            <div class="user-avatar">
+                                                <img src="{{ getImagePath(@$member->profile->avatar) }}" alt="{{ $member->name }}">
+                                            </div>
+                                            <div class="user-info">
+                                                <strong>{{ @$member->name ?? '' }}</strong>
+                                                <small>UID: {{ @$member->uuid ?? '' }}</small>
+                                            </div>
+                                        </td>
+                                        <td>{{ count($member->reals) ?? 0 }}</td>
+                                        <td>{{ $member->liveTime->sum("hours") }}</td>
+                                        <td>{{ $member->monthly_diamond_received ?? 0 }}</td>
+                                        <td>{{ $member->userSallary->sallary ?? 0 }}</td>
+                                        <td>
+                                            @if($isOwner)
+                                                <span class="role-badge owner">{{ __('Owner') }}</span>
+                                            @elseif($isAdmin)
+                                                <span class="role-badge admin">{{ __('Admin') }}</span>
+                                            @else
+                                                <button class="btn-action make-admin" data-id="{{ $member->id }}">
+                                                    {{ __('Make Admin') }}
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination-wrapper">
+                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                @else
+                    <div class="empty-table">
+                        <i class="fas fa-users-slash"></i>
+                        <p>{{ __('No members found') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
 
             <!-- Charges Section -->
-            <div id="showCharges" class="settings-section">
+            <div class="tab-content" id="charges-tab">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('charge') }}</h4>
-
-
+                    </div>
+                    
                             <div class="table-responsive">
-                                <div class="box-body table-responsive no-padding">
-                                    <table class="table table-hover grid-table" id="charge">
+                                <div class="box-body ">
+                                    <table class="data-table" id="charge">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -557,13 +741,13 @@
                                 {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                             </div>
 
-                    </div>
+                    
                 </div>
 
             </div>
 
             <!-- salary Section -->
-            <div id="showSalary" class="settings-section ">
+            <div class="tab-content" id="salary-tab">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
@@ -608,7 +792,7 @@
                 </div>
             </div>
 
-            <div id="joinAgency" class="settings-section">
+            <div class="tab-content" id="requests-tab">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
@@ -705,7 +889,7 @@
                 </div>
             </div>
 
-            <div id="userTargets" class="settings-section">
+            <div class="tab-content" id="targets-tab">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title text-left">{{ __('target') }}</h4>
@@ -938,7 +1122,7 @@
                 </div>
             </div>
             
-        </div>
+       
 
     </div>
 
@@ -948,42 +1132,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
-    document.addEventListener("DOMContentLoaded", function() {
-        // Show members tab by default
-        showSection('showMembers');
-
-        // Check URL for active tab
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeTab = urlParams.get('tab');
-        if (activeTab) {
-            showSection(activeTab);
-        }
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Remove active class from all buttons and content
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked button and corresponding content
+        btn.classList.add('active');
+        const target = btn.getAttribute('data-target');
+        document.getElementById(target).classList.add('active');
     });
-
-    function showSection(sectionId) {
-        // Hide all sections
-        document.querySelectorAll('.settings-section').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Show selected section
-        document.getElementById(sectionId).classList.add('active');
-
-        // Update button styles
-        document.querySelectorAll('.settings-menu button').forEach(button => {
-            button.classList.remove('active');
-        });
-
-        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-        if (activeButton) {
-            activeButton.classList.add('active');
-        }
-
-        // Update URL with active tab
-        const url = new URL(window.location);
-        url.searchParams.set('tab', sectionId);
-        window.history.pushState({}, '', url);
-    }
+});
 
 
     $(document).ready(function() {
@@ -1051,3 +1211,10 @@
 
 
     </script>
+
+
+
+
+
+
+
