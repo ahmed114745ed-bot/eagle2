@@ -117,12 +117,19 @@ class AgencyService
         $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
-        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year);
+        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year, 10, $request->page);
+
+
 
         return [
-            'target' => $target,
-            'rate_percentage' => $result,
-            'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+            'success' => true,
+            'message' => 'successfully',
+            'data' => [
+                'target' => $target,
+                'rate_percentage' => $result,
+                'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+            ],
+            'status' => 200,
         ];
     }
 
@@ -131,14 +138,14 @@ class AgencyService
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id' );
+        return $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id', 10, $request->page);
     }
 
     public function heroes($agencyId, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        return $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        return $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id', 10, $request->page);
     }
 
     public function agencyMembers($agencyId)

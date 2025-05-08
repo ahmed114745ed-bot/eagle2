@@ -72,12 +72,19 @@ class AgencyController extends Controller
     public function agencyTargetDetails($id, Request $request)
     {
         try {
-            $data = $this->agencyService->agencyTarget($id, $request);
+            $response = $this->agencyService->agencyTarget($id, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '',  $data, 200, $data['users_target']);
+        return Common::apiResponse(
+            1,
+            $response['message'],
+            $response['data'],
+            $response['status'],
+            '',
+            'users_target'
+        );
     }
 
     public function star($id, Request $request)

@@ -174,10 +174,20 @@ class PaymentCoinController extends MainController
 
         $form->image('photo', __('Photo'));
 
-        $form->table('fields', 'Fields', function ($table) {
-            $table->text('name', 'Input Name');
-            $table->text('value', 'Input Value');
-            $table->select('type', 'Type')->options([
+        $form->hasMany('settings', 'Fields', function ($form) {
+            $form->text('key', 'Input Name')
+                ->rules(function ($form) {
+                    // $form->model() is the Setting model; $form->parent is PaymentCoin
+                    $paymentCoinId = request()->route('payment_coins'); // or $form->parent->id in some versions
+                    $id = $form->model ? $form->model->id : null;
+
+                    return [
+                        'required',
+                        "unique:settings,key,$id,id,payment_coin_id,$paymentCoinId"
+                    ];
+                });
+            $form->text('value', 'Input Value');
+            $form->select('type', 'Type')->options([
                 'input' => 'Input',
                 'file' => 'File',
             ]);
