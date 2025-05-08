@@ -736,15 +736,22 @@
                 @endif
             </div>
         </div>
-    
+        @php
+                    $activeTab = request('tab', 'tab=targets'); 
+        @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
-            <button class="tab-btn active" data-target="members-tab">{{ __('Members') }}</button>
-            <button class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</button>
-            <button class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</button>
-            <button class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</button>
-            <button class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</button>
+            <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
+            <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</a>
+            <a href="?tab=salary" class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</a>
+            <a href="?tab=requests" class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</a>
+            <!-- <a href="?tab=targets" class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</a> -->
+            <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">{{ __('Targets') }}</a>
+
         </div>
+          
+
+         
     
               
         <div class="tab-content active" id="members-tab">
@@ -800,7 +807,7 @@
                                             @elseif($isAdmin)
                                                 <span class="role-badge admin">{{ __('Admin') }}</span>
                                             @else
-                                                <button class="btn-action make-admin" data-id="{{ $member->id }}">
+                                                <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
                                                     {{ __('Make Admin') }}
                                                 </button>
                                             @endif
@@ -1038,8 +1045,9 @@
                     
                     <div class="card-body">
                         <!-- Filter Form -->
-                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="filter-form">
+                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
                             <div class="row">
+                                <input type="hidden" name="tab" value="targets">
                                 <div class="col-md-5">
                                     <div class="form-group">
                                         <label for="month">{{ __('Month') }}</label>
@@ -1182,9 +1190,16 @@
                             @endif
                         </div>
             
-                        <!-- Targets Table -->
-                        <div class="table-section">
-                            <div class="table-responsive">
+                     
+                <div class="tab-content active" id="members-tab">
+                    <div class="card table-section">
+                        <div class="card-header">
+                            <h3>{{ __('') }}</h3>
+                            <span class="badge count-badge"></span>
+                        </div>
+
+                        <div class="table-section card">
+                            <!-- <div class="table-responsive"> -->
                                 <table class="agency-table">
                                     <thead>
                                         <tr>
@@ -1261,6 +1276,7 @@
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         </div>
+                     </div>
                     </div>
                 </div>
             </div>
@@ -1275,18 +1291,40 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
+    document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedTab = urlParams.get('tab') || 'members'; // افتراضيًا members
+
+            const allTabs = document.querySelectorAll('.tab-btn');
+            const allTabContents = document.querySelectorAll('[id$="-tab"]');
+
+            allTabs.forEach(tab => {
+                const target = tab.getAttribute('data-target');
+
+                if (target.startsWith(selectedTab)) {
+                    tab.classList.add('active');
+                    document.getElementById(target).style.display = 'block';
+                } else {
+                    tab.classList.remove('active');
+                    document.getElementById(target).style.display = 'none';
+                }
+            });
+        });
+
+
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Remove active class from all buttons and content
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        
-        // Add active class to clicked button and corresponding content
-        btn.classList.add('active');
-        const target = btn.getAttribute('data-target');
-        document.getElementById(target).classList.add('active');
-    });
-});
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                btn.classList.add('active');
+                const target = btn.getAttribute('data-target');
+                document.getElementById(target).classList.add('active');
+            });
+        });
 
 
     $(document).ready(function() {
@@ -1297,8 +1335,9 @@
                 _token: '{{ csrf_token() }}'
             }, function(response) {
                 if (response.status) {
-                    alert(response.message); // Show success
-                    location.reload();
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', 'requests');
+                    window.location.href = url.toString();
                 } else {
                     alert(response.message); // Show error returned by backend
                 }
@@ -1316,8 +1355,9 @@
                 _token: '{{ csrf_token() }}'
             }, function(response) {
                 if (response.status) {
-                    alert(response.message);
-                    location.reload();
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', 'requests');
+                    window.location.href = url.toString();
                 } else {
                     alert(response.message);
                 }
