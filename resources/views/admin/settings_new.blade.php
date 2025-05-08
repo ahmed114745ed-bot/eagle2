@@ -1100,23 +1100,27 @@
                                                      style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
                                             </div>
                                             <div class="row">
-                                                @foreach($coin->fields ?? [] as $field)
+                                                @foreach($coin->settings as $setting)
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            @php
-                                                                $label = is_string($field['name']) ? $field['name'] : (is_array($field['name']) ? implode(' ', $field['name']) : '');
-                                                            @endphp
-                                                            <label for="{{ $field['name'] }}">
-                                                                {{ __('admin.'.$field['name']) }}
-{{--                                                                {{ __(ucfirst(str_replace('_', ' ', $field['name']))) }}:--}}
+                                                            <label for="{{ $setting->key }}">
+                                                                {{ __('admin.'.$setting->key) }}
+                                                                {{-- {{ __(ucfirst(str_replace('_', ' ', $setting->key))) }}: --}}
                                                             </label>
-                                                            @if($field['type'] == 'input')
-                                                                <input type="text" id="{{ $field['name'] }}" name="{{ $field['name'] }}"
-                                                                       placeholder="{{ $field['name'] }}"
-                                                                       value="{{ $settings[$field['name']] ?? ($field['value'] ?? '')}}" class="form-control" required>
-                                                            @elseif($field['type'] == 'file')
-                                                                <input type="file" id="{{ $field['name'] }}" name="{{ $field['name'] }}"
-                                                                       class="form-control" required>
+                                                            @if($setting->type == 'input')
+                                                                <input type="text"
+                                                                       id="{{ $setting->key }}"
+                                                                       name="{{ $setting->key }}"
+                                                                       placeholder="{{ $setting->key }}"
+                                                                       value="{{ $settings[$setting->key] ?? $setting->value ?? '' }}"
+                                                                       class="form-control"
+                                                                       required>
+                                                            @elseif($setting->type == 'file')
+                                                                <input type="file"
+                                                                       id="{{ $setting->key }}"
+                                                                       name="{{ $setting->key }}"
+                                                                       class="form-control"
+                                                                       required>
                                                             @endif
                                                         </div>
                                                     </div>
