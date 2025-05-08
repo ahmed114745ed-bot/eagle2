@@ -10,6 +10,9 @@ class PaymentCoin extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+    protected $casts = [
+        'fields' => 'array',
+    ];
 
     public function getCreatedAtAttribute($value)
     {
