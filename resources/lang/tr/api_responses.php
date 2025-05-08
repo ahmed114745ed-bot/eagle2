@@ -123,6 +123,7 @@ return [
     'freeze_transfer_charger' => 'Transferleriniz donduruldu. Lütfen yönetimle iletişime geçin!',
     'freeze_transfer_receiver' => 'Alıcının transferleri donduruldu. Şu anda transfer alamaz.',
 
+    'whatsapp_inactive' => 'WhatsApp hizmeti şu anda aktif değil.',
     'agencyDown'                                                 => 'Üzgünüm! Ajans şu an kapalı, katılamazsınız',
     'canNotCharge'                                               => 'Yükleme yapamazsınız, ajansınız kapalı',
     'disabled_version'                                           => 'Lütfen uygulamayı silin ve Google Play\'den tekrar indirin, anlayışınız için teşekkür ederiz',
