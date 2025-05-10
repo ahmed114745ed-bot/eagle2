@@ -457,7 +457,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-    color: #7f8c8d;
+   
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
