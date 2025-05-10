@@ -19,7 +19,18 @@ class AgencyObserver
      */
     public function created(Agency $agency)
     {
-        User::query()->where('id', $agency->app_owner_id)->update(['agency_id' => $agency->id]);
+        $updateData = [
+            'agency_id' => $agency->id,
+        ];
+
+        if ($agency->Host_agency) {
+            $updateData['monthly_diamond_received'] = 0;
+        }
+
+        User::query()
+            ->where('id', $agency->app_owner_id)
+            ->update($updateData);
+
     }
 
 
@@ -50,7 +61,7 @@ class AgencyObserver
         if ($joinedAgency) UsersJoinedAgency::where('agency_id',  $agency->id)->update(['leave_date' => now()]);
         $user = User::find($agency->app_owner_id);
         Admin::where('username', $user->uuid)->delete();
-        //check delete agency action 
+        //check delete agency action
     }
 
     /**
