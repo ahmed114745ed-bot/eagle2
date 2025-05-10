@@ -137,7 +137,7 @@ class AgencyController extends MainController
         $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
         $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
         return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);   
+            ->view('agency_profile', $data);
 
     }
 
@@ -499,6 +499,7 @@ class AgencyController extends MainController
                 $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
                 $row->width(12)->hidden('Host_agency')->default(1);
+                $row->width(12)->switch('Shipping_agency')->default(0);
 
                 if (!Auth::user()->isRole('Agencies Managers')) {
                     $row->width(12)->hidden('Shipping_agency')->default(0);
