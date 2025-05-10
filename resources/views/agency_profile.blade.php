@@ -8,6 +8,28 @@
 
     <style>
 
+
+:root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --green-color: {{ config('themes.greenColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+        --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
 .stat-icon {
     width: 50px;
     height: 50px;
@@ -46,7 +68,7 @@
 }
 
 .section-box {
-    background: white;
+    background: var(--secondary-color);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -140,7 +162,7 @@
     margin-bottom: 30px;
     position: relative;
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    background: var(--primary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -299,7 +321,7 @@
 }
 
 .performers-card {
-    background: white;
+    background: var(--secondary-color);
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -471,6 +493,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: var(--primary-color);
 }
 
 .card-header h3 {
@@ -491,13 +514,20 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--box-background-color);
+}
+
+.table-section {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--box-background-color);
 }
 
 .data-table th {
     text-align: left;
     padding: 12px 15px;
-    background: #f8f9fa;
-    color: #7f8c8d;
+    background: var(--primary-color);
+   
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -601,11 +631,31 @@
     font-size: 14px;
 }
 
+.user-avatar,
+.supporter-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.supporters-avatars {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
 .pagination-wrapper {
     padding: 15px 20px;
     display: flex;
     justify-content: center;
     border-top: 1px solid #eee;
+     background: var(--box-background-color);
 }
 
 @media (max-width: 768px) {
@@ -1003,7 +1053,7 @@
                                                         {!! $image !!}
                                                         <div>
                                                             <strong>{{ $name }}</strong><br>
-                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                            <span style=" font-size: smaller;">UID: {{ $uid }}</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1210,18 +1260,14 @@
                                 </div>
                             @endif
                         </div>
-            
+            <br>
                      
                 <div class="tab-content active" id="members-tab">
-                    <div class="card table-section">
-                        <div class="card-header">
-                            <h3>{{ __('') }}</h3>
-                            <span class="badge count-badge"></span>
-                        </div>
+                   
 
                         <div class="table-section card">
-                            <!-- <div class="table-responsive"> -->
-                                <table class="agency-table">
+                             <div class="table-responsive"> 
+                                <table class="data-table">
                                     <thead>
                                         <tr>
                                             <th width="5%">#</th>
@@ -1246,6 +1292,23 @@
                                                 if (!isImageExists($avatarUrl)) {
                                                     $avatarUrl = $defaultImage;
                                                 }
+                                                 $month = request('month') ?? now()->month;
+                                                 $year = request('year') ?? now()->year;
+
+                                                 $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
+                                                            ->where('receiver_id', $memberTarget->id)
+                                                            ->whereHas('sender')
+                                                            ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'
+                                                            ->whereYear('created_at', $year)
+                                                            ->whereMonth('created_at', $month)
+                                                            ->selectRaw("sum(giftPrice) as exp, sender_id")
+                                                            ->groupBy('sender_id')
+                                                            ->orderByRaw("exp desc")
+                                                            ->limit(3)
+                                                            ->get()
+                                                            ->reject(fn ($q) => $q->exp == 0);
+
+                                                        $memberTarget->topSupporters = $giftLogs;
                                             @endphp
                                             
                                             <tr>
@@ -1271,12 +1334,27 @@
                                                 </td>
                                                 <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
                                                 <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
-                                                <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
+                                                <td>
+                                                    <div class="supporters-avatars">
+                                                        @foreach($memberTarget->topSupporters ?? [] as $supporter)
+                                                            @php
+                                                                $sender = $supporter->sender;
+                                                                $supporterAvatar = $sender->profile->avatar ?? null;
+                                                                $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
+                                                                if (!isImageExists($supporterUrl)) {
+                                                                    $supporterUrl = $defaultImage;
+                                                                }
+                                                            @endphp
+                                                            <img src="{{ $supporterUrl }}" class="supporter-avatar" title="{{ $sender->name ?? '' }}" alt="Supporter">
+                                                        @endforeach
+                                                    </div>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     @endif
                                 </table>
+                             
                             </div>
                             
                             @if($memberTargets->isEmpty())
@@ -1297,8 +1375,8 @@
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         </div>
-                     </div>
-                    </div>
+                   
+                   
                 </div>
             </div>
             
