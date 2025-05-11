@@ -1079,7 +1079,7 @@
                             <!-- dynamic Fields -->
                             @foreach($paymentCoins as $coin)
                                 <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                                    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
+                                    <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <div class="card p-3 shadow" style="height: 495px;">
                                             <div class="card-header d-flex justify-content-between align-items-center">
