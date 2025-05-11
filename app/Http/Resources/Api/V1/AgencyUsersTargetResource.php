@@ -58,6 +58,8 @@ class AgencyUsersTargetResource extends JsonResource
                 'user_days' => @$target->user_days ?? 0,
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
                 'old_targets'  => $userTarget,
+                'days'    => $this->user_days,
+                'hours' => $this->user_hours,
             ],
             'sender_gifts' => SenderGiftLogResource::collection($giftLog),
         ];
