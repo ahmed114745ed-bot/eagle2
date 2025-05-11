@@ -465,7 +465,7 @@
 }
 
 .tab-btn.active {
-    color: #3498db;
+    color:var(--primary-color);
     border-bottom-color: var(--primary-color);
 }
 
