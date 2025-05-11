@@ -1090,7 +1090,8 @@
                                                            class="custom-payment-radio libraryRealTime"
                                                            name="is_{{ $coin->title }}_active"
                                                            value="1"
-                                                        {{ @$settings['is_'.$coin->title.'_active'] == '1' ? 'checked' : '' }}>
+                                                        {{ $coin->status == 1 && @$settings['is_'.$coin->title.'_active'] == '1' ? 'checked' : '' }}
+                                                        {{ $coin->status == 0 ? 'disabled' : '' }}>
                                                     <label for="{{ $coin->title }}Radio" class="switch"></label>
                                                 </div>
                                             </div>
