@@ -87,55 +87,56 @@ class PaymentCoinController extends MainController
 
         $grid->column('status', __("status"))->switch($status);
 
-        $grid->column('custom_message', __('Custom Message'))->display(function () {
-            $fawryConfig = config('services.fawry');
-            $fawryCount = collect($fawryConfig)->every(function($value) {
-                return $value != null;
-            });
-
-            $payskyConfig = config('paysky');
-            $payskyCount = collect($payskyConfig)->every(function($value) {
-                return $value != null;
-            });
-
-            $stripeConfig = config('stripe');
-            $stripeCount = collect($stripeConfig)->every(function($value) {
-                return $value != null;
-            });
-
-            $opayConfig = config('nafezly-payments');
-            $opayCount = collect($opayConfig)->every(function($value) {
-                return $value != null;
-            });
-
-            $url = url('admin/settings?firsttab=paymentCredentialSettings');
-            $href = "<a href='{$url}'>". __('Please edit payment credential settings') ."</a>";
-            switch ($this->title){
-                case 'fawry':
-                    if (Config::get('is_fawry_active') != 1 || !$fawryCount) {
-                        return $href;
-                    }
-                    break;
-                case 'sky pay':
-                    if (Config::get('is_paysky_active') != 1 || !$payskyCount) {
-                        return $href;
-                    }
-                    break;
-                case 'stripe':
-                    if (Config::get('is_stripe_active') != 1 || !$stripeCount) {
-                        return $href;
-                    }
-                    break;
-                case 'opay':
-                    if (Config::get('is_opay_active') != 1 || !$opayCount) {
-                        return $href;
-                    }
-                    break;
-                default:
-                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-            }
-            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-        });
+        $grid->column('custom_message', __('Custom Message'));
+//            ->display(function () {
+//            $fawryConfig = config('services.fawry');
+//            $fawryCount = collect($fawryConfig)->every(function($value) {
+//                return $value != null;
+//            });
+//
+//            $payskyConfig = config('paysky');
+//            $payskyCount = collect($payskyConfig)->every(function($value) {
+//                return $value != null;
+//            });
+//
+//            $stripeConfig = config('stripe');
+//            $stripeCount = collect($stripeConfig)->every(function($value) {
+//                return $value != null;
+//            });
+//
+//            $opayConfig = config('nafezly-payments');
+//            $opayCount = collect($opayConfig)->every(function($value) {
+//                return $value != null;
+//            });
+//
+//            $url = url('admin/settings?firsttab=paymentCredentialSettings');
+//            $href = "<a href='{$url}'>". __('Please edit payment credential settings') ."</a>";
+//            switch ($this->title){
+//                case 'fawry':
+//                    if (Config::get('is_fawry_active') != 1 || !$fawryCount) {
+//                        return $href;
+//                    }
+//                    break;
+//                case 'sky pay':
+//                    if (Config::get('is_paysky_active') != 1 || !$payskyCount) {
+//                        return $href;
+//                    }
+//                    break;
+//                case 'stripe':
+//                    if (Config::get('is_stripe_active') != 1 || !$stripeCount) {
+//                        return $href;
+//                    }
+//                    break;
+//                case 'opay':
+//                    if (Config::get('is_opay_active') != 1 || !$opayCount) {
+//                        return $href;
+//                    }
+//                    break;
+//                default:
+//                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
+//            }
+//            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
+//        });
 
         return $grid;
     }
