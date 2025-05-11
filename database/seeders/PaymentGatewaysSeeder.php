@@ -31,7 +31,7 @@ class PaymentGatewaysSeeder extends Seeder
             'razorpay.webp',
             'senangpay.png',
             'paymob.png',
-            'flutterwave.png',
+            'flutterwave.jpg',
             'paystack.png',
             'sslcommerz.png',
             'googlepay.png',
