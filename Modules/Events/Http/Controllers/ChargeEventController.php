@@ -69,7 +69,7 @@ class ChargeEventController extends Controller
     }
     public function targets()
     {
-        $targets = ChargeTargetEvent::query()->with("rewards")->get();
+        $targets = ChargeTargetEvent::query()->with("rewards",'users')->orderBy('value', 'asc')->get();
         $currentMonth = now()->month;
         $user = User::withSum(['charges' => function ($query) use ($currentMonth) {
             $query->whereMonth('created_at', $currentMonth);

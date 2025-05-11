@@ -6,6 +6,7 @@ use App\Models\PaymentCoin;
 use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Storage;
 
 class PaymentGatewaysSeeder extends Seeder
 {
@@ -14,6 +15,37 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
+        $images = [
+            'fawry.jpeg',
+            'paysky.png',
+            'stripe.png',
+            'opay.png',
+            'cashfree.jpg',
+            'applepay.png',
+            'mada.png',
+            'liqpay.png',
+            'paypal.png',
+            'paytm.png',
+            'paytabs.webp',
+            'bkash.png',
+            'razorpay.webp',
+            'senangpay.png',
+            'paymob.png',
+            'flutterwave.jpg',
+            'paystack.png',
+            'sslcommerz.png',
+            'googlepay.png',
+            'huaweipay.png',
+        ];
+
+        foreach ($images as $img) {
+            $localPath = public_path('images/' . $img);
+            $gcsPath = 'images/' . $img;
+
+            if (file_exists($localPath)) {
+                Storage::disk('gcs')->put($gcsPath, file_get_contents($localPath), 'public');
+            }
+        }
 
         $fawry_id = PaymentCoin::updateOrCreate([
             'title' => 'fawry',
@@ -39,11 +71,6 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => "Sit dignissimos aliq"
             ],
-            'new_4' => [
-                "name" => "is_fawry_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_5' => [
                 "name" => "fawry_url",
                 "type" => "input",
@@ -66,22 +93,15 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
-
         // sky pay
-
          $pay_sky_id = PaymentCoin::updateOrCreate([
             'title' => 'skyPay',
         ], [
-            'photo' => 'images/skyPay.jpeg',
-            'status' => 1,
+            'photo' => 'images/paysky.png',
+            'status' => 0,
         ]);
 
         $pay_sky_fields = [
-            'new_1' => [
-                "name" => "is_skyPay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paysky_base_url",
                 "type" => "input",
@@ -105,7 +125,6 @@ class PaymentGatewaysSeeder extends Seeder
             ]
         ];
 
-
         foreach ($pay_sky_fields as $key => $value) {
             Setting::updateOrCreate([
                 'key' => $value['name'],
@@ -121,16 +140,11 @@ class PaymentGatewaysSeeder extends Seeder
         $strip_id = PaymentCoin::updateOrCreate([
             'title' => 'strip',
         ], [
-            'photo' => 'images/stripe.jpeg',
+            'photo' => 'images/stripe.png',
             'status' => 1,
         ]);
 
         $strip_fields = [
-            'new_1' => [
-                "name" => "is_stripe_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "stripe_test_secret_key",
                 "type" => "input",
@@ -152,7 +166,7 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'usd'
             ],
-            'new_5' => [
+            'new_6' => [
                 "name" => "stripe_webhook_secret",
                 "type" => "input",
                 "value" => 'webhook'
@@ -170,21 +184,15 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
-
         //opay
         $opay_id = PaymentCoin::updateOrCreate([
             'title' => 'opay',
         ], [
-            'photo' => 'images/opay.jpeg',
-            'status' => 1,
+            'photo' => 'images/opay.png',
+            'status' => 0,
         ]);
 
         $opay_fields = [
-            'new_1' => [
-                "name" => "is_opay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "opay_currency",
                 "type" => "input",
@@ -229,22 +237,15 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
-
-
         //cashfree
         $cashfree_id = PaymentCoin::updateOrCreate([
             'title' => 'cashfree',
         ], [
-            'photo' => 'images/cashfree.jpeg',
+            'photo' => 'images/cashfree.jpg',
             'status' => 1,
         ]);
 
         $cashfree_fields = [
-            'new_1' => [
-                "name" => "is_cashfree_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "cashfree_currency",
                 "type" => "input",
@@ -279,23 +280,15 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
-
-
-
         //applepay
         $applepay_id = PaymentCoin::updateOrCreate([
             'title' => 'applepay',
         ], [
-            'photo' => 'images/applepay.jpeg',
+            'photo' => 'images/applepay.png',
             'status' => 1,
         ]);
 
         $applepay_fields = [
-            'new_1' => [
-                "name" => "is_applepay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "apple_team_id",
                 "type" => "input",
@@ -341,16 +334,11 @@ class PaymentGatewaysSeeder extends Seeder
         $mada_id = PaymentCoin::updateOrCreate([
             'title' => 'mada',
         ], [
-            'photo' => 'images/mada.jpeg',
-            'status' => 1,
+            'photo' => 'images/mada.png',
+            'status' => 0,
         ]);
 
         $mada_fields = [
-            'new_1' => [
-                "name" => "is_mada_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "mada_access_token",
                 "type" => "input",
@@ -386,16 +374,11 @@ class PaymentGatewaysSeeder extends Seeder
         $liqpay_id = PaymentCoin::updateOrCreate([
             'title' => 'liqpay',
         ], [
-            'photo' => 'images/liqpay.jpeg',
-            'status' => 1,
+            'photo' => 'images/liqpay.png',
+            'status' => 0,
         ]);
 
         $liqpay_fields = [
-            'new_1' => [
-                "name" => "is_liqpay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "liqpay_public_key",
                 "type" => "input",
@@ -431,16 +414,11 @@ class PaymentGatewaysSeeder extends Seeder
         $paypal_id = PaymentCoin::updateOrCreate([
             'title' => 'paypal',
         ], [
-            'photo' => 'images/paypal.jpeg',
-            'status' => 1,
+            'photo' => 'images/paypal.png',
+            'status' => 0,
         ]);
 
         $paypal_fields = [
-            'new_1' => [
-                "name" => "is_paypal_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paypal_client_id",
                 "type" => "input",
@@ -477,16 +455,11 @@ class PaymentGatewaysSeeder extends Seeder
         $paytm_id = PaymentCoin::updateOrCreate([
             'title' => 'paytm',
         ], [
-            'photo' => 'images/paytm.jpeg',
-            'status' => 1,
+            'photo' => 'images/paytm.png',
+            'status' => 0,
         ]);
 
         $paytm_fields = [
-            'new_1' => [
-                "name" => "is_paytm_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paytm_merchant_key",
                 "type" => "input",
@@ -527,16 +500,11 @@ class PaymentGatewaysSeeder extends Seeder
         $paytabs_id = PaymentCoin::updateOrCreate([
             'title' => 'paytabs',
         ], [
-            'photo' => 'images/paytabs.jpeg',
-            'status' => 1,
+            'photo' => 'images/paytabs.webp',
+            'status' => 0,
         ]);
 
         $paytabs_fields = [
-            'new_1' => [
-                "name" => "is_paytabs_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paytabs_profile_id",
                 "type" => "input",
@@ -578,16 +546,11 @@ class PaymentGatewaysSeeder extends Seeder
         $bkash_id = PaymentCoin::updateOrCreate([
             'title' => 'bkash',
         ], [
-            'photo' => 'images/bkash.jpeg',
-            'status' => 1,
+            'photo' => 'images/bkash.png',
+            'status' => 0,
         ]);
 
         $bkash_fields = [
-            'new_1' => [
-                "name" => "is_bkash_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "bkash_appkey",
                 "type" => "input",
@@ -632,16 +595,11 @@ class PaymentGatewaysSeeder extends Seeder
         $razorpay_id = PaymentCoin::updateOrCreate([
             'title' => 'razorpay',
         ], [
-            'photo' => 'images/razorpay.jpeg',
-            'status' => 1,
+            'photo' => 'images/razorpay.webp',
+            'status' => 0,
         ]);
 
         $razorpay_fields = [
-            'new_1' => [
-                "name" => "is_razorpay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "razorpay_api_key",
                 "type" => "input",
@@ -677,16 +635,11 @@ class PaymentGatewaysSeeder extends Seeder
         $senangpay_id = PaymentCoin::updateOrCreate([
             'title' => 'senangpay',
         ], [
-            'photo' => 'images/senangpay.jpeg',
-            'status' => 1,
+            'photo' => 'images/senangpay.png',
+            'status' => 0,
         ]);
 
         $senangpay_fields = [
-            'new_1' => [
-                "name" => "is_senangpay_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "senangpay_callback_url",
                 "type" => "input",
@@ -728,16 +681,11 @@ class PaymentGatewaysSeeder extends Seeder
         $paymob_accept_id = PaymentCoin::updateOrCreate([
             'title' => 'paymob_accept',
         ], [
-            'photo' => 'images/paymob_accept.jpeg',
-            'status' => 1,
+            'photo' => 'images/paymob.png',
+            'status' => 0,
         ]);
 
         $paymob_accept_fields = [
-            'new_1' => [
-                "name" => "is_paymob_accept_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paymob_accept_callback_url",
                 "type" => "input",
@@ -788,16 +736,11 @@ class PaymentGatewaysSeeder extends Seeder
         $flutterwave_id = PaymentCoin::updateOrCreate([
             'title' => 'flutterwave',
         ], [
-            'photo' => 'images/flutterwave.jpeg',
-            'status' => 1,
+            'photo' => 'images/flutterwave.jpg',
+            'status' => 0,
         ]);
 
         $flutterwave_fields = [
-            'new_1' => [
-                "name" => "is_flutterwave_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "flutterwave_secret_key",
                 "type" => "input",
@@ -839,16 +782,11 @@ class PaymentGatewaysSeeder extends Seeder
         $paystack_id = PaymentCoin::updateOrCreate([
             'title' => 'paystack',
         ], [
-            'photo' => 'images/paystack.jpeg',
-            'status' => 1,
+            'photo' => 'images/paystack.png',
+            'status' => 0,
         ]);
 
         $paystack_fields = [
-            'new_1' => [
-                "name" => "is_paystack_active",
-                "type" => "input",
-                "value" => true
-            ],
             'new_2' => [
                 "name" => "paystack_public_key",
                 "type" => "input",
@@ -890,47 +828,97 @@ class PaymentGatewaysSeeder extends Seeder
 
 
 
-                //sslcommerz
-                $sslcommerz_id = PaymentCoin::updateOrCreate([
-                    'title' => 'sslcommerz',
-                ], [
-                    'photo' => 'images/sslcommerz.jpeg',
-                    'status' => 1,
-                ]);
+        //sslcommerz
+        $sslcommerz_id = PaymentCoin::updateOrCreate([
+            'title' => 'sslcommerz',
+        ], [
+            'photo' => 'images/sslcommerz.png',
+            'status' => 0,
+        ]);
 
-                $sslcommerz_fields = [
-                    'new_1' => [
-                        "name" => "is_sslcommerz_active",
-                        "type" => "input",
-                        "value" => true
-                    ],
-                    'new_2' => [
-                        "name" => "sslcommerz_store_id",
-                        "type" => "input",
-                        "value" => "apple team"
+        $sslcommerz_fields = [
+            'new_2' => [
+                "name" => "sslcommerz_store_id",
+                "type" => "input",
+                "value" => "apple team"
 
-                    ],
-                    'new_3' => [
-                        "name" => "sslcommerz_store_password",
-                        "type" => "input",
-                        "value" => "Sit dignissimos aliq"
-                    ],
-                    'new_4' => [
-                        "name" => "sslcommerz_payment_address",
-                        "type" => "input",
-                        "value" => 'asdasd'
-                    ],
-                ];
+            ],
+            'new_3' => [
+                "name" => "sslcommerz_store_password",
+                "type" => "input",
+                "value" => "Sit dignissimos aliq"
+            ],
+            'new_4' => [
+                "name" => "sslcommerz_payment_address",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
+        ];
 
 
-                foreach ($sslcommerz_fields as $key => $value) {
-                    Setting::updateOrCreate([
-                        'key' => $value['name'],
-                        'item_id' => $sslcommerz_id->id,
-                        'type' => 'payment'
-                    ], [
-                        'value' => $value['value'],'input_type' => $value['type']
-                    ]);
-                }
+        foreach ($sslcommerz_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $sslcommerz_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],'input_type' => $value['type']
+            ]);
+        }
+
+        // Google Pay
+        $google_pay_id = PaymentCoin::updateOrCreate([
+            'title' => 'google_pay',
+        ], [
+            'photo' => 'images/googlepay.png',
+            'status' => 1,
+        ]);
+
+        $google_pay_fields = [
+            'new_2' => [
+                "name" => "google_pay_merchant_id",
+                "type" => "input",
+                "value" => "123"
+            ],
+        ];
+
+        foreach ($google_pay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $google_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
+        //huawei pay
+        $huawei_pay_id = PaymentCoin::updateOrCreate([
+            'title' => 'huawei_pay',
+        ], [
+            'photo' => 'images/huaweipay.png',
+            'status' => 1,
+        ]);
+
+        $huawei_pay_fields = [
+            'new_2' => [
+                "name" => "huawei_pay_merchant_id",
+                "type" => "input",
+                "value" => "123"
+            ],
+        ];
+
+        foreach ($huawei_pay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $huawei_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
     }
 }
