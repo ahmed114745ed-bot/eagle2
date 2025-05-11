@@ -494,7 +494,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--primary-color);
+    background: var(--secondary-color);
 }
 
 .card-header h3 {
@@ -528,7 +528,7 @@
 .data-table th {
     text-align: left;
     padding: 12px 15px;
-    background: var(--primary-color);
+    background: var(--secondary-color);
    
     font-weight: 600;
     text-transform: uppercase;
