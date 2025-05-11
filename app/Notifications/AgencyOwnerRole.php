@@ -2,10 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class AgencyOwnerRole extends Notification
 {
@@ -36,8 +37,9 @@ class AgencyOwnerRole extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $appNameEn = config('app.name_en');
-        $appNameAr = config('app.name_ar');
+         $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
         $url = config('app.url');
         return (new MailMessage)
             ->subject('حسابك الشخصى')

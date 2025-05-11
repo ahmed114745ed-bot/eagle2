@@ -71,8 +71,9 @@ class AgencyController extends Controller
 
     public function agencyTargetDetails($id, Request $request)
     {
+        $user = $request->user();
         try {
-            $response = $this->agencyService->agencyTarget($id, $request);
+            $response = $this->agencyService->agencyTarget($id,$user, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
