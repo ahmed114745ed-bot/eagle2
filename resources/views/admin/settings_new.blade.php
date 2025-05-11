@@ -485,12 +485,7 @@
 
             <button onclick="showSection('realTimeSetting')">{{ __('Sound & Video') }}</button>
             <button onclick="showSection('pusherSettings')">{{ __('Real Time Setting') }}</button>
-            <button onclick="showSection('paymentCredentialSettings')" class="position-relative">
-                {{ __('Payment') }}
-                <div class="ribbon-banner">
-                    <span>{{ __('soon') }}</span>
-                </div>
-            </button>
+            <button onclick="showSection('paymentCredentialSettings')">{{ __('Payment') }}</button>
             <button onclick="showSection('gamesSettings')" class="position-relative">
                 {{ __('Games') }}
                 <div class="ribbon-banner">
@@ -1084,20 +1079,26 @@
                                         <div class="card p-3 shadow" style="height: 580px;">
                                             <div class="card-header d-flex justify-content-between align-items-center">
                                                 <h4 class="m-0">{{ __('admin.'.$coin->title) }}</h4>
+                                                @if(! $coin->status)
+                                                    <div class="ribbon-banner-card">
+                                                        <span>{{ __('soon') }}</span>
+                                                    </div>
+                                                @endif
                                                 <div class="d-flex align-items-center">
                                                     <input type="hidden" name="is_{{ $coin->title }}_active" value="0">
                                                     <input type="checkbox" id="{{ $coin->title }}Radio"
                                                            class="custom-payment-radio libraryRealTime"
                                                            name="is_{{ $coin->title }}_active"
                                                            value="1"
-                                                        {{ @$settings['is_'.$coin->title.'_active'] == '1' ? 'checked' : '' }}>
+                                                        {{ $coin->status == 1 && @$settings['is_'.$coin->title.'_active'] == '1' ? 'checked' : '' }}
+                                                        {{ $coin->status == 0 ? 'disabled' : '' }}>
                                                     <label for="{{ $coin->title }}Radio" class="switch"></label>
                                                 </div>
                                             </div>
                                             <div class="text-center my-3">
                                                 <img src="{{ $coin->photo ? getImagePath($coin->photo) : asset('images/dollar.jpg') }}"
                                                      alt="{{ $coin->title }}"
-                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover; display: block; margin: 3px auto;">
+                                                     style="border-radius: 50%; width: 100px; height: 100px; object-fit: contain; display: block; margin: 3px auto; background: #fff;">
                                             </div>
                                             <div class="row">
                                                 @foreach($coin->settings as $setting)

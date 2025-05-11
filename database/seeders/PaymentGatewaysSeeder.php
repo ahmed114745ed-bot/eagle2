@@ -17,7 +17,7 @@ class PaymentGatewaysSeeder extends Seeder
     {
         $images = [
             'fawry.jpeg',
-            'paySky.png',
+            'paysky.png',
             'stripe.png',
             'opay.png',
             'cashfree.jpg',
@@ -31,10 +31,11 @@ class PaymentGatewaysSeeder extends Seeder
             'razorpay.webp',
             'senangpay.png',
             'paymob.png',
-            'flutterwave.png',
+            'flutterwave.jpg',
             'paystack.png',
             'sslcommerz.png',
             'googlepay.png',
+            'huaweipay.png',
         ];
 
         foreach ($images as $img) {
@@ -96,8 +97,8 @@ class PaymentGatewaysSeeder extends Seeder
          $pay_sky_id = PaymentCoin::updateOrCreate([
             'title' => 'skyPay',
         ], [
-            'photo' => 'images/paySky.png',
-            'status' => 1,
+            'photo' => 'images/paysky.png',
+            'status' => 0,
         ]);
 
         $pay_sky_fields = [
@@ -188,7 +189,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'opay',
         ], [
             'photo' => 'images/opay.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $opay_fields = [
@@ -334,7 +335,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'mada',
         ], [
             'photo' => 'images/mada.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $mada_fields = [
@@ -374,7 +375,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'liqpay',
         ], [
             'photo' => 'images/liqpay.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $liqpay_fields = [
@@ -414,7 +415,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paypal',
         ], [
             'photo' => 'images/paypal.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $paypal_fields = [
@@ -455,7 +456,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paytm',
         ], [
             'photo' => 'images/paytm.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $paytm_fields = [
@@ -500,7 +501,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paytabs',
         ], [
             'photo' => 'images/paytabs.webp',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $paytabs_fields = [
@@ -546,7 +547,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'bkash',
         ], [
             'photo' => 'images/bkash.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $bkash_fields = [
@@ -595,7 +596,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'razorpay',
         ], [
             'photo' => 'images/razorpay.webp',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $razorpay_fields = [
@@ -635,7 +636,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'senangpay',
         ], [
             'photo' => 'images/senangpay.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $senangpay_fields = [
@@ -681,7 +682,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paymob_accept',
         ], [
             'photo' => 'images/paymob.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $paymob_accept_fields = [
@@ -735,8 +736,8 @@ class PaymentGatewaysSeeder extends Seeder
         $flutterwave_id = PaymentCoin::updateOrCreate([
             'title' => 'flutterwave',
         ], [
-            'photo' => 'images/flutterwave.png',
-            'status' => 1,
+            'photo' => 'images/flutterwave.jpg',
+            'status' => 0,
         ]);
 
         $flutterwave_fields = [
@@ -782,7 +783,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'paystack',
         ], [
             'photo' => 'images/paystack.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $paystack_fields = [
@@ -832,7 +833,7 @@ class PaymentGatewaysSeeder extends Seeder
             'title' => 'sslcommerz',
         ], [
             'photo' => 'images/sslcommerz.png',
-            'status' => 1,
+            'status' => 0,
         ]);
 
         $sslcommerz_fields = [
@@ -891,5 +892,33 @@ class PaymentGatewaysSeeder extends Seeder
                 'input_type' => $value['type']
             ]);
         }
+
+        //huawei pay
+        $huawei_pay_id = PaymentCoin::updateOrCreate([
+            'title' => 'huawei_pay',
+        ], [
+            'photo' => 'images/huaweipay.png',
+            'status' => 1,
+        ]);
+
+        $huawei_pay_fields = [
+            'new_2' => [
+                "name" => "huawei_pay_merchant_id",
+                "type" => "input",
+                "value" => "123"
+            ],
+        ];
+
+        foreach ($huawei_pay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $huawei_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
     }
 }

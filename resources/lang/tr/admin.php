@@ -343,6 +343,9 @@ return [
     //googlePay
     "google_pay_merchant_id" => "Mağaza ID",
 
+    //huaweiPay
+    'huawei_pay_merchant_id' => 'Mağaza Kimliği',
+
     'fawry'         => 'fawry',
     'skyPay'        => 'skyPay',
     'strip'         => 'stripe',
@@ -362,6 +365,7 @@ return [
     'paystack'      => 'paystack',
     'sslcommerz'    => 'sslcommerz',
     'google_pay'    => 'google_pay',
+    'huawei_pay' => 'Huawei Pay',
 
     "charge_level" => "şarj seviyesi",
 ];
