@@ -50,7 +50,6 @@ return [
     'chat_with_all_description_allow'    => 'اصبح لدي جميع المستخدمين امكانيه المحادثه معك',
 
     'welcome'                          => 'مرحبا :name فى :app_name',
-    'tik_chat'                         => 'الصفوة',
     'followed_you'                     => ' بمتابعتك:name قام',
     'like_your_moment'                 => '  قام :name بالتفاعل على اللحظة الخاصة بك',
     'like_your_real'                   => 'قام :name بالتفاعل على الفيديو الخاصة بك',

@@ -34,12 +34,15 @@ class RefuseAgency extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $appNameEn = config('app.name_en');
+        $appNameAr = config('app.name_ar');
+
         return (new MailMessage)
-        ->subject('وكالة جديدة')
-        ->line('تم رفض الوكاله')
-        ->line('شكرا لاستخدامك الصفوة !')
-        ->line('أطيب التمنيات لكم')
-        ->salutation("EL Safwa - الصفوة");
+            ->subject('وكالة جديدة')
+            ->line('تم رفض الوكاله')
+            ->line($appNameAr . 'شكرا لاستخدامك  !')
+            ->line('أطيب التمنيات لكم')
+            ->salutation($appNameEn . " - " . $appNameAr);
     }
 
     /**

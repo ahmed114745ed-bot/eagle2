@@ -42,7 +42,6 @@ return [
     'room_description_allow'           => 'Odanız kullanıcılara görünmez olacak',
     'spechEfeect_description_allow'    => 'Herhangi bir odaya girişte intro gösterilmesine izin verirsiniz',
     'welcome'                          => ':app_name\'a hoş geldiniz',
-    'tik_chat'                         => 'EL Safwa',
     'followed_you'                     => ':name sizi takip etti',
     'like_your_moment'                 => ':name anınıza tepki verdi',
     'like_your_real'                   => ':name reelinize tepki verdi',
