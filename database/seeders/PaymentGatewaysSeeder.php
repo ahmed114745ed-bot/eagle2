@@ -17,7 +17,7 @@ class PaymentGatewaysSeeder extends Seeder
     {
         $images = [
             'fawry.jpeg',
-            'paySky.png',
+            'paysky.png',
             'stripe.png',
             'opay.png',
             'cashfree.jpg',
@@ -97,7 +97,7 @@ class PaymentGatewaysSeeder extends Seeder
          $pay_sky_id = PaymentCoin::updateOrCreate([
             'title' => 'skyPay',
         ], [
-            'photo' => 'images/paySky.png',
+            'photo' => 'images/paysky.png',
             'status' => 0,
         ]);
 
