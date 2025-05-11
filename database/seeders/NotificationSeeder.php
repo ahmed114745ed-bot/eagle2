@@ -2,12 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Notification;
-use App\Models\NotificationTranslation;
 use Cache;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Setting;
+use App\Models\Notification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\NotificationTranslation;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class NotificationSeeder extends Seeder
 {
@@ -17,8 +18,9 @@ class NotificationSeeder extends Seeder
     public function run(): void
     {
 
-        $appNameEn = config('app.name_en');
-        $appNameAr = config('app.name_ar');
+        $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
 
         // DB::table('notifications')->truncate();
         // DB::table('notification_translations')->truncate();

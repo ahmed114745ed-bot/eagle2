@@ -2,10 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class RefuseRequestToGetSalary extends Notification
 {
@@ -36,8 +37,9 @@ class RefuseRequestToGetSalary extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $appNameEn = config('app.name_en');
-        $appNameAr = config('app.name_ar');
+         $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
         return (new MailMessage)
             ->subject('سحب راتب')
             ->line(__('api.denied_request_sallary', ["value" => $this->amount, 'reason' => $this->reason], 'ar'))
