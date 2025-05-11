@@ -66,6 +66,10 @@ class ChargeTargetEvent extends Model
         return $this->rewards->ware();
     }
 
+    public function users(){
+        return $this->hasMany(UserChargeEvent::class, 'charge_event_id');
+    }
+
     public function getWareAttribute()
     {
         $wares = $this->rewards->map(function ($reward) {
