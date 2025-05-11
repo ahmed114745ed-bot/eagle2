@@ -25,7 +25,12 @@ class TargetsResource extends JsonResource
     {
         return $this->resource->transform(function ($item) {
             $userCharges=$this->chargesSumAmount + $this->obtainedCoinsSum;
-            $remaining = $userCharges / $item->value;
+            if(!$item->value){
+                $remaining = 0;
+            } else {
+
+                $remaining = $userCharges / $item->value;
+            }
             $checkChargeEvent=UserChargeEvent::query()->where(["user_id" => auth()->user()->id , 'charge_event_id' =>$item->id])->first();
            if ($remaining < 0 ){
                $remaining = 0 ;
