@@ -350,6 +350,9 @@ return [
     //googlePay
     "google_pay_merchant_id" => "معرّف التاجر",
 
+    //huaweiPay
+    'huawei_pay_merchant_id' => 'معرّف التاجر',
+
     'fawry'         => 'فوري',
     'skyPay'        => 'سكاي باي',
     'strip'         => 'سترايب',
@@ -369,6 +372,7 @@ return [
     'paystack'      => 'باي ستاك',
     'sslcommerz'    => 'إس إس إل كمرز',
     'google_pay'    => 'جوجل باي',
+    'huawei_pay' => 'هواوي باي',
 
     "charge_level" => "مستوي الشحن",
 

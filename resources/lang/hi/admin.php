@@ -338,6 +338,9 @@ return [
     //googlePay
     "google_pay_merchant_id" => "व्यापारी आईडी",
 
+    //huaweiPay
+    'huawei_pay_merchant_id' => 'मर्चेंट आईडी',
+
     'fawry'         => 'फौरी',
     'skyPay'        => 'स्काई पे',
     'strip'         => 'स्ट्राइप',
@@ -357,6 +360,7 @@ return [
     'paystack'      => 'पेस्टैक',
     'sslcommerz'    => 'एसएसएलकॉमर्ज',
     'google_pay'    => 'गूगल पे',
+    'huawei_pay' => 'हुआवेई पे',
 
     "charge_level" => "चार्ज स्तर",
 ];

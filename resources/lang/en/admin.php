@@ -353,6 +353,9 @@ return [
     //googlePay
     "google_pay_merchant_id" => "Merchant Id",
 
+    //huaweiPay
+    "huawei_pay_merchant_id" => "Merchant Id",
+
     'fawry'         => 'Fawry',
     'skyPay'        => 'Sky Pay',
     'strip'         => 'Stripe',
@@ -372,6 +375,7 @@ return [
     'paystack'      => 'Paystack',
     'sslcommerz'    => 'SSLCommerz',
     'google_pay'    => 'Google Pay',
+    'huawei_pay'    => 'Huawei Pay',
 
     'creator' => 'admin'
 
