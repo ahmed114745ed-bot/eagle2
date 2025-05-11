@@ -59,7 +59,7 @@ class DailyPrizeController extends AdminController
             } elseif ($this->gift_type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
