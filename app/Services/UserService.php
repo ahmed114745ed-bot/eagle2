@@ -106,6 +106,12 @@ class UserService
         return $this->userRepository->searchUserAgency($key, $page, $perPage);
     }
 
+    public function searchUsersInAgencyShipping($key, $page)
+    {
+        $perPage = 10;
+        return $this->userRepository->searchUserAgencyShipping($key, $page, $perPage);
+    }
+
     public function searchUsersInFamily($key, $page)
     {
         $perPage = 10;
@@ -1072,7 +1078,7 @@ class UserService
             'progress'      => @$progress ?? 0,
         ];
 
-    return  [
+        return  [
             'gift_level' => Common::level_center($user->id),
             'charge_level' => $chargeLevel,
         ];

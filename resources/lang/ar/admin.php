@@ -31,10 +31,6 @@ return [
     'save'                  => 'حفظ',
     'refresh'               => 'تحديث',
     "secret_key" => 'المفتاح السرى',
-    "apple_team_id" => 'معرف الفريق',
-    "apple_client_id" => 'معرف العميل',
-    'apple_redirect_uri' => 'عنوان التوجيه',
-    "apple_service_file" => 'ملف الخدمة',
     'applepay' => 'دفع ابل',
     "cashfree" => "كاش فرى",
     'order'                 => 'ترتيب',
@@ -203,7 +199,6 @@ return [
     "merchant_code" => 'كود التاجر',
     "utd_url" => 'رابط UTD',
     "return_url" => 'رابط العودة',
-    "fawry_url" => 'رابط فوري',
     "skyPay" => 'سكاي باي',
     "base_url" => 'الرابط الأساسي',
     "merchant_id" => 'معرّف التاجر',
@@ -221,6 +216,164 @@ return [
     "Tencent" => 'تينسينت',
     "lucky_flex" => "لاكي فليكس",
     "guess_the_word" => "خمن الكلمة",
+
+    //fawry
+    "fawry_secret" => "السر",
+    "fawry_merchant_code" => "رمز التاجر",
+    "fawry_utd_url" => "رابط UTD",
+    "is_fawry_active" => "نشط",
+    "fawry_url" => "الرابط",
+    "fawry_return_url" => "رابط العودة",
+
+    // SkyPay
+    "is_skyPay_active" => "نشط",
+    "paysky_base_url" => "الرابط الأساسي",
+    "paysky_merchant_id" => "معرّف التاجر",
+    "paysky_terminal_id" => "معرّف الجهاز",
+    "paysky_api_key" => "مفتاح واجهة البرمجة",
+
+    // Stripe
+    "is_stripe_active" => "نشط",
+    "stripe_test_secret_key" => "مفتاح الاختبار السري",
+    "stripe_success_url" => "رابط النجاح",
+    "stripe_cancel_url" => "رابط الإلغاء",
+    "stripe_currency" => "العملة",
+    "stripe_webhook_secret" => "سر الويب هوك",
+
+    // Opay
+    "is_opay_active" => "نشط",
+    "opay_currency" => "العملة",
+    "opay_secret_key" => "المفتاح السري",
+    "opay_public_key" => "المفتاح العام",
+    "opay_merchant_id" => "معرّف التاجر",
+    "opay_country_code" => "كود الدولة",
+    "opay_base_url" => "الرابط الأساسي",
+
+    // Cashfree
+    "is_cashfree_active" => "نشط",
+    "cashfree_currency" => "العملة",
+    "cashfree_app_id" => "معرّف التطبيق",
+    "cashfree_secret_key" => "المفتاح السري",
+    "cashfree_base_url" => "الرابط الأساسي",
+
+    // ApplePay
+    "is_applepay_active" => "نشط",
+    "apple_team_id" => "معرّف الفريق",
+    "app_id" => "معرّف التطبيق",
+    "apple_client_id" => "معرّف العميل",
+    "apple_redirect_uri" => "رابط إعادة التوجيه",
+    "apple_service_file" => "ملف الخدمة",
+
+    // Mada
+    "is_mada_active" => "نشط",
+    "mada_access_token" => "رمز الوصول",
+    "mada_public_key" => "المفتاح العام",
+    "mada_payment_address" => "عنوان الدفع",
+
+    // Liqpay
+    "is_liqpay_active" => "نشط",
+    "liqpay_public_key" => "المفتاح العام",
+    "liqpay_private_key" => "المفتاح الخاص",
+    "liqpay_payment_address" => "عنوان الدفع",
+
+    // PayPal
+    "is_paypal_active" => "نشط",
+    "paypal_client_id" => "معرّف العميل",
+    "paypal_client_secret" => "سر العميل",
+    "paypal_payment_address" => "عنوان الدفع",
+
+    // Paytm
+    "is_paytm_active" => "نشط",
+    "paytm_merchant_key" => "مفتاح التاجر",
+    "paytm_merchant_id" => "معرّف التاجر",
+    "paytm_merchant_website_link" => "رابط موقع التاجر",
+    "paytm_payment_address" => "عنوان الدفع",
+
+    // Paytabs
+    "is_paytabs_active" => "نشط",
+    "paytabs_profile_id" => "معرّف الملف",
+    "paytabs_server_key" => "مفتاح الخادم",
+    "paytabs_base_url" => "الرابط الأساسي",
+    "paytabs_payment_address" => "عنوان الدفع",
+
+    // BKash
+    "is_bkash_active" => "نشط",
+    "bkash_appkey" => "مفتاح التطبيق",
+    "bkash_app_secret" => "سر التطبيق",
+    "bkash_username" => "اسم المستخدم",
+    "bkash_password" => "كلمة المرور",
+    "bkash_payment_address" => "عنوان الدفع",
+
+    // Razorpay
+    "is_razorpay_active" => "نشط",
+    "razorpay_api_key" => "مفتاح الواجهة البرمجية",
+    "razorpay_api_secret" => "سر الواجهة البرمجية",
+    "razorpay_payment_address" => "عنوان الدفع",
+
+    // Senangpay
+    "is_senangpay_active" => "نشط",
+    "senangpay_callback_url" => "رابط رد الاتصال",
+    "senangpay_secret_key" => "المفتاح السري",
+    "senangpay_merchant_id" => "معرّف التاجر",
+    "senangpay_payment_address" => "عنوان الدفع",
+
+    // Paymob Accept
+    "is_paymob_accept_active" => "نشط",
+    "paymob_accept_callback_url" => "رابط رد الاتصال",
+    "paymob_accept_api_key" => "مفتاح الواجهة البرمجية",
+    "paymob_accept_iframe_id" => "معرّف الإطار",
+    "paymob_accept_integration_id" => "معرّف التكامل",
+    "paymob_accept_hmac" => "توقيع HMAC",
+    "paymob_accept_payment_address" => "عنوان الدفع",
+
+    // Flutterwave
+    "is_flutterwave_active" => "نشط",
+    "flutterwave_secret_key" => "المفتاح السري",
+    "flutterwave_public_key" => "المفتاح العام",
+    "flutterwave_hash" => "هاش",
+    "flutterwave_payment_address" => "عنوان الدفع",
+
+    // Paystack
+    "is_paystack_active" => "نشط",
+    "paystack_public_key" => "المفتاح العام",
+    "paystack_secret_key" => "المفتاح السري",
+    "paystack_merchant_email" => "بريد التاجر",
+    "paystack_return_url" => "رابط العودة",
+    "paystack_payment_address" => "عنوان الدفع",
+
+    // SSLCommerz
+    "is_sslcommerz_active" => "نشط",
+    "sslcommerz_store_id" => "معرّف المتجر",
+    "sslcommerz_store_password" => "كلمة مرور المتجر",
+    "sslcommerz_payment_address" => "عنوان الدفع",
+
+    //googlePay
+    "google_pay_merchant_id" => "معرّف التاجر",
+
+    //huaweiPay
+    'huawei_pay_merchant_id' => 'معرّف التاجر',
+
+    'fawry'         => 'فوري',
+    'skyPay'        => 'سكاي باي',
+    'strip'         => 'سترايب',
+    'opay'          => 'أو باي',
+    'cashfree'      => 'كاش فري',
+    'applepay'      => 'آبل باي',
+    'mada'          => 'مدى',
+    'liqpay'        => 'ليك باي',
+    'paypal'        => 'باي بال',
+    'paytm'         => 'باي تي إم',
+    'paytabs'       => 'باي تابز',
+    'bkash'         => 'بي كاش',
+    'razorpay'      => 'رازور باي',
+    'senangpay'     => 'سينانج باي',
+    'paymob_accept' => 'بيموب أكسبت',
+    'flutterwave'   => 'فلتر ويف',
+    'paystack'      => 'باي ستاك',
+    'sslcommerz'    => 'إس إس إل كمرز',
+    'google_pay'    => 'جوجل باي',
+    'huawei_pay' => 'هواوي باي',
+
     "charge_level" => "مستوي الشحن",
 
 

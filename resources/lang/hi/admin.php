@@ -204,5 +204,163 @@ return [
     "Tencent" => 'Tencent',
     "lucky_flex" => "लकी फ्लेक्स",
     "guess_the_word" => "शब्द का अनुमान लगाएं",
+
+    // Fawry
+    "fawry_secret" => "गुप्त कुंजी",
+    "fawry_merchant_code" => "व्यापारी कोड",
+    "fawry_utd_url" => "UTD लिंक",
+    "is_fawry_active" => "सक्रिय",
+    "fawry_url" => "लिंक",
+    "fawry_return_url" => "वापसी लिंक",
+
+    // SkyPay
+    "is_skyPay_active" => "सक्रिय",
+    "paysky_base_url" => "मूल लिंक",
+    "paysky_merchant_id" => "व्यापारी आईडी",
+    "paysky_terminal_id" => "टर्मिनल आईडी",
+    "paysky_api_key" => "API कुंजी",
+
+    // Stripe
+    "is_stripe_active" => "सक्रिय",
+    "stripe_test_secret_key" => "टेस्ट गुप्त कुंजी",
+    "stripe_success_url" => "सफलता लिंक",
+    "stripe_cancel_url" => "रद्द लिंक",
+    "stripe_currency" => "मुद्रा",
+    "stripe_webhook_secret" => "वेबहुक सीक्रेट",
+
+    // Opay
+    "is_opay_active" => "सक्रिय",
+    "opay_currency" => "मुद्रा",
+    "opay_secret_key" => "गुप्त कुंजी",
+    "opay_public_key" => "सार्वजनिक कुंजी",
+    "opay_merchant_id" => "व्यापारी आईडी",
+    "opay_country_code" => "देश कोड",
+    "opay_base_url" => "मूल लिंक",
+
+    // Cashfree
+    "is_cashfree_active" => "सक्रिय",
+    "cashfree_currency" => "मुद्रा",
+    "cashfree_app_id" => "ऐप आईडी",
+    "cashfree_secret_key" => "गुप्त कुंजी",
+    "cashfree_base_url" => "मूल लिंक",
+
+    // ApplePay
+    "is_applepay_active" => "सक्रिय",
+    "apple_team_id" => "टीम आईडी",
+    "app_id" => "ऐप आईडी",
+    "apple_client_id" => "क्लाइंट आईडी",
+    "apple_redirect_uri" => "रीडायरेक्ट लिंक",
+    "apple_service_file" => "सेवा फाइल",
+
+    // Mada
+    "is_mada_active" => "सक्रिय",
+    "mada_access_token" => "एक्सेस टोकन",
+    "mada_public_key" => "सार्वजनिक कुंजी",
+    "mada_payment_address" => "भुगतान पता",
+
+    // Liqpay
+    "is_liqpay_active" => "सक्रिय",
+    "liqpay_public_key" => "सार्वजनिक कुंजी",
+    "liqpay_private_key" => "निजी कुंजी",
+    "liqpay_payment_address" => "भुगतान पता",
+
+    // PayPal
+    "is_paypal_active" => "सक्रिय",
+    "paypal_client_id" => "क्लाइंट आईडी",
+    "paypal_client_secret" => "क्लाइंट सीक्रेट",
+    "paypal_payment_address" => "भुगतान पता",
+
+    // Paytm
+    "is_paytm_active" => "सक्रिय",
+    "paytm_merchant_key" => "व्यापारी कुंजी",
+    "paytm_merchant_id" => "व्यापारी आईडी",
+    "paytm_merchant_website_link" => "व्यापारी वेबसाइट लिंक",
+    "paytm_payment_address" => "भुगतान पता",
+
+    // Paytabs
+    "is_paytabs_active" => "सक्रिय",
+    "paytabs_profile_id" => "प्रोफाइल आईडी",
+    "paytabs_server_key" => "सर्वर कुंजी",
+    "paytabs_base_url" => "मूल लिंक",
+    "paytabs_payment_address" => "भुगतान पता",
+
+    // BKash
+    "is_bkash_active" => "सक्रिय",
+    "bkash_appkey" => "ऐप कुंजी",
+    "bkash_app_secret" => "ऐप सीक्रेट",
+    "bkash_username" => "यूज़रनेम",
+    "bkash_password" => "पासवर्ड",
+    "bkash_payment_address" => "भुगतान पता",
+
+    // Razorpay
+    "is_razorpay_active" => "सक्रिय",
+    "razorpay_api_key" => "API कुंजी",
+    "razorpay_api_secret" => "API सीक्रेट",
+    "razorpay_payment_address" => "भुगतान पता",
+
+    // Senangpay
+    "is_senangpay_active" => "सक्रिय",
+    "senangpay_callback_url" => "कॉलबैक लिंक",
+    "senangpay_secret_key" => "गुप्त कुंजी",
+    "senangpay_merchant_id" => "व्यापारी आईडी",
+    "senangpay_payment_address" => "भुगतान पता",
+
+    // Paymob Accept
+    "is_paymob_accept_active" => "सक्रिय",
+    "paymob_accept_callback_url" => "कॉलबैक लिंक",
+    "paymob_accept_api_key" => "API कुंजी",
+    "paymob_accept_iframe_id" => "आईफ्रेम आईडी",
+    "paymob_accept_integration_id" => "इंटीग्रेशन आईडी",
+    "paymob_accept_hmac" => "HMAC हस्ताक्षर",
+    "paymob_accept_payment_address" => "भुगतान पता",
+
+    // Flutterwave
+    "is_flutterwave_active" => "सक्रिय",
+    "flutterwave_secret_key" => "गुप्त कुंजी",
+    "flutterwave_public_key" => "सार्वजनिक कुंजी",
+    "flutterwave_hash" => "हैश",
+    "flutterwave_payment_address" => "भुगतान पता",
+
+    // Paystack
+    "is_paystack_active" => "सक्रिय",
+    "paystack_public_key" => "सार्वजनिक कुंजी",
+    "paystack_secret_key" => "गुप्त कुंजी",
+    "paystack_merchant_email" => "व्यापारी ईमेल",
+    "paystack_return_url" => "वापसी लिंक",
+    "paystack_payment_address" => "भुगतान पता",
+
+    // SSLCommerz
+    "is_sslcommerz_active" => "सक्रिय",
+    "sslcommerz_store_id" => "स्टोर आईडी",
+    "sslcommerz_store_password" => "स्टोर पासवर्ड",
+    "sslcommerz_payment_address" => "भुगतान पता",
+
+    //googlePay
+    "google_pay_merchant_id" => "व्यापारी आईडी",
+
+    //huaweiPay
+    'huawei_pay_merchant_id' => 'मर्चेंट आईडी',
+
+    'fawry'         => 'फौरी',
+    'skyPay'        => 'स्काई पे',
+    'strip'         => 'स्ट्राइप',
+    'opay'          => 'ओपेय',
+    'cashfree'      => 'कैशफ्री',
+    'applepay'      => 'एप्पल पे',
+    'mada'          => 'मडा',
+    'liqpay'        => 'लिकपे',
+    'paypal'        => 'पेपल',
+    'paytm'         => 'पेटीएम',
+    'paytabs'       => 'पेयटैब्स',
+    'bkash'         => 'बीकैश',
+    'razorpay'      => 'रेजरपे',
+    'senangpay'     => 'सेनांग पे',
+    'paymob_accept' => 'पेमोब एक्सेप्ट',
+    'flutterwave'   => 'फ्लटरवेव',
+    'paystack'      => 'पेस्टैक',
+    'sslcommerz'    => 'एसएसएलकॉमर्ज',
+    'google_pay'    => 'गूगल पे',
+    'huawei_pay' => 'हुआवेई पे',
+
     "charge_level" => "चार्ज स्तर",
 ];

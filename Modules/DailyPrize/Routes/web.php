@@ -33,7 +33,7 @@ Route::group(
        // $router->resource('daily-gifts', DailyPrizeController::class);
         $router->resource('daily-gift-types', DailyPrizeTypeController::class);
         Route::prefix('daily-gifts/{type}')->group(function () {
-            Route::get('/', [DailyPrizeController::class, 'index']);
+            Route::get('/', [DailyPrizeController::class, 'index'])->name('daily-gifts.index');
             Route::get('/create', [DailyPrizeController::class, 'create']);
             Route::post('/', [DailyPrizeController::class, 'store']);
             Route::get('/{id}', [DailyPrizeController::class, 'show'])->where('id', '[0-9]+');
