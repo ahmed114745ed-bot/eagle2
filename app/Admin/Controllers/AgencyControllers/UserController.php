@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers\AgencyControllers;
 
-
+use App\Admin\Actions\CanPlaySwitchAction;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -13,6 +13,10 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Admin\Actions\ChangeAgencyAction;
+use App\Admin\Actions\ChargeSwitchAction;
+use App\Admin\Actions\InviteSwitchAction;
+use App\Admin\Actions\KickOfAgencyAction;
+use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Selectable\ImageColors;
 use App\Facades\UserHandling;
@@ -523,7 +527,21 @@ class UserController extends MainController
         $grid->actions(function ($actions) {
             $model = $actions->row;
 
-            $actions->add(new class extends \Encore\Admin\Actions\RowAction {
+            $actions->add(new ChargeSwitchAction());
+            $actions->add(new InviteSwitchAction());
+            $actions->add(new CanPlaySwitchAction());
+
+            if ($model->agency_id >= 1) {
+                $actions->add(new KickOfAgencyAction());
+            }
+            if ($model->family_id >= 1) {
+                $actions->add(new KickOfFamilyAction());
+            }
+            if ($model->agency_id >= 1) {
+                $actions->add(new ChangeAgencyAction($model->id));
+            }
+
+/*             $actions->add(new class extends \Encore\Admin\Actions\RowAction {
                 public $name = 'Status User';
 
                 public function render()
@@ -539,7 +557,7 @@ class UserController extends MainController
 //                        $model->can_play
                     ))->render();
                 }
-            });
+            }); */
 
             /*             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));

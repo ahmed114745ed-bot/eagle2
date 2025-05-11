@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use Carbon\Carbon;
 use App\Models\GiftLog;
+use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class AgencyUsersTargetResource extends JsonResource
                 $query->where(DB::raw('concat(year,"-", month)'), '==', $year . '-' . $month);
             })->sum(DB::raw('sallary - cut_amount'));
 
-
+       
         return [
             'id' => $this->id ?? 0,
 
@@ -51,6 +52,7 @@ class AgencyUsersTargetResource extends JsonResource
             'image' => $this->profile->avatar ?? '',
             'is_host' => $this->is_host,
             'salary'  => $salary ?? 0,
+           
             'target' => [
                 'id' => @$target->target_id ?? 0,
                 'user_diamonds' => @$target->user_diamonds ?? 0,
@@ -58,8 +60,6 @@ class AgencyUsersTargetResource extends JsonResource
                 'user_days' => @$target->user_days ?? 0,
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
                 'old_targets'  => $userTarget,
-                'days'    => $this->user_days,
-                'hours' => $this->user_hours,
             ],
             'sender_gifts' => SenderGiftLogResource::collection($giftLog),
         ];

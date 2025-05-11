@@ -2,26 +2,31 @@
 
 namespace App\Helpers;
 
-use App\Models\NotificationTemplate;
+use Carbon\Carbon;
 use App\Models\Vip;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Family;
+use App\Models\Setting;
 use App\Models\OfficialMessage;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
+use App\Models\NotificationTemplate;
 use App\Models\OfficialMessageAdmin;
-use Carbon\Carbon;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class CustomNotificationNewNotUesdNow
 {
+
     public function appName($lang)
-    {          ////  G : 235
-        return $lang == 'ar' ? config('app.name_ar') : config('app.name_en');
+    {
+        $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';     ////  G : 235
+        return $lang == 'ar' ?  $appNameAr : $appNameEn;
     }
 
     public function senderLevel(int $userId)
@@ -31,24 +36,24 @@ class CustomNotificationNewNotUesdNow
         if (!$user) {
             return 0;
         }
-    
+
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
-    
+
         $notification = Common::getNotificationContent(
-            'sender_level', 
-            $user->lan ?? 'en', 
+            'sender_level',
+            $user->lan ?? 'en',
             ['level' => $user->total_sender_level]
         );
-    
+
         $image = Vip::where('level', $user->total_sender_level)->where('type', 2)->first()?->img;
         $data = getImagePath($image);
         $icon = $data;
-    
+
         Common::send_firebase_notification($tokens_notfacion, $notification['title'], $notification['body'], icon: $icon, data: $data);
         Common::sendOfficialMessage($user->id, title: $notification['title'], content: $notification['body'], titleAr: $notification['body'], image: $data);
-    
+
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
-        
+
         // $user = User::withoutAppends()->where('id', $userId)->first();
         // if (!$user) {
         //     return 0;
@@ -73,14 +78,14 @@ class CustomNotificationNewNotUesdNow
             return 0;
         }
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
-       
+
         // $body_ar = __('api.receiver_level', ['level' => $user->total_received_level], 'ar');
         // $body_en = __('api.receiver_level', ['level' => $user->total_received_level], 'en');
         // $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         // $title = __('Receiver level upgraded');
         $notification = Common::getNotificationContent(
-            'receiver_level', 
-            $user->lan ?? 'en', 
+            'receiver_level',
+            $user->lan ?? 'en',
             ['level' => $user->total_received_level]
         );
         $image = Vip::where('level', $user->total_received_level)->where('type', 1)->first()?->img;
@@ -89,10 +94,10 @@ class CustomNotificationNewNotUesdNow
 
         // Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $notification['body'], icon: $icon, data: $data);
         // Common::sendOfficialMessage($user->id, title: $notification['body'], content: $title, titleAr: $notification['body'], image: $image);
-      
+
         Common::send_firebase_notification($tokens_notfacion, $notification['title'], $notification['body'], icon: $icon, data: $data);
         Common::sendOfficialMessage($user->id, title: $notification['title'], content: $notification['body'], titleAr: $notification['body'], image: $data);
-    
+
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
     }
 
@@ -103,16 +108,16 @@ class CustomNotificationNewNotUesdNow
             // $body_ar = __('api.background_accept', ['name' => $user->name], 'ar');
             // $body_en = __('api.background_accept', ['name' => $user->name], 'en');
             $notification = Common::getNotificationContent(
-                'background_accept', 
-                $user->lan ?? 'en', 
+                'background_accept',
+                $user->lan ?? 'en',
                 ['user_name' => $user->name]
             );
         } else {
             // $body_ar = __('api.background_refuse', ['name' => $user->name], 'ar');
             // $body_en = __('api.background_refuse', ['name' => $user->name], 'en');
             $notification = Common::getNotificationContent(
-                'background_refuse', 
-                $user->lan ?? 'en', 
+                'background_refuse',
+                $user->lan ?? 'en',
                 ['user_name' => $user->name]
             );
         }
@@ -122,7 +127,7 @@ class CustomNotificationNewNotUesdNow
 
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], messageType: 'backgroud-request');
         Common::sendOfficialMessage($user->id, title: $notification['title'], content: $notification['body'], titleAr: $notification['body']);
-    
+
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
     }
 
@@ -141,19 +146,19 @@ class CustomNotificationNewNotUesdNow
         // $body_en              = __('api.target', ['salary' => $salary, 'agency' => $agencyName], 'en');
         // $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'target', 
-            $user->lan ?? 'en', 
+            'target',
+            $user->lan ?? 'en',
             [
                 'salary' => $salary,
                 'agency' => $agencyName
-                ]
+            ]
         );
         $data['user_id'] = $user?->id;
         // Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $notification['body'], data: $data,  messageType: 'achieve-target-monthly');
         // Common::sendOfficialMessage($user->id, $notification['body'], __('New target'), titleAr: $body_ar);
         Common::send_firebase_notification($tokens_notfacion, $notification['title'], $notification['body'],  data: $data, messageType: 'achieve-target-monthly');
         Common::sendOfficialMessage($user->id, title: $notification['title'], content: $notification['body'], titleAr: $notification['body']);
-    
+
         (new UserCounterServices)->eventUser($user, 'official-messages', 1);
     }
 
@@ -166,8 +171,8 @@ class CustomNotificationNewNotUesdNow
         // $body_ar             = __('api.comment_moment', ['name' => $userSender->name], 'ar');
         // $body_en             = __('api.comment_moment', ['name' => $userSender->name], 'en');
         $notification = Common::getNotificationContent(
-            'comment_moment', 
-            $momentUser->lan ?? 'en', 
+            'comment_moment',
+            $momentUser->lan ?? 'en',
             ['user_name' => $userSender->name]
         );
         $data['moment_id'] = @$moment->id;
@@ -180,24 +185,24 @@ class CustomNotificationNewNotUesdNow
         // $body_ar             = __('api.like_your_real', ['name' => $userLike->name], 'ar');
         // $body_en             = __('api.like_your_real', ['name' => $userLike->name], 'en');
         $notification = Common::getNotificationContent(
-            'like_real', 
-            $reelUser->lan ?? 'en', 
+            'like_real',
+            $reelUser->lan ?? 'en',
             ['user_name' => $userLike->name]
         );
-        
+
         $data['real_id'] = @$real->id;
         $this->sendNotificationWithImage($reelUser, $notification['body'], $userLike, $notification['title'], 'like-real', $data);
     }
 
     public function CommentReal(Real $real, User $user)
     {
-        
+
         $reelUser               = $real->user;
         // $body_ar             = __('api.comment_real', ['name' => $user->name], 'ar');
         // $body_en             = __('api.comment_real', ['name' => $user->name], 'en');
         $notification = Common::getNotificationContent(
-            'comment_real', 
-            $reelUser->lan ?? 'en', 
+            'comment_real',
+            $reelUser->lan ?? 'en',
             ['user_name' => $user->name]
         );
         $data['real_id'] = @$real->id;
@@ -210,8 +215,8 @@ class CustomNotificationNewNotUesdNow
         // $body_ar             = __('api.like_your_moment', ['name' => $user->name], 'ar');
         // $body_en             = __('api.like_your_moment', ['name' => $user->name], 'en');
         $notification = Common::getNotificationContent(
-            'like_moment', 
-            $momentUser->lan ?? 'en', 
+            'like_moment',
+            $momentUser->lan ?? 'en',
             ['user_name' => $user->name]
         );
         $data['moment_id'] = @$moment->id;
@@ -225,8 +230,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.accept_agency', ['name' => $agency->name],  'en');
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'accept_agency', 
-            $user->lan ?? 'en', 
+            'accept_agency',
+            $user->lan ?? 'en',
             ['agency_name' => $agency->name]
         );
 
@@ -244,8 +249,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.visited_profile', ['name' => $visitor->name], 'en');
         // $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'visited_profile', 
-            $user->lan ?? 'en', 
+            'visited_profile',
+            $user->lan ?? 'en',
             ['user_name' => $visitor->name]
         );
         $data['image'] = getDriverUrl() . '/' . $visitor->profile->avatar;
@@ -264,8 +269,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.followed_you', ['name' => $user->name], 'en');
         // $firebaseBody = ($receiver->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'follow', 
-            $receiver->lan ?? 'en', 
+            'follow',
+            $receiver->lan ?? 'en',
             ['user_name' => $user->name]
         );
 
@@ -283,8 +288,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.follow_back', ['name' =>  $user->name], 'en');
         // $firebaseBody = ($receiver->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'follow_back', 
-            $receiver->lan ?? 'en', 
+            'follow_back',
+            $receiver->lan ?? 'en',
             ['user_name' => $user->name]
         );
         $data['image'] = getImagePath($user->profile->avatar);
@@ -302,8 +307,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.remove_from_family', ['name' => $family->name],  'en');
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'remove_from_family', 
-            $user->lan ?? 'en', 
+            'remove_from_family',
+            $user->lan ?? 'en',
             ['family_name' => $family->name]
         );
         $icon = $family->img;
@@ -320,8 +325,8 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.admin_family', ['name' => $family->name], 'en');
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'admin_family', 
-            $user->lan ?? 'en', 
+            'admin_family',
+            $user->lan ?? 'en',
             ['family_name' => $family->name]
         );
         $icon = $family->img;
@@ -348,8 +353,8 @@ class CustomNotificationNewNotUesdNow
             foreach ($usersChunk as $user) {
                 $user = $user->pluck('notification_id')->toArray();
 
-              Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
-            // dd($data);
+                Common::send_firebase_notification($user, title: $title, body: $body, icon: $icon, data: $data, messageType: 'system-msg');
+                // dd($data);
             }
             (new UserCounterServices)->eventUsers('system-messages');
             // $users->chunk(200, function ($chunkedUsers) use ($usersTokenAr, $body, $title) {
@@ -383,9 +388,9 @@ class CustomNotificationNewNotUesdNow
         // $body_en             = 'Your  agency has been accepted';
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'accept_request_agency', 
+            'accept_request_agency',
             $user->lan ?? 'en'
-            
+
         );
 
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], messageType: 'accept-agency');
@@ -400,9 +405,9 @@ class CustomNotificationNewNotUesdNow
         // $body_en             = 'Your agency has been refused';
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'refuse_request_agency', 
+            'refuse_request_agency',
             $user->lan ?? 'en'
-            
+
         );
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], messageType: 'accept-agency');
         Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
@@ -416,12 +421,12 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.user_send_gift_moment', ['name' =>  $senderUser->name, 'gift' => $gift->name], 'en');
         // $firebaseBody = ($receivedUser->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'user_send_gift_moment', 
-            $receivedUser->lan ?? 'en', 
+            'user_send_gift_moment',
+            $receivedUser->lan ?? 'en',
             [
                 'user_name' => $senderUser->name,
                 'gift' => $gift->name
-                ]
+            ]
         );
         $data['image'] = getImagePath($gift->img);
         $data['moment_id'] = $momentId;
@@ -438,11 +443,11 @@ class CustomNotificationNewNotUesdNow
         if ($type == 4) {
             // $body_ar             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(بابل)'], 'ar');
             // $body_en             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(Bubble)'], 'en');
-           
+
             $ware = ($receivedUser->lan ?? 'en') === 'ar' ? '(بابل)' : '(Bubble)';
             $notification = Common::getNotificationContent(
-                'gift_aristocracy', 
-                $receivedUser->lan ?? 'en', 
+                'gift_aristocracy',
+                $receivedUser->lan ?? 'en',
                 [
                     'user_name' => $toUser->name,
                     'ware_vip' => $ware
@@ -451,39 +456,42 @@ class CustomNotificationNewNotUesdNow
         } else if ($type == 5) {
             // $body_ar             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(ايطار)'], 'ar');
             // $body_en             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(frame)'], 'en');
-           
+
             $ware = ($receivedUser->lan ?? 'en') === 'ar' ? '(ايطار)' : '(frame)';
             $notification = Common::getNotificationContent(
-                'gift_aristocracy', 
-                $receivedUser->lan ?? 'en', 
+                'gift_aristocracy',
+                $receivedUser->lan ?? 'en',
                 [
                     'user_name' => $toUser->name,
                     'ware_vip' => $ware
-                ]            );
+                ]
+            );
         } else if ($type == 11) {
             // $body_ar             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(تاثير دخول)'], 'ar');
             // $body_en             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(entering effect)'], 'en');
-           
+
             $ware = ($receivedUser->lan ?? 'en') === 'ar' ? '(تاثير دخول)' : '(entering effect)';
             $notification = Common::getNotificationContent(
-                'gift_aristocracy', 
-                $receivedUser->lan ?? 'en', 
+                'gift_aristocracy',
+                $receivedUser->lan ?? 'en',
                 [
                     'user_name' => $toUser->name,
                     'ware_vip' => $ware
-                ]            );
+                ]
+            );
         } else {
             // $body_ar             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(بابل, ايطار او تأثير دخول)'], 'ar');
             // $body_en             = __('api.gift_aristocracy', ['name' => $user->name, 'ware' => '(Bubble ,frame or entering effect)'], 'en');
-          
+
             $ware = ($receivedUser->lan ?? 'en') === 'ar' ? '(بابل, ايطار او تأثير دخول)' : '(Bubble ,frame or entering effect)';
             $notification = Common::getNotificationContent(
-                'gift_aristocracy', 
-                $receivedUser->lan ?? 'en', 
+                'gift_aristocracy',
+                $receivedUser->lan ?? 'en',
                 [
                     'user_name' => $toUser->name,
                     'ware_vip' => $ware
-                ]);
+                ]
+            );
         }
 
         // $firebaseBody        = ($toUser?->lan === 'ar') ? $body_ar : $body_en;
@@ -505,11 +513,12 @@ class CustomNotificationNewNotUesdNow
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
 
         $notification = Common::getNotificationContent(
-            'accept_family', 
-            $user->lan ?? 'en', 
+            'accept_family',
+            $user->lan ?? 'en',
             [
                 'family_name' => $family->name
-             ]);
+            ]
+        );
 
         $icon = $family->img;
         $data['family_id'] = $family->id;
@@ -528,14 +537,15 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.send_Family', ['name' => $user->name], 'en');
         // $firebaseBody = ($family->owner?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'send_Family', 
-            $family->owner->lan ?? 'en', 
+            'send_Family',
+            $family->owner->lan ?? 'en',
             [
                 'user_name' => $user->name
-             ]);
+            ]
+        );
         $icon = $user->profile->avatar;
         $data['family_id'] = $family->id;
-        
+
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], $icon, data: $data, messageType: 'request-join-family');
         Common::sendOfficialMessage($family->owner?->id, image: $user->profile->avatar, title: $notification['body'], content: $user->name, titleAr: $notification['body'], fromUserId: $user->id);
         (new UserCounterServices)->eventUser($family->owner, 'official-messages');
@@ -549,11 +559,12 @@ class CustomNotificationNewNotUesdNow
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
 
         $notification = Common::getNotificationContent(
-            'accept_family', 
-            $user->lan ?? 'en', 
+            'accept_family',
+            $user->lan ?? 'en',
             [
                 'family_name' => $family->name
-             ]);
+            ]
+        );
 
         $icon = $family->img;
         $data['family_id'] = $family->id;
@@ -569,11 +580,12 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.accept_agency', ['name' => $agencyName->name],  'en');
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'accept_agency', 
-            $user->lan ?? 'en', 
+            'accept_agency',
+            $user->lan ?? 'en',
             [
                 'agency_name' => $agencyName->name
-             ]);
+            ]
+        );
         $data['image'] = $agencyName->img;
         $data['agency_id'] = $agencyName->id;
         $icon = $agencyName->img;
@@ -589,12 +601,13 @@ class CustomNotificationNewNotUesdNow
         // $body_en = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name],  'en');
         // $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'got_coin', 
-            $user->lan ?? 'en', 
+            'got_coin',
+            $user->lan ?? 'en',
             [
                 'coins' => $request->amount,
                 'user_name' => $user->name
-             ]);
+            ]
+        );
         $data['coins'] = $request->amount;
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], data: $data, messageType: 'charge-action-notifaction');
         Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
@@ -608,11 +621,12 @@ class CustomNotificationNewNotUesdNow
         // $body_en             = __('api.ban_user_id', ['duration' => $duration], 'en');
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'ban_user_id', 
-            $user->lan ?? 'en', 
+            'ban_user_id',
+            $user->lan ?? 'en',
             [
                 'duration' => $duration,
-             ]);
+            ]
+        );
         $data['user_id'] = $user?->id;
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], data: $data, messageType: 'ban-user');
         Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
@@ -628,9 +642,9 @@ class CustomNotificationNewNotUesdNow
 
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'removeBan_user_id', 
-            $user->lan ?? 'en', 
-            );
+            'removeBan_user_id',
+            $user->lan ?? 'en',
+        );
         $data['user_id'] = $user?->id;
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], data: $data, messageType: 'remove-ban-user');
         Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
@@ -646,12 +660,13 @@ class CustomNotificationNewNotUesdNow
         $vip = ($receivedUser->lan ?? 'en') === 'ar' ? '(الاستقراطيه)' : '(VIP)';
 
         $notification = Common::getNotificationContent(
-            'userVips', 
-            $user->lan ?? 'en', 
+            'userVips',
+            $user->lan ?? 'en',
             [
                 'duration' => $duration,
                 'vip' => $vip,
-             ]);
+            ]
+        );
         $data['image'] = getImagePath($img);
         $icon = $data['image'];
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], icon: $icon, data: $data, messageType: 'vips');
@@ -673,13 +688,14 @@ class CustomNotificationNewNotUesdNow
         // $body_en              = __('api.family_level_up', ['name' => $family->name, 'level' => $family->currentLevel?->level ?? 0], 'en');
 
         $notification = Common::getNotificationContent(
-            'family_level_up', 
-            $user->lan ?? 'en', 
+            'family_level_up',
+            $user->lan ?? 'en',
             [
                 'family_name' => $family->name,
                 'family_level' => $family->currentLevel?->level ?? 0,
-             ]);
-       
+            ]
+        );
+
         Common::sendOfficialMessage($family->id, $notification['body'], __('Family level up'), titleAr: $notification['body']);
         $data['image'] = getImagePath($family->image);
         $data['family_id'] = $familyId;
@@ -697,12 +713,13 @@ class CustomNotificationNewNotUesdNow
         // $body_en             = __('api.wareVips', ['duration' => $duration, 'name' => $name], 'en');
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'wareVips', 
-            $user->lan ?? 'en', 
+            'wareVips',
+            $user->lan ?? 'en',
             [
                 'duration' => $duration,
                 'ware_vip' => $name ?? 0,
-             ]);
+            ]
+        );
         $data['image'] = getImagePath($image);
         $icon = $data['image'];
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], icon: $icon, data: $data, messageType: 'ware-vip');
@@ -737,22 +754,23 @@ class CustomNotificationNewNotUesdNow
             // $body_en             = __('api.accept_request_sallary', ["value" => $value], 'en');
 
             $notification = Common::getNotificationContent(
-                'accept_request_sallary', 
-                $user->lan ?? 'en', 
+                'accept_request_sallary',
+                $user->lan ?? 'en',
                 [
-                    'value' => $value ,
-                 ]);
-
+                    'value' => $value,
+                ]
+            );
         } else {
             // $body_ar             = __('api.denied_request_sallary', ["value" => $value, 'reason' => $reason], 'ar');
             // $body_en             = __('api.denied_request_sallary', ["value" => $value, 'reason' => $reason], 'ar');
             $notification = Common::getNotificationContent(
-                'denied_request_sallary', 
-                $user->lan ?? 'en', 
+                'denied_request_sallary',
+                $user->lan ?? 'en',
                 [
                     'value' => $value,
-                    'reason' => $reason ,
-                 ]);
+                    'reason' => $reason,
+                ]
+            );
         }
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], icon: '', data: [], messageType: 'request-message');
@@ -769,12 +787,13 @@ class CustomNotificationNewNotUesdNow
 
         // $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $notification = Common::getNotificationContent(
-            'roomTarget', 
-            $user->lan ?? 'en', 
+            'roomTarget',
+            $user->lan ?? 'en',
             [
-                'coins' => $coins ,
-                'room' => $roomName 
-             ]);
+                'coins' => $coins,
+                'room' => $roomName
+            ]
+        );
         $data['user_id'] = $user?->id;
         Common::send_firebase_notification($tokens_notification, $notification['title'], $notification['body'], data: $data, messageType: 'room-achievement-target');
         Common::sendOfficialMessage($user->id, $notification['body'], '', titleAr: $notification['body']);
