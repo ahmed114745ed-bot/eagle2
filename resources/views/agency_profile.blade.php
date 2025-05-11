@@ -249,9 +249,9 @@
     letter-spacing: 0.5px;
 }
 
-.rtl .btn-back {
+.ltr .btn-back {
     position: absolute;
-    top: -56px;
+    top: 5px;
     right: 20px;
     background: #ecf0f1;
     border: none;
@@ -265,9 +265,9 @@
     gap: 5px;
 }
 
-.ltr .btn-back {
+.rtl .btn-back {
     position: absolute;
-    top: -56px;
+    top: 5px;
     left: 20px;
     background: #ecf0f1;
     border: none;
