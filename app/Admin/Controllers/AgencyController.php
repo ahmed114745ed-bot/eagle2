@@ -54,9 +54,9 @@ class AgencyController extends MainController
             ->description(__('List of Agencies'))
             ->row(function ($row) {
 
-                $row->column(3, view('agency.settings'));
 
-                $row->column(9, $this->grid());
+
+                $row->column(12, $this->grid());
             }));
     }
 
@@ -137,7 +137,7 @@ class AgencyController extends MainController
         $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
         $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
         return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);   
+            ->view('agency_profile', $data);
 
     }
 
@@ -231,7 +231,7 @@ class AgencyController extends MainController
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('Shipping_agency', '!=', 1)
+            ->where('Host_agency',  1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -466,7 +466,7 @@ class AgencyController extends MainController
      */
     protected function form()
     {
-        $form = new Form(new Agency);
+        $form = new Form(new Agency());
         $ops = [];
         foreach ($this->getAgencies() as $user) {
             $ops[$user->id] = $user->name;
@@ -525,8 +525,9 @@ class AgencyController extends MainController
 
                 $row->width(12)->hidden('Host_agency')->default(1);
 
+
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->hidden('Shipping_agency')->default(0);
+                    $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
                 }
             });
         }
@@ -543,13 +544,17 @@ class AgencyController extends MainController
 
             $appOwnerId = $form->input('app_owner_id');
             $Host_agency = $form->input('Host_agency');
-            $Shipping_agency = $form->input('Shipping_agency');
+
+            $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-            if (!$form->model()->exists)  Common::createUserAdmin($appOwnerId);
-            if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
+            // Create admin dashboard for agency when accept it
+            $modelExists = $form->model()->exists;
+            if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+
+            if ($modelExists && $newOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
@@ -597,6 +602,7 @@ class AgencyController extends MainController
 
 
 
+
             if ($Host_agency == 'on' || $Host_agency == 1) {
                 $host += 2;
             }
@@ -609,7 +615,12 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'is_host' => 1, 'monthly_diamond_received' => 0, 'agency_id' => $form->model()->id,]);
+            /*// Reset diamond only when agency created
+            if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
+            User::where('id', intval($appOwnerId))->update([
+                'type_user' => $newType,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,]);
             // }
 
 
