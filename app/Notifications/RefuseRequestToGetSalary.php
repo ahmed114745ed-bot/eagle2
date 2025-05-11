@@ -15,7 +15,7 @@ class RefuseRequestToGetSalary extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct($amount,$reason)
+    public function __construct($amount, $reason)
     {
         $this->amount = $amount;
         $this->reason = $reason;
@@ -36,12 +36,14 @@ class RefuseRequestToGetSalary extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $appNameEn = config('app.name_en');
+        $appNameAr = config('app.name_ar');
         return (new MailMessage)
-        ->subject('سحب راتب')
-        ->line(__('api.denied_request_sallary',["value"=>$this->amount,'reason'=>$this->reason],'ar'))
-        ->line('شكرا لاستخدامك الصفوة !')
-        ->line('أطيب التمنيات لكم')
-        ->salutation("EL Safwa - الصفوة");
+            ->subject('سحب راتب')
+            ->line(__('api.denied_request_sallary', ["value" => $this->amount, 'reason' => $this->reason], 'ar'))
+            ->line($appNameAr . 'شكرا لاستخدامك  !')
+            ->line('أطيب التمنيات لكم')
+            ->salutation($appNameEn . " - " . $appNameAr);
     }
 
     /**
