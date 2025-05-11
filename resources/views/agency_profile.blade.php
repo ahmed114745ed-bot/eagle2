@@ -4,8 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
 
+
+:root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --green-color: {{ config('themes.greenColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+        --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
 .stat-icon {
     width: 50px;
     height: 50px;
@@ -44,7 +68,7 @@
 }
 
 .section-box {
-    background: white;
+    background: var(--secondary-color);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -138,7 +162,7 @@
     margin-bottom: 30px;
     position: relative;
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    background: var(--primary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -224,10 +248,26 @@
     letter-spacing: 0.5px;
 }
 
-.btn-back {
+.rtl .btn-back {
     position: absolute;
-    top: 20px;
+    top: -56px;
     right: 20px;
+    background: #ecf0f1;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ltr .btn-back {
+    position: absolute;
+    top: -56px;
+    left: 20px;
     background: #ecf0f1;
     border: none;
     padding: 8px 15px;
@@ -281,7 +321,7 @@
 }
 
 .performers-card {
-    background: white;
+    background: var(--secondary-color);
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -417,7 +457,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-    color: #7f8c8d;
+   
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
@@ -453,6 +493,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: var(--primary-color);
 }
 
 .card-header h3 {
@@ -473,13 +514,20 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--box-background-color);
+}
+
+.table-section {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--box-background-color);
 }
 
 .data-table th {
     text-align: left;
     padding: 12px 15px;
-    background: #f8f9fa;
-    color: #7f8c8d;
+    background: var(--primary-color);
+   
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -583,11 +631,31 @@
     font-size: 14px;
 }
 
+.user-avatar,
+.supporter-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.supporters-avatars {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
 .pagination-wrapper {
     padding: 15px 20px;
     display: flex;
     justify-content: center;
     border-top: 1px solid #eee;
+     background: var(--box-background-color);
 }
 
 @media (max-width: 768px) {
@@ -600,6 +668,9 @@
     }
 }
     </style>
+
+<!-- SweetAlert2 -->
+
 </head>
 <body>
 
@@ -627,14 +698,14 @@
                     </div>
                 </div>
                 <div class="agency-stats">
-                    <div class="stat-card">
+                    <!-- <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
                         <div class="stat-label">{{__("coins")}}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <button class="btn-back" onclick="window.history.back()">
@@ -982,7 +1053,7 @@
                                                         {!! $image !!}
                                                         <div>
                                                             <strong>{{ $name }}</strong><br>
-                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                            <span style=" font-size: smaller;">UID: {{ $uid }}</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1189,18 +1260,14 @@
                                 </div>
                             @endif
                         </div>
-            
+            <br>
                      
                 <div class="tab-content active" id="members-tab">
-                    <div class="card table-section">
-                        <div class="card-header">
-                            <h3>{{ __('') }}</h3>
-                            <span class="badge count-badge"></span>
-                        </div>
+                   
 
                         <div class="table-section card">
-                            <!-- <div class="table-responsive"> -->
-                                <table class="agency-table">
+                             <div class="table-responsive"> 
+                                <table class="data-table">
                                     <thead>
                                         <tr>
                                             <th width="5%">#</th>
@@ -1225,6 +1292,23 @@
                                                 if (!isImageExists($avatarUrl)) {
                                                     $avatarUrl = $defaultImage;
                                                 }
+                                                 $month = request('month') ?? now()->month;
+                                                 $year = request('year') ?? now()->year;
+
+                                                 $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
+                                                            ->where('receiver_id', $memberTarget->id)
+                                                            ->whereHas('sender')
+                                                            ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'
+                                                            ->whereYear('created_at', $year)
+                                                            ->whereMonth('created_at', $month)
+                                                            ->selectRaw("sum(giftPrice) as exp, sender_id")
+                                                            ->groupBy('sender_id')
+                                                            ->orderByRaw("exp desc")
+                                                            ->limit(3)
+                                                            ->get()
+                                                            ->reject(fn ($q) => $q->exp == 0);
+
+                                                        $memberTarget->topSupporters = $giftLogs;
                                             @endphp
                                             
                                             <tr>
@@ -1250,12 +1334,27 @@
                                                 </td>
                                                 <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
                                                 <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
-                                                <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
+                                                <td>
+                                                    <div class="supporters-avatars">
+                                                        @foreach($memberTarget->topSupporters ?? [] as $supporter)
+                                                            @php
+                                                                $sender = $supporter->sender;
+                                                                $supporterAvatar = $sender->profile->avatar ?? null;
+                                                                $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
+                                                                if (!isImageExists($supporterUrl)) {
+                                                                    $supporterUrl = $defaultImage;
+                                                                }
+                                                            @endphp
+                                                            <img src="{{ $supporterUrl }}" class="supporter-avatar" title="{{ $sender->name ?? '' }}" alt="Supporter">
+                                                        @endforeach
+                                                    </div>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     @endif
                                 </table>
+                             
                             </div>
                             
                             @if($memberTargets->isEmpty())
@@ -1276,19 +1375,21 @@
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         </div>
-                     </div>
-                    </div>
+                   
+                   
                 </div>
             </div>
             
        
 
     </div>
+<!-- jQuery أولاً -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 
-
-    <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -1327,71 +1428,151 @@
         });
 
 
-    $(document).ready(function() {
-    $('.accept-btn').click(function() {
+        $(document).ready(function () {
+            console.log("Document ready");
+
+function showLoader() {
+    console.log("Showing loader");
+    Swal.fire({
+        title: 'Loading...',  // تغيير النص ليوضح الرسالة
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+}
+
+function showSuccess(message, callback = null) {
+    console.log("Showing success:", message);
+    Swal.fire({
+        icon: 'success',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    }).then(() => {
+        console.log("Success confirmed");
+        if (callback) {
+            console.log("Running success callback");
+            callback();
+        }
+    });
+}
+
+function showError(message) {
+    console.log("Showing error:", message);
+    Swal.fire({
+        icon: 'error',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    });
+}
+
+function confirmAction(message, onConfirm) {
+    console.log("Confirm action:", message);
+    Swal.fire({
+        title: message,
+        icon: 'question',  // استبدال type بـ icon
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    }).then(result => {
+        console.log("Confirmation result:", result);
+        console.log("isConfirmed:", result.isConfirmed);
+
+        if (result.value) {
+            console.log("User confirmed action");
+            onConfirm();
+        } else {
+            console.log("User cancelled action");
+        }
+    });
+}
+
+
+    // قبول الطلب
+    $('.accept-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to accept this request?")) {
+        console.log("Accept clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_accept") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/accept_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Accept response:", response);
                 if (response.status) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', 'requests');
-                    window.location.href = url.toString();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message); // Show error returned by backend
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Accept failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to accept the request.');
+                showError(res?.message ?? '{{ __("failed_accept_request") }}');
             });
-        }
+        });
     });
 
-    $('.reject-btn').click(function() {
+    // رفض الطلب
+    $('.reject-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to reject this request?")) {
+        console.log("Reject clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_reject") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/reject_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Reject response:", response);
                 if (response.status) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', 'requests');
-                    window.location.href = url.toString();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Reject failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to reject the request.');
+                showError(res?.message ?? '{{ __("failed_reject_request") }}');
             });
-        }
+        });
     });
 
+    // ترقية إلى Admin
     $('.make-admin-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to make this user an admin?")) {
+        console.log("Make admin clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/admin/${id}`, {
                 _token: '{{ csrf_token() }}'
             }, function (response) {
+                Swal.close();
+                console.log("Make admin response:", response);
                 if (response.status) {
-                    alert(response.message);
-                    location.reload();
+                    showSuccess(response.message, () => {
+                        location.reload();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
             }).fail(function (xhr) {
+                Swal.close();
+                console.error("Make admin failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to make user an admin.');
+                showError(res?.message ?? '{{ __("failed_make_admin") }}');
             });
-        }
+        });
     });
-
 });
 
-
-
-
-
-    </script>
+</script>
 

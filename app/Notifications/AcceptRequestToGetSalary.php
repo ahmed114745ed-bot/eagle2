@@ -34,12 +34,15 @@ class AcceptRequestToGetSalary extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+
+        $appNameEn = config('app.name_en');
+        $appNameAr = config('app.name_ar');
         return (new MailMessage)
-        ->subject('سحب راتب')
-        ->line(__('api.accept_request_sallary',["value"=>$this->value],'ar'))
-        ->line('شكرا لاستخدامك الصفوة !')
-        ->line('أطيب التمنيات لكم')
-        ->salutation("EL Safwa - الصفوة");
+            ->subject('سحب راتب')
+            ->line(__('api.accept_request_sallary', ["value" => $this->value], 'ar'))
+            ->line($appNameAr . 'شكرا لاستخدامك  !')
+            ->line('أطيب التمنيات لكم')
+            ->salutation($appNameEn . " - " . $appNameAr);
     }
 
     /**

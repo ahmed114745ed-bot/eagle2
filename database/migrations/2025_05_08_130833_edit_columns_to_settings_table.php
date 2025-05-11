@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->string('type')->nullable();
+            $table->string('input_type')->nullable();
+            $table->foreignId('item_id')->nullable();
         });
     }
 

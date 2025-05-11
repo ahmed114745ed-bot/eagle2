@@ -177,20 +177,20 @@ class PaymentCoinController extends MainController
         $form->hasMany('settings', 'Fields', function ($form) {
             $form->text('key', 'Input Name')
                 ->rules(function ($form) {
-                    // $form->model() is the Setting model; $form->parent is PaymentCoin
-                    $paymentCoinId = request()->route('payment_coins'); // or $form->parent->id in some versions
+                    $itemId = request()->route('items'); // Or get item id based on your routing
                     $id = $form->model ? $form->model->id : null;
 
                     return [
                         'required',
-                        "unique:settings,key,$id,id,payment_coin_id,$paymentCoinId"
+                        "unique:settings,key,$id,id,item_id,$itemId"
                     ];
                 });
-            $form->text('value', 'Input Value');
-            $form->select('type', 'Type')->options([
+            $form->text('value', 'Input Value')->required();
+            $form->select('input_type', 'Input Type')->options([
                 'input' => 'Input',
                 'file' => 'File',
-            ]);
+            ])->required();
+            $form->hidden('type')->default('payment');
         });
 
         $status = [

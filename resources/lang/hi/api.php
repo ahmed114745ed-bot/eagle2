@@ -38,7 +38,6 @@ return [
     'room_description_allow'           => 'आपका कमरा उपयोगकर्ताओं को दिखाई नहीं देता',
     'spechEfeect_description_allow'    => 'आप किसी भी कमरे में प्रवेश करते समय परिचय दिखाने की अनुमति देते हैं',
     'welcome'                          => 'स्वागत है :app_name में',
-    'tik_chat'                         => 'EL Safwa',
     'followed_you'                     => ':name ने आपको फॉलो किया',
     'like_your_moment'                 => ':name ने आपके क्षण पर प्रतिक्रिया दी',
     'like_your_real'                   => ':name ने आपकी रील पर प्रतिक्रिया दी',
