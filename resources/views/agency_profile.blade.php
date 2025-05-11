@@ -153,6 +153,7 @@
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
+     background: var(--box-background-color);
 }
 
 .agency-header {
@@ -162,7 +163,7 @@
     margin-bottom: 30px;
     position: relative;
     padding: 20px;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -514,13 +515,14 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--box-background-color);
+    background: var(--secondary-color);
 }
+
 
 .table-section {
     width: 100%;
     border-collapse: collapse;
-    background: var(--box-background-color);
+    background: var(--secondary-color);
 }
 
 .data-table th {
@@ -655,7 +657,7 @@
     display: flex;
     justify-content: center;
     border-top: 1px solid #eee;
-     background: var(--box-background-color);
+     background: var(--secondary-color);
 }
 
 @media (max-width: 768px) {
