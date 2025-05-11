@@ -2,24 +2,28 @@
 
 namespace Modules\SalaryTransaction\Helpers;
 
-use App\Helpers\Common;
-use App\Models\OfficialMessageAdmin;
 use App\Models\Vip;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Family;
+use App\Helpers\Common;
+use App\Models\Setting;
 use App\Models\OfficialMessage;
 use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
+use App\Models\OfficialMessageAdmin;
 
 class TransactionCustomNotification
 {
 
     public static function sendRequest(int $userId)
     {
+
+        $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
         $user = User::withoutAppends()->where('id', $userId)->first();
         if (!$user) {
             return 0;
@@ -29,7 +33,7 @@ class TransactionCustomNotification
         $body_en = __('salaryTransaction::api_responses.request_added', ['user'=>$user->name_en], 'en');
         $firebaseBody = ($user->lan === 'ar') ? $body_ar : $body_en;
         $title =__('salaryTransaction::api_responses.request_title');
-        $titleAppName = ($user->lan == 'ar') ?  config('app.name_ar') : config('app.name_en');
+        $titleAppName = ($user->lan == 'ar') ?  $appNameAr : $appNameEn;
         Common::send_firebase_notification($tokens_notfacion, $titleAppName, $firebaseBody);
         Common::sendOfficialMessage($user->id, title: $body_en, content: $title, titleAr: $body_ar);
     }
