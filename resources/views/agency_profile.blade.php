@@ -466,7 +466,7 @@
 
 .tab-btn.active {
     color: #3498db;
-    border-bottom-color: #3498db;
+    border-bottom-color: var(--primary-color);
 }
 
 .tab-btn:hover:not(.active) {
