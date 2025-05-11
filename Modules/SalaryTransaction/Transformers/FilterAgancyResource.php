@@ -16,13 +16,21 @@ class FilterAgancyResource extends JsonResource
      */
     public function toArray($request)
     {
+        $type = '';
+        if (($this->Shipping_agency == 1) && ($this->Host_agency == 1)) {
+            $type = 'hosts and shipping';
+        } elseif (($this->Shipping_agency == 0) && ($this->Host_agency == 1)) {
+            $type = 'hosts';
+        } elseif (($this->Shipping_agency == 1) && ($this->Host_agency == 0)) {
+            $type = 'shipping';
+        }
         return [
             'id' => $this->id,
             'name' => @$this->name,
             'image' => @$this->img,
             'total_members' => $this->mempers->count(),
             'members' => AgencyMemberResource::collection($this->mempers),
-            'agency_type' => $this->Shipping_agency == 1 ? 'shipping' : 'hosts',
+            'agency_type' =>  $type,
             'owner' => [
                 'id' => $this->owner->id ?? 0,
                 'uuid' => $this->owner->uuid ?? '',

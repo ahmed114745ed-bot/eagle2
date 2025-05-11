@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository as Repository;
 use Exception;
+
 class UserRepository extends Repository
 {
     public function search($key, $family, $perPage, $currentPage)
@@ -53,6 +54,20 @@ class UserRepository extends Repository
                     ->orWhereNull('agency_id');
             })
             ->where('type_user', 0)
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function searchUserAgencyShipping($key, $page, $perPage)
+    {
+        return User::selectRaw('concat(name, " - ", uuid) as name, id')
+            ->whereDoesntHave('ownAgency', function ($query) {
+                $query->where('Shipping_agency', 1);
+            })
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
@@ -109,17 +124,17 @@ class UserRepository extends Repository
     public function update_user_multi_images($user, $id, $src)
     {
         $updated = ProfileGallary::where('id', $id)
-                                 ->where('user_id', $user->id)
-                                 ->update(['img' => $src]);
-    
+            ->where('user_id', $user->id)
+            ->update(['img' => $src]);
+
         if (!$updated) {
             throw new Exception("Error updating image Or image not found");
         }
-    
+
         return true;
     }
 
-    
+
 
     public function userCharge()
     {

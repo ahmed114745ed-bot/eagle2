@@ -2,8 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Target;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -11,7 +13,9 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
+use App\Models\UserSallary;
 use App\Models\AgencySallary;
+use App\Models\AgencyUserJob;
 use Encore\Admin\Widgets\Tab;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
@@ -50,9 +54,9 @@ class AgencyController extends MainController
             ->description(__('List of Agencies'))
             ->row(function ($row) {
 
-                $row->column(3, view('agency.settings'));
 
-                $row->column(9, $this->grid());
+
+                $row->column(12, $this->grid());
             }));
     }
 
@@ -70,11 +74,14 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
-    public function profile($id, Content $content)
+    public function profile($id, Request $request, Content $content)
     {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        $tab = request('tab') ?? null;
         $cacheKey = "agency_profile_{$id}";
-        // $data = Cache::remember($cacheKey, 3600, function () use ($id) {
         $agency = Agency::with([
+            'admins',
             'charges' => function ($query) {
                 $query->select('id', 'agency_id', 'amount', 'created_at')
                     ->latest()
@@ -100,9 +107,9 @@ class AgencyController extends MainController
         }
 
         $agency->display_image = $imageUrl;
-
+        $agencyId = $agency->id;
         $members = $agency->mempers()
-            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'country_id')->with('country', 'agencyUserJob')
+            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
             ->paginate(10, ['*'], 'members_page');
 
         $charges = $agency->charges()
@@ -115,15 +122,41 @@ class AgencyController extends MainController
             ->paginate(10, ['*'], 'salary_page');
 
         $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
-            // 
             ->with('user')
-            ->whereHas('user')->orderByDesc('id')->paginate(10, ['*'], 'join_page');
+            ->whereHas('user')->orderByDesc('id')
+            ->paginate(10, ['*'], 'join_page');
 
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests');
-        // });
+        $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+        $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+            $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+        }])->paginate(10, ['*'], 'target_page');
+        [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
 
+        $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+        $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
+        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
+
+    }
+
+    public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
+    {
+        return  GiftLog::where('agency_id', $agencyId)->whereHas($rel)->with($rel)->whereYear('created_at', $year)->whereMonth('created_at', $month)
+            ->selectRaw("sum(giftPrice) as exp, $keywords")
+            ->groupBy($keywords)->orderByRaw("exp desc")
+            ->get()->reject(function ($q) {
+                return $q->exp == 0;
+            });
+    }
+
+    public function rateAgency($agencyId, $month, $year)
+    {
+        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+        $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
+        $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
+        return [$agencyTarget, $rate];
     }
 
     public function update($id)
@@ -198,7 +231,7 @@ class AgencyController extends MainController
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('Shipping_agency', '!=', 1)
+            ->where('Host_agency',  1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -433,7 +466,7 @@ class AgencyController extends MainController
      */
     protected function form()
     {
-        $form = new Form(new Agency);
+        $form = new Form(new Agency());
         $ops = [];
         foreach ($this->getAgencies() as $user) {
             $ops[$user->id] = $user->name;
@@ -492,8 +525,9 @@ class AgencyController extends MainController
 
                 $row->width(12)->hidden('Host_agency')->default(1);
 
+
                 if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->hidden('Shipping_agency')->default(0);
+                    $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
                 }
             });
         }
@@ -510,13 +544,17 @@ class AgencyController extends MainController
 
             $appOwnerId = $form->input('app_owner_id');
             $Host_agency = $form->input('Host_agency');
-            $Shipping_agency = $form->input('Shipping_agency');
+
+            $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
 
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
-            if (!$form->model()->exists)  Common::createUserAdmin($appOwnerId);
-            if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
+            // Create admin dashboard for agency when accept it
+            $modelExists = $form->model()->exists;
+            if (!$modelExists)  Common::createUserAdmin($appOwnerId);
+
+            if ($modelExists && $newOwnerId != $originalOwnerId) {
                 Common::createUserAdmin($appOwnerId);
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
@@ -564,6 +602,7 @@ class AgencyController extends MainController
 
 
 
+
             if ($Host_agency == 'on' || $Host_agency == 1) {
                 $host += 2;
             }
@@ -576,7 +615,12 @@ class AgencyController extends MainController
             }
             // if ($appOwnerId) {
             $newType = intval($host);
-            User::where('id', intval($appOwnerId))->update(['type_user' => $newType, 'is_host' => 1, 'monthly_diamond_received' => 0, 'agency_id' => $form->model()->id,]);
+            /*// Reset diamond only when agency created
+            if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
+            User::where('id', intval($appOwnerId))->update([
+                'type_user' => $newType,
+                'is_host' => 1,
+                'agency_id' => $form->model()->id,]);
             // }
 
 
@@ -829,13 +873,28 @@ class AgencyController extends MainController
 
     public function acceptJoin($id)
     {
+
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user', 'agency')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
         $user = $agencyJoinRequest->user;
-        if (!$user) return back()->with('error', ('user not found'));
+
+        if (!$user) return response()->json([
+            'status' => false,
+            'message' => __(' user Not found')
+        ], 404);
         $agency = $agencyJoinRequest->agency;
-        if (!$agency) return back()->with('error', __('agency not found'));
-        if ($user->agency_id) return back()->with('error', __('user joined in another agency'));
+        if (!$agency) return response()->json([
+            'status' => false,
+            'message' => __(' agency Not found')
+        ], 404);
+        if ($user->agency_id) return response()->json([
+            'status' => false,
+            'message' => __('user joined agency before')
+        ], 404);
+        // dd($agency,$user->agency_id);
         $agencyJoinRequest->status = 1;
         $agencyJoinRequest->save();
 
@@ -855,18 +914,49 @@ class AgencyController extends MainController
         // add vip to user
         UserCommon::userVip($user);
         CustomNotification::acceptAgencyApp($agency, $user);
-        return  redirect()->back()->with('success', __('Joined successfully'));;
+
+        return  response()->json([
+            'status' => true,
+            'message' => __('Joined successfully')
+        ]);
+    }
+
+    public function adminAgency($id)
+    {
+        $user = User::Find($id);
+        $admin =  AgencyUserJob::where('user_id', $user->id)->where('agency_id', $user->agency_id)->where('type', 'requestManger')->exists();
+        if ($admin) return response()->json([
+            'status' => false,
+            'message' => __('this user admin in  this agency')
+        ], 404);
+        $data = [
+            'agency_id' => $user->agency_id,
+            'user_id' => $user->id,
+            'type' => "requestManger",
+        ];
+        AgencyUserJob::create($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 
     public function rejectJoin($id)
     {
         $agencyJoinRequest = AgencyJoinRequest::where('id', $id)->with('user')->first();
-        if (!$agencyJoinRequest) return back()->with('error', __('not found'));
+        if (!$agencyJoinRequest) return response()->json([
+            'status' => false,
+            'message' => __('Not found')
+        ], 404);
 
         $agencyJoinRequest->status = 2;
         $agencyJoinRequest->save();
 
-        return redirect()->back()->with('success', __('Rejected successfully'));
+        return response()->json([
+            'status' => true,
+            'message' => __('Rejected successfully')
+        ]);
     }
 
     public function members($agencyId)
@@ -942,92 +1032,6 @@ class AgencyController extends MainController
         $grid->disableCreateButton();
         $grid->disableExport();
         $grid->disableActions();
-        return $grid;
-    }
-
-    public function stars($agencyId)
-    {
-        $grid = new Grid(new GiftLog);
-
-        // Apply filters BEFORE the selectRaw
-        $year = Request::input('year');
-        $month = Request::input('month');
-
-        $grid->model()
-            ->where('agency_id', $agencyId)
-            ->whereHas('receiver')
-            ->with('receiver')
-            ->when($year, function ($query) use ($year) {
-                $query->whereYear('created_at', $year);
-            })
-            ->when($month, function ($query) use ($month) {
-                $query->whereMonth('created_at', $month);
-            })
-            ->selectRaw("sum(giftPrice) as exp, receiver_id, MAX(created_at) as created_at")
-            ->groupBy('receiver_id')
-            ->orderByRaw("exp desc");
-
-        // Filters
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $year = Request::input('year');
-                    if (!empty($year)) {
-                        $query->whereYear('created_at', $year);
-                    }
-                }, __('Year'), 'year')->integer();
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $month = Request::input('month');
-                    if (!empty($month)) {
-                        $query->whereMonth('created_at', $month);
-                    }
-                }, __('Month'), 'month')->integer();
-            });
-        });
-
-        // Columns
-        $grid->column('receiver.name', __('User'))->display(function ($name) {
-            if (!$this->receiver) return 'user not found';
-            $uid = @$this->receiver->uuid;
-            $path = @$this->receiver->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->receiver->id, $url, 40, 40);
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                        <strong>$name</strong><br>
-                        <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
-                    </div>
-                </div>
-            ";
-        });
-
-        $grid->column('exp', __('Total Price'))->display(function () {
-            return number_format($this->exp, 2) . ' Coins';
-        });
-
-        // Optional: Show total sum in footer
-        // $grid->footer(function ($collection) {
-        //     $total = $collection->sum('exp');
-        //     return "<div style='padding: 10px'><strong>Total: " . number_format($total, 2) . " Coins</strong></div>";
-        // });
-
-        $this->extendGrid($grid);
-        $grid->disableCreateButton();
-        $grid->disableExport();
-        $grid->disableActions();
-
         return $grid;
     }
 }

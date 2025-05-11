@@ -2,23 +2,24 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Selectable\Users;
-use App\Models\Agency;
 use App\Models\User;
-use App\Models\UsersJoinedAgency;
-use Encore\Admin\Facades\Admin;
+use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use App\Admin\Controllers\MainController;
+use App\Admin\Selectable\Users;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Auth;
+use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
-use App\Traits\AdminTraits\AdminUserTrait;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
+use App\Admin\Controllers\MainController;
+use App\Traits\AdminTraits\AdminUserTrait;
+use App\Admin\Actions\DeleteShippingAgencyAction;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController
 {
@@ -48,7 +49,7 @@ class AppearChargerAgencyController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('appear-charger-agency'))
             ->body($this->detail($id)));
     }
@@ -62,7 +63,7 @@ class AppearChargerAgencyController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('appear-charger-agency'))
             ->body($this->form()->edit($id)));
     }
@@ -93,8 +94,8 @@ class AppearChargerAgencyController extends MainController
                     $input = $this->input;
                     $query->whereHas('owner', function ($q) use ($input) {
                         $q->where('name', 'like', "%$input%")
-                          ->orWhere('uuid', 'like', "%$input%")
-                          ->orWhere('phone', 'like', "%$input%");
+                            ->orWhere('uuid', 'like', "%$input%")
+                            ->orWhere('phone', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name , UUID , phone'));
             });
@@ -180,7 +181,11 @@ class AppearChargerAgencyController extends MainController
             })
             ->switch(Common::getSwitchStates());
 
-        $grid->disableActions();
+        $grid->actions(function ( $actions) {
+            $actions->disableView();
+            $actions->add(new DeleteShippingAgencyAction());
+            $actions->disableDelete();
+        });
 
         return $grid;
     }
@@ -218,16 +223,6 @@ class AppearChargerAgencyController extends MainController
             $ops[$user->id] = $user->name;
         }
 
-        $opsAgencyManger = [];
-        foreach (User::where('is_manger', 1)->get() as $user) {
-            $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
-        }
-
-        $opsAgencyMangerDash = [];
-        foreach (DB::table('admin_users')->get() as $user) {
-            $opsAgencyMangerDash[$user->id] = $user->name;
-        }
-
         // --- الحقول المشتركة ---
         $form->display('ID');
 
@@ -239,7 +234,7 @@ class AppearChargerAgencyController extends MainController
                 }
                 return $ops2;
             })
-            ->ajax('/api/search/users3', 'id', 'name')->rules('required');
+            ->ajax('/api/search/users5', 'id', 'name')->rules('required');
 
         $form->hidden('agency_manger_id', __('app manger id'));
 
@@ -282,20 +277,7 @@ class AppearChargerAgencyController extends MainController
                 Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
                 Admin::where('username', $user->uuid)->delete();
-
-                $user->update([
-                    'type_user' => 0,
-                    'agency_id' => 0,
-                    'monthly_diamond_received' => 0,
-                ]);
             }
-
-            $newType = 3;
-            User::where('id', intval($appOwnerId))->update([
-                'type_user' => $newType,
-                'monthly_diamond_received' => 0,
-                'agency_id' => $form->model()->id,
-            ]);
         });
 
         $form->saved(function (Form $form) {
@@ -317,6 +299,4 @@ class AppearChargerAgencyController extends MainController
 
         return $form;
     }
-
-
 }

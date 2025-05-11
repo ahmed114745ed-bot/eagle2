@@ -1885,6 +1885,7 @@
     "stripe": "ستريب",
     "fawry": "فوري",
     "oPay": "أو باي",
+    "opay": "أو باي",
     "Brand settings" : "إعدادات العلامة التجارية",
     "Theme settings" : "إعدادات اللون",
 
@@ -2205,8 +2206,33 @@
 "wallet-transactions": "معاملات المحفظة",
 "WalletTransaction": "معاملة محفظة",
   "vip_alert_message": "⚠️ الرجاء إضافة الامتيازات إلى VIP.",
-  "vip_alert_button": "اضافة"
-  
+  "vip_alert_button": "اضافة",
+  "Agency Stars": "نجوم الوكالة",
+  "Agency Admins": "مشرفو الوكالة",
+  "Members": "الأعضاء",
+  "Charges": "الشحنات",
+  "Join Requests": "طلبات الانضمام",
+  "Targets": "الأهداف",
+  "Agency Members": "أعضاء الوكالة",
+  "Live Hours": "ساعات البث",
+  "Role": "الدور",
+  "Agency join request": "طلب الانضمام إلى الوكالة",
+  "WhatsApp": "واتساب",
+  "Country": "الدولة",
+  "Action": "الإجراء",
+  "Make Admin": "تعيين كمشرف",
+  "All Months": "جميع الشهور",
+  "All Years": "جميع السنوات",
+  "Agency Rate": "تقييم الوكالة",
+  "Agency Heroes": "أبطال الوكالة",
+  "Supporters": "الداعمون",
+  "Remaining": "المتبقي",
+  "are_you_sure_accept": "هل أنت متأكد أنك تريد قبول الطلب؟",
+  "are_you_sure_reject": "هل أنت متأكد أنك تريد رفض الطلب؟",
+  "are_you_sure_make_admin": "هل أنت متأكد أنك تريد ترقية هذا المستخدم إلى مشرف؟",
+  "failed_accept_request": "فشل في قبول الطلب. يرجى المحاولة مرة أخرى.",
+  "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
+  "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى."
 
 
 

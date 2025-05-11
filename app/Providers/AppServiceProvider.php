@@ -123,11 +123,17 @@ class AppServiceProvider extends ServiceProvider
                 'nafezly-payments.OPAY_COUNTRY_CODE' => $settings['opay_country_code'] ?? '',
                 'nafezly-payments.OPAY_BASE_URL' => $settings['opay_base_url'] ?? '',
 
+                'apple.apple_team_id' => $settings['apple_team_id'] ?? '',
+                'apple.apple_key_id' => $settings['apple_key_id'] ?? '',
+                'apple.apple_client_id' => $settings['apple_client_id'] ?? '',
+                'apple.apple_redirect_uri' => $settings['apple_redirect_uri'] ?? '',
+                'apple.apple_service_file' => $settings['apple_service_file'] ?? '',
 
                 'is_fawry_active' => $settings['is_fawry_active'] ?? 0,
                 'is_paysky_active' => $settings['is_paysky_active'] ?? 0,
                 'is_stripe_active' => $settings['is_stripe_active'] ?? 0,
                 'is_opay_active' => $settings['is_opay_active'] ?? 0,
+                'is_applepay_active' => $settings['is_applepay_active'] ?? 0,
             ]);
 
             if (!Cache::has('app_title')) {

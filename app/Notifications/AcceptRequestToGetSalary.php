@@ -2,10 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class AcceptRequestToGetSalary extends Notification
 {
@@ -34,12 +35,16 @@ class AcceptRequestToGetSalary extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+
+         $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
         return (new MailMessage)
-        ->subject('سحب راتب')
-        ->line(__('api.accept_request_sallary',["value"=>$this->value],'ar'))
-        ->line('شكرا لاستخدامك الصفوة !')
-        ->line('أطيب التمنيات لكم')
-        ->salutation("EL Safwa - الصفوة");
+            ->subject('سحب راتب')
+            ->line(__('api.accept_request_sallary', ["value" => $this->value], 'ar'))
+            ->line($appNameAr . 'شكرا لاستخدامك  !')
+            ->line('أطيب التمنيات لكم')
+            ->salutation($appNameEn . " - " . $appNameAr);
     }
 
     /**

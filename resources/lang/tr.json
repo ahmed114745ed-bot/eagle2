@@ -2119,6 +2119,28 @@
 "wallet-transactions": "Cüzdan İşlemleri",
 "WalletTransaction": "Cüzdan İşlemi",
   "vip_alert_message": "⚠️ Lütfen VIP'ye ayrıcalıkları ekleyin.",
-  "vip_alert_button": "Şimdi"
+  "vip_alert_button": "Şimdi",
+  "Agency Stars": "Ajans Yıldızları",
+  "Agency Admins": "Ajans Yöneticileri",
+  "Members": "Üyeler",
+  "Charges": "Ücretler",
+  "Join Requests": "Katılma Talepleri",
+  "Targets": "Hedefler",
+  "Agency Members": "Ajans Üyeleri",
+  "Live Hours": "Canlı Saatler",
+  "Role": "Rol",
+  "Agency join request": "Ajansa Katılma Talebi",
+  "WhatsApp": "WhatsApp",
+  "Country": "Ülke",
+  "Action": "İşlem",
+  "Make Admin": "Yönetici Yap",
+  "All Months": "Tüm Aylar",
+  "All Years": "Tüm Yıllar",
+  "Agency Rate": "Ajans Değerlendirmesi",
+  "Agency Heroes": "Ajans Kahramanları",
+  "Supporters": "Destekçiler",
+  "Remaining": "Kalan"
+  
+
 
 }
