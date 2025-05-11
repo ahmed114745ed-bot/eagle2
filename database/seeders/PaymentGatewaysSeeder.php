@@ -6,6 +6,7 @@ use App\Models\PaymentCoin;
 use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Storage;
 
 class PaymentGatewaysSeeder extends Seeder
 {
@@ -14,6 +15,36 @@ class PaymentGatewaysSeeder extends Seeder
      */
     public function run(): void
     {
+        $images = [
+            'fawry.jpeg',
+            'paySky.png',
+            'stripe.png',
+            'opay.png',
+            'cashfree.jpg',
+            'applepay.png',
+            'mada.png',
+            'liqpay.png',
+            'paypal.png',
+            'paytm.png',
+            'paytabs.webp',
+            'bkash.png',
+            'razorpay.webp',
+            'senangpay.png',
+            'paymob.png',
+            'flutterwave.png',
+            'paystack.png',
+            'sslcommerz.png',
+            'googlepay.png',
+        ];
+
+        foreach ($images as $img) {
+            $localPath = public_path('images/' . $img);
+            $gcsPath = 'images/' . $img;
+
+            if (file_exists($localPath)) {
+                Storage::disk('gcs')->put($gcsPath, file_get_contents($localPath), 'public');
+            }
+        }
 
         $fawry_id = PaymentCoin::updateOrCreate([
             'title' => 'fawry',
