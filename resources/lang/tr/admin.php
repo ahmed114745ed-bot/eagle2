@@ -209,5 +209,159 @@ return [
     "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
     "guess_the_word" => "Kelimeyi Tahmin Et",
+
+    // Fawry
+    "fawry_secret" => "Gizli Anahtar",
+    "fawry_merchant_code" => "Mağaza Kodu",
+    "fawry_utd_url" => "UTD Adresi",
+    "is_fawry_active" => "Aktif Mi",
+    "fawry_url" => "Adres",
+    "fawry_return_url" => "Dönüş Adresi",
+
+    // SkyPay
+    "is_skyPay_active" => "Aktif Mi",
+    "paysky_base_url" => "Temel Adres",
+    "paysky_merchant_id" => "Mağaza ID",
+    "paysky_terminal_id" => "Terminal ID",
+    "paysky_api_key" => "API Anahtarı",
+
+    // Stripe
+    "is_stripe_active" => "Aktif Mi",
+    "stripe_test_secret_key" => "Test Gizli Anahtarı",
+    "stripe_success_url" => "Başarı Adresi",
+    "stripe_cancel_url" => "İptal Adresi",
+    "stripe_currency" => "Para Birimi",
+    "stripe_webhook_secret" => "Webhook Anahtarı",
+
+    // Opay
+    "is_opay_active" => "Aktif Mi",
+    "opay_currency" => "Para Birimi",
+    "opay_secret_key" => "Gizli Anahtar",
+    "opay_public_key" => "Açık Anahtar",
+    "opay_merchant_id" => "Mağaza ID",
+    "opay_country_code" => "Ülke Kodu",
+    "opay_base_url" => "Temel Adres",
+
+    // Cashfree
+    "is_cashfree_active" => "Aktif Mi",
+    "cashfree_currency" => "Para Birimi",
+    "cashfree_app_id" => "Uygulama ID",
+    "cashfree_secret_key" => "Gizli Anahtar",
+    "cashfree_base_url" => "Temel Adres",
+
+    // ApplePay
+    "is_applepay_active" => "Aktif Mi",
+    "apple_team_id" => "Takım ID",
+    "app_id" => "Uygulama ID",
+    "apple_client_id" => "Müşteri ID",
+    "apple_redirect_uri" => "Yönlendirme Adresi",
+    "apple_service_file" => "Servis Dosyası",
+
+    // Mada
+    "is_mada_active" => "Aktif Mi",
+    "mada_access_token" => "Erişim Tokeni",
+    "mada_public_key" => "Açık Anahtar",
+    "mada_payment_address" => "Ödeme Adresi",
+
+    // Liqpay
+    "is_liqpay_active" => "Aktif Mi",
+    "liqpay_public_key" => "Açık Anahtar",
+    "liqpay_private_key" => "Özel Anahtar",
+    "liqpay_payment_address" => "Ödeme Adresi",
+
+    // PayPal
+    "is_paypal_active" => "Aktif Mi",
+    "paypal_client_id" => "Müşteri ID",
+    "paypal_client_secret" => "Müşteri Şifresi",
+    "paypal_payment_address" => "Ödeme Adresi",
+
+    // Paytm
+    "is_paytm_active" => "Aktif Mi",
+    "paytm_merchant_key" => "Mağaza Anahtarı",
+    "paytm_merchant_id" => "Mağaza ID",
+    "paytm_merchant_website_link" => "Mağaza Web Sitesi Adresi",
+    "paytm_payment_address" => "Ödeme Adresi",
+
+    // Paytabs
+    "is_paytabs_active" => "Aktif Mi",
+    "paytabs_profile_id" => "Profil ID",
+    "paytabs_server_key" => "Sunucu Anahtarı",
+    "paytabs_base_url" => "Temel Adres",
+    "paytabs_payment_address" => "Ödeme Adresi",
+
+    // BKash
+    "is_bkash_active" => "Aktif Mi",
+    "bkash_appkey" => "Uygulama Anahtarı",
+    "bkash_app_secret" => "Uygulama Şifresi",
+    "bkash_username" => "Kullanıcı Adı",
+    "bkash_password" => "Şifre",
+    "bkash_payment_address" => "Ödeme Adresi",
+
+    // Razorpay
+    "is_razorpay_active" => "Aktif Mi",
+    "razorpay_api_key" => "API Anahtarı",
+    "razorpay_api_secret" => "API Şifresi",
+    "razorpay_payment_address" => "Ödeme Adresi",
+
+    // Senangpay
+    "is_senangpay_active" => "Aktif Mi",
+    "senangpay_callback_url" => "Callback Adresi",
+    "senangpay_secret_key" => "Gizli Anahtar",
+    "senangpay_merchant_id" => "Mağaza ID",
+    "senangpay_payment_address" => "Ödeme Adresi",
+
+    // Paymob Accept
+    "is_paymob_accept_active" => "Aktif Mi",
+    "paymob_accept_callback_url" => "Callback Adresi",
+    "paymob_accept_api_key" => "API Anahtarı",
+    "paymob_accept_iframe_id" => "Iframe ID",
+    "paymob_accept_integration_id" => "Entegrasyon ID",
+    "paymob_accept_hmac" => "HMAC İmzası",
+    "paymob_accept_payment_address" => "Ödeme Adresi",
+
+    // Flutterwave
+    "is_flutterwave_active" => "Aktif Mi",
+    "flutterwave_secret_key" => "Gizli Anahtar",
+    "flutterwave_public_key" => "Açık Anahtar",
+    "flutterwave_hash" => "Hash",
+    "flutterwave_payment_address" => "Ödeme Adresi",
+
+    // Paystack
+    "is_paystack_active" => "Aktif Mi",
+    "paystack_public_key" => "Açık Anahtar",
+    "paystack_secret_key" => "Gizli Anahtar",
+    "paystack_merchant_email" => "Mağaza E-Postası",
+    "paystack_return_url" => "Dönüş Adresi",
+    "paystack_payment_address" => "Ödeme Adresi",
+
+    // SSLCommerz
+    "is_sslcommerz_active" => "Aktif Mi",
+    "sslcommerz_store_id" => "Mağaza ID",
+    "sslcommerz_store_password" => "Mağaza Şifresi",
+    "sslcommerz_payment_address" => "Ödeme Adresi",
+
+    //googlePay
+    "google_pay_merchant_id" => "Mağaza ID",
+
+    'fawry'         => 'fawry',
+    'skyPay'        => 'skyPay',
+    'strip'         => 'stripe',
+    'opay'          => 'opay',
+    'cashfree'      => 'cashfree',
+    'applepay'      => 'applepay',
+    'mada'          => 'mada',
+    'liqpay'        => 'liqpay',
+    'paypal'        => 'paypal',
+    'paytm'         => 'paytm',
+    'paytabs'       => 'paytabs',
+    'bkash'         => 'bkash',
+    'razorpay'      => 'razorpay',
+    'senangpay'     => 'senangpay',
+    'paymob_accept' => 'paymob_accept',
+    'flutterwave'   => 'flutterwave',
+    'paystack'      => 'paystack',
+    'sslcommerz'    => 'sslcommerz',
+    'google_pay'    => 'google_pay',
+
     "charge_level" => "şarj seviyesi",
 ];

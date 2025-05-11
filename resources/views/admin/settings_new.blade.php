@@ -1081,9 +1081,9 @@
                                 <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
-                                        <div class="card p-3 shadow" style="height: 495px;">
+                                        <div class="card p-3 shadow" style="height: 580px;">
                                             <div class="card-header d-flex justify-content-between align-items-center">
-                                                <h4 class="m-0">{{ __($coin->title) }}</h4>
+                                                <h4 class="m-0">{{ __('admin.'.$coin->title) }}</h4>
                                                 <div class="d-flex align-items-center">
                                                     <input type="hidden" name="is_{{ $coin->title }}_active" value="0">
                                                     <input type="checkbox" id="{{ $coin->title }}Radio"
