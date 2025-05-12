@@ -6,17 +6,17 @@ jobs:
   run_example_job:
     runs-on: ubuntu-latest
     steps:
-    - name: print out Eagle test
-      uses: cross-the-world/ssh-scp-ssh-pipelines@latest
+    - name: print out tempo-feature test
+      uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.18.32"
-        user: ${{ secrets.USERNAME }}
+        host: "34.18.53.132"
+        username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
         command_timeout: 3m
-        first_ssh: |
+        script: |
           echo "$USER"
-          cd /var/www/Eagle
+          cd /var/www/tempo
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
           php artisan migrate

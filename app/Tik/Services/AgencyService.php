@@ -196,6 +196,7 @@ class AgencyService
             $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
+        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
 
         if ($user->agency_id) throw new Exception('user joined agency before');
 
@@ -204,10 +205,10 @@ class AgencyService
 
         if (!$action) throw new Exception('Request not found');
 
-        if ($accept == 0) {
+        if ($accept == 0 || $accept == 'false') {
             $action->status = 2;
             $action->save();
-        } elseif ($accept == 1) {
+        } elseif ($accept == 1 || $accept == true) {
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);

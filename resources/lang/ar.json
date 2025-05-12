@@ -308,7 +308,7 @@
     "gradient First Color:" : "اللون الاول للتدرج",
     "gradient Second Color:" : "اللون الثانى للتدرج",
     "gradient Third Color:": "اللون الثالث للتدرج",
-    "Agency_owner" : "وكيل",
+    "Agency_owner" : "مضيف",
     "gradient" : "التدرج",
     "Do you want to pin this room to the top?": "هل ترغب فى تثبيت الغرفة فى الاعلى؟",
     "config returned success": "تم إعادة تكوين الإعدادات بنجاح",
@@ -2232,7 +2232,8 @@
   "are_you_sure_make_admin": "هل أنت متأكد أنك تريد ترقية هذا المستخدم إلى مشرف؟",
   "failed_accept_request": "فشل في قبول الطلب. يرجى المحاولة مرة أخرى.",
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
-  "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى."
+  "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
+  "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد"
 
 
 

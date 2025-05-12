@@ -13,6 +13,7 @@ use App\Models\AgencyJoinRequest;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
+use App\Http\Resources\Api\V1\AdminsAgencyResource;
 use App\Http\Resources\Api\V1\AgencyDetailsResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
@@ -69,11 +70,22 @@ class AgencyController extends Controller
         return Common::apiResponse(1, '', new AgencyDetailsResource($agency));
     }
 
+    public function admin($id)
+    {
+        try {
+            $agency = $this->agencyService->find($id);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
+    }
+
     public function agencyTargetDetails($id, Request $request)
     {
         $user = $request->user();
         try {
-            $response = $this->agencyService->agencyTarget($id,$user, $request);
+            $response = $this->agencyService->agencyTarget($id, $user, $request);
         } catch (\Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -96,7 +108,7 @@ class AgencyController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '',  ReceiverGiftLogResource::collection($data) ,200);
+        return Common::apiResponse(1, '',  ReceiverGiftLogResource::collection($data), 200);
     }
 
     public function heroes($id, Request $request)
@@ -150,9 +162,9 @@ class AgencyController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        if ($accept == 0) {
+        if ($accept == 0 || $accept == 'false') {
             return Common::apiResponse(1, 'joinfalse');
-        } elseif ($accept == 1) {
+        } elseif ($accept == 1 || $accept == true) {
             return Common::apiResponse(1, 'joinSacsesAg');
         }
     }
