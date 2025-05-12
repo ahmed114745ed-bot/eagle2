@@ -829,8 +829,8 @@
             top: 50%;
             left: 50%;
             /* transform: translate(-50%, -50%); */
-            background: var(--second-alpha);
-            color: var(--text-secondary-color);
+            background: var(--primary-color);
+            color: var(--text-primary-color);
             z-index: 9999;
             padding: 30px 40px;
             border-radius: 10px;
@@ -841,7 +841,7 @@
             {{ __('Loading...') }}
         </div>
 
-         
+           
     
               
         <div class="tab-content active" id="members-tab">
