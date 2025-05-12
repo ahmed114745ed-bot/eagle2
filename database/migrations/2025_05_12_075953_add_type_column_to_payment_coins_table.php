@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payment_coins', function (Blueprint $table) {
-            $table->string('type')->unique();
+            $table->string('type')->nullable()->unique();
         });
     }
 
