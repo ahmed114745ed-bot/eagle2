@@ -521,7 +521,7 @@ class AgencyController extends MainController
 
                 $row->width(12)->text('name', __('agency name'))->rules('required');
                 $row->width(12)->switch('status', __('status'));
-                $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+                $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
                 $row->width(12)->hidden('Host_agency')->default(1);
 
@@ -531,7 +531,7 @@ class AgencyController extends MainController
                 }
             });
         }
-
+      
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -539,6 +539,61 @@ class AgencyController extends MainController
              });
          </script>');
         }
+
+        
+
+        Admin::script(<<<'JS'
+        function initPhoneInput() {
+            const input = document.querySelector("#phone-input");
+            if (input && !input.classList.contains('iti-initialized')) {
+                const parentDiv = input.parentElement;
+                parentDiv.style.position = 'relative';
+    
+                const iti = window.intlTelInput(input, {
+                    separateDialCode: true,
+                    preferredCountries: ["eg"],
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+    
+                document.head.insertAdjacentHTML('beforeend', `
+                    <style>
+                        .iti { width: 100%;  }
+                        .iti__flag-container { z-index: 99; }
+                        #phone-input {
+                            padding-left: 90px !important;
+                            width: 50%;
+                        }
+                        .fields-group .form-group { overflow: visible; }
+                    </style>
+                `);
+    
+                input.classList.add('iti-initialized');
+    
+                const form = input.closest('form');
+                if (form && !form.classList.contains('phone-init')) {
+                    form.addEventListener('submit', function () {
+                        if (iti) {
+                            const dialCode = iti.getSelectedCountryData().dialCode;
+                            const nationalNumber = input.value.replace(/\s/g, '');
+    
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.name = 'phone_code';
+                            hiddenInput.value = `+${dialCode}`;
+                            form.appendChild(hiddenInput);
+    
+                            input.value = nationalNumber;
+                        }
+                    });
+                    form.classList.add('phone-init');
+                }
+            }
+        }
+    
+        initPhoneInput();
+        $(document).on('pjax:complete', function () {
+            setTimeout(initPhoneInput, 100);
+        });
+    JS);
 
         $form->saving(function (Form $form) {
 
