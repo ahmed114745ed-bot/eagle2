@@ -1072,7 +1072,7 @@
 
                         <div class="row mt-4">
                             <!-- dynamic Fields -->
-                            @foreach($paymentCoins as $coin)
+                            @foreach($paymentCoins->where('status', 1) as $coin)
                                 <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                     <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                                         @csrf
@@ -1101,30 +1101,226 @@
                                                      style="border-radius: 50%; width: 100px; height: 100px; object-fit: contain; display: block; margin: 3px auto; background: #fff;">
                                             </div>
                                             <div class="row">
-                                                @foreach($coin->settings as $setting)
+                                                @if($coin->type == 'fawry')
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label for="{{ $setting->key }}">
-                                                                {{ __('admin.'.$setting->key) }}
-                                                            </label>
-                                                            @if($setting->input_type == 'input')
-                                                                <input type="text"
-                                                                       id="{{ $setting->key }}"
-                                                                       name="{{ $setting->key }}"
-                                                                       placeholder="{{ $setting->key }}"
-                                                                       value="{{ $settings[$setting->key] ?? $setting->value ?? '' }}"
-                                                                       class="form-control"
-                                                                       required>
-                                                            @elseif($setting->input_type == 'file')
-                                                                <input type="file"
-                                                                       id="{{ $setting->key }}"
-                                                                       name="{{ $setting->key }}"
-                                                                       class="form-control"
-                                                                       required>
-                                                            @endif
+                                                            <label
+                                                                for="fawry_secret">{{ __('admin.server_secret') }}:</label>
+                                                            <input type="text" id="fawry_secret"
+                                                                   name="fawry_secret" placeholder="secret"
+                                                                   value="{{ $settings['fawry_secret'] ?? ''}}" class="form-control" required>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="fawry_merchant_code">{{ __('admin.merchant_code') }}:</label>
+                                                            <input type="text" id="fawry_merchant_code" name="fawry_merchant_code"
+                                                                   placeholder="merchant_code" value="{{ $settings['fawry_merchant_code'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="fawry_utd_url">{{ __('admin.utd_url') }}:</label>
+                                                            <input type="text" id="fawry_utd_url" name="fawry_utd_url"
+                                                                   placeholder="utd_url" value="{{ $settings['fawry_utd_url'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="fawry_return_url">{{ __('admin.return_url') }}:</label>
+                                                            <input type="text" id="fawry_return_url" name="fawry_return_url"
+                                                                   placeholder="return_url" value="{{ $settings['fawry_return_url'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="fawry_url">{{ __('admin.fawry_url') }}:</label>
+                                                            <input type="text" id="fawry_url" name="fawry_url"
+                                                                   placeholder="fawry_url" value="{{ $settings['fawry_url'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if($coin->type == 'strip')
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label
+                                                                    for="stripe_test_secret_key">{{ __('admin.test_secret_key') }}:</label>
+                                                                <input type="text" id="stripe_test_secret_key"
+                                                                       name="stripe_test_secret_key" placeholder="test_secret_key"
+                                                                       value="{{ $settings['stripe_test_secret_key'] ?? ''}}" class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="stripe_success_url">{{ __('admin.success_url') }}:</label>
+                                                                <input type="text" id="stripe_success_url" name="stripe_success_url"
+                                                                       placeholder="success_url" value="{{ $settings['stripe_success_url'] ?? ''}}"
+                                                                       class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="stripe_cancel_url">{{ __('admin.cancel_url') }}:</label>
+                                                                <input type="text" id="stripe_cancel_url" name="stripe_cancel_url"
+                                                                       placeholder="cancel_url" value="{{ $settings['stripe_cancel_url'] ?? ''}}"
+                                                                       class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="stripe_currency">{{ __('admin.currency') }}:</label>
+                                                                <input type="text" id="stripe_currency" name="stripe_currency"
+                                                                       placeholder="currency" value="{{ $settings['stripe_currency'] ?? ''}}"
+                                                                       class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group">
+                                                                <label for="stripe_webhook_secret">{{ __('admin.webhook_secret') }}:</label>
+                                                                <input type="text" id="stripe_webhook_secret" name="stripe_webhook_secret"
+                                                                       placeholder="webhook_secret" value="{{ $settings['stripe_webhook_secret'] ?? ''}}"
+                                                                       class="form-control" required>
+                                                            </div>
+                                                        </div>
+                                                @endif
+                                                @if($coin->type == 'cash_free')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="cashfree_currency">{{ __('admin.currency') }}:</label>
+                                                            <input type="text" id="cashfree_currency" name="cashfree_currency"
+                                                                   placeholder="currency" value="{{ $settings['cashfree_currency'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="opay_secret_key">{{ __('admin.app_id') }}:</label>
+                                                            <input type="text" id="cashfree_app_id" name="cashfree_app_id"
+                                                                   placeholder="cashfree_app_id"
+                                                                   value="{{ $settings['cashfree_app_id'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_country_code">{{ __('admin.secret_key') }}:</label>
+                                                            <input type="text" id="cashfree_secret_key"
+                                                                   name="cashfree_secret_key" placeholder="cashfree_secret_key"
+                                                                   value="{{ $settings['cashfree_secret_key'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="opay_base_url">{{ __('admin.base_url') }}:</label>
+                                                            <input type="text" id="cashfree_base_url"
+                                                                   name="cashfree_base_url" placeholder="base_url"
+                                                                   value="{{ $settings['cashfree_base_url'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if($coin->type == 'apple_pay')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="apple_team_id">{{ __('admin.apple_team_id') }}:</label>
+                                                            <input type="text" id="apple_team_id" name="apple_team_id"
+                                                                   placeholder="apple_team_id" value="{{ $settings['apple_team_id'] ?? ''}}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="apple_key_id">{{ __('admin.app_id') }}:</label>
+                                                            <input type="text" id="apple_key_id" name="apple_key_id"
+                                                                   placeholder="apple_key_id"
+                                                                   value="{{ $settings['apple_key_id'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="apple_client_id">{{ __('admin.apple_client_id') }}:</label>
+                                                            <input type="text" id="apple_client_id"
+                                                                   name="apple_client_id" placeholder="apple_client_id"
+                                                                   value="{{ $settings['apple_client_id'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="apple_redirect_uri">{{ __('admin.apple_redirect_uri') }}:</label>
+                                                            <input type="text" id="apple_redirect_uri"
+                                                                   name="apple_redirect_uri" placeholder="apple_redirect_uri"
+                                                                   value="{{ $settings['apple_redirect_uri'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="apple_redirect_uri">{{ __('admin.apple_service_file') }}:</label>
+                                                            <input type="file" id="apple_service_file"
+                                                                   name="apple_service_file" placeholder="apple_service_file"
+                                                                   class="form-control" required>
+
+                                                            <input type="text" id="apple_service_file" disabled
+                                                                   name="apple_service_file" placeholder="apple_service_file"
+                                                                   value="{{ $settings['apple_service_file'] ?? ''}}" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if($coin->type == 'google_pay')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="google_pay_merchant_id">{{ __('admin.merchant_id') }}:</label>
+                                                            <input type="text" id="google_pay_merchant_id"
+                                                                   name="google_pay_merchant_id" placeholder="merchant_id"
+                                                                   value="{{ $settings['google_pay_merchant_id'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if($coin->type == 'huawei_pay')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="huawei_pay_merchant_id">{{ __('admin.merchant_id') }}:</label>
+                                                            <input type="text" id="huawei_pay_merchant_id"
+                                                                   name="huawei_pay_merchant_id" placeholder="merchant_id"
+                                                                   value="{{ $settings['huawei_pay_merchant_id'] ?? ''}}" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                @endif
+{{--                                                @foreach($coin->settings as $setting)--}}
+{{--                                                    <div class="col-md-6">--}}
+{{--                                                        <div class="form-group">--}}
+{{--                                                            <label for="{{ $setting->key }}">--}}
+{{--                                                                {{ __('admin.'.$setting->key) }}--}}
+{{--                                                            </label>--}}
+{{--                                                            @if($setting->input_type == 'input')--}}
+{{--                                                                <input type="text"--}}
+{{--                                                                       id="{{ $setting->key }}"--}}
+{{--                                                                       name="{{ $setting->key }}"--}}
+{{--                                                                       placeholder="{{ $setting->key }}"--}}
+{{--                                                                       value="{{ $settings[$setting->key] ?? $setting->value ?? '' }}"--}}
+{{--                                                                       class="form-control"--}}
+{{--                                                                       required>--}}
+{{--                                                            @elseif($setting->input_type == 'file')--}}
+{{--                                                                <input type="file"--}}
+{{--                                                                       id="{{ $setting->key }}"--}}
+{{--                                                                       name="{{ $setting->key }}"--}}
+{{--                                                                       class="form-control"--}}
+{{--                                                                       required>--}}
+{{--                                                            @endif--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endforeach--}}
                                             </div>
                                             <button type="submit" class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
                                         </div>
