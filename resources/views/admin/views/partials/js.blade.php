@@ -10,6 +10,7 @@
         onerror="this.onerror=null; this.src='';"></script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.js"></script>
  <!-- <script src="https://cdn..net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script> -->
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 
 
 <script>
@@ -92,4 +93,63 @@
             //     initDynamicFieldsScript();
             // });
 
+
+
+   
+
+        function initPhoneInput() {
+        document.querySelectorAll("#phone-input").forEach(function(input) {
+            if (!input.classList.contains('iti-initialized')) {
+                const parentDiv = input.parentElement;
+                parentDiv.style.position = 'relative';
+
+                const iti = window.intlTelInput(input, {
+                    separateDialCode: true,
+                    preferredCountries: ["eg"],
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+
+                document.head.insertAdjacentHTML('beforeend', `
+                    <style>
+                        .iti { width: 100%; }
+                        .iti__flag-container { z-index: 99; }
+                        #phone-input {
+                            padding-left: 90px !important;
+                            width: 50%;
+                        }
+                        .fields-group .form-group { overflow: visible; }
+                    </style>
+                `);
+
+                input.classList.add('iti-initialized');
+
+                const form = input.closest('form');
+                if (form && !form.classList.contains('phone-init')) {
+                    form.addEventListener('submit', function () {
+                        if (iti) {
+                            const dialCode = iti.getSelectedCountryData().dialCode;
+                            const nationalNumber = input.value.replace(/\s/g, '');
+
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.name = 'phone_code';
+                            hiddenInput.value = `+${dialCode}`;
+                            form.appendChild(hiddenInput);
+
+                            input.value = nationalNumber;
+                        }
+                    });
+                    form.classList.add('phone-init');
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initPhoneInput);
+    document.addEventListener('pjax:complete', function () {
+        setTimeout(initPhoneInput, 100);
+    });
+
+    $(document).on('click', '.add-form-row', function () {
+        setTimeout(initPhoneInput, 100);
+    });
 </script>
