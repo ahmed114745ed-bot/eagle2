@@ -139,7 +139,7 @@ class GiftLogService
 
         $sendGiftServices->updateFamilyLevelForReceiver($receivedUsers, $gift->price * $number);
 
-
+       
 
         if ($room->mode != '1' && $room->mode != '2') {
             $this->updateRoomCoinsToUser($userId, $room, $totalPrice);
@@ -175,7 +175,7 @@ class GiftLogService
         CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
 
-        $message = "  {$number} x" . __('api.sendGift') . __("api.value") . "{$gift->price} " .  __('api.to') . "{$to}";
+        $message = "  {$number} x" . __('api.sendGift') . __("api.value") . "{$realPrice} " .  __('api.to') . "{$to}";
         try {
             Utils::unwrap($promises);
         } catch (BadResponseException $e) {
