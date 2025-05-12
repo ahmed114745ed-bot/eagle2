@@ -205,7 +205,7 @@ class AgencyService
 
         if (!$action) throw new Exception('Request not found');
 
-        if ($accept == 0 || $accept == false) {
+        if ($accept == 0 || $accept == 'false') {
             $action->status = 2;
             $action->save();
         } elseif ($accept == 1 || $accept == true) {
