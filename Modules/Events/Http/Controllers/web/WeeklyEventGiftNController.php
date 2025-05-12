@@ -120,7 +120,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
@@ -187,7 +187,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
@@ -252,7 +252,7 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == 'achievement') {
                 $path = $this->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */

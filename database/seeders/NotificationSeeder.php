@@ -2,12 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Notification;
-use App\Models\NotificationTranslation;
 use Cache;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Setting;
+use App\Models\Notification;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\NotificationTranslation;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class NotificationSeeder extends Seeder
 {
@@ -16,11 +17,16 @@ class NotificationSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $appNameEn = Setting::where('key', 'app_title_en')->value('value') ?? 'Default';
+
+        $appNameAr = Setting::where('key', 'app_title_ar')->value('value') ?? 'Default';
+
         // DB::table('notifications')->truncate();
         // DB::table('notification_translations')->truncate();
 
         $notifications = Notification::all();
-        foreach($notifications as $n){
+        foreach ($notifications as $n) {
             Cache::forget($n->key);
         }
 
@@ -221,7 +227,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $comment_moment,
                 'title' => 'क्षण टिप्पणी',
-                'message' =>"{user_name} ने आपके पल पर टिप्पणी की",
+                'message' => "{user_name} ने आपके पल पर टिप्पणी की",
                 'language' => 'hi'
             ],
             [
@@ -256,7 +262,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $like_real,
                 'title' => 'असली जैसा',
-                'message' =>'{user_name} ने आपकी वास्तविक प्रतिक्रिया दी',
+                'message' => '{user_name} ने आपकी वास्तविक प्रतिक्रिया दी',
                 'language' => 'hi'
             ],
             [
@@ -291,7 +297,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $comment_real,
                 'title' => 'असली जैसा',
-                'message' =>'{user_name} ने आपके असली नाम पर टिप्पणी की है',
+                'message' => '{user_name} ने आपके असली नाम पर टिप्पणी की है',
                 'language' => 'hi'
             ],
             [
@@ -313,7 +319,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $like_moment,
                 'title' => 'like moment',
-                'message' =>'{user_name} reacted your moment',
+                'message' => '{user_name} reacted your moment',
                 'language' => 'en'
             ],
             [
@@ -325,7 +331,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $like_moment,
                 'title' => 'जैसे पल',
-                'message' =>'{user_name} ने आपके पल पर प्रतिक्रिया दी',
+                'message' => '{user_name} ने आपके पल पर प्रतिक्रिया दी',
                 'language' => 'hi'
             ],
             [
@@ -347,7 +353,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_agency,
                 'title' => '',
-                'message' =>'Congrats! Your request to join {agency_name} agency is accepted',
+                'message' => 'Congrats! Your request to join {agency_name} agency is accepted',
                 'language' => 'en'
             ],
             [
@@ -359,7 +365,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_agency,
                 'title' => '',
-                'message' =>'बधाई हो! {agency_name} एजेंसी में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है',
+                'message' => 'बधाई हो! {agency_name} एजेंसी में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है',
                 'language' => 'hi'
             ],
             [
@@ -380,7 +386,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $visited_profile,
                 'title' => '',
-                'message' =>'{user_name} visited your profile',
+                'message' => '{user_name} visited your profile',
                 'language' => 'en'
             ],
             [
@@ -392,7 +398,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $visited_profile,
                 'title' => '',
-                'message' =>'{user_name} ने आपकी प्रोफ़ाइल देखी',
+                'message' => '{user_name} ने आपकी प्रोफ़ाइल देखी',
                 'language' => 'hi'
             ],
             [
@@ -414,7 +420,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $follow,
                 'title' => '',
-                'message' =>'{user_name} followed you',
+                'message' => '{user_name} followed you',
                 'language' => 'en'
             ],
             [
@@ -426,7 +432,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $follow,
                 'title' => '',
-                'message' =>'{user_name} ने आपका अनुसरण किया',
+                'message' => '{user_name} ने आपका अनुसरण किया',
                 'language' => 'hi'
             ],
             [
@@ -449,7 +455,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $follow_back,
                 'title' => '',
-                'message' =>'Now you are friend with {user_name}',
+                'message' => 'Now you are friend with {user_name}',
                 'language' => 'en'
             ],
             [
@@ -461,7 +467,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $follow_back,
                 'title' => '',
-                'message' =>'अब आप {user_name} के मित्र हैं',
+                'message' => 'अब आप {user_name} के मित्र हैं',
                 'language' => 'hi'
             ],
             [
@@ -482,7 +488,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $remove_from_family,
                 'title' => '',
-                'message' =>'Sorry! You are removed from family {family_name} ',
+                'message' => 'Sorry! You are removed from family {family_name} ',
                 'language' => 'en'
             ],
             [
@@ -494,7 +500,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $remove_from_family,
                 'title' => '',
-                'message' =>'क्षमा करें! आपको परिवार {family_name} से निकाल दिया गया है',
+                'message' => 'क्षमा करें! आपको परिवार {family_name} से निकाल दिया गया है',
                 'language' => 'hi'
             ],
             [
@@ -516,25 +522,25 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $admin_family,
                 'title' => '',
-                'message' =>"Congrats! You are now admin in family {fmaily_name} \nBe worthy of your position to raise EL Safwa",
+                'message' => "Congrats! You are now admin in family {fmaily_name} \nBe worthy of your position to raise " . $appNameEn,
                 'language' => 'en'
             ],
             [
                 'notification_id' => $admin_family,
                 'title' => '',
-                'message' =>  ' تهانينا لقد اصبحت الان مشرف فى عائلة {family_name} يجب عليك ان تكون جيد بالمنصب من اجل ارتقاء الصفوة ',
+                'message' =>  ' تهانينا لقد اصبحت الان مشرف فى عائلة {family_name}' . $appNameAr . 'يجب عليك ان تكون جيد بالمنصب من اجل ارتقاء  ',
                 'language' => 'ar'
             ],
             [
                 'notification_id' => $admin_family,
                 'title' => '',
-                'message' =>"बधाई हो! अब आप परिवार {family_name} में व्यवस्थापक हैं \EL Safwa को बढ़ाने के लिए अपने पद के योग्य बनें",
+                'message' => "बधाई हो! अब आप परिवार {family_name} में व्यवस्थापक हैं " . $appNameEn . " को बढ़ाने के लिए अपने पद के योग्य बनें",
                 'language' => 'hi'
             ],
             [
                 'notification_id' => $admin_family,
                 'title' => '',
-                'message' => "Tebrikler! Artık {family_name} ailesinde admin oldun \ EL Safwa'yı yetiştirmek için pozisyonuna layık ol",
+                'message' => "Tebrikler! Artık {family_name} ailesinde admin oldun " . $appNameEn . "yı yetiştirmek için pozisyonuna layık ol",
                 'language' => 'tu'
             ]
         ]);
@@ -549,7 +555,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_request_agency,
                 'title' => '',
-                'message' =>'Your  agency has been accepted',
+                'message' => 'Your  agency has been accepted',
                 'language' => 'en'
             ],
             [
@@ -561,7 +567,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_request_agency,
                 'title' => '',
-                'message' =>'आपकी एजेंसी स्वीकार कर ली गई है',
+                'message' => 'आपकी एजेंसी स्वीकार कर ली गई है',
                 'language' => 'hi'
             ],
             [
@@ -582,7 +588,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $refuse_request_agency,
                 'title' => '',
-                'message' =>'Your agency has been refused',
+                'message' => 'Your agency has been refused',
                 'language' => 'en'
             ],
             [
@@ -594,7 +600,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $refuse_request_agency,
                 'title' => '',
-                'message' =>'आपकी एजेंसी को अस्वीकार कर दिया गया है',
+                'message' => 'आपकी एजेंसी को अस्वीकार कर दिया गया है',
                 'language' => 'hi'
             ],
             [
@@ -616,7 +622,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $user_send_gift_moment,
                 'title' => '',
-                'message' =>'{user_name} send you a {gift} in your moment',
+                'message' => '{user_name} send you a {gift} in your moment',
                 'language' => 'en'
             ],
             [
@@ -628,7 +634,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $user_send_gift_moment,
                 'title' => '',
-                'message' =>'{user_name} आपको इस समय एक {gift} भेज रहा हूँ',
+                'message' => '{user_name} आपको इस समय एक {gift} भेज रहा हूँ',
                 'language' => 'hi'
             ],
             [
@@ -661,7 +667,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $gift_aristocracy,
                 'title' => '',
-                'message' =>"{user_name} ने आपको {ware} उपहार भेजा है \क्लिक करें और बैग से अभी अपना उपहार सक्रिय करें",
+                'message' => "{user_name} ने आपको {ware} उपहार भेजा है \क्लिक करें और बैग से अभी अपना उपहार सक्रिय करें",
                 'language' => 'hi'
             ],
             [
@@ -695,7 +701,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_family,
                 'title' => '',
-                'message' =>"बधाई हो! परिवार {family_name} में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है \nपरिवार ही सब कुछ है, आइए भाग लें और अपना परिवार बढ़ाएँ",
+                'message' => "बधाई हो! परिवार {family_name} में शामिल होने का आपका अनुरोध स्वीकार कर लिया गया है \nपरिवार ही सब कुछ है, आइए भाग लें और अपना परिवार बढ़ाएँ",
                 'language' => 'hi'
             ],
             [
@@ -728,7 +734,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $send_Family,
                 'title' => '',
-                'message' =>"{user_name} आपके परिवार में शामिल होने के लिए अनुरोध भेजें",
+                'message' => "{user_name} आपके परिवार में शामिल होने के लिए अनुरोध भेजें",
                 'language' => 'hi'
             ],
             [
@@ -761,7 +767,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $got_coin,
                 'title' => '',
-                'message' =>'बधाई हो {user_name}! आपके खाते में {coins} सिक्के जोड़ दिए गए हैं',
+                'message' => 'बधाई हो {user_name}! आपके खाते में {coins} सिक्के जोड़ दिए गए हैं',
                 'language' => 'hi'
             ],
             [
@@ -782,25 +788,25 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $ban_user_id,
                 'title' => '',
-                'message' => "Sorry! You cannot log in to EL Safwa  now, you can log in after {duration} hours \nFor objection and complaint contact customer service",
+                'message' => "Sorry! You cannot log in to " . $appNameEn . "  now, you can log in after {duration} hours \nFor objection and complaint contact customer service",
                 'language' => 'en'
             ],
             [
                 'notification_id' => $ban_user_id,
                 'title' => '',
-                'message' =>  ' ابلاغك انك لن تستطيع الدخول الى الصفوة الا بعد مرور  {duration} ساعة. للاعتراض و الشكوى يرجى التواصل مع خدمة العملاء',
+                'message' =>  ' ابلاغك انك لن تستطيع الدخول الى ' . $appNameAr . ' الا بعد مرور  {duration} ساعة. للاعتراض و الشكوى يرجى التواصل مع خدمة العملاء',
                 'language' => 'ar'
             ],
             [
                 'notification_id' => $ban_user_id,
                 'title' => '',
-                'message' =>"क्षमा करें! आप अभी EL Safwa में लॉग इन नहीं कर सकते, आप {duration} घंटे बाद लॉग इन कर सकते हैं \nआपत्ति और शिकायत के लिए ग्राहक सेवा से संपर्क करें",
+                'message' => "क्षमा करें! आप अभी " . $appNameEn . " में लॉग इन नहीं कर सकते, आप {duration} घंटे बाद लॉग इन कर सकते हैं \nआपत्ति और शिकायत के लिए ग्राहक सेवा से संपर्क करें",
                 'language' => 'hi'
             ],
             [
                 'notification_id' => $ban_user_id,
                 'title' => '',
-                'message' => "Üzgünüz! Şu anda EL Safwa'ya giriş yapamazsınız, {duration} saat sonra giriş yapabilirsiniz \nİtiraz ve şikayet için müşteri hizmetleriyle iletişime geçin",
+                'message' => "Üzgünüz! Şu anda " . $appNameEn . " ya giriş yapamazsınız, {duration} saat sonra giriş yapabilirsiniz \nİtiraz ve şikayet için müşteri hizmetleriyle iletişime geçin",
                 'language' => 'tu'
             ]
         ]);
@@ -815,25 +821,25 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $removeBan_user_id,
                 'title' => '',
-                'message' => 'Congrats! You can log in to EL Safwa now,',
+                'message' => 'Congrats! You can log in to ' . $appNameEn . ' now,',
                 'language' => 'en'
             ],
             [
                 'notification_id' => $removeBan_user_id,
                 'title' => '',
-                'message' =>  'مبروك انت الان تستطيع استخدام الصفوة',
+                'message' =>  'مبروك انت الان تستطيع استخدام ' . $appNameAr,
                 'language' => 'ar'
             ],
             [
                 'notification_id' => $removeBan_user_id,
                 'title' => '',
-                'message' =>'बधाई हो! अब आप EL Safwa में लॉग इन कर सकते हैं,',
+                'message' => 'बधाई हो! अब आप ' . $appNameEn . ' में लॉग इन कर सकते हैं,',
                 'language' => 'hi'
             ],
             [
                 'notification_id' => $removeBan_user_id,
                 'title' => '',
-                'message' => 'Tebrikler! Artık EL Safwa\'ya giriş yapabilirsiniz,',
+                'message' => 'Tebrikler! Artık ' . $appNameEn . 'ya giriş yapabilirsiniz,',
                 'language' => 'tu'
             ]
         ]);
@@ -860,7 +866,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $userVips,
                 'title' => '',
-                'message' =>'बधाई हो! आप {vip} तक पहुंच गए हैं, {duration} दिनों के लिए',
+                'message' => 'बधाई हो! आप {vip} तक पहुंच गए हैं, {duration} दिनों के लिए',
                 'language' => 'hi'
             ],
             [
@@ -881,7 +887,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $family_level_up,
                 'title' => 'Family level up',
-                'message' =>'Congrats! your family {family_name} level up to {family_level}',
+                'message' => 'Congrats! your family {family_name} level up to {family_level}',
                 'language' => 'en'
             ],
             [
@@ -893,7 +899,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $family_level_up,
                 'title' => 'परिवार का स्तर ऊपर',
-                'message' =>'बधाई हो! आपके परिवार का {family_name} स्तर {family_level} तक पहुंच गया है',
+                'message' => 'बधाई हो! आपके परिवार का {family_name} स्तर {family_level} तक पहुंच गया है',
                 'language' => 'hi'
             ],
             [
@@ -915,7 +921,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $wareVips,
                 'title' => '',
-                'message' =>'Congrats! You reach {ware_vip}, for {duration} days ',
+                'message' => 'Congrats! You reach {ware_vip}, for {duration} days ',
                 'language' => 'en'
             ],
             [
@@ -927,7 +933,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $wareVips,
                 'title' => '',
-                'message' =>'बधाई हो! आप {ware_vip} पर पहुंच गए, {duration} दिनों के लिए',
+                'message' => 'बधाई हो! आप {ware_vip} पर पहुंच गए, {duration} दिनों के लिए',
                 'language' => 'hi'
             ],
             [
@@ -948,7 +954,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_request_sallary,
                 'title' => '',
-                'message' =>'Your salary transfer request with value {value}  has been accepted',
+                'message' => 'Your salary transfer request with value {value}  has been accepted',
                 'language' => 'en'
             ],
             [
@@ -960,7 +966,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $accept_request_sallary,
                 'title' => '',
-                'message' =>'आपका {value} मूल्य वाला वेतन स्थानांतरण अनुरोध स्वीकार कर लिया गया है',
+                'message' => 'आपका {value} मूल्य वाला वेतन स्थानांतरण अनुरोध स्वीकार कर लिया गया है',
                 'language' => 'hi'
             ],
             [
@@ -982,7 +988,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $denied_request_sallary,
                 'title' => '',
-                'message' =>'Your request for salary transfer with value: {value} was rejected for reason: {reason}',
+                'message' => 'Your request for salary transfer with value: {value} was rejected for reason: {reason}',
                 'language' => 'en'
             ],
             [
@@ -994,7 +1000,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $denied_request_sallary,
                 'title' => '',
-                'message' =>'आपका वेतन हस्तांतरण का अनुरोध, जिसका मूल्य {value} है, इस कारण से अस्वीकृत कर दिया गया है: {reason}',
+                'message' => 'आपका वेतन हस्तांतरण का अनुरोध, जिसका मूल्य {value} है, इस कारण से अस्वीकृत कर दिया गया है: {reason}',
                 'language' => 'hi'
             ],
             [
@@ -1015,7 +1021,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $roomTarget,
                 'title' => '',
-                'message' =>"Congrats! you achieve new target in {room} you got {coins}",
+                'message' => "Congrats! you achieve new target in {room} you got {coins}",
                 'language' => 'en'
             ],
             [
@@ -1027,7 +1033,7 @@ class NotificationSeeder extends Seeder
             [
                 'notification_id' => $roomTarget,
                 'title' => '',
-                'message' =>"बधाई हो! आपने {room} में नया लक्ष्य हासिल कर लिया है, आपको {coins} मिल गए हैं",
+                'message' => "बधाई हो! आपने {room} में नया लक्ष्य हासिल कर लिया है, आपको {coins} मिल गए हैं",
                 'language' => 'hi'
             ],
             [
@@ -1039,7 +1045,7 @@ class NotificationSeeder extends Seeder
         ]);
 
         $notifications = Notification::all();
-        foreach($notifications as $n){
+        foreach ($notifications as $n) {
             Cache::forever($n->key, $n->translations->toArray());
         }
     }

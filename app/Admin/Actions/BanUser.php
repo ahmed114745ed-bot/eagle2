@@ -32,10 +32,11 @@ class BanUser extends Action
 
     public function handle(Request $request)
     {
-        if (!AuthAdmin::user()->can('*')){
-            Permission::check('create-'.$this->permission_name);
+        if (!AuthAdmin::user()->can('*')) {
+            Permission::check('create-' . $this->permission_name);
         }
         $user = User::query()->searchByUuid($request->uuid)->first();
+        if (!$user) return $this->response()->error('user not found')->refresh();
         $userUuid  = $user->original_uuid;
         $now = now();
         $messages = [];

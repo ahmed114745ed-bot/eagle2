@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Admin;
 use App\Helpers\Common;
+use App\Models\LiveTime;
 use App\Helpers\UserCommon;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
@@ -110,27 +111,57 @@ class AgencyService
         return $agency;
     }
 
-    public function agencyTarget($agencyId, $request)
+    public function agencyTarget($agencyId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
-        $hero = $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id');
-        $star = $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
-        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year);
-       
+        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year, 10, $request->page);
+
+        $hours =   LiveTime::query()
+            ->selectRaw('sum(hours) as hours, max(created_at) as date')
+            ->where('uid', $user->id)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->groupBy(\DB::raw('date(created_at)'))
+            ->limit(31)->sum('hours');
+        $minutes = $hours * 60;
+
+
         return [
-            'target' => $target,
-            'rate_percentage' => $result,
-            'stars' => ReceiverGiftLogResource::collection($star),
-            'heroes' => SenderGiftLogResource::collection($hero),
-            'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+            'success' => true,
+            'message' => 'successfully',
+            'data' => [
+                'user' => [
+                    'days'    => $user->getTotalDays(),
+                    'type'    => $user->type_user,
+                    'minutes' => $minutes,
+                ],
+
+                'target' => $target,
+                'rate_percentage' => $result,
+                'users_target' => AgencyUsersTargetResource::collection($usersTargetDetails),
+            ],
+            'status' => 200,
         ];
     }
 
 
+    public function stars($agencyId, $request)
+    {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        return $this->giftLogRepository->getByAgency('receiver', $month, $year, $agencyId, 'receiver_id', 10, $request->page);
+    }
+
+    public function heroes($agencyId, $request)
+    {
+        $year = $request->year ?? Carbon::now()->year;
+        $month = $request->month ?? Carbon::now()->month;
+        return $this->giftLogRepository->getByAgency('sender', $month, $year, $agencyId, 'sender_id', 10, $request->page);
+    }
 
     public function agencyMembers($agencyId)
     {

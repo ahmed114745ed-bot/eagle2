@@ -5,11 +5,15 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentCoin extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+    protected $casts = [
+        'fields' => 'array',
+    ];
 
     public function getCreatedAtAttribute($value)
     {
@@ -45,6 +49,12 @@ class PaymentCoin extends Model
     // Parse the date and set the timezone
     return Carbon::parse($value)->setTimezone($timeZone)->format('Y-m-d H:i:s');
     }
+
+    public function settings(): HasMany
+    {
+        return $this->hasMany(Setting::class, 'item_id', 'id');
+    }
+
     public function coins()
     {
         return $this->hasMany(Coin::class, 'payment_gateway_id');

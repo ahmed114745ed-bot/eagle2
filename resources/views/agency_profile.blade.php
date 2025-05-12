@@ -4,13 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
+
+
+:root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --green-color: {{ config('themes.greenColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+        --background-image: {{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+
+
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 20px;
+}
+
+.stat-icon.bg-blue {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.stat-icon.bg-green {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+.section-box {
+    background: var(--secondary-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+
+.section-header h4 {
+    margin: 0;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-header .text-yellow {
+    color: #f39c12;
+}
+
+.section-header .text-red {
+    color: #e74c3c;
+}
+
+
+.number-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #ecf0f1;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.number-badge.warning {
+    background: #fef9e7;
+    color: #f39c12;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    color: #95a5a6;
+}
+
+.empty-state i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.empty-table {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #95a5a6;
+    background: white;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.empty-table i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.empty-table p {
+    margin: 0;
+    font-size: 14px;
+}
 .agency-profile-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
+     background: var(--box-background-color);
 }
 
 .agency-header {
@@ -20,7 +163,7 @@
     margin-bottom: 30px;
     position: relative;
     padding: 20px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -106,10 +249,26 @@
     letter-spacing: 0.5px;
 }
 
-.btn-back {
+.ltr .btn-back {
     position: absolute;
-    top: 20px;
+    top: 5px;
     right: 20px;
+    background: #ecf0f1;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: #7f8c8d;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rtl .btn-back {
+    position: absolute;
+    top: 5px;
+    left: 20px;
     background: #ecf0f1;
     border: none;
     padding: 8px 15px;
@@ -163,7 +322,7 @@
 }
 
 .performers-card {
-    background: white;
+    background: var(--secondary-color);
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -176,6 +335,12 @@
     margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
+}
+
+.stats-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .section-title {
@@ -293,15 +458,15 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-    color: #7f8c8d;
+   
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
 }
 
 .tab-btn.active {
-    color: #3498db;
-    border-bottom-color: #3498db;
+    color:var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 .tab-btn:hover:not(.active) {
@@ -329,6 +494,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: var(--secondary-color);
 }
 
 .card-header h3 {
@@ -349,13 +515,21 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--secondary-color);
+}
+
+
+.table-section {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--secondary-color);
 }
 
 .data-table th {
     text-align: left;
     padding: 12px 15px;
-    background: #f8f9fa;
-    color: #7f8c8d;
+    background: var(--secondary-color);
+   
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -459,13 +633,46 @@
     font-size: 14px;
 }
 
+.user-avatar,
+.supporter-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.supporters-avatars {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
 .pagination-wrapper {
     padding: 15px 20px;
     display: flex;
     justify-content: center;
     border-top: 1px solid #eee;
+     background: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+    .stats-row {
+        flex-direction: column;
+    }
+    
+    .avatar-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
 }
     </style>
+
+<!-- SweetAlert2 -->
+
 </head>
 <body>
 
@@ -493,14 +700,14 @@
                     </div>
                 </div>
                 <div class="agency-stats">
-                    <div class="stat-card">
+                    <!-- <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->coins) ?? 0 }}</div>
                         <div class="stat-label">{{__("coins")}}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">{{ number_format(@$agency->salary) ?? 0 }}</div>
                         <div class="stat-label">{{__("salary")}}</div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <button class="btn-back" onclick="window.history.back()">
@@ -602,15 +809,22 @@
                 @endif
             </div>
         </div>
-    
+        @php
+                    $activeTab = request('tab', 'tab=targets'); 
+        @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
-            <button class="tab-btn active" data-target="members-tab">{{ __('Members') }}</button>
-            <button class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</button>
-            <button class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</button>
-            <button class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</button>
-            <button class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</button>
+            <a href="?tab=members" class="tab-btn" data-target="members-tab">{{ __('Members') }}</a>
+            <a href="?tab=charges" class="tab-btn" data-target="charges-tab">{{ __('Charges') }}</a>
+            <a href="?tab=salary" class="tab-btn" data-target="salary-tab">{{ __('Salary') }}</a>
+            <a href="?tab=requests" class="tab-btn" data-target="requests-tab">{{ __('Join Requests') }}</a>
+            <!-- <a href="?tab=targets" class="tab-btn" data-target="targets-tab">{{ __('Targets') }}</a> -->
+            <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">{{ __('Targets') }}</a>
+
         </div>
+          
+
+         
     
               
         <div class="tab-content active" id="members-tab">
@@ -666,7 +880,7 @@
                                             @elseif($isAdmin)
                                                 <span class="role-badge admin">{{ __('Admin') }}</span>
                                             @else
-                                                <button class="btn-action make-admin" data-id="{{ $member->id }}">
+                                                <button class="btn-action make-admin-btn" data-id="{{ $member->id }}">
                                                     {{ __('Make Admin') }}
                                                 </button>
                                             @endif
@@ -749,11 +963,12 @@
             <!-- salary Section -->
             <div class="tab-content" id="salary-tab">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4 class="card-title" style="text-align: left;">{{ __('salary') }}</h4>
+                    </div>
                             <div class="table-responsive">
-                                <div class="box-body table-responsive no-padding">
-                                    <table class="table table-hover grid-table" id="salary">
+                                <div class="box-body ">
+                                    <table class="data-table" id="salary">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -788,18 +1003,19 @@
                                 </div>
                             </div>
 
-                    </div>
+                   
+
                 </div>
             </div>
 
             <div class="tab-content" id="requests-tab">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-header">
                         <h4 class="card-title text-left">{{ __('Agency join request') }}</h4>
-            
+                    </div>
                         <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="join">
+                            <div class="box-body ">
+                                <table class="data-table" id="join">
                                     <thead>
                                         <tr>
                                             <th>#</th>
@@ -839,7 +1055,7 @@
                                                         {!! $image !!}
                                                         <div>
                                                             <strong>{{ $name }}</strong><br>
-                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                            <span style=" font-size: smaller;">UID: {{ $uid }}</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -885,19 +1101,30 @@
                                 'target_page'  => $memberTargets->currentPage(),
                             ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
-                    </div>
+                    
                 </div>
             </div>
 
             <div class="tab-content" id="targets-tab">
-                <div class="card">
+                <div class="agency-card">
+                    <div class="card-header with-border">
+                        <h3 class="card-title">
+                            <i class="fas fa-bullseye"></i> {{ __('Agency Targets') }}
+                        </h3>
+                        <div class="card-tools">
+                            <span class="badge bg-purple">{{ $memberTargets->total() }}</span>
+                        </div>
+                    </div>
+                    
                     <div class="card-body">
-                        <h4 class="card-title text-left">{{ __('target') }}</h4>
-                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id) }}#userTargets" class="mb-4">
-                            <div class="row g-3 align-items-end">
+                        <!-- Filter Form -->
+                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
+                            <div class="row">
+                                <input type="hidden" name="tab" value="targets">
                                 <div class="col-md-5">
-                                    <div class="form-floating">
-                                        <select name="month" id="month" class="form-select">
+                                    <div class="form-group">
+                                        <label for="month">{{ __('Month') }}</label>
+                                        <select name="month" id="month" class="form-control">
                                             <option value="">All Months</option>
                                             @for($m = 1; $m <= 12; $m++)
                                                 <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
@@ -905,13 +1132,13 @@
                                                 </option>
                                             @endfor
                                         </select>
-                                        <label for="month">{{ __('Month') }}</label>
                                     </div>
                                 </div>
-                        
+                                
                                 <div class="col-md-5">
-                                    <div class="form-floating">
-                                        <select name="year" id="year" class="form-select">
+                                    <div class="form-group">
+                                        <label for="year">{{ __('Year') }}</label>
+                                        <select name="year" id="year" class="form-control">
                                             <option value="">All Years</option>
                                             @for($y = now()->year; $y >= 2020; $y--)
                                                 <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
@@ -919,33 +1146,56 @@
                                                 </option>
                                             @endfor
                                         </select>
-                                        <label for="year">{{ __('Year') }}</label>
                                     </div>
                                 </div>
-                        
-                                <div class="col-md-2 d-flex">
-                                    <button type="submit" class="btn btn-primary flex-grow-1">
-                                        <i class="fas fa-filter me-2"></i> {{ __('Apply') }}
+                                
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> {{ __('Apply') }}
                                     </button>
                                     @if(request()->has('month') || request()->has('year'))
-                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ms-2" title="Reset filters">
+                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
                                         <i class="fas fa-times"></i>
                                     </a>
                                     @endif
                                 </div>
                             </div>
                         </form>
-                        <br>
-                        <div class="stars-section">
+            
+                        <!-- Stats Cards -->
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-icon bg-blue">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{ $agencyTarget }}</div>
+                                    <div class="stat-label">{{ __('Target') }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon bg-green">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{ $rate }}</div>
+                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <!-- Stars Section -->
+                        <div class="section-box">
                             <div class="section-header">
-                                <h2 class="section-title">
-                                    <i class="fas fa-star"></i>
-                                    {{ __('نجوم الوكالة') }}
-                                </h2>
+                                <h4>
+                                    <i class="fas fa-star text-yellow"></i>
+                                    {{ __('Agency Stars') }}
+                                </h4>
                             </div>
                             
                             @if($stars && $stars->count())
-                                <div class="stars-container">
+                                <div class="avatar-grid">
                                     @foreach($stars as $log)
                                         @php
                                             $user = $log->receiver;
@@ -957,32 +1207,34 @@
                                             $exp = number_format($log->exp);
                                         @endphp
                                         
-                                        <div class="star-wrapper" 
-                                            onclick="window.location.href='{{ $userUrl }}'"
-                                            title="{{ $username }} ({{ $exp }} EXP)">
-                                            <img src="{{ $url }}" 
-                                                alt="{{ $username }}"
-                                                class="star-avatar">
-                                            <div class="star-badge">{{ $exp }}</div>
-                                        </div>
+                                        <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
+                                            <div class="avatar-img-container">
+                                                <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                                <div class="avatar-badge">{{ $exp }}</div>
+                                            </div>
+                                            <div class="avatar-name">{{ $username }}</div>
+                                        </a>
                                     @endforeach
                                 </div>
                             @else
-                                <p class="no-data">{{ __('No stars data available') }}</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-user-slash"></i>
+                                    <p>{{ __('No stars data available') }}</p>
+                                </div>
                             @endif
                         </div>
-                    
-                        <!-- Admins Section -->
-                        <div class="stars-section">
+            
+                        <!-- Heroes Section -->
+                        <div class="section-box">
                             <div class="section-header">
-                                <h2 class="section-title">
-                                    <i class="fas fa-user-shield"></i>
-                                    {{ __('ابطال الوكالة') }}
-                                </h2>
+                                <h4>
+                                    <i class="fas fa-user-shield text-red"></i>
+                                    {{ __('Agency Heroes') }}
+                                </h4>
                             </div>
                             
                             @if($heroes && $heroes->count())
-                                <div class="stars-container">
+                                <div class="avatar-grid">
                                     @foreach($heroes as $log)
                                         @php
                                             $user = $log->sender;
@@ -994,69 +1246,46 @@
                                             $exp = number_format($log->exp);
                                         @endphp
                                         
-                                        <div class="star-wrapper" 
-                                            onclick="window.location.href='{{ $userUrl }}'"
-                                            title="{{ $username }} ({{ $exp }} EXP)">
-                                            <img src="{{ $url }}" 
-                                                alt="{{ $username }}"
-                                                class="star-avatar">
-                                            <div class="star-badge">{{ $exp }}</div>
-                                        </div>
+                                        <a href="{{ $userUrl }}" class="avatar-item" title="{{ $username }} ({{ $exp }} EXP)">
+                                            <div class="avatar-img-container">
+                                                <img src="{{ $url }}" alt="{{ $username }}" class="avatar-img">
+                                                <div class="avatar-badge">{{ $exp }}</div>
+                                            </div>
+                                            <div class="avatar-name">{{ $username }}</div>
+                                        </a>
                                     @endforeach
                                 </div>
                             @else
-                                <p class="no-data">{{ __('لا يوجد ابطال للوكالة') }}</p>
+                                <div class="empty-state">
+                                    <i class="fas fa-user-slash"></i>
+                                    <p>{{ __('No heroes available') }}</p>
+                                </div>
                             @endif
                         </div>
-                        <br>
-                        <div class="modal-body">
+            <br>
+                     
+                <div class="tab-content active" id="members-tab">
+                   
 
-                            <div class="row">
-                              <!-- Card 1 -->
-                              <div class="col-md-6">
-                                <div class="card">
-     
-                                  <div class="card-body">
-                                    <h3 class="card-title">{{' target'}}</h3>
-                                    <p class="card-text">{{$agencyTarget}}</p>
-                                  </div>
-                                </div>
-                              </div>
-                    
-                              <!-- Card 2 -->
-                              <div class="col-md-6">
-                                <div class="card">
-                                 
-                                  <div class="card-body">
-                                    <h3 class="card-title">{{ 'agency rate'}}</h3>
-                                    <p class="card-text">{{$rate}}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                    
-                          
-                        </div>
-                        <div class="table-responsive">
-                            <div class="box-body table-responsive no-padding">
-                                <table class="table table-hover grid-table" id="target">
+                        <div class="table-section card">
+                             <div class="table-responsive"> 
+                                <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>{{ __('user') }}</th>
-                                            <th>{{ __('diamond') }}</th>
-                                            <th>{{ __('remaining diamonds') }}</th>
-                                            <th>{{ __('days') }}</th>
-                                            <th>{{ __('hours') }}</th>
-                                            <th>{{ __('supporters') }}</th>
+                                            <th width="5%">#</th>
+                                            <th width="25%">{{ __('User') }}</th>
+                                            <th width="12%">{{ __('Diamonds') }}</th>
+                                            <th width="18%">{{ __('Remaining') }}</th>
+                                            <th width="12%">{{ __('Days') }}</th>
+                                            <th width="12%">{{ __('Hours') }}</th>
+                                            <th width="16%">{{ __('Supporters') }}</th>
                                         </tr>
                                     </thead>
-            
+                                    
                                     @if($memberTargets && $memberTargets->count())
-                                    <tbody style="color: rgb(208, 115, 43);">
+                                    <tbody>
                                         @foreach($memberTargets as $index => $memberTarget)
                                             @php
-                                                
                                                 $name = $memberTarget->name ?? '-';
                                                 $uid = $memberTarget->uuid ?? '-';
                                                 $avatarPath = $memberTarget->profile?->avatar;
@@ -1065,156 +1294,287 @@
                                                 if (!isImageExists($avatarUrl)) {
                                                     $avatarUrl = $defaultImage;
                                                 }
-                                                $image = handleShowImageWithTypes($memberTarget->id, $avatarUrl, 40, 40);
-            
-                                               
+                                                 $month = request('month') ?? now()->month;
+                                                 $year = request('year') ?? now()->year;
+
+                                                 $giftLogs = \App\Models\GiftLog::where('agency_id', $memberTarget->agency_id)
+                                                            ->where('receiver_id', $memberTarget->id)
+                                                            ->whereHas('sender')
+                                                            ->with('sender.profile') // assuming sender has a 'profile' with 'avatar'
+                                                            ->whereYear('created_at', $year)
+                                                            ->whereMonth('created_at', $month)
+                                                            ->selectRaw("sum(giftPrice) as exp, sender_id")
+                                                            ->groupBy('sender_id')
+                                                            ->orderByRaw("exp desc")
+                                                            ->limit(3)
+                                                            ->get()
+                                                            ->reject(fn ($q) => $q->exp == 0);
+
+                                                        $memberTarget->topSupporters = $giftLogs;
                                             @endphp
-            
+                                            
                                             <tr>
                                                 <td>{{ $memberTargets->firstItem() + $index }}</td>
-            
                                                 <td>
-                                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                                        {!! $image !!}
+                                                    <div class="user-info-cell">
+                                                        <img src="{{ $avatarUrl }}" class="user-avatar" alt="{{ $name }}">
                                                         <div>
-                                                            <strong>{{ $name }}</strong><br>
-                                                            <span style="color: #aaa; font-size: smaller;">UID: {{ $uid }}</span>
+                                                            <div class="user-name">{{ $name }}</div>
+                                                            <div class="user-uuid">{{ $uid }}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-            
                                                 <td>
-                                                  {{$memberTarget->targets->first()->user_diamonds ?? 0}}
-                                                </td>
-            
-                                                <td>
-                                                    {{$memberTarget->targets->first()->next_diamond ?? 0}}
+                                                    <span class="number-badge">
+                                                        {{ $memberTarget->targets->first()->user_diamonds ?? 0 }}
+                                                    </span>
                                                 </td>
                                                 <td>
-                                                   {{$memberTarget->targets->first()->user_hours ?? 0}}
+                                                    <span class="number-badge warning">
+                                                        {{ $memberTarget->targets->first()->next_diamond ?? 0 }}
+                                                    </span>
                                                 </td>
+                                                <td>{{ $memberTarget->targets->first()->user_hours ?? 0 }}</td>
+                                                <td>{{ $memberTarget->targets->first()->user_days ?? 0 }}</td>
                                                 <td>
-                                                  {{$memberTarget->targets->first()->user_days ?? 0}}
+                                                    <div class="supporters-avatars">
+                                                        @foreach($memberTarget->topSupporters ?? [] as $supporter)
+                                                            @php
+                                                                $sender = $supporter->sender;
+                                                                $supporterAvatar = $sender->profile->avatar ?? null;
+                                                                $supporterUrl = getImagePath($supporterAvatar) ?? $defaultImage;
+                                                                if (!isImageExists($supporterUrl)) {
+                                                                    $supporterUrl = $defaultImage;
+                                                                }
+                                                            @endphp
+                                                            <img src="{{ $supporterUrl }}" class="supporter-avatar" title="{{ $sender->name ?? '' }}" alt="Supporter">
+                                                        @endforeach
+                                                    </div>
                                                 </td>
-                                                <td>
-                                                    {{$memberTarget->targets->first()->user_days ?? 0}}
-                                                </td>
-                                             
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     @endif
                                 </table>
+                             
+                            </div>
+                            
+                            @if($memberTargets->isEmpty())
+                            <div class="empty-table">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>{{ __('No target data available') }}</p>
+                            </div>
+                            @endif
+                            
+                            <div class="pagination-wrapper">
+                                {{ $memberTargets->appends([
+                                    'members_page' => $members->currentPage(),
+                                    'salaries_page' => $salaries->currentPage(),
+                                    'charges_page' => $charges->currentPage(),
+                                    'join_page' => $agencyJoinRequests->currentPage(),
+                                    'month' => request('month'),
+                                    'year' => request('year'),
+                                ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         </div>
-            
-                        <div class="pagination-container mt-3">
-                            {{ $memberTargets->appends([
-                                'members_page' => $members->currentPage(),
-                                'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage(),
-                                'join_page' => $agencyJoinRequests->currentPage(),
-                                'month' => request('month'),
-                                'year' => request('year'),
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    </div>
+                   
+                   
                 </div>
             </div>
             
        
 
     </div>
+<!-- jQuery أولاً -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 
-
-    <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
 
+    document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedTab = urlParams.get('tab') || 'members'; // افتراضيًا members
+
+            const allTabs = document.querySelectorAll('.tab-btn');
+            const allTabContents = document.querySelectorAll('[id$="-tab"]');
+
+            allTabs.forEach(tab => {
+                const target = tab.getAttribute('data-target');
+
+                if (target.startsWith(selectedTab)) {
+                    tab.classList.add('active');
+                    document.getElementById(target).style.display = 'block';
+                } else {
+                    tab.classList.remove('active');
+                    document.getElementById(target).style.display = 'none';
+                }
+            });
+        });
+
+
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        // Remove active class from all buttons and content
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        
-        // Add active class to clicked button and corresponding content
-        btn.classList.add('active');
-        const target = btn.getAttribute('data-target');
-        document.getElementById(target).classList.add('active');
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding content
+                btn.classList.add('active');
+                const target = btn.getAttribute('data-target');
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+
+        $(document).ready(function () {
+            console.log("Document ready");
+
+function showLoader() {
+    console.log("Showing loader");
+    Swal.fire({
+        title: 'Loading...',  // تغيير النص ليوضح الرسالة
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
     });
-});
+}
+
+function showSuccess(message, callback = null) {
+    console.log("Showing success:", message);
+    Swal.fire({
+        icon: 'success',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    }).then(() => {
+        console.log("Success confirmed");
+        if (callback) {
+            console.log("Running success callback");
+            callback();
+        }
+    });
+}
+
+function showError(message) {
+    console.log("Showing error:", message);
+    Swal.fire({
+        icon: 'error',  // استبدال type بـ icon
+        title: message,
+        confirmButtonText: 'OK'
+    });
+}
+
+function confirmAction(message, onConfirm) {
+    console.log("Confirm action:", message);
+    Swal.fire({
+        title: message,
+        icon: 'question',  // استبدال type بـ icon
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    }).then(result => {
+        console.log("Confirmation result:", result);
+        console.log("isConfirmed:", result.isConfirmed);
+
+        if (result.value) {
+            console.log("User confirmed action");
+            onConfirm();
+        } else {
+            console.log("User cancelled action");
+        }
+    });
+}
 
 
-    $(document).ready(function() {
-    $('.accept-btn').click(function() {
+    // قبول الطلب
+    $('.accept-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to accept this request?")) {
+        console.log("Accept clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_accept") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/accept_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Accept response:", response);
                 if (response.status) {
-                    alert(response.message); // Show success
-                    location.reload();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message); // Show error returned by backend
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Accept failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to accept the request.');
+                showError(res?.message ?? '{{ __("failed_accept_request") }}');
             });
-        }
+        });
     });
 
-    $('.reject-btn').click(function() {
+    // رفض الطلب
+    $('.reject-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to reject this request?")) {
+        console.log("Reject clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_reject") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/reject_join/${id}`, {
                 _token: '{{ csrf_token() }}'
-            }, function(response) {
+            }, function (response) {
+                Swal.close();
+                console.log("Reject response:", response);
                 if (response.status) {
-                    alert(response.message);
-                    location.reload();
+                    showSuccess(response.message, () => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('tab', 'requests');
+                        window.location.href = url.toString();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
-            }).fail(function(xhr) {
+            }).fail(function (xhr) {
+                Swal.close();
+                console.error("Reject failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to reject the request.');
+                showError(res?.message ?? '{{ __("failed_reject_request") }}');
             });
-        }
+        });
     });
 
+    // ترقية إلى Admin
     $('.make-admin-btn').click(function () {
         const id = $(this).data('id');
-        if (confirm("Are you sure you want to make this user an admin?")) {
+        console.log("Make admin clicked, ID:", id);
+        confirmAction('{{ __("are_you_sure_make_admin") }}', () => {
+            showLoader();
             $.post(`/admin/agencies/admin/${id}`, {
                 _token: '{{ csrf_token() }}'
             }, function (response) {
+                Swal.close();
+                console.log("Make admin response:", response);
                 if (response.status) {
-                    alert(response.message);
-                    location.reload();
+                    showSuccess(response.message, () => {
+                        location.reload();
+                    });
                 } else {
-                    alert(response.message);
+                    showError(response.message);
                 }
             }).fail(function (xhr) {
+                Swal.close();
+                console.error("Make admin failed", xhr);
                 const res = xhr.responseJSON;
-                alert(res?.message ?? 'Failed to make user an admin.');
+                showError(res?.message ?? '{{ __("failed_make_admin") }}');
             });
-        }
+        });
     });
-
 });
 
-
-
-
-
-    </script>
-
-
-
-
-
-
+</script>
 

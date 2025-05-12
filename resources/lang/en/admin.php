@@ -219,6 +219,164 @@ return [
     "Tencent" => 'Tencent',
     "lucky_flex" => "Lucky Flex",
     "guess_the_word" => "Guess The Word",
+
+    // Fawry
+    "fawry_secret" => "Secret",
+    "fawry_merchant_code" => "Merchant Code",
+    "fawry_utd_url" => "Utd Url",
+    "is_fawry_active" => "Is Active",
+    "fawry_url" => "Url",
+    "fawry_return_url" => "Return Url",
+
+    // SkyPay
+    "is_skyPay_active" => "Is Active",
+    "paysky_base_url" => "Base Url",
+    "paysky_merchant_id" => "Merchant Id",
+    "paysky_terminal_id" => "Terminal Id",
+    "paysky_api_key" => "Api Key",
+
+    // Stripe
+    "is_stripe_active" => "Is Active",
+    "stripe_test_secret_key" => "Test Secret Key",
+    "stripe_success_url" => "Success Url",
+    "stripe_cancel_url" => "Cancel Url",
+    "stripe_currency" => "Currency",
+    "stripe_webhook_secret" => "Webhook Secret",
+
+    // Opay
+    "is_opay_active" => "Is Active",
+    "opay_currency" => "Currency",
+    "opay_secret_key" => "Secret Key",
+    "opay_public_key" => "Public Key",
+    "opay_merchant_id" => "Merchant Id",
+    "opay_country_code" => "Country Code",
+    "opay_base_url" => "Base Url",
+
+    // Cashfree
+    "is_cashfree_active" => "Is Active",
+    "cashfree_currency" => "Currency",
+    "cashfree_app_id" => "App Id",
+    "cashfree_secret_key" => "Secret Key",
+    "cashfree_base_url" => "Base Url",
+
+    // ApplePay
+    "is_applepay_active" => "Is Active",
+    "apple_team_id" => "Team Id",
+    "app_id" => "App Id",
+    "apple_client_id" => "Client Id",
+    "apple_redirect_uri" => "Redirect Uri",
+    "apple_service_file" => "Service File",
+
+    // Mada
+    "is_mada_active" => "Is Active",
+    "mada_access_token" => "Access Token",
+    "mada_public_key" => "Public Key",
+    "mada_payment_address" => "Payment Address",
+
+    // Liqpay
+    "is_liqpay_active" => "Is Active",
+    "liqpay_public_key" => "Public Key",
+    "liqpay_private_key" => "Private Key",
+    "liqpay_payment_address" => "Payment Address",
+
+    // PayPal
+    "is_paypal_active" => "Is Active",
+    "paypal_client_id" => "Client Id",
+    "paypal_client_secret" => "Client Secret",
+    "paypal_payment_address" => "Payment Address",
+
+    // Paytm
+    "is_paytm_active" => "Is Active",
+    "paytm_merchant_key" => "Merchant Key",
+    "paytm_merchant_id" => "Merchant Id",
+    "paytm_merchant_website_link" => "Merchant Website Link",
+    "paytm_payment_address" => "Payment Address",
+
+    // Paytabs
+    "is_paytabs_active" => "Is Active",
+    "paytabs_profile_id" => "Profile Id",
+    "paytabs_server_key" => "Server Key",
+    "paytabs_base_url" => "Base Url",
+    "paytabs_payment_address" => "Payment Address",
+
+    // BKash
+    "is_bkash_active" => "Is Active",
+    "bkash_appkey" => "Appkey",
+    "bkash_app_secret" => "App Secret",
+    "bkash_username" => "Username",
+    "bkash_password" => "Password",
+    "bkash_payment_address" => "Payment Address",
+
+    // Razorpay
+    "is_razorpay_active" => "Is Active",
+    "razorpay_api_key" => "Api Key",
+    "razorpay_api_secret" => "Api Secret",
+    "razorpay_payment_address" => "Payment Address",
+
+    // Senangpay
+    "is_senangpay_active" => "Is Active",
+    "senangpay_callback_url" => "Callback Url",
+    "senangpay_secret_key" => "Secret Key",
+    "senangpay_merchant_id" => "Merchant Id",
+    "senangpay_payment_address" => "Payment Address",
+
+    // Paymob Accept
+    "is_paymob_accept_active" => "Is Active",
+    "paymob_accept_callback_url" => "Callback Url",
+    "paymob_accept_api_key" => "Api Key",
+    "paymob_accept_iframe_id" => "Iframe Id",
+    "paymob_accept_integration_id" => "Integration Id",
+    "paymob_accept_hmac" => "Hmac",
+    "paymob_accept_payment_address" => "Payment Address",
+
+    // Flutterwave
+    "is_flutterwave_active" => "Is Active",
+    "flutterwave_secret_key" => "Secret Key",
+    "flutterwave_public_key" => "Public Key",
+    "flutterwave_hash" => "Hash",
+    "flutterwave_payment_address" => "Payment Address",
+
+    // Paystack
+    "is_paystack_active" => "Is Active",
+    "paystack_public_key" => "Public Key",
+    "paystack_secret_key" => "Secret Key",
+    "paystack_merchant_email" => "Merchant Email",
+    "paystack_return_url" => "Return Url",
+    "paystack_payment_address" => "Payment Address",
+
+    // SSLCommerz
+    "is_sslcommerz_active" => "Is Active",
+    "sslcommerz_store_id" => "Store Id",
+    "sslcommerz_store_password" => "Store Password",
+    "sslcommerz_payment_address" => "Payment Address",
+
+    //googlePay
+    "google_pay_merchant_id" => "Merchant Id",
+
+    //huaweiPay
+    "huawei_pay_merchant_id" => "Merchant Id",
+
+    'fawry'         => 'Fawry',
+    'skyPay'        => 'Sky Pay',
+    'strip'         => 'Stripe',
+    'opay'          => 'OPay',
+    'cashfree'      => 'Cashfree',
+    'applepay'      => 'Apple Pay',
+    'mada'          => 'Mada',
+    'liqpay'        => 'LiqPay',
+    'paypal'        => 'PayPal',
+    'paytm'         => 'Paytm',
+    'paytabs'       => 'PayTabs',
+    'bkash'         => 'bKash',
+    'razorpay'      => 'Razorpay',
+    'senangpay'     => 'SenangPay',
+    'paymob_accept' => 'Paymob Accept',
+    'flutterwave'   => 'Flutter Wave',
+    'paystack'      => 'Paystack',
+    'sslcommerz'    => 'SSLCommerz',
+    'google_pay'    => 'Google Pay',
+    'huawei_pay'    => 'Huawei Pay',
+
     'creator' => 'admin'
 
 
