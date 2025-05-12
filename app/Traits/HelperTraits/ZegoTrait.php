@@ -156,7 +156,7 @@ Trait ZegoTrait
         $AppId = self::getConf ('zego_app_id');
         $SignatureNonce = self::getSignatureNonce ();
         $Timestamp = time ();
-        \Log::error($AppId,self::getConf('zego_server_secret'));
+        \Log::error($AppId .  ' Sign ' . self::getConf('zego_server_secret'));
         $str = $AppId.$SignatureNonce.self::getConf('zego_server_secret').$Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
