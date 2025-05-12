@@ -1228,7 +1228,7 @@ class RoomController extends Controller
 
         if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
         // if (count($adm_arr) > 15) return Common::apiResponse(0, 'room manager is full', null, 403);
-        if (count($adm_arr) > ($roomMax >= Common::getConfig('max_room_admin') ? $roomMax : Common::getConfig('max_room_admin'))) return Common::apiResponse(0, 'room manager is full', null, 403);
+        if (count($adm_arr) > ($roomMax >= (Common::getConfig('max_room_admin') ?? 1) ? $roomMax : (Common::getConfig('max_room_admin') ?? 1))) return Common::apiResponse(0, 'room manager is full', null, 403);
 
 
         $adm_arr = array_merge($adm_arr, [$admin_id]);
@@ -1241,14 +1241,14 @@ class RoomController extends Controller
         if ($a) {
             $n = $a->name ?: 'nan';
         }
-      //  Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
+        //  Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
         $ms   = [
             'messageContent' => [
                 'message' => 'updateAdmins',
                 'admins' => array_values($adm_arr)
             ]
         ];
-       
+
         if ($res) {
 
             $resu = Common::sendToZego('SendCustomCommand', $room->id, $uid, json_encode($ms));
@@ -1284,7 +1284,7 @@ class RoomController extends Controller
         if ($a) {
             $n = $a->name ?: 'nan';
         }
-       // Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
+        // Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
         $ms   = [
             'messageContent' => [
                 'message' => 'updateAdmins',
