@@ -196,6 +196,7 @@ class AgencyService
             $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
+        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
 
         if ($user->agency_id) throw new Exception('user joined agency before');
 

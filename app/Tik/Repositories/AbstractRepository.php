@@ -39,7 +39,7 @@ abstract class AbstractRepository
         if ($id instanceof Model){
             return $id->update($data);
         }
-        return $this->model->find($id)->update($data);
+        return $this->model->findOrFail($id)->update($data);
     }
 
 

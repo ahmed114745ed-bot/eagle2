@@ -481,6 +481,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
+                Route::get('admins/{id}', [AgencyController::class, 'admin']);
                 Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);
                 Route::get('stars/{id}', [AgencyController::class, 'star']);
                 Route::get('heroes/{id}', [AgencyController::class, 'heroes']);

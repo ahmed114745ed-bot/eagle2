@@ -153,6 +153,7 @@
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
+     background: var(--box-background-color);
 }
 
 .agency-header {
@@ -162,7 +163,7 @@
     margin-bottom: 30px;
     position: relative;
     padding: 20px;
-    background: var(--primary-color);
+    background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
@@ -248,9 +249,9 @@
     letter-spacing: 0.5px;
 }
 
-.rtl .btn-back {
+.ltr .btn-back {
     position: absolute;
-    top: -56px;
+    top: 5px;
     right: 20px;
     background: #ecf0f1;
     border: none;
@@ -264,9 +265,9 @@
     gap: 5px;
 }
 
-.ltr .btn-back {
+.rtl .btn-back {
     position: absolute;
-    top: -56px;
+    top: 5px;
     left: 20px;
     background: #ecf0f1;
     border: none;
@@ -464,8 +465,8 @@
 }
 
 .tab-btn.active {
-    color: #3498db;
-    border-bottom-color: #3498db;
+    color:var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 .tab-btn:hover:not(.active) {
@@ -493,7 +494,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: var(--primary-color);
+    background: var(--secondary-color);
 }
 
 .card-header h3 {
@@ -514,19 +515,20 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--box-background-color);
+    background: var(--secondary-color);
 }
+
 
 .table-section {
     width: 100%;
     border-collapse: collapse;
-    background: var(--box-background-color);
+    background: var(--secondary-color);
 }
 
 .data-table th {
     text-align: left;
     padding: 12px 15px;
-    background: var(--primary-color);
+    background: var(--secondary-color);
    
     font-weight: 600;
     text-transform: uppercase;
@@ -655,7 +657,7 @@
     display: flex;
     justify-content: center;
     border-top: 1px solid #eee;
-     background: var(--box-background-color);
+     background: var(--secondary-color);
 }
 
 @media (max-width: 768px) {
