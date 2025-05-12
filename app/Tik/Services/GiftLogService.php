@@ -130,6 +130,7 @@ class GiftLogService
 
         $realPrice = (int)($number * $gift->price);
         $totalPriceWithCountUsers =(int)($number * $gift->price) * count($receivedUsers);
+        $realNumber = $number *count($receivedUsers);
         $price = ceil($realPrice);
         $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds);
 
@@ -175,7 +176,7 @@ class GiftLogService
         CalculateAchievement::dispatch($gift, $number, $room->owner)->onQueue('achievement');
 
 
-        $message = "  {$number} x" . __('api.sendGift') . __("api.value") . "{$totalPriceWithCountUsers} " .  __('api.to') . "{$to}";
+        $message = "  {$realNumber} x" . __('api.sendGift') . __("api.value") . "{$totalPriceWithCountUsers} " .  __('api.to') . "{$to}";
         try {
             Utils::unwrap($promises);
         } catch (BadResponseException $e) {
