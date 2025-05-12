@@ -156,7 +156,6 @@ Trait ZegoTrait
         $AppId = self::getConf ('zego_app_id');
         $SignatureNonce = self::getSignatureNonce ();
         $Timestamp = time ();
-        \Log::error($AppId .  ' Sign ' . self::getConf('zego_server_secret'));
         $str = $AppId.$SignatureNonce.self::getConf('zego_server_secret').$Timestamp;
         $signature = md5($str);
         $SignatureVersion = '2.0';
@@ -178,9 +177,7 @@ Trait ZegoTrait
         ];
         try {
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
-            \Log::error($res);
         }catch (\Exception $exception){
-            \Log::error($exception->getMessage());
         }
 
         return $res;
