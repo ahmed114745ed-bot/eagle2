@@ -153,7 +153,9 @@
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
-     background: var(--box-background-color);
+    background: var(--secondary-color);
+    filter: brightness(0.85);
+
 }
 
 .agency-header {
@@ -526,7 +528,7 @@
 }
 
 .data-table th {
-    text-align: left;
+    /* text-align: left; */
     padding: 12px 15px;
     background: var(--secondary-color);
    
@@ -671,7 +673,6 @@
 }
     </style>
 
-<!-- SweetAlert2 -->
 
 </head>
 <body>
@@ -822,9 +823,25 @@
             <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">{{ __('Targets') }}</a>
 
         </div>
-          
+        <div id="tab-loading" style="
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* transform: translate(-50%, -50%); */
+            background: var(--primary-color);
+            color: var(--text-primary-color);
+            z-index: 9999;
+            padding: 30px 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        ">
+            {{ __('Loading...') }}
+        </div>
 
-         
+           
     
               
         <div class="tab-content active" id="members-tab">
@@ -1384,7 +1401,9 @@
             
        
 
+        
     </div>
+ 
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1393,26 +1412,47 @@
 
 
     <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const selectedTab = urlParams.get('tab') || 'members'; // افتراضيًا members
+            const selectedTab = urlParams.get('tab') || 'members';
 
             const allTabs = document.querySelectorAll('.tab-btn');
             const allTabContents = document.querySelectorAll('[id$="-tab"]');
 
+            let targetElement = null;
+
             allTabs.forEach(tab => {
                 const target = tab.getAttribute('data-target');
+                const content = document.getElementById(target);
 
                 if (target.startsWith(selectedTab)) {
                     tab.classList.add('active');
-                    document.getElementById(target).style.display = 'block';
+                    content.style.display = 'block';
+                    targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
                 } else {
                     tab.classList.remove('active');
-                    document.getElementById(target).style.display = 'none';
+                    content.style.display = 'none';
                 }
+
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('tab-loading').style.display = 'block';
+                    allTabs.forEach(t => t.style.pointerEvents = 'none');
+                    const href = tab.getAttribute('href');
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                });
             });
-        });
+
+    if (targetElement) {
+        setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
+    }
+});
+
+
 
 
 
