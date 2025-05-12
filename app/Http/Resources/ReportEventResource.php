@@ -31,7 +31,7 @@ class ReportEventResource extends JsonResource
         } elseif ($this->reward->type == 'achievement') {
             $path = $this->reward->target ?? '';
         } else {
-            $path = 'cion.png';
+            $path = 'coin.png';
         }
         return [
             'id' => $this->id,

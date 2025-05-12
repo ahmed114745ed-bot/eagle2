@@ -107,7 +107,7 @@ class EventReportController extends MainOldController
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
@@ -176,7 +176,7 @@ class EventReportController extends MainOldController
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
@@ -245,7 +245,7 @@ class EventReportController extends MainOldController
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->target;
             } else {
-                $path = 'cion.png';
+                $path = 'coin.png';
             }
 
             /** @var Gift $this */
@@ -264,34 +264,34 @@ class EventReportController extends MainOldController
     protected function charges_reports()
     {
             $grid = new Grid(new UserChargeEvent());
-        
+
             $grid->model()
                 ->whereHas('rewardCharge')
                 ->with(['user', 'rewardCharge']);
-        
+
             $grid->disableExport();
             $grid->disableCreateButton();
             $grid->disableRowSelector();
-        
+
             $grid->filter(function($filter) {
                 $filter->equal('charge_event_id', __('Target ID'));
             });
-        
+
             $grid->column('id', __('ID'));
-        
+
             $grid->column('user.name', __('Name'))->display(function ($name) {
                 $uid = @$this->user->uuid;
                 $path = @$this?->user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-        
+
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
-        
+
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
                 $showUrl = ($this->user) ? url("admin/users/{$this->user->id}") : 0;
-        
+
                 return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         $image
@@ -305,14 +305,14 @@ class EventReportController extends MainOldController
                 ";
             });
 
-        
+
         $grid->column('ChargeEvents.tile', __('title'));
         $grid->column('ChargeEvents.value', __('value'));
             $grid->column('rewards', __('Gifts'))->display(function () {
                 if (!$this->rewardCharges || count($this->rewardCharges) == 0) {
                     return '-';
                 }
-            
+
                 $html = '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
                 foreach ($this->rewardCharges as $reward) {
                     if ($reward->type == "ware") {
@@ -323,15 +323,15 @@ class EventReportController extends MainOldController
                         $img = getImagePath($reward->vip->img);
                     } elseif ($reward->type == "coins") {
                         $name = @$reward->target;
-                        $img = asset('cion.png');
+                        $img = asset('coin.png');
                     } elseif ($reward->type == "achievement") {
                         $name = "Achievement";
                         $img = getDriverUrl() . '/' . $reward->target;
                     } else {
                         $name = "-";
-                        $img = asset('cion.png');
+                        $img = asset('coin.png');
                     }
-            
+
                     $html .= "
                         <div style='text-align: center; width: 80px;'>
                             <img src='{$img}' width='50' height='50' style='border-radius: 8px;'><br>
@@ -346,7 +346,7 @@ class EventReportController extends MainOldController
             $grid->column('created_at', __('Created at'))->display(function ($date) {
                 return date('Y-m', strtotime($date)); // فقط السنة والشهر
             });
-        
+
             return $grid;
         }
 }

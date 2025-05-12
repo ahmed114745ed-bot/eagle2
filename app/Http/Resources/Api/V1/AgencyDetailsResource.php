@@ -2,13 +2,14 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Http\Resources\Api\V1\MyDataForAgancyResource;
+use Carbon\Carbon;
 use App\Models\Agency;
-use App\Models\GiftLog;
 use App\Models\Target;
+use App\Models\GiftLog;
 use App\Models\UserSallary;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 
 class AgencyDetailsResource extends JsonResource
 {
@@ -23,8 +24,13 @@ class AgencyDetailsResource extends JsonResource
 
     public function toArray($request)
     {
+        $year = request('year') ?? Carbon::now()->year;
+        $month = request('month') ?? Carbon::now()->month;
+
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
+        $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
+            ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
 
         return [
             'id' => $this->id ?: 0,
@@ -43,6 +49,7 @@ class AgencyDetailsResource extends JsonResource
             'admins' => AdminsAgencyResource::collection($this->admins),
             //'members' => MyDataForAgancyNewResource::collection($this->mempers),
             'star' => ReceiverGiftLogResource::collection($giftLog),
+            'heroes' => SenderGiftLogResource::collection($heroGiftLog),
 
         ];
     }
