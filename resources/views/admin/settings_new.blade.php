@@ -1085,7 +1085,6 @@
                     <label class="d-block">{{ __('Payment Credential Settings:') }}</label>
 
                     <div class="row mt-4">
-                        @dd($paymentCoins);
                         <!-- dynamic Fields -->
                         @foreach ($paymentCoins as $coin)
                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
