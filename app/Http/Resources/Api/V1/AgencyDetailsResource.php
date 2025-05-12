@@ -28,6 +28,7 @@ class AgencyDetailsResource extends JsonResource
 
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
+        $user = $request->user();
 
         $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
@@ -36,7 +37,7 @@ class AgencyDetailsResource extends JsonResource
         $admin = $this->admins()->whereYear('created_at', $year)->whereMonth('created_at', $month)->take(5)->get();
 
      
-        $adminUser = $this->owner?->agencyUserJob;
+        $adminUser = $user?->agencyUserJob;
 
         return [
             'id' => $this->id ?: 0,
