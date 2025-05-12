@@ -24,6 +24,8 @@ class AgencyDetailsResource extends JsonResource
 
     public function toArray($request)
     {
+
+
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
 
@@ -31,7 +33,11 @@ class AgencyDetailsResource extends JsonResource
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
-         $admin = $this->admins()->whereYear('created_at', $year)->whereMonth('created_at', $month) ->take(5)->get();
+        $admin = $this->admins()->whereYear('created_at', $year)->whereMonth('created_at', $month)->take(5)->get();
+
+     
+        $adminUser = $this->owner?->agencyUserJob;
+
         return [
             'id' => $this->id ?: 0,
             'name' => $this->name ?: '',
@@ -46,6 +52,7 @@ class AgencyDetailsResource extends JsonResource
                     "image" => ''
                 ]
             ],
+            'user_agency_status' =>  $this->app_owner_id == Auth::id() ? 2 : ($adminUser ? 1 : 3),
             'admins' => AdminsAgencyResource::collection($admin),
             //'members' => MyDataForAgancyNewResource::collection($this->mempers),
             'star' => ReceiverGiftLogResource::collection($giftLog),
