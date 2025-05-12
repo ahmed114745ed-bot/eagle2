@@ -1086,7 +1086,7 @@
 
                     <div class="row mt-4">
                         <!-- dynamic Fields -->
-                        @foreach ($paymentCoins->where('status', 1) as $coin)
+                        @foreach ($paymentCoins as $coin)
                             <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
                                 <form action="{{ route('admin.settings.update') }}" method="POST"
                                     enctype="multipart/form-data">
