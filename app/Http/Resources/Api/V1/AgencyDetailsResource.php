@@ -31,7 +31,7 @@ class AgencyDetailsResource extends JsonResource
             ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
         $heroGiftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, sender_id")
             ->with('sender')->groupBy('sender_id')->whereHas('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->get();
-
+         $admin = $this->admins()->whereYear('created_at', $year)->whereMonth('created_at', $month) ->take(5)->get();
         return [
             'id' => $this->id ?: 0,
             'name' => $this->name ?: '',
@@ -46,7 +46,7 @@ class AgencyDetailsResource extends JsonResource
                     "image" => ''
                 ]
             ],
-            'admins' => AdminsAgencyResource::collection($this->admins),
+            'admins' => AdminsAgencyResource::collection($admin),
             //'members' => MyDataForAgancyNewResource::collection($this->mempers),
             'star' => ReceiverGiftLogResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),

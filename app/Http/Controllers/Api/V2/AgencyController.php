@@ -13,6 +13,7 @@ use App\Models\AgencyJoinRequest;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
+use App\Http\Resources\Api\V1\AdminsAgencyResource;
 use App\Http\Resources\Api\V1\AgencyDetailsResource;
 use App\Http\Resources\Api\V1\AgencyJoinReqResource;
 use App\Http\Resources\Api\V1\AllDataAgencyResource;
@@ -67,6 +68,17 @@ class AgencyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         return Common::apiResponse(1, '', new AgencyDetailsResource($agency));
+    }
+
+    public function admin($id)
+    {
+        try {
+            $agency = $this->agencyService->find($id);
+        } catch (\Exception $exception) {
+
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+        return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
     }
 
     public function agencyTargetDetails($id, Request $request)
