@@ -205,10 +205,10 @@ class AgencyService
 
         if (!$action) throw new Exception('Request not found');
 
-        if ($accept == 0) {
+        if ($accept == 0 || $accept == 'false') {
             $action->status = 2;
             $action->save();
-        } elseif ($accept == 1) {
+        } elseif ($accept == 1 || $accept == true) {
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);
