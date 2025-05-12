@@ -177,6 +177,7 @@ Trait ZegoTrait
         ];
         try {
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
+            \Log::error($res);
         }catch (\Exception $exception){
             \Log::error($exception->getMessage());
         }
