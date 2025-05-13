@@ -99,7 +99,7 @@ class ChangeAgencyMangerController extends MainController
         $show->field('target_token_usd', __('Target token usd'));
         $show->field('app_owner_id', __('App owner id'));
         $show->field('salary', __('Salary'));
-        $show->field('Shipping_agency', __('Shipping agency'));
+        // $show->field('Shipping_agency', __('Shipping agency'));
         $show->field('Host_agency', __('Host agency'));
         $show->field('agency_manger_id', __('Agency manger id'));
         $show->field('agency_dash_manger_id', __('Agency dash manger id'));

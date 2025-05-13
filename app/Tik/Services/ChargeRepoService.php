@@ -5,6 +5,7 @@ namespace App\Tik\Services;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\Agency;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Services\WalletService;
 use App\Tik\Repositories\AgencyRepository;
@@ -113,7 +114,7 @@ class ChargeRepoService
         }
     }
 
-    public function chargeToAgency(User $fromUser, Agency $toAgency, $coins, $isRoomTarget, $usd)
+    public function chargeToAgency(User $fromUser, ShippingAgency $toAgency, $coins, $isRoomTarget, $usd)
     {
         $chargeType = $isRoomTarget ? 'room_owner' : 'host';
 
@@ -222,7 +223,8 @@ class ChargeRepoService
             if ($receiver->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
             }
-            $agency = $this->agencyRepository->findByStatus($sender->agency_id);
+
+            $agency = $this->agencyRepository->findAllByStatus($sender->agency_id);
             if (!isset($agency)) throw new \Exception('agency not founded');
             if ($agency->is_frozen == 1) {
                 throw new \Exception(__('api_responses.frozen_agency'));
@@ -285,7 +287,7 @@ class ChargeRepoService
 
   
 
-    public function chargeAgencyNew(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgencyNew(User $sender, ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
 
@@ -317,7 +319,7 @@ class ChargeRepoService
    
 
 
-    public function chargeAgency(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
+    public function chargeAgency(User $sender,Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
         $type = $receiver->owner?->user_type ?? '';
 
@@ -362,7 +364,7 @@ class ChargeRepoService
         DB::beginTransaction();
 
         try {
-            $authAgency = $this->agencyRepository->find($auth->agency_id);
+            $authAgency = $this->agencyRepository->findFomAll($auth->agency_id);
 
             if (!$authAgency) throw new \Exception(__('api.notAgency'));
             if ($authAgency->is_frozen) throw new \Exception(__('api_responses.frozen_agency'));

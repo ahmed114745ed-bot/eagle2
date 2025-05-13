@@ -136,6 +136,16 @@ class MyDataResource extends JsonResource
         /**@var User $this
          * @var Room $ownerRoom*/
 
+         $userTypes = [];
+
+         if ($this->type_user == 2) {
+             $userTypes = array_merge($userTypes, [1, 2]);
+         }
+         if ($this->hasShippingAgency()) {
+             $userTypes[] = 3;
+         }
+         $userTypes = array_unique($userTypes);
+         
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -213,7 +223,8 @@ class MyDataResource extends JsonResource
             'special_id_image'          =>  @$this->specialId?->ware?->show_img ?? "",
             'new_gift'          => (bool)$this->new_gift,
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
-            'wallet' => $this->wallet?->value ??0
+            'wallet' => $this->wallet?->value ??0,
+            'user_types' => $userTypes ?? [],
 
         ];
 

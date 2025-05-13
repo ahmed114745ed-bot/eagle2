@@ -939,7 +939,7 @@
                                             </tr>
                                         </thead>
                                         @if($charges && $charges->count())
-                                        @if($agency->Shipping_agency == 1)
+                                        @if($agency->type == 1)
                                         <tbody style="color: rgb(208, 115, 43);">
                                             @foreach($charges as $index => $charge)
                                                 @php

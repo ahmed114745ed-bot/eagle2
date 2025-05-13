@@ -82,7 +82,7 @@ class AgencyService
         $agency = $this->agencyRepository->findById($agencyId);
         if (!$agency) throw new Exception(__('api_responses.agency'));
         if ($agency->status == 0) throw new \Exception(__('api_responses.agencyDown'));
-        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
+        if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
 
         $joined = $user->agency_id;
         if ($joined) throw new \Exception(__('api_responses.you_are_already_under_agency'));
@@ -196,7 +196,7 @@ class AgencyService
             $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
-        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
+        if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
 
         if ($user->agency_id) throw new Exception('user joined agency before');
 
@@ -383,8 +383,7 @@ class AgencyService
             'status' => 0,
             'phone' => $request->input('phone'),
             'img' => $image ?? null,
-            'Host_agency' => true,
-            'Shipping_agency' => false,
+            'type' => 1,
         ];
         $agency = $this->agencyRepository->create($data);
 
@@ -907,21 +906,19 @@ class AgencyService
             'url' => $request->url,
             'img' => $image ?? '',
             'contents' => $request->contents,
-            'Host_agency' => $request->Host_agency,
-            'Shipping_agency' => $request->Shipping_agency,
+            'type' => $request->type,
+            // 'Shipping_agency' => $request->Shipping_agency,
         ];
 
         $agency =  $this->agencyRepository->create($data);
         Common::createUserAdmin($request->app_owner_id);
 
-        if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
+        if ($request->type == 1 ) {
 
             $userType = 2;
-        } elseif ($request->Host_agency == 1 && $request->Shipping_agency == 1) {
-            $userType = 4;
-        } elseif ($request->Host_agency == 0 && $request->Shipping_agency == 1) {
+        } elseif ($request->type == 2 ) {
             $userType = 3;
-        }
+        } 
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -949,14 +946,12 @@ class AgencyService
             Common::createUserAdmin($request->app_owner_id);
         }
 
-        if ($request->Host_agency == 1 && $request->Shipping_agency == 0) {
+        if ($request->type == 1 ) {
 
             $userType = 2;
-        } elseif ($request->Host_agency == 1 && $request->Shipping_agency == 1) {
-            $userType = 4;
-        } elseif ($request->Host_agency == 0 && $request->Shipping_agency == 1) {
+        } elseif ($request->type == 2 ) {
             $userType = 3;
-        }
+        } 
 
         $data = [
             'agency_id' =>  $agency->id,
@@ -971,8 +966,7 @@ class AgencyService
             'notice' => $request->notice,
             'url' => $request->url,
             'contents' => $request->contents,
-            'Host_agency' => $request->Host_agency,
-            'Shipping_agency' => $request->Shipping_agency,
+            'type' => $request->type,
         ];
         if ($request->hasFile('img')) {
 

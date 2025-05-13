@@ -4,6 +4,7 @@ namespace Modules\SalaryTransaction\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Models\PaymentGateway;
+use App\Models\ShippingAgency;
 use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Agency;
@@ -50,11 +51,11 @@ class SalaryTransactionController extends Controller
                 return Common::apiResponse(0, __('salaryTransaction::api_responses.dont_have_coin'), null, 422);
             }
 
-            $agency = Agency::with("owner")->where("app_owner_id",$request->agent_id)->first();
+            $agency = ShippingAgency::with("owner")->where("app_owner_id",$request->agent_id)->first();
             if (!$agency instanceof Agency) return Common::apiResponse(false, 'agency not found');
-            if ($agency->Shipping_agency != 1 ) {
-                return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
-            }
+            // if ($agency->Shipping_agency != 1 ) {
+            //     return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
+            // }
             if ($agency->is_frozen == 1) {
                 return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
             }
@@ -279,7 +280,7 @@ class SalaryTransactionController extends Controller
 
         $agency_owner = $requestSalary->agency?->owner;
         $agency = $requestSalary->agency;
-        if (@$agency->Shipping_agency != 1 ) {
+        if (@$agency->type != 2 ) {
             return Common::apiResponse(0, __('api_responses.agency_not_shipping'), null, 422);
         }
         $host = $request->user();

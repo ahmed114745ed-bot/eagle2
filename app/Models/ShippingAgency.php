@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\HostAgencyScope;
+use App\Models\Scopes\ShippingAgencyScope;
 use App\Traits\PaymentGetWayTrait;
 use Carbon\Carbon;
 use DB;
@@ -15,10 +15,13 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Http\Controllers\ChargeAgencyController;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
-class Agency extends Model
+class ShippingAgency extends Model
 {
     use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait;
+
+    protected $table='agencies';
     protected $guarded = [];
+
 
     protected $hidden = [
         'password',
@@ -198,8 +201,7 @@ class Agency extends Model
     protected static function boot()
     {
         parent::boot();
-        
-        static::addGlobalScope(new HostAgencyScope);
+        static::addGlobalScope(new ShippingAgencyScope);
 
         static::saving(function ($model) {
 
