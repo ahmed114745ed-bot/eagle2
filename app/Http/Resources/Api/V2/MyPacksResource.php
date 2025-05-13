@@ -70,7 +70,7 @@ class MyPacksResource extends JsonResource
             'name' => $this->name,
             'show_img' => $this->show_img,
             'svg'       =>  $this->img2 ?? '',
-            'price' => @$this->price ?? '',
+            'price' => @$this->ware->price ?? '',
             'is_dress' => $is_dress ?? 0,
             'title' => $title,
             'color' => $color,
