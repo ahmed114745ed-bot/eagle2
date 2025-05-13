@@ -1248,6 +1248,45 @@
                                 </div>
                             </form>
                         </div>
+
+
+
+                        <!-- cp Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('cp') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <span for="cp_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
+
+                                                <input type="text" id="cp_exp" name="cp_exp"
+                                                    placeholder="cp experience" value="{{ $settings['cp_exp'] ?? '' }}"
+                                                    class="form-control" style="width: auto; display: inline-block;">
+
+                                                <span class="ml-2">EXP</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cp_gift_price">{{ __('gift_price') }}</label>
+                                                <input type="text" id="cp_gift_price" name="cp_gift_price"
+                                                    placeholder="cp_gift_price"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['cp_gift_price'] ?? '' }}"
+                                                    class="form-control" required>
+                                                = 50000 exp and level is 10
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                 </div>
