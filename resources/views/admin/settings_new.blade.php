@@ -22,6 +22,8 @@
 </html> -->
 
 @php
+use App\Models\Vip;
+
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
 
@@ -1085,7 +1087,7 @@
                             <form action="{{ route('admin.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 580px;">
+                                <div class="card p-3 shadow" style="height: 400px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('wealth') }}</h4>
                                     </div>
@@ -1101,7 +1103,17 @@
                                                 <span class="ml-2">EXP</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        @php
+                                            $sender = Vip::where('type',2)->count();
+                                        @endphp
+                                        @if ($sender == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">Go to Settings</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        {{-- <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="wealth_gift_price">{{ __('gift_price') }}</label>
                                                 <input type="text" id="wealth_gift_price" name="wealth_gift_price"
@@ -1111,7 +1123,7 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -1128,7 +1140,7 @@
                             <form action="{{ route('admin.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 580px;">
+                                <div class="card p-3 shadow" style="height: 400px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('attraction') }}</h4>
                                     </div>
@@ -1145,7 +1157,7 @@
                                                 <span class="ml-2">EXP</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        {{-- <div class="col-md-12">
                                             <label for="gift_price">{{ __('live_experience') }}</label>
                                             <div class="form-group">
                                                 <label for="gift_price">{{ __('gift_price') }}</label>
@@ -1156,18 +1168,17 @@
                                                     class="form-control" required>
                                                 <span>= 50000 exp and level is 10</span>
                                             </div>
-                                        </div>
-
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <a href="{{ route('admin.settings.index') }}">Go to Settings</a>
-                                                <input type="text" id="attraction_input" name="attraction_input"
-                                                    placeholder="attraction_input"
-                                                    style="width: auto; display: inline-block;"
-                                                    value="{{ $settings['attraction_input'] ?? '' }}"
-                                                    class="form-control" required>
+                                        </div> --}}
+                                        @php
+                                            $receiver = Vip::where('type',1)->count();
+                                        @endphp
+                                        @if ($receiver == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">Go to Settings</a>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -1184,7 +1195,7 @@
                             <form action="{{ route('admin.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 580px;">
+                                <div class="card p-3 shadow" style="height: 400px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('charge') }}</h4>
                                     </div>
@@ -1200,7 +1211,7 @@
                                                 <span class="ml-2">EXP</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        {{-- <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="wealth_gift_price">{{ __('coins_number') }}</label>
                                                 <input type="text" id="charge_coins" name="charge_coins"
@@ -1210,7 +1221,18 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
-                                        </div>
+                                        </div> --}}
+
+                                        @php
+                                            $charger = Vip::where('type',5)->count();
+                                        @endphp
+                                        @if ($charger == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">Go to Settings</a>
+                                                </div>
+                                            </div>
+                                        @endif
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
@@ -1227,7 +1249,7 @@
                             <form action="{{ route('admin.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 580px;">
+                                <div class="card p-3 shadow" style="height: 400px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('Rooms') }}</h4>
                                     </div>
@@ -1244,7 +1266,7 @@
                                                 <span class="ml-2">EXP</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        {{-- <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="gift_price">{{ __('gift_price') }}</label>
                                                 <input type="text" id="room_gift_price" name="rooms_gift_price"
@@ -1254,7 +1276,17 @@
                                                     class="form-control" required>
                                                 <span>= 50000 exp and level is 10</span>
                                             </div>
-                                        </div>
+                                        </div> --}}
+@php
+                                            $rooms = Vip::where('type',4)->count();
+                                        @endphp
+                                        @if ($rooms == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">Go to Settings</a>
+                                                </div>
+                                            </div>
+                                        @endif
 
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
@@ -1272,7 +1304,7 @@
                             <form action="{{ route('admin.settings.update') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 580px;">
+                                <div class="card p-3 shadow" style="height: 400px;">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('cp') }}</h4>
                                     </div>
@@ -1289,7 +1321,7 @@
                                                 <span class="ml-2">EXP</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-12">
+                                        {{-- <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="cp_gift_price">{{ __('gift_price') }}</label>
                                                 <input type="text" id="cp_gift_price" name="cp_gift_price"
@@ -1299,7 +1331,19 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
-                                        </div>
+                                        </div> --}}
+
+                                        @php
+                                            $cp = Vip::where('type',3)->count();
+                                        @endphp
+                                        @if ($cp == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">Go to Settings</a>
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         <div class="col-12 d-flex gap-3 mt-3">
                                             <button type="submit"
                                                 class="btn btn-primary">{{ __('Save') }}</button>
