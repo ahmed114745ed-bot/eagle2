@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use Encore\Admin\Form;
@@ -82,7 +83,7 @@ class AppearChargerAgencyController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new Agency());
+        $grid = new Grid(new ShippingAgency());
 
         // إضافة profile إلى الاستعلام لتحميل بيانات المالك مرة واحدة
         $grid->model()->with('owner.profile');
@@ -101,7 +102,6 @@ class AppearChargerAgencyController extends MainController
             });
         });
 
-        $grid->model()->where('Shipping_agency', 1);
 
         $grid->column('id', __('Id'));
 
@@ -216,7 +216,7 @@ class AppearChargerAgencyController extends MainController
      */
     protected function form()
     {
-        $form = new Form(new Agency);
+        $form = new Form(new ShippingAgency());
 
         $ops = [];
         foreach ($this->getAgencies() as $user) {
@@ -245,6 +245,7 @@ class AppearChargerAgencyController extends MainController
         $form->url('url', __('url'));
         $form->textarea('contents', __('contents'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
+        $form->hidden('type', __('type'))->default(2);
 
 
 
@@ -256,7 +257,7 @@ class AppearChargerAgencyController extends MainController
                 });
             </script>');
         }
-        $form->hidden('Shipping_agency')->default(1);
+        // $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
@@ -274,7 +275,6 @@ class AppearChargerAgencyController extends MainController
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
 
-                Common::userJoinAgency($originalOwnerId, $newOwnerId, $agencyId);
 
                 Admin::where('username', $user->uuid)->delete();
             }

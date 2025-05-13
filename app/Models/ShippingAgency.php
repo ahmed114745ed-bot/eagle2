@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\HostAgencyScope;
+use App\Models\Scopes\ShippingAgencyScope;
 use App\Traits\PaymentGetWayTrait;
 use Carbon\Carbon;
 use DB;
@@ -15,10 +15,13 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Http\Controllers\ChargeAgencyController;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
-class Agency extends Model
+class ShippingAgency extends Model
 {
     use SoftDeletes, AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait;
+
+    protected $table='agencies';
     protected $guarded = [];
+
 
     protected $hidden = [
         'password',
@@ -198,8 +201,7 @@ class Agency extends Model
     protected static function boot()
     {
         parent::boot();
-        
-        static::addGlobalScope(new HostAgencyScope);
+        static::addGlobalScope(new ShippingAgencyScope);
 
         static::saving(function ($model) {
 
@@ -227,16 +229,13 @@ class Agency extends Model
         });
 
         static::updating(function ($agency) {
-
-                clearAgencyCache($agency->id);
-            
             if (isset($agency->is_frozen)) {
                 $agency->is_frozen = (bool) $agency->is_frozen;
             }
         });
 
         static::deleting(function ($agency) {
-            
+            // Update the related user model (change type to 0)
             if ($agency->app_owner_id) {
                 $user = User::find($agency->app_owner_id);
                 if ($user) {
@@ -247,8 +246,6 @@ class Agency extends Model
                     ]);
                 }
             }
-                clearAgencyCache($agency->id);
-            
         });
     }
 

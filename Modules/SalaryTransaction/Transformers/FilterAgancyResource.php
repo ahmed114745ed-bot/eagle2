@@ -17,11 +17,17 @@ class FilterAgancyResource extends JsonResource
     public function toArray($request)
     {
         $type = '';
-        if (($this->Shipping_agency == 1) && ($this->Host_agency == 1)) {
-            $type = 'hosts and shipping';
-        } elseif (($this->Shipping_agency == 0) && ($this->Host_agency == 1)) {
-            $type = 'hosts';
-        } elseif (($this->Shipping_agency == 1) && ($this->Host_agency == 0)) {
+        // if (($this->Shipping_agency == 1) && ($this->Host_agency == 1)) {
+        //     $type = 'hosts and shipping';
+        // } elseif (($this->Shipping_agency == 0) && ($this->Host_agency == 1)) {
+        //     $type = 'hosts';
+        // } elseif (($this->Shipping_agency == 1) && ($this->Host_agency == 0)) {
+        //     $type = 'shipping';
+        // }
+        if ($this->type == 1 ) {
+            $type = 'hosts ';
+         
+        } elseif ($this->type == 2) {
             $type = 'shipping';
         }
         return [

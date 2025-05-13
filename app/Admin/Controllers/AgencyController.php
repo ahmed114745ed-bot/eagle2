@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Models\Scopes\HostAgencyScope;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -241,6 +242,8 @@ class AgencyController extends MainController
             ->view('agency_profile', $data);
     }
 
+  
+
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {
@@ -278,15 +281,19 @@ class AgencyController extends MainController
             $newUser = User::find($data['app_owner_id']);
             if ($newUser) {
                 $newUser->agency_id = $agency->id;
-                if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
-                    $newUser->type_user = 4;
-                } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
+                // if ($agency->Host_agency == 1 && $agency->Shipping_agency == 1) {
+                //     $newUser->type_user = 4;
+                // } elseif ($agency->Host_agency == 1 && $agency->Shipping_agency == 0) {
+                //     $newUser->type_user = 2;
+                // } elseif (
+                //     $agency->Host_agency == 0 && $agency->Shipping_agency == 1
+                // ) {
+                //     $newUser->type_user = 3;
+                // }
+                if ($agency->type == 1 ) {
                     $newUser->type_user = 2;
-                } elseif (
-                    $agency->Host_agency == 0 && $agency->Shipping_agency == 1
-                ) {
-                    $newUser->type_user = 3;
-                }
+                } 
+                
 
                 $newUser->is_host = 1;
                 $newUser->save();
@@ -332,7 +339,6 @@ class AgencyController extends MainController
             ->with(['owner' => function ($query) {
                 $query->select('id', 'name', 'uuid');
             }])
-            ->where('Host_agency',  1)
             ->orderByDesc('id');
 
         if (request("active") == true) {
@@ -582,7 +588,7 @@ class AgencyController extends MainController
         foreach (DB::table('admin_users')->get() as $user) {
             $opsAgencyMangerDash[$user->id] = $user->name;
         }
-
+        $form->hidden('type', __('type'))->default(1);
         $form->display('ID');
         if (!$form->isEditing()) {
             $form->row(function ($row) {
@@ -599,11 +605,11 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(9)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
-                if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->hidden('Shipping_agency')->default(0);
-                }
+                // if (!Auth::user()->isRole('Agencies Managers')) {
+                //     $row->width(12)->hidden('Shipping_agency')->default(0);
+                // }
             });
         } else {
 
@@ -624,15 +630,17 @@ class AgencyController extends MainController
                 $row->width(12)->switch('status', __('status'));
                 $row->width(12)->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
 
-                $row->width(12)->hidden('Host_agency')->default(1);
+                // $row->width(12)->hidden('Host_agency')->default(1);
 
 
-                if (!Auth::user()->isRole('Agencies Managers')) {
-                    $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
-                }
+                // if (!Auth::user()->isRole('Agencies Managers')) {
+                //     $row->width(12)->switch('Shipping_agency', __('Shipping agency'))->default(0);
+                // }
             });
         }
-      
+        
+        
+
         if (Session::has('show_alert')) {
             $form->html('<script>
              $(document).ready(function () {
@@ -699,11 +707,11 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
 
             $appOwnerId = $form->input('app_owner_id');
-            $Host_agency = $form->input('Host_agency');
+            // $Host_agency = $form->input('Host_agency');
 
-            $Shipping_agency = $form->input('Shipping_agency') ;
+            // $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
-
+            $form->model()->type =1;
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
@@ -723,58 +731,58 @@ class AgencyController extends MainController
                     'monthly_diamond_received' => 0,
                     'is_host' => 0,
                 ]);
-
-                if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 2,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 4,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
-                    User::find($newOwnerId)->update([
-                        'type_user' => 3,
-                        'agency_id' => $form->model()->id,
-                        'monthly_diamond_received' => 0,
-                        'is_host' => 1,
-                    ]);
-                }
+               
+                // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 2,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'on' && $Shipping_agency === 'on') || ($Host_agency == 1 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 4,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // } elseif (($Host_agency === 'off' && $Shipping_agency === 'on') || ($Host_agency == 0 && $Shipping_agency == 1)) {
+                //     User::find($newOwnerId)->update([
+                //         'type_user' => 3,
+                //         'agency_id' => $form->model()->id,
+                //         'monthly_diamond_received' => 0,
+                //         'is_host' => 1,
+                //     ]);
+                // }
             }
 
 
 
-            if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
+            // if (($Host_agency == 'off' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
 
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
-            }
-
-
+            //     session()->flash('show_alert', 'Your alert message');
+            //     return redirect()->back();
+            // }
 
 
-            if ($Host_agency == 'on' || $Host_agency == 1) {
-                $host += 2;
-            }
 
-            if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
-                $host += 3;
-            }
-            if ($host > 3) {
-                $host = 4;
-            }
+
+            // if ($Host_agency == 'on' || $Host_agency == 1) {
+            //     $host += 2;
+            // }
+
+            // if ($Shipping_agency == 'on' || $Shipping_agency == 1) {
+            //     $host += 3;
+            // }
+            // if ($host > 3) {
+            //     $host = 4;
+            // }
             // if ($appOwnerId) {
-            $newType = intval($host);
+            // $newType = intval($host);
             /*// Reset diamond only when agency created
             if (!$modelExists) $values['monthly_diamond_received'] = 0;*/
             User::where('id', intval($appOwnerId))->update([
-                'type_user' => $newType,
+                'type_user' => 2,
                 'is_host' => 1,
                 'agency_id' => $form->model()->id,]);
             // }

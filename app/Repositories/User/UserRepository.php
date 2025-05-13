@@ -53,7 +53,10 @@ class UserRepository extends Repository
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })
-            ->where('type_user', 0)
+            // ->where('type_user', 0)
+            ->whereDoesntHave('hostAgency', function ($query) {
+                $query->where('type', 1);
+            })
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('uuid', 'like', '%' . $key . '%')
@@ -65,8 +68,8 @@ class UserRepository extends Repository
     public function searchUserAgencyShipping($key, $page, $perPage)
     {
         return User::selectRaw('concat(name, " - ", uuid) as name, id')
-            ->whereDoesntHave('ownAgency', function ($query) {
-                $query->where('Shipping_agency', 1);
+            ->whereDoesntHave('shippingAgency', function ($query) {
+                $query->where('type', 2);
             })
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')

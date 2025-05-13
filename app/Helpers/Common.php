@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Setting;
+use App\Models\ShippingAgency;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -1225,9 +1226,9 @@ class Common
                 'role_id' => $role->id,
             ]);
         }
-        if ($user->email != null) {
-            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
-        }
+        // if ($user->email != null) {
+        //     Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+        // }
         return true;
     }
 
@@ -1357,11 +1358,7 @@ class Common
 
     public static function searchAgency($id)
     {
-        $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true) 
-            // ->whereHas('chargeAgency' )
-            ->first();
-
+        $agency = ShippingAgency::find($id);
         return $agency ?: false;
     }
 }

@@ -1267,4 +1267,22 @@ class User extends Authenticatable
         return $this->hasMany(WalletTransactionBackup::class);
     }
 
+    public function shippingAgency()
+    {
+        return $this->hasOne(ShippingAgency::class, 'app_owner_id');
+    }
+    public function hasShippingAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
+    public function hostAgency()
+    {
+        return $this->hasOne(Agency::class, 'app_owner_id');
+    }
+    public function hasHostAgency()
+    {
+        return $this->shippingAgency()->exists();
+    }
+
 }
