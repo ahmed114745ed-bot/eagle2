@@ -152,7 +152,6 @@ class AgencyController extends Controller
     {
         $accept    = $request->accept;
         $owner     = $request->user();
-        dd($accept);
         if (!$request->user_id || !isset($request->accept)) {
             return Common::apiResponse(0, 'missing params');
         }
