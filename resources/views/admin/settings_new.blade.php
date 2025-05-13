@@ -1095,7 +1095,7 @@
                                                 <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
 
                                                 <input type="text" id="wealth_exp" name="wealth_exp"
-                                                    placeholder="secret" value="{{ $settings['wealth_exp'] ?? '' }}"
+                                                    placeholder="wealt_exp" value="{{ $settings['wealth_exp'] ?? '' }}"
                                                     class="form-control" style="width: auto; display: inline-block;">
 
                                                 <span class="ml-2">EXP</span>
@@ -1111,6 +1111,10 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
+                                        </div>
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1133,8 +1137,9 @@
                                             <div class="form-group d-flex align-items-center">
                                                 <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
 
-                                                <input type="text" id="wealth_exp" name="wealth_exp"
-                                                    placeholder="secret" value="{{ $settings['attraction_exp'] ?? '' }}"
+                                                <input type="text" id="attraction_exp" name="attraction_exp"
+                                                    placeholder="attraction_exp"
+                                                    value="{{ $settings['attraction_exp'] ?? '' }}"
                                                     class="form-control" style="width: auto; display: inline-block;">
 
                                                 <span class="ml-2">EXP</span>
@@ -1144,8 +1149,8 @@
                                             <label for="gift_price">{{ __('live_experience') }}</label>
                                             <div class="form-group">
                                                 <label for="gift_price">{{ __('gift_price') }}</label>
-                                                <input type="text" id="attraction_gift_price" name="attraction_gift_price"
-                                                    placeholder="attraction_gift_price"
+                                                <input type="text" id="attraction_gift_price"
+                                                    name="attraction_gift_price" placeholder="attraction_gift_price"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['attraction_gift_price'] ?? '' }}"
                                                     class="form-control" required>
@@ -1155,7 +1160,6 @@
 
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <h5 for="attraction">{{ __('attraction_input') }}</h5>
                                                 <a href="{{ route('admin.settings.index') }}">Go to Settings</a>
                                                 <input type="text" id="attraction_input" name="attraction_input"
                                                     placeholder="attraction_input"
@@ -1163,6 +1167,10 @@
                                                     value="{{ $settings['attraction_input'] ?? '' }}"
                                                     class="form-control" required>
                                             </div>
+                                        </div>
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1186,7 +1194,7 @@
                                                 <span for="charge_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
 
                                                 <input type="text" id="charge_exp" name="charge_exp"
-                                                    placeholder="secret" value="{{ $settings['charge_exp'] ?? '' }}"
+                                                    placeholder="charge_exp" value="{{ $settings['charge_exp'] ?? '' }}"
                                                     class="form-control" style="width: auto; display: inline-block;">
 
                                                 <span class="ml-2">EXP</span>
@@ -1202,6 +1210,10 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
+                                        </div>
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1225,8 +1237,9 @@
                                                 <span for="rooms_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
 
                                                 <input type="text" id="rooms_exp" name="rooms_exp"
-                                                    placeholder="rooms_exp" value="{{ $settings['rooms_exp'] ?? '' }}"
-                                                    class="form-control" style="width: auto; display: inline-block;">
+                                                    placeholder="rooms_exp"
+                                                    value="{{ $settings['rooms_exp'] ?? '' }}" class="form-control"
+                                                    style="width: auto; display: inline-block;">
 
                                                 <span class="ml-2">EXP</span>
                                             </div>
@@ -1243,7 +1256,10 @@
                                             </div>
                                         </div>
 
-
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -1266,8 +1282,9 @@
                                                 <span for="cp_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
 
                                                 <input type="text" id="cp_exp" name="cp_exp"
-                                                    placeholder="cp experience" value="{{ $settings['cp_exp'] ?? '' }}"
-                                                    class="form-control" style="width: auto; display: inline-block;">
+                                                    placeholder="cp experience"
+                                                    value="{{ $settings['cp_exp'] ?? '' }}" class="form-control"
+                                                    style="width: auto; display: inline-block;">
 
                                                 <span class="ml-2">EXP</span>
                                             </div>
@@ -1282,6 +1299,10 @@
                                                     class="form-control" required>
                                                 = 50000 exp and level is 10
                                             </div>
+                                        </div>
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1812,9 +1833,11 @@
                                             @if ($coin->type == 'paytabs')
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="profile_id">{{ __('admin.profile_id') }}:</label>
+                                                        <label
+                                                            for="profile_id">{{ __('admin.profile_id') }}:</label>
                                                         <input type="text" id="paytabs_profile_id"
-                                                            name="paytabs_profile_id" placeholder="paytabs_profile_id"
+                                                            name="paytabs_profile_id"
+                                                            placeholder="paytabs_profile_id"
                                                             value="{{ $settings['paytabs_profile_id'] ?? '' }}"
                                                             class="form-control">
                                                     </div>
@@ -1824,7 +1847,8 @@
                                                         <label
                                                             for="paytabs_server_key">{{ __('admin.server_key') }}:</label>
                                                         <input type="text" id="paytabs_server_key"
-                                                            name="paytabs_server_key" placeholder="paytabs_server_key"
+                                                            name="paytabs_server_key"
+                                                            placeholder="paytabs_server_key"
                                                             value="{{ $settings['paytabs_server_key'] ?? '' }}"
                                                             class="form-control" required>
                                                     </div>
@@ -1857,8 +1881,8 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="profile_id">{{ __('admin.appkey') }}:</label>
-                                                        <input type="text" id="bkash_appkey" name="bkash_appkey"
-                                                            placeholder="bkash_appkey"
+                                                        <input type="text" id="bkash_appkey"
+                                                            name="bkash_appkey" placeholder="bkash_appkey"
                                                             value="{{ $settings['bkash_appkey'] ?? '' }}"
                                                             class="form-control">
                                                     </div>
@@ -1946,7 +1970,8 @@
                                             @if ($coin->type == 'senang_pay')
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="api_key">{{ __('admin.callback_url') }}:</label>
+                                                        <label
+                                                            for="api_key">{{ __('admin.callback_url') }}:</label>
                                                         <input type="text" id="senangpay_callback_url"
                                                             name="senangpay_callback_url"
                                                             placeholder="senangpay_callback_url"
@@ -3377,36 +3402,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                                                                                                                        // Updated selector to match your new class
-                                                                                                                                                                                                        const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                                                                                                                        const fieldsContainers = {
-                                                                                                                                                                                                            '0': document.getElementById('agora-fields'),
-                                                                                                                                                                                                            '1': document.getElementById('zego-fields'),
-                                                                                                                                                                                                            '2': document.getElementById('pusher-fields')
-                                                                                                                                                                                                        };
+                                                                                                                                                                                                                    // Updated selector to match your new class
+                                                                                                                                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
+                                                                                                                                                                                                                    const fieldsContainers = {
+                                                                                                                                                                                                                        '0': document.getElementById('agora-fields'),
+                                                                                                                                                                                                                        '1': document.getElementById('zego-fields'),
+                                                                                                                                                                                                                        '2': document.getElementById('pusher-fields')
+                                                                                                                                                                                                                    };
 
-                                                                                                                                                                                                        function toggleFields() {
-                                                                                                                                                                                                            const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                                                                                                                                                                    function toggleFields() {
+                                                                                                                                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                                                                                                                            // Hide all fields first
-                                                                                                                                                                                                            Object.values(fieldsContainers).forEach(container => {
-                                                                                                                                                                                                                container.style.display = 'none';
-                                                                                                                                                                                                            });
+                                                                                                                                                                                                                        // Hide all fields first
+                                                                                                                                                                                                                        Object.values(fieldsContainers).forEach(container => {
+                                                                                                                                                                                                                            container.style.display = 'none';
+                                                                                                                                                                                                                        });
 
-                                                                                                                                                                                                            // Show the selected one
-                                                                                                                                                                                                            if (fieldsContainers[selectedValue]) {
-                                                                                                                                                                                                                fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                        }
+                                                                                                                                                                                                                        // Show the selected one
+                                                                                                                                                                                                                        if (fieldsContainers[selectedValue]) {
+                                                                                                                                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                    }
 
-                                                                                                                                                                                                        // Add event listeners to radio buttons
-                                                                                                                                                                                                        radioButtons.forEach(radio => {
-                                                                                                                                                                                                            radio.addEventListener('change', toggleFields);
-                                                                                                                                                                                                        });
+                                                                                                                                                                                                                    // Add event listeners to radio buttons
+                                                                                                                                                                                                                    radioButtons.forEach(radio => {
+                                                                                                                                                                                                                        radio.addEventListener('change', toggleFields);
+                                                                                                                                                                                                                    });
 
-                                                                                                                                                                                                        // Initialize the fields visibility
-                                                                                                                                                                                                        toggleFields();
-                                                                                                                                                                                                    });*/
+                                                                                                                                                                                                                    // Initialize the fields visibility
+                                                                                                                                                                                                                    toggleFields();
+                                                                                                                                                                                                                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
