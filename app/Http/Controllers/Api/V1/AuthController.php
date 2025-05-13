@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 
+use App\Events\DeviceTokenSent;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use App\Helpers\Common;
@@ -107,6 +108,8 @@ class AuthController extends Controller
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
+        event(new DeviceTokenSent($user->id, $user->device_token));
+
         $user->auth_token = $token;
         return Common::apiResponse(
             true,
@@ -117,6 +120,7 @@ class AuthController extends Controller
                 'auth_token'    => $user->auth_token
             ]
         );
+
         return Common::apiResponse(true, 'logged in successfully', new MyDataResource($user), 200);
     }
 
