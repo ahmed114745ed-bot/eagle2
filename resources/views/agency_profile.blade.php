@@ -153,7 +153,7 @@
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
-    background: var(--secondary-color);
+    /* background: var(--secondary-color); */
     filter: brightness(0.85);
 
 }
