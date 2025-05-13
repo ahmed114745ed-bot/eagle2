@@ -621,7 +621,6 @@ class AgencyService
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
         $isThisMonth = $month == now()->month && $year == now()->year;
-        $startDay = 1;
         $endDay = Carbon::create($year, $month)->endOfMonth()->day;
 
         if ($isThisMonth) $endDay = today()->day;
@@ -639,12 +638,13 @@ class AgencyService
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
-        for (; $startDay <= $endDay; $startDay++) {
+        for ($startDay = 1; $startDay <= $endDay; $startDay++) {
+            \Log::info($startDay);
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
             $data['daly_reports'][] = [
-                'day' => (int)$startDay,
+                'day' => $startDay,
                 'live_minutes' => (int)$minutes,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,

@@ -148,7 +148,7 @@ class AgencyAppController extends Controller
         $user = $request->user();
         $kickOutStartPerDays = Common::getConfig('kick_out_less_than_day') ?? 5;
         $kickOutEndPerDays = Common::getConfig('kick_out_greater_than_day') ?? 10;
-         
+
         // if (Carbon::now()->day < $kickOutStartPerDays || Carbon::now()->day > $kickOutEndPerDays) return Common::apiResponse(0,__('api.kickRole', ['startDay' => $kickOutStartPerDays, 'endDay' => $kickOutEndPerDays], ), []);
         if (!$request->user_id) return Common::apiResponse(0, 'missing_parameters', 404);
         $user_kicked = User::find($request->user_id);
@@ -176,6 +176,8 @@ class AgencyAppController extends Controller
         $user  = \Auth::user();
         $month = request()->month ? (int) request()->month : now()->month;
         $year = request()->year ? (int) request()->year : now()->year;
+        \Log::info($month);
+        \Log::info($year);
 
         if (!$user instanceof User) return;
         $userId        = $user->id;
