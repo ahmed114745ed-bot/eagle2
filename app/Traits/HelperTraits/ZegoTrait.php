@@ -6,6 +6,7 @@ namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Http;
+use function Laravel\Prompts\error;
 
 Trait ZegoTrait
 {
@@ -177,7 +178,6 @@ Trait ZegoTrait
         try {
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
-
         }
 
         return $res;

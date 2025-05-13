@@ -38,12 +38,12 @@ class PaymentCoinController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('payment-coins'))
             ->body($this->detail($id)));
     }
 
-     /**
+    /**
      * Edit interface.
      *
      * @param mixed $id
@@ -52,7 +52,7 @@ class PaymentCoinController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('payment-coins'))
             ->body($this->form()->edit($id)));
     }
@@ -77,7 +77,7 @@ class PaymentCoinController extends MainController
         $grid->column('photo', __('image'))->image('', 50);
         $grid->column(__('procedures'))->display(function () {
             $url1 = url('admin/coins/' . $this->id);
-            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>". __('coins') ."</a>";
+            $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('coins') . "</a>";
             return $button1;
         });
         $status = [
@@ -88,56 +88,56 @@ class PaymentCoinController extends MainController
         $grid->column('status', __("status"))->switch($status);
 
         $grid->column('custom_message', __('Custom Message'));
-//            ->display(function () {
-//            $fawryConfig = config('services.fawry');
-//            $fawryCount = collect($fawryConfig)->every(function($value) {
-//                return $value != null;
-//            });
-//
-//            $payskyConfig = config('paysky');
-//            $payskyCount = collect($payskyConfig)->every(function($value) {
-//                return $value != null;
-//            });
-//
-//            $stripeConfig = config('stripe');
-//            $stripeCount = collect($stripeConfig)->every(function($value) {
-//                return $value != null;
-//            });
-//
-//            $opayConfig = config('nafezly-payments');
-//            $opayCount = collect($opayConfig)->every(function($value) {
-//                return $value != null;
-//            });
-//
-//            $url = url('admin/settings?firsttab=paymentCredentialSettings');
-//            $href = "<a href='{$url}'>". __('Please edit payment credential settings') ."</a>";
-//            switch ($this->title){
-//                case 'fawry':
-//                    if (Config::get('is_fawry_active') != 1 || !$fawryCount) {
-//                        return $href;
-//                    }
-//                    break;
-//                case 'sky pay':
-//                    if (Config::get('is_paysky_active') != 1 || !$payskyCount) {
-//                        return $href;
-//                    }
-//                    break;
-//                case 'stripe':
-//                    if (Config::get('is_stripe_active') != 1 || !$stripeCount) {
-//                        return $href;
-//                    }
-//                    break;
-//                case 'opay':
-//                    if (Config::get('is_opay_active') != 1 || !$opayCount) {
-//                        return $href;
-//                    }
-//                    break;
-//                default:
-//                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-//            }
-//            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
-//        });
-
+        //            ->display(function () {
+        //            $fawryConfig = config('services.fawry');
+        //            $fawryCount = collect($fawryConfig)->every(function($value) {
+        //                return $value != null;
+        //            });
+        //
+        //            $payskyConfig = config('paysky');
+        //            $payskyCount = collect($payskyConfig)->every(function($value) {
+        //                return $value != null;
+        //            });
+        //
+        //            $stripeConfig = config('stripe');
+        //            $stripeCount = collect($stripeConfig)->every(function($value) {
+        //                return $value != null;
+        //            });
+        //
+        //            $opayConfig = config('nafezly-payments');
+        //            $opayCount = collect($opayConfig)->every(function($value) {
+        //                return $value != null;
+        //            });
+        //
+        //            $url = url('admin/settings?firsttab=paymentCredentialSettings');
+        //            $href = "<a href='{$url}'>". __('Please edit payment credential settings') ."</a>";
+        //            switch ($this->title){
+        //                case 'fawry':
+        //                    if (Config::get('is_fawry_active') != 1 || !$fawryCount) {
+        //                        return $href;
+        //                    }
+        //                    break;
+        //                case 'sky pay':
+        //                    if (Config::get('is_paysky_active') != 1 || !$payskyCount) {
+        //                        return $href;
+        //                    }
+        //                    break;
+        //                case 'stripe':
+        //                    if (Config::get('is_stripe_active') != 1 || !$stripeCount) {
+        //                        return $href;
+        //                    }
+        //                    break;
+        //                case 'opay':
+        //                    if (Config::get('is_opay_active') != 1 || !$opayCount) {
+        //                        return $href;
+        //                    }
+        //                    break;
+        //                default:
+        //                    return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
+        //            }
+        //            return "<span class='text-muted'>". __('Payment gateway is ready to use') ."</span>";
+        //        });
+        $grid->disableCreateButton();
         return $grid;
     }
 

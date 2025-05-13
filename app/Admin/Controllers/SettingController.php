@@ -33,7 +33,6 @@ class SettingController extends MainController
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::with('settings')->orderByDesc('status')->get();
-
         $pusher_app_id = Common::getConf('pusher_app_id');
         $pusher_app_key = Common::getConf('pusher_app_key');
         $pusher_app_secret = Common::getConf('pusher_app_secret');
