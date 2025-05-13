@@ -1076,6 +1076,181 @@
 
 
             <div id="workSettings" class="settings-section">
+                <div class="form">
+                    <label class="d-block">{{ __('Experience settings:') }}</label>
+
+                    <div class="row mt-4">
+                        <!-- Wealth Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('wealth') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
+
+                                                <input type="text" id="wealth_exp" name="wealth_exp"
+                                                    placeholder="secret" value="{{ $settings['wealth_exp'] ?? '' }}"
+                                                    class="form-control" style="width: auto; display: inline-block;">
+
+                                                <span class="ml-2">EXP</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="wealth_gift_price">{{ __('gift_price') }}</label>
+                                                <input type="text" id="wealth_gift_price" name="wealth_gift_price"
+                                                    placeholder="wealth_gift_price"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['wealth_gift_price'] ?? '' }}"
+                                                    class="form-control" required>
+                                                = 50000 exp and level is 10
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Attraction Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('attraction') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
+
+                                                <input type="text" id="wealth_exp" name="wealth_exp"
+                                                    placeholder="secret" value="{{ $settings['attraction_exp'] ?? '' }}"
+                                                    class="form-control" style="width: auto; display: inline-block;">
+
+                                                <span class="ml-2">EXP</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label for="gift_price">{{ __('live_experience') }}</label>
+                                            <div class="form-group">
+                                                <label for="gift_price">{{ __('gift_price') }}</label>
+                                                <input type="text" id="attraction_gift_price" name="attraction_gift_price"
+                                                    placeholder="attraction_gift_price"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['attraction_gift_price'] ?? '' }}"
+                                                    class="form-control" required>
+                                                <span>= 50000 exp and level is 10</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <h5 for="attraction">{{ __('attraction_input') }}</h5>
+                                                <a href="{{ route('admin.settings.index') }}">Go to Settings</a>
+                                                <input type="text" id="attraction_input" name="attraction_input"
+                                                    placeholder="attraction_input"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['attraction_input'] ?? '' }}"
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Charge Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('charge') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <span for="charge_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
+
+                                                <input type="text" id="charge_exp" name="charge_exp"
+                                                    placeholder="secret" value="{{ $settings['charge_exp'] ?? '' }}"
+                                                    class="form-control" style="width: auto; display: inline-block;">
+
+                                                <span class="ml-2">EXP</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="wealth_gift_price">{{ __('coins_number') }}</label>
+                                                <input type="text" id="charge_coins" name="charge_coins"
+                                                    placeholder="charge_coins"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['charge_coins'] ?? '' }}"
+                                                    class="form-control" required>
+                                                = 50000 exp and level is 10
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Rooms Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 shadow" style="height: 580px;">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('Rooms') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <span for="rooms_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
+
+                                                <input type="text" id="rooms_exp" name="rooms_exp"
+                                                    placeholder="rooms_exp" value="{{ $settings['rooms_exp'] ?? '' }}"
+                                                    class="form-control" style="width: auto; display: inline-block;">
+
+                                                <span class="ml-2">EXP</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="gift_price">{{ __('gift_price') }}</label>
+                                                <input type="text" id="room_gift_price" name="rooms_gift_price"
+                                                    placeholder="rooms_gift_price"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['rooms_gift_price'] ?? '' }}"
+                                                    class="form-control" required>
+                                                <span>= 50000 exp and level is 10</span>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
 
@@ -3163,36 +3338,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                                                                                                // Updated selector to match your new class
-                                                                                                                                                                                const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                                                                                                const fieldsContainers = {
-                                                                                                                                                                                    '0': document.getElementById('agora-fields'),
-                                                                                                                                                                                    '1': document.getElementById('zego-fields'),
-                                                                                                                                                                                    '2': document.getElementById('pusher-fields')
-                                                                                                                                                                                };
+                                                                                                                                                                                                        // Updated selector to match your new class
+                                                                                                                                                                                                        const radioButtons = document.querySelectorAll('.radio-input');
+                                                                                                                                                                                                        const fieldsContainers = {
+                                                                                                                                                                                                            '0': document.getElementById('agora-fields'),
+                                                                                                                                                                                                            '1': document.getElementById('zego-fields'),
+                                                                                                                                                                                                            '2': document.getElementById('pusher-fields')
+                                                                                                                                                                                                        };
 
-                                                                                                                                                                                function toggleFields() {
-                                                                                                                                                                                    const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                                                                                                                                                        function toggleFields() {
+                                                                                                                                                                                                            const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                                                                                                    // Hide all fields first
-                                                                                                                                                                                    Object.values(fieldsContainers).forEach(container => {
-                                                                                                                                                                                        container.style.display = 'none';
-                                                                                                                                                                                    });
+                                                                                                                                                                                                            // Hide all fields first
+                                                                                                                                                                                                            Object.values(fieldsContainers).forEach(container => {
+                                                                                                                                                                                                                container.style.display = 'none';
+                                                                                                                                                                                                            });
 
-                                                                                                                                                                                    // Show the selected one
-                                                                                                                                                                                    if (fieldsContainers[selectedValue]) {
-                                                                                                                                                                                        fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                                                                                                    }
-                                                                                                                                                                                }
+                                                                                                                                                                                                            // Show the selected one
+                                                                                                                                                                                                            if (fieldsContainers[selectedValue]) {
+                                                                                                                                                                                                                fieldsContainers[selectedValue].style.display = 'flex';
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                        }
 
-                                                                                                                                                                                // Add event listeners to radio buttons
-                                                                                                                                                                                radioButtons.forEach(radio => {
-                                                                                                                                                                                    radio.addEventListener('change', toggleFields);
-                                                                                                                                                                                });
+                                                                                                                                                                                                        // Add event listeners to radio buttons
+                                                                                                                                                                                                        radioButtons.forEach(radio => {
+                                                                                                                                                                                                            radio.addEventListener('change', toggleFields);
+                                                                                                                                                                                                        });
 
-                                                                                                                                                                                // Initialize the fields visibility
-                                                                                                                                                                                toggleFields();
-                                                                                                                                                                            });*/
+                                                                                                                                                                                                        // Initialize the fields visibility
+                                                                                                                                                                                                        toggleFields();
+                                                                                                                                                                                                    });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {
