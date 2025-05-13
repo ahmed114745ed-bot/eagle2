@@ -188,6 +188,7 @@ class AgencyService
     {
         $accept    = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
+        if(!$user)throw new Exception('user not found');
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
