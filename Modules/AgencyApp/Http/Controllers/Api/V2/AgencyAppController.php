@@ -176,8 +176,6 @@ class AgencyAppController extends Controller
         $user  = \Auth::user();
         $month = request()->month ? (int) request()->month : now()->month;
         $year = request()->year ? (int) request()->year : now()->year;
-        \Log::info($month);
-        \Log::info($year);
 
         if (!$user instanceof User) return;
         $userId        = $user->id;
