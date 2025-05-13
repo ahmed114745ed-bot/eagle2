@@ -471,6 +471,12 @@ use App\Models\Vip;
         padding: 0 !important;
         margin: 0 !important;
     }
+    .exp-card{
+        margin-bottom: 32px;
+
+    }
+   .exp-card-cont{
+     height: 314px;}
 </style>
 
 </head>
@@ -1084,23 +1090,23 @@ use App\Models\Vip;
                     <div class="row mt-4">
                         <!-- Wealth Fields -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('wealth') }}</h4>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                                <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
-
-                                                <input type="text" id="wealth_exp" name="wealth_exp"
-                                                    placeholder="wealt_exp" value="{{ $settings['wealth_exp'] ?? '' }}"
-                                                    class="form-control" style="width: auto; display: inline-block;">
-
-                                                <span class="ml-2">EXP</span>
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('wealth') }}</label>
+                                                    <input type="text" id="wealth_exp" name="exp_sender_percentage"
+                                                        placeholder="Enter value" value="{{ $settings['exp_sender_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = X EXP</span>
+                                                </div>
                                             </div>
                                         </div>
                                         @php
@@ -1137,24 +1143,23 @@ use App\Models\Vip;
 
                         <!-- Attraction Fields -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header exp-card  d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('attraction') }}</h4>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                                <span for="wealth_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
-
-                                                <input type="text" id="attraction_exp" name="attraction_exp"
-                                                    placeholder="attraction_exp"
-                                                    value="{{ $settings['attraction_exp'] ?? '' }}"
-                                                    class="form-control" style="width: auto; display: inline-block;">
-
-                                                <span class="ml-2">EXP</span>
+                                            <div class="form-group">
+                                                <label for="attraction_exp" class="form-label">{{ __('attraction') }}</label>
+                                                <input type="text" id="attraction_exp" name="exp_received_percentage"
+                                                    placeholder="Enter value" value="{{ $settings['attraction_exp'] ?? '' }}"
+                                                    class="form-control">
+                                                <span class="form-text text-muted">1 Diamond = X EXP</span>
+                                            </div>
                                             </div>
                                         </div>
                                         {{-- <div class="col-md-12">
@@ -1192,23 +1197,23 @@ use App\Models\Vip;
 
                         <!-- Charge Fields -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('charge') }}</h4>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                                <span for="charge_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
-
-                                                <input type="text" id="charge_exp" name="charge_exp"
-                                                    placeholder="charge_exp" value="{{ $settings['charge_exp'] ?? '' }}"
-                                                    class="form-control" style="width: auto; display: inline-block;">
-
-                                                <span class="ml-2">EXP</span>
+                                            <div class="form-group">
+                                                <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
+                                                <input type="text" id="charge_exp" name="exp_charge_percentage"
+                                                    placeholder="Enter value" value="{{ $settings['charge_exp'] ?? '' }}"
+                                                    class="form-control">
+                                                <span class="form-text text-muted">1 coin = EXP</span>
+                                            </div>
                                             </div>
                                         </div>
                                         {{-- <div class="col-md-12">
@@ -1246,24 +1251,23 @@ use App\Models\Vip;
 
                         <!-- Rooms Fields -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('Rooms') }}</h4>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                                <span for="rooms_exp" class="mb-0 mr-2 mt-3">1 Diamond =</span>
-
-                                                <input type="text" id="rooms_exp" name="rooms_exp"
-                                                    placeholder="rooms_exp"
-                                                    value="{{ $settings['rooms_exp'] ?? '' }}" class="form-control"
-                                                    style="width: auto; display: inline-block;">
-
-                                                <span class="ml-2">EXP</span>
+                                            <div class="form-group">
+                                                    <label for="rooms_exp" class="form-label">{{ __('Rooms') }}</label>
+                                                    <input type="text" id="rooms_exp" name="exp_room_percentage"
+                                                        placeholder="Enter value" value="{{ $settings['rooms_exp'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 Diamond = EXP</span>
+                                                </div>
                                             </div>
                                         </div>
                                         {{-- <div class="col-md-12">
@@ -1301,24 +1305,23 @@ use App\Models\Vip;
 
                         <!-- cp Fields -->
                         <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
-                            <form action="{{ route('admin.settings.update') }}" method="POST"
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
-                                <div class="card p-3 shadow" style="height: 400px;">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header  exp-card d-flex justify-content-between align-items-center">
                                         <h4 class="m-0">{{ __('cp') }}</h4>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                                <span for="cp_exp" class="mb-0 mr-2 mt-3">1 coin =</span>
-
-                                                <input type="text" id="cp_exp" name="cp_exp"
-                                                    placeholder="cp experience"
-                                                    value="{{ $settings['cp_exp'] ?? '' }}" class="form-control"
-                                                    style="width: auto; display: inline-block;">
-
-                                                <span class="ml-2">EXP</span>
+                                            <div class="form-group">
+                                                    <label for="cp_exp" class="form-label">{{ __('cp') }}</label>
+                                                    <input type="text" id="cp_exp" name="exp_cp_percentage"
+                                                        placeholder="Enter value" value="{{ $settings['cp_exp'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = EXP</span>
+                                                </div>
                                             </div>
                                         </div>
                                         {{-- <div class="col-md-12">
