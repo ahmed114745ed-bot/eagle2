@@ -6,6 +6,7 @@ use App\Admin\Actions\RoomPinAction;
 use App\Helpers\Common;
 use App\Models\Room;
 use App\Http\Controllers\Controller;
+use App\Models\EnteredRoom;
 use App\Models\RoomCategory;
 use App\Models\User;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -18,6 +19,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Table;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Request;
 
 class RoomController extends MainController
@@ -94,17 +96,136 @@ class RoomController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Room);
-        $grid->model()->with('owner.profile', 'owner:uuid,id,name',)
-            ->orderByDesc('rooms.pin')->whereHas('owner')
-            ->orderByDesc('rooms.top_room')
-            ->orderByDesc('session')
-            ->orderByDesc('count_room_socket');
 
+        $filterType = request('filter', 'all'); // Fetch from query string
+
+        $user = auth()->user();
+    $grid->header(function () use ($filterType) {
+        $tabs = [
+            'all'       => __('All'),
+            'trend'     => __('Trend'),
+            'popular'   => __('Popular'),
+            'boss'      => __('Boss'),
+            //'friends'   => 'Friends',
+            //'following' => 'Following',
+            'recently'  => __('Recently'),
+            'interested'=> __('Interested'),
+            'nearby'    => __('Nearby'),
+            'last_create' => __('New'),
+            'pk'        => __('PK'),
+            'party'     => __('Party'),
+            'festival'  => __('Festival'),
+        ];
+
+        $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+        foreach ($tabs as $key => $label) {
+            $active = $filterType === $key ? 'active' : '';
+            $url = request()->fullUrlWithQuery(['filter' => $key]);
+            $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+        }
+        $html .= '</ul></div>';
+
+        return $html;
+    });
+    $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
+->whereHas('owner');
+
+            switch ($filterType) {
+                case 'boss':
+                    $roomIds = EnteredRoom::query()
+                        ->where('uid', $user->id)
+                        ->orderByDesc('entered_at')
+                        ->pluck('rid')
+                        ->toArray();
+                    $grid->model()->whereIn('id', $roomIds);
+                    break;
+
+                case 'trend':
+                    $grid->model()->orderByDesc('top_room')
+                        ->orderByDesc('room_visitors_count')
+                        ->orderByDesc('session');
+                    break;
+
+                case 'popular':
+                    $grid->model()->orderByDesc('top_room')
+                        ->orderByDesc('room_visitors_count');
+                    break;
+
+                case 'last_create':
+                    $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                        ->orderByDesc('id');
+                    break;
+
+                case 'pk':
+                    $grid->model()->has('lastPk');
+                    break;
+
+                case 'party':
+                    $grid->model()->whereHas('roomCategory', function ($query) {
+                        $query->where('type', 'party');
+                    });
+                    break;
+
+                case 'festival':
+                case 'recently':
+                    $grid->model()->orderByDesc('top_room')
+                        ->orderByDesc('room_visitors_count')
+                        ->orderByDesc('session');
+                    break;
+
+                case 'interested':
+                    $roomTypes = EnteredRoom::query()
+                        ->where('uid', $user->id)
+                        ->where('entered_at', '>=', Carbon::now()->subDay())
+                        ->with('room')
+                        ->get()
+                        ->pluck('room.room_type')
+                        ->unique();
+                    $grid->model()->whereIn('room_type', $roomTypes)
+                        ->orderByDesc('top_room')
+                        ->orderByDesc('session');
+                    break;
+
+                /* case 'following':
+                    $grid->model()->whereIn('uid', $user->followeds_ids())
+                        ->orderByDesc('top_room')
+                        ->orderByDesc('room_visitors_count')
+                        ->orderByDesc('session');
+                    break;
+
+                case 'friends':
+                    $grid->model()->whereIn('uid', $user->friends_ids())
+                        ->orderByDesc('top_room')
+                        ->orderByDesc('room_visitors_count')
+                        ->orderByDesc('session');
+                    break; */
+
+                case 'nearby':
+                    $userLat  = $user->lat;
+                    $userLong = $user->long;
+                    $grid->model()->selectRaw(
+                        'rooms.*,
+                    (6371 * acos(cos(radians(?)) * cos(radians(owner.lat))
+                    * cos(radians(owner.long) - radians(?)) + sin(radians(?))
+                    * sin(radians(owner.lat)))) AS distance',
+                        [$userLat, $userLong, $userLat]
+                    )
+                        ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                        ->orderBy('distance');
+                    break;
+
+                default:
+                    $grid->model()->orderByDesc('rooms.pin')
+                        ->orderByDesc('rooms.top_room')
+                        ->orderByDesc('session')
+                        ->orderByDesc('count_room_socket');
+                    break;
+            }
+        // Filters UI
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
-                //  $filter->equal('uid',__ ('owner id'));
                 $filter->where(function ($query) {
                     $input = $this->input;
 
@@ -119,7 +240,7 @@ class RoomController extends MainController
         $grid->disableRowSelector();
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
-            return $pin == 1 
+            return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
         })->sortable();
@@ -178,20 +299,20 @@ class RoomController extends MainController
         });
 
 
-    //     $grid->column('pin', __('Pin'))->display(function ($pin) {
-    //         $roomId = $this->id;
-    //         $isPinned = $pin ? 'true' : 'false';
-    //         $pinIcon = $pin ? 'fa-check-circle' : 'fa-thumb-tack';
-    //         $pinColor = $pin ? 'text-success' : 'text-muted';
+        //     $grid->column('pin', __('Pin'))->display(function ($pin) {
+        //         $roomId = $this->id;
+        //         $isPinned = $pin ? 'true' : 'false';
+        //         $pinIcon = $pin ? 'fa-check-circle' : 'fa-thumb-tack';
+        //         $pinColor = $pin ? 'text-success' : 'text-muted';
 
-    //         return <<<HTML
-    // <button class="btn btn-sm {$pinColor} pin-room-btn"
-    //         data-room="{$roomId}"
-    //         data-pinned="{$isPinned}">
-    //     <i class="fa {$pinIcon}"></i>
-    // </button>
-    // HTML;
-    //     });
+        //         return <<<HTML
+        // <button class="btn btn-sm {$pinColor} pin-room-btn"
+        //         data-room="{$roomId}"
+        //         data-pinned="{$isPinned}">
+        //     <i class="fa {$pinIcon}"></i>
+        // </button>
+        // HTML;
+        //     });
         /*         $grid->column(__('status'))->display(function () {
             return (new \App\Admin\Actions\RoomAction(
                 $this->id,
@@ -213,20 +334,20 @@ class RoomController extends MainController
             $cachedUsers = \App\Models\User::whereIn('id', $ids)
                 ->with(['profile:user_id,avatar'])
                 ->get(['id', 'name']);
-        
+
             if ($cachedUsers->isEmpty()) {
                 return '';
             }
-        
+
             $html = '<div class="image-container">';
-        
+
             foreach ($cachedUsers as $user) {
                 $path = $user->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = isImageExists(getImagePath($path)) ? getImagePath($path) : $defaultImage;
                 $username = htmlspecialchars($user->name ?? 'Unknown');
                 $userUrl = route('admin.users.show', $user->id); // Assuming you have a route like this
-        
+
                 $html .= '
                     <div class="image-wrapper" onclick="window.location.href=\'' . $userUrl . '\'">
                         <img src="' . $url . '"
@@ -237,9 +358,9 @@ class RoomController extends MainController
                                     transition: transform 0.3s ease;"/>
                     </div>';
             }
-        
+
             $html .= '</div>';
-        
+
             // CSS for styling
             $html .= '
             <style>
@@ -253,13 +374,13 @@ class RoomController extends MainController
                     width: 218px;
                     padding-right: 16px;
                 }
-        
+
                 .image-wrapper {
                     display: inline-block;
                     position: relative;
                         margin-right: -12px;
                 }
-        
+
                 .image-wrapper img {
                     width: 40px;
                     height: 40px;
@@ -270,22 +391,22 @@ class RoomController extends MainController
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
                     cursor: pointer;
                 }
-        
+
                 .image-wrapper img:hover {
                     transform: scale(1.2); /* Slightly enlarge image on hover */
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* More pronounced shadow on hover */
                 }
-        
+
                 /* Optional: If you want to add a tooltip style for the images */
                 .image-wrapper img[title] {
                     cursor: pointer; /* Change cursor to indicate interactivity */
                 }
-        
+
                 .image-wrapper img[title]:hover {
                     opacity: 0.8; /* Slight opacity change on hover */
                 }
             </style>';
-        
+
             return $html;
         });
 
@@ -297,11 +418,9 @@ class RoomController extends MainController
         $grid->actions(function ($action) {
             $action->disableView();
             $pin = $action->row->pin;
-    
+
             // إضافة الفعل مع تمرير الـ pin
             $action->add(new RoomPinAction($action->row->id, $pin));
-        
-
         });
         $grid->disableCreateButton();
         $grid->disableExport();
@@ -335,9 +454,9 @@ class RoomController extends MainController
     {
         $token = csrf_token();
 
-        $confirm =__('Confirm Pin Room');
+        $confirm = __('Confirm Pin Room');
         $doyouwant = __('Do you want to pin this room to the top?');
-        $confirm =__('Confirm');
+        $confirm = __('Confirm');
         $cancel  = __('admin.cancel');
         Admin::html(<<<HTML
 <div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
