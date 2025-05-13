@@ -154,7 +154,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
     /* background: var(--secondary-color); */
-    filter: brightness(0.85);
+    /* filter: brightness(0.85); */
 
 }
 
@@ -168,7 +168,7 @@
     background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    filter: brightness(0.5);
+    /* filter: brightness(0.5); */
 
 }
 
@@ -330,7 +330,7 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    filter: brightness(0.5);
+    /* filter: brightness(0.5); */
 
 }
 
