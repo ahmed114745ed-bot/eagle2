@@ -225,32 +225,32 @@ class RoomController extends Controller
 
     public function quit_room(Request $request)
     {
+
         if (!$request->owner_id) {
 
             return Common::apiResponse(false, __('missing owner_id'), null, 422);
         }
+        try {
+            $user            = $request->user();
+            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user);
+            if ($isToZegoCharisma && isset($userDataWithCharisma)) {
+                $ms = [
+                    'messageContent' => [
+                        "message" => "updateCharisma",
+                        'data' => $userDataWithCharisma
+                    ]
+                ];
+                $json = json_encode($ms);
 
-        $user            = $request->user();
-        [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user);
-        if ($isToZegoCharisma && isset($userDataWithCharisma)) {
-            $ms = [
-                'messageContent' => [
-                    "message" => "updateCharisma",
-                    'data' => $userDataWithCharisma
-                ]
-            ];
+                Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
+            }
+            $this->handleLeaveCp($user, $roomId);
 
-            $json = json_encode($ms);
+            return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
+        } catch (Exception $exception) {
 
-            Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-
-        if (!isset($roomId)) {
-            Common::apiResponse(false, '');
-        }
-        $this->handleLeaveCp($user, $roomId);
-
-        return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
     }
 
     public function handleLeaveCp($user, $roomId)
@@ -1228,7 +1228,7 @@ class RoomController extends Controller
 
         if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
         // if (count($adm_arr) > 15) return Common::apiResponse(0, 'room manager is full', null, 403);
-        if (count($adm_arr) > ($roomMax >= (Common::getConfig('max_room_admin') ?? 1) ? $roomMax : (Common::getConfig('max_room_admin') ?? 1))) return Common::apiResponse(0, 'room manager is full', null, 403);
+        if (count($adm_arr) > ($roomMax >= Common::getConfig('max_room_admin') ? $roomMax : Common::getConfig('max_room_admin'))) return Common::apiResponse(0, 'room manager is full', null, 403);
 
 
         $adm_arr = array_merge($adm_arr, [$admin_id]);
@@ -1695,7 +1695,6 @@ class RoomController extends Controller
         $validator = Validator::make($request->all(), [
             'room_id' => 'required|integer|exists:rooms,id',
             'user_id' => 'required|integer|exists:users,id',
-            'duration' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -1729,9 +1728,8 @@ class RoomController extends Controller
                 }
             }
 
-            $banDuration = $request->duration;
-            $blacklist[] = $userToBlock . '#' . time() . '#' . $banDuration;
-
+            // Add the user to the blacklist
+            $blacklist[] = $userToBlock . '#' . time(); // Add a timestamp or additional info if needed
             $room->room_black = implode(',', $blacklist);
             $room->save();
 
