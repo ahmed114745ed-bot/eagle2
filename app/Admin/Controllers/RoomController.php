@@ -100,93 +100,93 @@ class RoomController extends MainController
         $filterType = request('filter', 'all'); // Fetch from query string
 
         $user = auth()->user();
-    $grid->header(function () use ($filterType) {
-        $tabs = [
-            'all'       => __('All'),
-            'trend'     => __('Trend'),
-            'popular'   => __('Popular'),
-            'boss'      => __('Boss'),
-            //'friends'   => 'Friends',
-            //'following' => 'Following',
-            'recently'  => __('Recently'),
-            'interested'=> __('Interested'),
-            'nearby'    => __('Nearby'),
-            'last_create' => __('New'),
-            'pk'        => __('PK'),
-            'party'     => __('Party'),
-            'festival'  => __('Festival'),
-        ];
+        $grid->header(function () use ($filterType) {
+            $tabs = [
+                'all'       => __('All'),
+                'trend'     => __('Trend'),
+                'popular'   => __('Popular'),
+                'boss'      => __('Boss'),
+                //'friends'   => 'Friends',
+                //'following' => 'Following',
+                'recently'  => __('Recently'),
+                'interested' => __('Interested'),
+                'nearby'    => __('Nearby'),
+                'last_create' => __('New'),
+                'pk'        => __('PK'),
+                'party'     => __('Party'),
+                'festival'  => __('Festival'),
+            ];
 
-        $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-        foreach ($tabs as $key => $label) {
-            $active = $filterType === $key ? 'active' : '';
-            $url = request()->fullUrlWithQuery(['filter' => $key]);
-            $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-        }
-        $html .= '</ul></div>';
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = $filterType === $key ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
 
-        return $html;
-    });
-    $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
-->whereHas('owner');
+            return $html;
+        });
+        $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
+            ->whereHas('owner');
 
-            switch ($filterType) {
-                case 'boss':
-                    $roomIds = EnteredRoom::query()
-                        ->where('uid', $user->id)
-                        ->orderByDesc('entered_at')
-                        ->pluck('rid')
-                        ->toArray();
-                    $grid->model()->whereIn('id', $roomIds);
-                    break;
+        switch ($filterType) {
+            case 'boss':
+                $roomIds = EnteredRoom::query()
+                    ->where('uid', $user->id)
+                    ->orderByDesc('entered_at')
+                    ->pluck('rid')
+                    ->toArray();
+                $grid->model()->whereIn('id', $roomIds);
+                break;
 
-                case 'trend':
-                    $grid->model()->orderByDesc('top_room')
-                        ->orderByDesc('room_visitors_count')
-                        ->orderByDesc('session');
-                    break;
+            case 'trend':
+                $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('room_visitors_count')
+                    ->orderByDesc('session');
+                break;
 
-                case 'popular':
-                    $grid->model()->orderByDesc('top_room')
-                        ->orderByDesc('room_visitors_count');
-                    break;
+            case 'popular':
+                $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('room_visitors_count');
+                break;
 
-                case 'last_create':
-                    $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
-                        ->orderByDesc('id');
-                    break;
+            case 'last_create':
+                $grid->model()->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                    ->orderByDesc('id');
+                break;
 
-                case 'pk':
-                    $grid->model()->has('lastPk');
-                    break;
+            case 'pk':
+                $grid->model()->has('lastPk');
+                break;
 
-                case 'party':
-                    $grid->model()->whereHas('roomCategory', function ($query) {
-                        $query->where('type', 'party');
-                    });
-                    break;
+            case 'party':
+                $grid->model()->whereHas('roomCategory', function ($query) {
+                    $query->where('type', 'party');
+                });
+                break;
 
-                case 'festival':
-                case 'recently':
-                    $grid->model()->orderByDesc('top_room')
-                        ->orderByDesc('room_visitors_count')
-                        ->orderByDesc('session');
-                    break;
+            case 'festival':
+            case 'recently':
+                $grid->model()->orderByDesc('top_room')
+                    ->orderByDesc('room_visitors_count')
+                    ->orderByDesc('session');
+                break;
 
-                case 'interested':
-                    $roomTypes = EnteredRoom::query()
-                        ->where('uid', $user->id)
-                        ->where('entered_at', '>=', Carbon::now()->subDay())
-                        ->with('room')
-                        ->get()
-                        ->pluck('room.room_type')
-                        ->unique();
-                    $grid->model()->whereIn('room_type', $roomTypes)
-                        ->orderByDesc('top_room')
-                        ->orderByDesc('session');
-                    break;
+            case 'interested':
+                $roomTypes = EnteredRoom::query()
+                    ->where('uid', $user->id)
+                    ->where('entered_at', '>=', Carbon::now()->subDay())
+                    ->with('room')
+                    ->get()
+                    ->pluck('room.room_type')
+                    ->unique();
+                $grid->model()->whereIn('room_type', $roomTypes)
+                    ->orderByDesc('top_room')
+                    ->orderByDesc('session');
+                break;
 
-                /* case 'following':
+            /* case 'following':
                     $grid->model()->whereIn('uid', $user->followeds_ids())
                         ->orderByDesc('top_room')
                         ->orderByDesc('room_visitors_count')
@@ -200,27 +200,27 @@ class RoomController extends MainController
                         ->orderByDesc('session');
                     break; */
 
-                case 'nearby':
-                    $userLat  = $user->lat;
-                    $userLong = $user->long;
-                    $grid->model()->selectRaw(
-                        'rooms.*,
+            case 'nearby':
+                $userLat  = $user->lat;
+                $userLong = $user->long;
+                $grid->model()->selectRaw(
+                    'rooms.*,
                     (6371 * acos(cos(radians(?)) * cos(radians(owner.lat))
                     * cos(radians(owner.long) - radians(?)) + sin(radians(?))
                     * sin(radians(owner.lat)))) AS distance',
-                        [$userLat, $userLong, $userLat]
-                    )
-                        ->join('users as owner', 'rooms.uid', '=', 'owner.id')
-                        ->orderBy('distance');
-                    break;
+                    [$userLat, $userLong, $userLat]
+                )
+                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                    ->orderBy('distance');
+                break;
 
-                default:
-                    $grid->model()->orderByDesc('rooms.pin')
-                        ->orderByDesc('rooms.top_room')
-                        ->orderByDesc('session')
-                        ->orderByDesc('count_room_socket');
-                    break;
-            }
+            default:
+                $grid->model()->orderByDesc('rooms.pin')
+                    ->orderByDesc('rooms.top_room')
+                    ->orderByDesc('session')
+                    ->orderByDesc('count_room_socket');
+                break;
+        }
         // Filters UI
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

@@ -188,6 +188,7 @@ class AgencyService
     {
         $accept    = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
+        if(!$user)throw new Exception('user not found');
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
@@ -205,10 +206,10 @@ class AgencyService
 
         if (!$action) throw new Exception('Request not found');
 
-        if ($accept == 0 || $accept == 'false') {
+        if ($accept === 0 || $accept === false) {
             $action->status = 2;
             $action->save();
-        } elseif ($accept == 1 || $accept == true) {
+        } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);

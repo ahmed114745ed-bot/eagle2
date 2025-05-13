@@ -145,7 +145,7 @@ class RewardTargetController extends MainController
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
         $form->select('type', trans('type'))->options(["ware" => __('ware'),"vip" => __('vip'), "coins" => __('coins'),"achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
-                $form->belongsTo('target1', Wares::class, trans('wares'));
+                $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })
         ->when("vip",function () use ($form){
             $form->select('target2', trans('vips'))->options(function (){
@@ -154,13 +154,13 @@ class RewardTargetController extends MainController
                     $ops[$vip->id]=$vip->name;
                 }
                 return $ops;
-            });
+            })->rules('required');
         })
          ->when("coins",function () use ($form){
-            $form->number("target3",__("coins"));
+            $form->number("target3",__("coins"))->rules('required');
         })->when("achievement",function () use ($form){
             $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp.'.'.$file->guessExtension();
+                return now()->timestamp.'.'.$file->guessExtension()->rules('required');
             })->disk('gcs');
         });
         $form->number('expire', __('expire'));
