@@ -22,8 +22,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Repositories\Room\RoomRepoInterface;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
-
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class RoomRepoService
 {
@@ -159,10 +158,7 @@ class RoomRepoService
     public function quiteRoom($ownerId, User $user)
     {
         $room  = $this->findRoomUser($ownerId);
-
-        if(!$room){
-            return null;
-        }
+        if(!$room)  throw new \Exception(__("Room not found for this owner."));
         $isToZegoCharisma = false;
         //reset user charisma
         if (isset($room->charizma_status)) {
@@ -309,44 +305,48 @@ class RoomRepoService
         $room->save();
         $jsons = [];
         $map = [];
-        if ($currentMode == '1') {
-            $mode = 'party';
-        } elseif ($currentMode == '2') {
-            $mode = 'seats12';
-        } elseif ($currentMode == '5') {
-            $mode = 'cinema';
-//            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
-//            $jsons[] = $json;
-        } elseif ($currentMode == '4') {
-            $mode = 'game';
-            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
-            $game = AllGame::find($request->game_id);
-            if (!$game) return Common::apiResponse(false, 'this game does not exists');
+        $mode = '';
+        try {
+            if ($currentMode == '1') {
+                $mode = 'party';
+            } elseif ($currentMode == '2') {
+                $mode = 'seats12';
+            } elseif ($currentMode == '5') {
+                $mode = 'cinema';
+                //            $json = $this->changeBackground($room, $request->owner_id, 'custom_image/back-black.png');
+                //            $jsons[] = $json;
+            } elseif ($currentMode == '4') {
+                $mode = 'game';
+                if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+                $game = AllGame::find($request->game_id);
+                if (!$game) return Common::apiResponse(false, 'this game does not exists');
 
-            $room->game_id = $request->game_id;
-            $room->save();
-            $map['game_url'] = $game->mini_url;
-        } elseif ($currentMode == '8') {
-            $mode = 'eight';
-        } else {
-            $mode = 'topCenter';
+                $room->game_id = $request->game_id;
+                $room->save();
+                $map['game_url'] = $game->mini_url;
+            } elseif ($currentMode == '8') {
+                $mode = 'eight';
+            } else {
+                $mode = 'topCenter';
+            }
+        } catch (\Throwable $e) {
+            return Common::apiResponse(0, $e->getMessage());
         }
         $ms   = [
             'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
         ];
         $json = json_encode($ms);
         $jsons[] = $json;
-        //        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
 
-        
+
             $jsons[] = $this->changeBackground($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
-    
-        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
             Utils::unwrap($promises);
         } catch (\Throwable $e) {
         }
+
         return Common::apiResponse(1, 'done', null, 201);
     }
     public function getRoomBackground(?Room $room)
