@@ -141,6 +141,8 @@ class AuthController extends Controller
             return Common::apiResponse(false, 'you are blocked', [], 408);
         }
         $user->auth_token = $token;
+        event(new DeviceTokenSent($user->id, $user->device_token));
+
         return Common::apiResponse(
             true,
             __('api_responses.logged'),
@@ -204,6 +206,7 @@ class AuthController extends Controller
         }
 
         $user->auth_token = $token;
+        event(new DeviceTokenSent($user->id, $user->device_token));
 
         return Common::apiResponse(true, '', new MyDataResource($user), 200);
     }
@@ -219,6 +222,8 @@ class AuthController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         $user->auth_token = $token;
+        event(new DeviceTokenSent($user->id, $user->device_token));
+
         return Common::apiResponse(
             true,
             __('api_responses.logged'),
