@@ -39,7 +39,7 @@ class SpecialIdController extends Controller
                 if ($ware->expire != 0) {
                     DB::beginTransaction();
                     try {
-                        $pack->expire += ( $ware->expire * 86400);
+                        $pack->expire += (now()->addDays($ware->expire)->timestamp * 86400);
                         $pack->price += $total_price;
                         $user->decrement('di', $total_price);
                         $pack->save();
@@ -66,11 +66,11 @@ class SpecialIdController extends Controller
             $arr['get_type']  = $ware->get_type;
             $arr['target_id'] = $ware->id;
             $arr['num']       = 1; //$qty;
-            $arr['expire']    = $ware->expire ? time() + ($ware->expire * 86400) : 0;
+            $arr['expire']    = $ware->expire ? now()->addDays($ware->expire)->timestamp  : 0;
             $arr['is_read']   = 1;
             $arr['use_num']   = $ware->num;
             $arr['price']     = $total_price;
-            $newPack=Pack::query()->create($arr);
+            $newPack = Pack::query()->create($arr);
             $user->decrement('di', $total_price);
             DB::commit();
             (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
@@ -88,7 +88,7 @@ class SpecialIdController extends Controller
         $status = $request->used ?? 0;
         if (!$item_id) return Common::apiResponse(0, 'missing params');
 
-        $pack= Pack::query()
+        $pack = Pack::query()
             ->where(['user_id' => $user->id])
             ->where('id', $item_id)->with('ware')
             ->first();
@@ -96,12 +96,12 @@ class SpecialIdController extends Controller
         if ($pack) {
             $pack->update(['is_used' => $status, 'use_num' => 1]);
             SpecialHistory::create([
-                'status'=>$status,
-                'user_id'=>$user->id,
-                'ware_id'=>$pack->target_id,
+                'status' => $status,
+                'user_id' => $user->id,
+                'ware_id' => $pack->target_id,
             ]);
 
-            $user->special_id = $status == 0 ? null: $pack->ware->value;
+            $user->special_id = $status == 0 ? null : $pack->ware->value;
             $user->save();
             return Common::apiResponse(1, 'update successfully', ['target_id' => !$status ? null : $pack->target_id], 200);
         }
@@ -112,92 +112,92 @@ class SpecialIdController extends Controller
     {
         $user    = $request->user();
         $special_id = $request->value;
-        if (!$special_id || !$request->frame_id ) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$special_id || !$request->frame_id) return Common::apiResponse(0, 'missing params', null, 422);
         $ware = Ware::query()->whereDoesntHave('ware_users')->where('value', $special_id)
             ->where('enable', 1)
             ->first();
         if ($ware) return Common::apiResponse(0, 'item exist before go to mall to buy it', null, 404);
 
-        $pack        = Pack::query()->where("user_id",'!=',$user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id){
-            $q->where("value",$special_id);
+        $pack        = Pack::query()->where("user_id", '!=', $user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id) {
+            $q->where("value", $special_id);
         })->first();
         if ($pack) return Common::apiResponse(0, 'item is used with anther user', null, 404);
-        $total_price = Config::query()->where('name','upload_special_id_price')->first()?->value ?? 0;
+        $total_price = Config::query()->where('name', 'upload_special_id_price')->first()?->value ?? 0;
         if ($user->di < $total_price) return Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
 
-        $expire = Config::query()->where('name','custom_special_id_expire')->first()?->value ?? 30;
+        $expire = Config::query()->where('name', 'custom_special_id_expire')->first()?->value ?? 30;
 
         $frame = SpecialIdFram::query()->find($request->fram_id);
-        $check= Ware::query()->where('value',$special_id)->first();
-        if ($check){
-            $checkRequest=\DB::table('user_ware')->where('ware_id', $check->id)->where('user_id',$user->id)->first();
-            if ($checkRequest){
+        $check = Ware::query()->where('value', $special_id)->first();
+        if ($check) {
+            $checkRequest = \DB::table('user_ware')->where('ware_id', $check->id)->where('user_id', $user->id)->first();
+            if ($checkRequest) {
                 return Common::apiResponse(0, 'you have an request before', null, 405);
             }
         }
         $user->decrement('di', $total_price);
 
-        $ware=Ware::updateOrCreate([
+        $ware = Ware::updateOrCreate([
             'value' => $special_id,
-        ],[
-            'type' =>25,
-            'get_type' =>4,
+        ], [
+            'type' => 25,
+            'get_type' => 4,
             'image' => @$frame->image,
             'expire' => $expire,
             'enable' => 0,
         ]);
         $ware->ware_users()->attach($user->id, ['disable' => false]);
         return Common::apiResponse(1, __("api_responses.request_sent"));
-//        $pack        = Pack::query()->where("user_id",$user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id){
-//            $q->where("value",$special_id);
-//        })->first();
-//        if ($pack) {
-//            if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-//            if ($pack->expire > now()->timestamp) {
-//                if ($ware->expire != 0) {
-//                    DB::beginTransaction();
-//                    try {
-//                        $pack->expire += ( $ware->expire * 86400);
-//                        $pack->price += $total_price;
-//                        $user->decrement('di', $total_price);
-//                        $pack->save();
-//                        $user->save();
-//                        DB::commit();
-//                        (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
-//                        return Common::apiResponse(1, 'success process');
-//                    } catch (\Exception $exception) {
-//                        DB::rollBack();
-//                        return Common::apiResponse(0, 'fail', null, 400);
-//                    }
-//                } else {
-//                    return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
-//                }
-//            } else {
-//                $pack->delete();
-//            }
-//        }
-//
-//        DB::beginTransaction();
-//        try {
-//            $arr['user_id']   = $user->id;
-//            $arr['type']      = $ware->type;
-//            $arr['get_type']  = $ware->get_type;
-//            $arr['target_id'] = $ware->id;
-//            $arr['num']       = 1; //$qty;
-//            $arr['expire']    = $ware->expire ? time() + ($ware->expire * 86400) : 0;
-//            $arr['is_read']   = 1;
-//            $arr['use_num']   = $ware->num;
-//            $arr['price']     = $total_price;
-//            $newPack=Pack::query()->create($arr);
-//            $user->decrement('di', $total_price);
-//            $ware->ware_users()->attach($user->id);
-//            DB::commit();
-//            (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
-//            return Common::apiResponse(1, 'success process');
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
-//        }
+        //        $pack        = Pack::query()->where("user_id",$user->id)->where('expire', '>=', now()->timestamp)->whereHas('ware', function ($q) use ($special_id){
+        //            $q->where("value",$special_id);
+        //        })->first();
+        //        if ($pack) {
+        //            if ($pack->expire == 0) return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+        //            if ($pack->expire > now()->timestamp) {
+        //                if ($ware->expire != 0) {
+        //                    DB::beginTransaction();
+        //                    try {
+        //                        $pack->expire += ( $ware->expire * 86400);
+        //                        $pack->price += $total_price;
+        //                        $user->decrement('di', $total_price);
+        //                        $pack->save();
+        //                        $user->save();
+        //                        DB::commit();
+        //                        (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
+        //                        return Common::apiResponse(1, 'success process');
+        //                    } catch (\Exception $exception) {
+        //                        DB::rollBack();
+        //                        return Common::apiResponse(0, 'fail', null, 400);
+        //                    }
+        //                } else {
+        //                    return Common::apiResponse(0, 'you have this item in your pack no need to buy it', null, 405);
+        //                }
+        //            } else {
+        //                $pack->delete();
+        //            }
+        //        }
+        //
+        //        DB::beginTransaction();
+        //        try {
+        //            $arr['user_id']   = $user->id;
+        //            $arr['type']      = $ware->type;
+        //            $arr['get_type']  = $ware->get_type;
+        //            $arr['target_id'] = $ware->id;
+        //            $arr['num']       = 1; //$qty;
+        //            $arr['expire']    = $ware->expire ? time() + ($ware->expire * 86400) : 0;
+        //            $arr['is_read']   = 1;
+        //            $arr['use_num']   = $ware->num;
+        //            $arr['price']     = $total_price;
+        //            $newPack=Pack::query()->create($arr);
+        //            $user->decrement('di', $total_price);
+        //            $ware->ware_users()->attach($user->id);
+        //            DB::commit();
+        //            (new UpgradeLevelServices())->purchaseItem($user, $ware->exp);
+        //            return Common::apiResponse(1, 'success process');
+        //        } catch (\Exception $exception) {
+        //            DB::rollBack();
+        //            return Common::apiResponse(0, 'an error occurred please try again later!', null, 400);
+        //        }
     }
 
     public function specialIdFrame()
@@ -206,15 +206,14 @@ class SpecialIdController extends Controller
         return Common::apiResponse(1, '', $data, 200);
     }
 
-   public function specialUsers(Request $request)
-   {
-       $data = SpecialHistory::when(isset($request['startDate']) && $request['startDate'] != 'null' && isset($request['endDate']) && $request['endDate'] != 'null', function ($query) use ($request) {
-        $query->whereBetween('created_at', [Carbon::createFromFormat('Y-m-d', $request['startDate'])->startOfDay(), Carbon::createFromFormat('Y-m-d', $request['endDate'])->endOfDay()]);
-    })->when(isset($request['ware_id']) && $request['ware_id'] != 'null', function ($query) use ($request) {
-        $query->where('ware_id', $request['ware_id']);
-    })->where('status',1)->with('user','ware')->get();
+    public function specialUsers(Request $request)
+    {
+        $data = SpecialHistory::when(isset($request['startDate']) && $request['startDate'] != 'null' && isset($request['endDate']) && $request['endDate'] != 'null', function ($query) use ($request) {
+            $query->whereBetween('created_at', [Carbon::createFromFormat('Y-m-d', $request['startDate'])->startOfDay(), Carbon::createFromFormat('Y-m-d', $request['endDate'])->endOfDay()]);
+        })->when(isset($request['ware_id']) && $request['ware_id'] != 'null', function ($query) use ($request) {
+            $query->where('ware_id', $request['ware_id']);
+        })->where('status', 1)->with('user', 'ware')->get();
 
-    return Common::apiResponse(1, '', SpecialUsersRecourse::collection($data), 200);
-   }
-
+        return Common::apiResponse(1, '', SpecialUsersRecourse::collection($data), 200);
+    }
 }
