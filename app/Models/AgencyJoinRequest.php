@@ -72,5 +72,21 @@ class AgencyJoinRequest extends Model
         return parent::update($attributes, $options);
     }
 
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+
+        static::deleted(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+    }
+
+
 
 }

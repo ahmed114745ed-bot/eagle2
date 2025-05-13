@@ -224,13 +224,16 @@ class Agency extends Model
         });
 
         static::updating(function ($agency) {
+
+                clearAgencyCache($agency->id);
+            
             if (isset($agency->is_frozen)) {
                 $agency->is_frozen = (bool) $agency->is_frozen;
             }
         });
 
         static::deleting(function ($agency) {
-            // Update the related user model (change type to 0)
+            
             if ($agency->app_owner_id) {
                 $user = User::find($agency->app_owner_id);
                 if ($user) {
@@ -241,6 +244,8 @@ class Agency extends Model
                     ]);
                 }
             }
+                clearAgencyCache($agency->id);
+            
         });
     }
 

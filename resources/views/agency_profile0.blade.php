@@ -168,8 +168,6 @@
     background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    filter: brightness(0.5);
-
 }
 
 .agency-avatar {
@@ -330,8 +328,6 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    filter: brightness(0.5);
-
 }
 
 .section-header {
@@ -852,7 +848,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3>{{ __('Agency Members') }}</h3>
-                    <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
+                    <span class="badge count-badge">{{ $members->total() }}</span>
                 </div>
                 
                 @if($members && $members->count())
@@ -913,12 +909,7 @@
                     </div>
                     
                     <div class="pagination-wrapper">
-                        {{ $members?->appends([
-                            'charges_page' => $charges?->currentPage(),
-                            'salaries_page' => $salaries?->currentPage(),
-                            'join_page'    => $agencyJoinRequests?->currentPage(),
-                            'target_page'  => $memberTargets?->currentPage(),
-                        ])->links('vendor.pagination.default') }}
+                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                     </div>
                 @else
                     <div class="empty-table">
@@ -977,13 +968,8 @@
                                 </div>
                             </div>
 
-                            <div class="pagination-wrapper">
-                                {{ $members?->appends([
-                                    'charges_page' => $charges?->currentPage(),
-                                    'salaries_page' => $salaries?->currentPage(),
-                                    'join_page'    => $agencyJoinRequests?->currentPage(),
-                                    'target_page'  => $memberTargets?->currentPage(),
-                                ])->links('vendor.pagination.default') }}
+                            <div class="pagination-container">
+                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
                             </div>
 
                     
@@ -1026,16 +1012,11 @@
                                         @endif
                                     </table>
 
-                                    @if($salaries)
-                                            <div class="pagination-container">
-                                                {{ $salaries->appends([
-                                                    'charges_page' => $charges?->currentPage(),
-                                                    'join_page' => $agencyJoinRequests?->currentPage(),
-                                                    'members_page' => $members?->currentPage(),
-                                                    'target_page' => $memberTargets?->currentPage(),
-                                                ])->links('vendor.pagination.bootstrap-4') }}
-                                            </div>
-                                        @endif
+                                    <!-- Pagination Links -->
+                                    <div class="pagination-container">
+                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage(),
+                                        'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
+                                    </div>
                                 </div>
                             </div>
 
@@ -1130,14 +1111,12 @@
                         </div>
             
                         <div class="pagination-container mt-3">
-                            @if($agencyJoinRequests)
-                                {{ $agencyJoinRequests->appends([
-                                    'members_page' => $members ? $members->currentPage() : 1,
-                                    'salaries_page' => $salaries ? $salaries->currentPage() : 1,
-                                    'charges_page' => $charges ? $charges->currentPage() : 1,
-                                    'target_page'  => $memberTargets ? $memberTargets->currentPage() : 1,
-                                ])->links('vendor.pagination.bootstrap-4') }}
-                            @endif
+                            {{ $agencyJoinRequests->appends([
+                                'members_page' => $members->currentPage(),
+                                'salaries_page' => $salaries->currentPage(),
+                                'charges_page' => $charges->currentPage(),
+                                'target_page'  => $memberTargets->currentPage(),
+                            ])->links('vendor.pagination.bootstrap-4') }}
                         </div>
                     
                 </div>
@@ -1150,11 +1129,8 @@
                             <i class="fas fa-bullseye"></i> {{ __('Agency Targets') }}
                         </h3>
                         <div class="card-tools">
-                        <span class="badge bg-purple">
-                            {{ $memberTargets ? $memberTargets->total() : 0 }}
-                        </span>           
-                    
-                    </div>
+                            <span class="badge bg-purple">{{ $memberTargets->total() }}</span>
+                        </div>
                     </div>
                     
                     <div class="card-body">
@@ -1400,26 +1376,23 @@
                              
                             </div>
                             
-                            @if($memberTargets && $memberTargets->isEmpty())
-                                <div class="empty-table">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                    <p>{{ __('No target data available') }}</p>
-                                </div>
+                            @if($memberTargets->isEmpty())
+                            <div class="empty-table">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>{{ __('No target data available') }}</p>
+                            </div>
                             @endif
-
-                            @if($memberTargets)
-                                <div class="pagination-wrapper">
-                                    {{ $memberTargets->appends([
-                                        'members_page' => $members?->currentPage() ?? 1,
-                                        'salaries_page' => $salaries?->currentPage() ?? 1,
-                                        'charges_page' => $charges?->currentPage() ?? 1,
-                                        'join_page' => $agencyJoinRequests?->currentPage() ?? 1,
-                                        'month' => request('month'),
-                                        'year' => request('year'),
-                                    ])->links('vendor.pagination.bootstrap-4') }}
-                                </div>
-                            @endif
-
+                            
+                            <div class="pagination-wrapper">
+                                {{ $memberTargets->appends([
+                                    'members_page' => $members->currentPage(),
+                                    'salaries_page' => $salaries->currentPage(),
+                                    'charges_page' => $charges->currentPage(),
+                                    'join_page' => $agencyJoinRequests->currentPage(),
+                                    'month' => request('month'),
+                                    'year' => request('year'),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
                         </div>
                    
                    

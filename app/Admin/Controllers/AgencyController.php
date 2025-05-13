@@ -74,72 +74,173 @@ class AgencyController extends MainController
             ->body($this->form()));
     }
 
+    // public function profile($id, Request $request, Content $content)
+    // {
+    //     $year = $request->year ?? Carbon::now()->year;
+    //     $month = $request->month ?? Carbon::now()->month;
+    //     $tab = request('tab') ?? null;
+      
+    //     $cacheKey = "agency_profile_{$id}";
+    //     $agency = Agency::with([
+    //         'admins',
+    //         'charges' => function ($query) {
+    //             $query->select('id', 'agency_id', 'amount', 'created_at')
+    //                 ->latest()
+    //                 ->take(10);
+    //         },
+    //         'mempers' => function ($query) {
+    //             $query->select('id', 'agency_id', 'name', 'created_at')
+    //                 ->latest()
+    //                 ->take(10);
+    //         },
+    //         'owner' => function ($query) {
+    //             $query->select('id', 'name', 'uuid');
+    //         }
+    //     ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+    //         ->findOrFail($id);
+
+    //     $path = @$agency->img;
+    //     $defaultImage = asset("images/icon-agency.jpg");
+    //     $imageUrl = getImagePath($path) ?? $defaultImage;
+
+    //     if (!isImageExists($imageUrl)) {
+    //         $imageUrl = $defaultImage;
+    //     }
+
+    //     $agency->display_image = $imageUrl;
+    //     $agencyId = $agency->id;
+    //     $members = $agency->mempers()
+    //         ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
+    //         ->paginate(10, ['*'], 'members_page');
+
+    //     $charges = $agency->charges()
+    //         ->select('id', 'amount', 'created_at')
+    //         ->paginate(10, ['*'], 'charges_page');
+
+    //     $salaries = AgencySallary::where('agency_id', $id)
+    //         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
+    //         ->orderByDesc('id')
+    //         ->paginate(10, ['*'], 'salary_page');
+
+    //     $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
+    //         ->with('user')
+    //         ->whereHas('user')->orderByDesc('id')
+    //         ->paginate(10, ['*'], 'join_page');
+
+    //     $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+    //         ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
+    //     $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+    //         $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
+    //     }])->paginate(10, ['*'], 'target_page');
+    //     [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
+
+    //     $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
+    //     $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
+    //     $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
+     
+    //     return $content->title(__('agency profile'))
+    //         ->view('agency_profile', $data);
+
+    // }
+
     public function profile($id, Request $request, Content $content)
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $tab = request('tab') ?? null;
-        $cacheKey = "agency_profile_{$id}";
-        $agency = Agency::with([
-            'admins',
-            'charges' => function ($query) {
-                $query->select('id', 'agency_id', 'amount', 'created_at')
-                    ->latest()
-                    ->take(10);
-            },
-            'mempers' => function ($query) {
-                $query->select('id', 'agency_id', 'name', 'created_at')
-                    ->latest()
-                    ->take(10);
-            },
-            'owner' => function ($query) {
-                $query->select('id', 'name', 'uuid');
-            }
-        ])->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-            ->findOrFail($id);
-
-        $path = @$agency->img;
+        $tab = request('tab') ?? 'members';
+    
+        $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+            return Agency::with(['admins', 'owner:id,name,uuid'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                ->findOrFail($id);
+        });
+    
+        $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($path) ?? $defaultImage;
-
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
-
         $agency->display_image = $imageUrl;
+    
         $agencyId = $agency->id;
-        $members = $agency->mempers()
-            ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')->with('country', 'agencyUserJob')
-            ->paginate(10, ['*'], 'members_page');
-
-        $charges = $agency->charges()
-            ->select('id', 'amount', 'created_at')
-            ->paginate(10, ['*'], 'charges_page');
-
-        $salaries = AgencySallary::where('agency_id', $id)
-            ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'salary_page');
-
-        $agencyJoinRequests = AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
-            ->with('user')
-            ->whereHas('user')->orderByDesc('id')
-            ->paginate(10, ['*'], 'join_page');
-
-        $giftLog = GiftLog::where('agency_id', $id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->orderByDesc('exp')->get();
-        $memberTargets = $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
-            $query->where('agency_id', $agencyId)->whereMonth('created_at', $month)->whereYear('created_at', $year);
-        }])->paginate(10, ['*'], 'target_page');
-        [$agencyTarget, $rate] =    $this->rateAgency($agencyId, $month, $year);
-
-        $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
-        $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
-        $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
+    
+        $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
+    
+        switch ($tab) {
+            case 'members':
+                $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
+                    return $agency->mempers()
+                        ->select('id', 'name', 'uuid', 'total_days', 'monthly_diamond_received', 'agency_id', 'country_id')
+                        ->with('country', 'agencyUserJob')
+                        ->paginate(10, ['*'], 'members_page');
+                });
+                break;
+    
+            case 'charges':
+                $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
+                    return $agency->charges()
+                        ->select('id', 'amount', 'created_at')
+                        ->latest()
+                        ->paginate(10, ['*'], 'charges_page');
+                });
+                break;
+    
+            case 'salary':
+                $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
+                    return AgencySallary::where('agency_id', $id)
+                        ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
+                        ->orderByDesc('id')
+                        ->paginate(10, ['*'], 'salary_page');
+                });
+                break;
+    
+            case 'requests':
+                $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
+                    return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
+                        ->with('user')
+                        ->whereHas('user')
+                        ->orderByDesc('id')
+                        ->paginate(10, ['*'], 'join_page');
+                });
+                break;
+    
+            case 'targets':
+                $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
+                    return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
+                        $query->where('agency_id', $agencyId)
+                            ->whereMonth('created_at', $month)
+                            ->whereYear('created_at', $year);
+                    }])->paginate(10, ['*'], 'target_page');
+                });
+    
+                [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
+                $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
+                $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
+    
+                break;
+        }
+    
+        $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
+            return GiftLog::where('agency_id', $id)
+                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->with('receiver')
+                ->groupBy('receiver_id')
+                ->whereHas('receiver')
+                ->orderByDesc('exp')
+                ->get();
+        });
+    
+        $data = compact(
+            'agency', 'members', 'charges', 'salaries',
+            'agencyJoinRequests', 'giftLog', 'memberTargets',
+            'agencyTarget', 'rate', 'stars', 'heroes', 'tab'
+        );
+    
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
-
     }
+
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
     {

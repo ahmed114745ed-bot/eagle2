@@ -175,7 +175,7 @@ class HomeController extends Controller
         $user         = $request->user();
         $privilegeArr = [
             'has_color_name' => 18,
-            'anonymous'      => 17,
+//            'anonymous'      => 17,
             'country'        => 13,
             'last_active'    => 20,
             'visit'          => 19,
@@ -245,7 +245,7 @@ class HomeController extends Controller
             $user         = $request->user();
             $privilegeArr = [
                 'has_color_name' => 18,
-                'anonymous'      => 17,
+//                'anonymous'      => 17,
                 'country'        => 13,
                 'last_active'    => 20,
                 'visit'          => 19,
@@ -266,7 +266,7 @@ class HomeController extends Controller
         $user = $request->user();
         $privilegeArr = [
             'has_color_name' => 18,
-            'anonymous'      => 17,
+//            'anonymous'      => 17,
             'country'        => 13,
             'last_active'    => 20,
             'visit'          => 19,

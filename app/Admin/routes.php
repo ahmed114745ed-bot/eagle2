@@ -2,6 +2,7 @@
 
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\WalletTransactionController;
+use App\Admin\Controllers\WareController;
 use App\Models\Room;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use Illuminate\Routing\Router;
@@ -251,6 +252,8 @@ Route::group(
         $router->resource('charge-vips', ChargeVipController::class);
         $router->resource('delete-accounts', DeleteAccountController::class);
         $router->resource('wares', 'WareController', ['names' => ['index' => 'wares']]);
+        $router->put('wares/toggle-enable/{id}', [WareController::class, 'toggleEnable']);
+
         $router->resource('test-pusher', TestPusherController::class);
         $router->resource('report_user', ReportUserController::class);
         $router->resource('coupons', 'CouponController');
