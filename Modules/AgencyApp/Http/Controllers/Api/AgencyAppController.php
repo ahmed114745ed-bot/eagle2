@@ -275,6 +275,7 @@ class AgencyAppController extends Controller
 
     public function dailyReport()
     {
+        info('i am here in the wrong class');
         $user  = \Auth::user();
         $month = request()->month ? (int) request()->month : now()->month;
         $year = request()->year ? (int) request()->year : now()->year;
