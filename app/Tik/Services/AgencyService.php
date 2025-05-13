@@ -639,7 +639,6 @@ class AgencyService
             'daly_reports' => []
         ];
         for ($startDay = 1; $startDay <= $endDay; $startDay++) {
-            \Log::info($startDay);
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
