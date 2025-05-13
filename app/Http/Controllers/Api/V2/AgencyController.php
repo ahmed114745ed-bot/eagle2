@@ -152,6 +152,7 @@ class AgencyController extends Controller
     {
         $accept    = $request->accept;
         $owner     = $request->user();
+        dd($accept);
         if (!$request->user_id || !isset($request->accept)) {
             return Common::apiResponse(0, 'missing params');
         }
@@ -161,9 +162,10 @@ class AgencyController extends Controller
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        if ($accept == 0 || $accept === false) {
+        if ($accept === 0 || $accept === false) {
+            
             return Common::apiResponse(1, 'joinfalse');
-        } elseif ($accept == 1 || $accept === true) {
+        } elseif ($accept === 1 || $accept === true) {
             return Common::apiResponse(1, 'joinSacsesAg');
         }
     }
