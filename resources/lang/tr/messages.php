@@ -8,4 +8,6 @@ return [
     'coins' => "Üzgünüz, kullanıcının bu kadar parası yok",
     'refuse' => 'Bu kullanıcının ajansa katılmasını reddetmek istediğinizden emin misiniz?',
     'yes' => 'Evet',
+    'deleteShipping' => 'Ajans silinirse, paralar ve dolarlar kaybolur',
+    'cancel' => 'İptal et',
 ];

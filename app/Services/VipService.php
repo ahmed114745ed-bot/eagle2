@@ -3,9 +3,12 @@
 namespace App\Services;
 
 
+use Exception;
+use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
 use App\Tik\Repositories\VipRepository;
 use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
@@ -14,8 +17,6 @@ use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
 use App\Tik\Repositories\VipPrivilegeRepository;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class VipService
 {
@@ -215,29 +216,15 @@ class VipService
         $qty = $request->qty ?: 1;
         $total = $vip->price * $qty;
         $expire = $vip->expire;
-        if ($expire == 0) {
-            $ex = 0;
-        } else {
-            $ex = now()->addDays($expire * $qty)->timestamp;
-        }
-        if ($request->type == 1) {
-            $type = 1;
-            if (!$request->to_user) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-            $user_id = $request->to_user;
-            $user = $this->userRepository->searchUser($user_id);
-            if (!$user) return Common::apiResponse(0, __('api_responses.not_found'), null, 404);
-            $user_id = $user->id;
-            $sender = $request->user();
-            $sender_id = $sender->id;
-            if ($sender->di < $total) return Common::apiResponse(0, __('api_responses.low_balance'), null, 407);
-            $from = $sender;
-        } else {
-            $type = 0;
-            $user = $request->user();
-            $user_id = $user->id;
-            $sender_id = 0;
-            if ($user->di < $total) return Common::apiResponse(0, __('api_responses.low_balance'), null, 407);
-            $from = $user;
+        $expire == 0 ? $ex = 0 : $ex = now()->addDays($expire * $qty)->timestamp;
+        try {
+            if ($request->type == 1) {
+                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeOne($request, $total);
+            } else {
+                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeZero($request, $total);
+            }
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
         }
 
         DB::beginTransaction();
@@ -288,5 +275,31 @@ class VipService
             DB::rollBack();
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
+    }
+
+    public function userTypeOne($request, $total)
+    {
+        $type = 1;
+        if (!$request->to_user) throw new Exception(__('api_responses.missing_params'));
+        $user_id = $request->to_user;
+        $user = $this->userRepository->searchUser($user_id);
+        if (!$user) throw new Exception(__('user not found'));
+        $user_id = $user->id;
+        $sender = $request->user();
+        $sender_id = $sender->id;
+        if ($sender->di < $total) throw new Exception(__('api_responses.low_balance'));
+        $from = $sender;
+        return [$user_id, $from, $type, $sender_id, $user];
+    }
+
+    public function userTypeZero($request, $total)
+    {
+        $type = 0;
+        $user = $request->user();
+        $user_id = $user->id;
+        $sender_id = 0;
+        if ($user->di < $total) throw new Exception( __('api_responses.low_balance'));
+        $from = $user;
+        return [$user_id, $from, $type, $sender_id, $user];
     }
 }

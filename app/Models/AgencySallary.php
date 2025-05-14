@@ -48,4 +48,20 @@ class AgencySallary extends Model
     {
         return floor($this->sallary - $this->cut_amount);
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+
+        static::deleted(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+    }
+
 }

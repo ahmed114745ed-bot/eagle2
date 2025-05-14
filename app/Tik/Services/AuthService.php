@@ -5,6 +5,7 @@ namespace App\Tik\Services;
 use App\Exceptions\CValidationException;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
+use DB;
 use Google_Client;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -59,25 +60,33 @@ class AuthService
     }
 
 
+    /**
+     * @throws \Throwable
+     */
     public function registration($request)
     {
-        if ($this->userRepository->findByPhoneUser($request->phone))  throw new \Exception('already exists');
-        if ($this->userRepository->findByPhoneUserTrashed($request->phone))  throw new \Exception(__('api_responses.reserved'));
-
-
         $phone = str_replace([' ', '-', '/', '{', '}', '_', '(', ')'], '', $request->phone);
 
+        if ($this->userRepository->findByPhoneUser($request->phone))  throw new \Exception('already exists');
 
+        $trashedUser = $this->userRepository->findByPhoneUserTrashed($request->phone);
 
-
-        $data = [
-            'phone' => $phone,
-            'password' => $request->password,
-            'di' => 1000000,
-        ];
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            $user = $this->userRepository->create($data);
+            if ($trashedUser){
+                $trashedUser->restore();
+
+                $trashedUser->password = $request->password;
+
+                $user = $trashedUser;
+            }else{
+                $data = [
+                    'phone' => $phone,
+                    'password' => $request->password,
+                ];
+
+                $user = $this->userRepository->create($data);
+            }
             if (\request('tags') && is_array(\request('tags'))) {
                 $user->tags()->attach(\request('tags'));
             }
@@ -90,9 +99,9 @@ class AuthService
             $token = $user->createToken('api_token')->plainTextToken;
             UserHandling::AddUserVip($user, 'register');
 
-            \DB::commit();
+            DB::commit();
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
 
@@ -116,17 +125,17 @@ class AuthService
 
     public function loginWithGoogle($request)
     {
-        
-     
+
+
         $client = new Google_Client();
-        
+
         $client->setClientId("813834667937-svjtqjn4plrl84c3egcc9qd233864hv1.apps.googleusercontent.com");
         // $payload = $client->verifyIdToken($request['id_token']);
         // if (!$payload) {
         //     throw new \Exception('Google ID Token not found or invalid');
         // }
         // $google_id = $payload['sub'];
-        
+
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
         if (!$user) {

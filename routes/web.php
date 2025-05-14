@@ -259,7 +259,9 @@ Route::get('/update-rooms-microphone', function(){
     return "done";
 });
 
-
+Route::get('/delete_reward_target', function(){
+    \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
+});
 
 Route::get('/test-fcm/{userid}', function($userId) {
     $testToken = 'fTFfWXoaQUqjCqFRqMqqGG:APA91bGw6rmXbrGm8XwPwwZ6sJOlcxeXrGNffGbpfXWBzIBK463WyoDFArkJJnYDRzvjDOP23Q2xqh6_c95vsdk08ww7v_R4GJeTOSxSDuWGTXVOLxpxzxE';

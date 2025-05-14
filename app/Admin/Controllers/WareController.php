@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -86,10 +87,13 @@ class WareController extends MainController
      *
      * @return Grid
      */
-    protected function grid()
+
+     protected function grid()
     {
         $grid = new Grid(new Ware);
-        $grid->model()->whereNot('get_type', 1);
+        // $grid->model()->whereNot('get_type', 1);
+        $grid->model()->where('get_type', '!=', 1);
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -129,7 +133,9 @@ class WareController extends MainController
         $grid->column('name', __('name'))->editable();
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
             $grid->column('price', __('price'))->editable();
+            $grid->setResource('wares/toggle-enable');
             $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+         
         } else {
             $grid->column('price', __('price'));
         }
@@ -368,4 +374,37 @@ class WareController extends MainController
 
         return $form;
     }
+
+
+
+    public function toggleEnable($id, Request $request)
+{
+    try {
+        $ware = Ware::findOrFail($id);
+
+        if (!$request->has('enable')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Missing enable value.',
+            ], 422);
+        }
+
+       
+        $enable = $request->input('enable') == '1' ? true : false;
+       
+        $ware->enable = $enable;  
+        
+        $ware->save();
+        dd($ware);
+        return response()->json([
+            'status' => true,
+            'message' => 'تم تحديث الحالة بنجاح.',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'حدث خطأ أثناء الحفظ: ' . $e->getMessage(),
+        ], 500);
+    }
+}
 }

@@ -41,7 +41,7 @@ class RegisterRequest extends FormRequest
         }elseif ($this->get ('type') == 'facebook'){
             $rules['facebook_id'] = ['required','unique:users'];
         }else{
-            $rules['phone'] = ['required','unique:users'];
+            $rules['phone'] = ['required'];
             $rules['password'] = ['required'];
         }
         return $rules;

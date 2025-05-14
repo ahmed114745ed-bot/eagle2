@@ -224,8 +224,8 @@ class CustomNotification
     public function adminFamily(Family $family, User $user)
     {
         $tokens_notification = $user?->notification_id;
-        $body_ar = __('api.admin_family', ['name' => $family->name], 'ar');
-        $body_en = __('api.admin_family', ['name' => $family->name], 'en');
+        $body_ar = __('api.admin_family', ['name' => $family->name,'appName' => $this->appName('ar')], 'ar');
+        $body_en = __('api.admin_family', ['name' => $family->name, 'appName' => $this->appName('en')], 'en');
         $firebaseBody = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $icon = $family->img;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, $icon);
@@ -401,7 +401,7 @@ class CustomNotification
     }
 
 
-    public function chargeAction(User $user, $request, $admin="Admin")
+    public function chargeAction(User $user, $request, $admin = "Admin")
     {
         $tokens_notification[] = DB::table('users')->where('id', $user->id)->value('notification_id');
         $body_ar = __('api.got_coin', ['coins' => $request->amount, 'name' => $user->name, 'admin' => $admin],  'ar');
@@ -416,8 +416,8 @@ class CustomNotification
     public function banUser(User $user, $duration)
     {
         $tokens_notification = $user?->notification_id;
-        $body_ar             = __('api.ban_user_id', ['duration' => $duration], 'ar');
-        $body_en             = __('api.ban_user_id', ['duration' => $duration], 'en');
+        $body_ar             = __('api.ban_user_id', ['duration' => $duration, 'appName' => $this->appName('ar')], 'ar');
+        $body_en             = __('api.ban_user_id', ['duration' => $duration, 'appName' => $this->appName('en')], 'en');
         $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['user_id'] = $user?->id;
         Common::send_firebase_notification($tokens_notification, $this->appName($user->lan), $firebaseBody, data: $data, messageType: 'ban-user');
@@ -429,8 +429,8 @@ class CustomNotification
     {
         $tokens_notification = $user?->notification_id;
 
-        $body_ar             = __('api.removeBan_user_id', locale: 'ar');
-        $body_en             = __('api.removeBan_user_id', locale: 'en');
+        $body_ar             = __('api.removeBan_user_id', ['appName' => $this->appName('ar')], locale: 'ar');
+        $body_en             = __('api.removeBan_user_id', ['appName' => $this->appName('en')], locale: 'en');
 
         $firebaseBody        = ($user?->lan === 'ar') ? $body_ar : $body_en;
         $data['user_id'] = $user?->id;

@@ -578,4 +578,28 @@ if (!function_exists('showSvgaImage')) {
                 ");
         return $model;
     }
+
+
+
+    if (! function_exists('clearAgencyCache')) {
+        function clearAgencyCache($agencyId)
+        {
+            $tabs = ['members', 'charges', 'salaries', 'requests', 'targets', 'rate', 'stars', 'heroes', 'giftlog'];
+    
+            foreach ($tabs as $tab) {
+                for ($i = 1; $i <= 10; $i++) {
+                    Cache::forget("agency_{$agencyId}_{$tab}_page_{$i}");
+                }
+    
+                if (in_array($tab, ['rate', 'stars', 'heroes'])) {
+                    for ($month = 1; $month <= 12; $month++) {
+                        $year = date('Y'); 
+                        Cache::forget("agency_{$agencyId}_{$tab}_{$month}_{$year}");
+                    }
+                }
+            }
+    
+            Cache::forget("agency_{$agencyId}_giftlog");
+        }
+    }
 }
