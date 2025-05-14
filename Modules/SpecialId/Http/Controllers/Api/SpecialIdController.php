@@ -95,11 +95,24 @@ class SpecialIdController extends Controller
 
         if ($pack) {
             $pack->update(['is_used' => $status, 'use_num' => 1]);
-            SpecialHistory::create([
-                'status' => $status,
+            SpecialHistory::where('user_id', $user->id)->where('ware_id', '!=', $pack->target_id)->update(['status' => 0]);
+            $specialHistory =  SpecialHistory::where([
                 'user_id' => $user->id,
                 'ware_id' => $pack->target_id,
-            ]);
+            ])->first();
+            if (!$specialHistory) {
+
+
+                SpecialHistory::create([
+                    'status' => $status,
+                    'user_id' => $user->id,
+                    'ware_id' => $pack->target_id,
+                ]);
+            } else {
+                $specialHistory->status = $status;
+                $specialHistory->save();
+            }
+
 
             $user->special_id = $status == 0 ? null : $pack->ware->value;
             $user->save();
