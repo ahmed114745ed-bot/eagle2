@@ -440,7 +440,7 @@ trait CalcsTrait
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
-        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $receivedNum        =  floor($diamondReceived  * (@$expPercentages[1] ?? 0));
         $diamondSend             = $user->total_sender_diamonds;
 
         $senderNum        = floor($diamondSend  * $expPercentages[0]);
@@ -758,8 +758,8 @@ trait CalcsTrait
 
     public static function ovip_center_rank_img($user_id)
     {
-     
-     
+
+
         if (is_object($user_id)) {
             if (isset($user_id->userId)) {
                 $user_id = $user_id->userId;
@@ -799,9 +799,9 @@ trait CalcsTrait
 
     public static function wareUserVip($user_id, $type, $item)
     {
-       
 
-   
+
+
 
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);
