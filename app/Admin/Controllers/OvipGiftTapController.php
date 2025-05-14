@@ -327,16 +327,15 @@ class OvipGiftTapController extends MainController
         } else {
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
-        \Log::info('privilegeTypes');
 
-          \Log::info($privilegeTypes?->keys()->first());
+ 
           \Log::info('type');
-          
+
           \Log::info($type);
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
 
         $alert =false;
-        if (!$currentType) {
+        if (!$type) {
             $alert = true;
         }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
