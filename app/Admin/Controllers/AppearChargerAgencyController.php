@@ -181,7 +181,7 @@ class AppearChargerAgencyController extends MainController
             })
             ->switch(Common::getSwitchStates());
 
-        $grid->actions(function ( $actions) {
+        $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->add(new DeleteShippingAgencyAction());
             $actions->disableDelete();
@@ -239,12 +239,10 @@ class AppearChargerAgencyController extends MainController
         $form->hidden('agency_manger_id', __('app manger id'));
 
         $form->text('name', __('name'))->rules('required');
-       // $form->text('notice', __('notice'))->rules('required');
         $form->switch('status', __('status'));
-       // $form->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
-         $form->text('phone', __('agency whatsApp number'))->rules('required')->attribute('id', 'phone-input');
+
+        $form->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input');
         $form->url('url', __('url'));
-       // $form->textarea('contents', __('contents'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
 
 
@@ -258,7 +256,7 @@ class AppearChargerAgencyController extends MainController
             </script>');
         }
 
-         Admin::script(<<<'JS'
+        Admin::script(<<<'JS'
         function initPhoneInput() {
             const input = document.querySelector("#phone-input");
             if (input && !input.classList.contains('iti-initialized')) {
@@ -314,6 +312,8 @@ class AppearChargerAgencyController extends MainController
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
+
+          $form->phone_code = request('phone_code');
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
