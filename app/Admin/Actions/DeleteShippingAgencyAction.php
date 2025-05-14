@@ -35,6 +35,13 @@ class DeleteShippingAgencyAction extends RowAction
 
     public function dialog()
     {
-        $this->confirm(__('dashboard.chickDelete'), '', []);
+      //  $this->confirm(__('dashboard.chickDelete'), '', []);
+
+      $this->confirm(__('dashboard.chickDelete'), __('messages.deleteShipping'), [
+            'icon' => 'warning',
+            'showCancelButton' => true,
+            'confirmButtonText' => __('messages.yes'),
+            'cancelButtonText' => __('messages.cancel'),
+        ]);
     }
 }
