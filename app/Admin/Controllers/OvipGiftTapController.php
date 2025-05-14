@@ -39,7 +39,7 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
-        dd($ovip?->privilegs->first()?->type);
+      
 
 
         return parent::index($content
@@ -329,6 +329,7 @@ class OvipGiftTapController extends MainController
         }
 
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+        
         $alert =false;
         if (!$currentType) {
             $alert = true;
