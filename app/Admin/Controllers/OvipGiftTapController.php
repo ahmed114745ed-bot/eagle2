@@ -39,6 +39,8 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
+        dd($ovip?->privilegs->first()?->type);
+
 
         return parent::index($content
             ->title(trans('Privileges'))
