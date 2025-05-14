@@ -328,10 +328,6 @@ class OvipGiftTapController extends MainController
             $privilegeTypes = $privileges?->pluck('name', 'type')->sortKeys();
         }
 
- 
-          \Log::info('type');
-
-          \Log::info($type);
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
 
         $alert =false;
