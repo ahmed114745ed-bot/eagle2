@@ -73,12 +73,10 @@ class DedicateVipController extends MainController
         Admin::style("
         .table {
             background-color: var(--table-background-color) !important;
-            color: var(--text-primary-color) !important;
         }
     
         .table th, .table td {
             background-color: var(--table-background-color) !important;
-            color: var(--text-primary-color) !important;
         }
     
         .table tbody tr:hover {
