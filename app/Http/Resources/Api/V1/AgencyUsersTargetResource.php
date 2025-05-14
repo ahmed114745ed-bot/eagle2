@@ -36,7 +36,7 @@ class AgencyUsersTargetResource extends JsonResource
             ->whereIn('add_month', $months)
             ->select('add_month', 'user_diamonds')
             ->pluck('user_diamonds', 'add_month');
-            
+
         $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
@@ -67,7 +67,7 @@ class AgencyUsersTargetResource extends JsonResource
                 'user_hours' => @$target->user_hours ?? 0,
                 'user_days' => @$target->user_days ?? 0,
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
-                'old_targets'  => $userTarget,
+                'old_targets'  => $userTargets,
             ],
             'sender_gifts' => SenderGiftLogResource::collection($giftLog),
         ];
