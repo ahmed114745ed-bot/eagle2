@@ -150,7 +150,6 @@ class AuthService
                     'email' => $request['email'],
                     'name' => $request['name'],
                 ];
-                throw new CValidationException('email already taken');
                 /*return  [[], '', $resource];
                 Common::apiResponse(false, 'email already taken', $resource, 405);*/
             } else {
