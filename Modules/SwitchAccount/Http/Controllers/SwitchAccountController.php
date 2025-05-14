@@ -43,7 +43,7 @@ class SwitchAccountController extends Controller
             'key' => $key,
             'expire' => 30,
         ]);
-        $accounts = $this->getAccounts($user->id, $otherUser->id, $user->device_token);
+        $accounts = $this->getAllAccounts($user->id, $otherUser->id, $user->device_token);
         $user_acount = UserAccount::query()->where(function ($q) use ($user) {
             $q->where("parent_user_id", $user->id)->orWhere("child_user_id", $user->id);
         })->first();
