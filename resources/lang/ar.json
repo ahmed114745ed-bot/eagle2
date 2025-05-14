@@ -2249,8 +2249,15 @@
   "failed_accept_request": "فشل في قبول الطلب. يرجى المحاولة مرة أخرى.",
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
   "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
-  "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد"
-
+  "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد",
+  "cp_gift_price": "سعر هدية النقاط التنافسية",
+  "Enter Exp": "أدخل النقاط",
+  "rooms_gift_price": "سعر هدية الغرف",
+  "charge_gift_price": "سعر هدية الشحن",
+  "attraction_gift_price": "سعر هدية الجاذبية",
+  "Go to Settings": "انتقل إلى الإعدادات"
+,
+  "wealth_gift_price": "سعر هدية الثروة"
 
 
 
