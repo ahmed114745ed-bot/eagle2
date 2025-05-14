@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
         $schedule->command('queue:work --queue=default')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=updatePkAndSendToZigo')->withoutOverlapping()->runInBackground();
@@ -42,7 +42,7 @@ class Kernel extends ConsoleKernel
      *
      * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
 
