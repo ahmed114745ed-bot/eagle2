@@ -3,16 +3,11 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
-use App\Admin\Controllers\MainOldController;
-use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-
-;
-use App\Selectables\Gifts;
 use App\Helpers\UserCommon;
 use App\Services\AppFeatureService;
 use Encore\Admin\Layout\Row;
@@ -20,10 +15,9 @@ use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\PkEvent;
 use Modules\Events\Entities\PkReward;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class PkEventController extends MainOldController
+class PkEventController extends MainController
 {
 
     use HasResourceActions;

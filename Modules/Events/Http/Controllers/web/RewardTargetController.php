@@ -2,22 +2,14 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainOldController;
-use App\Models\Vip;
 use App\Models\OVip;
 use App\Models\Ware;
-use App\Models\Emoji;
-
 use App\Selectables\Wares;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
 use Encore\Admin\Admin;
 
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-
 use App\Admin\Controllers\MainController;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\ChargeTargetEvent;
