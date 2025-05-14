@@ -486,6 +486,9 @@ use App\Models\Vip;
     <div class="settings-sidebar">
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
+            <button onclick="showSection('workSettings')" class="position-relative">
+                {{ __('Work') }}
+            </button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
 
@@ -511,12 +514,7 @@ use App\Models\Vip;
                     <span>{{ __('soon') }}</span>
                 </div>
             </button>
-            <button onclick="showSection('workSettings')" class="position-relative">
-                {{ __('Work') }}
-                <div class="ribbon-banner">
-                    <span>{{ __('soon') }}</span>
-                </div>
-            </button>
+           
         </div>
     </div>
     <div class="all-page" style="    width: 100%;">

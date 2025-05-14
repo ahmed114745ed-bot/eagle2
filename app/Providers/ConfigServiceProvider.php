@@ -47,7 +47,7 @@ class ConfigServiceProvider extends ServiceProvider
 
     public function getReceivedAndSanderPercentage(): array
     {
-        // return Cache::remember('exp_percentages', now()->addMinutes(60), function () {
+        return Cache::remember('exp_percentages', now()->addMinutes(60), function () {
             $keys = [
                 'exp_sender_percentage',
                 'exp_received_percentage',
@@ -66,7 +66,7 @@ class ConfigServiceProvider extends ServiceProvider
             }
 
             return $values;
-        // });
+        });
     }
     // public function getReceivedAndSanderPercentage(): array
     // {
