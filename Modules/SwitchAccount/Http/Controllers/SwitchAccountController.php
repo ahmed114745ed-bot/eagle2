@@ -89,6 +89,35 @@ class SwitchAccountController extends Controller
         return $accounts ?? [];
     }
 
+    public function getAllAccounts($userId, $otherUserId, $deviceToken)
+    {
+
+        if (empty($deviceToken))  return  [];
+
+        $users = UserAccount::
+            //            where(function ($q) use ($userId,$otherUserId){
+            //                $q->where("parent_user_id", $userId)
+            //                    ->orWhere("child_user_id", $userId)
+            //                    ->orWhere("child_user_id", $otherUserId)
+            //                    ->orWhere("parent_user_id", $otherUserId);
+            //            })
+            where('device_token', $deviceToken)->where('parent_user_id',$userId)
+            ->get();
+
+        // $parentUserIds = $users->pluck('parent_user_id');
+        $childUserIds = $users->pluck('child_user_id');
+
+        // $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
+
+        // $filteredIds = array_filter($allIds, function ($id) use ($userId) {
+        //     return $id != $userId;
+        // });
+        // $filteredIds = array_values($filteredIds);
+        $accounts = User::query()->whereIn('id', $childUserIds)->get();
+
+        return $accounts ?? [];
+    }
+
     public function getOtherUser($request)
     {
         $bearerToken = $request->token_new_account;
@@ -133,7 +162,7 @@ class SwitchAccountController extends Controller
         $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->pluck('id')->toArray();
         $total_unread_message =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $user->id)->where('status', 'not Like', 'seen')->count();
 
-        $accounts = $this->getAccounts($user->id, 0, $user->device_token);
+        $accounts = $this->getAllAccounts($user->id, 0, $user->device_token);
         $user_acount = UserAccount::query()->where(function ($q) use ($user) {
             $q->where("parent_user_id", $user->id)->orWhere("child_user_id", $user->id);
         })->first();

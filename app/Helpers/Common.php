@@ -373,6 +373,9 @@ class Common
 
     public static function getConf($key)
     {
+        if($key === 'enable_vip_auto'){
+            return "true";
+        }
         if ($conf = Config::query()->where('name', $key)->first()) {
             return $conf->value;
         }
