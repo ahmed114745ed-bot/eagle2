@@ -298,7 +298,7 @@ class VipService
         $user = $request->user();
         $user_id = $user->id;
         $sender_id = 0;
-        if ($user->di < $total) return Common::apiResponse(0, __('api_responses.low_balance'), null, 407);
+        if ($user->di < $total) throw new Exception( __('api_responses.low_balance'));
         $from = $user;
         return [$user_id, $from, $type, $sender_id, $user];
     }

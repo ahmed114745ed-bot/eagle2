@@ -27,10 +27,14 @@ class DeleteTrashedUsers extends Command
      */
     public function handle()
     {
-        $deleted = User::onlyTrashed()
+        $trashedUsers = User::onlyTrashed()
             ->where('deleted_at', '<=', Carbon::now()->subMonth())
-            ->forceDelete();
+            ->get();
 
-        $this->info("Permanently deleted {$deleted} user(s).");
+        $trashedUsers->each(function ($item){
+           $item->forceDelete() ;
+        });
+
+        $this->info("Permanently deleted {$trashedUsers} user(s).");
     }
 }
