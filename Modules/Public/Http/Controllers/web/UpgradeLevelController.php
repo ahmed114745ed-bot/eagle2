@@ -21,7 +21,7 @@ class UpgradeLevelController extends MainController
     public function ovipConfig(Request $request)
     {
 
-        $data = $request->except('_token','test_calco');
+        $data = $request->except('_token');
         $Keys = [
             'exp_sender_percentage',
             'exp_received_percentage',

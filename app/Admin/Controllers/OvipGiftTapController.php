@@ -39,12 +39,14 @@ class OvipGiftTapController extends MainController
         } elseif (request('level')) {
             $ovip = OVip::where('level', request('level'));
         }
+      
+
 
         return parent::index($content
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->id));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->id,$ovip?->privilegs->first()?->type));
             })
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
@@ -314,7 +316,7 @@ class OvipGiftTapController extends MainController
     }
 
 
-    private function tabsComponent($privileges ,$level)
+    private function tabsComponent($privileges ,$level,$type)
     {
         $content = new Row();
 
@@ -327,8 +329,9 @@ class OvipGiftTapController extends MainController
         }
 
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
+
         $alert =false;
-        if (!$currentType) {
+        if (!$type) {
             $alert = true;
         }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [
