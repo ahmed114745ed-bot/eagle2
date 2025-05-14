@@ -13,7 +13,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Controllers\MainOldController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class GeneralRoleController extends MainOldController
+class GeneralRoleController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'general-roles';
