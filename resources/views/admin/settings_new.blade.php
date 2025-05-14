@@ -1249,7 +1249,7 @@ use App\Models\Vip;
                                             <div class="form-group">
                                                 <label for="charge_gift_price">{{ __('coins') }}</label>
                                                 <input type="text" id="charge_gift_price" name="test_calco"
-                                                    placeholder="{{  __('charge_gift_price') }}"
+                                                    placeholder="{{  __('coins') }}"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['charge_gift_price'] ?? '' }}"
                                                     class="form-control" required>
