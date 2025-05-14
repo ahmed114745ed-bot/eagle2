@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         Commands\UpdateRoomUserNowCron::class,
         Commands\OpenStatusAppFeature::class,
         Commands\CloseStatusAppFeature::class,
+        Commands\DeleteTrashedUsers::class,
     ];
 
     /**
@@ -33,8 +34,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=heavy2')->withoutOverlapping()->runInBackground();
         $schedule->command('queue:work --queue=heavy3')->withoutOverlapping()->runInBackground();
         $schedule->command('wallet:backup')->monthly();
-
-
+        $schedule->command('users:delete-trashed-users')->daily();
     }
 
     /**
