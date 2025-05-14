@@ -180,7 +180,7 @@ class AgencyRepository extends AbstractRepository
 
     public function getAgencyByFilter($keyword)
     {
-        return  $this->model->withoutGlobalScope(HostAgencyScope::class) ->query()
+        return  $this->model->withoutGlobalScope(HostAgencyScope::class) 
             ->with('owner')
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%')
