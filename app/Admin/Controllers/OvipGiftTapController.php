@@ -135,7 +135,7 @@ class OvipGiftTapController extends MainController
             HTML;
         })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
 
-
+         $grid->disableActions();
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableEdit();

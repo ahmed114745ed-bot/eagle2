@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --queue=heavy3')->withoutOverlapping()->runInBackground();
         $schedule->command('wallet:backup')->monthly();
 
+
     }
 
     /**
@@ -59,7 +60,7 @@ class Kernel extends ConsoleKernel
             $setting =   Setting::where('key', 'timezone')->first();
             return $setting?->value ?? 'UTC';
         });
-        
+
         return $timezone;
     }
 }

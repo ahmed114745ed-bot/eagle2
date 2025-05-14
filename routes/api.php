@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Models\Room;
 use App\Models\User;
@@ -139,7 +140,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan'])->group(
         function () {
-
+            Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
             //     return Broadcast::auth($request);
             // });
@@ -480,6 +481,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('join_request', [AgencyController::class, 'joinRequest']);
                 Route::get('show', [AgencyController::class, 'view']);
                 Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
+                Route::get('admins/{id}', [AgencyController::class, 'admin']);
                 Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']);
                 Route::get('stars/{id}', [AgencyController::class, 'star']);
                 Route::get('heroes/{id}', [AgencyController::class, 'heroes']);

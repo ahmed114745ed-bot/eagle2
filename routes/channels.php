@@ -43,3 +43,11 @@ Broadcast::channel('enter-user-room', function ($user) {
 Broadcast::channel('test-channel', function () {
     return true; // No authentication required
 });
+
+
+Broadcast::channel('presence.user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id
+        ? ['id' => $user->id, 'name' => $user->name, 'device_token' => $user->device_token]
+        : false;
+});
+

@@ -78,4 +78,20 @@ class Charge extends Model
     {
         return $this->belongsTo(Agency::class, 'agency_id');
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+
+        static::deleted(function ($model) {
+            if ($model->agency_id) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+    }
+
 }

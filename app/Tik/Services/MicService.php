@@ -27,8 +27,7 @@ class MicService
         private readonly PkRepository $pkRepository,
         private readonly TimeLogRepository $timeLogRepository,
 
-    ) {
-    }
+    ) {}
 
 
     public function createLiveTime($userId, $seconde)
@@ -66,13 +65,15 @@ class MicService
         $mic_arr = explode(',', $room->microphone);
         $main_mic = explode(',', $room->main_microphone);
         $base_mic = explode(',', $room->getOriginal('microphone'));
+
+        if (!isset($main_mic[$position])) throw new Exception(__('This seat is out of the designated range'));
         $oldValue = $main_mic[$position];
 
         //If it is on the mic, skip to the top mic, and the original mic is empty
         if (in_array($user->id, $mic_arr)) {
 
             CpRoomHistory::where("user_one_id", $user->id)
-            ->orWhere("user_two_id", $user->id)->delete();
+                ->orWhere("user_two_id", $user->id)->delete();
 
             $key = array_search($user->id, $mic_arr);
             $old = $main_mic[$key];
@@ -105,7 +106,7 @@ class MicService
     {
         $existingCps = Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
-                  ->orWhere("user_two_id", $user->id);
+                ->orWhere("user_two_id", $user->id);
         })->whereIn("status", [
             CpStatus::ACTIVE,
             CpStatus::RESTORED
@@ -119,10 +120,10 @@ class MicService
             return true;
         }
 
-        if ($room->mode == 0){
+        if ($room->mode == 0) {
             $userSeats = $this->getUserNearby($position - 1, mode: $room->mode);
-            $userSeats = array_map(fn($item) => $item + 1 , $userSeats);
-        }else{
+            $userSeats = array_map(fn($item) => $item + 1, $userSeats);
+        } else {
 
             $userSeats = $this->getUserNearby($position, mode: $room->mode);
         }
@@ -134,7 +135,7 @@ class MicService
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
                 $this->handleCpRoomHistory($user, $room, $position, $antherUserPosition, $userOtherId);
-//                $this->sendCpLovelyMessage($room, $user);
+                //                $this->sendCpLovelyMessage($room, $user);
             }
         }
         $this->sendCpLovelyMessage($room, $user);
@@ -144,7 +145,7 @@ class MicService
 
     public function sendCpLovelyMessage($room, $user)
     {
-        $cpRoomHistories = CpRoomHistory::where("room_id",$room->id)->get(['index1', 'index2']);
+        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
         $indices = $cpRoomHistories->map(function ($history) {
             return [$history->index1, $history->index2];
         })->toArray();
@@ -170,7 +171,7 @@ class MicService
             ->where("user_two_id", $userOtherId)
             ->orWhere(function ($query) use ($user, $userOtherId) {
                 $query->where("user_two_id", $user->id)
-                      ->where("user_one_id", $userOtherId);
+                    ->where("user_one_id", $userOtherId);
             })
             ->where('room_id', $room->id)
             ->first();
@@ -204,7 +205,7 @@ class MicService
             // ->where("cp_relation_id",5)
             ->first();
     }
-    public function getUserNearby($index, $mode,$rowSize = 4)
+    public function getUserNearby($index, $mode, $rowSize = 4)
     {
 
         if ($index % $rowSize == 0) {
@@ -226,9 +227,9 @@ class MicService
 
 
         $room = $this->roomRepository->findRoomUser($data['owner_id'], false);
-       if(!$room) throw new Exception(__('api_responses.room_not_found'));
+        if (!$room) throw new Exception(__('api_responses.room_not_found'));
 
-         $this->goMicrophoneHand($user, $room);
+        $this->goMicrophoneHand($user, $room);
         return $room;
     }
 
@@ -266,7 +267,7 @@ class MicService
         return true;
     }
 
-    public function handleLeaveCp($user,$room)
+    public function handleLeaveCp($user, $room)
     {
         $userId = $user->id;
         $this->removeUserCpInRoom($userId);

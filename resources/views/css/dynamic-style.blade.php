@@ -382,6 +382,14 @@
         border: 1px solid var(--second-alpha) !important;
     }
 
+    .nav-tabs > li {
+        float: left;
+    }
+
+    .rtl .nav-tabs > li {
+        float: right;
+    }
+
     .rtl .box-body .fields-group [class*="col-md-12"] {
         float: left; !important;
     }
@@ -696,7 +704,7 @@
             width: 70px;
             position: relative;
             font-size: 10px;
-            
+
             position: relative;
             right: -91px;
             top: 6px;
@@ -870,7 +878,7 @@
             left: -30px;
            }
 
-          
+
 
 
 

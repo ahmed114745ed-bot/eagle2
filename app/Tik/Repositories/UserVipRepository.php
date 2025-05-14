@@ -76,6 +76,8 @@ class UserVipRepository extends AbstractRepository
 
     public function findByUserLevel($userId, $level, $vipId)
     {
-        return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id', $vipId)->where('expire', '!=', 0)->where('expire', '<', Carbon::now()->timestamp)->first();
+        return $this->model->where('user_id', $userId)->where('level', $level)->where('vip_id', $vipId)->where(function ($query) {
+            $query->where('expire', '!=', 0)->where('expire', '>', Carbon::now()->timestamp)->orWhere('expire', 0);
+        })->first();
     }
 }

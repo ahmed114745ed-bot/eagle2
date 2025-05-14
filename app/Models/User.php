@@ -1237,7 +1237,15 @@ class User extends Authenticatable
             if ($newCoins > $originalCoins) {
                 $user->new_gift = true;
             }
+            if ($user->agency_id) {
+                clearAgencyCache($user->agency_id);
+            }
 
+            static::deleted(function ($user) {
+                if ($user->agency_id) {
+                    clearAgencyCache($user->agency_id);
+                }
+            });
             // Handle profile.avatar update
 
         });

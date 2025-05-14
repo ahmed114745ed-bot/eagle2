@@ -37,9 +37,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15px;
+    margin-right: 57px;
     color: white;
     font-size: 20px;
+    margin-bottom: 6px;
 }
 
 .stat-icon.bg-blue {
@@ -153,7 +154,9 @@
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
-     background: var(--box-background-color);
+    /* background: var(--secondary-color); */
+    /* filter: brightness(0.85); */
+
 }
 
 .agency-header {
@@ -166,6 +169,8 @@
     background: var(--secondary-color);
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    /* filter: brightness(0.5); */
+
 }
 
 .agency-avatar {
@@ -233,7 +238,8 @@
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     text-align: center;
-    min-width: 100px;
+    min-width: 200px;
+
 }
 
 .stat-value {
@@ -326,6 +332,8 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* filter: brightness(0.5); */
+
 }
 
 .section-header {
@@ -526,7 +534,7 @@
 }
 
 .data-table th {
-    text-align: left;
+    /* text-align: left; */
     padding: 12px 15px;
     background: var(--secondary-color);
    
@@ -660,18 +668,146 @@
      background: var(--secondary-color);
 }
 
-@media (max-width: 768px) {
+
+
+    .target-card-section-1{
+        /* display: inline-flex; */
+        width: 100%;
+        padding-top: 26px;
+        margin-bottom: 35px;
+
+    }
+    .card-target-filter{
+        display: inline;
+        width: 34%;
+        left: 33px;
+        position: absolute;
+    }
+    .card-target-filter .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+    .card-target-filter button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+    .card-target-filter-phone{
+        width: 51%;
+        margin-bottom: 27px;
+        position: relative;
+    }
+    .card-target-filter-phone .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+    .card-target-filter-phone button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+
+    .target-card-stat{
+        width: 50%;
+    }
+    .filter-form{
+        border-radius: 13px;
+        height: 165px;
+
+    }
+
+    .card-target-filter-phone{
+        /* display: none; */
+    }
+    .card-target-filter{
+        display: none;
+    }
+    @media (max-width: 768px) {
     .stats-row {
         flex-direction: column;
+        width: 108%;
+
     }
     
     .avatar-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
+
+    .target-card-section-1 {
+            display: grid;
+            width: 100%;
+            padding-top: 26px;
+            margin-bottom: 35px;
+        }
+
+    
+    .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 118px;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 6px;
+
+    }
+
+    
+    .target-card-stat {
+         width: 92%;
+
+    }
+    .card-target-filter{
+        display: none;
+    }
+    .card-target-filter-phone {
+        display: block;
+        width: 100%;
+        left: 0px;
+        position: relative;
+        margin-bottom: 31px;
+
+    }
+    .card-target-filter-phone  .col-md-7{  
+       float: none;
+    }
+
+    .card-target-filter-phone .form-control {
+            display: block;
+            width: 89%;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: var(--text-secondary-color) !important;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid var(--primary-hover-alpha) !important;
+            border-radius: 4px;
+        }
+
+        .card-target-filter-phone .filter-form {
+            border-radius: 13px;
+            height: 238px;
+        }
+
+        .card-target-filter-phone .align-items-end{
+            display: grid;
+        }
+
+        .card-target-filter-phone button {
+            left: -224px;
+
+        }
 }
     </style>
 
-<!-- SweetAlert2 -->
 
 </head>
 <body>
@@ -822,16 +958,32 @@
             <a href="?tab=targets" class="tab-btn {{ $activeTab == 'targets' ? 'active' : '' }}" data-target="targets-tab">{{ __('Targets') }}</a>
 
         </div>
-          
+        <div id="tab-loading" style="
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* transform: translate(-50%, -50%); */
+            background: var(--primary-color);
+            color: var(--text-primary-color);
+            z-index: 9999;
+            padding: 30px 40px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        ">
+            {{ __('Loading...') }}
+        </div>
 
-         
+           
     
               
         <div class="tab-content active" id="members-tab">
             <div class="card">
                 <div class="card-header">
                     <h3>{{ __('Agency Members') }}</h3>
-                    <span class="badge count-badge">{{ $members->total() }}</span>
+                    <span class="badge count-badge">{{ optional($members)->total() ?? 0 }}</span>
                 </div>
                 
                 @if($members && $members->count())
@@ -892,7 +1044,12 @@
                     </div>
                     
                     <div class="pagination-wrapper">
-                        {{ $members->appends(['charges_page' => $charges->currentPage(),'salaries_page' => $salaries->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
+                        {{ $members?->appends([
+                            'charges_page' => $charges?->currentPage(),
+                            'salaries_page' => $salaries?->currentPage(),
+                            'join_page'    => $agencyJoinRequests?->currentPage(),
+                            'target_page'  => $memberTargets?->currentPage(),
+                        ])->links('vendor.pagination.default') }}
                     </div>
                 @else
                     <div class="empty-table">
@@ -951,8 +1108,13 @@
                                 </div>
                             </div>
 
-                            <div class="pagination-container">
-                                {{ $charges->appends(['members_page' => $members->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'salaries_page' => $salaries->currentPage(),'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
+                            <div class="pagination-wrapper">
+                                {{ $members?->appends([
+                                    'charges_page' => $charges?->currentPage(),
+                                    'salaries_page' => $salaries?->currentPage(),
+                                    'join_page'    => $agencyJoinRequests?->currentPage(),
+                                    'target_page'  => $memberTargets?->currentPage(),
+                                ])->links('vendor.pagination.default') }}
                             </div>
 
                     
@@ -995,11 +1157,16 @@
                                         @endif
                                     </table>
 
-                                    <!-- Pagination Links -->
-                                    <div class="pagination-container">
-                                        {{ $salaries->appends(['charges_page' => $charges->currentPage(),'join_page' => $agencyJoinRequests->currentPage(),'members_page' => $members->currentPage(),
-                                        'target_page'  => $memberTargets->currentPage(),])->links('vendor.pagination.bootstrap-4') }}
-                                    </div>
+                                    @if($salaries)
+                                            <div class="pagination-container">
+                                                {{ $salaries->appends([
+                                                    'charges_page' => $charges?->currentPage(),
+                                                    'join_page' => $agencyJoinRequests?->currentPage(),
+                                                    'members_page' => $members?->currentPage(),
+                                                    'target_page' => $memberTargets?->currentPage(),
+                                                ])->links('vendor.pagination.bootstrap-4') }}
+                                            </div>
+                                        @endif
                                 </div>
                             </div>
 
@@ -1094,12 +1261,14 @@
                         </div>
             
                         <div class="pagination-container mt-3">
-                            {{ $agencyJoinRequests->appends([
-                                'members_page' => $members->currentPage(),
-                                'salaries_page' => $salaries->currentPage(),
-                                'charges_page' => $charges->currentPage(),
-                                'target_page'  => $memberTargets->currentPage(),
-                            ])->links('vendor.pagination.bootstrap-4') }}
+                            @if($agencyJoinRequests)
+                                {{ $agencyJoinRequests->appends([
+                                    'members_page' => $members ? $members->currentPage() : 1,
+                                    'salaries_page' => $salaries ? $salaries->currentPage() : 1,
+                                    'charges_page' => $charges ? $charges->currentPage() : 1,
+                                    'target_page'  => $memberTargets ? $memberTargets->currentPage() : 1,
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            @endif
                         </div>
                     
                 </div>
@@ -1112,78 +1281,138 @@
                             <i class="fas fa-bullseye"></i> {{ __('Agency Targets') }}
                         </h3>
                         <div class="card-tools">
-                            <span class="badge bg-purple">{{ $memberTargets->total() }}</span>
-                        </div>
+                        <span class="badge bg-purple">
+                            {{ $memberTargets ? $memberTargets->total() : 0 }}
+                        </span>           
+                    
+                    </div>
                     </div>
                     
-                    <div class="card-body">
-                        <!-- Filter Form -->
-                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
-                            <div class="row">
-                                <input type="hidden" name="tab" value="targets">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="month">{{ __('Month') }}</label>
-                                        <select name="month" id="month" class="form-control">
-                                            <option value="">All Months</option>
-                                            @for($m = 1; $m <= 12; $m++)
-                                                <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
-                                                    {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                                                </option>
-                                            @endfor
-                                        </select>
+                <div class="card-body">
+                       <div class="target-card-section-1">
+
+
+                       <div class="card-target-filter-phone ">
+                                <!-- Filter Form -->
+                                <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
+                                    <div class="row">
+                                        <input type="hidden" name="tab" value="targets">
+                                        <div class="col-sm-12 col-md-7 ">
+                                            <div class="form-group">
+                                                <label for="month">{{ __('Month') }}</label>
+                                                <select name="month" id="month" class="form-control">
+                                                    <option value="">All Months</option>
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="year">{{ __('Year') }}</label>
+                                                <select name="year" id="year" class="form-control">
+                                                    <option value="">All Years</option>
+                                                    @for($y = now()->year; $y >= 2020; $y--)
+                                                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-filter"></i> {{ __('Apply') }}
+                                            </button>
+                                            @if(request()->has('month') || request()->has('year'))
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="year">{{ __('Year') }}</label>
-                                        <select name="year" id="year" class="form-control">
-                                            <option value="">All Years</option>
-                                            @for($y = now()->year; $y >= 2020; $y--)
-                                                <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
-                                                    {{ $y }}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-filter"></i> {{ __('Apply') }}
-                                    </button>
-                                    @if(request()->has('month') || request()->has('year'))
-                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
-                                        <i class="fas fa-times"></i>
-                                    </a>
-                                    @endif
-                                </div>
+                                </form>
                             </div>
-                        </form>
+                    
+                        <div class="target-card-stat">
+                                <div class="stats-row">
+                                            <div class="stat-card">
+                                                <div class="stat-icon bg-blue">
+                                                    <i class="fas fa-bullseye"></i>
+                                                </div>
+                                                <div class="stat-info">
+                                                    <div class="stat-value">{{ $agencyTarget }}</div>
+                                                    <div class="stat-label">{{ __('Target') }}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="stat-card">
+                                                <div class="stat-icon bg-green">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </div>
+                                                <div class="stat-info">
+                                                    <div class="stat-value">{{ $rate }}</div>
+                                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                            </div>
+
+
+
+                            <!-- <div class="card-target-filter">
+                                <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
+                                    <div class="row">
+                                        <input type="hidden" name="tab" value="targets">
+                                        <div class="col-sm-12 col-md-7 ">
+                                            <div class="form-group">
+                                                <label for="month">{{ __('Month') }}</label>
+                                                <select name="month" id="month" class="form-control">
+                                                    <option value="">All Months</option>
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="year">{{ __('Year') }}</label>
+                                                <select name="year" id="year" class="form-control">
+                                                    <option value="">All Years</option>
+                                                    @for($y = now()->year; $y >= 2020; $y--)
+                                                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-filter"></i> {{ __('Apply') }}
+                                            </button>
+                                            @if(request()->has('month') || request()->has('year'))
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </form>
+                            </div> -->
+                     </div>
             
-                        <!-- Stats Cards -->
-                        <div class="stats-row">
-                            <div class="stat-card">
-                                <div class="stat-icon bg-blue">
-                                    <i class="fas fa-bullseye"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value">{{ $agencyTarget }}</div>
-                                    <div class="stat-label">{{ __('Target') }}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon bg-green">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value">{{ $rate }}</div>
-                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
-                                </div>
-                            </div>
-                        </div>
+                     
             
                         <!-- Stars Section -->
                         <div class="section-box">
@@ -1359,23 +1588,26 @@
                              
                             </div>
                             
-                            @if($memberTargets->isEmpty())
-                            <div class="empty-table">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <p>{{ __('No target data available') }}</p>
-                            </div>
+                            @if($memberTargets && $memberTargets->isEmpty())
+                                <div class="empty-table">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <p>{{ __('No target data available') }}</p>
+                                </div>
                             @endif
-                            
-                            <div class="pagination-wrapper">
-                                {{ $memberTargets->appends([
-                                    'members_page' => $members->currentPage(),
-                                    'salaries_page' => $salaries->currentPage(),
-                                    'charges_page' => $charges->currentPage(),
-                                    'join_page' => $agencyJoinRequests->currentPage(),
-                                    'month' => request('month'),
-                                    'year' => request('year'),
-                                ])->links('vendor.pagination.bootstrap-4') }}
-                            </div>
+
+                            @if($memberTargets)
+                                <div class="pagination-wrapper">
+                                    {{ $memberTargets->appends([
+                                        'members_page' => $members?->currentPage() ?? 1,
+                                        'salaries_page' => $salaries?->currentPage() ?? 1,
+                                        'charges_page' => $charges?->currentPage() ?? 1,
+                                        'join_page' => $agencyJoinRequests?->currentPage() ?? 1,
+                                        'month' => request('month'),
+                                        'year' => request('year'),
+                                    ])->links('vendor.pagination.bootstrap-4') }}
+                                </div>
+                            @endif
+
                         </div>
                    
                    
@@ -1384,7 +1616,9 @@
             
        
 
+        
     </div>
+ 
 <!-- jQuery أولاً -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1393,26 +1627,47 @@
 
 
     <script>
-
-    document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const selectedTab = urlParams.get('tab') || 'members'; // افتراضيًا members
+            const selectedTab = urlParams.get('tab') || 'members';
 
             const allTabs = document.querySelectorAll('.tab-btn');
             const allTabContents = document.querySelectorAll('[id$="-tab"]');
 
+            let targetElement = null;
+
             allTabs.forEach(tab => {
                 const target = tab.getAttribute('data-target');
+                const content = document.getElementById(target);
 
                 if (target.startsWith(selectedTab)) {
                     tab.classList.add('active');
-                    document.getElementById(target).style.display = 'block';
+                    content.style.display = 'block';
+                    targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
                 } else {
                     tab.classList.remove('active');
-                    document.getElementById(target).style.display = 'none';
+                    content.style.display = 'none';
                 }
+
+                tab.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.getElementById('tab-loading').style.display = 'block';
+                    allTabs.forEach(t => t.style.pointerEvents = 'none');
+                    const href = tab.getAttribute('href');
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 300);
+                });
             });
-        });
+
+    if (targetElement) {
+        setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
+    }
+});
+
+
 
 
 

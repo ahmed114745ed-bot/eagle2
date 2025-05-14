@@ -188,6 +188,7 @@ class AgencyService
     {
         $accept    = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
+        if(!$user)throw new Exception('user not found');
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
@@ -196,6 +197,7 @@ class AgencyService
             $agency = $this->agencyRepository->findAgencyByOwnerId($owner->id);
         }
         if (!$agency) throw new Exception('u_not_owner_agncy');
+        if ($agency->Shipping_agency == 1 && $agency->Host_agency == 0) throw new \Exception(__('api_responses.shippingAgency'));
 
         if ($user->agency_id) throw new Exception('user joined agency before');
 
@@ -204,10 +206,10 @@ class AgencyService
 
         if (!$action) throw new Exception('Request not found');
 
-        if ($accept == 0) {
+        if ($accept === 0 || $accept === false) {
             $action->status = 2;
             $action->save();
-        } elseif ($accept == 1) {
+        } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);
@@ -620,7 +622,6 @@ class AgencyService
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
         $isThisMonth = $month == now()->month && $year == now()->year;
-        $startDay = 1;
         $endDay = Carbon::create($year, $month)->endOfMonth()->day;
 
         if ($isThisMonth) $endDay = today()->day;
@@ -638,12 +639,12 @@ class AgencyService
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
-        for (; $startDay <= $endDay; $startDay++) {
+        for ($startDay = 1; $startDay <= $endDay; $startDay++) {
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
             $data['daly_reports'][] = [
-                'day' => (int)$startDay,
+                'day' => $startDay,
                 'live_minutes' => (int)$minutes,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,
