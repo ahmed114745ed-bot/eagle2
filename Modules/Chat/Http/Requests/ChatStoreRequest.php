@@ -16,7 +16,7 @@ class ChatStoreRequest extends FormRequest
     {
         return [
             'user_id'    => 'required|exists:users,id',
-            'message'    => 'nullable|string|max:255',
+            'message'    => 'nullable|string',
             'message_id' => 'nullable|exists:chat_messages,id',
         ];
     }

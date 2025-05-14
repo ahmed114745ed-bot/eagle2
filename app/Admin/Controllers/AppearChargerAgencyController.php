@@ -181,7 +181,7 @@ class AppearChargerAgencyController extends MainController
             })
             ->switch(Common::getSwitchStates());
 
-        $grid->actions(function ( $actions) {
+        $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->add(new DeleteShippingAgencyAction());
             $actions->disableDelete();
@@ -239,11 +239,10 @@ class AppearChargerAgencyController extends MainController
         $form->hidden('agency_manger_id', __('app manger id'));
 
         $form->text('name', __('name'))->rules('required');
-        $form->text('notice', __('notice'))->rules('required');
         $form->switch('status', __('status'));
-        $form->text('phone', __('Phone'))->rules('required')->attribute('id', 'phone-input');
+
+        $form->text('phone', __('agency whatsApp number'))->attribute('id', 'phone-input');
         $form->url('url', __('url'));
-        $form->textarea('contents', __('contents'));
         $form->hidden('is_frozen', __('is_frozen'))->default(0);
         $form->hidden('type', __('type'))->default(2);
 
@@ -257,10 +256,65 @@ class AppearChargerAgencyController extends MainController
                 });
             </script>');
         }
-        // $form->hidden('Shipping_agency')->default(1);
+
+        Admin::script(<<<'JS'
+        function initPhoneInput() {
+            const input = document.querySelector("#phone-input");
+            if (input && !input.classList.contains('iti-initialized')) {
+                const parentDiv = input.parentElement;
+                parentDiv.style.position = 'relative';
+    
+                const iti = window.intlTelInput(input, {
+                    separateDialCode: true,
+                    preferredCountries: ["eg"],
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+    
+                document.head.insertAdjacentHTML('beforeend', `
+                    <style>
+                        .iti { width: 100%;  }
+                        .iti__flag-container { z-index: 99; }
+                        #phone-input {
+                            padding-left: 90px !important;
+                            width: 50%;
+                        }
+                        .fields-group .form-group { overflow: visible; }
+                    </style>
+                `);
+    
+                input.classList.add('iti-initialized');
+    
+                const form = input.closest('form');
+                if (form && !form.classList.contains('phone-init')) {
+                    form.addEventListener('submit', function () {
+                        if (iti) {
+                            const dialCode = iti.getSelectedCountryData().dialCode;
+                            const nationalNumber = input.value.replace(/\s/g, '');
+    
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.name = 'phone_code';
+                            hiddenInput.value = `+${dialCode}`;
+                            form.appendChild(hiddenInput);
+    
+                            input.value = nationalNumber;
+                        }
+                    });
+                    form.classList.add('phone-init');
+                }
+            }
+        }
+    
+        initPhoneInput();
+        $(document).on('pjax:complete', function () {
+            setTimeout(initPhoneInput, 100);
+        });
+    JS);
+        $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
+
+          $form->phone_code = request('phone_code');
             $appOwnerId = $form->input('app_owner_id');
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;

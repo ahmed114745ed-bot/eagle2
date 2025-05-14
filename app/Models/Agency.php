@@ -203,6 +203,10 @@ class Agency extends Model
 
         static::saving(function ($model) {
 
+
+            if (request()->has('phone_code')) {
+                $model->phone_code = request('phone_code');
+            }
             if (request()->has('charge_agency')) {
                 if (request('charge_agency') == 1) {
                     ChargeAgency::firstOrCreate([
@@ -228,15 +232,15 @@ class Agency extends Model
 
         static::updating(function ($agency) {
 
-                clearAgencyCache($agency->id);
-            
+            clearAgencyCache($agency->id);
+
             if (isset($agency->is_frozen)) {
                 $agency->is_frozen = (bool) $agency->is_frozen;
             }
         });
 
         static::deleting(function ($agency) {
-            
+
             if ($agency->app_owner_id) {
                 $user = User::find($agency->app_owner_id);
                 if ($user) {
@@ -247,8 +251,7 @@ class Agency extends Model
                     ]);
                 }
             }
-                clearAgencyCache($agency->id);
-            
+            clearAgencyCache($agency->id);
         });
     }
 
