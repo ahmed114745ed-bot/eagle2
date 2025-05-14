@@ -37,9 +37,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 15px;
+    margin-right: 57px;
     color: white;
     font-size: 20px;
+    margin-bottom: 6px;
 }
 
 .stat-icon.bg-blue {
@@ -237,7 +238,8 @@
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     text-align: center;
-    min-width: 100px;
+    min-width: 200px;
+
 }
 
 .stat-value {
@@ -666,14 +668,143 @@
      background: var(--secondary-color);
 }
 
-@media (max-width: 768px) {
+
+
+    .target-card-section-1{
+        /* display: inline-flex; */
+        width: 100%;
+        padding-top: 26px;
+        margin-bottom: 35px;
+
+    }
+    .card-target-filter{
+        display: inline;
+        width: 34%;
+        left: 33px;
+        position: absolute;
+    }
+    .card-target-filter .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+    .card-target-filter button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+    .card-target-filter-phone{
+        width: 51%;
+        margin-bottom: 27px;
+        position: relative;
+    }
+    .card-target-filter-phone .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+    .card-target-filter-phone button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+
+    .target-card-stat{
+        width: 50%;
+    }
+    .filter-form{
+        border-radius: 13px;
+        height: 165px;
+
+    }
+
+    .card-target-filter-phone{
+        /* display: none; */
+    }
+    .card-target-filter{
+        display: none;
+    }
+    @media (max-width: 768px) {
     .stats-row {
         flex-direction: column;
+        width: 108%;
+
     }
     
     .avatar-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
+
+    .target-card-section-1 {
+            display: grid;
+            width: 100%;
+            padding-top: 26px;
+            margin-bottom: 35px;
+        }
+
+    
+    .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 118px;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 6px;
+
+    }
+
+    
+    .target-card-stat {
+         width: 92%;
+
+    }
+    .card-target-filter{
+        display: none;
+    }
+    .card-target-filter-phone {
+        display: block;
+        width: 100%;
+        left: 0px;
+        position: relative;
+        margin-bottom: 31px;
+
+    }
+    .card-target-filter-phone  .col-md-7{  
+       float: none;
+    }
+
+    .card-target-filter-phone .form-control {
+            display: block;
+            width: 89%;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: var(--text-secondary-color) !important;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid var(--primary-hover-alpha) !important;
+            border-radius: 4px;
+        }
+
+        .card-target-filter-phone .filter-form {
+            border-radius: 13px;
+            height: 238px;
+        }
+
+        .card-target-filter-phone .align-items-end{
+            display: grid;
+        }
+
+        .card-target-filter-phone button {
+            left: -224px;
+
+        }
 }
     </style>
 
@@ -1157,74 +1288,131 @@
                     </div>
                     </div>
                     
-                    <div class="card-body">
-                        <!-- Filter Form -->
-                        <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
-                            <div class="row">
-                                <input type="hidden" name="tab" value="targets">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="month">{{ __('Month') }}</label>
-                                        <select name="month" id="month" class="form-control">
-                                            <option value="">All Months</option>
-                                            @for($m = 1; $m <= 12; $m++)
-                                                <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
-                                                    {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                                                </option>
-                                            @endfor
-                                        </select>
+                <div class="card-body">
+                       <div class="target-card-section-1">
+
+
+                       <div class="card-target-filter-phone ">
+                                <!-- Filter Form -->
+                                <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
+                                    <div class="row">
+                                        <input type="hidden" name="tab" value="targets">
+                                        <div class="col-sm-12 col-md-7 ">
+                                            <div class="form-group">
+                                                <label for="month">{{ __('Month') }}</label>
+                                                <select name="month" id="month" class="form-control">
+                                                    <option value="">All Months</option>
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="year">{{ __('Year') }}</label>
+                                                <select name="year" id="year" class="form-control">
+                                                    <option value="">All Years</option>
+                                                    @for($y = now()->year; $y >= 2020; $y--)
+                                                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-filter"></i> {{ __('Apply') }}
+                                            </button>
+                                            @if(request()->has('month') || request()->has('year'))
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="year">{{ __('Year') }}</label>
-                                        <select name="year" id="year" class="form-control">
-                                            <option value="">All Years</option>
-                                            @for($y = now()->year; $y >= 2020; $y--)
-                                                <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
-                                                    {{ $y }}
-                                                </option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-filter"></i> {{ __('Apply') }}
-                                    </button>
-                                    @if(request()->has('month') || request()->has('year'))
-                                    <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
-                                        <i class="fas fa-times"></i>
-                                    </a>
-                                    @endif
-                                </div>
+                                </form>
                             </div>
-                        </form>
+                    
+                        <div class="target-card-stat">
+                                <div class="stats-row">
+                                            <div class="stat-card">
+                                                <div class="stat-icon bg-blue">
+                                                    <i class="fas fa-bullseye"></i>
+                                                </div>
+                                                <div class="stat-info">
+                                                    <div class="stat-value">{{ $agencyTarget }}</div>
+                                                    <div class="stat-label">{{ __('Target') }}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="stat-card">
+                                                <div class="stat-icon bg-green">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </div>
+                                                <div class="stat-info">
+                                                    <div class="stat-value">{{ $rate }}</div>
+                                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                            </div>
+
+
+
+                            <!-- <div class="card-target-filter">
+                                <form method="GET" action="{{ url('admin/agencies/profile/' . $agency->id ) }}" class="filter-form">
+                                    <div class="row">
+                                        <input type="hidden" name="tab" value="targets">
+                                        <div class="col-sm-12 col-md-7 ">
+                                            <div class="form-group">
+                                                <label for="month">{{ __('Month') }}</label>
+                                                <select name="month" id="month" class="form-control">
+                                                    <option value="">All Months</option>
+                                                    @for($m = 1; $m <= 12; $m++)
+                                                        <option value="{{ $m }}" {{ request('month', now()->month) == $m ? 'selected' : '' }}>
+                                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                <label for="year">{{ __('Year') }}</label>
+                                                <select name="year" id="year" class="form-control">
+                                                    <option value="">All Years</option>
+                                                    @for($y = now()->year; $y >= 2020; $y--)
+                                                        <option value="{{ $y }}" {{ request('year', now()->year) == $y ? 'selected' : '' }}>
+                                                            {{ $y }}
+                                                        </option>
+                                                    @endfor
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-filter"></i> {{ __('Apply') }}
+                                            </button>
+                                            @if(request()->has('month') || request()->has('year'))
+                                            <a href="{{ url('admin/agencies/profile/' . $agency->id) }}" class="btn btn-outline-secondary ml-2" title="Reset filters">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </form>
+                            </div> -->
+                     </div>
             
-                        <!-- Stats Cards -->
-                        <div class="stats-row">
-                            <div class="stat-card">
-                                <div class="stat-icon bg-blue">
-                                    <i class="fas fa-bullseye"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value">{{ $agencyTarget }}</div>
-                                    <div class="stat-label">{{ __('Target') }}</div>
-                                </div>
-                            </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon bg-green">
-                                    <i class="fas fa-chart-line"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value">{{ $rate }}</div>
-                                    <div class="stat-label">{{ __('Agency Rate') }}</div>
-                                </div>
-                            </div>
-                        </div>
+                     
             
                         <!-- Stars Section -->
                         <div class="section-box">
