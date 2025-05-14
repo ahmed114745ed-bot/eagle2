@@ -71,20 +71,20 @@ class DedicateVipController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         Admin::style("
-    .table {
-        background-color: #222323 !important; /* Dark brown */
-        color: white !important;
-    }
-
-    .table th, .table td {
-        background-color: #222323 !important; /* Lighter brown for contrast */
-        color: white !important;
-    }
-
-    .table tbody tr:hover {
-        background-color: #704214 !important; /* Slightly darker brown on hover */
-    }
-");
+        .table {
+            background-color: var(--table-background-color) !important;
+            color: var(--text-primary-color) !important;
+        }
+    
+        .table th, .table td {
+            background-color: var(--table-background-color) !important;
+            color: var(--text-primary-color) !important;
+        }
+    
+        .table tbody tr:hover {
+            background-color: var(--primary-hover-alpha) !important;
+        }
+    ");
         $grid->column('ware', __('wares'))->expand(function () {
 
             $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $this->level)->where('is_active_for_vip', 1)->get()->map(function ($ware) {
