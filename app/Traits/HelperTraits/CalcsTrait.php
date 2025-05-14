@@ -277,9 +277,9 @@ trait CalcsTrait
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
-        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
         $diamondSend             = $user->total_sender_diamonds;
-        $senderNum        = floor($diamondSend  * $expPercentages[0]);
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
 
         $star_level      = $user->total_received_level;
 
@@ -440,10 +440,10 @@ trait CalcsTrait
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
-        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
         $diamondSend             = $user->total_sender_diamonds;
 
-        $senderNum        = floor($diamondSend  * $expPercentages[0]);
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
         //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
         $star_level      = $user->total_received_level;

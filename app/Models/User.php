@@ -908,7 +908,7 @@ class User extends Authenticatable
             $this->sub_sender_num = ($diamonds - $expPercentages[0] * $this->total_diamond_send) / $expPercentages[0];
         } else {*/
 
-        $this->sub_sender_num = ceil(($diamonds / $expPercentages[0])) - $this->total_diamond_send;
+        $this->sub_sender_num = ceil(($diamonds / $expPercentages['exp_sender_percentage'])) - $this->total_diamond_send;
 
         //        }
     }
@@ -927,7 +927,7 @@ class User extends Authenticatable
         /*if ($expPercentages[0] <= 1) {
             $this->sub_receiver_num = ($diamonds - $this->total_diamond_received * $expPercentages[1]) / $expPercentages[1];
         } else {*/
-        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages[1])) - $this->total_diamond_received);
+        $this->sub_receiver_num = (ceil(($diamonds / $expPercentages['exp_received_percentage'])) - $this->total_diamond_received);
 
         //        }
     }
