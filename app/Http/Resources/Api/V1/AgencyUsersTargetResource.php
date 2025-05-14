@@ -26,9 +26,17 @@ class AgencyUsersTargetResource extends JsonResource
 
 
         $target = $this->targets->first();
-        $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
-            ->select('id', 'user_diamonds')->get();
+        // $userTarget = UserTarget::where('user_id', $this->id)->where('agency_id', $this->agency_id)->where('add_year', $year)->where('add_month', '<', $month)->orderByDesc('add_month')
+        //     ->select('id', 'user_diamonds')->get();
+        $months = collect(range($month - 3, $month - 1))->filter(fn($m) => $m > 0)->values();
 
+        $userTargets = UserTarget::where('user_id', $this->id)
+            ->where('agency_id', $this->agency_id)
+            ->where('add_year', $year)
+            ->whereIn('add_month', $months)
+            ->select('add_month', 'user_diamonds')
+            ->pluck('user_diamonds', 'add_month');
+            
         $giftLog = GiftLog::where('agency_id', $this->agency_id)->where('receiver_id', $this->id)->whereHas('sender')->with('sender')->whereYear('created_at', $year)->whereMonth('created_at', $month)
             ->selectRaw("sum(giftPrice) as exp, sender_id")
             ->groupBy('sender_id')->orderByRaw("exp desc")->limit(3)
