@@ -121,10 +121,30 @@ class RoomController extends MainController
             foreach ($tabs as $key => $label) {
                 $active = $filterType === $key ? 'active' : '';
                 $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
             }
             $html .= '</ul></div>';
-
+        
+            $html .= <<<HTML
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const tabLinks = document.querySelectorAll('.tab-link');
+                                const loader = document.getElementById('tab-loading');
+                        
+                                tabLinks.forEach(function (tab) {
+                                    tab.addEventListener('click', function (e) {
+                                        e.preventDefault();
+                                        loader.style.display = 'block';
+                                        tabLinks.forEach(t => t.style.pointerEvents = 'none');
+                                        setTimeout(() => {
+                                            window.location.href = tab.getAttribute('href');
+                                        }, 300);
+                                    });
+                                });
+                            });
+                        </script>
+                        HTML;
+                        
             return $html;
         });
         $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
