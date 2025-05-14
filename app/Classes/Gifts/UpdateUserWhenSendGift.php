@@ -86,6 +86,7 @@ class UpdateUserWhenSendGift
 
     public function getLevel(int $type, int $totalCoins)
     {
+
         return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
@@ -119,9 +120,11 @@ class UpdateUserWhenSendGift
     }
 
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)
-    {
-        $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages[0] ;
+    {   
+        $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'] ;
+        // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
         $levelVip                 = $this->getLevel(2, $total);
+
         return $levelVip != null ? (@$levelVip->level - $subSenderLevel) ?? 0 : 0;
     }
 
@@ -134,8 +137,10 @@ class UpdateUserWhenSendGift
 
     public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subSenderLevel)
     {
-        $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages[1] ;
+        $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages['exp_received_percentage'] ;
+      
         $levelVip                 = $this->getLevel(1, $total);
+      
         return $levelVip != null ? (@$levelVip->level - $subSenderLevel) ?? 0 : 0;
     }
 
