@@ -1046,7 +1046,7 @@ class UserService
             $progressCurrent = $expLevel - $currentLevel->exp;
             $progressNext    = $secondLevel->exp - $currentLevel->exp;
 
-            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 1;
 
             if ($prog >= 1) {
                 $bar = 1;
