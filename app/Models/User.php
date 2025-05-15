@@ -237,6 +237,7 @@ class User extends Authenticatable
 
         return $days->count();
     }
+
     public function getSallaryInfo(): array
     {
         $month = (int)@request()->month;
