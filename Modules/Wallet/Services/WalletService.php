@@ -60,7 +60,10 @@ class WalletService
         return $this->startTransaction($userWallet, $receiver, $sender, $amount, $coins, $receiverType);
     }
 
-    public function startTransaction(UserWallet $userWallet, $receiver,User $sender, int $amount, int $coins,string $receiverType): JsonResponse
+    /**
+     * @throws \Throwable
+     */
+    public function startTransaction(UserWallet $userWallet, $receiver, User $sender, int $amount, int $coins, string $receiverType): JsonResponse
     {
         DB::beginTransaction();
         try {
