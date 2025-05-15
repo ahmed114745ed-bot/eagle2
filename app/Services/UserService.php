@@ -1046,7 +1046,7 @@ class UserService
             $progressCurrent = $expLevel - $currentLevel->exp;
             $progressNext    = $secondLevel->exp - $currentLevel->exp;
 
-            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 1;
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
 
             if ($prog >= 1) {
                 $bar = 1;
@@ -1081,7 +1081,7 @@ class UserService
             'next_img'      => @$secondLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
             'progress'      => @$progress ?? 0,
-            'result_charge' => (int) $expPercentages['exp_charge_percentage']?? 1 *  $expLevel,
+            'result_charge' => (int) $expPercentages['exp_charge_percentage'] ?? 1 *  $expLevel,
         ];
 
         return  [
