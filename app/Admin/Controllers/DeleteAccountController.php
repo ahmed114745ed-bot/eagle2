@@ -19,12 +19,14 @@ class DeleteAccountController extends AdminController
      */
    
      public $permission_name = 'delete-account-details';
-    public function index(Content $content)
-    {
-        return parent::index($content
-            ->title(trans('delete-accounts'))
-            ->body($this->grid()));
-    }
+
+     
+    // public function index(Content $content)
+    // {
+    //     return parent::index($content
+    //         ->title(trans('delete-accounts'))
+    //         ->body($this->grid()));
+    // }
 
     /**
      * Show interface.
