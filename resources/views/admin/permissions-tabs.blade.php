@@ -41,7 +41,7 @@
                             id="perm-{{ $perm->id }}"
                             {{ in_array($perm->id, $selected) ? 'checked' : '' }}>
                      <label class="form-check-label" for="perm-{{ $perm->id }}">
-                         {{  $perm->name }}
+                         {{  __($perm->name) }}
                      </label>
                  </div>
              @endforeach
