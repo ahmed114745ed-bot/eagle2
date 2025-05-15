@@ -7,8 +7,6 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Country;
 use App\Models\User;
-use Encore\Admin\Auth\Database\Administrator;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
