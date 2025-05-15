@@ -2243,7 +2243,19 @@
   "failed_accept_request": "فشل في قبول الطلب. يرجى المحاولة مرة أخرى.",
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
   "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
-  "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد"
+  "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد",
+  "browse agency settings":"",
+  "edit agency settings":"",
+  "browse page":"",
+  "create page":"",
+"delete page":"",
+"edit page":"",
+"browse payment coin":"",
+"create payment coin":"",
+"delete payment coin":"",
+"edit payment coin":"",
+"delete exchange":"",
+"edit exchange"
 
 
 
