@@ -145,12 +145,24 @@ class UserObserver
         //        Agency::where('owner_id',$user->id)->delete();
         FamilyUser::where('user_id',$user->id)->delete();
         Pack::where('user_id',$user->id)->delete();
-        Follow::where('user_id', $user->id)
-              ->orWhere('followed_user_id', $user->id)
-              ->delete();
+        Report_user::where('user_id',$user->id)->delete();
+        Follow::where('user_id', $user->id)->orWhere('followed_user_id', $user->id)->delete();
         BlackList::where('user_id',$user->id)->orWhere('from_uid',$user->id)->delete();
     }
 
+    public function forceDeleting(User $user): void
+    {
+        $user->profile()->delete();
+        AgencyJoinRequest::query()->where('user_id', $user->id)->delete();
+        $user->ownerRoom()->delete();
+        //        $user->carousels()->delete();
+        //        Agency::where('owner_id',$user->id)->delete();
+        FamilyUser::where('user_id',$user->id)->delete();
+        Pack::where('user_id',$user->id)->delete();
+        Report_user::where('user_id',$user->id)->delete();
+        Follow::where('user_id', $user->id)->orWhere('followed_user_id', $user->id)->delete();
+        BlackList::where('user_id',$user->id)->orWhere('from_uid',$user->id)->delete();
+    }
     /**
      * @param User $user
      * @return void

@@ -3,7 +3,6 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
-use App\Admin\Controllers\MainOldController;
 use App\Models\OVip;
 use App\Models\Ware;
 use App\Services\AppFeatureService;
@@ -11,10 +10,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
-
 use Encore\Admin\Layout\Content;
 use Modules\Events\Entities\PkReward;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class PkEventGiftController extends MainController
