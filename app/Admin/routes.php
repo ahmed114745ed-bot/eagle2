@@ -1,8 +1,10 @@
 <?php
 
+use App\Admin\Controllers\BDControllers\WalletController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\WareController;
+use App\Http\Controllers\Api\V1\ChargeController;
 use App\Models\Room;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use Illuminate\Routing\Router;
@@ -525,6 +527,21 @@ Route::group(
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
 
+    
+        Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
+            $router->get('/', 'HomeController@index')->name('home');
+            $router->get('/charges', 'ChargeController@index')->name('charges');
+            $router->resource('/agencies', 'AgencyController');
+            $router->resource('/salaries', 'BdSalariesController');
+            $router->resource('/wallet', 'WalletController');
+            Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+            Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+
+        });
+
+        
+        
+    
     }
 
 

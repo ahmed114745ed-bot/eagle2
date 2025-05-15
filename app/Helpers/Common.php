@@ -1228,9 +1228,9 @@ class Common
                 'role_id' => $role->id,
             ]);
         }
-        if ($user->email != null) {
-            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
-        }
+        // if ($user->email != null) {
+        //     Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+        // }
         return true;
     }
 
@@ -1361,7 +1361,7 @@ class Common
     public static function searchAgency($id)
     {
         $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true)
+            // ->where('Shipping_agency', true)
             // ->whereHas('chargeAgency' )
             ->first();
 

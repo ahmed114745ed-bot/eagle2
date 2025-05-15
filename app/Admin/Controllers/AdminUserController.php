@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Models\Agent;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
+use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use function Doctrine\Common\Cache\Psr6\get;
@@ -70,6 +71,10 @@ class AdminUserController extends EncorUsersController
         })->ajax('/api/search/users3', 'id', 'name')->rules('required');
 
 
+        $form->saving(function (Form $form) {
+           dd($form->app_id,$form->roles );
+            
+        });
         return $form;
     }
 

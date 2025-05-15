@@ -33,14 +33,14 @@ class WalletService
                 ['user_id' => $userId],
                 ['value' => 0, 'cut_amount' => 0, 'pending_value' => 0]
             );
-
+            
             switch ($type) {
                 case 'add':
                     $wallet->value += $amount;
                     break;
 
                 case 'cut':
-                    $wallet->value -= $amount;
+                    // $wallet->value -= $amount;
                     $wallet->cut_amount += $amount;
                     $amount = -$amount;
                     break;
@@ -52,9 +52,8 @@ class WalletService
                 default:
                     throw new Exception("Unsupported wallet transaction type: $type");
             }
-
+            
             $wallet->save();
-
             return WalletTransaction::create([
                 'user_id' => $userId,
                 'type' => $type,
