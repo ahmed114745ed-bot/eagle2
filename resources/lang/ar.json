@@ -2368,7 +2368,10 @@
   "delete user agent target": "حذف هدف وكيل المستخدم",
   "edit user agent target": "تعديل هدف وكيل المستخدم",
   "browse charges agency": "تصفح رسوم الوكالة",
-  "create charges agency": "إنشاء رسوم الوكالة"
+  "create charges agency": "إنشاء رسوم الوكالة",
+"create charge country": "إنشاء رسوم الدولة",
+"shipping agency switch": "مفتاح وكالة الشحن",
+  "browse updates_group_chat": "تصفح تحديثات الدردشة الجماعية"
 
 
 

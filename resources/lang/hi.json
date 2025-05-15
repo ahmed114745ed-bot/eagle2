@@ -1414,7 +1414,10 @@
   "delete user agent target": "उपयोगकर्ता एजेंट लक्ष्य हटाएँ",
   "edit user agent target": "उपयोगकर्ता एजेंट लक्ष्य संपादित करें",
   "browse charges agency": "एजेंसी शुल्क देखें",
-  "create charges agency": "एजेंसी शुल्क बनाएँ"
+  "create charges agency": "एजेंसी शुल्क बनाएँ",
+  "create charge country": "चार्ज देश बनाएँ",
+  "shipping agency switch": "शिपिंग एजेंसी स्विच",
+  "browse updates_group_chat": "ग्रुप चैट अपडेट ब्राउज़ करें"
 
 
 
