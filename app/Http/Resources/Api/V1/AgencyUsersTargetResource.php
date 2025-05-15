@@ -61,7 +61,12 @@ class AgencyUsersTargetResource extends JsonResource
                 'diamonds_next_target'   => @$target?->next_diamond ?? 0,
                 'old_targets'  => $userTarget,
             ],
-            'sender_gifts' => SenderGiftLogResource::collection($giftLog),
+            // 'top_users' => SenderGiftLogResource::collection($giftLog),
+            'top_users' => $giftLog->map(function ($log) {
+
+                                             return $log->sender?->profile?->avatar ?? '';
+                                             
+                                 })->filter()->values()->toArray(),
         ];
     }
 }
