@@ -1081,7 +1081,7 @@ class UserService
             'next_img'      => @$secondLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
             'progress'      => @$progress ?? 0,
-            'result_charge' => (int) $expPercentages['exp_charge_percentage'] ?? 1 *  $expLevel,
+            'exp_charge' =>  $expPercentages['exp_charge_percentage'] ?? 1,
         ];
 
         return  [

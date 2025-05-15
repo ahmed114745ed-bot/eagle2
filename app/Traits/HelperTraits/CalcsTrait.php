@@ -503,6 +503,8 @@ trait CalcsTrait
         $data['prev_sender_num'] = (int)($current_gold_num);
         $data['current_receiver_num'] = $current_star_num;
         $data['current_sender_num'] = $current_gold_num;
+        $data['exp-sender'] = $expPercentages['exp_sender_percentage'] ?? 1;
+        $data['exp-receiver'] = $expPercentages['exp_received_percentage'] ?? 1;
 
         $rt = (int)$next_star_num - (int)$current_star_num;
         $st = (int)$next_gold_num - (int)($current_gold_num);
