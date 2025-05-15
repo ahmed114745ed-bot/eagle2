@@ -85,7 +85,8 @@ class WareTabController extends MainController
         $type = request()->get('type', 1);
 
         $grid = new Grid(new Ware());
-        $grid->model()->where('type', $type)->whereNot('get_type', 1);
+        $types=[6,4,5];
+        $grid->model()->whereIn('type', $types)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -107,7 +108,10 @@ class WareTabController extends MainController
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
+            $defaultImage = asset("images/businessman-icon.jpg");
+            
             $url = getImagePath($path);
+            $url = $url ?? $defaultImage;
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('get_type', __('get_type'))->select(
