@@ -8,6 +8,7 @@ use App\Models\Charge;
 use App\Models\User;
 use App\Models\UserWallet;
 use App\Models\WalletTransaction;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Modules\Wallet\Enum\WalletEnum;
@@ -27,10 +28,10 @@ class WalletService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @throws \Throwable
      */
-    public function makeTransaction(array $data): JsonResponse
+    public function makeTransaction(array $data): array
     {
         $sender = auth()->user();
         $amount = $data['amount'];
@@ -62,7 +63,7 @@ class WalletService
     /**
      * @throws \Throwable
      */
-    public function startTransaction(UserWallet $userWallet, $receiver, User $sender, int $amount, int $coins, string $receiverType): JsonResponse
+    public function startTransaction(UserWallet $userWallet, $receiver, User $sender, int $amount, int $coins, string $receiverType): array
     {
         DB::beginTransaction();
         try {
@@ -98,10 +99,10 @@ class WalletService
             Charge::create($data);
 
             DB::commit();
-            return Common::apiResponse(1, 'success', $data, 201);
-        } catch (\Exception $exception) {
+            return $data;
+        } catch (Exception $exception) {
             DB::rollBack();
-            return Common::apiResponse(0, $exception->getMessage(), 400);
+            throw new Exception($exception->getMessage());
         }
     }
 
