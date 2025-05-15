@@ -243,7 +243,7 @@ class AdminPermission extends Seeder
         }
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
         $actions = ['create', 'edit', 'delete', 'show','charge'];
-        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report','wares-dedicate','vips-dedicate','achievement_dedicate','level-user-history','agent-request-history','salary-history','request-agency-history'];
+        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report','wares-dedicate','vips-dedicate','achievement_dedicate','level-user-history','agent-request-history','salary-history','request-agency-history','updates_group_chat','users-family','uuid-dedicate'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -254,7 +254,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['update_setting_button','agency-settings','agency-setting','settings','charge-settings','room-settings','ovip-settings','box-settings','moment-settings','reel-settings','chat-setting','user-status'];
+        $targets = ['update_setting_button','agency-settings','agency-setting','settings','charge-settings','room-settings','ovip-settings','box-settings','moment-settings','reel-settings','chat-setting','user-status','updates_family-config','agora-zego'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
