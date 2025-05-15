@@ -68,15 +68,18 @@ class GiftLogRepository extends AbstractRepository
             ->whereYear('created_at', now()->year)->whereIn("receiver_id", $receiverIds)->sum('giftPrice');
     }
 
-    public function getByDaily($userId, $agencyId, $month, $year)
+    public function getByDaily($userId, $agencyId, $start, $end)
     {
-        return  $this->model->query()
+        return $this->model->query()
             ->selectRaw('sum(giftPrice) as diamonds, max(created_at) as date')
-            ->where(fn($q) => $q->whereYear('created_at', '<', $year)->orWhere(fn($q) => $q->whereMonth('created_at', '<=', $month)->whereYear('created_at', '<=', $year)))
+            ->whereBetween('created_at', [$start, $end])
             ->where('receiver_id', $userId)
-            ->where('agency_id', $agencyId)->groupBy(\DB::raw('date(created_at)'))
-            ->limit(31)->get();
+            ->where('agency_id', $agencyId)
+            ->groupBy(\DB::raw('date(created_at)'))
+            ->orderBy('date', 'asc')
+            ->get();
     }
+
 
     public function getByDailyNew($userId, $agencyId, $start_at, $end_at)
     {
