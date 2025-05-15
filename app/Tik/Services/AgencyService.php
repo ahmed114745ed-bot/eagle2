@@ -644,7 +644,7 @@ class AgencyService
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
             $data['daly_reports'][] = [
-                'day' => $startDay,
+                'day' => sprintf('%02d-%02d', $startDay, $month),
                 'live_minutes' => (int)$minutes,
                 'diamonds' => numToString((int)$diamonds),
                 'is_active_day' => $hours >= 1,

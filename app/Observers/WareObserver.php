@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Ware;
+use App\Models\User;
 
 class WareObserver
 {
@@ -47,6 +48,13 @@ class WareObserver
             }elseif ($ware->type == 28){
                 settings()->set('profile_frame_updated', time());
             }
+        }
+
+
+        $originalSpecialValue = $ware->getOriginal('value');
+        if($ware->type == 25 && $originalSpecialValue != $ware->value ){
+            User::where('special_id', $originalSpecialValue)
+                ->update(['special_id' => $ware->value]);
         }
     }
 
