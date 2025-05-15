@@ -42,7 +42,6 @@ class WalletService
 
         if ($data['type'] == WalletEnum::USER->value){
             $receiver = CheckUserExistence::userExists($this->userModel, $data['receiver_id']);
-            info($receiver);
             $receiverType = 'user';
         }
 
@@ -67,6 +66,8 @@ class WalletService
     {
         DB::beginTransaction();
         try {
+            //Todo if user increment the di if agency increment the coins
+            //Todo add transactions_type column
             $userWallet->increment('cut_amount', $amount);
             $receiver->increment('coins', $coins);
 

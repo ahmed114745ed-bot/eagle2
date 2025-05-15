@@ -42,6 +42,7 @@ class CheckSystemConfigs
     {
         $rate = Common::getCoinsValue('user_coins');
 
+        //todo Contact the admin
         if (!$rate){
             throw new Exception( __('please set usd_value_in_coins in configs'));
         }
