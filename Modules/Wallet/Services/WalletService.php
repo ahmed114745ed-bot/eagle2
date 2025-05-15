@@ -40,12 +40,13 @@ class WalletService
 
         $userWallet = CheckAvailableBalance::checkAvailableBalance($this->userWalletModel, $amount);
 
-        if ($data['type'] == WalletEnum::USER){
+        if ($data['type'] == WalletEnum::USER->value){
             $receiver = CheckUserExistence::userExists($this->userModel, $data['receiver_id']);
+            info($receiver);
             $receiverType = 'user';
         }
 
-        if ($data['type'] == WalletEnum::AGENCY){
+        if ($data['type'] == WalletEnum::AGENCY->value){
             $receiver = CheckAgencyExistence::agencyExists($this->agencyModel, $data['receiver_id']);
             $receiverType = 'agency';
         }
