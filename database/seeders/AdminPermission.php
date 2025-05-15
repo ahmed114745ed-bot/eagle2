@@ -43,7 +43,6 @@ class AdminPermission extends Seeder
             'ovip',
             'room-vip',
             'withdraw-type',
-            'weekly-star',
             'general-roles',
             'pk-event',
             'pk-event-rewards',
@@ -152,8 +151,10 @@ class AdminPermission extends Seeder
             'coins',
             'gold-coins',
             'config',
-            'level-user-history'
-            
+            'level-user-history',
+            'request-problem',
+            'user-target-eg'
+
 
 
 
@@ -169,64 +170,33 @@ class AdminPermission extends Seeder
 
         $categories = [
 
-            'event-related' => ['event', 'pk-event', 'target-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'event_report', 'general-roles','weekly_cp','event-period','gift-target-event'],
-            'special_id' => ['special-history', 'special-Ware', 'special-frame', 'special-id-request'],
-            'daily-prize' => ['daily-prize'],
-            'roles' => ['roles', 'Permissions',],
-            'cp' => ['level-cp'],
-            'report' => ['report', 'report-moment', 'charger-report', 'report-user',],
-            'user' => ['users', 'trashed-account-user', 'user-target','free-users', 'users-hunters','action-trashed','user-status'],
-            'achievement' => ['achievement', 'user_achievement_level', 'achievement_level',],
-            'level' => ['level', 'ovip','wares-vips','ovip-gift','charge-level','vip-privilege'],
-            'moment' => ['moment',],
-            'dedicate' => ['wares-dedicate', 'vips-dedicate', 'users-devices','uuid-dedicate','achievement_dedicate'],
-            'version' => ['version'],
-            'auth-users' => ['auth-users','admin-users'],
-            'agency' => ['agency-manager', 'manger-agency-manager', 'manger-type', 'request-agencies', "agencies-tareget-manger",'managers','agencies','agency-setting','agency-settings','agency-join-requests','request-agency-history','appear-charger-agency'],
-            'agent' => ['agent-user', 'agent-request', 'agent-target','user-agent-target','charges-agency','agent-home'],
-            'payment-gat-way' => ['payment-gat-way',],
-            'box' => ['boxes', 'box-use',],
-            'exchange' => ['exchange'],
-            'rooms' => ['room-vip', 'room-target','rooms','categories','room-background'],
-            'image-color' => ['image-color'],
-            'sailer' => ['sailer','salary-history'],
-            'real' => ['Real','report-real'],
-            'user-parent' => ['user-parent',],
-            'level-interval' => ['level-interval'],
-            'all-statistic' => ['all-statistic'],
-            'core-wallets' => ['core-wallets'],
-            'target-percentage' => ['target-percentage',],
-            'background-image' => ['background-image-request'],
-            'color' => ['color'],
-            'get-salary-requests' => ['get-salary-requests'],
-            'withdraw-type' => ['withdraw-type'],
-            'offers' => ['offers'],
-            'banners' =>['banners'],
-            'official-messages' => ['official-messages'],
-            'carousel' => ['carousel'],
-            'user-levels' => ['user-levels'],
-            'salary-transaction' => ["request-problem",'agent-request-transaction',"charge-country",'charge-agency','salary-request',"agent-request-history"],
-            'bans' => ['bans','ban-rooms'],
-            'update-group-chat' => ['updates_group_chat'],
-            'agora-zego' => ['agora-zego'],
-            'users-family' => ['users-family'],
-            'updates_family-config' => ['updates_family-config'],
-            'setting' => ['language','settings','notification','charge-settings','room-settings','agency-settings','ovip-settings','box-settings','moment-settings','reel-settings','agency-manger-setting','chat-setting','update_setting_button'],
-             'charge' => ['charge'],
-             'ticket' => ['ticket'],
-             'products' => ['wares','gift'],
-             'family' => ['family','family-level'],
-             'target' => ['target'],
-             'emoji'=> ['emoji'],
-             'delete-account-details'=>['delete-account-details'],
-             'questions' =>['questions'],
-             'country' => ['country'],
-             'page' => ['page'],
-             'coin' => ['payment-coin','coins'],
-             'gold-coins'=> ['gold-coins'],
-             'config' => ['config'],
-             'level-user-history' => ['level-user-history']
-
+            'Fast orders' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate'],
+            'Wallet' => ['core-wallets'],
+            'charge system' => ['charge', 'charger-report'],
+            'users' => ['free-users', 'ticket', 'trashed-account-user'],
+            'Advertisements' => ['carousel', 'banners', 'official-messages', 'offers'],
+            'Store' => ['wares',],
+            'Distinguished identifier' => ['special-Ware', 'special-history', 'image-color'],
+            'Vip' => ['ovip', 'vip-privilege', 'ovip-settings'],
+            'families' => ['family', 'family-level'],
+            'Agency System' => ['agency-settings'],
+            'Internal Sales System' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem'],
+            'Host Agencies' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report'],
+            'Agency Settings' => ['agency-join-requests', 'request-agencies', 'target'],
+            'Charging Agencies' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way'],
+            'Agency Manager' => ['managers'],
+            'Room' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings'],
+            'Achievements' => ['achievement', 'user_achievement_level'],
+            'user parent' => ['user-parent'],
+            'Group chat'  => ['group-chat', 'updates_group_chat'],
+            'Lucky box' => ['boxes', 'box-use', 'box-settings'],
+            'Events' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report'],
+            'Reels' => ['Real', 'report-real'],
+            'Moment' => ['moment', 'report-moment'],
+            'Work Settings' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history'],
+            'Sensitive Settings' => ['updates', 'config'],
+            'System Settings' => ['settings', 'language', 'daily-prize'],
+            'Level' => ['level', 'level-interval',],
         ];
 
         // Function to get category for each permission
@@ -257,7 +227,6 @@ class AdminPermission extends Seeder
                         'category'   => $category,
                         'updated_at' => now(),
                     ]);
-
                 } else {
                     // Insert the new permission with its category
                     DB::table('admin_permissions')->insert([
@@ -272,7 +241,49 @@ class AdminPermission extends Seeder
                 }
             }
         }
+        DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
+        $actions = ['create', 'edit', 'delete', 'show','charge'];
+        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report','wares-dedicate','vips-dedicate','achievement_dedicate','level-user-history','agent-request-history','salary-history','request-agency-history'];
 
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
 
+        $actions = ['create', 'delete', 'show'];
+        $targets = ['update_setting_button','agency-settings','agency-setting','settings','charge-settings','room-settings','ovip-settings','box-settings','moment-settings','reel-settings','chat-setting','user-status'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+
+        $actions = ['create', 'edit', 'show'];
+        $targets = ['special-history'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
+
+        $actions = ['create'];
+        $targets = ['box-use'];
+
+        DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
+            foreach ($actions as $action) {
+                foreach ($targets as $target) {
+                    $query->orWhere('slug', 'like', "{$action}-{$target}");
+                }
+            }
+        })->delete();
     }
 }

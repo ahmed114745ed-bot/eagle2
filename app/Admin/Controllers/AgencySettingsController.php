@@ -6,8 +6,6 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use App\Models\Config;
 use App\Models\Language;
-use App\Models\Setting;
-use Encore\Admin\Controllers\AdminController;
 
 class AgencySettingsController extends MainController
 {

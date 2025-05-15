@@ -1,10 +1,6 @@
 <?php
 
-use App\Admin\Controllers\UserWalletController;
-use App\Admin\Controllers\WalletTransactionController;
-use App\Admin\Controllers\WareController;
 use App\Models\Room;
-use App\Admin\Controllers\AgencyControllers\UserController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +10,7 @@ use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
+use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -53,13 +50,14 @@ use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
+use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
-
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ChargeReportController;
+
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
@@ -77,6 +75,7 @@ use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
@@ -85,6 +84,7 @@ use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
+use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
@@ -92,6 +92,7 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
