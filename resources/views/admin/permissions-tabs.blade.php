@@ -14,9 +14,9 @@
  @foreach($grouped as $category => $perms)
      <li class="nav-item">
          <a class="nav-link {{ $loop->first ? 'active' : '' }}"
-            data-category="{{ __($category) }}"
+            data-category="{{ $category }}"
             href="#">
-             {{ $category }}
+             {{__($category)  }}
          </a>
      </li>
  @endforeach
