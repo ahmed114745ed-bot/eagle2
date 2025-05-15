@@ -14,7 +14,6 @@ class WalletController extends Controller
     public function __construct(private readonly WalletService $walletService)
     {
     }
-
     /**
      * @throws \Exception
      * @throws \Throwable

@@ -56,7 +56,7 @@ class WalletService
 
         $coins = $amount * $rate;
 
-        return $this->startTransaction($this->userWalletModel, $receiver, $sender, $amount, $coins, $receiverType);
+        return $this->startTransaction($userWallet, $receiver, $sender, $amount, $coins, $receiverType);
     }
 
     public function startTransaction(UserWallet $userWallet, User $receiver,User $sender, int $amount, int $coins,string $receiverType): JsonResponse
