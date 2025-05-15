@@ -98,7 +98,7 @@
                                     id="perm-${perm.id}"
                                     ${checked}>
                              <label class="form-check-label" for="perm-${perm.id}">
-                                 ${ perm.name}
+                                 ${ __(perm.name)}
                              </label>
                          </div>
                      `;
