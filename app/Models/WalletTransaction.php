@@ -15,6 +15,7 @@ class WalletTransaction extends Model
         'value',
         'description',
         'description_data',
+        'transactions_type'
     ];
 
     public function user(): BelongsTo

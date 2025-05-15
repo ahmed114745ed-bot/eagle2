@@ -382,6 +382,8 @@
     "current phone not verified": "वर्तमान फ़ोन सत्यापित नहीं है",
     "account deleted successfully": "खाता सफलतापूर्वक हटा दिया गया",
     "please set usd_value_in_coins in configs": "कृपया कॉन्फ़िग में usd_value_in_coins सेट करें",
+    "please set usd_value_in_coins in configs. Contact the administration!": "कृपया कॉन्फ़िग्स में usd_value_in_coins सेट करें। प्रशासन से संपर्क करें!",
+    "this agency not found": "यह एजेंसी नहीं मिली",
     "balance not enough": "शेष राशि पर्याप्त नहीं है",
     "missing owner_id": "मालिक का आईडी गायब है",
     "Missing data": "डेटा गायब है",

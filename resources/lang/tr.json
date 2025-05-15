@@ -369,7 +369,9 @@
 "current phone not verified": "Geçerli telefon onaylanmadı",
 "account deleted successfully": "Hesap başarıyla silindi",
 "please set usd_value_in_coins in configs": "Lütfen usd_value_in_coins yapılandırmasını ayarlayın",
-"balance not enough": "Yetersiz bakiye",
+    "please set usd_value_in_coins in configs. Contact the administration!": "Lütfen ayarlarda usd_value_in_coins değerini belirleyin. Yönetim ile iletişime geçin!",
+    "this agency not found": "Bu ajans bulunamadı",
+    "balance not enough": "Yetersiz bakiye",
 "missing owner_id": "Sahip kimliği eksik",
 "Missing data": "Eksik veri",
 "The user is not in this room": "Kullanıcı bu odada değil",
@@ -2140,7 +2142,7 @@
   "Agency Heroes": "Ajans Kahramanları",
   "Supporters": "Destekçiler",
   "Remaining": "Kalan"
-  
+
 
 
 }

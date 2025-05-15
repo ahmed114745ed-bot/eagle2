@@ -411,6 +411,8 @@
     "current phone not verified": "لم يتم التحقق من الهاتف الحالي",
     "account deleted successfully": "تم حذف الحساب بنجاح",
     "please set usd_value_in_coins in configs": "يرجى تعيين usd_value_in_coins في الإعدادات",
+    "please set usd_value_in_coins in configs. Contact the administration!": "يرجى ضبط قيمة usd_value_in_coins في الإعدادات. يرجى التواصل مع الإدارة!",
+    "this agency not found": "هذه الوكالة غير موجودة",
     "balance not enough": "الرصيد غير كافي",
     "missing owner_id": "معرف المستخدم مفقود",
     "Missing data": "بيانات مفقودة",

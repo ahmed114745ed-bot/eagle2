@@ -42,12 +42,12 @@ class WalletService
 
         if ($data['type'] == WalletEnum::USER->value){
             $receiver = CheckUserExistence::userExists($this->userModel, $data['receiver_id']);
-            $receiverType = 'user';
+            $receiverType = WalletEnum::USER->value;
         }
 
         if ($data['type'] == WalletEnum::AGENCY->value){
             $receiver = CheckAgencyExistence::agencyExists($this->agencyModel, $data['receiver_id']);
-            $receiverType = 'agency';
+            $receiverType = WalletEnum::AGENCY->value;
         }
 
         CheckSystemConfigs::checkUserTransferAvailability($sender, $receiver);
@@ -66,10 +66,15 @@ class WalletService
     {
         DB::beginTransaction();
         try {
-            //Todo if user increment the di if agency increment the coins
-            //Todo add transactions_type column
             $userWallet->increment('cut_amount', $amount);
-            $receiver->increment('coins', $coins);
+
+            if ($receiverType == WalletEnum::USER->value){
+                $receiver->increment('di', $coins);
+            }
+
+            if ($receiverType == WalletEnum::AGENCY->value){
+                $receiver->increment('coins', $coins);
+            }
 
             $this->walletTransactionModel::create([
                 'user_id' => $sender->id,
