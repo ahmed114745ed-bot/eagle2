@@ -3,6 +3,7 @@
 namespace Modules\Wallet\Services;
 
 use App\Helpers\Common;
+use App\Models\Agency;
 use App\Models\User;
 use Exception;
 
@@ -23,7 +24,7 @@ class CheckSystemConfigs
     /**
      * @throws Exception
      */
-    public static function checkUserTransferAvailability(User $sender, User $receiver): void
+    public static function checkUserTransferAvailability(User $sender, $receiver): void
     {
         if ($sender->transfer_salary == 1) {
             throw new Exception(__('api_responses.freeze_transfer_charger'));
@@ -42,7 +43,7 @@ class CheckSystemConfigs
         $rate = Common::getCoinsValue('user_coins');
 
         if (!$rate){
-            throw new Exception( __('please set usd_value_in_coins in configs'));
+            throw new Exception( __('please set usd_value_in_coins in configs. Contact the administration!'));
         }
 
         return $rate;

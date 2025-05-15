@@ -8,6 +8,7 @@ use App\Models\Charge;
 use App\Models\User;
 use App\Models\UserWallet;
 use App\Models\WalletTransaction;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Modules\Wallet\Enum\WalletEnum;
@@ -27,10 +28,10 @@ class WalletService
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @throws \Throwable
      */
-    public function makeTransaction(array $data): JsonResponse
+    public function makeTransaction(array $data): array
     {
         $sender = auth()->user();
         $amount = $data['amount'];
@@ -40,14 +41,14 @@ class WalletService
 
         $userWallet = CheckAvailableBalance::checkAvailableBalance($this->userWalletModel, $amount);
 
-        if ($data['type'] == WalletEnum::USER){
+        if ($data['type'] == WalletEnum::USER->value){
             $receiver = CheckUserExistence::userExists($this->userModel, $data['receiver_id']);
-            $receiverType = 'user';
+            $receiverType = WalletEnum::USER->value;
         }
 
-        if ($data['type'] == WalletEnum::AGENCY){
+        if ($data['type'] == WalletEnum::AGENCY->value){
             $receiver = CheckAgencyExistence::agencyExists($this->agencyModel, $data['receiver_id']);
-            $receiverType = 'agency';
+            $receiverType = WalletEnum::AGENCY->value;
         }
 
         CheckSystemConfigs::checkUserTransferAvailability($sender, $receiver);
@@ -59,12 +60,22 @@ class WalletService
         return $this->startTransaction($userWallet, $receiver, $sender, $amount, $coins, $receiverType);
     }
 
-    public function startTransaction(UserWallet $userWallet, User $receiver,User $sender, int $amount, int $coins,string $receiverType): JsonResponse
+    /**
+     * @throws \Throwable
+     */
+    public function startTransaction(UserWallet $userWallet, $receiver, User $sender, int $amount, int $coins, string $receiverType): array
     {
         DB::beginTransaction();
         try {
             $userWallet->increment('cut_amount', $amount);
-            $receiver->increment('coins', $coins);
+
+            if ($receiverType == WalletEnum::USER->value){
+                $receiver->increment('di', $coins);
+            }
+
+            if ($receiverType == WalletEnum::AGENCY->value){
+                $receiver->increment('coins', $coins);
+            }
 
             $this->walletTransactionModel::create([
                 'user_id' => $sender->id,
@@ -88,10 +99,10 @@ class WalletService
             Charge::create($data);
 
             DB::commit();
-            return Common::apiResponse(1, 'success', $data, 201);
-        } catch (\Exception $exception) {
+            return $data;
+        } catch (Exception $exception) {
             DB::rollBack();
-            return Common::apiResponse(0, $exception->getMessage(), 400);
+            throw new Exception($exception->getMessage());
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace Modules\Wallet\Http\Controllers;
 
+use App\Helpers\Common;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,8 @@ class WalletController extends Controller
      */
     public function makeTransaction(MakeTransferRequest $request): JsonResponse
     {
-        return $this->walletService->makeTransaction($request->validated());
+        $result = $this->walletService->makeTransaction($request->validated());
+
+        return Common::apiResponse(1, 'success', $result, 201);
     }
 }
