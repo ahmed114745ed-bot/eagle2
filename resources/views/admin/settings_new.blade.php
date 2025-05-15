@@ -1236,13 +1236,13 @@ use App\Models\Vip;
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group d-flex align-items-center">
-                                            <div class="form-group">
-                                                <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
-                                                <input type="text" id="charge_exp" name="exp_charge_percentage"
-                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                                    class="form-control">
-                                                <span class="form-text text-muted">1 coin = EXP</span>
-                                            </div>
+                                                <div class="form-group">
+                                                    <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
+                                                    <input type="text" id="charge_exp" name="exp_charge_percentage"
+                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = EXP</span>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-12">

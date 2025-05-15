@@ -14,7 +14,6 @@ use App\Facades\UserHandling;
 use App\Http\Services\WhatsappOtp;
 use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
@@ -43,8 +42,10 @@ use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Illuminate\Support\Facades\Config;
 
 class UserService
 {
@@ -1031,6 +1032,7 @@ class UserService
     {
         $expLevel     = $user->total_charge_coins + $user->sub_charger_coins;
         $currentLevel = $this->vipRepository->findByLevel($user->charge_level, 5);
+
         if ($currentLevel) {
             $secondLevel = $this->vipRepository->nextLevel($currentLevel->level, 5);
         } else {
@@ -1043,7 +1045,9 @@ class UserService
             $exactlyValue    = @$secondLevel?->exp;
             $progressCurrent = $expLevel - $currentLevel->exp;
             $progressNext    = $secondLevel->exp - $currentLevel->exp;
-            $prog = ($progressCurrent / $progressNext);
+
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
             if ($prog >= 1) {
                 $bar = 1;
             } else {
@@ -1067,6 +1071,7 @@ class UserService
             $progress  = 1;
             $remaining = 0;
         }
+        $expPercentages  = Config::get('exp_percentages') ??  cache('exp_percentages');;
         $chargeLevel = [
             'current_level' => $currentLevel->level ?? 0,
             'current_exp'   => $currentLevel->exp ?? 0,
@@ -1076,6 +1081,7 @@ class UserService
             'next_img'      => @$secondLevel->img ?? '',
             'remaining'     => @$remaining ?? 0,
             'progress'      => @$progress ?? 0,
+            'result_charge' => (int) $expPercentages['exp_charge_percentage']?? 1 *  $expLevel,
         ];
 
         return  [
