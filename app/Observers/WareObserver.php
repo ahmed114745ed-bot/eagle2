@@ -54,7 +54,7 @@ class WareObserver
         $originalSpecialValue = $ware->getOriginal('value');
         if($ware->type == 25 && $originalSpecialValue != $ware->value ){
             User::where('special_id', $originalSpecialValue)
-                ->update(['value' => $ware->value]);
+                ->update(['special_id' => $ware->value]);
         }
     }
 
