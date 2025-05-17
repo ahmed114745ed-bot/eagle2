@@ -216,6 +216,30 @@ class User extends Authenticatable
         return $subQuery->count('entry_count');
     }
 
+    public function getTotalDaysJoinedAgency($from_date = null)
+    {
+        $month = @request()->month;
+        $year  = @request()->year;
+        if (!$month) $month = now()->month;
+        if (!$year) $year = now()->year;
+
+        $query = $this->liveTime()
+            ->selectRaw('DATE(created_at) as date, SUM(hours) as total_hours')
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year);
+
+        if ($from_date) {
+            $query->where('created_at', '>=', $from_date);
+        }
+
+        $days = $query
+            ->groupBy('date')
+            ->having('total_hours', '>', 1)
+            ->get();
+
+        return $days->count();
+    }
+
     public function getSallaryInfo(): array
     {
         $month = (int)@request()->month;
@@ -1212,7 +1236,7 @@ class User extends Authenticatable
 
                 $file       = request('photo');
                 if ($file instanceof  UploadedFile) {
-                   
+
                     $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
                     Storage::delete($model->profile->avatar);
                 }
@@ -1227,7 +1251,7 @@ class User extends Authenticatable
             unset($model->photo);
         });
 
-     
+
 
         static::updating(function ($user) {
             // Check if coins increased
