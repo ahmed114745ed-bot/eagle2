@@ -11,7 +11,7 @@
     /* القائمة الجانبية */
     .settings-sidebar {
         width: 250px;
-        background: #222;
+        background: var(--secondary-color);
         min-height: 400px;
 
         padding: 20px;
@@ -288,30 +288,18 @@
 
 <body>
     <div class="all-page">
-        @php
-            $agencyMenu = null;
-            foreach (Admin::menu() as $item) {
-                if ($item['title'] == __('App Feature')) {
-                    $agencyMenu = $item;
-                    break;
-                }
-            }
-        @endphp
 
-        <div class="settings-sidebar" style="margin-bottom: 24px;">
-            <h2>{{ __('App Feature') }}</h2>
-            @if($agencyMenu)
-                <ul class="sidebar-menu">
-                    <li class="header">{{ admin_trans($agencyMenu['title']) }}</li>
-                    @foreach($agencyMenu['children'] as $item)
-                        @include('admin::partials.menu', $item)
-                    @endforeach
-                </ul>
-            @endif
-        </div>
+        <div class="all-page">
+            <div class="settings-sidebar">
+                <h2>{{ __('Settings') }}</h2>
+                <div class="settings-menu">
+                    <button onclick="showSection('AppFeature')"
+                            style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('App Feature') }}</button>
+                </div>
+            </div>
 
         <div class="settings-content">
-            <div id="PercentageTarget" class="settings-section active">
+            <div id="AppFeature" class="settings-section active">
                 <h2>{{ __('Agency Feature') }}</h2>
 
                 <form id="agencyFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
