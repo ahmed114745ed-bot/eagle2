@@ -88,7 +88,7 @@ class User extends Authenticatable
         'original_uuid',
         'is_frozen',
         'total_charge_level',
-         'photo'
+        'photo'
     ];
 
     /* protected $appends = [
@@ -409,7 +409,7 @@ class User extends Authenticatable
 
     public function country()
     {
-        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name','phone_code','iso');
+        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name', 'phone_code', 'iso');
     }
 
     public function getLangAttribute()
@@ -717,8 +717,7 @@ class User extends Authenticatable
         if ($level == $value) return;
 
         $this->sub_charger_level = $value - @$this->charge_level ?? 0;
-        $diamonds               =
-            (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
     }
 
@@ -1290,5 +1289,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(WalletTransactionBackup::class);
     }
-
 }
