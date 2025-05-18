@@ -139,6 +139,7 @@ class SettingsController extends Controller
             $data['app_background'] = $request->background_color;
             $data['background_color'] = $request->background_color;
         } elseif ($request->background_type === 'image' && $request->hasFile('app_background_image')) {
+            dd(123);
             $data['app_background'] = Common::upload('images', $request->file('app_background_image'));
             $data['images_background'] = Common::upload('images', $request->file('app_background_image'));
         } else if ($request->background_type == 'gradient') {
