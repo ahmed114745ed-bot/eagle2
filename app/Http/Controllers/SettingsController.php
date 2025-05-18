@@ -181,7 +181,7 @@ class SettingsController extends Controller
             if (Str::contains($key, ['color']) && (common::getSettingValue('app_primary_color') != $request->app_primary_color || common::getSettingValue('app_second_color') != $request->app_second_color || common::getSettingValue('app_white_color') != $request->app_white_color || common::getSettingValue('app_black_color') != $request->app_black_color || common::getSettingValue('app_grey_color') != $request->app_grey_color || common::getSettingValue('app_yellow_color') != $request->app_yellow_color)) {
                 $cacheKey = 'colors_updated_at';
                 settings()->set($cacheKey, true);
-            } elseif ((common::getSettingValue('background_type') != $request->background_type || common::getSettingValue('images_background') != $request->images_background || common::getSettingValue('background_color') != $request->background_color || common::getSettingValue('gradient_2') != $request->gradient_2 || common::getSettingValue('gradient_3') != $request->gradient_3 || common::getSettingValue('gradient_1') != $request->gradient_1)) {
+            } elseif ((common::getSettingValue('background_type') !== $request->background_type || common::getSettingValue('images_background') !== $request->images_background || common::getSettingValue('background_color') !== $request->background_color || common::getSettingValue('gradient_2') !== $request->gradient_2 || common::getSettingValue('gradient_3') !== $request->gradient_3 || common::getSettingValue('gradient_1') !== $request->gradient_1)) {
           Log::info($key, ['value' => $value]);
                 $cacheKey = 'ground_updated_at';
                 settings()->set($cacheKey, true);
