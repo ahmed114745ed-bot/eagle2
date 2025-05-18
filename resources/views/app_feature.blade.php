@@ -314,13 +314,13 @@
                     <div class="form">
                         <!-- Toggle switch for enabling/disabling the agency feature -->
                         <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
                             <label class="switch">
                                 <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
                                 onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
                         document.getElementById('agencyFeatureForm').submit();">
                                 <span class="slider round"></span>
                             </label>
-                            <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
                             <!-- Only this input has the name attribute to be submitted -->
                             <input type="hidden" name="host_agency" id="host_agency_value" value="{{ $hostAgencyStatus ? '1' : '0' }}">
                         </div>
