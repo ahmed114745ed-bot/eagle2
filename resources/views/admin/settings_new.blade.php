@@ -7,7 +7,7 @@
     </head>  -->
 <!--
 <body>
-    <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('POST')
         @php
@@ -519,7 +519,7 @@
 
                 <h3> {{ __('Brand settings') }}</h3>
 
-                <form action="{{ route('admin.setting.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form row">
 
@@ -578,7 +578,7 @@
 
             <div id="themeSettings" class="settings-section">
                 <h3>{{ __('Theme settings') }}</h3>
-                <form id="themeSettingsForm" action="{{ route('admin.setting.update') }}" method="POST"
+                <form id="themeSettingsForm" action="{{ route('admin.settings.update') }}" method="POST"
                     enctype="multipart/form-data">
                     <div class="form row">
                         @csrf
@@ -721,7 +721,7 @@
 
             <div id="timeSettings" class="settings-section">
                 <h3>{{ __('Timing settings') }}</h3>
-                <form action="{{ route('admin.setting.update') }}" method="POST">
+                <form action="{{ route('admin.settings.update') }}" method="POST">
                     @csrf
                     <div class="form">
 
