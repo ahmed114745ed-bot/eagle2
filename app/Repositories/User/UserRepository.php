@@ -48,32 +48,19 @@ class UserRepository extends Repository
 
     public function searchUserAgency($key, $page, $perPage)
     {
-        // return User::selectRaw('concat(name, " - ", uuid) as name, id')
-        //     ->where(function ($query) {
-        //         $query->where('agency_id', 0)
-        //             ->orWhereNull('agency_id');
-        //     })
-        //     ->where('type_user', 0)
-        //     ->where(function ($query) use ($key) {
-        //         $query->where('name', 'like', '%' . $key . '%')
-        //             ->orWhere('uuid', 'like', '%' . $key . '%')
-        //             ->orWhere('id', 'like', '%' . $key . '%');
-        //     })
-        //     ->paginate($perPage, ['*'], 'page', $page);
-        \Log::info($key);
-        \Log::info('gth');
-        return User::selectRaw('concat(name, " - ", uuid) as name, id')
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+        ->where(function ($query) {
+                $query->where('agency_id', 0)
+                    ->orWhereNull('agency_id');
+            })
+            ->where('type_user', 0)
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
-                    ->orWhere('uuid', 'like', '%' . $key . '%');
-            })
-            ->when(is_numeric($key), function ($query) use ($key) {
-                $query->orWhere('id', $key);
-            })
-            ->when(strlen($key) === 36, function ($query) use ($key) {
-                $query->orWhere( 'uuid', $key);
+                    ->orWhere('uuid', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
+     
     }
 
     public function searchUserAgencyShipping($key, $page, $perPage)
