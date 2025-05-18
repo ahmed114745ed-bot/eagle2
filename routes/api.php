@@ -161,7 +161,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
-            //  Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
+              Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
 

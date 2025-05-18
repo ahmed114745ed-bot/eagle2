@@ -423,7 +423,7 @@ class UserCommon
         $user->total_charge_coins += $amount;
 
         $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
-        $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->latest()->first();
+        $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
         if ($level) {
             $user->charge_level = $level->level;
         }

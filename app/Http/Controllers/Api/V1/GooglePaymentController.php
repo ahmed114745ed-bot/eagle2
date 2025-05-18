@@ -117,17 +117,18 @@ class GooglePaymentController extends Controller
     }
 
 
-    // public static function addChargeLevel(Request $request)
-    // {
-    //     $user = User::where("id", $request->user()->id)->first();
-    //     $user->total_charge_coins += $request->amount;
-    //     $level = Vip::where("exp", "<=", $user->total_charge_coins)->where('type', 5)->orderByDesc('exp')->first();
-       
-    //     if ($level) {
-    //         $user->charge_level = $level->level;
-    //     }
-    //     $user->save();
+    public static function addChargeLevel(Request $request)
+    {
+        $user = User::where("id", $request->user()->id)->first();
+        $user->total_charge_coins += $request->amount;
+        $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
+        $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
 
-    //     return Common::apiResponse(1,  $user->total_charge_level, 200);
-    // }
+        if ($level) {
+            $user->charge_level = $level->level;
+        }
+        $user->save();
+
+        return Common::apiResponse(1,  $user->total_charge_level, 200);
+    }
 }
