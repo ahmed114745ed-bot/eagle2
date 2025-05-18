@@ -187,7 +187,7 @@ class AgencyAppController extends Controller
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year);
-
+        $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }
 }

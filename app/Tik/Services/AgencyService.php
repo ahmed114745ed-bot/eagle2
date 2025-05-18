@@ -663,7 +663,7 @@ class AgencyService
             ];
         }
 
-        return empty($data) ? new \stdClass() : $data;
+        return $data;
     }
 
 
