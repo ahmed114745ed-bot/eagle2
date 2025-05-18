@@ -72,7 +72,6 @@ class AdminUserController extends EncorUsersController
 
 
         $form->saving(function (Form $form) {
-           dd($form->app_id,$form->roles );
             
         });
         return $form;
