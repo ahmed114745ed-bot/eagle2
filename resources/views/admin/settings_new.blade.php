@@ -1124,12 +1124,12 @@ use App\Models\Vip;
                                         @endif
                                       <div class="col-md-12">
                                       <div class="form-group">
-                                 <label for="wealth_gift_price">{{ __('gift_price') }}</label>
+                                 <label for="wealth_gift_price">{{ __('gift price') }}</label>
                                             <input type="text" id="wealth_gift_price" name="test_calco"
                                                 placeholder="{{  __('wealth_gift_price') }}"
                                                 style="width: auto; display: inline-block;"
                                                 value="{{ $settings['wealth_gift_price'] ?? '' }}"
-                                                class="form-control" required>
+                                                class="form-control" >
                                             <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                         </div>
 
