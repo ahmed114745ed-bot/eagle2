@@ -30,6 +30,11 @@
     "Permission": "अनुमति",
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
+
+    "Agencies Count": "एजेंसियों की संख्या",
+    "BD Wallet": "बीडी वॉलेट",
+    "My Wallet": "मेरा वॉलेट",
+
     "App": "एप्लिकेशन",
     "Achievement Id": "उपलब्धि आईडी",
     "Description Ar": "विवरण अरबी",
@@ -1371,7 +1376,7 @@
   "user parent": "उपयोगकर्ता अभिभावक",
   "general": "सामान्य",
   "Lucky box": "लकी बॉक्स",
-  
+
   "Create Agencies": "एजेंसियां बनाएँ",
   "browse report": "रिपोर्ट देखें",
   "browse users hunters": "शिकारी उपयोगकर्ता देखें",

@@ -300,6 +300,11 @@
 "user already joined to other family": "Kullanıcı zaten başka bir aileye katıldı",
 "invalid data": "Geçersiz veri",
 "full admins": "Dolu yöneticiler",
+
+    "Agencies Count": "Ajans Sayısı",
+    "BD Wallet": "BD Cüzdanı",
+    "My Wallet": "Cüzdanım",
+
 "full members": "Dolu üyeler",
 "try to remove your self": "Kendinizi kaldırmaya çalışın",
 "cant follow your self": "Kendinizi takip edemezsiniz",
@@ -2220,7 +2225,7 @@
   "user parent": "Kullanıcı velisi",
   "general": "Genel",
    "Lucky box": "Şans kutusu",
-   
+
   "Create Agencies": "Ajanslar Oluştur",
   "browse report": "Raporlara Gözat",
   "browse users hunters": "Kullanıcı  Gözat",
