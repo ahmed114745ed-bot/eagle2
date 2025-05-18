@@ -18,6 +18,7 @@ Route::group(
             'adminIp',
 //            'adminGeneralBan',
             'multiLanguage',
+            'agencyFeature'
         ],
         'as'            => config('admin.route.prefix') . '.',
     ],
@@ -28,5 +29,5 @@ Route::group(
         $router->resource ('agency-country',ChargeAgencyController::class);
         $router->resource('salary-requests', SalaryRequestController::class);
         $router->resource ('agent-requests-history', AgentRequestHistoryController::class);
-       
+
 });

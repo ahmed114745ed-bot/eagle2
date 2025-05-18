@@ -1,6 +1,7 @@
 <?php
 
 use App\Admin\Controllers\AgencySettingsController;
+use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Models\Room;
 use App\Models\User;
@@ -547,6 +548,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::delete('{id}/user', [MusicController::class, 'destroyUserMusic']);
                 Route::post('/create', [MusicController::class, 'store']);
             });
+
+            Route::get('app_feature', [AppFeatureController::class, 'show']);
         }
     );
 

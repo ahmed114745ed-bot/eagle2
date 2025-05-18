@@ -12,6 +12,7 @@ use App\Http\Middleware\UserBanMiddleware;
 use App\Http\Middleware\GeneralBanMiddleware;
 use App\Http\Middleware\AdminGeneralBanMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Modules\SalaryTransaction\Http\Middleware\EnsureAgencyFeatureEnabled;
 use Modules\ServerControl\Http\Middleware\ConfigMiddleware;
 use KevinSoft\MultiLanguage\Middlewares\MultiLanguageMiddleware;
 
@@ -98,6 +99,7 @@ class Kernel extends HttpKernel
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
+//        'agencyFeature' => EnsureAgencyFeatureEnabled::class,
 
     ];
 }

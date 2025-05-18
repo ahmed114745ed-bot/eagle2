@@ -1755,6 +1755,7 @@
     "Group Chat":"دردشة جماعية",
     "Settings":"الأعدادات",
     "Agency System":"نظام الوكالات",
+    "Agency Feature is Disabled, Contact the administration": "ميزة الوكالة معطلة، يرجى التواصل مع الإدارة",
     "Internal Sales System":"نظام البيع الداخلي",
     "Countries Where Salary Payments Are Available":"الدول المتاح بها تسليم رواتب",
     "Host Agencies":"وكالات المضيفين",
@@ -2244,7 +2245,7 @@
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
   "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
   "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد",
-  
+
   "browse agency settings": "عرض إعدادات الوكالة",
   "edit agency settings": "تعديل إعدادات الوكالة",
   "browse page": "عرض الصفحة",
@@ -2323,7 +2324,7 @@
   "user parent": " المستخدمون الرئيسيون ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
-   
+
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
   "browse users hunters": "تصفح مستخدمي ",
