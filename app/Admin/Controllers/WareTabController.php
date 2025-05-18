@@ -37,7 +37,7 @@ class WareTabController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('wares'))
             ->body($this->detail($id)));
     }
@@ -57,7 +57,7 @@ class WareTabController extends MainController
         // // Get type from request or fall back to warehouse's type
         // $currentType = request('type', $ware->type);
 
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('wares'))
             // ->row(function (Row $row) use ($id, $currentType) {
             //     $row->column(12, $this->tabsComponentEdit($id, $currentType));
@@ -85,7 +85,8 @@ class WareTabController extends MainController
         $type = request()->get('type', 1);
 
         $grid = new Grid(new Ware());
-        $grid->model()->where('type', $type)->whereNot('get_type', 1);
+        $types = [6, 4, 5];
+        $grid->model()->whereIn('type', $types)->whereNot('get_type', 1);
 
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -104,10 +105,24 @@ class WareTabController extends MainController
             $grid->column('price', __('price'));
         }
 
-        $grid->column('show_img', __('show_img'))->image('', 30);
+        $grid->column('show_img', __('show_img'))->display(function ($path) {
+            /** @var Ware $this */
+            $defaultImage = asset("images/image.png");
+
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('get_type', __('get_type'))->select(
@@ -190,7 +205,7 @@ class WareTabController extends MainController
         // });
 
         $types = collect($typeMap);
-  
+
 
         $currentType = request()->get('type', $types->keys()->first());
 

@@ -7,12 +7,8 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\UserSallary;
-use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\InfoBox;
+
 
 class ChangeAgencyMangerController extends MainController
 {

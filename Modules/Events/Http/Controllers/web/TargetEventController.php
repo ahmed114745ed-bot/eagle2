@@ -3,7 +3,6 @@
 namespace Modules\Events\Http\Controllers\web;
 
 
-use App\Admin\Controllers\MainOldController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;

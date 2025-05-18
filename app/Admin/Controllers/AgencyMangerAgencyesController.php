@@ -4,12 +4,9 @@ namespace App\Admin\Controllers;
 
 use App\Models\User;
 use App\Traits\AdminTraits\AdminUserTrait;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
 use App\Models\Agency;
 use App\Models\AgencySallary;
-use App\Models\UserTarget;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;

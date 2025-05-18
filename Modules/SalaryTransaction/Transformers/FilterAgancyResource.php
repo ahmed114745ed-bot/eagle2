@@ -2,9 +2,13 @@
 
 namespace Modules\SalaryTransaction\Transformers;
 
-use App\Helpers\Common;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Helpers\Common;
+use App\Models\GiftLog;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\V1\AdminsAgencyResource;
+use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
 
 class FilterAgancyResource extends JsonResource
 {
@@ -30,6 +34,11 @@ class FilterAgancyResource extends JsonResource
         } elseif ($this->type == 2) {
             $type = 'shipping';
         }
+        $year = request('year') ?? Carbon::now()->year;
+        $month = request('month') ?? Carbon::now()->month;
+
+        $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
+            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(5)->get();
         return [
             'id' => $this->id,
             'name' => @$this->name,
@@ -42,7 +51,9 @@ class FilterAgancyResource extends JsonResource
                 'uuid' => $this->owner->uuid ?? '',
                 'name' => @$this->owner->name ?? '',
                 'image' => @$this->owner->profile?->avatar ?? '',
-            ]
+            ],
+            'admins' => AdminsAgencyResource::collection($this->admins),
+            'star' => ReceiverGiftLogResource::collection($giftLog),
         ];
     }
 }

@@ -35,9 +35,10 @@ class OVipController extends MainController
         (new AppFeatureService)->validateStatusEnable("vips");
     }
 
-    public function vip_settings(Content $content){
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_setting);
+    public function vip_settings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_setting);
         }
 
         $config = Config::pluck('value', 'name')->toArray();
@@ -57,7 +58,7 @@ class OVipController extends MainController
     public function show($id, Content $content)
     {
         $oVip = OVip::findOrFail($id);
-        return parent::show($id,$content->title(__('OVip'))->view('ovip_profile', compact('oVip')));
+        return parent::show($id, $content->title(__('OVip'))->view('ovip_profile', compact('oVip')));
     }
 
     /**
@@ -69,7 +70,7 @@ class OVipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('vip'))
             ->body($this->form()->edit($id)));
     }
@@ -109,7 +110,11 @@ class OVipController extends MainController
         $grid->column('name', __('name'));
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('price', __('price'))->display(function ($coin) {

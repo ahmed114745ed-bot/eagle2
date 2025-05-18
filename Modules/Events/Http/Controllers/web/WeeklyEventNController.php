@@ -2,22 +2,17 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainOldController;
 use App\Models\Gift;
 use App\Models\OVip;
 use App\Models\Ware;
-
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Admin;
-
 use App\Selectables\Gifts;
 use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
 use Modules\Events\Entities\Reward;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;

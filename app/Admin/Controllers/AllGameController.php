@@ -2,21 +2,20 @@
 
 namespace App\Admin\Controllers;
 
+use DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\AllGame;
 use App\Models\CoinGameUser;
-use App\Services\AppFeatureService;
-use Carbon\Carbon;
-use DB;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
-use Encore\Admin\Widgets\Box;
-use Encore\Admin\Layout\Row;
+use App\Services\AppFeatureService;
+use App\Admin\Controllers\MainController;
 
-class AllGameController extends AdminController
+class AllGameController extends MainController
 {
     protected $title = 'AllGame';
 
