@@ -1,0 +1,41 @@
+name: SSh-zion-pipline
+on:
+  push:
+    branches: ["zion"]
+jobs:
+  run_example_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: print out Zion
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.81.119"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 22m
+        script: |
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
+          cd /var/www/zino
+          pwd
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t zion:${{ github.sha }} .
+          docker service update --image zion:${{ github.sha }} zion-app
+          # check again
+          threshold=75
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits"
+          fi
