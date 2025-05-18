@@ -397,7 +397,7 @@
                 }
 
                 // Get the 'firsttab' parameter from URL or default to 'brandSettings'
-                const activeTab = getQueryParam("firsttab") || "PercentageTarget";
+                const activeTab = getQueryParam("firsttab") || "AppFeature";
 
                 // Show the selected tab
                 showSection(activeTab);
