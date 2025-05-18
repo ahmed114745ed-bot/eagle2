@@ -362,23 +362,23 @@ Route::group(
 
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
-            Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-            Route::prefix('ware-gift')->group(function () {
+        Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
+        Route::prefix('ware-gift')->group(function () {
 
-                Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-                Route::post('/{level}', [OvipGiftTapController::class, 'store']);
-                // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-            });
-            $router->resource('ware-gifts', 'OvipGiftTapController');
-            Route::prefix('ware-gifts')->group(function () {
+            Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
+            Route::post('/{level}', [OvipGiftTapController::class, 'store']);
+            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        $router->resource('ware-gifts', 'OvipGiftTapController');
+        Route::prefix('ware-gifts')->group(function () {
 
 
-                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-            });
+            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -401,7 +401,7 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
-        $router->get('moment-gallery/{id}', [MomentController::class,'momentGallery']);
+        $router->get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
         $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
         $router->resource('reel-settings', ReelSettingsController::class);
@@ -490,9 +490,7 @@ Route::group(
                     $background->use_count = $background_count;
                     $background->save();
                 }
-                //dd("done");
             }
-            //dd("note found data");
         });
 
         $router->resource('user-wallets', UserWalletController::class);
@@ -504,28 +502,20 @@ Route::group(
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
-
-
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
 
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
-
-
         $router->resource('notification-templates', NotificationsTemplatesController::class);
-       // Route::get('ware-management', [WareTabController::class, 'index']);
-      //  $router->resource('ware-management', WareTabController::class);
-      //Route::post('/ware-management/create/{type?}', [WareTabController::class, 'create']);
-      Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
-      Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
+        Route::post('/ware-managements/create', [WareTabController::class, 'store']);
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
             Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
             Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
-
     }
 
 
