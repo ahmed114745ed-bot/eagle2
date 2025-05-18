@@ -19,7 +19,13 @@ class UserTargetController extends MainController
     use HasResourceActions;
     public $permission_name = 'agent-target';
 
-
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
     public function index(Content $content)
     {
         return parent::index($content
@@ -96,7 +102,7 @@ class UserTargetController extends MainController
         $grid->column('user_obtain',__ ('user obtain'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
@@ -104,7 +110,7 @@ class UserTargetController extends MainController
         $grid->column('agency_obtain',__ ('agency obtain'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

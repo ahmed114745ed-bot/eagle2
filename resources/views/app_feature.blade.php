@@ -299,7 +299,7 @@
         @endphp
 
         <div class="settings-sidebar" style="margin-bottom: 24px;">
-            <h2>{{ __('Agencies Menu') }}</h2>
+            <h2>{{ __('App Feature') }}</h2>
             @if($agencyMenu)
                 <ul class="sidebar-menu">
                     <li class="header">{{ admin_trans($agencyMenu['title']) }}</li>
@@ -312,7 +312,7 @@
 
         <div class="settings-content">
             <div id="PercentageTarget" class="settings-section active">
-                <h2>Agency Feature</h2>
+                <h2>{{ __('Agency Feature') }}</h2>
 
                 <form id="agencyFeatureForm" action="{{ route('admin.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
