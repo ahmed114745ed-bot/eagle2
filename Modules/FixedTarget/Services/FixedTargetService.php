@@ -144,7 +144,8 @@ class FixedTargetService
             $t,
             'user_transaction',
             'target_achieved',
-            ['target_id' => $target->id]
+            ['target_id' => $target->id],
+            'get_target'
         );
 
         try {

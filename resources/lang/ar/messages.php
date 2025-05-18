@@ -12,5 +12,11 @@ return[
 'yes' => 'نعم',
 'deleteShipping' => 'في حالة مسح الوكالة ستفقد العملات والدولارات',
 'cancel' => 'إلغاء',
-    
+'transfer_to_user'     => 'تم تحويل مبلغ إلى المستخدم :name.',
+'transfer_to'          => 'تم تحويل مبلغ إلى :target.',
+'transfer_to_'          => 'تم تحويل مبلغ إلى :target.',
+'trans_to_my_wallet'   => 'تم تحويل مبلغ إلى محفظتي.',
+'transfer_to_agency'   => 'تم تحويل مبلغ إلى الوكالة :name.',
+'trans_to_'            => 'تم تحويل مبلغ إلى الجهة المستهدفة :target.',
+'charge_to_user'       => 'تم شحن رصيد إلى المستخدم :name.',
 ];

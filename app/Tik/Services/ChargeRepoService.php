@@ -260,7 +260,9 @@ class ChargeRepoService
             $usd,
             'user_transaction',
             'transfer_to_user',
-            ['receiver_id' => $receiver->id]
+            ['receiver_id' => $receiver->id],
+            'charge_to_user'
+
          );
 
         $type = $receiver->user_type;
@@ -297,7 +299,8 @@ class ChargeRepoService
             $usd,
             'user_transaction',
             'transfer_to_agency',
-            ['agency_id' => $receiver->id]
+            ['agency_id' => $receiver->id],
+                             'charge_to_agency'
          );
 
         $data = [

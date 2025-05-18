@@ -3,6 +3,7 @@
 namespace Modules\Wallet\Http\Controllers;
 
 use App\Helpers\Common;
+use App\Http\Resources\TransactionResource;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ class WalletController extends Controller
     public function getWalletTransactions(Request $request)
     {
         $result = $this->walletService->getWalletTransactions($request->all());
-        return Common::apiResponse(1, 'success', $result, 201);
+        return Common::apiResponse(1, 'success', TransactionResource::collection( $result), 201);
 
     }
 

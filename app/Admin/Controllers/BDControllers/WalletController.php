@@ -280,7 +280,8 @@ class WalletController extends MainController
             $request->amount,
             'user_transaction',
             'transfer_to_wallet',
-            []
+            [],
+            'trans_to_my_wallet'
         );
     
         admin_toastr(__('transferred_successfully'), 'success');
@@ -359,12 +360,15 @@ class WalletController extends MainController
         try {
             $userWallet->increment('cut_amount', $amount);
             $receiver->increment('coins', $coins);
+            $descriptionData=['receiver_id'  => $receiver->id];
 
             WalletTransaction::create([
                 'user_id' => $sender->id,
                 'type' => 'cut',
                 'transactions_type' => 'user_transaction',
                 'value' => $amount,
+                'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
+                'message' => 'transfer_to_',
             ]);
 
             $data = [
@@ -445,7 +449,9 @@ class WalletController extends MainController
             $usd,
             'user_transaction',
             'transfer_to_agency',
-            ['agency_id' => $toAgency->id]
+            ['agency_id' => $toAgency->id],
+            'trans_to_agency'
+
         );
         
         $data = [

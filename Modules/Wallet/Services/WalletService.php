@@ -77,12 +77,18 @@ class WalletService
             if ($receiverType == WalletEnum::AGENCY->value){
                 $receiver->increment('coins', $coins);
             }
+            $descriptionData=['receiver_id'  => $receiver->id];
+
+
 
             $this->walletTransactionModel::create([
                 'user_id' => $sender->id,
                 'type' => 'cut',
                 'transactions_type' => 'user_transaction',
                 'value' => $amount,
+                'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
+                'message' => 'transfer_to_',
+
             ]);
 
             $data = [

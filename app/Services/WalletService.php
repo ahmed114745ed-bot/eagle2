@@ -26,9 +26,10 @@ class WalletService
         float $amount,
         ?string $transactionsType = null,
         ?string $description = null,
-        $descriptionData = null
+        $descriptionData = null,
+        $message = 'transfer_to_user'
     ): WalletTransaction {
-        return DB::transaction(function () use ($userId, $type, $amount, $transactionsType, $description, $descriptionData) {
+        return DB::transaction(function () use ($userId, $type, $amount, $transactionsType, $description, $descriptionData ,$message) {
             $wallet = UserWallet::firstOrCreate(
                 ['user_id' => $userId],
                 ['value' => 0, 'cut_amount' => 0, 'pending_value' => 0]
@@ -40,7 +41,6 @@ class WalletService
                     break;
 
                 case 'cut':
-                    // $wallet->value -= $amount;
                     $wallet->cut_amount += $amount;
                     $amount = -$amount;
                     break;
@@ -61,6 +61,8 @@ class WalletService
                 'value' => $amount,
                 'description' => $description,
                 'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
+                'message' => $message,
+           
             ]);
         });
     }
