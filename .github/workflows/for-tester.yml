@@ -19,5 +19,5 @@ jobs:
           cd /var/www/for-tester
           pwd
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          php artisan migrate
+          php artisan migrate --force
           php artisan optimize:clear
