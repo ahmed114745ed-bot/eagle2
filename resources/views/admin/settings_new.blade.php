@@ -1194,12 +1194,12 @@ use App\Models\Vip;
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="attraction_gift_price">{{ __('gift_price') }}</label>
+                                                <label for="attraction_gift_price">{{ __('gift price') }}</label>
                                                 <input type="text" id="attraction_gift_price" name="test_calco"
                                                     placeholder="{{  __('attraction_gift_price') }}"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['attraction_gift_price'] ?? '' }}"
-                                                    class="form-control" required>
+                                                    class="form-control" >
                                                 <span id="attraction_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                             </div>
                                         </div>
@@ -1252,7 +1252,7 @@ use App\Models\Vip;
                                                     placeholder="{{  __('charge_gift_price') }}"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['charge_gift_price'] ?? '' }}"
-                                                    class="form-control" required>
+                                                    class="form-control">
                                                 <span id="charge_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                             </div>
                                         </div>
@@ -1301,12 +1301,12 @@ use App\Models\Vip;
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="rooms_gift_price">{{ __('gift_price') }}</label>
+                                                <label for="rooms_gift_price">{{ __('gift price') }}</label>
                                                 <input type="text" id="rooms_gift_price" name="test_calco"
                                                     placeholder="{{  __('rooms_gift_price') }}"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['rooms_gift_price'] ?? '' }}"
-                                                    class="form-control" required>
+                                                    class="form-control" >
                                                 <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                             </div>
                                         </div>
@@ -1355,12 +1355,12 @@ use App\Models\Vip;
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="cp_gift_price">{{ __('gift_price') }}</label>
+                                                <label for="cp_gift_price">{{ __('gift price') }}</label>
                                                 <input type="text" id="cp_gift_price" name="test_calco"
                                                     placeholder="cp_gift_price"
                                                     style="width: auto; display: inline-block;"
                                                     value="{{ $settings['cp_gift_price'] ?? '' }}"
-                                                    class="form-control" required>
+                                                    class="form-control" >
                                                 <span id="cp_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
                                             </div>
                                         </div>
