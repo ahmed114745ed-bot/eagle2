@@ -81,7 +81,7 @@ class AgencyController extends MainController
     //     $year = $request->year ?? Carbon::now()->year;
     //     $month = $request->month ?? Carbon::now()->month;
     //     $tab = request('tab') ?? null;
-      
+
     //     $cacheKey = "agency_profile_{$id}";
     //     $agency = Agency::with([
     //         'admins',
@@ -139,7 +139,7 @@ class AgencyController extends MainController
     //     $stars = $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id');
     //     $heroes = $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id');
     //     $data = compact('agency', 'members', 'charges', 'salaries', 'agencyJoinRequests', 'giftLog', 'memberTargets', 'agencyTarget', 'rate', 'stars', 'heroes','tab');
-     
+
     //     return $content->title(__('agency profile'))
     //         ->view('agency_profile', $data);
 
@@ -150,21 +150,20 @@ class AgencyController extends MainController
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'members';
-    
+
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::with(['admins', 'owner:id,name,uuid'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
-        if(!$agency)
-        {
-             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-                ->findOrFail($id);
-        });
+        if (!$agency) {
+            $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+                return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
+                    ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                    ->findOrFail($id);
+            });
         }
-    
+
         $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
         $imageUrl = getImagePath($path) ?? $defaultImage;
@@ -172,11 +171,11 @@ class AgencyController extends MainController
             $imageUrl = $defaultImage;
         }
         $agency->display_image = $imageUrl;
-    
+
         $agencyId = $agency->id;
-    
+
         $members = $charges = $salaries = $agencyJoinRequests = $giftLog = $memberTargets = $agencyTarget = $rate = $stars = $heroes = null;
-    
+
         switch ($tab) {
             case 'members':
                 $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
@@ -186,7 +185,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'members_page');
                 });
                 break;
-    
+
             case 'charges':
                 $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
                     return $agency->charges()
@@ -195,7 +194,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'charges_page');
                 });
                 break;
-    
+
             case 'salary':
                 $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
                     return AgencySallary::where('agency_id', $id)
@@ -204,7 +203,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'salary_page');
                 });
                 break;
-    
+
             case 'requests':
                 $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
                     return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
@@ -214,7 +213,7 @@ class AgencyController extends MainController
                         ->paginate(10, ['*'], 'join_page');
                 });
                 break;
-    
+
             case 'targets':
                 $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
                     return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
@@ -223,14 +222,14 @@ class AgencyController extends MainController
                             ->whereYear('created_at', $year);
                     }])->paginate(10, ['*'], 'target_page');
                 });
-    
+
                 [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
                 $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
                 $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
-    
+
                 break;
         }
-    
+
         $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
             return GiftLog::where('agency_id', $id)
                 ->selectRaw("SUM(giftPrice) as exp, receiver_id")
@@ -240,18 +239,27 @@ class AgencyController extends MainController
                 ->orderByDesc('exp')
                 ->get();
         });
-    
+
         $data = compact(
-            'agency', 'members', 'charges', 'salaries',
-            'agencyJoinRequests', 'giftLog', 'memberTargets',
-            'agencyTarget', 'rate', 'stars', 'heroes', 'tab'
+            'agency',
+            'members',
+            'charges',
+            'salaries',
+            'agencyJoinRequests',
+            'giftLog',
+            'memberTargets',
+            'agencyTarget',
+            'rate',
+            'stars',
+            'heroes',
+            'tab'
         );
-    
+
         return $content->title(__('agency profile'))
             ->view('agency_profile', $data);
     }
 
-  
+
 
 
     public function giftLogByAgency($rel, $month, $year, $agencyId, $keywords)
@@ -299,10 +307,10 @@ class AgencyController extends MainController
                 // ) {
                 //     $newUser->type_user = 3;
                 // }
-                if ($agency->type == 1 ) {
+                if ($agency->type == 1) {
                     $newUser->type_user = 2;
-                } 
-                
+                }
+
 
                 $newUser->is_host = 1;
                 $newUser->save();
@@ -647,8 +655,8 @@ class AgencyController extends MainController
                 // }
             });
         }
-        
-        
+
+
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -658,7 +666,7 @@ class AgencyController extends MainController
          </script>');
         }
 
-        
+
 
         Admin::script(<<<'JS'
         function initPhoneInput() {
@@ -720,7 +728,7 @@ class AgencyController extends MainController
 
             // $Shipping_agency = $form->input('Shipping_agency') ;
             $host = 0;
-            $form->model()->type =1;
+            $form->model()->type = 1;
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
             // Create admin dashboard for agency when accept it
@@ -740,7 +748,7 @@ class AgencyController extends MainController
                     'monthly_diamond_received' => 0,
                     'is_host' => 0,
                 ]);
-               
+
                 // if (($Host_agency == 'on' && $Shipping_agency == 'off') || ($Host_agency == 0 && $Shipping_agency == 0)) {
                 //     User::find($newOwnerId)->update([
                 //         'type_user' => 2,
@@ -793,7 +801,8 @@ class AgencyController extends MainController
             User::where('id', intval($appOwnerId))->update([
                 'type_user' => 2,
                 'is_host' => 1,
-                'agency_id' => $form->model()->id,]);
+                'agency_id' => $form->model()->id,
+            ]);
             // }
 
 
