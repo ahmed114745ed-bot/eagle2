@@ -568,7 +568,7 @@ class AgencyController extends MainController
      */
     protected function detail($id)
     {
-        $show = new Show(Agency::findOrFail($id));
+        $show = new Show(HostAgencyScope::findOrFail($id));
 
         $show->id('ID');
         $show->field('owner_id', __('owner_id'));
