@@ -76,7 +76,7 @@ class BdSalariesController extends MainController
         $grid->disableCreateButton();
     
         // 👇 عرض اسم الوكالة + صورة + لينك باستخدام العلاقة
-        $grid->column('agency.name', trans('salary.agency'))->display(function () {
+        $grid->column('agency.name', trans('agency'))->display(function () {
             $agency = $this->agency;
     
             if (!$agency) {
@@ -111,10 +111,10 @@ class BdSalariesController extends MainController
             ";
         });
     
-        $grid->column('total_sallary', trans('salary.total'));
-        $grid->column('total_cut', trans('salary.cut'));
+        $grid->column('total_sallary', trans('total'));
+        $grid->column('total_cut', trans('cut'));
     
-        $grid->column('remaining_percent', trans('salary.remaining_percent'))->display(function () {
+        $grid->column('remaining_percent', trans('remaining_percent'))->display(function () {
             if ($this->total_sallary == 0) return '0%';
             $remaining = ($this->total_sallary - $this->total_cut) / $this->total_sallary * 100;
             return round($remaining, 2) . '%';
