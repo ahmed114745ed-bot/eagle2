@@ -310,7 +310,7 @@ class AppearChargerAgencyController extends MainController
             setTimeout(initPhoneInput, 100);
         });
     JS);
-        $form->hidden('Shipping_agency')->default(1);
+        // $form->hidden('Shipping_agency')->default(1);
 
         // --- الأحداث عند الحفظ ---
         $form->saving(function (Form $form) {
