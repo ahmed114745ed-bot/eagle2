@@ -28,8 +28,8 @@
 
 </style>
 <div class="card bg-successs" style="padding: 20px; font-size: 20px; text-align: center; width: 469px; margin: 42px auto; height: auto;">
-    <strong style="color: white;">{{ $translated }}: </strong>
-    <span style="color: white;">{{ $finalSalary }} 💰</span>
+    <strong style="">{{ $translated }}: </strong>
+    <span style="">{{ $finalSalary }} 💰</span>
 
     <div style="margin-top: 15px;">
         <button onclick="openTransferModal()" class="btn btn-light btn-sm">

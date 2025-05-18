@@ -5,7 +5,6 @@
     .wallet-card {
         padding: 20px;
         /* background-color: #007bff; */
-        color: white;
         font-size: 20px;
         text-align: center;
         width: 100%;
@@ -23,7 +22,6 @@
     .wallet-button {
         padding: 8px 16px;
         background-color: white;
-        color: #007bff;
         border: none;
         border-radius: 6px;
         font-weight: bold;

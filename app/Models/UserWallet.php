@@ -20,4 +20,11 @@ class UserWallet extends Model
     {
         return $this->hasMany(WalletTransaction::class, 'user_id', 'user_id');
     }
+
+    public function getCurrentBalanceAttribute()
+    {
+        return $this->value - $this->cut_amount ;
+    }
+    
+
 }

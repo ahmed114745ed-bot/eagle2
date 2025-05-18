@@ -10,6 +10,7 @@ use App\Models\UserWallet;
 use App\Models\WalletTransaction;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Modules\Wallet\Enum\WalletEnum;
 
@@ -106,4 +107,28 @@ class WalletService
         }
     }
 
+
+   
+
+    public function getWalletTransactions($request)
+    {
+        $user = Auth::user();
+        $type = $request['type']; 
+    
+        if (!in_array($type, ['add', 'cut'])) {
+            throw new Exception('Invalid transaction type. Allowed values: add, cut');
+
+        }
+    
+        $transactions = WalletTransaction::whereHas('wallet', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->where('type', $type)
+            ->latest()
+            ->paginate(15);
+    
+        return $transactions;
+    
+    }
+    
 }

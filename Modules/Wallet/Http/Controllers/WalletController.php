@@ -25,4 +25,18 @@ class WalletController extends Controller
 
         return Common::apiResponse(1, 'success', $result, 201);
     }
+
+  
+
+    public function getWalletTransactions(Request $request)
+    {
+        $result = $this->walletService->getWalletTransactions($request->all());
+        return Common::apiResponse(1, 'success', $result, 201);
+
+    }
+
+ 
+    
+
 }
+
