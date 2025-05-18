@@ -1757,6 +1757,11 @@
     "Group Chat":"دردشة جماعية",
     "Settings":"الأعدادات",
     "Agency System":"نظام الوكالات",
+
+    "Agencies Count": "عدد الوكالات",
+    "BD Wallet": "محفظة Bd",
+    "My Wallet": "محفظتي",
+
     "Internal Sales System":"نظام البيع الداخلي",
     "Countries Where Salary Payments Are Available":"الدول المتاح بها تسليم رواتب",
     "Host Agencies":"وكالات المضيفين",
@@ -2324,7 +2329,7 @@
   "user parent": " المستخدمون الرئيسيون ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
-   
+
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
   "browse users hunters": "تصفح مستخدمي ",
