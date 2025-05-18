@@ -59,6 +59,7 @@ class VersionController extends Controller
                 'profile_frame_updated' => $ProfileFrameUpdated,
                 'colors' => settings()->get('colors_updated_at') ?? false,
                 'background' => settings()->get('ground_updated_at') ?? false,
+                'host_agency' => (bool)\Cache::get('host_agency'),
                 //intro - frames - extradata - emoji
             ], 'enable_chat'  => settings()->get('chat_status') == "on"
         ];
