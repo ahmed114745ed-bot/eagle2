@@ -2,7 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Scopes\HostAgencyScope;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
@@ -18,6 +17,7 @@ use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use Encore\Admin\Widgets\Tab;
+use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
@@ -29,6 +29,7 @@ use App\Facades\CustomNotification;
 use App\Services\AppFeatureService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Scopes\HostAgencyScope;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
@@ -155,6 +156,14 @@ class AgencyController extends MainController
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
+        if(!$agency)
+        {
+             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
+                ->findOrFail($id);
+        });
+        }
     
         $path = $agency->img;
         $defaultImage = asset("images/icon-agency.jpg");
