@@ -99,7 +99,7 @@ class Kernel extends HttpKernel
         'production.error' => \App\Http\Middleware\StopInProduction::class,
         'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
-//        'agencyFeature' => EnsureAgencyFeatureEnabled::class,
+        'agencyFeature' => EnsureAgencyFeatureEnabled::class,
 
     ];
 }
