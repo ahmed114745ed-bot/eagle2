@@ -1,5 +1,5 @@
 @php
-    $translated = trans('salary.current_balance');
+    $translated = trans('current_balance');
 @endphp
 <style>
     .wallet-card {
@@ -114,12 +114,14 @@
     }
 
 </style>
-<div class="card bg-primary" style="padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margin: 42px auto;">
+<div class="card bg-primary" style="
+   background: var(--secondary-color);
+padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margin: 42px auto;">
     <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
 
     <div style="margin-top: 15px;">
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
-            {{ __('wallet.charge_wallet') }}
+            {{ __('charge_wallet') }}
         </button>
     </div>
 </div>
@@ -127,32 +129,36 @@
 {{-- Charge Modal --}}
 <div id="chargeModal" class="transferModal" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%);
     background: white; padding: ; border-radius: 10px; z-index: 9999; width: 520px;">
+      <div class="modal-header" style="background-color: var(--primary-color); color: var(--text-secondary-color);">
+                    <h5 class="modal-title" id="modalDescriptionTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: var(--text-secondary-color);">&times;</button>
+                </div>
     <form id="chargeForm" class="transferForm" method="POST" action="{{ route('admin.bd.wallet.charge') }}">
         @csrf
 
         <div class="form-group">
-            <label for="target_type">{{ __('wallet.select_target') }}</label>
+            <label for="target_type">{{ __('select_target') }}</label>
             <select id="target_type" name="target_type" class="form-control" required onchange="toggleTargetFields()">
-                <option value="">{{ __('wallet.choose') }}</option>
-                <option value="user">{{ __('wallet.user') }}</option>
-                <option value="agency">{{ __('wallet.agency') }}</option>
+                <option value="">{{ __('select') }}</option>
+                <option value="user">{{ __('user') }}</option>
+                <option value="agency">{{ __('agency') }}</option>
             </select>
         </div>
 
         <div id="target_fields" style="display: none;">
             <div class="form-group">
-                <label for="target_id">{{ __('wallet.enter_id') }}</label>
+                <label for="target_id">{{ __('id') }}</label>
                 <input type="number" name="target_id" id="target_id" class="form-control" required>
             </div>
 
             <div class="form-group">
-                <label for="amount">{{ __('wallet.enter_amount') }}</label>
+                <label for="amount">{{ __('enter_amount') }}</label>
                 <input type="number" name="amount" id="amount" class="form-control" required step="0.01" min="0.01">
             </div>
 
             <div class="text-right mt-3 actions">
-                <button type="submit" class="btn btn-success">{{ __('wallet.confirm_charge') }}</button>
-                <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('wallet.cancel') }}</button>
+                <button type="submit" class="btn btn-success">{{ __('confirm_charge') }}</button>
+                <button type="button" class="btn btn-secondary" onclick="closeChargeModal()">{{ __('Cancel') }}</button>
             </div>
         </div>
     </form>
