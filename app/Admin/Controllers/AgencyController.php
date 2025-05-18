@@ -154,13 +154,13 @@ class AgencyController extends MainController
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::with(['admins', 'owner:id,name,uuid'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-                ->findOrFail($id);
+                ->find($id);
         });
         if (!$agency) {
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
                     ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
-                    ->findOrFail($id);
+                    ->find($id);
             });
         }
 
