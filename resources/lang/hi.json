@@ -22,12 +22,14 @@
     "Shipping": "शिपिंग",
     "Hosting" : "मेज़बान",
     "Agency_owner" : "एजेंसी मालिक",
-
+    "Agency Feature": "एजेंसी सुविधा",
+    "Enable Agency Feature": "एजेंसी सुविधा सक्षम करें",
     "Enter amount in dollars": "राशि डॉलर में दर्ज करें",
     "Please set agency coins in configs": "कृपया shipping_coins को कॉन्फ़िग में सेट करें",
     "Charged by app": "ऐप के माध्यम से चार्ज",
     "Owner uuid": "معرف المالك المميز",
     "Permission": "अनुमति",
+    "App Feature": "ऐप सुविधा",
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
     "App": "एप्लिकेशन",
@@ -1369,7 +1371,7 @@
   "user parent": "उपयोगकर्ता अभिभावक",
   "general": "सामान्य",
   "Lucky box": "लकी बॉक्स",
-  
+
   "Create Agencies": "एजेंसियां बनाएँ",
   "browse report": "रिपोर्ट देखें",
   "browse users hunters": "शिकारी उपयोगकर्ता देखें",
@@ -1417,7 +1419,9 @@
   "create charges agency": "एजेंसी शुल्क बनाएँ",
   "create charge country": "चार्ज देश बनाएँ",
   "shipping agency switch": "शिपिंग एजेंसी स्विच",
-  "browse updates_group_chat": "ग्रुप चैट अपडेट ब्राउज़ करें"
+  "browse updates_group_chat": "ग्रुप चैट अपडेट ब्राउज़ करें",
+  "agency does not have this coin": "एजेंसी के पास इतने सिक्के नहीं हैं।"
+  
 
 
 

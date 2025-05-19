@@ -1273,7 +1273,33 @@ class User extends Authenticatable
 
         });
     }
-
+    public function userType()
+    {
+        switch ($this->type_user) {
+            case 0:
+                $userType = __("User");
+                break;
+            case 1:
+                $userType = __("Host");
+                break;
+            case 2:
+                $userType = __("Host Agent");
+                break;
+            case 3:
+                $userType = __("Shipping Agent");
+                break;
+            case 4:
+                $userType = __("Resort & Shipping Agent");
+                break;
+            case 5:
+                $userType = __("Admin");
+                break;
+            default:
+                $userType = $this->type_user; // Keep the original value if no match is found
+                break;
+        }
+        return $userType;
+    }
 
     public function wallet()
     {

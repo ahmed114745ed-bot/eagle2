@@ -296,7 +296,11 @@
 "already have one": "Zaten bir tane var",
 "family not found": "Aile bulunamadı",
 "already joined": "Zaten katıldınız",
-"family is full members": "Aile üye doldu",
+    "Agency Feature is Disabled, Contact the administration": "Ajans özelliği devre dışı, lütfen yönetimle iletişime geçin",
+    "Agency Feature": "Ajans Özelliği",
+    "Enable Agency Feature": "Ajans Özelliğini Etkinleştir",
+    "App Feature": "Uygulama Özelliği",
+    "family is full members": "Aile üye doldu",
 "user already joined to other family": "Kullanıcı zaten başka bir aileye katıldı",
 "invalid data": "Geçersiz veri",
 "full admins": "Dolu yöneticiler",
@@ -2140,7 +2144,7 @@
   "Agency Heroes": "Ajans Kahramanları",
   "Supporters": "Destekçiler",
   "Remaining": "Kalan",
-  
+
   "browse agency settings": "Ajans ayarlarını görüntüle",
   "edit agency settings": "Ajans ayarlarını düzenle",
   "browse page": "Sayfayı görüntüle",
@@ -2219,7 +2223,7 @@
   "user parent": "Kullanıcı velisi",
   "general": "Genel",
    "Lucky box": "Şans kutusu",
-   
+
   "Create Agencies": "Ajanslar Oluştur",
   "browse report": "Raporlara Gözat",
   "browse users hunters": "Kullanıcı  Gözat",
@@ -2267,11 +2271,12 @@
   "create charges agency": "Ajans Ücreti Oluştur",
   "create charge country": "Ülke Ücreti Oluştur",
   "shipping agency switch": "Nakliye Ajansı Anahtarı",
-  "browse updates_group_chat": "Grup Sohbet Güncellemelerini Görüntüle"
+  "browse updates_group_chat": "Grup Sohbet Güncellemelerini Görüntüle",
+   "agency does not have this coin": "Ajansın bu kadar jetonu yok."
 
 
 
-  
+
 
 
 }

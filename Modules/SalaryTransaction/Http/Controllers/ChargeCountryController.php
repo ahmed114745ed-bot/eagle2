@@ -28,6 +28,14 @@ class ChargeCountryController extends MainController
     use HasResourceActions;
     public $permission_name = 'charge-country';
 
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
+    
     public function index(Content $content)
     {
         return parent::index($content
@@ -80,7 +88,7 @@ class ChargeCountryController extends MainController
         $grid->column('country.phone_code',trans('phone code'));
         $grid->column('country.language',trans ('language'));
         $grid->column ('country.flag',trans ('flag'))->image ('',30);
-        
+
         $this->extendGrid ($grid);
 
         return $grid;
@@ -122,7 +130,7 @@ class ChargeCountryController extends MainController
             if (!$id = $form->model()->id) {
                 return 'unique:charge_countries,country_id';
             }
-        
+
         });
         return $form;
     }

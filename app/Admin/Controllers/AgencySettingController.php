@@ -14,10 +14,10 @@ class  AgencySettingController extends MainController
     public function index(Content $content)
     {
         $tab = new Tab();
-        
+
         $targets = Target::orderBy('diamonds')->get();
 
-        
+
 
         $tab->add(__("targets"), view('admin.t  argets.targets', ["targets" => $targets]));
         $tab->add('Settings', "هنا هيكون حاجه جميله انتظر");
