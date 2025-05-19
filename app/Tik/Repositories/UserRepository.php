@@ -34,7 +34,7 @@ class UserRepository extends AbstractRepository
 
     public function filterUser($userUuId)
     {
-        return $this->model->fitterByUuid($userUuId)->first();
+        return $this->model->fitterByUuid($userUuId)->get();
     }
 
     public function searchUserById($userUuId)
