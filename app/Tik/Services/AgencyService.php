@@ -189,7 +189,7 @@ class AgencyService
     {
         $accept    = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
-        if(!$user)throw new Exception('user not found');
+        if (!$user) throw new Exception('user not found');
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
@@ -601,8 +601,8 @@ class AgencyService
 
     public function dailyReport($user, $month, $year)
     {
-        $joinedAgency = AgencyJoinRequest::where('user_id', $user->id)->first();
-        if (! $joinedAgency){
+        $joinedAgency = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
+        if (! $joinedAgency) {
             return [];
         }
         $userCreated = Carbon::parse($joinedAgency->created_at);
