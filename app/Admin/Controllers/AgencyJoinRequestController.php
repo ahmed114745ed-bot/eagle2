@@ -28,9 +28,13 @@ class AgencyJoinRequestController extends MainController
     use HasResourceActions;
     public $permission_name = 'agency-join-requests';
 
-
     public function __construct()
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
@@ -97,7 +101,7 @@ class AgencyJoinRequestController extends MainController
      */
     protected function grid()
     {
-       
+
         $grid = new Grid(new AgencyJoinRequest);
         $grid->model()->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
@@ -271,7 +275,7 @@ class AgencyJoinRequestController extends MainController
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
-           
+
 
             if ($form->model()->status == 1) {
                 $user = User::query()->where('id', $form->model()->user_id)->first();

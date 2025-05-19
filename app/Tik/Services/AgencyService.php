@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Models\AgencyJoinRequest;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
@@ -600,10 +601,26 @@ class AgencyService
 
     public function dailyReport($user, $month, $year)
     {
-        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $user->agency_id, $month, $year);
+        $joinedAgency = AgencyJoinRequest::where('user_id', $user->id)->first();
+        if (! $joinedAgency){
+            return [];
+        }
+        $userCreated = Carbon::parse($joinedAgency->created_at);
+        $startOfMonth = Carbon::create($year, $month, 1);
+        $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
+        $reportStart = ($userCreated->year == $year && $userCreated->month == $month)
+            ? $userCreated->day
+            : 1;
 
-        $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $month, $year);
+        $isThisMonth = $month == now()->month && $year == now()->year;
+        $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
+
+        $startDate = Carbon::create($year, $month, $reportStart)->startOfDay();
+        $endDate = Carbon::create($year, $month, $endDay)->endOfDay();
+
+        $dailyDiamonds = $this->giftLogRepository->getByDaily($user->id, $user->agency_id, $startDate, $endDate);
+        $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) {
             $data->day = Carbon::parse($data->date)->day;
@@ -613,25 +630,19 @@ class AgencyService
             $data->day = Carbon::parse($data->date)->day;
             return $data;
         });
-        /** @var User $user */
-        $totalDays = $user->getTotalDays();
 
+        $totalDays = $user->getTotalDaysJoinedAgency($joinedAgency->created_at);
         $userInfoArray = $user->getSallaryInfo();
-
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
 
-        $isThisMonth = $month == now()->month && $year == now()->year;
-        $endDay = Carbon::create($year, $month)->endOfMonth()->day;
-
-        if ($isThisMonth) $endDay = today()->day;
-
         $hours = $dailyTimes->sum('hours');
         $minutes = $hours * 60;
+
         $data = [
             'user_salary' => [
                 'cut_amount' => (int)$totalCutAmount,
-                'salary' =>  intval($totalSalary),
+                'salary' => intval($totalSalary),
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $user->agency_id),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
@@ -639,7 +650,8 @@ class AgencyService
             'active_days' => (string)$totalDays,
             'daly_reports' => []
         ];
-        for ($startDay = 1; $startDay <= $endDay; $startDay++) {
+
+        for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
             $hours = $dailyTimes->where('day', $startDay)->first()?->hours ?? 0;
             $minutes = $hours * 60;
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;

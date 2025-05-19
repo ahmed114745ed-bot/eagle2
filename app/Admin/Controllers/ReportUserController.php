@@ -21,6 +21,14 @@ class ReportUserController extends MainController
 
     public $permission_name = 'report-user';
 
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -140,7 +148,7 @@ class ReportUserController extends MainController
                     ->get(); // Having condition
 
                 $days = $subQuery->count('entry_count');
-                
+
 
             }
             return "<span style='color:green; font-weight: bold;'>{$days}</span>";
@@ -163,7 +171,7 @@ class ReportUserController extends MainController
             $usd =  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
@@ -173,7 +181,7 @@ class ReportUserController extends MainController
             $usd =  $this->salary;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

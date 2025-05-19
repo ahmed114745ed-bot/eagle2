@@ -17,13 +17,11 @@ use App\Models\Country;
 use App\Models\UserVip;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
-use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
 use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table as TableWidget;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
@@ -231,17 +229,17 @@ class UserController extends MainController
         });
         $grid->column('name', __('Name'));
 
-//        $grid->column('return', __('status user'))->display(function () {
-//            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
-//            return (new \App\Admin\Actions\UserAction(
-//                $this->id,
-//                $this->charge_status,
-//                $this->transfer_salary,
-//                $userSetting->show_invite_code ?? 0,  // Extra fallback
-//                $userSetting->hide_chat ?? 0,        // Extra fallback
-//                $this->can_play
-//            ))->render();
-//        });
+        //        $grid->column('return', __('status user'))->display(function () {
+        //            $userSetting = $this->userSetting ?? (object) ['show_invite_code' => 0, 'hide_chat' => 0];
+        //            return (new \App\Admin\Actions\UserAction(
+        //                $this->id,
+        //                $this->charge_status,
+        //                $this->transfer_salary,
+        //                $userSetting->show_invite_code ?? 0,  // Extra fallback
+        //                $userSetting->hide_chat ?? 0,        // Extra fallback
+        //                $this->can_play
+        //            ))->render();
+        //        });
 
 
         $grid->column('reals.user_id', __('user Active'))->modal(__('user Active'), function ($model) {
@@ -736,6 +734,21 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
+    public function profile($id, Request $request, Content $content)
+    {
+        $user = User::with('profile')->find($id);
+        $packs = Pack::where('user_id', $id)->with(['ware' => function ($q) {
+            $q->select('id', 'show_img');
+        }])->paginate(10, ['*'], 'pack_page');
+        $userVips = UserVip::where('user_id', $id)
+            ->select(['id', 'user_id', 'level', 'expire', 'qty', 'total'])->paginate(10, ['*'], 'vip_page');
+
+        $data = compact('user', 'packs', 'userVips');
+
+        return $content->title(__('user profile'))
+            ->view('user_profile', $data);
+    }
+
     /**
      * Make a form builder.
      *
@@ -801,10 +814,10 @@ class UserController extends MainController
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
 
-//        $form->switch('charge_status', __("charge status"))->states($state);
-//        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-//        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-//        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
+        //        $form->switch('charge_status', __("charge status"))->states($state);
+        //        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
+        //        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
+        //        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
             $ops       = [null => __('no country')];
             $countries = Country::all();
@@ -813,48 +826,48 @@ class UserController extends MainController
             }
             return $ops;
         });
-//        $states = [
-//            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-//            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
-//            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
-//        ];
-//        if ($form->isCreating()) {
-//            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
-//        } elseif ($form->isEditing()) {
-//            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
-//                $can_play = UserHandling::chickLevelToPlay($this);
-//                return $can_play ? 'on' : 'off';
-//            })->states($states);
-//        }
+        //        $states = [
+        //            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
+        //            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+        //            'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
+        //        ];
+        //        if ($form->isCreating()) {
+        //            $form->switch('can_play', __('canPlay'))->default(0)->states($states);
+        //        } elseif ($form->isEditing()) {
+        //            $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
+        //                $can_play = UserHandling::chickLevelToPlay($this);
+        //                return $can_play ? 'on' : 'off';
+        //            })->states($states);
+        //        }
 
-//        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
-//            if ($form->isEditing()) {
-//                $form->number('di', __('Coins'))->default(0)
-//                    ->disable($form->isEditing());
-//            } else {
-//                $form->number('di', __('Coins'))->default(0);
-//            }
-//            $form->number('user_diamond', __('Diamonds'))->default(0);
-//            $form->number('total_sender_level', __('Sender Level'))->default(0);
-//            $form->number('total_received_level', __('Received Level'))->default(0);
-//            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
-//            $form->number('salary', __('salary'))->disable();
-//        }
+        //        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
+        //            if ($form->isEditing()) {
+        //                $form->number('di', __('Coins'))->default(0)
+        //                    ->disable($form->isEditing());
+        //            } else {
+        //                $form->number('di', __('Coins'))->default(0);
+        //            }
+        //            $form->number('user_diamond', __('Diamonds'))->default(0);
+        //            $form->number('total_sender_level', __('Sender Level'))->default(0);
+        //            $form->number('total_received_level', __('Received Level'))->default(0);
+        //            $form->number('total_charge_level', __('admin.charge_level'))->default(0);
+        //            $form->number('salary', __('salary'))->disable();
+        //        }
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['nullable', "unique:users,phone,{{id}}"])->updateRules(['nullable', "unique:users,phone,{{id}}"]);
-//        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
-//        $form->select('type_user', trans('User Type'))->options([
-//            $form->model()->type_user => $form->model()->type_user,
-//            0                         => 'مستخدم',
-//            1                         => 'مضيف',
-//            2                         => 'وكيل مضيفين',
-//            3                         => 'وكيل شحن',
-//            4                         => ' وكيل مصيفين ووكيل شحن',
-//            5                         => 'اداري',
-//
-//        ])->default(0);
+        //        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
+        //        $form->select('type_user', trans('User Type'))->options([
+        //            $form->model()->type_user => $form->model()->type_user,
+        //            0                         => 'مستخدم',
+        //            1                         => 'مضيف',
+        //            2                         => 'وكيل مضيفين',
+        //            3                         => 'وكيل شحن',
+        //            4                         => ' وكيل مصيفين ووكيل شحن',
+        //            5                         => 'اداري',
+        //
+        //        ])->default(0);
 
         if (Session::has('show_alert')) {
             $form->html('<script>

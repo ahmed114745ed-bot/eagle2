@@ -106,12 +106,17 @@
                     url: '/admin/send-request-make-rooms-top',
                     method: 'POST',
                     data: { make_rooms_top: isChecked },
-                    success: function(response) { console.log(response); },
-                    error: function(error) { console.error(error); }
+                    success: function(response) {
+                        // Optionally show a message, then reload:
+                        location.reload(); // This will reload the page
+                    },
+                    error: function(error) {
+                        console.error(error);
+                        alert('حدث خطأ أثناء التحديث!'); // Optional: show error to user
+                    }
                 });
             });
         });
     </script>
-
 
 </div>

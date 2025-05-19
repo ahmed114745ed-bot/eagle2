@@ -2,44 +2,20 @@
 
 namespace App\Admin\Controllers;
 
+
 use App\Models\User;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-
-
-use App\Admin\Actions\DeletePackAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
+use Encore\Admin\Facades\Admin;
+// use Encore\Admin\Actions\Response;
+use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Forms\ProfileForm;
-use App\Helpers\Common;
-use App\Models\Agency;
-use App\Models\Charge;
-use App\Models\Country;
-use App\Models\Pack;
-use App\Models\UserTarget;
-use App\Models\UserVip;
-use App\Models\Ware;
-use App\Traits\AdminTraits\AdminControllersTrait;
-use Carbon\Carbon;
-// use Encore\Admin\Actions\Response;
-use Illuminate\Http\Response;
+use App\Admin\Controllers\MainController;
 
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Widgets\InfoBox;
-use Encore\Admin\Widgets\Tab;
-use Encore\Admin\Widgets\Table;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Session;
 
-class AgencyMangerUsers extends AdminController
+class AgencyMangerUsers extends MainController
 {
     /**
      * Title for current resource.

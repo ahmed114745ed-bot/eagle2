@@ -26,6 +26,14 @@ class AgentRequestController extends MainController
     use HasResourceActions;
     public $permission_name = 'agent-request-transaction';
 
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
+    
     public function index(Content $content)
     {
         return parent::index($content
@@ -94,7 +102,7 @@ class AgentRequestController extends MainController
             } else {
                 $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
             }
-            
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -134,16 +142,16 @@ class AgentRequestController extends MainController
         $grid->column('usd', __('Usd'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center;'>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-        
+
         $grid->column('coins', __('Coins'))->display(function ($coins) {
             $image = asset('images/coin.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center;'>
-                       
+
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
                     </div>";
@@ -167,7 +175,7 @@ class AgentRequestController extends MainController
 
     // protected function detail($id)
     // {
-       
+
     //     $show = new Show(Emoji::findOrFail($id));
 
     //     $show->id(__('admin.ID'));
@@ -197,7 +205,7 @@ class AgentRequestController extends MainController
         $show->field('created_at', __('Created At'));
 
         $this->extendShow($show);
-        
+
         return $show;
     }
 

@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\Vip;
 use App\Models\Coin;
-use App\Models\CoinLog;
 use App\Models\User;
+use GuzzleHttp\Client;
 use App\Helpers\Common;
-use App\Traits\User\PaymentTrait;
-use GuzzleHttp\Exception\GuzzleException;
+use App\Models\CoinLog;
 use Illuminate\Http\Request;
+use App\Traits\User\PaymentTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 // use Google_Client;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Exception\GuzzleException;
 
 class GooglePaymentController extends Controller
 {
@@ -81,7 +82,7 @@ class GooglePaymentController extends Controller
         $url = config('app.payment_url') . '/api/google-pay';
 
         try {
-           
+
 
             $productId = $request->productId;
             $response  = $client->post($url, [
@@ -113,7 +114,21 @@ class GooglePaymentController extends Controller
             return Common::apiResponse(0, 'هناك مشكله حاول مره اخرى!', 402);
         }
         return Common::apiResponse(0, 'هناك مشكله حاول مره اخرى!', 402);
-
     }
 
+
+    public static function addChargeLevel(Request $request)
+    {
+        $user = User::where("id", $request->user()->id)->first();
+        $user->total_charge_coins += $request->amount;
+        $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
+        $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
+
+        if ($level) {
+            $user->charge_level = $level->level;
+        }
+        $user->save();
+
+        return Common::apiResponse(1,  $user->total_charge_level, 200);
+    }
 }
