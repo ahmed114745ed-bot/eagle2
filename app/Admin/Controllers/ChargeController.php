@@ -2,19 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\Setting;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Models\Setting;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use App\Admin\Actions\ChargeAction;
+use App\Admin\Actions\ChargeAction2;
 use App\Http\Controllers\Controller;
-use App\Models\Agency;
 use Illuminate\Support\Facades\Request;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -279,7 +280,7 @@ class ChargeController extends MainController
         $grid->column('actions', __('Actions'))
             ->display(function () {
 
-                 return (new ChargeAction())->setAgencyId($this->id)->render(); })
+                 return (new ChargeAction2())->setAgencyId($this->id)->render(); })
             ->style('white-space: nowrap; width: 100px;');
         $grid->disableCreateButton();
         $grid->disableExport();

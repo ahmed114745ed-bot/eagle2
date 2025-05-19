@@ -2,19 +2,15 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
-use Encore\Admin\Form;
-use App\Helpers\Common;
 use App\Models\Setting;
-use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Illuminate\Validation\ValidationException;
 
 class ChargeAction2 extends Action
 {
@@ -65,7 +61,11 @@ class ChargeAction2 extends Action
             $coins = $amount * $shippingCoins;
 
             $agency->coins += $coins;
-            if ($agency->coins < 0)  return $this->response()->error(__('agency does not have this coin'))->refresh();
+            if ($agency->coins < 0) {
+                throw ValidationException::withMessages([
+                    'coins' => [__('agency does not have this coin')],
+                ]);
+            }
             $agency->save();
 
             $this->createChargeRecord($request,  $agency, $amount, $coins, $request->amount);
