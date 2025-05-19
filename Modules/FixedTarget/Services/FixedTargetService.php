@@ -3,6 +3,7 @@
 namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
+use App\Models\BDSallary;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -220,6 +221,31 @@ class FixedTargetService
 
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
+
+    
+        $bdSalary = BDSallary::query()->where([
+            'bd_id'     => $user->agency->bd_id,
+            'month'     => Carbon::now()->month,
+            'year'      => Carbon::now()->year,
+            'agency_id' => $user->agency_id, 
+        ])->lock()->first();
+        
+        if ($bdSalary) {
+            $bdSalary->update([
+                'sallary' => $bdSalary->sallary + ($db_usd * $percentageAchieved)
+            ]);
+        } else {
+            $bdSalary = BDSallary::query()->create([
+                'bd_id'        => $user->agency->bd_id,
+                'agency_id'    => $user->agency_id,
+                'month'        => Carbon::now()->month,
+                'year'         => Carbon::now()->year,
+                'cut_amount'   =>  0,
+                'sallary'      => $db_usd * $percentageAchieved,
+                'is_paid'      => false,
+                ...$values
+            ])->lock();
+            }
     }
 
     /**
