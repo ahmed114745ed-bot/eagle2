@@ -148,10 +148,10 @@ class RoomController extends MainController
             return $html;
         });
         $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
-            ->whereHas('owner');
+            ->whereHas('owner')->orderByDesc('pin');
         $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         if ($topRooms){
-            $grid->model()->orderByDesc('pin');
+            $grid->model()->orderByDesc('room_visitors_count');
         }
 
         switch ($filterType) {

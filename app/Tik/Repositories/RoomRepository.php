@@ -93,11 +93,12 @@ class RoomRepository extends AbstractRepository
             'background',
             'roomVisitorUsers' => fn($q) => $q->limit(5)
         ])
+            ->orderByDesc('pin')
             ->withCount('roomVisitors')
             ->whereHas('owner')
             ->when($topRooms, function ($query) {
+                $query->orderByDesc('room_visitors_count');
 //                $query->where(function ($query) {
-                    $query->orderByDesc('pin');
 //                    $query->where(fn($q) => $q->has("roomVisitors"))
 //                        ->orWhere(fn($q) => $q->where('pin', 1));
                     // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
