@@ -124,13 +124,13 @@ class RoomController extends MainController
                 $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
             }
             $html .= '</ul></div>';
-        
+
             $html .= <<<HTML
                         <script>
                             document.addEventListener('DOMContentLoaded', function () {
                                 const tabLinks = document.querySelectorAll('.tab-link');
                                 const loader = document.getElementById('tab-loading');
-                        
+
                                 tabLinks.forEach(function (tab) {
                                     tab.addEventListener('click', function (e) {
                                         e.preventDefault();
@@ -144,11 +144,15 @@ class RoomController extends MainController
                             });
                         </script>
                         HTML;
-                        
+
             return $html;
         });
         $grid->model()->with('owner.profile', 'owner:uuid,id,name')->withCount('roomVisitors')
             ->whereHas('owner');
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        if ($topRooms){
+            $grid->model()->orderByDesc('pin');
+        }
 
         switch ($filterType) {
             case 'boss':
@@ -235,10 +239,11 @@ class RoomController extends MainController
                 break;
 
             default:
-                $grid->model()->orderByDesc('rooms.pin')
-                    ->orderByDesc('rooms.top_room')
-                    ->orderByDesc('session')
-                    ->orderByDesc('count_room_socket');
+                $grid->model()->orderByDesc('hour_hot');
+//                $grid->model()->orderByDesc('rooms.pin')
+//                    ->orderByDesc('rooms.top_room')
+//                    ->orderByDesc('session')
+//                    ->orderByDesc('count_room_socket');
                 break;
         }
         // Filters UI
@@ -263,7 +268,7 @@ class RoomController extends MainController
             return $pin == 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
-        })->sortable();
+        });
 
         $grid->id(__('ID'));
 
