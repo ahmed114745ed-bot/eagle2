@@ -210,11 +210,11 @@ class RequestAgencyController extends MainController
         });
         $grid->disableCreateButton();
 
-        $grid->tools(function (Grid\Tools $tools) {
-            $url = '/admin/request-agencies-filteration';
-            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
-            $tools->append($button);
-        });
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $url = '/admin/request-agencies-filteration';
+        //     $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+        //     $tools->append($button);
+        // });
 
         return $grid;
     }
