@@ -367,5 +367,13 @@ return [
     'google_pay'    => 'google_pay',
     'huawei_pay' => 'Huawei Pay',
 
+    "target_no" => 'Hedef Numarası',
+    "diamonds" => 'Elmas Hedefi',
+    "usd" => 'Dolar',
+    "agency_share" => 'Ajan Maaşı',
+    "db_percentage" => 'BD Yüzdesi',
+    "hours" => 'Saatler',
+    "days" => 'Günler',
+
     "charge_level" => "şarj seviyesi",
 ];

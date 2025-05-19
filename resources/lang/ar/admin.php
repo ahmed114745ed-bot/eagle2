@@ -374,6 +374,14 @@ return [
     'google_pay'    => 'جوجل باي',
     'huawei_pay' => 'هواوي باي',
 
+    "target_no" => 'رقم الهدف',
+    "diamonds" => 'هدف الألماس',
+    "usd" => 'دولار',
+    "agency_share" => 'راتب الوكلاء',
+    "db_percentage" => 'نسبة BD',
+    "hours" => 'ساعات',
+    "days" => 'أيام',
+
     "charge_level" => "مستوي الشحن",
 
 

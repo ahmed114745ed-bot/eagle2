@@ -377,9 +377,14 @@ return [
     'google_pay'    => 'Google Pay',
     'huawei_pay'    => 'Huawei Pay',
 
-    'creator' => 'admin'
+    "target_no" => 'Target Number',
+    "diamonds" => 'Diamond Target',
+    "usd" => 'dollar',
+    "agency_share" => 'Agents Salary',
+    "db_percentage" => 'BD Percentage',
+    "hours" => "Hours",
+    "days" => "Days",
 
 
-
-
+    'creator' => 'admin',
 ];
