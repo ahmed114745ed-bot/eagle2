@@ -66,8 +66,12 @@ class BdSalariesController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BDSallary);
-    
+        $appID = Auth::user()->app_id;
+\Log::info($appID);
+\Log::info('ffffff');
+ 
         $grid->model()
+            ->where('bd_id', $appID)
             ->with('agency') // تحميل العلاقة
             ->selectRaw('agency_id, SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut, COUNT(*) as count')
             ->groupBy('agency_id');
