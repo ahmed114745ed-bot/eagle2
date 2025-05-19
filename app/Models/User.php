@@ -1305,6 +1305,15 @@ class User extends Authenticatable
     }
     public function incrementCutAmountInBdSallary(int $amount)
     {
-        return $this->bdSalaries()->increment('cut_amount', $amount);
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+    
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);  
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+            return true;
+        }
+    
+        return false;
     }
+    
 }
