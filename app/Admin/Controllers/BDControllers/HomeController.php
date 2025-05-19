@@ -38,11 +38,11 @@ class HomeController extends Controller
         $finalSalary = $salaryData->total_sallary - $salaryData->total_cut;
 
         // مجموع المحفظة
-        $walletData = \App\Models\UserWallet::where('user_id', $appID)
-            ->selectRaw('COALESCE(SUM(value),0) AS total_value, COALESCE(SUM(cut_amount),0) AS total_cut')
-            ->first();
-        $finalWallet = $walletData->total_value - $walletData->total_cut;
-
+        // $walletData = \App\Models\UserWallet::where('user_id', $appID)
+        //     ->selectRaw('COALESCE(SUM(value),0) AS total_value, COALESCE(SUM(cut_amount),0) AS total_cut')
+        //     ->first();
+        // $finalWallet = $walletData->total_value - $walletData->total_cut;
+        $finalWallet = '';
         return $content
             ->title('لوحة BD')
             ->description('إحصائيات عامة')
@@ -50,7 +50,7 @@ class HomeController extends Controller
             ->row(function (Row $row) use ($agencyCount, $finalSalary, $finalWallet) {
                 $row->column(4, new InfoBox(__('Agencies Count'), 'users', 'aqua', 'bd/agencies', $agencyCount));
                 $row->column(4, new InfoBox(__('BD Wallet'), 'money', 'green', 'bd/salaries', number_format($finalSalary) . ' 💰'));
-                $row->column(4, new InfoBox(__('My Wallet'), 'credit-card', 'yellow', 'bd/wallet', number_format($finalWallet) . ' 💳'));
+                // $row->column(4, new InfoBox(__('My Wallet'), 'credit-card', 'yellow', 'bd/wallet', number_format($finalWallet) . ' 💳'));
             });
     }
 

@@ -533,7 +533,7 @@ Route::group(
             $router->get('/charges', 'ChargeController@index')->name('charges');
             $router->resource('/agencies', 'AgencyController');
             $router->resource('/salaries', 'BdSalariesController');
-            $router->resource('/wallet', 'WalletController');
+            // $router->resource('/wallet', 'WalletController');
             Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
             Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
 

@@ -709,6 +709,9 @@ class User extends Authenticatable
         //        }
     }
 
+
+
+    
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -1289,4 +1292,19 @@ class User extends Authenticatable
         return $this->hasMany(WalletTransactionBackup::class);
     }
 
+    public function bdSalaries()
+    {
+        return $this->hasMany(BDSallary::class, 'bd_id');
+    }
+
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSallary );
+    }
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        return $this->bdSalaries()->increment('cut_amount', $amount);
+    }
 }

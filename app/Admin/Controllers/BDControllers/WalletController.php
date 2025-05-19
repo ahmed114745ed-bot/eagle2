@@ -296,12 +296,13 @@ class WalletController extends MainController
             'target_id' => 'nullable',    
             'target_type' => 'required|string',
         ]);
-    
+       
+
         $types = [
             'user' => [$this, 'chargeToUser'],
             'agency' => [$this, 'chargeToAgency']
         ];
-    
+      
         $type = $request->input('target_type');
      
         if (!array_key_exists($type, $types)) {
@@ -310,7 +311,7 @@ class WalletController extends MainController
         }
        
         try {
-            
+          
             $data = call_user_func($types[$type], $request->all());
             admin_toastr('تم الشحن بنجاح', 'success');
             return back();
@@ -321,17 +322,20 @@ class WalletController extends MainController
     }
 
     public function chargeToUser(array $data)
-    {   
+    {     
         $appID =Auth::user()->app_id;
         $sender = User::find($appID);
         $amount = $data['amount'];
         $receiverId = $data['target_id'] ?? null;
-        
-        $wallet = UserWallet::where('user_id', $sender->id)->first();
-        if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
+       
+        // $wallet = UserWallet::where('user_id', $sender->id)->first();
+        // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $amount) {
+        //     throw new \Exception(__('balance not enough'));
+        // }
+        $totalSalary = $sender->bdSalary;
+        if ($totalSalary < $amount) {
             throw new \Exception(__('balance not enough'));
-        }
-    
+           }
       
         $receiver = User::find($receiverId);
         if (!$receiver) {
@@ -351,14 +355,15 @@ class WalletController extends MainController
     
         $coins = $amount * $rate;
  
-        return $this->startTransaction($wallet, $receiver, $sender, $amount, $coins, 'user');
+        return $this->startTransaction( $receiver, $sender, $amount, $coins, 'user');
     }
 
-    public function startTransaction(UserWallet $userWallet, User $receiver,User $sender, int $amount, int $coins,string $receiverType)
+    public function startTransaction(User $receiver, User $sender, int $amount, int $coins, string $receiverType)
     {
         DB::beginTransaction();
         try {
-            $userWallet->increment('cut_amount', $amount);
+            
+            $sender->incrementCutAmountInBdSallary($amount);
             $receiver->increment('coins', $coins);
             $descriptionData=['receiver_id'  => $receiver->id];
 
@@ -375,12 +380,13 @@ class WalletController extends MainController
                 'charger_id' => $sender->id,
                 'charger_type' => 'user',
                 'user_id' => $receiver->id,
-                'agency_id' => $receiver->id,
+                'agency_id' => null,
                 'user_type' => $receiverType,
                 'amount' => $coins,
                 'amount_type' => 2,
                 "usd" =>  $amount ?? 0,
                 'is_used_transferred' => 1,
+                'user_charger_type'=>'bd'
             ];
 
             Charge::create($data);
@@ -422,12 +428,15 @@ class WalletController extends MainController
 
         }
         $coins = $usd * $rate;
-    
-    
-        $wallet = UserWallet::where('user_id', $from->id)->first();
-        if (!$wallet || ($wallet->value - $wallet->cut_amount) < $usd) {
+        // $wallet = UserWallet::where('user_id', $from->id)->first();
+        // if (!$wallet || ($wallet->value - $wallet->cut_amount) < $usd) {
+        //     throw new \Exception(__('balance not enough'));
+        // }    $totalSalary = $sender->salary;
+        $totalSalary = $from->bdSalary;
+
+        if ($totalSalary < $usd) {
             throw new \Exception(__('balance not enough'));
-        }
+           }
     
        
             $this->performAgencyCharge($from, $to, $coins, $usd);
@@ -439,8 +448,7 @@ class WalletController extends MainController
     {
         
     
-   
-    
+        $fromUser->incrementCutAmountInBdSallary($usd);
         $toAgency->increment('coins', $coins);
     
         WalletService::storeTransaction(
@@ -457,13 +465,15 @@ class WalletController extends MainController
         $data = [
             'charger_id' => $fromUser->id,
             'charger_type' => 'bd',
-            'user_id' => $toAgency->id,
+            'user_id' => null,
             'agency_id' => $toAgency->id,
             'user_type' => 'agency',
             'amount' => $coins,
             'amount_type' => 2,
             'usd' => $usd,
             'is_used_transferred' => false,
+            'user_charger_type'=>'bd'
+
         ];
 
         Charge::create($data);

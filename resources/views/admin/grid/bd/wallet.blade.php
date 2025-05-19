@@ -110,19 +110,79 @@
     .transferForm .actions button{
         margin-left: 4px;
     }
+    .icon_trans{
+        font-size: 15px;
+        margin: 0px 11px;
+    }
+
+    .card-content{
+            color: black !important;
+        }
+    .card-visa {
+        /* background: var(--secondary-color, #0d6efd); اللون الثانوي الافتراضي */
+        background:  #0d6efd; /* اللون الثانوي الافتراضي */
+        padding: 20px;
+        color: #fff; /* نص أبيض */
+        font-size: 20px;
+        text-align: center;
+        width: 500px;
+        margin: 42px auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* الأيقونة */
+    .card-visa .icon_trans {
+        font-size: 28px;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    /* محتوى البطاقة */
+    .card-visa .card-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .card-visa .btn {
+        cursor: pointer;
+    }
 
 </style>
-<div class="card bg-primary" style="
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- <div class="card bg-primary" style="
    background: var(--secondary-color);
 padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margin: 42px auto;">
-    <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
 
     <div style="margin-top: 15px;">
+    <span class="icon_trans"> <i class="fas fa-exchange-alt"></i></span>
+
         <button onclick="openChargeModal()" class="btn btn-light btn-sm">
             {{ __('charge_wallet') }}
         </button>
+        <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
+
+    </div>
+</div> -->
+
+
+<div class="card-visa">
+    <div class="card-content">
+        <span class="icon_trans"><i class="fas fa-exchange-alt"></i></span>
+        <button onclick="openChargeModal()" class="btn btn-light btn-sm">
+            {{ __('Charge') }}
+        </button>
+        <strong>{{ $translated }}: </strong> {{ number_format($finalSalary) }} 💰
     </div>
 </div>
+
+
 
 {{-- Charge Modal --}}
 <div id="chargeModal" class="transferModal" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%);

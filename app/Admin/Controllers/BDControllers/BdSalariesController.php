@@ -48,7 +48,8 @@ class BdSalariesController extends MainController
 
         ->row(function ($row) use ($finalSalary) {
             // الكارت سيتم تضمينه من Blade View
-            $row->column(12, view('admin.grid.bd.sallary', ['finalSalary' => $finalSalary]));
+            // $row->column(12, view('admin.grid.bd.sallary', ['finalSalary' => $finalSalary]));
+            $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
         })
 
         ->row(function ($row) {
@@ -56,7 +57,7 @@ class BdSalariesController extends MainController
         });
     }
 
-
+    
 
     /**
      * Make a grid builder.
