@@ -17,6 +17,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class BdSalariesController extends MainController
 {
@@ -67,8 +68,7 @@ class BdSalariesController extends MainController
     {
         $grid = new Grid(new BDSallary);
         $appID = Auth::user()->app_id;
-\Log::info($appID);
-\Log::info('ffffff');
+
  
         $grid->model()
             ->where('bd_id', $appID)
@@ -79,7 +79,6 @@ class BdSalariesController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
     
-        // 👇 عرض اسم الوكالة + صورة + لينك باستخدام العلاقة
         $grid->column('agency.name', trans('agency'))->display(function () {
             $agency = $this->agency;
     
@@ -116,13 +115,11 @@ class BdSalariesController extends MainController
         });
     
         $grid->column('total_sallary', trans('total'));
-        $grid->column('total_cut', trans('cut'));
+        // $grid->column('total_cut', trans('cut'));
     
-        $grid->column('remaining_percent', trans('remaining_percent'))->display(function () {
-            if ($this->total_sallary == 0) return '0%';
-            $remaining = ($this->total_sallary - $this->total_cut) / $this->total_sallary * 100;
-            return round($remaining, 2) . '%';
-        });
+        $grid->column('created_at', __('Created at'))->display(function ($value) {
+            return Carbon::parse($value)->translatedFormat('d F Y - h:i A');
+        });     
     
         return $grid;
     }
