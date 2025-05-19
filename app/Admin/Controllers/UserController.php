@@ -517,54 +517,54 @@ class UserController extends MainController
         }
     }
 
-    public function show($id, Content $content)
-    {
-        return $content->row(
-            function ($row) use ($id) {
-                $user = User::withTrashed()->find($id);
-                if ($user) {
-                    $user->flowers = 0;
-                    $user->save();
-                }
+    // public function show($id, Content $content)
+    // {
+    //     return $content->row(
+    //         function ($row) use ($id) {
+    //             $user = User::withTrashed()->find($id);
+    //             if ($user) {
+    //                 $user->flowers = 0;
+    //                 $user->save();
+    //             }
 
-                $type = $user->type_user;
-                switch ($type) {
-                    case 0:
-                        $userType = __("User");
-                        break;
-                    case 1:
-                        $userType = __("Host");
-                        break;
-                    case 2:
-                        $userType = __("Host Agent");
-                        break;
-                    case 3:
-                        $userType = __("Shipping Agent");
-                        break;
-                    case 4:
-                        $userType = __("Resort & Shipping Agent");
-                        break;
-                    case 5:
-                        $userType = __("Admin");
-                        break;
-                    default:
-                        $userType = $type; // Keep the original value if no match is found
-                        break;
-                }
-                $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
-                $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
-                $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
-                $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
-                $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
-                $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
-            }
-        )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
-            $row->column(12, $this->packList($id));
-        })
-            ->row("<h3>" . __('vips') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->vipList($id));
-            });
-    }
+    //             $type = $user->type_user;
+    //             switch ($type) {
+    //                 case 0:
+    //                     $userType = __("User");
+    //                     break;
+    //                 case 1:
+    //                     $userType = __("Host");
+    //                     break;
+    //                 case 2:
+    //                     $userType = __("Host Agent");
+    //                     break;
+    //                 case 3:
+    //                     $userType = __("Shipping Agent");
+    //                     break;
+    //                 case 4:
+    //                     $userType = __("Resort & Shipping Agent");
+    //                     break;
+    //                 case 5:
+    //                     $userType = __("Admin");
+    //                     break;
+    //                 default:
+    //                     $userType = $type; // Keep the original value if no match is found
+    //                     break;
+    //             }
+    //             $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
+    //             $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+    //             $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
+    //             $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
+    //             $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
+    //             $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
+    //         }
+    //     )->row("<h3>" . __('pack') . "</h3>")->row(function ($row) use ($id) {
+    //         $row->column(12, $this->packList($id));
+    //     })
+    //         ->row("<h3>" . __('vips') . "</h3>")->row(function ($row) use ($id) {
+    //             $row->column(12, $this->vipList($id));
+    //         });
+    // }
 
     protected function packList($id)
     {
@@ -737,7 +737,7 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
-    public function profile($id, Request $request, Content $content)
+    public function show($id, Content $content)
     {
         $user = User::with('profile')->find($id);
         $packs = Pack::where('user_id', $id)->with(['ware' => function ($q) {
