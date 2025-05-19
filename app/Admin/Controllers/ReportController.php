@@ -21,6 +21,15 @@ use App\Admin\Controllers\MainController;
 class ReportController extends MainController
 {
     public $permission_name = 'report';
+
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -47,11 +56,11 @@ class ReportController extends MainController
 
 
 
-    
+
     // user reports
     protected function users()
     {
-       
+
 
         $grid = new Grid(new User());
         $grid->model()
@@ -92,7 +101,7 @@ class ReportController extends MainController
             }, __('Month'), 'month')->integer();
         });
         $grid->column('id', __('Id'));
-      
+
         $grid->column('name', __('user'))->display(function ($name) {
             $name = @$this->name ?? '';
             $uid = @$this->uuid;
@@ -123,7 +132,7 @@ class ReportController extends MainController
            $diamond= @$this->getTotalDiamond(request()->month, request()->year)?? 0;
            $image = asset('images/diamond.jpg'); // Adjust path as needed
            return "<div style='display: flex; align-items: center; '>
-                     
+
                        <span>{$diamond}</span>
                          <img src='{$image}' alt='USD' width='20' height='20'>
                    </div>";
@@ -134,12 +143,12 @@ class ReportController extends MainController
         $grid->column('expenses', __('expenses'))->display(function () {
             return @$this->getTotalCutAmount(request()->month, request()->year) ?? 0;
         });
-       
+
         $grid->column('total', __('salary'))->display(function () {
             $salary = $this->getSalary(request()->month, request()->year) ?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$salary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
@@ -164,11 +173,11 @@ class ReportController extends MainController
             </div>
         ";
         });
-      
+
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . route('custom-export-users', ['month' => request()->month, 'year' => request()->year, 'agency_id' => request('agency_id')]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>'. __('admin.exportExcel') .'</a>');
         });
-        
+
         return $grid;
     }
 
@@ -231,12 +240,12 @@ class ReportController extends MainController
         $grid->column('expenses', __('expenses'))->display(function () {
             return @$this->getTotalCutAmountAgency(request()->month, request()->year)?? 0;
         });
-       
+
         $grid->column('total', __('salary'))->display(function () {
             $salary= $this->getSalaryAgency(request()->month, request()->year)?? 0;
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$salary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
@@ -248,7 +257,7 @@ class ReportController extends MainController
                 $path =@$this->owner->profile?->avatar ?? @$this->dashOwner->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
-    
+
                 // Check if the image exists
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
@@ -267,7 +276,7 @@ class ReportController extends MainController
                         </div>
                     </div>
                 ";
-            
+
         });
         $grid->column('users', __('users'))->display(function () {
             return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users()->count() . '</a>';
@@ -296,7 +305,7 @@ class ReportController extends MainController
         $grid->column('user.id', __('Id'));
 
         $grid->column('user.name', __('name'))->display(function ($name) {
-            
+
             $uid = @$this->user->uuid;
             $path = @$this?->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -326,7 +335,7 @@ class ReportController extends MainController
             $salary= ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$salary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

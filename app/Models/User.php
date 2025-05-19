@@ -88,7 +88,7 @@ class User extends Authenticatable
         'original_uuid',
         'is_frozen',
         'total_charge_level',
-         'photo'
+        'photo'
     ];
 
     /* protected $appends = [
@@ -214,6 +214,30 @@ class User extends Authenticatable
 
 
         return $subQuery->count('entry_count');
+    }
+
+    public function getTotalDaysJoinedAgency($from_date = null)
+    {
+        $month = @request()->month;
+        $year  = @request()->year;
+        if (!$month) $month = now()->month;
+        if (!$year) $year = now()->year;
+
+        $query = $this->liveTime()
+            ->selectRaw('DATE(created_at) as date, SUM(hours) as total_hours')
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year);
+
+        if ($from_date) {
+            $query->where('created_at', '>=', $from_date);
+        }
+
+        $days = $query
+            ->groupBy('date')
+            ->having('total_hours', '>', 1)
+            ->get();
+
+        return $days->count();
     }
 
     public function getSallaryInfo(): array
@@ -385,7 +409,7 @@ class User extends Authenticatable
 
     public function country()
     {
-        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name','phone_code','iso');
+        return $this->belongsTo(Country::class)->select('id', 'name', 'flag', 'language', 'e_name', 'phone_code', 'iso');
     }
 
     public function getLangAttribute()
@@ -693,8 +717,7 @@ class User extends Authenticatable
         if ($level == $value) return;
 
         $this->sub_charger_level = $value - @$this->charge_level ?? 0;
-        $diamonds               =
-            (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
+        $diamonds  = (@Vip::query()->where('type', 5)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         $this->sub_charger_coins = $diamonds - $this->total_charge_coins;
     }
 
@@ -1212,7 +1235,7 @@ class User extends Authenticatable
 
                 $file       = request('photo');
                 if ($file instanceof  UploadedFile) {
-                   
+
                     $url = Common::uploadProfileUser('profile', $file, $originalProfile->id, $newCount);
                     Storage::delete($model->profile->avatar);
                 }
@@ -1227,7 +1250,7 @@ class User extends Authenticatable
             unset($model->photo);
         });
 
-     
+
 
         static::updating(function ($user) {
             // Check if coins increased
@@ -1250,7 +1273,33 @@ class User extends Authenticatable
 
         });
     }
-
+    public function userType()
+    {
+        switch ($this->type_user) {
+            case 0:
+                $userType = __("User");
+                break;
+            case 1:
+                $userType = __("Host");
+                break;
+            case 2:
+                $userType = __("Host Agent");
+                break;
+            case 3:
+                $userType = __("Shipping Agent");
+                break;
+            case 4:
+                $userType = __("Resort & Shipping Agent");
+                break;
+            case 5:
+                $userType = __("Admin");
+                break;
+            default:
+                $userType = $this->type_user; // Keep the original value if no match is found
+                break;
+        }
+        return $userType;
+    }
 
     public function wallet()
     {
@@ -1266,5 +1315,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(WalletTransactionBackup::class);
     }
-
 }

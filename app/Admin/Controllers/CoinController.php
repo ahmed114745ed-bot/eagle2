@@ -8,15 +8,13 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
-class CoinController extends MainOldController
+class CoinController extends MainController
 {
     use HasResourceActions;
 

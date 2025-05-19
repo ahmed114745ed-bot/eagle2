@@ -467,8 +467,11 @@ class UserService
         $cacheKey = 'cache-data-mystore-' . $user->id;
         // if (\Cache::add($cacheKey, true, now()->addSeconds(30))) {
 
-        $targetService = new FixedTargetService($user);
-        $targetService->calculateTarget();
+        $app_feature = Cache::get('host_agency');
+        if ($app_feature){
+            $targetService = new FixedTargetService($user);
+            $targetService->calculateTarget();
+        }
         if ($user->ownerRoom != null) {
             $roomTarget = new RoomGameServices();
             $roomTarget->CalculateRoomSalaries($user->ownerRoom);

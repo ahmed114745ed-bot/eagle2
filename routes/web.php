@@ -255,6 +255,15 @@ Route::get('/update-rooms-microphone', function(){
     return "done";
 });
 
+Route::get('/clear-admin-error', function () {
+    session()->forget('error');         // If flashed as 'error'
+    session()->forget('danger');        // If flashed as 'danger'
+    session()->forget('info');          // If used admin_info()
+    session()->forget('success');
+    session()->flush();   // Or session()->forget('error');
+    return 'Session cleared!';
+});
+
 Route::get('/delete_reward_target', function(){
     \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
 });

@@ -44,7 +44,7 @@
         --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     }
         body {
-            font-family: DejaVu Sans, sans-serif;
+            font-family: 'dejavu sans', sans-serif; /* Use the font you configured */
         }
         thead.custom-header {
             background-color: var(--primary-color) !important;

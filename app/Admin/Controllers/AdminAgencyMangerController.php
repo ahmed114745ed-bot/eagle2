@@ -7,8 +7,6 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Country;
 use App\Models\User;
-use Encore\Admin\Auth\Database\Administrator;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -28,10 +26,13 @@ class  AdminAgencyMangerController extends MainController
 
     protected $model;
 
-
-
     public function __construct()
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+
         $userModel = Admin::class;
         $this->model = new $userModel;
     }

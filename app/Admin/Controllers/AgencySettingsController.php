@@ -6,8 +6,6 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use App\Models\Config;
 use App\Models\Language;
-use App\Models\Setting;
-use Encore\Admin\Controllers\AdminController;
 
 class AgencySettingsController extends MainController
 {
@@ -19,6 +17,14 @@ class AgencySettingsController extends MainController
      * @var string
      */
     protected $title = 'Agency settings';
+
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
 
     public function index(Content $content){
         $hours =  settings()->get('hours');

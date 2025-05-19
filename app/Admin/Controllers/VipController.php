@@ -38,8 +38,8 @@ class VipController extends MainController
 
     public function senderIndex(Content $content)
     {
-        if (!Admin::user()->can('*')){
-            Permission::check('browse-'.$this->permission_name);
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . $this->permission_name);
         }
         return parent::index($content
             ->title(trans('charge level'))
@@ -67,7 +67,15 @@ class VipController extends MainController
         })->editable();
         //        $grid->column('di', __('Diamonds'));
         //        $grid->column('co', __('Coins'));
-        $grid->column('img', __('Image'))->image('', '30');
+        $grid->column('img', __('Image'))->display(function ($path) {
+            /** @var Ware $this */
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $this->extendGrid($grid);
         $grid->disableExport();
         $grid->setResource('vips');
@@ -231,7 +239,7 @@ class VipController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('charge level'))
             ->body($this->detail($id)));
     }
@@ -245,7 +253,7 @@ class VipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('charge level'))
             ->body($this->form()->edit($id)));
     }
@@ -324,7 +332,11 @@ class VipController extends MainController
             return number_format($value->getOriginal());
         })->editable();
 
-        $grid->column('img', __('Image'))->image('', '30');
+        $grid->column('img', __('Image'))->display(function ($img) {
+            if (!$img) return '';
+            $url = getImagePath($img);
+            return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
+        });
 
         // Any custom grid extensions
         $this->extendGrid($grid);
@@ -404,8 +416,8 @@ class VipController extends MainController
             ]);
         }
 
-//        $form->textarea('name_ar', __('name_ar'));
-//        $form->textarea('name_en', __('name_en'));
+        //        $form->textarea('name_ar', __('name_ar'));
+        //        $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         //        $form->number('di', __('Diamonds'));
@@ -418,7 +430,7 @@ class VipController extends MainController
             $footer->disableReset();        // Disables the "Reset" button
             $footer->disableViewCheck();    // Disables the "View" checkbox
             $footer->disableEditingCheck(); // Disables the "Continue editing" checkbox
-            $footer->disableCreatingCheck();// Disables the "Continue creating" checkbox
+            $footer->disableCreatingCheck(); // Disables the "Continue creating" checkbox
         });
 
         return $form;

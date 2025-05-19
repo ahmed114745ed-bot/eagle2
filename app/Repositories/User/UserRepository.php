@@ -48,8 +48,8 @@ class UserRepository extends Repository
 
     public function searchUserAgency($key, $page, $perPage)
     {
-        return User::selectRaw('concat(name, " - ", uuid) as name, id')
-            ->where(function ($query) {
+        return User::selectRaw('concat(COALESCE(name, ""), " - ", uuid) as name, id')
+        ->where(function ($query) {
                 $query->where('agency_id', 0)
                     ->orWhereNull('agency_id');
             })
@@ -60,6 +60,7 @@ class UserRepository extends Repository
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
+     
     }
 
     public function searchUserAgencyShipping($key, $page, $perPage)

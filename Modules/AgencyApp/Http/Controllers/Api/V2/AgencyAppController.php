@@ -162,6 +162,11 @@ class AgencyAppController extends Controller
 
     public function agency_filter(Request $request)
     {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
         $keyword = $request->keyword;
         [$agencies, $agencyManger] = $this->agencyService->filter($keyword);
         $data = [
@@ -187,7 +192,7 @@ class AgencyAppController extends Controller
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year);
-
+        $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }
 }

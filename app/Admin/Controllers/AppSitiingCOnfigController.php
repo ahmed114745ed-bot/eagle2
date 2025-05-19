@@ -2,14 +2,8 @@
 
 namespace App\Admin\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Form;
-use Illuminate\Support\Facades\Route;
 
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Form as AdminForm;
+use Illuminate\Support\HtmlString;
 use Encore\Admin\Layout\Content;
 
 class AppSitiingCOnfigController extends MainController

@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api\V2;
 use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use App\Models\Setting;
+use Cache;
 use Illuminate\Http\Request;
 use App\Models\AgencyUserJob;
 use PHPUnit\Framework\Exception;
@@ -33,6 +35,11 @@ class AgencyController extends Controller
 
     public function joinRequest(Request $request)
     {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
         $user   = $request->user();
         if (!$request->agency_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
 
@@ -48,6 +55,10 @@ class AgencyController extends Controller
 
     public function view(Request $request)
     {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
         $agencyId = request()->get('id', $request->user()->agency_id);
 
         try {
@@ -61,6 +72,11 @@ class AgencyController extends Controller
 
     public function agencyDetails($id)
     {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
         try {
             $agency = $this->agencyService->find($id);
         } catch (\Exception $exception) {
@@ -162,7 +178,7 @@ class AgencyController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
         if ($accept === 0 || $accept === false) {
-            
+
             return Common::apiResponse(1, 'joinfalse');
         } elseif ($accept === 1 || $accept === true) {
             return Common::apiResponse(1, 'joinSacsesAg');
@@ -186,6 +202,11 @@ class AgencyController extends Controller
 
     public function update(Request $request, $id)
     {
+        $app_feature = Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
         $userId = $request->user()->id;
 
         try {
