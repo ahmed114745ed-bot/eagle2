@@ -3,6 +3,7 @@
 namespace Modules\FixedTarget\Services;
 
 use App\Helpers\Common;
+use App\Models\BDSallary;
 use App\Services\WalletService;
 use Carbon\Carbon;
 use App\Models\User;
@@ -144,7 +145,8 @@ class FixedTargetService
             $t,
             'user_transaction',
             'target_achieved',
-            ['target_id' => $target->id]
+            ['target_id' => $target->id],
+            'get_target'
         );
 
         try {
@@ -219,6 +221,9 @@ class FixedTargetService
 
                                         ])->where('id','!=', $userSalary->id)->delete();*/
         }
+
+    
+       
     }
 
     /**

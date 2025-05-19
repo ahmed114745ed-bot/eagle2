@@ -742,6 +742,31 @@
     "charge_gift_price": "Charge Gift Price",
     "attraction_gift_price": "Attraction Gift Price",
     "wealth_gift_price": "Wealth Gift Price",
-    "Go to Settings": "Go to Settings"
+    "Go to Settings": "Go to Settings",
+    "app BD id": "App BD ID",
+    "salaries BD": "Salaries BD",
+    "my wallet": "My Wallet",
+    "request-agencies": "Request Agencies",
+    "request agencies": "Request Agencies",
+    "Request agencies": "Request Agencies",
+    "bd": "BD",
+    "Bd": "BD",
+    "BD": "BD",
+    "current_balance": "Current Balance",
+    "remaining_percent": "Remaining Percent",
+    "cut": "Cut",
+    "total": "Total",
+    "agency": "Agency",
+    "List of Agencies": "List of Agencies",
+    "confirm_charge": "Confirm Charge",
+    "enter_amount": "Enter Amount",
+      "transfer_to_wallet": "Transfer to Wallet",
+  "charge_wallet": "Charge Wallet",
+  "current_balance": "Current Balance",
+  "select_target": "Select Target",
+  "bd_wallet_notice": "When you transfer an amount in dollars from the BD wallet, it will be added to your wallet. Then you can sell or send it to others through the My Wallet page."
+,"confirm_transfer":"Confirm Transfer",
+"total_sallary":" Total Sallary",
+"totalCut":"Total Amount"
 
 }

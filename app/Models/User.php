@@ -209,9 +209,7 @@ class User extends Authenticatable
             ->where('uid', $this->id)
             ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
             ->havingRaw('SUM(hours) > 1')
-            ->get(); // Having condition
-
-
+            ->get();
 
         return $subQuery->count('entry_count');
     }
@@ -711,6 +709,9 @@ class User extends Authenticatable
         //        }
     }
 
+
+
+    
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -1308,4 +1309,28 @@ class User extends Authenticatable
         return $this->shippingAgency()->exists();
     }
 
+    public function bdSalaries()
+    {
+        return $this->hasMany(BDSallary::class, 'bd_id');
+    }
+
+    public function getBdSalaryAttribute()
+    {
+        $userSallary = $this->bdSalaries()
+            ->sum(DB::raw('sallary - cut_amount'));
+        return floor($userSallary );
+    }
+    public function incrementCutAmountInBdSallary(int $amount)
+    {
+        $lastBdSalary = $this->bdSalaries()->latest()->first();
+    
+        if ($lastBdSalary) {
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);  
+            $lastBdSalary->update(['cut_amount' => $newAmount]);
+            return true;
+        }
+    
+        return false;
+    }
+    
 }

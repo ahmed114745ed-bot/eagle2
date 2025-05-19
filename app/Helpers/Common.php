@@ -1364,4 +1364,41 @@ class Common
         $agency = ShippingAgency::find($id);
         return $agency ?: false;
     }
+
+
+
+    public static function renderWalletMessage(string $messageKey, string|array|null $messageData): string
+    {
+        $messageData = is_string($messageData) ? json_decode($messageData, true) ?? [] : $messageData;
+        $fullKey = 'messages.' . $messageKey;
+    
+        if (str_contains($messageKey, 'user')) {
+            $userId = $messageData['receiver_id'] ?? $messageData['user_id'] ?? null;
+            if ($userId) {
+                $user = \App\Models\User::find($userId);
+                if ($user) {
+                    $messageData['name'] = $user->name;
+                    $messageData['target'] = $user->name; 
+                
+                }
+            }
+        }
+    
+        if (str_contains($messageKey, 'agency')) {
+            $agencyId = $messageData['agency_id'] ?? null;
+            if ($agencyId) {
+                $agency = \App\Models\Agency::find($agencyId);
+                if ($agency) {
+                    $messageData['name'] = $agency->name;
+                    $messageData['target'] = $agency->name;
+                }
+            }
+        }
+    
+        $messageData['name'] = $messageData['name'] ?? $messageData['target'] ?? __('unknown');
+        $messageData['target'] = $messageData['target'] ?? $messageData['name'] ?? __('unknown');
+    
+        return __($fullKey, $messageData);
+    }
+    
 }

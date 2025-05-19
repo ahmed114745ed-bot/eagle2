@@ -20,5 +20,6 @@
     "SalaryTransaction": true,
     "WhatsappAuth": true,
     "DailyPrize": true,
-    "Tasks": true
+    "Tasks": true,
+    "Wallet": true
 }

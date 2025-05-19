@@ -1,5 +1,8 @@
 <?php
 
+use App\Admin\Controllers\BDControllers\WalletController;
+use App\Admin\Controllers\WareController;
+use App\Http\Controllers\Api\V1\ChargeController;
 use App\Models\Room;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -10,7 +13,6 @@ use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
-use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -517,6 +519,23 @@ Route::group(
             Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
+
+    
+        Route::prefix('bd')->name('bd.')->namespace('BDControllers')->group(function (Router $router) {
+            $router->get('/', 'HomeController@index')->name('home');
+            $router->get('/charges', 'ChargeController@index')->name('charges');
+            $router->resource('/agencies', 'AgencyController');
+            $router->resource('/salaries', 'BdSalariesController');
+            $router->resource('/request-agencies', 'RequestAgencyController');
+            // $router->resource('/wallet', 'WalletController');
+            Route::post('admin/wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
+            Route::post('admin/salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
+
+        });
+
+        
+        
+    
     }
 
 

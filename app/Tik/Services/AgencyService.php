@@ -665,7 +665,6 @@ class AgencyService
         return $data;
     }
 
-
     public function dataAgency()
     {
         $user = $this->get_user(request());

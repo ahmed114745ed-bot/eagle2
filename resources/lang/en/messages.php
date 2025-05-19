@@ -16,4 +16,12 @@ return[
 
 'deleteShipping' => 'If the agency is deleted, the coins and dollars will be lost',
 'cancel' => 'cancel',
+
+'transfer_to_user'     => 'An amount has been transferred to user :name.',
+'transfer_to'          => 'An amount has been transferred to :target.',
+'transfer_to_'          => 'An amount has been transferred to :target.',
+'trans_to_my_wallet'   => 'An amount has been transferred to my wallet.',
+'transfer_to_agency'   => 'An amount has been transferred to agency :name.',
+'trans_to_'            => 'An amount has been transferred to the target: :target.',
+'charge_to_user'       => 'Balance has been charged to user :name.',
 ];
