@@ -50,7 +50,7 @@ class ChargeAction extends Action
             return $this->response()->error(__('frozen'))->refresh();
         }
         $user = $agency->owner;
-        if(!$user)  return $this->response()->error(__('api_responses.ownerNotFound'))->refresh();
+        if (!$user)  return $this->response()->error(__('this agency not have owner'))->refresh();
         return $this->handleAgencyCharge($request, $agency, $user);
 
         //        }
@@ -102,10 +102,12 @@ class ChargeAction extends Action
 
         DB::transaction(function () use ($request, $agency, $user, $amount, $shippingCoins) {
             $coins = $amount * $shippingCoins;
+
             $agency->coins += $coins;
+            if ($agency->coins < 0)  return $this->response()->error(__('agency does not have this coin'))->refresh();
             $agency->save();
 
-            $this->createChargeRecord($request, $user, $agency, $amount, $coins,$request->amount);
+            $this->createChargeRecord($request, $user, $agency, $amount, $coins, $request->amount);
 
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
@@ -138,9 +140,9 @@ class ChargeAction extends Action
             $user->save();
             if ($request->charge_type == "increment") {
                 $admin = Auth::user()->username ?? 'Admin';
-                CustomNotification::chargeAction($user, $request,$admin);
+                CustomNotification::chargeAction($user, $request, $admin);
             }
-            $this->createChargeRecord($request, $user, null, $amount, $usdAmount,$request->amount);
+            $this->createChargeRecord($request, $user, null, $amount, $usdAmount, $request->amount);
 
             (new UserAchievementService())->insertCharging($user, $request->amount);
         });
@@ -148,7 +150,7 @@ class ChargeAction extends Action
         return $this->response()->success('Success')->refresh();
     }
 
-    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount )
+    private function createChargeRecord(Request $request, User $user, ?Agency $agency, $amount, $coins = 0, $usdAmount)
     {
 
         //        $shippingCoins = cache()->get('shipping_coins');
@@ -203,6 +205,4 @@ class ChargeAction extends Action
                 </script>
                 HTML;
     }
-
-
 }
