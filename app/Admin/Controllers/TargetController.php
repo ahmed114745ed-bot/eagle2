@@ -560,7 +560,6 @@ class TargetController extends MainController
 
     public function downloadTargetPdf(HttpRequest $request)
     {
-        info($request);
         try {
             $selectedColumns = $request->input('columns', []);
 
