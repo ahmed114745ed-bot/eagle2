@@ -85,9 +85,7 @@ class RoomRepository extends AbstractRepository
         $roomType = $req->room_type ?? 'audio';
 
         $user = $req?->user();
-        $allRooms = (settings()->get('make_rooms_top') == 1) ?? false;
-
-
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
         $result = $this->model->with([
             'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1),
             'backgroundImage',
@@ -97,12 +95,13 @@ class RoomRepository extends AbstractRepository
         ])
             ->withCount('roomVisitors')
             ->whereHas('owner')
-            ->when(!$allRooms, function ($query) {
-                $query->where(function ($query) {
-                    $query->where(fn($q) => $q->has("roomVisitors"))
-                        ->orWhere(fn($q) => $q->where('pin', 1));
+            ->when($topRooms, function ($query) {
+//                $query->where(function ($query) {
+                    $query->orderByDesc('pin');
+//                    $query->where(fn($q) => $q->has("roomVisitors"))
+//                        ->orWhere(fn($q) => $q->where('pin', 1));
                     // ->orWhere(fn($q) => $q->has("roomVisitors")->orWhere('count_room_socket','!=',0));
-                });
+//                });
             })
             ->where('uid','!=', Auth::id())
             ->where('room_status', 1);
