@@ -203,17 +203,6 @@ class FixedTargetService
         if ($userSalary) {
             $values['remaining_diamond'] =  ($month_received - (@$target->diamonds ?? 0));
             $userSalary->update($values);
-           
-                $bdSalary = BDSallary::query()->create([
-                    'bd_id'        => $user->agency->bd_id,
-                    'agency_id'    => $user->agency_id,
-                    'month'        => Carbon::now()->month,
-                    'year'         => Carbon::now()->year,
-                    'cut_amount'   =>  0,
-                    'sallary'      => $db_usd * $percentageAchieved,
-                    'is_paid'      => false,
-                    ...$values
-                ])->lock();
         } else {
             $userSalary = UserSallary::query()->create([
                 'user_id' => $user->id,
@@ -231,24 +220,32 @@ class FixedTargetService
                                             'user_agency_id' => $user->agency_id,
 
                                         ])->where('id','!=', $userSalary->id)->delete();*/
-                    
-                        $bdSalary = BDSallary::query()->create([
-                            'bd_id'        => $user->agency->bd_id,
-                            'agency_id'    => $user->agency_id,
-                            'month'        => Carbon::now()->month,
-                            'year'         => Carbon::now()->year,
-                            'cut_amount'   =>  0,
-                            'sallary'      => $db_usd * $percentageAchieved,
-                            'is_paid'      => false,
-                            ...$values
-                        ])->lock();
-
-      
-                                    }
+        }
 
     
-       
+        $bdSalary = BDSallary::query()->where([
+            'bd_id'     => $user->agency->bd_id,
+            'month'     => Carbon::now()->month,
+            'year'      => Carbon::now()->year,
+            'agency_id' => $user->agency_id, 
+        ])->lock()->first();
         
+        if ($bdSalary) {
+            $bdSalary->update([
+                'sallary' => $bdSalary->sallary + ($db_usd * $percentageAchieved)
+            ]);
+        } else {
+            $bdSalary = BDSallary::query()->create([
+                'bd_id'        => $user->agency->bd_id,
+                'agency_id'    => $user->agency_id,
+                'month'        => Carbon::now()->month,
+                'year'         => Carbon::now()->year,
+                'cut_amount'   =>  0,
+                'sallary'      => $db_usd * $percentageAchieved,
+                'is_paid'      => false,
+                ...$values
+            ])->lock();
+        }
     }
 
     /**
