@@ -48,8 +48,8 @@ class HomeController extends Controller
             ->description('إحصائيات عامة')
 
             ->row(function (Row $row) use ($agencyCount, $finalSalary, $finalWallet) {
-                $row->column(4, new InfoBox(__('Agencies Count'), 'users', 'aqua', 'bd/agencies', $agencyCount));
-                $row->column(4, new InfoBox(__('BD Wallet'), 'money', 'green', 'bd/salaries', number_format($finalSalary) . ' 💰'));
+                $row->column(6, new InfoBox(__('Agencies Count'), 'users', 'aqua', 'bd/agencies', $agencyCount));
+                $row->column(6, new InfoBox(__('BD Wallet'), 'money', 'green', 'bd/salaries', number_format($finalSalary) . ' 💰'));
                 // $row->column(4, new InfoBox(__('My Wallet'), 'credit-card', 'yellow', 'bd/wallet', number_format($finalWallet) . ' 💳'));
             });
     }
