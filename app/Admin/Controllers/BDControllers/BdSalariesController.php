@@ -18,6 +18,9 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Encore\Admin\Widgets\InfoBox;
+use Encore\Admin\Layout\Row;
+
 
 class BdSalariesController extends MainController
 {
@@ -40,7 +43,8 @@ class BdSalariesController extends MainController
         $netSalary = BDSallary::where('bd_id', $appID)
         ->selectRaw('SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut')
         ->first();
-
+ $totalCut =$netSalary->total_cut;
+ $total_sallary =$netSalary->total_sallary;
     $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
     return $content
         ->header(trans('admin.index'))
@@ -50,6 +54,10 @@ class BdSalariesController extends MainController
             // الكارت سيتم تضمينه من Blade View
             // $row->column(12, view('admin.grid.bd.sallary', ['finalSalary' => $finalSalary]));
             $row->column(12, view('admin.grid.bd.wallet', ['finalSalary' => $finalSalary]));
+        })
+        ->row(function (Row $row) use ($total_sallary, $totalCut ) {
+            $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', $total_sallary  . ' 💰' ));
+            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', '', number_format($totalCut)));
         })
 
         ->row(function ($row) {
