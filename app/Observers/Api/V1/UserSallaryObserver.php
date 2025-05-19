@@ -74,31 +74,35 @@ class UserSallaryObserver
      */
     public function updateOrCreateAgencySallary(UserSallary $userSalary, bool $isCreate = false): void
     {
-        $agency = Agency::find($userSalary->user_agency_id);
-        if ($userSalary->user_agency_id != 0 /*&& ($userSalary->isDirty('agency_sallary') || $isCreate)*/ && $agency && $agency->status == 1) {
-            $agency_id    = $userSalary->user_agency_id;
-            $month        = now()->month;
-            $year         = now()->year;
-            $agencySalary =
-                AgencySallary::query()->where('month', $month)->where('year', $year)->where('agency_id', $agency_id)->first();
+        $app_feature = \Cache::get('host_agency');
+        if ($app_feature){
+            $agency = Agency::find($userSalary->user_agency_id);
+            if ($userSalary->user_agency_id != 0 /*&& ($userSalary->isDirty('agency_sallary') || $isCreate)*/ && $agency && $agency->status == 1) {
+                $agency_id    = $userSalary->user_agency_id;
+                $month        = now()->month;
+                $year         = now()->year;
+                $agencySalary =
+                    AgencySallary::query()->where('month', $month)->where('year', $year)->where('agency_id', $agency_id)->first();
 
 //            $diff = (double)$userSalary->agency_sallary - ((double)$userSalary->getOriginal('agency_sallary') ?? 0);
 
-            $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->sum('agency_sallary');
-            /*if( $diff < 0 ){
-                $diff = $userSalary->agency_sallary;
-            }*/
+                $salary = UserSallary::where('user_agency_id', $agency_id)->where('month', now()->month)->where('year', now()->year)->sum('agency_sallary');
+                /*if( $diff < 0 ){
+                    $diff = $userSalary->agency_sallary;
+                }*/
 
-            if ($agencySalary) {
-                $agencySalary->update([
-                                          'sallary' => $salary
-                                      ]);
-            } else {
-                AgencySallary::query()->create([
-                                                   'sallary' => $salary, 'agency_id' => $agency_id, 'month' => $month,
-                                                   'year'    => $year
-                                               ]);
+                if ($agencySalary) {
+                    $agencySalary->update([
+                        'sallary' => $salary
+                    ]);
+                } else {
+                    AgencySallary::query()->create([
+                        'sallary' => $salary, 'agency_id' => $agency_id, 'month' => $month,
+                        'year'    => $year
+                    ]);
+                }
             }
+
         }
     }
 }

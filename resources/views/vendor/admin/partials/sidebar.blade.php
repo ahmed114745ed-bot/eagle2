@@ -4,23 +4,20 @@
     <section class="sidebar">
 
         <!-- Sidebar user panel (optional) -->
-        <div class="user-panel">
-            <div class="pull-left image">
-                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">
-            </div>
-            <div class="pull-left info">
-                <p>{{ Admin::user()->name }}</p>
-                <!-- Status -->
-                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>
-            </div>
-            <div class="pull-role">
-                @if(Auth::user()->roles->isNotEmpty())
-                    {{ Auth::user()->roles[0]->name }}
-                @else
-                    {{ __('No role assigned') }} <!-- Or any fallback message -->
-                @endif
-            </div>
-        </div>
+{{--        <div class="user-panel">--}}
+{{--            <div class="pull-left image">--}}
+{{--                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">--}}
+{{--            </div>--}}
+{{--            <div class="pull-left info">--}}
+{{--                <p>{{ Admin::user()->name }}</p>--}}
+{{--                <!-- Status -->--}}
+{{--                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>--}}
+{{--            </div>--}}
+{{--            <div class="pull-role">--}}
+{{--            {{ Auth::user()->roles[0]->name }}--}}
+{{--            <!-- Status -->--}}
+{{--            </div>--}}
+{{--        </div>--}}
 
         @if(config('admin.enable_menu_search'))
         <!-- search form (Optional) -->
@@ -71,7 +68,7 @@
                 }
             </style>
 
-            
+
             <div id="tab-loading" >
             Loading...
             </div>

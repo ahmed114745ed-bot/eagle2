@@ -2,13 +2,13 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\AppFeature;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Models\AppFeature;
+use App\Admin\Controllers\MainController;
 
-class AppFeatureController extends AdminController
+class AppFeatureController extends MainController
 {
     /**
      * Title for current resource.

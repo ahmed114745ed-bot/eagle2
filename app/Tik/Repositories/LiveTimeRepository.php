@@ -80,15 +80,14 @@ class LiveTimeRepository extends AbstractRepository
         }
     }
 
-    public function getByDaily($userId, $month, $year)
+    public function getByDaily($userId, $start, $end)
     {
         return $this->model->query()
             ->selectRaw('sum(hours) as hours, max(created_at) as date')
             ->where('uid', $userId)
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
+            ->whereBetween('created_at', [$start, $end])
             ->groupBy(\DB::raw('date(created_at)'))
-            ->limit(31)
+            ->orderBy('date', 'asc')
             ->get();
     }
 

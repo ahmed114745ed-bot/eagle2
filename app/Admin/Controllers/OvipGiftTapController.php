@@ -33,7 +33,7 @@ class OvipGiftTapController extends MainController
         <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
-        $ovip=null;
+        $ovip = null;
         if (request('ovip_id')) {
             $ovip = OVip::find(request('ovip_id'));
         } elseif (request('level')) {
@@ -44,7 +44,7 @@ class OvipGiftTapController extends MainController
             ->title(trans('Privileges'))
             ->row($buttonHTML)
             ->row(function (Row $row) use ($ovip) {
-                $row->column(12, $this->tabsComponent($ovip?->privilegs,$ovip?->id));
+                $row->column(12, $this->tabsComponent($ovip?->privilegs, $ovip?->id, $ovip?->privilegs->first()?->type));
             })
             ->row(function (Row $row) use ($ovip) {
                 $row->column(12, $this->gridDynamic($ovip?->level, $ovip?->privilegs->first()?->type));
@@ -72,7 +72,7 @@ class OvipGiftTapController extends MainController
 
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('gift'))
             ->body($this->detail($id)));
     }
@@ -80,17 +80,17 @@ class OvipGiftTapController extends MainController
     public function edit($id, Content $content)
     {
 
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('gift'))
             ->body($this->form()->edit($id)));
     }
 
     protected function gridDynamic($level, $firstType)
     {
-       
+
         $type = request()->get('type', $firstType);
         $grid = new Grid(new Ware);
-       
+
         $grid->model()->where('level', $level)->where('get_type', 1)->where('type', $type)->where('is_active_for_vip', 1);
 
         $grid->id(__('ID'));
@@ -98,10 +98,22 @@ class OvipGiftTapController extends MainController
 
         $grid->column('price', __('price'));
 
-        $grid->column('show_img', __('show_img'))->image('', 30);
+        $grid->column('show_img', __('show_img'))->display(function ($path) {
+            /** @var Ware $this */
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
         $grid->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
-            $url = getImagePath($path);
+            $defaultImage = asset("images/image.png");
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
@@ -135,7 +147,7 @@ class OvipGiftTapController extends MainController
             HTML;
         })->style('min-width:120px')->setAttributes(['style' => 'text-align:center']);
 
-         $grid->disableActions();
+        $grid->disableActions();
         $grid->actions(function ($actions) {
             $actions->disableView();
             $actions->disableEdit();
@@ -145,23 +157,22 @@ class OvipGiftTapController extends MainController
         $this->extendGrid($grid);
         $grid->disableExport();
         if ($firstType) {
-          
-        $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
-            $level = $level ?? request('level');
-            $url =    url('admin/ware-gift/' . $level . '/' . $type);
-            $add = __('add');
 
-            $customButtonHTML = <<<HTML
+            $grid->tools(function (Grid\Tools $tools) use ($level, $type,) {
+                $level = $level ?? request('level');
+                $url =    url('admin/ware-gift/' . $level . '/' . $type);
+                $add = __('add');
+
+                $customButtonHTML = <<<HTML
 
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
 
             HTML;
-            $tools->append($customButtonHTML);
-        });
-         
-           }
+                $tools->append($customButtonHTML);
+            });
+        }
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -318,7 +329,7 @@ class OvipGiftTapController extends MainController
     }
 
 
-    private function tabsComponent($privileges ,$level)
+    private function tabsComponent($privileges, $level, $type)
     {
         $content = new Row();
 
@@ -331,8 +342,8 @@ class OvipGiftTapController extends MainController
         }
 
         $currentType = request()->get('type', $privilegeTypes?->keys()->first());
-        $alert =false;
-        if (!$currentType) {
+        $alert = false;
+        if (!$type) {
             $alert = true;
         }
         $box = new Box(content: view('admin.grid.Form.privilegeTabs', [

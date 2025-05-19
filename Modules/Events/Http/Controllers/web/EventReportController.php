@@ -2,10 +2,6 @@
 
 namespace Modules\Events\Http\Controllers\web;
 
-use App\Admin\Controllers\MainOldController;
-use App\Models\OVip;
-use App\Models\UserSallary;
-use App\Models\Ware;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use App\Services\AppFeatureService;
@@ -14,7 +10,7 @@ use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\WinnerReward;
 use Modules\Events\Entities\RewardWinnerPk;
 
-class EventReportController extends MainOldController
+class EventReportController extends MainController
 {
     public $permission_name = 'event_report';
     public function __construct()

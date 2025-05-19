@@ -2,14 +2,14 @@
 
 namespace Modules\SpecialId\Http\Controllers\web;
 
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\SpecialId\Entities\SpecialHistory;
 use Encore\Admin\Layout\Content;
+use App\Admin\Controllers\MainController;
+use Modules\SpecialId\Entities\SpecialHistory;
 
-class SpecialHistoryController extends AdminController
+class SpecialHistoryController extends MainController
 {
     /**
      * Title for current resource.

@@ -373,7 +373,7 @@ class Common
 
     public static function getConf($key)
     {
-        if($key === 'enable_vip_auto'){
+        if ($key === 'enable_vip_auto') {
             return "true";
         }
         if ($conf = Config::query()->where('name', $key)->first()) {
@@ -801,8 +801,8 @@ class Common
 
     public static function handelVip($vip, $user, $expire = null)
     {
-        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->where('is_active_for_vip', 1)->get();
-
+        $type = $vip->privilegs()->pluck('type')->toArray();
+        $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $vip->level)->whereIn('type', $type)->where('is_active_for_vip', 1)->get();
         foreach ($wares as $ware) {
             Pack::query()->where('user_id', $user->id)
                 ->where('expire', '<', now()->timestamp)
@@ -1210,7 +1210,7 @@ class Common
 
     public static  function createUserAdmin($appOwnerId)
     {
-        if(!$appOwnerId) return;
+        if (!$appOwnerId) return;
         $user = User::find($appOwnerId);
         if (!$user) return true;
         $password = Str::random(8);
@@ -1361,7 +1361,7 @@ class Common
     public static function searchAgency($id)
     {
         $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true) 
+            ->where('Shipping_agency', true)
             // ->whereHas('chargeAgency' )
             ->first();
 

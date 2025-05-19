@@ -232,8 +232,7 @@ class RoleControllerNew extends MainController
         $data = $permissions->map(function ($perm) {
             return [
                 'id' => $perm->id,
-                'name' => $perm->name,
-                'name_ar' => $perm->name_ar,
+                'name' => __($perm->name),
             ];
         });
 

@@ -1,10 +1,7 @@
 <?php
 
-use App\Admin\Controllers\UserWalletController;
-use App\Admin\Controllers\WalletTransactionController;
-use App\Admin\Controllers\WareController;
+use App\Admin\Controllers\FeatureAppController;
 use App\Models\Room;
-use App\Admin\Controllers\AgencyControllers\UserController;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +11,7 @@ use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ReelController;
 use App\Admin\Controllers\RoomController;
+use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\OfferController;
 use App\Admin\Controllers\RouteController;
@@ -34,9 +32,7 @@ use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
-use App\Http\Controllers\SettingsController;
 use App\Admin\Controllers\LanguageController;
-use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -53,17 +49,17 @@ use App\Admin\Controllers\PermissionController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\RoomTargetController;
 use App\Admin\Controllers\TestPusherController;
+use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\OvipGiftTapController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PaymentCoinController;
-
 use App\Admin\Controllers\ReportRealsController;
 use App\Admin\Controllers\ChargeReportController;
+
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
-use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
@@ -77,14 +73,15 @@ use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
+use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
-use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\UserOnlineHistoryController;
+use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\ChangeAgencyMangerController;
 use App\Admin\Controllers\ChangeLevelHistoryController;
 use App\Admin\Controllers\TrashedUserAccountController;
@@ -92,6 +89,8 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\AgencyControllers\UserController;
+use App\Admin\Controllers\UserController as UsersAppController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
@@ -219,6 +218,8 @@ Route::group(
             ]
         ]);
 
+         $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
+
         $router->resource('free-users', 'FreeUserController');
 
         $router->resource('family-users', 'UserFamilyController');
@@ -262,7 +263,7 @@ Route::group(
         $router->resource('countries', 'CountryController');
         $router->resource('backgrounds', 'BackgroundController');
         $router->resource('official_msgs', 'OfficialMessageController');
-        $router->resource('emojis', 'EmojiController');
+        $router->resource('emojis', 'EmfojiController');
         $router->resource('home_carousels', 'HomeCarouselController');
         $router->resource('vip_prev', 'VipAuthController');
         $router->resource('agencies', 'AgencyController');
@@ -361,24 +362,23 @@ Route::group(
 
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
 
-            Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
+        Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
+        Route::prefix('ware-gift')->group(function () {
 
-            Route::prefix('ware-gift')->group(function () {
-                Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
-                Route::post('/{level}', [OvipGiftTapController::class, 'store']);
-                // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-            });
-
-            $router->resource('ware-gifts', 'OvipGiftTapController');
-            Route::prefix('ware-gifts')->group(function () {
+            Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
+            Route::post('/{level}', [OvipGiftTapController::class, 'store']);
+            // Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            // Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            // Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+        $router->resource('ware-gifts', 'OvipGiftTapController');
+        Route::prefix('ware-gifts')->group(function () {
 
 
-                Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
-                Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
-                Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
-            });
+            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
         $router->resource('vip_privilege', 'VipPrivilegeController');
         $router->resource('tickets', 'TicketController');
         $router->resource('pages', 'PageController');
@@ -401,7 +401,7 @@ Route::group(
         $router->resource('trxs', 'CoinLogController');
         $router->resource('images', 'ImageController');
         $router->resource('moments', MomentController::class);
-        $router->get('moment-gallery/{id}', [MomentController::class,'momentGallery']);
+        $router->get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
         $router->resource('moment-settings', MomentSettingsController::class);
         $router->resource('reels', ReelController::class);
         $router->resource('reel-settings', ReelSettingsController::class);
@@ -471,6 +471,7 @@ Route::group(
         $router->resource('parent-users', ParentUsersController::class);
         $router->resource('custom-zego-messages', CustomZegoMessageController::class);
         $router->resource('agency-settings', AgencySettingsController::class);
+        $router->resource('app-feature', FeatureAppController::class);
         $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //$router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
@@ -490,9 +491,7 @@ Route::group(
                     $background->use_count = $background_count;
                     $background->save();
                 }
-                //dd("done");
             }
-            //dd("note found data");
         });
 
         $router->resource('user-wallets', UserWalletController::class);
@@ -504,28 +503,20 @@ Route::group(
         $router->resource('room-settings', RoomSettingsController::class);
         $router->resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
-
-
         Route::post('rooms/{room}/pin', function (Room $room) {
             $room->update(['pin' => !$room->pin]);
 
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
-
-
         $router->resource('notification-templates', NotificationsTemplatesController::class);
-       // Route::get('ware-management', [WareTabController::class, 'index']);
-      //  $router->resource('ware-management', WareTabController::class);
-      //Route::post('/ware-management/create/{type?}', [WareTabController::class, 'create']);
-      Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
-      Route::post('/ware-managements/create', [WareTabController::class, 'store']);
+        Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
+        Route::post('/ware-managements/create', [WareTabController::class, 'store']);
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
             Route::get('/{id}/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
             Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
-
     }
 
 

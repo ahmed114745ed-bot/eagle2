@@ -56,12 +56,17 @@ class ChargeController extends Controller
 
     public function chargeTo(Request $request)
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
         $types = [
             'user' => [$this, 'chargeToUser'],
             'agency' => [$this, 'chargeToAgency']
         ];
 
-        $type = $request->input('type'); 
+        $type = $request->input('type');
         $instance = $types[$type] ?? $types['agency'];
 
         if (!$instance) {
@@ -94,7 +99,7 @@ class ChargeController extends Controller
         }
 
         if (!$to) Common::apiResponse(0, __('user not found'), 404);
-       
+
 
 
         $usd = $request->usd;
@@ -134,8 +139,8 @@ class ChargeController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), 400);
         }
     }
-    
-    
+
+
 
 
     public function chargeToAgency(Request $request)
@@ -145,7 +150,7 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
         }
 
-    
+
         $toId = $request->to_id;
         $from = $request->user();
         $isRoomTarget = false;
@@ -238,6 +243,10 @@ class ChargeController extends Controller
 
     public function ChargeDollarForOwner(Request $request)
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!$app_feature){
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
         $stop_all_charge = settings()->get("stop_charge") ?? 0;
         if ($stop_all_charge == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
@@ -256,7 +265,7 @@ class ChargeController extends Controller
         $data = call_user_func($instance, $request);
         return $data;
     }
-    
+
 
     public function ChargeDollarForOwner_to_users(Request $request)
     {
@@ -290,7 +299,7 @@ class ChargeController extends Controller
         }
     }
 
- 
+
     public function ChargeDollarForOwner_to_agency(Request $request)
     {
         //done
