@@ -19,6 +19,14 @@ class UserTargetController extends MainController
 
     public $permission_name = 'user-target-eg';
 
+    public function __construct()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+    }
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -132,7 +140,7 @@ class UserTargetController extends MainController
         $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
             return explode('/', $diamond)[1] ?? 0;
         });
-       
+
         $grid->column('hours', __('user hours'))->display(function ($hours) {
             return explode('/', $hours)[0] ?? 0;
         });
@@ -143,16 +151,16 @@ class UserTargetController extends MainController
             $usd = explode('/', $diamond)[0] ?? 0;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
         });
-       
+
         $grid->column('sallary', __('user obtain'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
@@ -160,7 +168,7 @@ class UserTargetController extends MainController
         $grid->column('agency_sallary', __('agency obtain'))->display(function ($usd) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

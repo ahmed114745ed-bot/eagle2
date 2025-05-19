@@ -19,8 +19,14 @@ use Encore\Admin\Widgets\Table as WidgetsTable;
 class RequestAgencyController extends MainController
 {
     public $permission_name = 'request-agencies';
+
     public function __construct()
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
@@ -111,7 +117,7 @@ class RequestAgencyController extends MainController
                 </div>
             ";
         });
-       
+
         $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';
             $path = @$this->img;
@@ -166,7 +172,7 @@ class RequestAgencyController extends MainController
         $grid->column('additionalInfo.salary', __('salary'))->display(function ($salary) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
-                      
+
                         <span>{$salary}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";

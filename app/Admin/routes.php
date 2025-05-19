@@ -1,5 +1,6 @@
 <?php
 
+use App\Admin\Controllers\FeatureAppController;
 use App\Models\Room;
 use Illuminate\Routing\Router;
 use Encore\Admin\Facades\Admin;
@@ -471,6 +472,7 @@ Route::group(
         $router->resource('parent-users', ParentUsersController::class);
         $router->resource('custom-zego-messages', CustomZegoMessageController::class);
         $router->resource('agency-settings', AgencySettingsController::class);
+        $router->resource('app-feature', FeatureAppController::class);
         $router->get('chat-settings', [GroupChatController::class, 'chat_settings']);
         $router->get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //$router->get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');

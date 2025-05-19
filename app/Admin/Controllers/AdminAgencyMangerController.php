@@ -26,10 +26,13 @@ class  AdminAgencyMangerController extends MainController
 
     protected $model;
 
-
-
     public function __construct()
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(404);
+        }
+
         $userModel = Admin::class;
         $this->model = new $userModel;
     }
