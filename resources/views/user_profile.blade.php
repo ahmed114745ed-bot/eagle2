@@ -1038,42 +1038,42 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
-            const selectedTab = urlParams.get('tab') || 'members';
+            const selectedTab = urlParams.get('tab') || 'packs';
 
             const allTabs = document.querySelectorAll('.tab-btn');
             const allTabContents = document.querySelectorAll('[id$="-tab"]');
 
-            let targetElement = null;
+    //         let targetElement = null;
 
-            allTabs.forEach(tab => {
-                const target = tab.getAttribute('data-target');
-                const content = document.getElementById(target);
+    //         allTabs.forEach(tab => {
+    //             const target = tab.getAttribute('data-target');
+    //             const content = document.getElementById(target);
 
-                if (target.startsWith(selectedTab)) {
-                    tab.classList.add('active');
-                    content.style.display = 'block';
-                    targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
-                } else {
-                    tab.classList.remove('active');
-                    content.style.display = 'none';
-                }
+    //             if (target.startsWith(selectedTab)) {
+    //                 tab.classList.add('active');
+    //                 content.style.display = 'block';
+    //                 targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
+    //             } else {
+    //                 tab.classList.remove('active');
+    //                 content.style.display = 'none';
+    //             }
 
-                tab.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.getElementById('tab-loading').style.display = 'block';
-                    allTabs.forEach(t => t.style.pointerEvents = 'none');
-                    const href = tab.getAttribute('href');
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
-                });
-            });
+    //             tab.addEventListener('click', function (e) {
+    //                 e.preventDefault();
+    //                 document.getElementById('tab-loading').style.display = 'block';
+    //                 allTabs.forEach(t => t.style.pointerEvents = 'none');
+    //                 const href = tab.getAttribute('href');
+    //                 setTimeout(() => {
+    //                     window.location.href = href;
+    //                 }, 300);
+    //             });
+    //         });
 
-    if (targetElement) {
-        setTimeout(() => {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
-    }
+    // if (targetElement) {
+    //     setTimeout(() => {
+    //         targetElement.scrollIntoView({ behavior: 'smooth' });
+    //     }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
+    // }
 });
 
 
