@@ -215,35 +215,34 @@ class TargetController extends MainController
 
         //     $tools->append($button);
         // });
-        Admin::html(<<<HTML
-                    <div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
-                      <div class="modal-dialog" role="document">
-                        <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="exportPdfLabel">Choose Columns to Export</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body">
-                              <label><input type="checkbox" name="columns[]" value="target_no" checked> Target No</label><br>
-                              <label><input type="checkbox" name="columns[]" value="diamonds" checked> Diamonds</label><br>
-                              <label><input type="checkbox" name="columns[]" value="usd" checked> Host Percentage</label><br>
-                              <label><input type="checkbox" name="columns[]" value="agency_share" checked> Agency Share</label><br>
-                              <label><input type="checkbox" name="columns[]" value="db_percentage" checked> DB Percentage</label><br>
-                              <label><input type="checkbox" name="columns[]" value="hours" checked> Hours</label><br>
-                              <label><input type="checkbox" name="columns[]" value="days" checked> Days</label><br>
-                              <!-- Add more checkboxes as needed -->
-                            </div>
-                            <div class="modal-footer">
-                              <button type="submit" class="btn btn-primary">Export PDF</button>
-                            </div>
-                          </div>
-                        </form>
+        Admin::html(
+                        '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exportPdfLabel">' . __('Choose Columns to Export') . '</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <label><input type="checkbox" name="columns[]" value="target_no" checked> ' . __('Target No') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="diamonds" checked> ' . __('Diamonds') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="usd" checked> ' . __('Host Percentage') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="agency_share" checked> ' . __('Agency Share') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="db_percentage" checked> ' . __('DB Percentage') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
+                          <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="submit" class="btn btn-primary">' . __('Export PDF') . '</button>
+                        </div>
                       </div>
-                    </div>
-                    HTML);
+                    </form>
+                  </div>
+                </div>'
+             );
 
         $this->extendGrid($grid);
         $grid->disableExport();
