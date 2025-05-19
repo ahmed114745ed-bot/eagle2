@@ -32,9 +32,7 @@ use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
-use App\Http\Controllers\SettingsController;
 use App\Admin\Controllers\LanguageController;
-use App\Admin\Controllers\OvipGiftController;
 use App\Admin\Controllers\QuestionController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\TerminalController;
@@ -62,7 +60,6 @@ use App\Admin\Controllers\ChargeReportController;
 use App\Admin\Controllers\ReelSettingsController;
 use App\Admin\Controllers\ReportMomentController;
 use App\Admin\Controllers\RoomSettingsController;
-use App\Admin\Controllers\AgencySettingController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Admin\Controllers\MultiLanguageController;
@@ -80,7 +77,6 @@ use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\AgoraZegoSettingController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
-use App\Admin\Controllers\TargetPercentageController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\GameChargeHistoryController;
@@ -94,6 +90,7 @@ use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
 use App\Admin\Controllers\AgencyControllers\UserController;
+use App\Admin\Controllers\UserController as UsersAppController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 
@@ -220,6 +217,8 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+
+         $router->get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         $router->resource('free-users', 'FreeUserController');
 
