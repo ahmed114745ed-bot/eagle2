@@ -332,7 +332,7 @@ class VipController extends MainController
             return number_format($value->getOriginal());
         })->editable();
 
-        $grid->column('img', __('Image'))->image('', '50');
+        $grid->column('img', __('Image'))->image('', '100');
 
         // Any custom grid extensions
         $this->extendGrid($grid);
