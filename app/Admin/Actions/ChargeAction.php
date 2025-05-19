@@ -83,6 +83,7 @@ class ChargeAction extends Action
     private function handleAgencyCharge(Request $request, Agency $agency, User $user)
     {
         $amount = $request->charge_type == 'increment' ? $request->amount : -$request->amount;
+
         if ($amount < 0 && $agency->coins < abs($amount)) {
             return $this->response()->error(__('Insufficient agency balance'))->refresh();
         }
@@ -100,7 +101,7 @@ class ChargeAction extends Action
         }
 
         DB::transaction(function () use ($request, $agency, $user, $amount, $shippingCoins) {
-            $coins = $request->amount * $shippingCoins;
+            $coins = $amount * $shippingCoins;
             $agency->coins += $coins;
             $agency->save();
 
