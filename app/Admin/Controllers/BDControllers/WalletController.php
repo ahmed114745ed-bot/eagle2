@@ -364,7 +364,7 @@ class WalletController extends MainController
         try {
             
             $sender->incrementCutAmountInBdSallary($amount);
-            $receiver->increment('coins', $coins);
+            $receiver->increment('di', $coins);
             $descriptionData=['receiver_id'  => $receiver->id];
 
             WalletTransaction::create([
