@@ -479,6 +479,9 @@ class UserController extends MainController
             if ($model->agency_id >= 1) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
+            if ($model->phone = '+201000100010') {
+                $actions->disableDelete();
+            }
         });
         if (config('app.env') == 'production') $grid->disableCreateButton();
         $grid->disableExport();
