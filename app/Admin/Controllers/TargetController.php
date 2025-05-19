@@ -581,6 +581,7 @@ class TargetController extends MainController
             $log = $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
             info('downloaded');
         } catch (\Exception $e) {
+            info($e->getMessage());
 
             return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());
         }
