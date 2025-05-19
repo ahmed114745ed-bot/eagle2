@@ -230,11 +230,7 @@ class FixedTargetService
             'agency_id' => $user->agency_id, 
         ])->lock()->first();
         
-        if ($bdSalary) {
-            $bdSalary->update([
-                'sallary' => $bdSalary->sallary + ($db_usd * $percentageAchieved)
-            ]);
-        } else {
+       
             $bdSalary = BDSallary::query()->create([
                 'bd_id'        => $user->agency->bd_id,
                 'agency_id'    => $user->agency_id,
@@ -245,7 +241,7 @@ class FixedTargetService
                 'is_paid'      => false,
                 ...$values
             ])->lock();
-            }
+        
     }
 
     /**

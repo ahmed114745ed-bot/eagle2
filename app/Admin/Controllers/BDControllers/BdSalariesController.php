@@ -41,7 +41,6 @@ class BdSalariesController extends MainController
         ->first();
 
     $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
-
     return $content
         ->header(trans('admin.index'))
         ->description(trans('admin.description'))
