@@ -362,5 +362,13 @@ return [
     'google_pay'    => 'गूगल पे',
     'huawei_pay' => 'हुआवेई पे',
 
+    "target_no" => 'लक्ष्य संख्या',
+    "diamonds" => 'हीरे का लक्ष्य',
+    "usd" => 'डॉलर',
+    "agency_share" => 'एजेंट वेतन',
+    "db_percentage" => 'BD प्रतिशत',
+    "hours" => 'घंटे',
+    "days" => 'दिन',
+
     "charge_level" => "चार्ज स्तर",
 ];

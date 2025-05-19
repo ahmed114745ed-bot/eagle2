@@ -14,6 +14,10 @@
             $logo = getImagePath( $logoDb);
         }
     }
+
+    $selectedColumns = $selectedColumns ?? [];
+    info($selectedColumns)
+
 @endphp
 
 <!DOCTYPE html>
@@ -98,42 +102,36 @@
     <div class="content-wrapper">
         <table>
             <thead class="custom-header">
-                <tr>
-                    <th>{{ __('Level') }}</th>
-                    <th>{{ __('Diamond Target') }}</th>
-                    <th>{{ __('Day & Hours') }}</th>
-                    <th>{{ __('Host Salary') }}</th>
-                    <th>{{ __('Agents Salary') }}</th>
-                    <th>{{ __('BD Admin') }}</th>
-                </tr>
+            <tr>
+                @foreach($selectedColumns as $column)
+                    <th>{{ __('admin.' . $column) }}</th>
+                @endforeach
+            </tr>
             </thead>
-            <tbody class="tbody-colored">
-                @if($targets->count())
-                    @php $honor = $targets->first(); @endphp
-                    <tr>
-                        <td><strong>{{ __('Honor') }}</strong></td>
-                        <td>{{ $honor->diamonds }}</td>
-                        <td>{{ $honor->days }} D / {{ $honor->hours }} h</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->usd ?? 0) }} $</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->agency_share ?? 0) }} $</td>
-                        <td>{{ calculateUserUsd($honor->diamonds, $honor->db_percentage ?? 0 )  }}$</td>
-                    </tr>
 
-                    @foreach($targets->skip(1) as $index => $target)
-                        <tr>
-                            <td>{{ 'S' . ($index + 1) }}</td>
-                            <td>{{ $target->diamonds }}</td>
-                            <td>{{ $target->days }} D / {{ $target->hours }} h</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->usd ?? 0) }} $</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->agency_share ?? 0) }} $</td>
-                            <td>{{ calculateUserUsd($target->diamonds, $target->db_percentage ?? 0) }}$</td>
-                        </tr>
+            <tbody>
+            @foreach($targets as $target)
+                <tr>
+                    @foreach($selectedColumns as $column)
+                        <td>
+                            @php
+                                if ($column == 'target_no') {
+                                    echo $loop->parent->index + 1;
+                                } elseif ($column == 'diamonds') {
+                                    echo $target->diamonds;
+                                } elseif ($column == 'usd') {
+                                    $coins = \App\Helpers\Common::getMaxCoins();
+                                    $endFormatted = $coins ? ($target->diamonds / $coins) : 0;
+                                    $endFormatted = \App\Helpers\Common::roundToTwoDecimalPlaces($endFormatted);
+                                    echo "$$endFormatted";
+                                } else {
+                                    echo $target->$column ?? '-';
+                                }
+                            @endphp
+                        </td>
                     @endforeach
-                @else
-                    <tr>
-                        <td colspan="6">{{ __('No data available.') }}</td>
-                    </tr>
-                @endif
+                </tr>
+            @endforeach
             </tbody>
         </table>
     </div>
