@@ -216,7 +216,7 @@ class TargetController extends MainController
         //     $tools->append($button);
         // });
         Admin::html(
-                        '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
+            '<div class="modal fade" id="exportPdfModal" tabindex="-1" role="dialog" aria-labelledby="exportPdfLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <form id="exportPdfForm" method="GET" action="/admin/download-target-pdf" target="_blank">
                       <div class="modal-content">
@@ -242,7 +242,7 @@ class TargetController extends MainController
                     </form>
                   </div>
                 </div>'
-             );
+            );
 
         $this->extendGrid($grid);
         $grid->disableExport();

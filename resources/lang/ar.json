@@ -1697,7 +1697,7 @@
     "DB Percentage": "نسبة قاعدة البيانات",
     "Hours": "ساعات",
     "Days": "أيام",
-
+    "Choose Columns to Export": "اختر الأعمدة للتصدير",
     "Salary Policy" : "سياسة الرواتب",
     "This type is used before; please modify it":"هذا النوع مستخدم من قبل روح عدل عليه ",
     "Shipping agent ID":"معرف وكيل الشحن",
@@ -2384,7 +2384,7 @@
 "shipping agency switch": "مفتاح وكالة الشحن",
   "browse updates_group_chat": "تصفح تحديثات الدردشة الجماعية",
   "agency does not have this coin":"الوكالة لا تملك هذا العدد من القطع.",
-  "Game profits": "أرباح الألعاب" 
+  "Game profits": "أرباح الألعاب"
 
 
 
