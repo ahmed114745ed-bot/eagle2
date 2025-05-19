@@ -2,19 +2,20 @@
 
 namespace App\Tik\Services;
 
+use App\Models\User;
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\Agency;
-use App\Models\User;
 use App\Services\WalletService;
+use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
-use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\ChargeRepository;
 use App\Tik\Repositories\CoinLogRepository;
 use App\Tik\Repositories\RoomSalaryRepository;
-use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
-use Illuminate\Support\Facades\DB;
+use App\Tik\Repositories\AgencySalaryRepository;
+use App\Http\Resources\Api\V1\GeneralUserResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -340,19 +341,15 @@ class ChargeRepoService
             if ($request->type === 'agency') {
                 $user = $this->agencyRepository->find($request->id);
             } else {
-                $user = $this->userRepository->filterUser($request->id);
+                $users = $this->userRepository->filterUser($request->id);
+                return GeneralUserResource::collection($users);
             }
             $data = [
                 'id' => $user?->id,
                 'name' => $user?->name ?? '',
 
             ];
-            if ($request->type != 'agency') {
-                $data = array_merge($data, [
-                    'image' => $user?->profile->avatar ?? '',
-                    'level' => Common::level_center(@$user),
-                ]);
-            }
+            
             return $data;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
