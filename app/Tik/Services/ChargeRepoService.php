@@ -28,10 +28,7 @@ class ChargeRepoService
         private readonly AgencyRepository       $agencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly CoinLogRepository $coinLogRepository
-    )
-    {
-
-    }
+    ) {}
 
     public function create(array $data)
     {
@@ -149,8 +146,8 @@ class ChargeRepoService
 
         $this->userRepository->decrementUserCoins($sender, $count);
         // $percentage = Common::getConf("one_usd_value_in_coins") ?? 1;4
-        $percentage = Common::getCoinsValue("user_coins") ;
-        
+        $percentage = Common::getCoinsValue("user_coins");
+
         $usd = $count / $percentage;
         $this->charge($sender, $userReceiver, 'freight forwarder', $count, $usd);
         return $userReceiver;
@@ -161,10 +158,10 @@ class ChargeRepoService
     {
         $charge = $this->chargeRepository->getChargeHistory($chargeType);
         if ($type == 'received') {
-            $charge = $charge/*->where('user_type', $charger_type)*/ ->where('user_id', $userId);
+            $charge = $charge/*->where('user_type', $charger_type)*/->where('user_id', $userId);
         }
         if ($type == 'sent') {
-            $charge = $charge/*->where('charger_type', $charger_type)*/ ->where('charger_id', $userId);
+            $charge = $charge/*->where('charger_type', $charger_type)*/->where('charger_id', $userId);
         }
 
         if ($searchKey != null) {
@@ -184,13 +181,13 @@ class ChargeRepoService
             $receiver = $this->userRepository->searchUserById($receiverUuid);
             if (!$receiver) throw new \Exception('this user not found');
             if ($receiver->transfer_salary == 1) throw new \Exception('api.freez_charge');
-            
+
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (!isset($agency))
                 throw new \Exception('agency not founded');
 
             if ($agency->is_frozen == 1) throw new \Exception(__('api_responses.frozen_agency'));
-            
+
             if ($agency->status == 0 || $agency->app_owner_id != $sender->id)
                 throw new \Exception(__('api_responses.canNotCharge'),);
 
@@ -253,7 +250,7 @@ class ChargeRepoService
     }
     public function charge(User $sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-        
+
         WalletService::storeTransaction(
             $sender->id,
             'cut',
@@ -261,7 +258,7 @@ class ChargeRepoService
             'user_transaction',
             'transfer_to_user',
             ['receiver_id' => $receiver->id]
-         );
+        );
 
         $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
@@ -283,7 +280,7 @@ class ChargeRepoService
         return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
     }
 
-  
+
 
     public function chargeAgencyNew(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
@@ -298,7 +295,7 @@ class ChargeRepoService
             'user_transaction',
             'transfer_to_agency',
             ['agency_id' => $receiver->id]
-         );
+        );
 
         $data = [
             'charger_id' => $sender->id,
@@ -314,7 +311,7 @@ class ChargeRepoService
         $this->create($data);
     }
 
-   
+
 
 
     public function chargeAgency(User $sender, Agency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
@@ -343,17 +340,24 @@ class ChargeRepoService
             if ($request->type === 'agency') {
                 $user = $this->agencyRepository->find($request->id);
             } else {
-                $user = $this->userRepository->searchUser($request->id);
+                $user = $this->userRepository->filterUser($request->id);
             }
             $data = [
                 'id' => $user?->id,
-                'name' => $user?->name,
+                'name' => $user?->name ?? '',
+
             ];
+            if ($request->type != 'agency') {
+                $data = array_merge($data, [
+                    'image' => $user?->profile->avatar ?? '',
+                    'level' => Common::level_center(@$user),
+                ]);
+            }
             return $data;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-    } 
+    }
 
 
 
@@ -393,7 +397,7 @@ class ChargeRepoService
             throw new \Exception($e->getMessage());
         }
     }
-    
+
 
     private function handleAgencyCharge($authAgency, $request)
     {
@@ -405,12 +409,12 @@ class ChargeRepoService
         if (!$chargeAgency) throw new \Exception(__('api.notAgencyFound'));
         if (!$chargeAgency->status) throw new \Exception(__('api.notActive'));
         if ($chargeAgency->is_frozen) throw new \Exception(__('api_responses.frozen'));
-        
+
         $this->processAgencyCharge($authAgency, $chargeAgency, $request->amount);
     }
-    
-    
-        private function handleUserCharge($authAgency, $auth, $request)
+
+
+    private function handleUserCharge($authAgency, $auth, $request)
     {
         $receiver = $this->userRepository->searchUserById($request->id);
 
@@ -436,8 +440,8 @@ class ChargeRepoService
             chargeType: 'agency'
         );
     }
-    
-      private function processUserCharge($authAgency, $receiver, $amount)
+
+    private function processUserCharge($authAgency, $receiver, $amount)
     {
         $authAgency->decrement('coins', $amount);
         $receiver->increment('di', $amount);
@@ -457,7 +461,7 @@ class ChargeRepoService
 
         UserCommon::UserEarnedInvitation($receiver->id, $amount);
     }
-    
+
 
     public function agencyCharge($chargerId, $userId, $amount, $type, $usd = null, $chargeType, $transferred = false)
     {
@@ -473,6 +477,4 @@ class ChargeRepoService
         ];
         $this->create($data);
     }
-    
-    
 }
