@@ -568,11 +568,18 @@ class TargetController extends MainController
 //            $pdf = PDF::loadView('target_pdf', compact('targets'));
 //            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
 
-            return PDF::loadView('target_pdf', [
+//            return PDF::loadView('target_pdf', [
+//                'targets' => $targets,
+//                'selectedColumns' => $selectedColumns,
+//            ])->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+
+            $pdf = PDF::loadView('target_pdf', [
                 'targets' => $targets,
                 'selectedColumns' => $selectedColumns,
-            ])->download('target_data_' . now()->format('Y_m_d') . '.pdf');
-
+            ]);
+            info($targets->toArray());
+            $log = $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
+            info('downloaded');
         } catch (\Exception $e) {
 
             return redirect()->back()->with('error', 'Failed to generate PDF: ' . $e->getMessage());

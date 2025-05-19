@@ -16,8 +16,6 @@
     }
 
     $selectedColumns = $selectedColumns ?? [];
-            info($selectedColumns);
-
 @endphp
 
 <!DOCTYPE html>
