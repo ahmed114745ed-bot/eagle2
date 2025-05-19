@@ -65,6 +65,7 @@
     .skin-black-light .sidebar-menu > li.header {
         color: var(--text-secondary-color) !important;
         background: var(--second-alpha) !important;
+        margin-top: 3px;
     }
 
     * {
