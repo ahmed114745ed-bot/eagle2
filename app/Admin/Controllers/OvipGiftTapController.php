@@ -244,7 +244,7 @@ class OvipGiftTapController extends MainController
                 'png' => __('png'),
 
             ]
-        )->attribute(['id' => 'profile_frame']);
+        )->attribute(['id' => 'profile_frame'])->required();
         $form->text('key', trans('key'));
 
         $script = <<<SCRIPT
