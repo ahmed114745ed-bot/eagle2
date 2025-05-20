@@ -612,3 +612,26 @@ if (!function_exists('showSvgaImage')) {
         }
     }
 }
+
+
+
+if (!function_exists('getTimezone')) {
+    function getTimezone()
+    {
+        $cacheKey = 'timezone';
+        return \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+
+    }
+}
+
+
+if (!function_exists('getToday')) {
+    function getToday() : array
+    {
+        $timezone = getTimezone();
+        return [Carbon::now($timezone)->startOfDay()->timezone('UTC'), Carbon::now($timezone)->endOfDay()->timezone('UTC')];
+    }
+}

@@ -31,8 +31,23 @@ class FixedTargetService
     private TargetInterface $targetInstance;
     private TargetType $userTargetType;
 
-    public function __construct(private User $user)
+    private \DateTime $startDate;
+
+    private \DateTime $endDate;
+
+    public function __construct(private User $user, private int $month = 0, private int $year = 0)
     {
+            $timezone = getTimezone();
+        if ($this->month == 0 || $this->year == 0) {
+            $tz = new \DateTimeZone($timezone);
+            $dt = new \DateTime('now', $tz);
+            $this->month = $dt->format('m');
+            $this->year = $dt->format('Y');
+        }
+
+        $this->startDate = Carbon::now($timezone)->startOfMonth()->timezone('UTC');
+        $this->endDate = Carbon::now($timezone)->endOfMonth()->timezone('UTC');
+
         $targetType           = $this->getUserTargetType($user->id);
         $this->userTargetType = $targetType;
         $this->targetInstance = new RegularTarget();
@@ -40,8 +55,8 @@ class FixedTargetService
 
     private function getUserTargetType(int $userId): TargetType
     {
-        $isSpecial = SpecialUser::query()->where('user_id', $userId)->where('status', true)->exists();
-        return $isSpecial ? TargetType::FIXED : TargetType::REGULAR;
+
+        return TargetType::REGULAR;
     }
 
     public function calculateTarget()
@@ -128,7 +143,7 @@ class FixedTargetService
      */
     public function getUserLiveTime(User $user): null|Model
     {
-        return LiveTime::query()->where('uid', $user->id)->whereYear('created_at', '=', Carbon::now()->year)->whereMonth('created_at', '=', Carbon::now()->month)->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
+        return LiveTime::query()->where('uid', $user->id)->whereBetween('created_at', [$this->startDate, $this->endDate])->selectRaw('uid, sum(hours) as hnum, count(days) as dnum')->groupBy('uid')->first();
     }
 
     private function updateSalaries(User &$user, $t, $ap, $hours, $target, $days, $month_received, TargetType $targetType, array $extra = null, $appProfit, $db, $percentageAchieved = 0): void
@@ -150,8 +165,8 @@ class FixedTargetService
         try {
             $values = [
                 'user_id'             => $user->id,
-                'add_month' => Carbon::now()->month,
-                'add_year'            => Carbon::now()->year,
+                'add_month'           => $this->month,
+                'add_year'            => $this->year,
                 'agency_id'           => $user->agency_id,
                 'target_id' => @$target->id,
                 'target_diamonds'     => @$target->diamonds ?? 0,
@@ -173,8 +188,8 @@ class FixedTargetService
             }
             UserTarget::query()->updateOrCreate([
                 'user_id' => $user->id,
-                'add_month' => Carbon::now()->month,
-                'add_year' => Carbon::now()->year,
+                'add_month' => $this->month,
+                'add_year' => $this->year,
                 'type'    => $targetType,
             ], $values)->lock('user-' . $user->id);
         } catch (\Exception $e) {
@@ -194,8 +209,8 @@ class FixedTargetService
 
         $userSalary = UserSallary::query()->where([
             'user_id' => $user->id,
-            'month' => Carbon::now()->month,
-            'year' => Carbon::now()->year,
+            'month' => $this->month,
+            'year' => $this->year,
             'user_agency_id' => $user->agency_id,
         ])->lock()->first();
         if ($userSalary) {
@@ -204,8 +219,8 @@ class FixedTargetService
         } else {
             $userSalary = UserSallary::query()->create([
                 'user_id' => $user->id,
-                'month' => Carbon::now()->month,
-                'year' => Carbon::now()->year,
+                'month' => $this->month,
+                'year' => $this->year,
                 'user_agency_id' => $user->agency_id,
                 'remaining_diamond'   => ($month_received - (@$target->diamonds ?? 0)),
                 'target_id' =>  @$target->id,
@@ -243,7 +258,7 @@ class FixedTargetService
                 $targetReel  = explode(',', $target->reel);
                 $targetMoment = explode(',', $target->moment);
 
-                $extra = UserCommon::UserStatistic($user->id, 1);
+                $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $this->startDate, endDate: $this->endDate);
 
 
                 $t                = $this->targetInstance->calculateUsdFromTarget($target, $hours ?? 0, $days, $extra);
