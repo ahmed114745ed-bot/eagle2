@@ -89,13 +89,13 @@ class SpecialWareController extends  MainController
         // });
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.png'); // Ensure this path is correct
-            return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
+            return '<img src="' . $icon . '" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . number_format($coin);
         });
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-        $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+            $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         }
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
@@ -200,6 +200,7 @@ class SpecialWareController extends  MainController
         }
 
         $form->number('level', trans('level'));
+        $form->text('key', trans('key'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png')->rules('required');

@@ -2,19 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Facades\UserHandling;
 use App\Helpers\Common;
-use App\Http\Resources\CountryResource;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Models\Country;
-use App\Models\Family;
-use App\Models\FamilyUser;
-use App\Models\Pack;
-use App\Models\Room;
-use App\Models\Ware;
-use Carbon\Carbon;
-use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class GeneralUserResource extends JsonResource
@@ -29,11 +17,10 @@ class GeneralUserResource extends JsonResource
     {
 
         $data = [
-            'id'   => @$this->id,
-            'uuid' => @$this->uuid,
-            'name' => @$this->name ?: '',
-            'image' => @$this->profile->avatar ?? '',
-            'level' => Common::level_center(@$this),
+            'id'   => $this->ware->id ?? 0,
+            'image' => $this->ware->img2 ?? '',
+            'image_type' => $this->ware->image_type ?? 'svga',
+            'key' => $this->ware->key ?? '',
 
 
         ];

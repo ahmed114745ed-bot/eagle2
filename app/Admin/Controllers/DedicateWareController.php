@@ -204,6 +204,7 @@ class DedicateWareController extends MainController
         }
         //        $form->number('score', trans('score'));
         $form->number('level', trans('level'));
+        $form->text('key', trans('key'));
         $form->image('show_img', trans('img'))->default('1.png')->rules('required');
 
         //        $form->image('img1', trans('img'));
