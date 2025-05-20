@@ -236,7 +236,7 @@ class OvipGiftTapController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->attribute(['id' => 'image_type1']);
+        )->attribute(['id' => 'image_type1'])->required();
 
         $form->select('profile_frame_type', __('image_type'))->options(
             [
