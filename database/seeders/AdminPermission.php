@@ -169,36 +169,37 @@ class AdminPermission extends Seeder
             'edit',
         ];
 
-       
+
         // Step 1: Category definitions with sort number
         $categories = [
-            ['name' => 'Fast orders', 'sort' => 1, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
-            ['name' => 'Wallet', 'sort' => 2, 'permissions' => ['core-wallets']],
-            ['name' => 'charge system', 'sort' => 3, 'permissions' => ['charge', 'charger-report']],
-            ['name' => 'users', 'sort' => 4, 'permissions' => ['free-users', 'ticket', 'trashed-account-user']],
-            ['name' => 'Advertisements', 'sort' => 6, 'permissions' => ['carousel', 'banners', 'official-messages', 'offers']],
-            ['name' => 'Store', 'sort' => 7, 'permissions' => ['wares']],
-            ['name' => 'Distinguished identifier', 'sort' => 8, 'permissions' => ['special-Ware', 'special-history', 'image-color']],
-            ['name' => 'Vip', 'sort' => 9, 'permissions' => ['ovip', 'vip-privilege', 'ovip-settings']],
-            ['name' => 'families', 'sort' => 10, 'permissions' => ['family', 'family-level']],
-            ['name' => 'Agency System', 'sort' => 11, 'permissions' => ['agency-settings']],
-            ['name' => 'Internal Sales System', 'sort' => 12, 'permissions' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem']],
-            ['name' => 'Host Agencies', 'sort' => 13, 'permissions' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report']],
-            ['name' => 'Agency Settings', 'sort' => 14, 'permissions' => ['agency-join-requests', 'request-agencies', 'target']],
-            ['name' => 'Charging Agencies', 'sort' => 15, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way']],
-            ['name' => 'Agency Manager', 'sort' => 16, 'permissions' => ['managers']],
-            ['name' => 'Room', 'sort' => 17, 'permissions' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
-            ['name' => 'Achievements', 'sort' => 18, 'permissions' => ['achievement', 'user_achievement_level']],
-            ['name' => 'Group chat', 'sort' => 19, 'permissions' => ['group-chat', 'updates_group_chat']],
-            ['name' => 'Lucky box', 'sort' => 20, 'permissions' => ['boxes', 'box-use', 'box-settings']],
-            ['name' => 'Events', 'sort' => 21, 'permissions' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report']],
-            ['name' => 'Reels', 'sort' => 22, 'permissions' => ['Real', 'report-real']],
-            ['name' => 'Moment', 'sort' => 23, 'permissions' => ['moment', 'report-moment']],
-            ['name' => 'Work Settings', 'sort' => 24, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
-            ['name' => 'Sensitive Settings', 'sort' => 25, 'permissions' => ['updates', 'config']],
-            ['name' => 'System Settings', 'sort' => 26, 'permissions' => ['settings', 'language', 'daily-prize']],
-            ['name' => 'Level', 'sort' => 27, 'permissions' => ['level', 'level-interval']],
-             ['name' => 'user parent', 'sort' => 28, 'permissions' => ['user-parent']],
+            ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['all-statistic']],
+            ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
+            ['name' => 'Wallet', 'sort' => 3, 'permissions' => ['core-wallets']],
+            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charger-report']],
+            ['name' => 'users', 'sort' => 5, 'permissions' => ['free-users', 'ticket', 'trashed-account-user']],
+            ['name' => 'Advertisements', 'sort' => 7, 'permissions' => ['carousel', 'banners', 'official-messages', 'offers']],
+            ['name' => 'Store', 'sort' => 8, 'permissions' => ['wares']],
+            ['name' => 'Distinguished identifier', 'sort' => 9, 'permissions' => ['special-Ware', 'special-history', 'image-color']],
+            ['name' => 'Vip', 'sort' => 10, 'permissions' => ['ovip', 'vip-privilege', 'ovip-settings']],
+            ['name' => 'families', 'sort' => 11, 'permissions' => ['family', 'family-level']],
+            ['name' => 'Agency System', 'sort' => 12, 'permissions' => ['agency-settings']],
+            ['name' => 'Internal Sales System', 'sort' => 13, 'permissions' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem']],
+            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report']],
+            ['name' => 'Agency Settings', 'sort' => 15, 'permissions' => ['agency-join-requests', 'request-agencies', 'target']],
+            ['name' => 'Charging Agencies', 'sort' => 16, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way']],
+            ['name' => 'Agency Manager', 'sort' => 17, 'permissions' => ['managers']],
+            ['name' => 'Room', 'sort' => 18, 'permissions' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
+            ['name' => 'Achievements', 'sort' => 19, 'permissions' => ['achievement', 'user_achievement_level']],
+            ['name' => 'Group chat', 'sort' => 20, 'permissions' => ['group-chat', 'updates_group_chat']],
+            ['name' => 'Lucky box', 'sort' => 21, 'permissions' => ['boxes', 'box-use', 'box-settings']],
+            ['name' => 'Events', 'sort' => 22, 'permissions' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report']],
+            ['name' => 'Reels', 'sort' => 23, 'permissions' => ['Real', 'report-real']],
+            ['name' => 'Moment', 'sort' => 24, 'permissions' => ['moment', 'report-moment']],
+            ['name' => 'Work Settings', 'sort' => 25, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
+            ['name' => 'Sensitive Settings', 'sort' => 26, 'permissions' => ['updates', 'config']],
+            ['name' => 'System Settings', 'sort' => 27, 'permissions' => ['settings', 'language', 'daily-prize']],
+            ['name' => 'Level', 'sort' => 29, 'permissions' => ['level', 'level-interval']],
+            ['name' => 'user parent', 'sort' => 29, 'permissions' => ['user-parent']],
         ];
 
         // Step 2: Save categories to rolecategories table
@@ -259,7 +260,7 @@ class AdminPermission extends Seeder
 
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
         $actions = ['create', 'edit', 'delete', 'show', 'charge'];
-        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate'];
+        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate','all-statistic'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
