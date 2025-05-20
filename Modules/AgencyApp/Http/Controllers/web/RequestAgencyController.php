@@ -22,17 +22,19 @@ class RequestAgencyController extends MainController
 
     public function __construct()
     {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-
         (new AppFeatureService)->validateStatusEnable("agencies");
     }
 
 
     public function index(Content $content)
     {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            admin_error(__('Agency Feature is Disabled, Contact the administration'));
+
+            return redirect()->back();
+        }
+
         return parent::index($content
             ->title(trans('Request agencies'))
             ->body($this->grid()));

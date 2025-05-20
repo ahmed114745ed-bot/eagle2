@@ -20,16 +20,10 @@ class SallariesController extends MainController
 {
     public $permission_name = 'sailer';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return parent::index($content
             ->title(trans('Agencies Wallet'))
             ->description(__(request('desc') ?: 'users'))
