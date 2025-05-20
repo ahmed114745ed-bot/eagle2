@@ -16,6 +16,7 @@ use App\Tik\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
+use App\Http\Resources\Api\V1\GeneralAgencyResource;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
 
@@ -338,18 +339,15 @@ class ChargeRepoService
     public function userAgencySearch($request)
     {
         try {
-            if ($request->type === 'agency') {
-                $user = $this->agencyRepository->find($request->id);
-            } else {
-                $users = $this->userRepository->filterUser($request->id);
-                return GeneralUserResource::collection($users);
-            }
+
+            $agencies = $this->agencyRepository->filterAgency($request->id);
+            $users = $this->userRepository->filterUser($request->id);
             $data = [
-                'id' => $user?->id,
-                'name' => $user?->name ?? '',
+                'agency' => GeneralAgencyResource::collection($agencies),
+                'user' => GeneralUserResource::collection($users),
 
             ];
-            
+
             return $data;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
