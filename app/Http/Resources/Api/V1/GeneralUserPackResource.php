@@ -29,14 +29,13 @@ class GeneralUserPackResource extends JsonResource
     {
 
         $data = [
-            'id'   => @$this->id,
-            'uuid' => @$this->uuid,
-            'name' => @$this->name ?: '',
-            'image' => @$this->profile->avatar ?? '',
-            'level' => Common::level_center(@$this),
-
+            'id'   => $this->ware->id ?? 0,
+            'image' => $this->ware->img2 ?? '',
+            'image_type' => $this->ware->image_type ?? 'svga',
+            'key' => $this->ware->key ?? '',
 
         ];
+
         return $data;
     }
 }

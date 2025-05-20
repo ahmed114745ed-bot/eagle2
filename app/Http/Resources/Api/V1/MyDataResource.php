@@ -214,7 +214,7 @@ class MyDataResource extends JsonResource
             'new_gift'          => (bool)$this->new_gift,
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
             'wallet' => $this->wallet?->value ?? 0,
-            'wabble'=> $this->getUserPack(12),
+            'wabble' => $this->getUserPack(12),
 
         ];
 
@@ -252,6 +252,6 @@ class MyDataResource extends JsonResource
     public function getUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->first();
-        return $pack ?  new GeneralUserResource($pack) : [];
+        return $pack ?  new GeneralUserPackResource($pack) : [];
     }
 }
