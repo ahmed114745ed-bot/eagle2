@@ -113,14 +113,14 @@ class AgencyService
         return $agency;
     }
 
-    public function agencyTarget($agencyId, $user, $request)
+    public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
+        $target = $this->userSalaryRepository->newUserSalary($userId, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
-        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year, 10, $request->page);
+        $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
 
         $hours =   LiveTime::query()
             ->selectRaw('sum(hours) as hours, max(created_at) as date')
