@@ -251,7 +251,7 @@ class MyDataResource extends JsonResource
 
     public function getUserPack($type)
     {
-        $pack = $this->packs->where('type', $type);
-        return $pack ? GeneralUserResource::collection($pack) : [];
+        $pack = $this->packs->where('type', $type)->first();
+        return $pack ?  new GeneralUserResource($pack) : [];
     }
 }
