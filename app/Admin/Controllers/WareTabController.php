@@ -275,7 +275,7 @@ class WareTabController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->attribute(['id' => 'image_type1']);
+        )->attribute(['id' => 'image_type1'])->required();
 
         $form->select('profile_frame_type', __('image_type'))->options(
             [
@@ -283,7 +283,7 @@ class WareTabController extends MainController
                 'png' => __('png'),
 
             ]
-        )->attribute(['id' => 'profile_frame']);
+        )->attribute(['id' => 'profile_frame'])->required();
 
         $script = <<<SCRIPT
              $(document).ready(function() {
@@ -295,7 +295,7 @@ class WareTabController extends MainController
                      } else {
                          $('#profile_frame').closest('.form-group').hide();
                          $('#image_type1').closest('.form-group').show();
-                         
+
                      }
                  }
                  toggleWinProbability();
