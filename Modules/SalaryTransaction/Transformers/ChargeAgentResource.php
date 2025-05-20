@@ -21,29 +21,20 @@ class ChargeAgentResource extends JsonResource
     {
         //        if (!$this instanceof Agency) return [];
         $user = $this->owner;
-        $userDetails =  User::where('id', $user->id)
-            ->whereHas('charges', function ($q) use ($user) {
-                $q->whereRaw('charger_id != user_id')
-                    ->where(function ($q) use ($user) {
-                        $q->where('charger_id', $this->id)
-                            ->orWhere('user_id', $user->id);
-                    });
-            })->withCount('charges')
-            ->first();
 
-        $frame = Common::getUserDress($user->id, $user->dress_1, 4, 'img2', true) ?: Common::getUserDress($user->id, $user->dress_1, 4, 'img1', true);
+        $frame = Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$user?->id, @$user?->dress_1, 4, 'img1', true);
         return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'phone' => $user->phone,
+            'id' => $user->id ?? 0,
+            'name' => $user->name ?? '',
+            'phone' => $user->phone ?? '',
             'image' => @$user->profile->avatar ?: '',
-            'uuid' => $user->uuid,
+            'uuid' => $user->uuid ?? '',
             'payment_getaway' => $this->AgencypaymentGateways ?? [],
             'countries' => $this->Countries ?? [],
-            'frame' => $frame,
+            'frame' => $frame ?? '',
             'frame_id' => $frame != '' ? @$user->dress_1 : 0, // both
-            'level' => $user->total_sender_level, // both
-            'vip' => @$user->UserVip->level, // both
+            'level' => $user->total_sender_level ?? 0, // both
+            'vip' => @$user->UserVip->level ?? 0, // both
             'charge_count' => $this->salary_requests_count ?? 0,
             // 'charge_count' => $userDetails->charges_count ?? 0,
         ];
