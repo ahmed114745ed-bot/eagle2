@@ -584,9 +584,8 @@ if (!function_exists('showSvgaImage')) {
         {
             $app_feature = \Cache::get('host_agency');
             if (!($app_feature == '1' || $app_feature == 1)) {
-                admin_error(__('Agency Feature is Disabled, Contact the administration'));
-
-                return redirect()->back()->send();
+                abort(403, __('This feature has not been activated for you'));
+//                return redirect()->back()->send();
             }
         }
     }

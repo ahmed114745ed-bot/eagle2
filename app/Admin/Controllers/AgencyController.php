@@ -43,10 +43,10 @@ class AgencyController extends MainController
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
 
-    public function __construct()
-    {
-        (new AppFeatureService)->validateStatusEnable("agencies");
-    }
+//    public function __construct()
+//    {
+//        (new AppFeatureService)->validateStatusEnable("agencies");
+//    }
 
     public function index(Content $content)
     {
