@@ -8,6 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Models\Role;
+use Illuminate\Support\Str;
 
 class RoleControllerNew extends MainController
 {
@@ -175,9 +176,9 @@ class RoleControllerNew extends MainController
 
         $form = new Form(new $roleModel());
 
-        $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
+        // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
-        $form->text('name', trans('admin.name'))->rules('required|unique:admin_roles,name,{{id}}');
+        $form->text('name', trans('role name'))->rules('required|unique:admin_roles,name,{{id}}');
 
         // Hide default listbox and use custom tabbed permission UI
         // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
@@ -185,19 +186,26 @@ class RoleControllerNew extends MainController
         // Custom tabbed view
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
-            'selectedPermissions' =>$id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray(): [],
+            'selectedPermissions' => $id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray() : [],
         ])->render());
 
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
         $form->image('image', __('Image'))->help('Image will appear beside user in app');
 
-        // Save permissions
+        $form->saving(function (Form $form) {
+            $form->ignore('permissions');
+
+            // Automatically generate slug from name *before saving*
+            $form->model()->slug = Str::slug($form->name);
+        });
         $form->saving(function (Form $form) {
             $form->ignore('permissions'); // handled manually
         });
 
         $form->saved(function (Form $form) {
+
+            $form->slug = Str::slug(request('name'));
             $all = request('permissions_all'); // comma-separated string
 
             $permissions = array_filter(explode(',', $all));
