@@ -2297,7 +2297,9 @@
   "current_balance": "Mevcut Bakiye",
   "select_target": "Hedefi Seç",
   "bd_wallet_notice": "BD cüzdanından dolar aktardığınızda, tutar cüzdanınıza eklenecektir. Daha sonra bu tutarı satabilir veya başkalarına gönderebilirsiniz."
-
+,
+  "back": "Geri",
+  "Charge History": "Şarj Geçmişi"
 
 
 

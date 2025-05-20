@@ -43,12 +43,12 @@ class BdSalariesController extends MainController
         $netSalary = BDSallary::where('bd_id', $appID)
         ->selectRaw('SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut')
         ->first();
- $totalCut =$netSalary->total_cut;
- $total_sallary =$netSalary->total_sallary;
-    $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
-    return $content
-        ->header(trans('admin.index'))
-        ->description(trans('admin.description'))
+        $totalCut =$netSalary->total_cut;
+        $total_sallary =$netSalary->total_sallary;
+        $finalSalary = ($netSalary->total_sallary ?? 0) - ($netSalary->total_cut ?? 0);
+            return $content
+                ->header(trans('admin.index'))
+                ->description(trans('admin.description'))
 
         ->row(function ($row) use ($finalSalary) {
             // الكارت سيتم تضمينه من Blade View
@@ -57,7 +57,7 @@ class BdSalariesController extends MainController
         })
         ->row(function (Row $row) use ($total_sallary, $totalCut ) {
             $row->column(6, new InfoBox(__('total_sallary'), 'money', 'green', '', $total_sallary  . ' 💰' ));
-            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', '', number_format($totalCut)));
+            $row->column(6, new InfoBox(__('totalCut'), 'money', 'red', 'charges', number_format($totalCut)));
         })
 
         ->row(function ($row) {
@@ -107,10 +107,10 @@ class BdSalariesController extends MainController
                 return handleShowImageWithTypes($agency->id, $url, 40, 40);
             });
     
-            $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+            // $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
     
             return "
-                <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
+                <a href='#' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         {$image}
                         <div style='display: flex; flex-direction: column;'>
@@ -129,6 +129,11 @@ class BdSalariesController extends MainController
             return Carbon::parse($value)->translatedFormat('d F Y - h:i A');
         });     
     
+        // $grid->tools(function (Grid\Tools $tools) {
+        //     $url = 'charges';
+        //     $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("Charge History") . '</a>';
+        //     $tools->append($button);
+        // });
         return $grid;
     }
     

@@ -251,7 +251,15 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    public function agencies(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->userService->searchInAgency($key, $page);
 
+        return response()->json($users);
+    }
+    
     public function userAgencyShipping(Request $request)
     {
         $key = $request->q;

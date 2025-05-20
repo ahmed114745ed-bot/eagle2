@@ -2,6 +2,7 @@
 
 namespace App\Repositories\User;
 
+use App\Models\Agency;
 use App\Models\Follow;
 use App\Models\ProfileGallary;
 use App\Models\User;
@@ -61,6 +62,18 @@ class UserRepository extends Repository
             })
             ->paginate($perPage, ['*'], 'page', $page);
     }
+
+    public function searchInAgency($key, $page, $perPage)
+    {
+        return Agency::selectRaw('concat(name, " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    
 
     public function searchUserAgencyShipping($key, $page, $perPage)
     {
