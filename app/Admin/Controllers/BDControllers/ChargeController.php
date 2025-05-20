@@ -59,10 +59,10 @@ class ChargeController extends AdminController
                     return handleShowImageWithTypes($agency->id, $url, 40, 40);
                 });
     
-                // $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+                $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
     
                 return "
-                    <a href='#' style='text-decoration: none; color: inherit;'>
+                    <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div style='display: flex; flex-direction: column;'>
@@ -82,10 +82,10 @@ class ChargeController extends AdminController
                 if (!isImageExists($url)) $url = $defaultImage;
     
                 $image = handleShowImageWithTypes($user->id ?? 0, $url, 40, 40);
-                // $showUrl = url("admin/users/{$user->id}");
+                $showUrl = url("admin/users/{$user->id}");
     
                 return "
-                    <a href='#' style='text-decoration: none; color: inherit;'>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                         <div style='display: flex; align-items: center; gap: 10px;'>
                             {$image}
                             <div>

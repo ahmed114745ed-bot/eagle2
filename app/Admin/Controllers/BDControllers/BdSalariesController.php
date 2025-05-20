@@ -132,10 +132,10 @@ class BdSalariesController extends MainController
                 return handleShowImageWithTypes($agency->id, $url, 40, 40);
             });
     
-            // $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
+            $profileUrl = route('admin.agency.profile', ['id' => $agency->id]);
     
             return "
-                <a href='#' style='text-decoration: none; color: inherit;'>
+                <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         {$image}
                         <div style='display: flex; flex-direction: column;'>
