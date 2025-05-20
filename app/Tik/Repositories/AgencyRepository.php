@@ -32,7 +32,7 @@ class AgencyRepository extends AbstractRepository
 
     public function filterAgency($id)
     {
-        return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', ['%' . $id . '%'])->with('owner','AgencypaymentGateways')->get();
+        return $this->model->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])->with('owner','AgencypaymentGateways')->get();
     }
     public function findById($id)
     {
