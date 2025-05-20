@@ -2,7 +2,9 @@
 
  @php
  use Illuminate\Support\Str;
+ use App\Models\RoleCategory;
  $grouped = $permissions->groupBy('category');
+ $categories = RoleCategory::orderBy('sort')->select('slug')->get();
  $selected = $selectedPermissions ?? [];
 @endphp
 
@@ -11,15 +13,15 @@
 
 <!-- Category Tabs -->
 <ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">
- @foreach($grouped as $category => $perms)
-     <li class="nav-item">
-         <a class="nav-link {{ $loop->first ? 'active' : '' }}"
-            data-category="{{ $category }}"
-            href="#">
-             {{__($category)  }}
-         </a>
-     </li>
- @endforeach
+    @foreach($categories as $category)
+        <li class="nav-item">
+            <a class="nav-link {{ $loop->first ? 'active' : '' }}"
+               data-category="{{ $category->slug }}"
+               href="#">
+                {{ __($category->slug) }}
+            </a>
+        </li>
+    @endforeach
 </ul>
 
 <!-- Permission Display Container -->
