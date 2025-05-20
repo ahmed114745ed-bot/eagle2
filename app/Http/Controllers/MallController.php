@@ -18,6 +18,6 @@ class MallController extends Controller
     public function buyVip(Request $request){
         if (!$request->vip_id ) return Common::apiResponse (0,__('api_responses.missing_params'),null,422);
 
-       return $this->vipService->buyVipWithActive($request);
+       return $this->vipService->buyVips($request);
     }
 }

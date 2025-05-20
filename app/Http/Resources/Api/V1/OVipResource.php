@@ -13,7 +13,7 @@ class OVipResource extends JsonResource
         $userVip = UserVip::where("user_id", auth()->user()->id)
             ->where("vip_id", $this->id)
             ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            ->first();
+            ->get();
 
         $activePrivilegeIds = $this->privilegs->pluck('id')->toArray();
 
@@ -26,10 +26,7 @@ class OVipResource extends JsonResource
             "price" => $this->price,
             "expire" => $this->expire,
             "exp" => $this->exp,
-            "target_id" => $userVip?->id,
-            "is_buyed" => $userVip != null ? true : false,
-            "is_used" => ($userVip != null && $userVip->is_used == 1 ? true : false),
-            "using" => ($userVip != null && $userVip->using == 1 ? true : false),
+            'user_vip' => UserVipResource::collection($userVip),
             'privilegs' => VipPrivilegeResource::collection(
                 $request->vipPrivileges->map(function ($p) use ($activePrivilegeIds) {
                     $priv = clone  $p;

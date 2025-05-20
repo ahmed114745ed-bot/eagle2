@@ -57,6 +57,11 @@ class VipService
         return $data;
     }
 
+
+
+
+
+
     public function buyVip($request)
     {
         $vip = $this->ovipRepository->findById($request->vip_id);
@@ -147,7 +152,8 @@ class VipService
             'sender_id' => $from->id,
             'user_id' => $user->id,
         ];
-        $this->userVipRepository->update($data, $user_vip->id);
+        $user_vip->update($data);
+
         return $user_vip;
     }
 
@@ -219,9 +225,9 @@ class VipService
         $expire == 0 ? $ex = 0 : $ex = now()->addDays($expire * $qty)->timestamp;
         try {
             if ($request->type == 1) {
-                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeOne($request, $total);
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUserSend($request, $total);
             } else {
-                [$user_id, $from, $type, $sender_id, $user] = $this->userTypeZero($request, $total);
+                [$user_id, $from, $type, $sender_id, $user] = $this->authUser($request, $total);
             }
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage());

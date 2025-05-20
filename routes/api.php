@@ -162,7 +162,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('/generate-upload-link', [UploadLinkController::class, 'uploadLink']);
 
             Route::post('/google-pay-purchased', [GooglePaymentController::class, 'purchasedFour']);
-              Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
+            Route::post('/testCharge', [GooglePaymentController::class, 'addChargeLevel']);
 
             Route::get('/countries/users', [CountryController::class, 'countries']);
 
@@ -438,6 +438,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // start vips
             Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
                 Route::get('/list', [VipController::class, 'vipList']);
+                Route::get('/user/list', [VipController::class, 'vipUserList']);
                 Route::post('/buyVip', [VipController::class, 'buyVip']);
                 Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
                 Route::post('/use', [VipController::class, 'vip_use']);
