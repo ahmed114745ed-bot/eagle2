@@ -605,13 +605,11 @@ class AgencyService
         if (! $joinedAgency) {
             return [];
         }
-        $userCreated = Carbon::parse($joinedAgency->created_at);
+        
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
-        $reportStart = ($userCreated->year == $year && $userCreated->month == $month)
-            ? $userCreated->day
-            : 1;
+        $reportStart = 1;
 
         $isThisMonth = $month == now()->month && $year == now()->year;
         $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
