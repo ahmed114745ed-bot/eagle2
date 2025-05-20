@@ -139,7 +139,7 @@ class VipService
         $user_vip = $this->userVipRepository->findById($request->vip_id);
         if (!$user_vip || $user_vip->user_id != $from->id)  throw new \Exception(__("api_responses.vip_not_found"));
 
-        if ($user_vip->is_used == 1  || $user_vip->num_used >= 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
+        if ($user_vip->is_used == 1  || $user_vip->num_used >= 1 || $user_vip->using == 1) throw new \Exception('ال vip مستخدم من قبل لا يمكن اهدائه');
         $user = $this->userRepository->searchUser($request->user_id);
         if (!$user) throw new \Exception('api_responses.notFound');
         if ($user->id == $from->id)  throw new \Exception(__("api_responses.notSend"));
