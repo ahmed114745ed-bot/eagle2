@@ -2,17 +2,18 @@
 
 namespace App\Tik\Services;
 
-use App\Models\AgencyJoinRequest;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Helpers\UserCommon;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
+use App\Models\AgencyJoinRequest;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
@@ -601,11 +602,13 @@ class AgencyService
 
     public function dailyReport($user, $month, $year)
     {
-        $joinedAgency = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
+        $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
+        $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
+        $joinedAgency = $member ??  $owner;
         if (! $joinedAgency) {
             return [];
         }
-        
+
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
