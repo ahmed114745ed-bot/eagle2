@@ -34,7 +34,7 @@ class UserRepository extends AbstractRepository
 
     public function filterUser($userUuId)
     {
-        return $this->model->fitterByUuid($userUuId)->get();
+        return $this->model->select(['*', DB::raw("((LENGTH(users.uuid) - LENGTH(REPLACE(users.uuid, '{$userUuId}', ''))) / CHAR_LENGTH(users.uuid)) * 100 AS matching_percentage")])->fitterByUuid($userUuId)->get();
     }
 
     public function searchUserById($userUuId)
