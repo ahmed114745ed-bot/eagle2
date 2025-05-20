@@ -45,8 +45,8 @@ class FixedTargetService
             $this->year = $dt->format('Y');
         }
 
-        $this->startDate = Carbon::now($timezone)->startOfMonth()->timezone('UTC');
-        $this->endDate = Carbon::now($timezone)->endOfMonth()->timezone('UTC');
+        $this->startDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->startOfMonth()->timezone('UTC');
+        $this->endDate = Carbon::createFromDate(year: $this->year, month: $this->month,  tz:$timezone)->endOfMonth()->timezone('UTC');
 
         $targetType           = $this->getUserTargetType($user->id);
         $this->userTargetType = $targetType;
