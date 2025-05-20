@@ -45,7 +45,7 @@ class ChargeController extends AdminController
         $grid->column('amount', __('Amount'));
         // $grid->column('amount_type', __('Amount type'));
     
-        $grid->column('agency_id', __('المستلم'))->display(function () {
+        $grid->column('agency_id', __('receiver'))->display(function () {
             if ($this->agency) {
                 $agency = $this->agency;
     

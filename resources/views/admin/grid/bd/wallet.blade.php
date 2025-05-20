@@ -294,8 +294,8 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 
     <div id="target_fields" style="display: none;">
         <div class="form-group position-relative">
-            <label for="target_id_search">{{ __('id') }}</label>
-            <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('search_by_name_or_id') }}" oninput="searchTarget()" autocomplete="off">
+            <label for="target_id_search">{{ __('receiver') }}</label>
+            <input type="text" id="target_id_search" class="form-control" placeholder="{{ __('Search') }}" oninput="searchTarget()" autocomplete="off">
             <input type="hidden" name="target_id" id="target_id" required>
 
             <div id="searchResults" class="list-group" style="
