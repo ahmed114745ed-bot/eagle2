@@ -28,18 +28,6 @@ class AgencyJoinRequestController extends MainController
     use HasResourceActions;
     public $permission_name = 'agency-join-requests';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-
-        (new AppFeatureService)->validateStatusEnable("agencies");
-    }
-
-
-
     public function update($id)
     {
 
@@ -67,6 +55,8 @@ class AgencyJoinRequestController extends MainController
      */
     public function show($id, Content $content)
     {
+        checkAgencyFeature();
+
         return parent::show($id, $content
             ->title(trans('Join To Agency Requests'))
             ->body($this->detail($id)));

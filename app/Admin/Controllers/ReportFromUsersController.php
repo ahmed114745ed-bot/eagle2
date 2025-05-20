@@ -20,16 +20,10 @@ class ReportFromUsersController extends AdminController
      */
     protected $title = 'Report_user';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return $content
             ->header(trans('User_Report'))
             // ->description(trans('admin.User_Report'))

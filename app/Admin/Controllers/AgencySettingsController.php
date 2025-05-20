@@ -18,15 +18,9 @@ class AgencySettingsController extends MainController
      */
     protected $title = 'Agency settings';
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-    }
-
     public function index(Content $content){
+        checkAgencyFeature();
+
         $hours =  settings()->get('hours');
         $days =  settings()->get('days');
         $moments =  settings()->get('moments');
