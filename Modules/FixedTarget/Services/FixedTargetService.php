@@ -139,15 +139,15 @@ class FixedTargetService
         $db_usd         = Common::getTargetUsd($target->diamonds, $target->db_percentage);
 
         $next_target = Target::where('diamonds', '>', $month_received)->orderBy('diamonds')->first();
-        WalletService::storeTransaction(
-            $user->id,
-            'add',
-            $t,
-            'user_transaction',
-            'target_achieved',
-            ['target_id' => $target->id],
-            'get_target'
-        );
+        // WalletService::storeTransaction(
+        //     $user->id,
+        //     'add',
+        //     $t,
+        //     'user_transaction',
+        //     'target_achieved',
+        //     ['target_id' => $target->id],
+        //     'get_target'
+        // );
 
         try {
             $values = [

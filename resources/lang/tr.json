@@ -2299,7 +2299,22 @@
   "bd_wallet_notice": "BD cüzdanından dolar aktardığınızda, tutar cüzdanınıza eklenecektir. Daha sonra bu tutarı satabilir veya başkalarına gönderebilirsiniz."
 ,
   "back": "Geri",
-  "Charge History": "Şarj Geçmişi"
+  "Charge History": "Şarj Geçmişi",
+  "Total Agency Sallary": "Toplam Ajans Maaşı",
+  "Total Users Sallary": "Toplam Kullanıcı Maaşı",
+  "Total Diamond": "Toplam Elmas",
+  "January": "Ocak",
+  "February": "Şubat",
+  "March": "Mart",
+  "April": "Nisan",
+  "May": "Mayıs",
+  "June": "Haziran",
+  "July": "Temmuz",
+  "August": "Ağustos",
+  "September": "Eylül",
+  "October": "Ekim",
+  "November": "Kasım",
+  "December": "Aralık"
 
 
 

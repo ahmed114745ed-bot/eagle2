@@ -2404,7 +2404,23 @@
   "total_sallary":" اجمالي دخل المرتبات",
   "totalCut":" اجمالي المصروفات",
     "back": "رجوع",
-  "Charge History": "سجل الشحن"
+  "Charge History": "سجل الشحن",
+  "Total Agency Sallary": "إجمالي راتب الوكالة",
+  "Total Users Sallary": "إجمالي رواتب المستخدمين",
+  "Total Diamond": "إجمالي الألماس",
+  "totalBd":"اجمالي راتبBD",
+  "January": "يناير",
+  "February": "فبراير",
+  "March": "مارس",
+  "April": "أبريل",
+  "May": "مايو",
+  "June": "يونيو",
+  "July": "يوليو",
+  "August": "أغسطس",
+  "September": "سبتمبر",
+  "October": "أكتوبر",
+  "November": "نوفمبر",
+  "December": "ديسمبر"
 
 
 

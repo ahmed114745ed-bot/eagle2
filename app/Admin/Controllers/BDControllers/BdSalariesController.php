@@ -80,13 +80,38 @@ class BdSalariesController extends MainController
  
         $grid->model()
             ->where('bd_id', $appID)
-            ->with('agency') // تحميل العلاقة
-            ->selectRaw('agency_id, SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut, COUNT(*) as count')
-            ->groupBy('agency_id');
+            ->with('agency'); // تحميل العلاقة
+            // ->selectRaw('agency_id, SUM(sallary) as total_sallary, SUM(cut_amount) as total_cut, COUNT(*) as count')
+            // ->groupBy('agency_id');
     
         $grid->disableActions();
         $grid->disableCreateButton();
-    
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+        
+            $filter->equal('month', __('Month'))->select([
+                1 => __('January'),
+                2 => __('February'),
+                3 => __('March'),
+                4 => __('April'),
+                5 => __('May'),
+                6 => __('June'),
+                7 => __('July'),
+                8 => __('August'),
+                9 => __('September'),
+                10 => __('October'),
+                11 => __('November'),
+                12 => __('December'),
+            ]);
+        
+            $currentYear = now()->year;
+            $years = [];
+            for ($i = $currentYear; $i >= $currentYear - 10; $i--) {
+                $years[$i] = $i;
+            }
+            $filter->equal('year', __('Year'))->select($years);
+        });
+        
         $grid->column('agency.name', trans('agency'))->display(function () {
             $agency = $this->agency;
     
@@ -122,13 +147,18 @@ class BdSalariesController extends MainController
             ";
         });
     
-        $grid->column('total_sallary', trans('total'));
+        $grid->column('sallary', trans('totalBd'));
         // $grid->column('total_cut', trans('cut'));
     
-        $grid->column('created_at', __('Created at'))->display(function ($value) {
-            return Carbon::parse($value)->translatedFormat('d F Y - h:i A');
-        });     
+        // $grid->column('created_at', __('Created at'))->display(function ($value) {
+        //     return Carbon::parse($value)->translatedFormat('d F Y - h:i A');
+        // });     
     
+        $grid->column('total_agency_sallary', __('Total Agency Sallary'));
+        $grid->column('total_users_sallary', __('Total Users Sallary'));
+        $grid->column('total_diamond', __('Total Diamond'));
+        $grid->column('month', __('month'));
+        $grid->column('year', __('year'));
         // $grid->tools(function (Grid\Tools $tools) {
         //     $url = 'charges';
         //     $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("Charge History") . '</a>';

@@ -1448,7 +1448,22 @@
   "select_target": "लक्ष्य चुनें",
   "bd_wallet_notice": "BD वॉलेट से डॉलर राशि स्थानांतरित करने पर, वह राशि आपके वॉलेट में जोड़ दी जाएगी। फिर आप इसे बेच सकते हैं या दूसरों को भेज सकते हैं।"
 ,  "back": "वापस",
-  "Charge History": "चार्ज इतिहास"
+  "Charge History": "चार्ज इतिहास",
+  "Total Agency Sallary": "कुल एजेंसी वेतन",
+  "Total Users Sallary": "कुल उपयोगकर्ता वेतन",
+  "Total Diamond": "कुल हीरा",
+  "January": "जनवरी",
+  "February": "फ़रवरी",
+  "March": "मार्च",
+  "April": "अप्रैल",
+  "May": "मई",
+  "June": "जून",
+  "July": "जुलाई",
+  "August": "अगस्त",
+  "September": "सितंबर",
+  "October": "अक्टूबर",
+  "November": "नवंबर",
+  "December": "दिसंबर"
 
 
 
