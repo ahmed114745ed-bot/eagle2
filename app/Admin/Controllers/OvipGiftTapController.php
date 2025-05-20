@@ -235,7 +235,7 @@ class OvipGiftTapController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->attribute(['id' => 'image_type1']);
+        )->attribute(['id' => 'image_type1'])->required();
 
         $form->select('profile_frame_type', __('image_type'))->options(
             [
@@ -243,7 +243,7 @@ class OvipGiftTapController extends MainController
                 'png' => __('png'),
 
             ]
-        )->attribute(['id' => 'profile_frame']);
+        )->attribute(['id' => 'profile_frame'])->required();
 
         $script = <<<SCRIPT
              $(document).ready(function() {
