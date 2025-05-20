@@ -54,6 +54,7 @@ class UserVipRepository extends AbstractRepository
     public function updateIsUsed($userVip, $isUsed)
     {
         $userVip->is_used = $isUsed;
+        $userVip->using  = 1;
         $this->updateUserVip($userVip);
     }
     public function updateNumUsed($userVip)
