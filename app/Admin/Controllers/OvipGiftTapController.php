@@ -220,6 +220,7 @@ class OvipGiftTapController extends MainController
         }
 
         $form->number('exp', __('exp'));
+        $form->text('key', trans('key'));
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
