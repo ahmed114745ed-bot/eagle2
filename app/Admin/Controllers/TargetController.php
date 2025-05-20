@@ -563,7 +563,7 @@ class TargetController extends MainController
         try {
             $selectedColumns = $request->input('columns', []);
 
-            $targets = Target::orderByDesc('diamonds')->get();
+            $targets = Target::orderBy('diamonds')->get();
             //$pdf = Pdf::loadView('target_pdf', compact('targets'));
 //            $pdf = PDF::loadView('target_pdf', compact('targets'));
 //            return $pdf->download('target_data_' . now()->format('Y_m_d') . '.pdf');
