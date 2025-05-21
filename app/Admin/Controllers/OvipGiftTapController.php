@@ -220,6 +220,7 @@ class OvipGiftTapController extends MainController
         }
 
         $form->number('exp', __('exp'));
+
         $form->image('show_img', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png');
@@ -235,7 +236,7 @@ class OvipGiftTapController extends MainController
                 'vap' => __('vap'),
 
             ]
-        )->attribute(['id' => 'image_type1']);
+        )->attribute(['id' => 'image_type1'])->required();
 
         $form->select('profile_frame_type', __('image_type'))->options(
             [
@@ -243,7 +244,8 @@ class OvipGiftTapController extends MainController
                 'png' => __('png'),
 
             ]
-        )->attribute(['id' => 'profile_frame']);
+        )->attribute(['id' => 'profile_frame'])->required();
+        $form->text('key', trans('key'));
 
         $script = <<<SCRIPT
              $(document).ready(function() {

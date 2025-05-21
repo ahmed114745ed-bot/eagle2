@@ -43,18 +43,15 @@ class AgencyController extends MainController
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
 
-    public function __construct()
-    {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
-            abort(404);
-        }
-
-        (new AppFeatureService)->validateStatusEnable("agencies");
-    }
+//    public function __construct()
+//    {
+//        (new AppFeatureService)->validateStatusEnable("agencies");
+//    }
 
     public function index(Content $content)
     {
+        checkAgencyFeature();
+
         return parent::index($content
             ->title(__('Agencies'))
             ->description(__('List of Agencies'))

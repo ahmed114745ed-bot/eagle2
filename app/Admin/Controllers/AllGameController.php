@@ -50,7 +50,7 @@ class AllGameController extends MainController
             ->description('Description')
             ->row(function (Row $row) use ($result) {
                 $row->column(6, $this->grid2());
-                $row->column(6, new InfoBox("المبلغ المفقود من قبل المستخدمون", 'shopping-cart', 'primary', route(config('admin.route.prefix').'.wares'), $result));
+                $row->column(6, new InfoBox(__('Game profits'), 'gamepad', 'primary', route(config('admin.route.prefix').'.wares'), $result));
             })
             
             ->row($this->grid());

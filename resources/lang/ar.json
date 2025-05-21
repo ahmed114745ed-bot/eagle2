@@ -16,6 +16,7 @@
     "Operation log": "سجل العمليات",
     "App": "التطبيق",
     "Email": "بريد الكتروني",
+    "this room has been banned.": "تم حظر هذه الغرفة.",
     "action": "عمليات",
     "All Managers": " (DB)جميع المدرين ",
     "male": "ذكر",
@@ -1684,13 +1685,21 @@
     "back":"  رجوع",
     "add":" اضف",
     "export pdf": "تصدير الملف",
+
     "Diamond Target" : "هدف الماسات",
     "Day & Hours": "الايام و الساعات",
-
-
     "Host Salary" : "مرتب المضيف",
     "Agents Salary" : "مرتب العملاء",
     "BD Admin" : "ادمن BD",
+    "Target No": "رقم الهدف",
+    "Diamonds": "الماس",
+    "Host Percentage": "نسبة المضيف",
+    "Agency Share": "حصة الوكالة",
+    "DB Percentage": "نسبة قاعدة البيانات",
+    "Hours": "ساعات",
+    "Days": "أيام",
+    "Choose Columns to Export": "اختر الأعمدة للتصدير",
+
     "Salary Policy" : "سياسة الرواتب",
     "This type is used before; please modify it":"هذا النوع مستخدم من قبل روح عدل عليه ",
     "Shipping agent ID":"معرف وكيل الشحن",
@@ -2377,8 +2386,8 @@
 "shipping agency switch": "مفتاح وكالة الشحن",
   "browse updates_group_chat": "تصفح تحديثات الدردشة الجماعية",
   "agency does not have this coin":"الوكالة لا تملك هذا العدد من القطع.",
-  "this agency not have owner": ""
-
+  "Game profits": "أرباح الألعاب",
+"role name": "اسم الدور"
 
 
 

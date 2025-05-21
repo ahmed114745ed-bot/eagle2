@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\RoleCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Lang;
+
 
 class AdminPermission extends Seeder
 {
@@ -168,82 +169,98 @@ class AdminPermission extends Seeder
             'edit',
         ];
 
-        $categories = [
 
-            'Fast orders' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate'],
-            'Wallet' => ['core-wallets'],
-            'charge system' => ['charge', 'charger-report'],
-            'users' => ['free-users', 'ticket', 'trashed-account-user'],
-            'Advertisements' => ['carousel', 'banners', 'official-messages', 'offers'],
-            'Store' => ['wares',],
-            'Distinguished identifier' => ['special-Ware', 'special-history', 'image-color'],
-            'Vip' => ['ovip', 'vip-privilege', 'ovip-settings'],
-            'families' => ['family', 'family-level'],
-            'Agency System' => ['agency-settings'],
-            'Internal Sales System' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem'],
-            'Host Agencies' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report'],
-            'Agency Settings' => ['agency-join-requests', 'request-agencies', 'target'],
-            'Charging Agencies' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way'],
-            'Agency Manager' => ['managers'],
-            'Room' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings'],
-            'Achievements' => ['achievement', 'user_achievement_level'],
-            'user parent' => ['user-parent'],
-            'Group chat'  => ['group-chat', 'updates_group_chat'],
-            'Lucky box' => ['boxes', 'box-use', 'box-settings'],
-            'Events' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report'],
-            'Reels' => ['Real', 'report-real'],
-            'Moment' => ['moment', 'report-moment'],
-            'Work Settings' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history'],
-            'Sensitive Settings' => ['updates', 'config'],
-            'System Settings' => ['settings', 'language', 'daily-prize'],
-            'Level' => ['level', 'level-interval',],
+        // Step 1: Category definitions with sort number
+        $categories = [
+            ['name' => 'Dashboard', 'sort' => 1, 'permissions' => ['all-statistic']],
+            ['name' => 'Fast orders', 'sort' => 2, 'permissions' => ['bans', 'ban-rooms', 'special-id-request', 'user-levels', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate']],
+            ['name' => 'Wallet', 'sort' => 3, 'permissions' => ['core-wallets']],
+            ['name' => 'charge system', 'sort' => 4, 'permissions' => ['charge', 'charger-report']],
+            ['name' => 'users', 'sort' => 5, 'permissions' => ['free-users', 'ticket', 'trashed-account-user']],
+            ['name' => 'Advertisements', 'sort' => 7, 'permissions' => ['carousel', 'banners', 'official-messages', 'offers']],
+            ['name' => 'Store', 'sort' => 8, 'permissions' => ['wares']],
+            ['name' => 'Distinguished identifier', 'sort' => 9, 'permissions' => ['special-Ware', 'special-history', 'image-color']],
+            ['name' => 'Vip', 'sort' => 10, 'permissions' => ['ovip', 'vip-privilege', 'ovip-settings']],
+            ['name' => 'families', 'sort' => 11, 'permissions' => ['family', 'family-level']],
+            ['name' => 'Agency System', 'sort' => 12, 'permissions' => ['agency-settings']],
+            ['name' => 'Internal Sales System', 'sort' => 13, 'permissions' => ['charge-country', 'salary-request', 'agent-request-transaction', 'request-problem']],
+            ['name' => 'Host Agencies', 'sort' => 14, 'permissions' => ['users-hunters', 'user-target', 'salary-history', 'Report_user', 'agencies', 'user-target-eg', 'report']],
+            ['name' => 'Agency Settings', 'sort' => 15, 'permissions' => ['agency-join-requests', 'request-agencies', 'target']],
+            ['name' => 'Charging Agencies', 'sort' => 16, 'permissions' => ['agency-manger-setting', 'appear-charger-agency', 'charge-agency', 'payment-gat-way']],
+            ['name' => 'Agency Manager', 'sort' => 17, 'permissions' => ['managers']],
+            ['name' => 'Room', 'sort' => 18, 'permissions' => ['rooms', 'categories', 'room-vip', 'room-background', 'emoji', 'gift', 'room-settings']],
+            ['name' => 'Achievements', 'sort' => 19, 'permissions' => ['achievement', 'user_achievement_level']],
+            ['name' => 'Group chat', 'sort' => 20, 'permissions' => ['group-chat', 'updates_group_chat']],
+            ['name' => 'Lucky box', 'sort' => 21, 'permissions' => ['boxes', 'box-use', 'box-settings']],
+            ['name' => 'Events', 'sort' => 22, 'permissions' => ['event-period', 'target-event', 'pk-event', 'pk-event-rewards', 'weekly_star_rewards', 'weekly-star', 'general-roles', 'event_report']],
+            ['name' => 'Reels', 'sort' => 23, 'permissions' => ['Real', 'report-real']],
+            ['name' => 'Moment', 'sort' => 24, 'permissions' => ['moment', 'report-moment']],
+            ['name' => 'Work Settings', 'sort' => 25, 'permissions' => ['delete-account-details', 'questions', 'country', 'page', 'payment-coin', 'exchange', 'sailer', 'salary-history']],
+            ['name' => 'Sensitive Settings', 'sort' => 26, 'permissions' => ['updates', 'config']],
+            ['name' => 'System Settings', 'sort' => 27, 'permissions' => ['settings', 'language', 'daily-prize']],
+            ['name' => 'Level', 'sort' => 29, 'permissions' => ['level', 'level-interval']],
+            ['name' => 'user parent', 'sort' => 29, 'permissions' => ['user-parent']],
         ];
 
-        // Function to get category for each permission
+        // Step 2: Save categories to rolecategories table
+        foreach ($categories as $category) {
+            RoleCategory::updateOrCreate(
+                ['name_en' => $category['name']],
+                ['slug' => $category['name'], 'sort' => $category['sort']]
+            );
+        }
+
+        $lastSort = RoleCategory::max('sort');
+        RoleCategory::updateOrCreate(
+            ['name_en' => 'general'],
+            [
+                'slug' => 'general',
+                'sort' => $lastSort + 1,
+            ]
+        );
+
+        // Step 3: Helper to get category name by permission
         function getCategory($permission, $categories)
         {
-            foreach ($categories as $category => $permissionsInCategory) {
-                if (in_array($permission, $permissionsInCategory)) {
-                    return $category;
+            foreach ($categories as $category) {
+                if (in_array($permission, $category['permissions'])) {
+                    return $category['name'];
                 }
             }
             return 'general';
         }
 
+        // Step 4: Loop through permissions and assign category
         foreach ($permissions as $permission) {
             foreach ($methods as $method) {
                 $slug = $method . '-' . $permission;
                 $name = $method . ' ' . str_replace('-', ' ', $permission);
-
-                // Check if the permission already exists
-                $permissionExists = DB::table('admin_permissions')->where('slug', $slug)->first();
-
-                // Get the category for the permission
                 $category = getCategory($permission, $categories);
 
-                if ($permissionExists) {
-                    // If the permission exists, update the category
+                $exists = DB::table('admin_permissions')->where('slug', $slug)->first();
+
+                if ($exists) {
                     DB::table('admin_permissions')->where('slug', $slug)->update([
-                        'category'   => $category,
+                        'category' => $category,
                         'updated_at' => now(),
                     ]);
                 } else {
-                    // Insert the new permission with its category
                     DB::table('admin_permissions')->insert([
-                        'name'        => $name,
-                        'slug'        => $slug,
+                        'name' => $name,
+                        'slug' => $slug,
                         'http_method' => null,
-                        'http_path'   => null,
-                        'category'    => $category,
-                        'created_at'  => now(),
-                        'updated_at'  => now(),
+                        'http_path' => null,
+                        'category' => $category,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]);
                 }
             }
         }
+
         DB::table('admin_permissions')->where('slug', 'like', 'update%')->orWhere('slug', 'like', 'show%')->delete();
-        $actions = ['create', 'edit', 'delete', 'show','charge'];
-        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report','wares-dedicate','vips-dedicate','achievement_dedicate','level-user-history','agent-request-history','salary-history','request-agency-history','updates_group_chat','users-family','uuid-dedicate'];
+        $actions = ['create', 'edit', 'delete', 'show', 'charge'];
+        $targets = ['report-user', 'report', 'event_report', 'report-real', 'charger-report', 'wares-dedicate', 'vips-dedicate', 'achievement_dedicate', 'level-user-history', 'agent-request-history', 'salary-history', 'request-agency-history', 'updates_group_chat', 'users-family', 'uuid-dedicate','all-statistic'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {
@@ -254,7 +271,7 @@ class AdminPermission extends Seeder
         })->delete();
 
         $actions = ['create', 'delete', 'show'];
-        $targets = ['update_setting_button','agency-settings','agency-setting','settings','charge-settings','room-settings','ovip-settings','box-settings','moment-settings','reel-settings','chat-setting','user-status','updates_family-config','agora-zego'];
+        $targets = ['update_setting_button', 'agency-settings', 'agency-setting', 'settings', 'charge-settings', 'room-settings', 'ovip-settings', 'box-settings', 'moment-settings', 'reel-settings', 'chat-setting', 'user-status', 'updates_family-config', 'agora-zego'];
 
         DB::table('admin_permissions')->where(function ($query) use ($actions, $targets) {
             foreach ($actions as $action) {

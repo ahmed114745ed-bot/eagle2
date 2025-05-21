@@ -579,27 +579,59 @@ if (!function_exists('showSvgaImage')) {
         return $model;
     }
 
-
+    if (! function_exists('checkAgencyFeature')){
+        function checkAgencyFeature()
+        {
+            $app_feature = \Cache::get('host_agency');
+            if (!($app_feature == '1' || $app_feature == 1)) {
+                abort(403, __('This feature has not been activated for you'));
+//                return redirect()->back()->send();
+            }
+        }
+    }
 
     if (! function_exists('clearAgencyCache')) {
         function clearAgencyCache($agencyId)
         {
             $tabs = ['members', 'charges', 'salaries', 'requests', 'targets', 'rate', 'stars', 'heroes', 'giftlog'];
-    
+
             foreach ($tabs as $tab) {
                 for ($i = 1; $i <= 10; $i++) {
                     Cache::forget("agency_{$agencyId}_{$tab}_page_{$i}");
                 }
-    
+
                 if (in_array($tab, ['rate', 'stars', 'heroes'])) {
                     for ($month = 1; $month <= 12; $month++) {
-                        $year = date('Y'); 
+                        $year = date('Y');
                         Cache::forget("agency_{$agencyId}_{$tab}_{$month}_{$year}");
                     }
                 }
             }
-    
+
             Cache::forget("agency_{$agencyId}_giftlog");
         }
+    }
+}
+
+
+
+if (!function_exists('getTimezone')) {
+    function getTimezone()
+    {
+        $cacheKey = 'timezone';
+        return \Cache::rememberForever($cacheKey, function () {
+            $setting = \App\Models\Setting::where('key', 'timezone')->first();
+            return $setting?->value ?? 'UTC';
+        });
+
+    }
+}
+
+
+if (!function_exists('getToday')) {
+    function getToday() : array
+    {
+        $timezone = getTimezone();
+        return [Carbon::now($timezone)->startOfDay()->timezone('UTC'), Carbon::now($timezone)->endOfDay()->timezone('UTC')];
     }
 }

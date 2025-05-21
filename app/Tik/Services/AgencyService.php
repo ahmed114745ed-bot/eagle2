@@ -2,17 +2,18 @@
 
 namespace App\Tik\Services;
 
-use App\Models\AgencyJoinRequest;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Helpers\UserCommon;
 use Illuminate\Support\Str;
 use App\Facades\UserHandling;
+use App\Models\AgencyJoinRequest;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;
@@ -112,14 +113,14 @@ class AgencyService
         return $agency;
     }
 
-    public function agencyTarget($agencyId, $user, $request)
+    public function agencyTarget($userId, $user, $request)
     {
         $year = $request->year ?? Carbon::now()->year;
         $month = $request->month ?? Carbon::now()->month;
-        $target = $this->userSalaryRepository->agencySalary($agencyId, $month, $year);
+        $target = $this->userSalaryRepository->newUserSalary($userId, $month, $year);
         $minValue = $this->targetRepository->getByUsd($target);
         $result = (@$minValue->agency_share / 100) * @$target;
-        $usersTargetDetails = $this->userRepository->agencyUsers($agencyId, $month, $year, 10, $request->page);
+        $usersTargetDetails = $this->userRepository->agencyUsers($userId, $month, $year, 10, $request->page);
 
         $hours =   LiveTime::query()
             ->selectRaw('sum(hours) as hours, max(created_at) as date')
@@ -189,7 +190,7 @@ class AgencyService
     {
         $accept    = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
-        if(!$user)throw new Exception('user not found');
+        if (!$user) throw new Exception('user not found');
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
@@ -601,17 +602,17 @@ class AgencyService
 
     public function dailyReport($user, $month, $year)
     {
-        $joinedAgency = AgencyJoinRequest::where('user_id', $user->id)->first();
-        if (! $joinedAgency){
+        $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
+        $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
+        $joinedAgency = $member ??  $owner;
+        if (! $joinedAgency) {
             return [];
         }
-        $userCreated = Carbon::parse($joinedAgency->created_at);
+
         $startOfMonth = Carbon::create($year, $month, 1);
         $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth();
 
-        $reportStart = ($userCreated->year == $year && $userCreated->month == $month)
-            ? $userCreated->day
-            : 1;
+        $reportStart = 1;
 
         $isThisMonth = $month == now()->month && $year == now()->year;
         $endDay = $isThisMonth ? now()->day : $endOfMonth->day;
