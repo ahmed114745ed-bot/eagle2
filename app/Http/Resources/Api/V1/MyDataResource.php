@@ -145,7 +145,7 @@ class MyDataResource extends JsonResource
              $userTypes[] = 3;
          }
          $userTypes = array_unique($userTypes);
-         
+
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -263,6 +263,6 @@ class MyDataResource extends JsonResource
     public function getUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->first();
-        return $pack ?  new GeneralUserPackResource($pack) : [];
+        return $pack ?  new GeneralUserPackResource($pack) : new \stdClass();
     }
 }
