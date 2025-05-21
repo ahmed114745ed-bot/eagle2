@@ -711,7 +711,7 @@ class User extends Authenticatable
 
 
 
-    
+
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -1118,7 +1118,7 @@ class User extends Authenticatable
     public function getLoadedPacks()
     {
         if ($this->loadedPacks === null) {
-            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6])->where('is_used', 1)->with('ware')->get();
+            $this->loadedPacks = $this->packs()->whereIn('type', [20, 18, 17, 20, 19, 16, 13, 3, 4, 5, 25, 6, 12])->where('is_used', 1)->with('ware')->get();
         }
         return $this->loadedPacks;
     }
@@ -1349,14 +1349,14 @@ class User extends Authenticatable
     public function incrementCutAmountInBdSallary(int $amount)
     {
         $lastBdSalary = $this->bdSalaries()->latest()->first();
-    
+
         if ($lastBdSalary) {
-            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);  
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
             $lastBdSalary->update(['cut_amount' => $newAmount]);
             return true;
         }
-    
+
         return false;
     }
-    
+
 }

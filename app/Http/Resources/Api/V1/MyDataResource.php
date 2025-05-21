@@ -146,6 +146,14 @@ class MyDataResource extends JsonResource
         }
         $userTypes = array_unique($userTypes);
 
+         if ($this->type_user == 2) {
+             $userTypes = array_merge($userTypes, [1, 2]);
+         }
+         if ($this->hasShippingAgency()) {
+             $userTypes[] = 3;
+         }
+         $userTypes = array_unique($userTypes);
+
         $data = [
             'id' => @$this->id,
             'notification_id' => @$this->notification_id ?: "",
@@ -269,6 +277,6 @@ class MyDataResource extends JsonResource
     public function getUserPack($type)
     {
         $pack = $this->packs->where('type', $type)->first();
-        return $pack ?  new GeneralUserPackResource($pack) : [];
+        return $pack ?  new GeneralUserPackResource($pack) : new \stdClass();
     }
 }
