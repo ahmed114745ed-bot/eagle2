@@ -50,9 +50,19 @@ class AllDataAgencyResource extends JsonResource
         $year = request('year') ?? Carbon::now()->year;
         $month = request('month') ?? Carbon::now()->month;
 
-        $giftLog = GiftLog::where('agency_id', $this->id)->selectRaw("SUM(giftPrice) as exp, receiver_id")
-            ->with('receiver')->groupBy('receiver_id')->whereHas('receiver')->whereYear('created_at', $year)->whereMonth('created_at', $month)->orderByDesc('exp')->take(5)->get();
+        $giftLog = $this->getTopGiftLogsByUserType(
+            year: $year,
+            month: $month,
+            userType: 'receiver',
+            limit: 5
+        );
 
+        $heroGiftLog = $this->getTopGiftLogsByUserType(
+            year: $year,
+            month: $month,
+            userType: 'sender',
+            limit: 5
+        );
         // $target =Target::where('level',$this->id)->first();
         // // $target_usd =Agency::where('id',$this->id)->sum('target_usd');
         // $Theratio=$target->agency_share /100;
@@ -83,8 +93,30 @@ class AllDataAgencyResource extends JsonResource
             // 'mempers'=>$this->mempers ?? (object)[], 
             'members' => MyDataForAgancyNewResource::collection(@$this->mempers),
             'user_agency_status' => $owner ? 2 : ($admin ? 1 : 3),
-             'admins' => AdminsAgencyResource::collection($this->admins),
+            'admins' => AdminsAgencyResource::collection($this->admins),
             'star' => ReceiverGiftLogResource::collection($giftLog),
+            'heroes' => SenderGiftLogResource::collection($heroGiftLog),
         ];
+    }
+
+    public function getTopGiftLogsByUserType(int $year, int $month, string $userType, int $limit = null)
+    {
+        $userRelation = $userType; // 'receiver' or 'sender'
+        $userColumn   = $userType . '_id'; // receiver_id or sender_id
+
+        $query = GiftLog::where('agency_id', $this->id)
+            ->selectRaw("SUM(giftPrice) as exp, {$userColumn}")
+            ->with($userRelation)
+            ->groupBy($userColumn)
+            ->whereHas($userRelation)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderByDesc('exp');
+
+        if ($limit) {
+            $query->take($limit);
+        }
+
+        return $query->get();
     }
 }

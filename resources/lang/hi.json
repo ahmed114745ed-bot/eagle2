@@ -17,6 +17,7 @@
     "charge-reports": "चार्ज रिपोर्ट",
     "Charged by dash": "सिस्टम से चार्ज",
     "Badges": "बैज",
+    "this room has been banned.": "इस कमरे को प्रतिबंधित कर दिया गया है।",
     "Agency wallet": "एजेंसी वॉलेट",
     "Supporter" : "समर्थक",
     "Shipping": "शिपिंग",
@@ -1419,8 +1420,10 @@
   "create charge country": "चार्ज देश बनाएँ",
   "shipping agency switch": "शिपिंग एजेंसी स्विच",
   "browse updates_group_chat": "ग्रुप चैट अपडेट ब्राउज़ करें",
-  "agency does not have this coin": "एजेंसी के पास इतने सिक्के नहीं हैं।"
-  
+  "agency does not have this coin": "एजेंसी के पास इतने सिक्के नहीं हैं।",
+  "Game profits": "खेलों का लाभ",
+  "role name": "भूमिका का नाम"
+
 
 
 

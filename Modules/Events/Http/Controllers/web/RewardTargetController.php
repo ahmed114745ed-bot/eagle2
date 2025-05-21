@@ -152,7 +152,7 @@ class RewardTargetController extends MainController
             $form->number("target3",__("coins"))->rules('required');
         })->when("achievement",function () use ($form){
             $form->image("target4", __('image'))->name(function ($file) {
-                return now()->timestamp.'.'.$file->guessExtension()->rules('required');
+                return now()->timestamp.'.'.$file->guessExtension();
             })->disk('gcs');
         });
         $form->number('expire', __('expire'));

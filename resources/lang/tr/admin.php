@@ -340,8 +340,52 @@ return [
     "sslcommerz_store_password" => "Mağaza Şifresi",
     "sslcommerz_payment_address" => "Ödeme Adresi",
 
-    //googlePay
-    "google_pay_merchant_id" => "Mağaza ID",
+    "payment_url"       => "Ödeme Bağlantısı",
+    "node_server_name"  => "Node Sunucu Adı",
+
+    // Mada
+    "access_token"      => "Erişim Jetonu",
+    "payment_address"   => "Ödeme Adresi",
+
+    // LiqPay
+    "private_key"       => "Gizli Anahtar",
+
+    // PayPal
+    "client_id"         => "Müşteri Kimliği",
+    "client_secret"     => "Müşteri Gizli Anahtarı",
+
+    // Paytm
+    "merchant_key"             => "Mağaza Anahtarı",
+    "merchant_website_link"    => "Mağaza Web Sitesi Bağlantısı",
+
+    // PayTabs
+    "profile_id"        => "Profil Kimliği",
+    "server_key"        => "Sunucu Anahtarı",
+
+    // bKash
+    "appkey"            => "Uygulama Anahtarı",
+    "app_secret"        => "Uygulama Gizli Anahtarı",
+
+    // Razorpay
+    "api_secret"        => "API Gizli Anahtarı",
+
+    // SenangPay
+    "callback_url"      => "Geri Dönüş URL'si",
+
+    // Paymob Accept
+    "iframe_id"         => "Iframe Kimliği",
+    "integration_id"    => "Entegrasyon Kimliği",
+    "hmac"              => "HMAC",
+
+    // Flutter Wave
+    "hash"              => "Hash",
+
+    // Paystack
+    "merchant_email"    => "Mağaza E-posta Adresi",
+
+    // SSLCommerz
+    "store_id"          => "Mağaza Kimliği",
+    "store_password"    => "Mağaza Şifresi",
 
     //huaweiPay
     'huawei_pay_merchant_id' => 'Mağaza Kimliği',
@@ -366,6 +410,14 @@ return [
     'sslcommerz'    => 'sslcommerz',
     'google_pay'    => 'google_pay',
     'huawei_pay' => 'Huawei Pay',
+
+    "target_no" => 'Hedef Numarası',
+    "diamonds" => 'Elmas Hedefi',
+    "usd" => 'Dolar',
+    "agency_share" => 'Ajan Maaşı',
+    "db_percentage" => 'BD Yüzdesi',
+    "hours" => 'Saatler',
+    "days" => 'Günler',
 
     "charge_level" => "şarj seviyesi",
 ];

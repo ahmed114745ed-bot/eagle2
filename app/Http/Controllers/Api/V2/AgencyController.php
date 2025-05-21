@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\Setting;
+use App\Models\User;
 use Cache;
 use Illuminate\Http\Request;
 use App\Models\AgencyUserJob;
@@ -97,8 +98,9 @@ class AgencyController extends Controller
         return Common::apiResponse(1, '', AdminsAgencyResource::collection($agency->admins));
     }
 
-    public function agencyTargetDetails($id, Request $request)
+    public function agencyTargetDetails(Request $request)
     {
+        $id = User::whereId(auth()->id())->where('type_user', '!=', 0)->firstOrFail()->id;
         $user = $request->user();
         try {
             $response = $this->agencyService->agencyTarget($id, $user, $request);
