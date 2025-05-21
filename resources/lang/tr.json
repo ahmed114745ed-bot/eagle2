@@ -2301,12 +2301,10 @@
   "updates_family config": "Güncellemeler_aile yapılandırması",
    "setting agency system": "Ajans sistemi ayarları",
   "setting agency manager": "Ajans yöneticisi ayarları",
-  "Setting host agencies": "Barındırıcı ajans ayarları",
   "setting internal sales system": "Dahili satış sistemi ayarları",
     "Settings charging agencies": "Şarj ajanslarının ayarları",
       "setting Agency Manager": "Ajans Yöneticisi Ayarları",
-
-
+"Host Agencies Settings": "Ana Ajans Ayarları",
   "Remaining": "Kalan",
    "app BD id": "Uygulama BD Kimliği",
   "salaries BD": "BD Maaşları",

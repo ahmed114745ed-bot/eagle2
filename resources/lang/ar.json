@@ -2443,10 +2443,19 @@
   "updates_family config": "إعدادات تحديث العائلة",
   "setting agency system": "إعداد نظام الوكالة",
   "setting agency manager": "إعداد مدير الوكالة",
-  "Setting host agencies": "إعداد وكالات الاستضافة",
   "setting internal sales system": "إعداد نظام المبيعات الداخلية",
 "Settings charging agencies": "إعدادات وكالات الشحن",
-  "setting Agency Manager": "إعداد مدير الوكالة"
+  "setting Agency Manager": "إعداد مدير الوكالة",
+  "Host Agencies Settings": "إعدادات وكالات المضفين"
+
+
+
+
+
+
+
+
+
 
 
 
