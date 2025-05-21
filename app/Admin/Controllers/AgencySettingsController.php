@@ -34,26 +34,33 @@ class AgencySettingsController extends MainController
 
     public function badges(){
         $lang = request()->header('X-localization', 'en');
-        $host = Config::where('name', $lang . '_'. 'host')->first();
-        $shipping = Config::where('name', $lang . '_'. 'shipping')->first();
-        $agency_owner = Config::where('name', $lang . '_'. 'agency_owner')->first();
+
+        $types = ['shipping', 'host', 'agency_owner', 'bd'];
+        $typeIds = ['shipping' => 3, 'host' => 2, 'agency_owner' => 1, 'bd' => 4]; // example IDs
+        $suffixes = ['badge', 'intro', 'frame'];
+
+        $data = [];
+
+        foreach ($types as $type) {
+            $images = [];
+            foreach ($suffixes as $suffix) {
+                $name = $suffix === 'badge'
+                    ? $lang . '_' . $type
+                    : $lang . '_' . $type . '_' . $suffix;
+
+                $config = Config::where('name', $name)->first();
+                $images['image_' . $suffix] = $config?->value ?? null;
+            }
+
+            $data[] = array_merge(
+                ['type' => $typeIds[$type]],
+                $images
+            );
+        }
 
         return response([
             'status' => 'success',
-            'data' => [
-                [
-                    'type' => 3,
-                    'image' => $shipping?->value
-                ],
-                [
-                    'type' => 2,
-                    'image' => $host?->value
-                ],
-                [
-                    'type' => 1,
-                    'image' => $agency_owner?->value
-                ]
-            ]
+            'data' => $data
         ]);
     }
 }
