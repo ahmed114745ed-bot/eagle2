@@ -89,7 +89,6 @@ class CoinService
 
                 //  get url
                 $paymentUrl = $oldFawryService->makePayment($log->id, $coin->usd, $exterData);
-                
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
                     return $paymentUrl;
                 }
