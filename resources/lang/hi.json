@@ -1883,8 +1883,15 @@
 
   "browse users": "उपयोगकर्ता ब्राउज़ करें",
   "create users": "उपयोगकर्ता बनाएं",
-  "delete users": "उपयोगकर्ता हटाएं"
-    
+  "delete users": "उपयोगकर्ता हटाएं",
+     "delete color": "रंग हटाएं",
+  "delete achievement_level": "उपलब्धि स्तर हटाएं",
+  "edit achievement_level": "उपलब्धि स्तर संपादित करें",
+  "browse achievement_level": "उपलब्धि स्तर ब्राउज़ करें",
+  "edit version": "संस्करण संपादित करें"
+
+
+
 
 
 
