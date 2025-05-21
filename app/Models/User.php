@@ -924,6 +924,7 @@ class User extends Authenticatable
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
         $this->sub_sender_level = 0;
+        $this->sender_level = $value;
         $diamonds  = (@Vip::query()->where('type', 2)->where('level', '=', $value)->orderByDesc('exp')->limit(1)->first())?->exp ?? 0;
         //        $this->sub_sender_num   = $diamonds - $this->total_diamond_send;
         //        $this->sub_sender_num   = ($diamonds - $this->total_diamond_send) + (( (( $diamonds - $this->total_diamond_send) * ( 2 * ($expPercentages[0] / 100)))) );
