@@ -322,6 +322,7 @@ class ChargeController extends Controller
         if ($receiver->is_frozen == 1) {
             return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
         }
+      
         try {
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
 

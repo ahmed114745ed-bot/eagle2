@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AgencyResource;
 use App\Models\Agency;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,10 +15,14 @@ use Modules\SalaryTransaction\Transformers\FilterAgencyMangerResource;
 
 class AgencyController extends Controller
 {
-    public function get_info()
+    public function get_info(?ShippingAgency $agency)
     {
         $user = Auth::user();
-        $agency = Agency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId($user->id)->first();
+
+        if (!$agency){
+            $agency = ShippingAgency::query()->with("countries", 'AgencypaymentGateways')->whereAppOwnerId($user->id)->first();
+        }
+
         if (!$agency) {
             return Common::apiResponse(1, __("api_responses.agency"), []);
         }

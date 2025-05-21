@@ -300,7 +300,7 @@
     "AppCharge": "مستوي الشحن",
     "Pin": "تثبيت",
     "Confirm": "تأكيد",
-    "Badges" : "شارات",
+    "Badges" : "مكتسبات المنصب",
     "Supporter" : "داعم",
     "Shipping": "وكالة الشحن",
     "Hosting" : "وكالة المضيفين",
@@ -412,6 +412,8 @@
     "current phone not verified": "لم يتم التحقق من الهاتف الحالي",
     "account deleted successfully": "تم حذف الحساب بنجاح",
     "please set usd_value_in_coins in configs": "يرجى تعيين usd_value_in_coins في الإعدادات",
+    "please set usd_value_in_coins in configs. Contact the administration!": "يرجى ضبط قيمة usd_value_in_coins في الإعدادات. يرجى التواصل مع الإدارة!",
+    "this agency not found": "هذه الوكالة غير موجودة",
     "balance not enough": "الرصيد غير كافي",
     "missing owner_id": "معرف المستخدم مفقود",
     "Missing data": "بيانات مفقودة",
@@ -536,6 +538,12 @@
     "PK": "PK",
     "Party" : "حفلة",
     "Festival": "مهرجان",
+    "Experience settings:" : "اعدادات نقاط الخبرة Exp :",
+    "wealth": "الثروة",
+    "attraction" : "الجاذبية",
+    "gift_price" : "سعر الهديه",
+    "coins_number": "عدد العملات",
+    "live_experience": "تجربة حية",
     "from uid": "معرف مستخدم المرسل",
     "get_type": "النوع الاساسي",
     "color": "اللون",
@@ -1010,7 +1018,7 @@
     "browse app editing": "استعراض تحرير التطبيق",
     "browse appear charger agency": "استعراض وكالة الشحن الظاهرة",
     "browse auth user": "استعراض مستخدم المصادقة",
-    "browse auth users": "استعراض مستخدمي المصادقة",
+    "browse auth users": "استعراض  الموظفين",
     "browse background image request": "استعراض طلب صورة الخلفية",
     "Browse Backgrounds": "استعراض الخلفيات",
     "browse banners": "استعراض اللافتات",
@@ -1062,7 +1070,7 @@
     "browse pk event": "استعراض حدث PK",
     "browse pk event rewards": "استعراض مكافآت حدث PK",
     "Browse Privilege": "استعراض الامتيازات",
-    "browse Real": "استعراض الحقيقة",
+    "browse Real": "استعراض الفديوهات",
     "Browse Recharge Request": "استعراض طلبات إعادة الشحن",
     "browse": "استعراض",
     "browse report moment": "استعراض تقارير اللحظات",
@@ -1118,7 +1126,7 @@
   "create app editing": "إنشاء تعديل التطبيق",
   "create appear charger agency": "إنشاء ظهور وكالة الشحن",
   "create auth user": "إنشاء مستخدم مصدق",
-  "create auth users": "إنشاء المستخدمين المصدقين",
+  "create auth users": "إنشاء الموظفين ",
   "create background image request": "إنشاء طلب صورة خلفية",
   "Create Backgrounds": "إنشاء خلفيات",
   "create banner": "إنشاء لافتة",
@@ -1169,7 +1177,7 @@
   "create pk event": "إنشاء حدث PK",
   "create pk event rewards": "إنشاء مكافآت حدث PK",
   "Create Privilege": "إنشاء امتياز",
-  "create Real": "إنشاء حقيقي",
+  "create Real": "إنشاء الفديوهات",
   "Create Recharge Request": "إنشاء طلب إعادة شحن",
   "create report": "إنشاء تقرير",
   "create report moment": "إنشاء تقرير لحظة",
@@ -1226,7 +1234,7 @@
     "delete app editing": "حذف تحرير التطبيق",
     "delete appear charger agency": "حذف ظهور شاحن الوكالة",
     "delete auth user": "حذف المستخدم المصادق",
-    "delete auth users": "حذف المستخدمين المصادقين",
+    "delete auth users": "حذف الموظفين ",
     "delete background image request": "حذف طلب صورة الخلفية",
     "delete Backgrounds": "حذف الخلفيات",
     "delete banners": "حذف اللافتات",
@@ -1277,7 +1285,7 @@
     "delete pk event": "حذف حدث pk",
     "delete pk event rewards": "حذف مكافآت حدث pk",
     "delete Privilege": "حذف الامتياز",
-    "delete Real": "حذف Real",
+    "delete Real": "حذف الفديوهات",
     "delete Recharge Request": "حذف طلب الشحن",
     "delete report": "حذف التقرير",
     "delete report moment": "حذف تقرير اللحظة",
@@ -1332,7 +1340,7 @@
     "edit app editing": "تعديل تحرير التطبيق",
     "edit appear charger agency": "تعديل ظهور شاحن الوكالة",
     "edit auth user": "تعديل المستخدم المصادق",
-    "edit auth users": "تعديل المستخدمين المصادقين",
+    "edit auth users": "تعديل الموظفين ",
     "edit background image request": "تعديل طلب صورة الخلفية",
     "Edit Backgrounds": "تعديل الخلفيات",
     "edit banners": "تعديل اللافتات",
@@ -1384,7 +1392,7 @@
   "edit pk event": "تعديل حدث PK",
   "edit pk event rewards": "تعديل مكافآت حدث PK",
   "Edit Privilege": "تعديل الامتياز",
-  "edit Real": "تعديل الواقع",
+  "edit Real": "تعديل الفديوهات",
   "Edit Recharge Request": "تعديل طلب الشحن",
   "edit report": "تعديل التقرير",
   "edit report moment": "تعديل لحظة التقرير",
@@ -1441,7 +1449,7 @@
   "show app editing": "عرض تحرير التطبيق",
   "show appear charger agency": "عرض ظهور وكالة الشحن",
   "show auth user": "عرض المستخدم المخول",
-  "show auth users": "عرض المستخدمين المخولين",
+  "show auth users": "عرض الموظفين ",
   "show background image request": "عرض طلب صورة الخلفية",
   "show Backgrounds": "عرض الخلفيات",
   "show banners": "عرض اللافتات",
@@ -1493,7 +1501,7 @@
   "show pk event": "عرض حدث PK",
   "show pk event rewards": "عرض مكافآت حدث PK",
   "show Privilege": "عرض الامتياز",
-  "show Real": "عرض الواقع",
+  "show Real": "عرض الفديوهات",
   "show Recharge Request": "عرض طلب الشحن",
   "show report": "عرض التقرير",
   "show report moment": "عرض لحظة التقرير",
@@ -1546,7 +1554,7 @@
     "update app editing": "تحديث تحرير التطبيق",
     "update appear charger agency": "تحديث وكالة شاحن الظهور",
     "update auth user": "تحديث المستخدم المعتمد",
-    "update auth users": "تحديث المستخدمين المعتمدين",
+    "update auth users": "تحديث الموظفين ",
     "update background image request": "تحديث طلب صورة الخلفية",
     "update banners": "تحديث الإعلانات",
     "update bans": "تحديث الحظر",
@@ -1764,9 +1772,11 @@
     "Group Chat":"دردشة جماعية",
     "Settings":"الأعدادات",
     "Agency System":"نظام الوكالات",
-    "Agency Feature is Disabled, Contact the administration": "ميزة الوكالة معطلة، يرجى التواصل مع الإدارة",
-    "Agency Feature": "ميزة الوكالة",
-    "Enable Agency Feature": "تفعيل ميزة الوكالة",
+
+    "Agencies Count": "عدد الوكالات",
+    "BD Wallet": "محفظة Bd",
+    "My Wallet": "محفظتي",
+
     "Internal Sales System":"نظام البيع الداخلي",
     "App Feature": "ميزة التطبيق",
     "Countries Where Salary Payments Are Available":"الدول المتاح بها تسليم رواتب",
@@ -2257,7 +2267,15 @@
   "failed_reject_request": "فشل في رفض الطلب. يرجى المحاولة مرة أخرى.",
   "failed_make_admin": "فشل في ترقية المستخدم إلى مشرف. يرجى المحاولة مرة أخرى.",
   "This seat is out of the designated range" : "هذا المقعد خارج النطاق المحدد",
-
+  "cp_gift_price": "سعر هدية النقاط التنافسية",
+  "Enter Exp": "أدخل النقاط",
+  "rooms_gift_price": "سعر هدية الغرف",
+  "charge_gift_price": "سعر هدية الشحن",
+  "attraction_gift_price": "سعر هدية الجاذبية",
+  "Go to Settings": "انتقل إلى الإعدادات"
+,
+  "wealth_gift_price": "سعر هدية الثروة",
+  
   "browse agency settings": "عرض إعدادات الوكالة",
   "edit agency settings": "تعديل إعدادات الوكالة",
   "browse page": "عرض الصفحة",
@@ -2331,11 +2349,12 @@
   "browse box settings": "عرض إعدادات الصندوق",
   "edit box settings": "تعديل إعدادات الصندوق",
   "create group chat": "إنشاء محادثة جماعية",
-  "browse report real": "عرض التقارير الحقيقية",
+  "browse report real": "عرض التقارير الفديوهات",
   "Group chat": "دردشة جماعية",
   "user parent": " المستخدمون  ",
   "general": "عام",
    "Lucky box": "صندوق الحظ",
+   
 
   "Create Agencies": "إنشاء الوكالات",
   "browse report": "تصفح التقرير",
@@ -2387,7 +2406,62 @@
   "browse updates_group_chat": "تصفح تحديثات الدردشة الجماعية",
   "agency does not have this coin":"الوكالة لا تملك هذا العدد من القطع.",
   "Game profits": "أرباح الألعاب",
-"role name": "اسم الدور"
+"role name": "اسم الدور",
+" browse charger report": "تصفح تقرير الشاحن",
+  "gift price":"سعر الهدية",
+
+
+  "app BD id": "معرّف  BD",
+  "salaries BD": "محفظة  BD",
+  "my wallet": "محفظتي",
+  "My wallet": "محفظتي",
+  "request-agencies": "طلبات الوكالات",
+  "request agencies": "طلبات الوكالات",
+  "Request agencies": "طلبات الوكالات",
+
+  "current_balance": "الرصيد الحالي",
+  "remaining_percent": "النسبة المتبقية",
+  "cut": "الخصم",
+  "total": "الإجمالي",
+  "agency": "وكالة",
+  "List of Agencies": "قائمة الوكالات",
+  "confirm_charge": "تأكيد الشحن",
+  "enter_amount": "أدخل المبلغ",
+  "transfer_to_wallet": "تحويل إلى المحفظة",
+  "charge_wallet": "شحن المحفظة",
+  "current_balance": "الرصيد الحالي",
+  "select_target": "اختر المستهدف",
+  "bd_wallet_notice": "عند تحويلك مبلغ من الدولارات من محفظة الـ BD سيتم إضافة المبلغ إلى محفظتي، ثم يمكنك بيعه أو إرساله للآخرين من خلال صفحة محفظتي."
+ ,"confirm_transfer":"تحويل",
+  "total_sallary":" اجمالي دخل المرتبات",
+  "totalCut":" اجمالي المصروفات",
+  "browse charge level": "استعراض مستوى الشحن",
+  "create admin profile": "إنشاء ملف المسؤول",
+  "delete admin profile": "حذف ملف المسؤول",
+  "edit admin profile": "تعديل ملف المسؤول",
+  "browse updates_family config": "استعراض إعدادات تحديث العائلة",
+  "updates_family config": "إعدادات تحديث العائلة",
+  "setting agency system": "إعداد نظام الوكالة",
+  "setting agency manager": "إعداد مدير الوكالة",
+  "setting internal sales system": "إعداد نظام المبيعات الداخلية",
+"Settings charging agencies": "إعدادات وكالات الشحن",
+  "setting Agency Manager": "إعداد مدير الوكالة",
+  "Host Agencies Settings": "إعدادات وكالات المضفين",
+"Agency Hosts Reports": "تقارير وكالات المضفين"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

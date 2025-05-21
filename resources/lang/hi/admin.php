@@ -386,6 +386,10 @@ return [
     //huaweiPay
     'huawei_pay_merchant_id' => 'मर्चेंट आईडी',
 
+    // ziniPay
+    "zinipay" => "जिनीपे",
+    "url" => "यूआरएल",
+
     'fawry'         => 'फौरी',
     'skyPay'        => 'स्काई पे',
     'strip'         => 'स्ट्राइप',
@@ -406,6 +410,7 @@ return [
     'sslcommerz'    => 'एसएसएलकॉमर्ज',
     'google_pay'    => 'गूगल पे',
     'huawei_pay' => 'हुआवेई पे',
+    "webhook_url" => "वेबहुक URL",
 
     "target_no" => 'लक्ष्य संख्या',
     "diamonds" => 'हीरे का लक्ष्य',

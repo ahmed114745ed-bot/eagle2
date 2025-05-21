@@ -18,7 +18,8 @@ class AgencySettingsController extends MainController
      */
     protected $title = 'Agency settings';
 
-    public function index(Content $content){
+    public function index(Content $content)
+    {
         checkAgencyFeature();
 
         $hours =  settings()->get('hours');
@@ -29,31 +30,39 @@ class AgencySettingsController extends MainController
         $languages = Language::all();
         $configAll = Config::all();
         return parent::index($content
-        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels','diamonds', 'languages', 'configAll')));
+            ->view('agency_settings', compact('hours', 'days', 'moments', 'reels', 'diamonds', 'languages', 'configAll')));
     }
 
-    public function badges(){
+    public function badges()
+    {
         $lang = request()->header('X-localization', 'en');
-        $host = Config::where('name', $lang . '_'. 'host')->first();
-        $shipping = Config::where('name', $lang . '_'. 'shipping')->first();
-        $agency_owner = Config::where('name', $lang . '_'. 'agency_owner')->first();
 
+        $types = ['shipping', 'host', 'agency_owner', 'bd'];
+        $typeIds = ['shipping' => 3, 'host' => 2, 'agency_owner' => 1, 'bd' => 4]; // example IDs
+        $suffixes = ['badge', 'intro', 'frame'];
+
+        $data = [];
+
+        foreach ($types as $type) {
+            $images = [];
+            foreach ($suffixes as $suffix) {
+                $name = $suffix === 'badge'
+                    ? $lang . '_' . $type
+                    : $lang . '_' . $type . '_' . $suffix;
+
+                $config = Config::where('name', $name)->first();
+                $images['image_' . $suffix] = $config?->value ?? null;
+            }
+
+            $data[] = array_merge(
+                ['type' => $typeIds[$type]],
+                $images
+            );
+        }
+        settings()->set('badges-agency', false);
         return response([
             'status' => 'success',
-            'data' => [
-                [
-                    'type' => 3,
-                    'image' => $shipping?->value
-                ],
-                [
-                    'type' => 2,
-                    'image' => $host?->value
-                ],
-                [
-                    'type' => 1,
-                    'image' => $agency_owner?->value
-                ]
-            ]
+            'data' => $data
         ]);
     }
 }

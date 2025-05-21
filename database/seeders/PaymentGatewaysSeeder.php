@@ -36,6 +36,7 @@ class PaymentGatewaysSeeder extends Seeder
             'sslcommerz.png',
             'googlepay.png',
             'huaweipay.png',
+            'zinipay.jpg',
         ];
 
         foreach ($images as $img) {
@@ -82,6 +83,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'https://www.google.com'
             ],
+            'new_7' => [
+                "name" => "fawry_webhook_url",
+                "type" => "input",
+                "value" => 'https://www.google.com'
+            ],
         ];
 
         foreach ($fawry_fields as $key => $value) {
@@ -122,6 +128,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_5' => [
                 "name" => "paysky_api_key",
+                "type" => "input",
+                "value" => 'https://www.google.com'
+            ],
+            'new_6' => [
+                "name" => "paysky_webhook_url",
                 "type" => "input",
                 "value" => 'https://www.google.com'
             ]
@@ -171,6 +182,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_6' => [
                 "name" => "stripe_webhook_secret",
+                "type" => "input",
+                "value" => 'webhook'
+            ],
+            'new_7' => [
+                "name" => "stripe_webhook_url",
                 "type" => "input",
                 "value" => 'webhook'
             ],
@@ -228,6 +244,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'webhook'
             ],
+            'new_8' => [
+                "name" => "opay_webhook_url",
+                "type" => "input",
+                "value" => 'webhook'
+            ],
         ];
 
 
@@ -269,6 +290,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_5' => [
                 "name" => "cashfree_base_url",
+                "type" => "input",
+                "value" => 'asdasdad'
+            ],
+            'new_6' => [
+                "name" => "cashfree_webhook_url",
                 "type" => "input",
                 "value" => 'asdasdad'
             ],
@@ -321,6 +347,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "file",
                 "value" => 'asdasdad'
             ],
+            'new_7' => [
+                "name" => "apple_webhook_url",
+                "type" => "file",
+                "value" => 'asdasdad'
+            ],
         ];
 
 
@@ -361,7 +392,12 @@ class PaymentGatewaysSeeder extends Seeder
                 "name" => "mada_payment_address",
                 "type" => "input",
                 "value" => 'asdasd'
-            ]
+            ],
+            'new_5' => [
+                "name" => "mada_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -402,7 +438,12 @@ class PaymentGatewaysSeeder extends Seeder
                 "name" => "liqpay_payment_address",
                 "type" => "input",
                 "value" => 'asdasd'
-            ]
+            ],
+            'new_5' => [
+                "name" => "liqpay_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -443,7 +484,12 @@ class PaymentGatewaysSeeder extends Seeder
                 "name" => "paypal_payment_address",
                 "type" => "input",
                 "value" => 'asdasd'
-            ]
+            ],
+            'new_5' => [
+                "name" => "paypal_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -490,7 +536,12 @@ class PaymentGatewaysSeeder extends Seeder
                 "name" => "paytm_payment_address",
                 "type" => "input",
                 "value" => 'asdasd'
-            ]
+            ],
+            'new_6' => [
+                "name" => "paytm_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -536,7 +587,12 @@ class PaymentGatewaysSeeder extends Seeder
                 "name" => "paytabs_payment_address",
                 "type" => "input",
                 "value" => 'asdasd'
-            ]
+            ],
+            'new_6' => [
+                "name" => "paytabs_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -589,6 +645,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'asdasd'
             ],
+            'new_7' => [
+                "name" => "bkash_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -626,6 +687,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_4' => [
                 "name" => "razorpay_payment_address",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
+            'new_5' => [
+                "name" => "razorpay_webhook_url",
                 "type" => "input",
                 "value" => 'asdasd'
             ],
@@ -672,6 +738,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_5' => [
                 "name" => "senangpay_payment_address",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
+            'new_6' => [
+                "name" => "senangpay_webhook_url",
                 "type" => "input",
                 "value" => 'asdasd'
             ],
@@ -732,6 +803,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'asdasd'
             ],
+            'new_8' => [
+                "name" => "paymob_accept_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -775,6 +851,11 @@ class PaymentGatewaysSeeder extends Seeder
             ],
             'new_5' => [
                 "name" => "flutterwave_payment_address",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
+            'new_6' => [
+                "name" => "flutterwave_webhook_url",
                 "type" => "input",
                 "value" => 'asdasd'
             ],
@@ -830,6 +911,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'asdasd'
             ],
+            'new_7' => [
+                "name" => "paystack_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -871,6 +957,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => 'asdasd'
             ],
+            'new_5' => [
+                "name" => "sslcommerz_webhook_url",
+                "type" => "input",
+                "value" => 'asdasd'
+            ],
         ];
 
 
@@ -904,6 +995,11 @@ class PaymentGatewaysSeeder extends Seeder
                 "type" => "input",
                 "value" => "test"
             ],
+            'new_3' => [
+                "name" => "google_pay_webhook_url",
+                "type" => "input",
+                "value" => "test"
+            ],
         ];
 
         foreach ($google_pay_fields as $key => $value) {
@@ -927,8 +1023,13 @@ class PaymentGatewaysSeeder extends Seeder
         ]);
 
         $huawei_pay_fields = [
-            'new_2' => [
+            'new_1' => [
                 "name" => "huawei_pay_merchant_id",
+                "type" => "input",
+                "value" => "123"
+            ],
+            'new_2' => [
+                "name" => "huawei_pay_webhook_url",
                 "type" => "input",
                 "value" => "123"
             ],
@@ -938,6 +1039,44 @@ class PaymentGatewaysSeeder extends Seeder
             Setting::updateOrCreate([
                 'key' => $value['name'],
                 'item_id' => $huawei_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
+        //zinipay
+        $zinipay_id = PaymentCoin::updateOrCreate([
+            'title' => 'zinipay',
+        ], [
+            'photo' => 'images/zinipay.jpg',
+            'status' => 1,
+            'type' => 'zinipay',
+        ]);
+
+        $zinipay_fields = [
+            'new_1' => [
+                "name" => "zinipay_api_key",
+                "type" => "input",
+                "value" => "123"
+            ],
+            'new_2' => [
+                "name" => "zinipay_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+            'new_3' => [
+                "name" => "zinipay_webhook_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+        ];
+
+        foreach ($zinipay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $zinipay_id->id,
                 'type' => 'payment'
             ], [
                 'value' => $value['value'],

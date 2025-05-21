@@ -9,36 +9,10 @@
     }
 
     /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: #222;
-        min-height: 400px;
+   
 
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
 
-    .settings-sidebar h2 {
-        text-align: center;
-        color: #ff9800;
-    }
 
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        background: #333;
-        color: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .settings-menu button:hover {
-        background: #ff9800;
-    }
 
     /* محتوى الصفحة */
     .settings-content {
@@ -195,6 +169,18 @@
     .tab-content input[type="file"] {
         grid-column: 2;
     }
+.settings-sidebar {
+        width: 250px;
+        background: #222;
+        min-height: 400px;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .settings-sidebar h2 {
+        text-align: center;
+        color: #ff9800;
+    }
 
     .tab-content button {
         grid-column: 1 / span 2;
@@ -270,6 +256,48 @@
         transition: background 0.3s;
         grid-column: 1 / -1; /* Span full width */
     }
+    .settings-sidebar {
+
+        background-color: var(--table-background-color);
+        display: inline;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: var(--text-secondary-color);
+        overflow-x: auto;
+        /* يجعل الشريط قابلاً للتمرير عند الحاجة */
+        white-space: nowrap;
+        /* يمنع العناصر من النزول لسطر جديد */
+        scrollbar-width: thin;
+        /* تقليل عرض شريط التمرير */
+    }
+    .settings-menu {
+        display: flex;
+        gap: 4px;
+        color: var(--text-secondary-color);
+        overflow-x: auto;
+        /* يجعل الشريط قابلاً للتمرير عند الحاجة */
+        white-space: nowrap;
+        /* يمنع العناصر من النزول لسطر جديد */
+        scrollbar-width: thin;
+        /* تقليل عرض شريط التمرير */
+
+    }
+     .settings-menu button {
+        background-color: var(--box-background-color);
+        border: none;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: color 0.3s ease-in-out;
+        color: var(--text-secondary-color) !important;
+
+    }
+     .settings-menu button:hover {
+        background: #ff9800;
+    }
+
 
     .upload-button:hover {
         background: #ffab40;
@@ -285,16 +313,14 @@
 </head>
 
 <body>
-    <div class="all-page">
-        <div class="settings-sidebar">
-            <h2>{{ __('Settings') }}</h2>
-            <div class="settings-menu">
-                <button onclick="showSection('PaymentGateways')"
-                style="background: var(--box-background-color); color: var(--text-secondary-color);">
-            {{ __('Payment Gateways') }}
-        </button>
-            </div>
+
+    <div class="settings-sidebar">
+        <div class="settings-menu">
+            <button onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
         </div>
+    </div>
+    <div class="all-page" style="width: 100%;">
+       
 
         <div class="settings-content">
 
@@ -390,36 +416,78 @@
         </script>
         <!-- كود JavaScript -->
         <script>
+            // function showSection(sectionId) {
+            //     //     document.querySelectorAll('.settings-section').forEach(section => {
+            //     //         section.classList.remove('active');
+            //     //     });
+
+            //     //     document.getElementById(sectionId).classList.add('active');
+            //     // }
+
+            //     document.querySelectorAll('.settings-menu button').forEach(button => {
+            //         button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
+            //         button.style.color = ''; // إرجاع لون النص الافتراضي
+            //     });
+
+            //     // إخفاء جميع الأقسام
+            //     document.querySelectorAll('.settings-section').forEach(section => {
+            //         section.classList.remove('active');
+            //     });
+
+            //     // إظهار القسم المطلوب
+            //     document.getElementById(sectionId).classList.add('active');
+
+            //     // تحديد الزر المضغوط عليه
+            //     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+
+            //     // تعيين لون الزر من متغير CSS
+            //     activeButton.style.backgroundColor = 'var(--primary-color)';
+            //     activeButton.style.color = 'var(--text-secondary-color)';
+
+
+            // }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                    // Function to get query parameter by name
+                    function getQueryParam(name) {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get(name);
+                    }
+
+                    // Get the 'firsttab' parameter from URL or default to 'chargesSettings'
+                    const activeTab = getQueryParam("firsttab") || "PaymentGateways";
+
+                    // Show the selected tab
+                    showSection(activeTab);
+                });
+
             function showSection(sectionId) {
-                //     document.querySelectorAll('.settings-section').forEach(section => {
-                //         section.classList.remove('active');
-                //     });
+                    // Remove active class from all sections
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
 
-                //     document.getElementById(sectionId).classList.add('active');
-                // }
+                    // Add active class to the selected section
+                    document.getElementById(sectionId).classList.add('active');
 
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
-                    button.style.color = ''; // إرجاع لون النص الافتراضي
-                });
+                    // Reset button styles
+                    document.querySelectorAll('.settings-menu button').forEach(button => {
+                        button.style.backgroundColor = '';
+                        button.style.color = '';
+                    });
 
-                // إخفاء جميع الأقسام
-                document.querySelectorAll('.settings-section').forEach(section => {
-                    section.classList.remove('active');
-                });
+                    // Highlight the active button
+                    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                    if (activeButton) {
+                        activeButton.style.backgroundColor = 'var(--primary-color)';
+                        activeButton.style.color = 'var(--text-secondary-color)';
+                    }
 
-                // إظهار القسم المطلوب
-                document.getElementById(sectionId).classList.add('active');
-
-                // تحديد الزر المضغوط عليه
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-
-                // تعيين لون الزر من متغير CSS
-                activeButton.style.backgroundColor = 'var(--primary-color)';
-                activeButton.style.color = 'var(--text-secondary-color)';
-
-
-            }
+                    // Update the URL with the selected tab without reloading
+                    const url = new URL(window.location);
+                    url.searchParams.set("firsttab", sectionId);
+                    window.history.pushState({}, "", url);
+                }
 
             function openFullScreen(imgElement) {
                 var modal = document.getElementById("imageModal");

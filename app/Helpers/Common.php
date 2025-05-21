@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Setting;
+use App\Models\ShippingAgency;
 use App\Models\Vip;
 use App\Models\Pack;
 use App\Models\Role;
@@ -1228,9 +1229,9 @@ class Common
                 'role_id' => $role->id,
             ]);
         }
-        if ($user->email != null) {
-            Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
-        }
+        // if ($user->email != null) {
+        //     Notification::route('mail',  $user->email)->notify(new AgencyOwnerRole($user->uuid, $password));
+        // }
         return true;
     }
 
@@ -1360,11 +1361,44 @@ class Common
 
     public static function searchAgency($id)
     {
-        $agency = Agency::where('id', $id)
-            ->where('Shipping_agency', true)
-            // ->whereHas('chargeAgency' )
-            ->first();
-
+        $agency = ShippingAgency::find($id);
         return $agency ?: false;
     }
+
+
+
+    public static function renderWalletMessage(string $messageKey, string|array|null $messageData): string
+    {
+        $messageData = is_string($messageData) ? json_decode($messageData, true) ?? [] : $messageData;
+        $fullKey = 'messages.' . $messageKey;
+    
+        if (str_contains($messageKey, 'user')) {
+            $userId = $messageData['receiver_id'] ?? $messageData['user_id'] ?? null;
+            if ($userId) {
+                $user = \App\Models\User::find($userId);
+                if ($user) {
+                    $messageData['name'] = $user->name;
+                    $messageData['target'] = $user->name; 
+                
+                }
+            }
+        }
+    
+        if (str_contains($messageKey, 'agency')) {
+            $agencyId = $messageData['agency_id'] ?? null;
+            if ($agencyId) {
+                $agency = \App\Models\Agency::find($agencyId);
+                if ($agency) {
+                    $messageData['name'] = $agency->name;
+                    $messageData['target'] = $agency->name;
+                }
+            }
+        }
+    
+        $messageData['name'] = $messageData['name'] ?? $messageData['target'] ?? __('unknown');
+        $messageData['target'] = $messageData['target'] ?? $messageData['name'] ?? __('unknown');
+    
+        return __($fullKey, $messageData);
+    }
+    
 }

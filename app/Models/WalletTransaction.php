@@ -15,6 +15,8 @@ class WalletTransaction extends Model
         'value',
         'description',
         'description_data',
+        'transactions_type',
+        'message'
     ];
 
     public function user(): BelongsTo
@@ -26,4 +28,6 @@ class WalletTransaction extends Model
     {
         return $this->belongsTo(UserWallet::class, 'user_id', 'user_id');
     }
+
+
 }

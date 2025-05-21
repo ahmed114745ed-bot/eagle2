@@ -26,21 +26,21 @@ class WalletService
         float $amount,
         ?string $transactionsType = null,
         ?string $description = null,
-        $descriptionData = null
+        $descriptionData = null,
+        $message = 'transfer_to_user'
     ): WalletTransaction {
-        return DB::transaction(function () use ($userId, $type, $amount, $transactionsType, $description, $descriptionData) {
+        return DB::transaction(function () use ($userId, $type, $amount, $transactionsType, $description, $descriptionData ,$message) {
             $wallet = UserWallet::firstOrCreate(
                 ['user_id' => $userId],
                 ['value' => 0, 'cut_amount' => 0, 'pending_value' => 0]
             );
-
+            
             switch ($type) {
                 case 'add':
                     $wallet->value += $amount;
                     break;
 
                 case 'cut':
-                    $wallet->value -= $amount;
                     $wallet->cut_amount += $amount;
                     $amount = -$amount;
                     break;
@@ -52,9 +52,8 @@ class WalletService
                 default:
                     throw new Exception("Unsupported wallet transaction type: $type");
             }
-
+            
             $wallet->save();
-
             return WalletTransaction::create([
                 'user_id' => $userId,
                 'type' => $type,
@@ -62,6 +61,8 @@ class WalletService
                 'value' => $amount,
                 'description' => $description,
                 'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
+                'message' => $message,
+           
             ]);
         });
     }

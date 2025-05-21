@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Helpers\Common;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 
@@ -46,14 +47,37 @@ class ConfigServiceProvider extends ServiceProvider
 
     public function getReceivedAndSanderPercentage(): array
     {
-        $keys       = [ 'exp_sender_percentage', 'exp_received_percentage', 'exp_cp_percentage'];
-        $collection = Common::getConfFromKey($keys);
-        $values = [];
-        foreach ($keys as $key) {
-            $config    = $collection->where('name', $key)->first();
-            $values[] = $config? $config->value / 100 : 1;
-        }
-        unset($collection);
-        return $values;
+        return Cache::remember('exp_percentages', now()->addMinutes(60), function () {
+            $keys = [
+                'exp_sender_percentage',
+                'exp_received_percentage',
+                'exp_cp_percentage',
+                'exp_room_percentage',
+                'exp_charge_percentage'
+            ];
+
+            $collection = Common::getConfFromKey($keys);
+            \Log::info($collection);
+            $values = [];
+
+            foreach ($keys as $key) {
+                $config = $collection->where('name', $key)->first();
+                $values[$key] = $config ? $config->value  : 1;
+            }
+
+            return $values;
+        });
     }
+    // public function getReceivedAndSanderPercentage(): array
+    // {
+    //     $keys       = [ 'exp_sender_percentage', 'exp_received_percentage', 'exp_cp_percentage'];
+    //     $collection = Common::getConfFromKey($keys);
+    //     $values = [];
+    //     foreach ($keys as $key) {
+    //         $config    = $collection->where('name', $key)->first();
+    //         $values[] = $config? $config->value / 100 : 1;
+    //     }
+    //     unset($collection);
+    //     return $values;
+    // }
 }
