@@ -347,8 +347,53 @@ return [
     "sslcommerz_store_password" => "كلمة مرور المتجر",
     "sslcommerz_payment_address" => "عنوان الدفع",
 
-    //googlePay
-    "google_pay_merchant_id" => "معرّف التاجر",
+    // Google Pay
+    "payment_url"       => "رابط الدفع",
+    "node_server_name"  => "اسم خادم Node",
+
+    // Mada
+    "access_token"      => "رمز الوصول",
+    "payment_address"   => "عنوان الدفع",
+
+    // LiqPay
+    "private_key"       => "المفتاح الخاص",
+
+    // PayPal
+    "client_id"         => "معرّف العميل",
+    "client_secret"     => "سر العميل",
+
+    // Paytm
+    "merchant_key"             => "مفتاح التاجر",
+    "merchant_website_link"    => "رابط موقع التاجر",
+
+    // PayTabs
+    "profile_id"        => "معرّف الملف الشخصي",
+    "server_key"        => "مفتاح الخادم",
+
+    // bKash
+    "appkey"            => "مفتاح التطبيق",
+    "app_secret"        => "سر التطبيق",
+
+    // Razorpay
+    "api_secret"        => "سر واجهة البرمجة",
+
+    // SenangPay
+    "callback_url"      => "رابط العودة",
+
+    // Paymob Accept
+    "iframe_id"         => "معرّف Iframe",
+    "integration_id"    => "معرّف التكامل",
+    "hmac"              => "رمز HMAC",
+
+    // Flutter Wave
+    "hash"              => "هاش",
+
+    // Paystack
+    "merchant_email"    => "بريد التاجر الإلكتروني",
+
+    // SSLCommerz
+    "store_id"          => "معرّف المتجر",
+    "store_password"    => "كلمة مرور المتجر",
 
     //huaweiPay
     'huawei_pay_merchant_id' => 'معرّف التاجر',
