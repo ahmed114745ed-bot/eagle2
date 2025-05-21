@@ -400,38 +400,54 @@
                             <input type="hidden" name="language" value="{{ $language->code }}">
 
                             <div class="badge-upload-container">
-                                @foreach (['shipping', 'host', 'agency_owner'] as $type)
-                                    <div class="badge-upload-item">
-                                        <label for="{{ $language->code }}_{{ $type }}">
+                                @foreach (['shipping', 'host', 'agency_owner', 'bd'] as $type)
+                                    <div class="badge-upload-item" style="padding: 12px; border: 1px solid #444; margin-bottom: 20px; background: #333; color: #ffa500;">
+                                        <label>
                                             @if ($type == 'host')
                                                 {{ __('Hosting') }} ({{ strtoupper($language->code) }}):
                                             @else
                                                 {{ __(ucfirst($type)) }} ({{ strtoupper($language->code) }}):
                                             @endif
                                         </label>
-                                        <input type="file" id="{{ $language->code }}_{{ $type }}"
-                                            name="{{ $language->code }}_{{ $type }}"
-                                            onchange="previewImage(this, 'preview_{{ $language->code }}_{{ $type }}')">
 
-                                        <div class="badge-preview">
-                                            @php
-                                                $row = $configAll
-                                                    ->where('name', $language->code . '_' . $type)
-                                                    ->first();
-                                            @endphp
-                                            @if ($row)
-                                                <img id="preview_{{ $language->code }}_{{ $type }}"
-                                                    src="{{ getImagePath($row?->value) }}"
-                                                    alt="{{ $type }} badge" onclick="openFullScreen(this)">
-                                            @else
-                                                <img id="preview_{{ $language->code }}_{{ $type }}"
-                                                    src="" alt="No image uploaded" style="display: none;">
-                                            @endif
+                                        @php
+                                            $suffixes = ['badge', 'intro', 'frame'];
+                                        @endphp
+
+                                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
+                                            @foreach ($suffixes as $suffix)
+                                                @php
+                                                    $inputName = $language->code . '_' . $type . '_' . $suffix;
+                                                    $row = $configAll->where('name', $inputName)->first();
+                                                @endphp
+
+                                                <div>
+                                                    <input type="file"
+                                                           id="{{ $inputName }}"
+                                                           name="{{ $inputName }}"
+                                                           onchange="previewImage(this, 'preview_{{ $inputName }}')"
+                                                           style="display: block; width: 100%; max-width: 200px;">
+
+                                                    <div class="badge-preview" style="margin-top: 5px;">
+                                                        @if ($row)
+                                                            <img id="preview_{{ $inputName }}"
+                                                                 src="{{ getImagePath($row?->value) }}"
+                                                                 alt="{{ $type }} {{ $suffix }}"
+                                                                 style="max-height: 50px; cursor: pointer;"
+                                                                 onclick="openFullScreen(this)">
+                                                        @else
+                                                            <img id="preview_{{ $inputName }}"
+                                                                 src=""
+                                                                 alt="No image uploaded"
+                                                                 style="display: none; max-height: 50px;">
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
-
                             <button type="submit" class="upload-button">
                                 {{ __('Submit') }}
                             </button>
