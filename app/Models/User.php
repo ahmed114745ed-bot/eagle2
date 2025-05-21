@@ -440,7 +440,7 @@ class User extends Authenticatable
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class);
+        return $this->belongsTo(Agency::class, 'agency_id');
     }
 
     public function agencies()
@@ -711,7 +711,7 @@ class User extends Authenticatable
 
 
 
-    
+
     public function setTotalChargeLevelAttribute(float $value)
     {
         $level = @$this->charge_level  + $this->sub_charger_level;
@@ -1349,14 +1349,14 @@ class User extends Authenticatable
     public function incrementCutAmountInBdSallary(int $amount)
     {
         $lastBdSalary = $this->bdSalaries()->latest()->first();
-    
+
         if ($lastBdSalary) {
-            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);  
+            $newAmount = max(0, $lastBdSalary->cut_amount + $amount);
             $lastBdSalary->update(['cut_amount' => $newAmount]);
             return true;
         }
-    
+
         return false;
     }
-    
+
 }
