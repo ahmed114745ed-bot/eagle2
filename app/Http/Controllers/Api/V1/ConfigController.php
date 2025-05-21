@@ -53,6 +53,7 @@ class ConfigController extends Controller
                 ]);
             }
         }
+        settings()->set('badges-agency', true);
         return back();
     }
 

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn('Host_agency');
-            $table->dropColumn('Shipping_agency');
+            // $table->dropColumn('Host_agency');
+            // $table->dropColumn('Shipping_agency');
             $table->integer('type')->after('id')->comment('1 = Host Agency, 2 = Shipping');
         });
     }
