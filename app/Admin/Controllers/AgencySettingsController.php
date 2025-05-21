@@ -18,7 +18,8 @@ class AgencySettingsController extends MainController
      */
     protected $title = 'Agency settings';
 
-    public function index(Content $content){
+    public function index(Content $content)
+    {
         checkAgencyFeature();
 
         $hours =  settings()->get('hours');
@@ -29,10 +30,11 @@ class AgencySettingsController extends MainController
         $languages = Language::all();
         $configAll = Config::all();
         return parent::index($content
-        ->view('agency_settings',compact('hours', 'days', 'moments', 'reels','diamonds', 'languages', 'configAll')));
+            ->view('agency_settings', compact('hours', 'days', 'moments', 'reels', 'diamonds', 'languages', 'configAll')));
     }
 
-    public function badges(){
+    public function badges()
+    {
         $lang = request()->header('X-localization', 'en');
 
         $types = ['shipping', 'host', 'agency_owner', 'bd'];
@@ -57,7 +59,7 @@ class AgencySettingsController extends MainController
                 $images
             );
         }
-
+        settings()->set('badges-agency', false);
         return response([
             'status' => 'success',
             'data' => $data
