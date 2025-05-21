@@ -398,6 +398,10 @@ return [
     //huaweiPay
     'huawei_pay_merchant_id' => 'معرّف التاجر',
 
+    // ziniPay
+    "zinipay" => "زيني باي",
+    "url" => "الرابط",
+
     'fawry'         => 'فوري',
     'skyPay'        => 'سكاي باي',
     'strip'         => 'سترايب',
@@ -418,6 +422,7 @@ return [
     'sslcommerz'    => 'إس إس إل كمرز',
     'google_pay'    => 'جوجل باي',
     'huawei_pay' => 'هواوي باي',
+    "webhook_url" => "عنوان ويب هوك",
 
     "target_no" => 'رقم الهدف',
     "diamonds" => 'هدف الألماس',

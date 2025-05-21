@@ -13,7 +13,7 @@ class AgenciesExport implements FromCollection, WithHeadings
         return Agency::select([
             'id', 'owner_id', 'name', 'notice', 'status', 'phone', 'url', 'img', 'contents', 
             'created_at', 'updated_at', 'old_usd', 'target_usd', 'target_token_usd', 'app_owner_id', 
-            'salary', 'Shipping_agency', 'Host_agency', 'agency_manger_id', 'agency_dash_manger_id', 
+            'salary',  'agency_manger_id', 'agency_dash_manger_id', 
             'deleted_at', 'monthly_target', 'password', 'coins'
         ])->get();
     }
