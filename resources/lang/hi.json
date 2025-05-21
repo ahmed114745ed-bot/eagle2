@@ -1827,7 +1827,66 @@
   "setting internal sales system": "आंतरिक बिक्री प्रणाली सेटिंग",
     "Settings charging agencies": "चार्जिंग एजेंसियों की सेटिंग्स",
   "setting Agency Manager": "एजेंसी मैनेजर की सेटिंग",
-  "Host Agencies Settings": "होस्ट एजेंसियों की सेटिंग्स"
+  "Host Agencies Settings": "होस्ट एजेंसियों की सेटिंग्स",
+
+
+ "browse get salary requests": "वेतन अनुरोध ब्राउज़ करें",
+  "create get salary requests": "वेतन प्राप्ति अनुरोध बनाएं",
+  "delete get salary requests": "वेतन प्राप्ति अनुरोध हटाएं",
+  "edit get salary requests": "वेतन प्राप्ति अनुरोध संपादित करें",
+  "show get salary requests": "वेतन प्राप्ति अनुरोध दिखाएं",
+
+  "browse withdraw type": "निकासी प्रकार ब्राउज़ करें",
+  "create withdraw type": "निकासी प्रकार बनाएं",
+  "delete withdraw type": "निकासी प्रकार हटाएं",
+  "edit withdraw type": "निकासी प्रकार संपादित करें",
+  "show withdraw type": "निकासी प्रकार दिखाएं",
+
+  "browse event": "ईवेंट ब्राउज़ करें",
+  "create event": "ईवेंट बनाएं",
+  "delete event": "ईवेंट हटाएं",
+  "edit event": "ईवेंट संपादित करें",
+  "show event": "ईवेंट दिखाएं",
+
+  "browse special frame": "विशेष फ्रेम ब्राउज़ करें",
+  "create special frame": "विशेष फ्रेम बनाएं",
+  "delete special frame": "विशेष फ्रेम हटाएं",
+  "edit special frame": "विशेष फ्रेम संपादित करें",
+  "show special frame": "विशेष फ्रेम दिखाएं",
+
+  "browse wares vips": "VIP वस्तुएं ब्राउज़ करें",
+  "create wares vips": "VIP वस्तुएं बनाएं",
+  "delete wares vips": "VIP वस्तुएं हटाएं",
+  "edit wares vips": "VIP वस्तुएं संपादित करें",
+  "show wares vips": "VIP वस्तुएं दिखाएं",
+
+  "browse manger type": "प्रबंधक प्रकार ब्राउज़ करें",
+  "create manger type": "प्रबंधक प्रकार बनाएं",
+  "delete manger type": "प्रबंधक प्रकार हटाएं",
+  "edit manger type": "प्रबंधक प्रकार संपादित करें",
+  "show manger type": "प्रबंधक प्रकार दिखाएं",
+
+  "browse manger agency manager": "एजेंसी प्रबंधक ब्राउज़ करें",
+  "create manger agency manager": "एजेंसी प्रबंधक बनाएं",
+  "delete manger agency manager": "एजेंसी प्रबंधक हटाएं",
+  "edit manger agency manager": "एजेंसी प्रबंधक संपादित करें",
+  "show manger agency manager": "एजेंसी प्रबंधक दिखाएं",
+
+  "Browse Coins": "सिक्के ब्राउज़ करें",
+  "Create Coins": "सिक्के बनाएं",
+  "Edit Coins": "सिक्के संपादित करें",
+  "delete Coins": "सिक्के हटाएं",
+
+  "browse version": "संस्करण ब्राउज़ करें",
+  "create version": "संस्करण बनाएं",
+  "delete version": "संस्करण हटाएं",
+
+  "browse users": "उपयोगकर्ता ब्राउज़ करें",
+  "create users": "उपयोगकर्ता बनाएं",
+  "delete users": "उपयोगकर्ता हटाएं"
+    
+
+
 
 
 
