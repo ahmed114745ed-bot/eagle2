@@ -141,13 +141,27 @@ Route::get('/clear_clear', function () {
 //    return "Seeded!";
 //});
 
+//Route::get('/change_agencies_type', function () {
+//
+//    DB::table('agencies')
+//        ->where('type', 0)
+//        ->update(['type' => 1]);
+//
+//    return "Done!";
+//});
+
 Route::get('/change_agencies_type', function () {
 
     DB::table('agencies')
-        ->where('type', 0)
+        ->where('Shipping_agency', 1)
+        ->where('Host_agency', 0)
+        ->update(['type' => 2]);
+
+    DB::table('agencies')
+        ->where('Host_agency', 1)
         ->update(['type' => 1]);
 
-    return "Done!";
+    return "agencies types changed successfully!";
 });
 
 Route::get('/config_cache', function () {
