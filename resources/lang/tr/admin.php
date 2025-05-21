@@ -390,6 +390,9 @@ return [
     //huaweiPay
     'huawei_pay_merchant_id' => 'Mağaza Kimliği',
 
+    "zinipay" => "ZiniPay",
+    "url" => "Bağlantı",
+
     'fawry'         => 'fawry',
     'skyPay'        => 'skyPay',
     'strip'         => 'stripe',
@@ -410,6 +413,7 @@ return [
     'sslcommerz'    => 'sslcommerz',
     'google_pay'    => 'google_pay',
     'huawei_pay' => 'Huawei Pay',
+    "webhook_url" => "Webhook URL'si",
 
     "target_no" => 'Hedef Numarası',
     "diamonds" => 'Elmas Hedefi',

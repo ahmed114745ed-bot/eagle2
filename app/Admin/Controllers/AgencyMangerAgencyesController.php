@@ -163,8 +163,8 @@ class AgencyMangerAgencyesController extends MainController
         $show->field('target_token_usd', __('Target token usd'));
         $show->field('app_owner_id', __('App owner id'));
         $show->field('salary', __('Salary'));
-        $show->field('Shipping_agency', __('Shipping agency'));
-        $show->field('Host_agency', __('Host agency'));
+        // $show->field('Shipping_agency', __('Shipping agency'));
+        // $show->field('Host_agency', __('Host agency'));
         $show->field('agency_manger_id', __('Agency manger id'));
         $this->extendShow($show);
 
@@ -293,26 +293,26 @@ class AgencyMangerAgencyesController extends MainController
             // $form->input('at_least_one_selected', $atLeastOneSelected);
 
             $appOwnerId = $form->input('app_owner_id');
-            $Host_agency = $form->input('Host_agency');
-            $Shipping_agency = $form->input('Shipping_agency');
+            // $Host_agency = $form->input('Host_agency');
+            // $Shipping_agency = $form->input('Shipping_agency');
             $host = 0;
 
-            if ($Host_agency === 'off' && $Shipping_agency === 'off') {
-                session()->flash('show_alert', 'Your alert message');
-                return redirect()->back();
-            }
-            if ($Host_agency === 'on') {
-                $host += 2;
-            }
+            // if ($Host_agency === 'off' && $Shipping_agency === 'off') {
+            //     session()->flash('show_alert', 'Your alert message');
+            //     return redirect()->back();
+            // }
+            // if ($Host_agency === 'on') {
+            //     $host += 2;
+            // }
 
-            if ($Shipping_agency === 'on') {
-                $host += 3;
-            }
-            if ($host > 3) {
-                $host = 4;
-            }
+            // if ($Shipping_agency === 'on') {
+            //     $host += 3;
+            // }
+            // if ($host > 3) {
+            //     $host = 4;
+            // }
             // if ($appOwnerId) {
-            $newType = intval($host);
+            // $newType = intval($host);
             $user =   User::where('id', $appOwnerId)->first();
             $user->type_user = 2;
             $user->save();

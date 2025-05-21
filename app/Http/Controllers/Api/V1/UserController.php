@@ -285,9 +285,6 @@ class UserController extends Controller
     {
         $user = $request->user();
         try {
-
-
-
             $userWithMedals = $this->userService->processUserData($user, $request->header('X-Device-Token'), $request->header('lat'), $request->header('long'));
         } catch (\Exception $exception) {
 

@@ -212,7 +212,9 @@ return [
     'kickFamily' => 'Kick from family',
     'chickKick' => 'Are you sure you want to kick him from the family?',
     'kickAgency' => 'Kick from agency',
-    'chickKickAgency' => 'The salary value will be set to zero for the current month, and the achieved diamonds and hours for this user will be removed. Do you want to confirm?',
+    'chickKickAgency' => 'If approved, the host will be removed from the agency and the diamonds, hours, and days earned in this agency will be deleted.
+    *However, the dollars already earned will not be withdrawn; they have been added to the wallet and can be used at any time.
+    After leaving the agency, they can join another agency and start the target again.',
     'free' => 'Free',
     'raise' => 'Raise',
     'lower' => 'Lower',
