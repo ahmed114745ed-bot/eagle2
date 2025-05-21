@@ -5,6 +5,7 @@ use App\Models\DeleteAccount;
 use App\Models\Room;
 use Encore\Admin\Controllers\AdminController;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use App\Admin\Controllers\CoinController;
 use App\Admin\Controllers\ConfigController as ControllersConfigController;
@@ -308,6 +309,82 @@ Route::get('/test-fcm/{userid}', function($userId) {
         ],
         'fcm_response' => $result
     ]);
+});
+
+
+
+
+Route::get('/add-admin-permissions', function () {
+
+    $sections = [
+        [
+            'base' => 'BD',
+            'slug_base' => 'bd',
+            'name_ar' => 'إضافة مدير تطوير',
+        ],
+        [
+            'base' => 'Host Agencies',
+            'slug_base' => 'host-agencies',
+            'name_ar' => 'وكالات الاستضافة',
+        ],
+        [
+            'base' => 'Mall Dedicate System',
+            'slug_base' => 'mall-dedicate',
+            'name_ar' => 'نظام المول المخصص',
+        ],
+        [
+            'base' => 'User Details',
+            'slug_base' => 'user-details',
+            'name_ar' => 'تفاصيل المستخدم',
+        ],
+    ];
+
+    $actions = [
+        ['name' => 'Add',     'slug' => 'create',     'method' => ['GET'],  'path' => '/create'],
+        ['name' => 'Store',   'slug' => 'store',      'method' => ['POST'], 'path' => '/store'],
+        ['name' => 'List',    'slug' => 'index',      'method' => ['GET'],  'path' => '/'],
+        ['name' => 'Show',    'slug' => 'show',       'method' => ['GET'],  'path' => '/{id}'],
+        ['name' => 'Operations', 'slug' => 'operations', 'method' => ['GET'], 'path' => '/operations'],
+    ];
+
+    foreach ($sections as $section) {
+        foreach ($actions as $action) {
+            $slug = "{$section['slug_base']}.{$action['slug']}";
+
+            $id = DB::table('admin_permissions')->updateOrInsert(
+                ['slug' => $slug],
+                [
+                    'name' => "{$section['base']} - {$action['name']}",
+                    'slug' => $slug,
+                    'http_method' => json_encode($action['method']),
+                    'http_path' => "/{$section['slug_base']}{$action['path']}",
+                    'name_ar' => "{$section['name_ar']} - {$action['name']}",
+                    'category' => $section['base'],
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]
+            );
+
+            // نحصل على ID الخاص بالصلاحية
+            $permissionId = DB::table('admin_permissions')
+                ->where('slug', $slug)
+                ->value('id');
+
+            // ربط الصلاحية بالدور 9
+            DB::table('admin_role_permissions')->updateOrInsert([
+                'role_id' => 9,
+                'permission_id' => $permissionId,
+            ]);
+        }
+    }
+
+    // صلاحية إضافية يدوية
+    DB::table('admin_role_permissions')->updateOrInsert([
+        'role_id' => 9,
+        'permission_id' => 17,
+    ]);
+
+    return '✅ تم إنشاء الصلاحيات وربطها بالدور 9 بنجاح.';
 });
 
 
