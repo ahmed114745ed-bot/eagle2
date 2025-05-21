@@ -225,6 +225,7 @@ class MyDataResource extends JsonResource
             'show_invite_code' => (bool)$this->userSetting?->show_invite_code ?? false,
             'wallet' => $this->wallet?->value ??0,
             'user_types' => $userTypes ?? [],
+            'wabble' => $this->getUserPack(12),
 
         ];
 
