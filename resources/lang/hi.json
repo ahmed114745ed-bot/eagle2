@@ -33,6 +33,11 @@
     "App Feature": "ऐप सुविधा",
     "Menu": "मेनू",
     "Operation log": "परिचालन लॉग",
+
+    "Agencies Count": "एजेंसियों की संख्या",
+    "BD Wallet": "बीडी वॉलेट",
+    "My Wallet": "मेरा वॉलेट",
+
     "App": "एप्लिकेशन",
     "Achievement Id": "उपलब्धि आईडी",
     "Description Ar": "विवरण अरबी",
@@ -385,6 +390,8 @@
     "current phone not verified": "वर्तमान फ़ोन सत्यापित नहीं है",
     "account deleted successfully": "खाता सफलतापूर्वक हटा दिया गया",
     "please set usd_value_in_coins in configs": "कृपया कॉन्फ़िग में usd_value_in_coins सेट करें",
+    "please set usd_value_in_coins in configs. Contact the administration!": "कृपया कॉन्फ़िग्स में usd_value_in_coins सेट करें। प्रशासन से संपर्क करें!",
+    "this agency not found": "यह एजेंसी नहीं मिली",
     "balance not enough": "शेष राशि पर्याप्त नहीं है",
     "missing owner_id": "मालिक का आईडी गायब है",
     "Missing data": "डेटा गायब है",
@@ -1293,6 +1300,13 @@
   "failed_accept_request": "अनुरोध को स्वीकार करने में विफल। कृपया पुनः प्रयास करें।",
   "failed_reject_request": "अनुरोध को अस्वीकार करने में विफल। कृपया पुनः प्रयास करें।",
   "failed_make_admin": "उपयोगकर्ता को व्यवस्थापक बनाने में विफल। कृपया पुनः प्रयास करें।",
+  "cp_gift_price": "प्रतिस्पर्धी अंक उपहार मूल्य",
+  "Enter Exp": "अंक दर्ज करें",
+  "rooms_gift_price": "कमरे का उपहार मूल्य",
+  "charge_gift_price": "चार्ज उपहार मूल्य",
+  "attraction_gift_price": "आकर्षण उपहार मूल्य",
+  "wealth_gift_price": "संपत्ति उपहार मूल्य",
+  "Go to Settings": "सेटिंग्स पर जाएं",
 
   "browse agency settings": "एजेंसी सेटिंग्स देखें",
   "edit agency settings": "एजेंसी सेटिंग्स संपादित करें",
@@ -1372,6 +1386,7 @@
   "user parent": "उपयोगकर्ता अभिभावक",
   "general": "सामान्य",
   "Lucky box": "लकी बॉक्स",
+  
 
   "Create Agencies": "एजेंसियां बनाएँ",
   "browse report": "रिपोर्ट देखें",
@@ -1421,9 +1436,29 @@
   "create charge country": "चार्ज देश बनाएँ",
   "shipping agency switch": "शिपिंग एजेंसी स्विच",
   "browse updates_group_chat": "ग्रुप चैट अपडेट ब्राउज़ करें",
-  "agency does not have this coin": "एजेंसी के पास इतने सिक्के नहीं हैं।",
-  "Game profits": "खेलों का लाभ",
-  "role name": "भूमिका का नाम"
+  "gift price": "उपहार मूल्य",
+  "app BD id": "ऐप BD आईडी",
+  "salaries BD": "BD वेतन",
+  "my wallet": "मेरा वॉलेट",
+  "request-agencies": "एजेंसी अनुरोध",
+  "request agencies": "एजेंसी अनुरोध",
+  "Request agencies": "एजेंसी अनुरोध",
+  "bd": "BD",
+  "Bd": "BD",
+  "BD": "BD",
+  "current_balance": "वर्तमान शेष",
+  "remaining_percent": "शेष प्रतिशत",
+  "cut": "कटौती",
+  "total": "कुल",
+  "agency": "एजेंसी",
+  "List of Agencies": "एजेंसियों की सूची",
+  "confirm_charge": "चार्ज की पुष्टि करें",
+  "enter_amount": "राशि दर्ज करें",
+  "transfer_to_wallet": "वॉलेट में स्थानांतरित करें",
+  "charge_wallet": "वॉलेट चार्ज करें",
+  "current_balance": "वर्तमान शेष",
+  "select_target": "लक्ष्य चुनें",
+  "bd_wallet_notice": "BD वॉलेट से डॉलर राशि स्थानांतरित करने पर, वह राशि आपके वॉलेट में जोड़ दी जाएगी। फिर आप इसे बेच सकते हैं या दूसरों को भेज सकते हैं।"
 
 
 

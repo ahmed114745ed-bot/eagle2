@@ -20,12 +20,21 @@ class UpgradeLevelController extends MainController
 
     public function ovipConfig(Request $request)
     {
-        $data = $request->except('_token');
 
+        $data = $request->except('_token','test_calco');
+        $Keys = [
+            'exp_sender_percentage',
+            'exp_received_percentage',
+            'exp_cp_percentage',
+            'exp_room_percentage',
+            'exp_charge_percentage'
+        ];
         foreach ($data as $key => $value) {
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
+            if (in_array($key, $Keys)) {
+                \Cache::forget('exp_percentages');
+            }
         }
-
         return redirect()->back()->with('message', __('dashboard.update'));
 
     }

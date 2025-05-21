@@ -18,9 +18,9 @@ class UpdateUserWhenSendGift
 
     private array $expPercentages;
 
-    public function __construct() {
-        $this->expPercentages = Config::get('exp_percentages') ?? [1,1];
-
+    public function __construct()
+    {
+        $this->expPercentages = Config::get('exp_percentages') ?? [1, 1];
     }
 
     public function update(int $totalCoins, User $receivedUser)
@@ -50,19 +50,16 @@ class UpdateUserWhenSendGift
 
 
         return $receivedUser;
-
     }
     public function updateUsers(int $totalCoins, array $userIds)
     {
         DB::table('users')->whereIn('id', $userIds)->update([
-                                                                'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
-                                                                'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
-                                                                'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
-                                                            ]);
-
-
+            'monthly_diamond_received' => DB::raw('monthly_diamond_received + ' . $totalCoins),
+            'total_diamond_received' => DB::raw('total_diamond_received + ' . $totalCoins),
+            'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
+        ]);
     }
-    public function updateReceivedLevels( User $receivedUser)
+    public function updateReceivedLevels(User $receivedUser)
     {
         $receivedUser->enableSaving = false;
         //update monthly diamond for received user
@@ -71,7 +68,7 @@ class UpdateUserWhenSendGift
 
         $totalDiamondReceived                  = $receivedUser->total_received_diamonds;
         $levelVip                     = $this->getLevel(1, $totalDiamondReceived);
-        $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0: 0;
+        $receivedUser->received_level = $levelVip != null ? (@$levelVip->level - $receivedUser->sub_receiver_level) ?? 0 : 0;
         if ($receivedUser->total_received_level > $lastReceivedLevel) {
             dispatch(new SendCustomOfficialMessageToUser($receivedUser->id, NotificationType::RECEIVED_LEVEL))->onQueue('notification');
         }
@@ -81,11 +78,11 @@ class UpdateUserWhenSendGift
         $receivedUser->enableSaving = true;
 
         return $receivedUser;
-
     }
 
     public function getLevel(int $type, int $totalCoins)
     {
+
         return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }
 
@@ -115,13 +112,17 @@ class UpdateUserWhenSendGift
         $senderUser->enableSaving = true;
 
         return $senderUser;
-
     }
 
     public function getSenderLevel($totalDiamondSend, $totalDiamond, int $subSenderLevel)
     {
-        $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages[0] ;
+        $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages['exp_sender_percentage'];
+        // dd($total,$totalDiamondSend,$totalDiamond ,$this->expPercentages['exp_sender_percentage']);
         $levelVip                 = $this->getLevel(2, $total);
+        if ($subSenderLevel < 0) {
+
+            return $levelVip != null ? (@$levelVip->level + $subSenderLevel) ?? 0 : 0;
+        }
         return $levelVip != null ? (@$levelVip->level - $subSenderLevel) ?? 0 : 0;
     }
 
@@ -132,12 +133,15 @@ class UpdateUserWhenSendGift
         return $levelVip != null ? @$levelVip->level ?? 0 : 0;
     }
 
-    public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subSenderLevel)
+    public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subReceiverLevel)
     {
-        $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages[1] ;
+        $total = intval($totalDiamondReceived + $totalDiamond) * $this->expPercentages['exp_received_percentage'];
+
         $levelVip                 = $this->getLevel(1, $total);
-        return $levelVip != null ? (@$levelVip->level - $subSenderLevel) ?? 0 : 0;
+        if ($subReceiverLevel < 0) {
+            return $levelVip != null ? (@$levelVip->level + $subReceiverLevel) ?? 0 : 0;
+        }
+
+        return $levelVip != null ? (@$levelVip->level - $subReceiverLevel) ?? 0 : 0;
     }
-
-
 }

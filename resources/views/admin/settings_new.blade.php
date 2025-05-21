@@ -22,6 +22,8 @@
 </html> -->
 
 @php
+use App\Models\Vip;
+
     $selectedTimeZone = App\Models\Setting::where('key', 'timezone')->first();
     $settings = App\Models\Setting::pluck('value', 'key')->toArray();
 
@@ -469,6 +471,14 @@
         padding: 0 !important;
         margin: 0 !important;
     }
+    .exp-card{
+        margin-bottom: 32px;
+
+    }
+   .exp-card-cont{
+    height: 400px;
+
+     }
 </style>
 
 </head>
@@ -478,6 +488,9 @@
     <div class="settings-sidebar">
         <div class="settings-menu">
             <button onclick="showSection('brandSettings')">{{ __('Brand settings') }}</button>
+            <button onclick="showSection('workSettings')" class="position-relative">
+                {{ __('Work') }}
+            </button>
             <button onclick="showSection('themeSettings')">{{ __('Theme settings') }}</button>
             <button onclick="showSection('timeSettings')">{{ __('Timing settings') }}</button>
 
@@ -503,12 +516,7 @@
                     <span>{{ __('soon') }}</span>
                 </div>
             </button>
-            <button onclick="showSection('workSettings')" class="position-relative">
-                {{ __('Work') }}
-                <div class="ribbon-banner">
-                    <span>{{ __('soon') }}</span>
-                </div>
-            </button>
+           
         </div>
     </div>
     <div class="all-page" style="    width: 100%;">
@@ -1076,6 +1084,309 @@
 
 
             <div id="workSettings" class="settings-section">
+                @php
+                $oldExpData=cache('exp_percentages');
+                @endphp
+                <div class="form">
+                    <label class="d-block">{{ __('Experience settings:') }}</label>
+
+                    <div class="row mt-4">
+                        <!-- Wealth Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('wealth') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="wealth_exp" class="form-label">{{ __('wealth') }}</label>
+                                                    <input type="text" id="wealth_exp" name="exp_sender_percentage"
+                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = X EXP</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @php
+                                            $sender = Vip::where('type',2)->count();
+                                        @endphp
+                                        @if ($sender == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                      <div class="col-md-12">
+                                      <div class="form-group">
+                                 <label for="wealth_gift_price">{{ __('gift price') }}</label>
+                                            <input type="text" id="wealth_gift_price" name="test_calco"
+                                                placeholder="{{  __('wealth_gift_price') }}"
+                                                style="width: auto; display: inline-block;"
+                                                value="{{ $settings['wealth_gift_price'] ?? '' }}"
+                                                class="form-control" >
+                                            <span id="exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                        </div>
+
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const expInput = document.getElementById('wealth_exp');
+                                                const giftPriceInput = document.getElementById('wealth_gift_price');
+                                                const resultSpan = document.getElementById('exp_result');
+
+                                                function updateExpResult() {
+                                                    const expRate = parseFloat(expInput.value);
+                                                    const giftPrice = parseFloat(giftPriceInput.value);
+
+                                                    if (!isNaN(expRate) && !isNaN(giftPrice)) {
+                                                        const totalExp = expRate * giftPrice;
+                                                        resultSpan.textContent = `= ${totalExp} EXP`;
+                                                    } else {
+                                                        resultSpan.textContent = '';
+                                                    }
+                                                }
+
+                                                expInput.addEventListener('input', updateExpResult);
+                                                giftPriceInput.addEventListener('input', updateExpResult);
+
+                                                // حساب أولي عند تحميل الصفحة
+                                                updateExpResult();
+                                            });
+                                        </script>
+
+                                        </div> 
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Attraction Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header exp-card  d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('attraction') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                <label for="attraction_exp" class="form-label">{{ __('attraction') }}</label>
+                                                <input type="text" id="attraction_exp" name="exp_received_percentage"
+                                                    placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
+                                                    class="form-control">
+                                                <span class="form-text text-muted">1 Diamond = X EXP</span>
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="attraction_gift_price">{{ __('gift price') }}</label>
+                                                <input type="text" id="attraction_gift_price" name="test_calco"
+                                                    placeholder="{{  __('attraction_gift_price') }}"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['attraction_gift_price'] ?? '' }}"
+                                                    class="form-control" >
+                                                <span id="attraction_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                            </div>
+                                        </div>
+                                        @php
+                                            $receiver = Vip::where('type',1)->count();
+                                        @endphp
+                                        @if ($receiver == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Charge Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card exp-card-cont p-3 shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('charge') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                                <div class="form-group">
+                                                    <label for="charge_exp" class="form-label">{{ __('charge') }}</label>
+                                                    <input type="text" id="charge_exp" name="exp_charge_percentage"
+                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = EXP</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="charge_gift_price">{{ __('coins') }}</label>
+                                                <input type="text" id="charge_gift_price" name="test_calco"
+                                                    placeholder="{{  __('charge_gift_price') }}"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['charge_gift_price'] ?? '' }}"
+                                                    class="form-control">
+                                                <span id="charge_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                            </div>
+                                        </div>
+
+                                        @php
+                                            $charger = Vip::where('type',5)->count();
+                                        @endphp
+                                        @if ($charger == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- Rooms Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('Rooms') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="rooms_exp" class="form-label">{{ __('Rooms') }}</label>
+                                                    <input type="text" id="rooms_exp" name="exp_room_percentage"
+                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 Diamond = EXP</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="rooms_gift_price">{{ __('gift price') }}</label>
+                                                <input type="text" id="rooms_gift_price" name="test_calco"
+                                                    placeholder="{{  __('rooms_gift_price') }}"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['rooms_gift_price'] ?? '' }}"
+                                                    class="form-control" >
+                                                <span id="rooms_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                            </div>
+                                        </div>
+@php
+                                            $rooms = Vip::where('type',4)->count();
+                                        @endphp
+                                        @if ($rooms == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+
+                        <!-- cp Fields -->
+                        <div class="col-md-6 mb-3 ms-0 me-auto" style="margin-top: 40px;">
+                            <form action="{{ route('admin.ovip-config') }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="card p-3 exp-card-cont shadow" style="">
+                                    <div class="card-header  exp-card d-flex justify-content-between align-items-center">
+                                        <h4 class="m-0">{{ __('cp') }}</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group d-flex align-items-center">
+                                            <div class="form-group">
+                                                    <label for="cp_exp" class="form-label">{{ __('cp') }}</label>
+                                                    <input type="text" id="cp_exp" name="exp_cp_percentage"
+                                                        placeholder="{{  __('Enter Exp') }}" value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
+                                                        class="form-control">
+                                                    <span class="form-text text-muted">1 coin = EXP</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="cp_gift_price">{{ __('gift price') }}</label>
+                                                <input type="text" id="cp_gift_price" name="test_calco"
+                                                    placeholder="cp_gift_price"
+                                                    style="width: auto; display: inline-block;"
+                                                    value="{{ $settings['cp_gift_price'] ?? '' }}"
+                                                    class="form-control" >
+                                                <span id="cp_exp_result" style="margin-left: 10px; font-weight: bold;"></span>
+                                            </div>
+                                        </div>
+
+                                        @php
+                                            $cp = Vip::where('type',3)->count();
+                                        @endphp
+                                        @if ($cp == 0)
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <a href="/admin/vips">{{  __('Go to Settings') }}</a>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div class="col-12 d-flex gap-3 mt-3">
+                                            <button type="submit"
+                                                class="btn btn-primary">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
 
@@ -1608,9 +1919,11 @@
                                             @if ($coin->type == 'paytabs')
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="profile_id">{{ __('admin.profile_id') }}:</label>
+                                                        <label
+                                                            for="profile_id">{{ __('admin.profile_id') }}:</label>
                                                         <input type="text" id="paytabs_profile_id"
-                                                            name="paytabs_profile_id" placeholder="paytabs_profile_id"
+                                                            name="paytabs_profile_id"
+                                                            placeholder="paytabs_profile_id"
                                                             value="{{ $settings['paytabs_profile_id'] ?? '' }}"
                                                             class="form-control">
                                                     </div>
@@ -1620,7 +1933,8 @@
                                                         <label
                                                             for="paytabs_server_key">{{ __('admin.server_key') }}:</label>
                                                         <input type="text" id="paytabs_server_key"
-                                                            name="paytabs_server_key" placeholder="paytabs_server_key"
+                                                            name="paytabs_server_key"
+                                                            placeholder="paytabs_server_key"
                                                             value="{{ $settings['paytabs_server_key'] ?? '' }}"
                                                             class="form-control" required>
                                                     </div>
@@ -1653,8 +1967,8 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="profile_id">{{ __('admin.appkey') }}:</label>
-                                                        <input type="text" id="bkash_appkey" name="bkash_appkey"
-                                                            placeholder="bkash_appkey"
+                                                        <input type="text" id="bkash_appkey"
+                                                            name="bkash_appkey" placeholder="bkash_appkey"
                                                             value="{{ $settings['bkash_appkey'] ?? '' }}"
                                                             class="form-control">
                                                     </div>
@@ -1742,7 +2056,8 @@
                                             @if ($coin->type == 'senang_pay')
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="api_key">{{ __('admin.callback_url') }}:</label>
+                                                        <label
+                                                            for="api_key">{{ __('admin.callback_url') }}:</label>
                                                         <input type="text" id="senangpay_callback_url"
                                                             name="senangpay_callback_url"
                                                             placeholder="senangpay_callback_url"
@@ -2925,6 +3240,35 @@
                 }
             </script>
             <script>
+                
+                document.addEventListener('DOMContentLoaded', function () {
+                        const units = ['attraction', 'charge', 'rooms', 'cp'];
+
+                        units.forEach(unit => {
+                            const expInput = document.getElementById(`${unit}_exp`);
+                            const priceInput = document.getElementById(`${unit}_gift_price`);
+                            const resultSpan = document.getElementById(`${unit}_exp_result`);
+
+                            if (expInput && priceInput && resultSpan) {
+                                function updateExpResult() {
+                                    const expRate = parseFloat(expInput.value);
+                                    const giftPrice = parseFloat(priceInput.value);
+
+                                    if (!isNaN(expRate) && !isNaN(giftPrice)) {
+                                        const totalExp = expRate * giftPrice;
+                                        resultSpan.textContent = `= ${totalExp} EXP`;
+                                    } else {
+                                        resultSpan.textContent = '';
+                                    }
+                                }
+
+                                expInput.addEventListener('input', updateExpResult);
+                                priceInput.addEventListener('input', updateExpResult);
+                                updateExpResult();
+                            }
+                        });
+                    });
+
                 function select_brand_image(name, obj) {
                     $('#brand_image').val(name)
                     $('.image_success').removeClass('border-success')
@@ -3173,36 +3517,36 @@
 
             <script>
                 /*document.addEventListener('DOMContentLoaded', function() {
-                                                                                                                                                                                // Updated selector to match your new class
-                                                                                                                                                                                const radioButtons = document.querySelectorAll('.radio-input');
-                                                                                                                                                                                const fieldsContainers = {
-                                                                                                                                                                                    '0': document.getElementById('agora-fields'),
-                                                                                                                                                                                    '1': document.getElementById('zego-fields'),
-                                                                                                                                                                                    '2': document.getElementById('pusher-fields')
-                                                                                                                                                                                };
+                                                                                                                                                                                                                    // Updated selector to match your new class
+                                                                                                                                                                                                                    const radioButtons = document.querySelectorAll('.radio-input');
+                                                                                                                                                                                                                    const fieldsContainers = {
+                                                                                                                                                                                                                        '0': document.getElementById('agora-fields'),
+                                                                                                                                                                                                                        '1': document.getElementById('zego-fields'),
+                                                                                                                                                                                                                        '2': document.getElementById('pusher-fields')
+                                                                                                                                                                                                                    };
 
-                                                                                                                                                                                function toggleFields() {
-                                                                                                                                                                                    const selectedValue = document.querySelector('input[name="library"]:checked').value;
+                                                                                                                                                                                                                    function toggleFields() {
+                                                                                                                                                                                                                        const selectedValue = document.querySelector('input[name="library"]:checked').value;
 
-                                                                                                                                                                                    // Hide all fields first
-                                                                                                                                                                                    Object.values(fieldsContainers).forEach(container => {
-                                                                                                                                                                                        container.style.display = 'none';
-                                                                                                                                                                                    });
+                                                                                                                                                                                                                        // Hide all fields first
+                                                                                                                                                                                                                        Object.values(fieldsContainers).forEach(container => {
+                                                                                                                                                                                                                            container.style.display = 'none';
+                                                                                                                                                                                                                        });
 
-                                                                                                                                                                                    // Show the selected one
-                                                                                                                                                                                    if (fieldsContainers[selectedValue]) {
-                                                                                                                                                                                        fieldsContainers[selectedValue].style.display = 'flex';
-                                                                                                                                                                                    }
-                                                                                                                                                                                }
+                                                                                                                                                                                                                        // Show the selected one
+                                                                                                                                                                                                                        if (fieldsContainers[selectedValue]) {
+                                                                                                                                                                                                                            fieldsContainers[selectedValue].style.display = 'flex';
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                    }
 
-                                                                                                                                                                                // Add event listeners to radio buttons
-                                                                                                                                                                                radioButtons.forEach(radio => {
-                                                                                                                                                                                    radio.addEventListener('change', toggleFields);
-                                                                                                                                                                                });
+                                                                                                                                                                                                                    // Add event listeners to radio buttons
+                                                                                                                                                                                                                    radioButtons.forEach(radio => {
+                                                                                                                                                                                                                        radio.addEventListener('change', toggleFields);
+                                                                                                                                                                                                                    });
 
-                                                                                                                                                                                // Initialize the fields visibility
-                                                                                                                                                                                toggleFields();
-                                                                                                                                                                            });*/
+                                                                                                                                                                                                                    // Initialize the fields visibility
+                                                                                                                                                                                                                    toggleFields();
+                                                                                                                                                                                                                });*/
 
 
                 document.addEventListener("DOMContentLoaded", function() {

@@ -396,8 +396,8 @@ class AgencyAppController extends Controller
                 'status' => 0,
                 'phone' => $request->input('phone'),
                 'img' => $image ?? null,
-                'Host_agency' => true,
-                'Shipping_agency' => false,
+                'type' => 1,
+            
             ]
         );
         if ($request->hasFile('face_image')) {

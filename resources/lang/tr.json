@@ -305,6 +305,11 @@
 "user already joined to other family": "Kullanıcı zaten başka bir aileye katıldı",
 "invalid data": "Geçersiz veri",
 "full admins": "Dolu yöneticiler",
+
+    "Agencies Count": "Ajans Sayısı",
+    "BD Wallet": "BD Cüzdanı",
+    "My Wallet": "Cüzdanım",
+
 "full members": "Dolu üyeler",
 "try to remove your self": "Kendinizi kaldırmaya çalışın",
 "cant follow your self": "Kendinizi takip edemezsiniz",
@@ -374,7 +379,9 @@
 "current phone not verified": "Geçerli telefon onaylanmadı",
 "account deleted successfully": "Hesap başarıyla silindi",
 "please set usd_value_in_coins in configs": "Lütfen usd_value_in_coins yapılandırmasını ayarlayın",
-"balance not enough": "Yetersiz bakiye",
+    "please set usd_value_in_coins in configs. Contact the administration!": "Lütfen ayarlarda usd_value_in_coins değerini belirleyin. Yönetim ile iletişime geçin!",
+    "this agency not found": "Bu ajans bulunamadı",
+    "balance not enough": "Yetersiz bakiye",
 "missing owner_id": "Sahip kimliği eksik",
 "Missing data": "Eksik veri",
 "The user is not in this room": "Kullanıcı bu odada değil",
@@ -2145,7 +2152,13 @@
   "Agency Heroes": "Ajans Kahramanları",
   "Supporters": "Destekçiler",
   "Remaining": "Kalan",
-
+  "cp_gift_price": "Rekabetçi Puan Hediye Fiyatı",
+  "Enter Exp": "Puanları Girin",
+  "rooms_gift_price": "Oda Hediye Fiyatı",
+  "charge_gift_price": "Şarj Hediye Fiyatı",
+  "attraction_gift_price": "Çekim Hediye Fiyatı",
+  "wealth_gift_price": "Zenginlik Hediye Fiyatı",
+  "Go to Settings": "Ayarlar'a Git",
   "browse agency settings": "Ajans ayarlarını görüntüle",
   "edit agency settings": "Ajans ayarlarını düzenle",
   "browse page": "Sayfayı görüntüle",
@@ -2224,6 +2237,7 @@
   "user parent": "Kullanıcı velisi",
   "general": "Genel",
    "Lucky box": "Şans kutusu",
+   
 
   "Create Agencies": "Ajanslar Oluştur",
   "browse report": "Raporlara Gözat",
@@ -2273,11 +2287,34 @@
   "create charge country": "Ülke Ücreti Oluştur",
   "shipping agency switch": "Nakliye Ajansı Anahtarı",
   "browse updates_group_chat": "Grup Sohbet Güncellemelerini Görüntüle",
-   "agency does not have this coin": "Ajansın bu kadar jetonu yok.",
-   "Game profits": "Oyun kazançları",
-   "role name": "Rol adı"
+  "gift price": "hediye fiyatı",
 
 
+
+  
+  "Remaining": "Kalan",
+   "app BD id": "Uygulama BD Kimliği",
+  "salaries BD": "BD Maaşları",
+  "my wallet": "Cüzdanım",
+  "request-agencies": "Ajans Talepleri",
+  "request agencies": "Ajans Talebi",
+  "Request agencies": "Ajans Talebi",
+  "bd": "BD",
+  "Bd": "BD",
+  "BD": "BD",
+  "current_balance": "Mevcut Bakiye",
+  "remaining_percent": "Kalan Yüzde",
+  "cut": "Kesinti",
+  "total": "Toplam",
+  "agency": "Ajans",
+  "List of Agencies": "Ajans Listesi",
+  "confirm_charge": "Şarjı Onayla",
+  "enter_amount": "Tutarı Girin",
+  "transfer_to_wallet": "Cüzdana Aktar",
+  "charge_wallet": "Cüzdanı Yükle",
+  "current_balance": "Mevcut Bakiye",
+  "select_target": "Hedefi Seç",
+  "bd_wallet_notice": "BD cüzdanından dolar aktardığınızda, tutar cüzdanınıza eklenecektir. Daha sonra bu tutarı satabilir veya başkalarına gönderebilirsiniz."
 
 
 
