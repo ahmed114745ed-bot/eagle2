@@ -95,6 +95,7 @@ class UserSalaryRepository extends AbstractRepository
 
     public function  newUserSalary($agencyId, $month, $year)
     {
-        return $this->model->where('user_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('sallary');
+        return $this->model->where('user_id', $agencyId)->sum(DB::raw('sallary - cut_amount'));
     }
 }
+   
