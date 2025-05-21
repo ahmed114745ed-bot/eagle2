@@ -169,6 +169,12 @@ class UserResource extends JsonResource
             'image_color'          => @$this->color_image,
             'profile_frame_id' => common::wareUserVip($this->id, 28, 'id'),
             "multi_images" => $this->images?->select("img"),
+            "shipping-agency" => $this->shippingAgency ? [
+                "id" => $this->shippingAgency->id,
+                "name" => $this->shippingAgency->name ?? '',
+                "image" => $this->shippingAgency->img ?? '',
+                "complete-transactions" => $this->shippingAgency->charges?->count() ?? 0,
+            ] : null,
         ];
 
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {

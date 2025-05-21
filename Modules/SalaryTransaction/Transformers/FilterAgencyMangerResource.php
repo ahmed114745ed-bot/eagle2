@@ -18,11 +18,17 @@ class FilterAgencyMangerResource extends JsonResource
     {
 
         $type = '';
-        if (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 1)) {
-            $type = 'hosts and shipping';
-        } elseif (($this->ownAgency?->Shipping_agency == 0) && ($this->ownAgency?->Host_agency == 1)) {
-            $type = 'hosts';
-        } elseif (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 0)) {
+        // if (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 1)) {
+        //     $type = 'hosts and shipping';
+        // } elseif (($this->ownAgency?->Shipping_agency == 0) && ($this->ownAgency?->Host_agency == 1)) {
+        //     $type = 'hosts';
+        // } elseif (($this->ownAgency?->Shipping_agency == 1) && ($this->ownAgency?->Host_agency == 0)) {
+        //     $type = 'shipping';
+        // }
+        if ($this->ownAgency?->type == 1 ) {
+            $type = 'hosts ';
+         
+        } elseif ($this->ownAgency?->type == 2) {
             $type = 'shipping';
         }
         return [

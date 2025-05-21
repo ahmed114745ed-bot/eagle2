@@ -277,9 +277,9 @@ trait CalcsTrait
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
-        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
         $diamondSend             = $user->total_sender_diamonds;
-        $senderNum        = floor($diamondSend  * $expPercentages[0]);
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
 
         $star_level      = $user->total_received_level;
 
@@ -440,10 +440,10 @@ trait CalcsTrait
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
         // $user            = User::find($user_id);
         $diamondReceived = $user->total_received_diamonds;
-        $receivedNum        =  floor($diamondReceived  * $expPercentages[1]);
+        $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
         $diamondSend             = $user->total_sender_diamonds;
 
-        $senderNum        = floor($diamondSend  * $expPercentages[0]);
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
         //$senderNum        = floor(2000000000000000000000  * $expPercentages[0]);
 
         $star_level      = $user->total_received_level;
@@ -503,6 +503,8 @@ trait CalcsTrait
         $data['prev_sender_num'] = (int)($current_gold_num);
         $data['current_receiver_num'] = $current_star_num;
         $data['current_sender_num'] = $current_gold_num;
+        $data['exp-sender'] = $expPercentages['exp_sender_percentage'] ?? 1;
+        $data['exp-receiver'] = $expPercentages['exp_received_percentage'] ?? 1;
 
         $rt = (int)$next_star_num - (int)$current_star_num;
         $st = (int)$next_gold_num - (int)($current_gold_num);
@@ -758,8 +760,8 @@ trait CalcsTrait
 
     public static function ovip_center_rank_img($user_id)
     {
-     
-     
+
+
         if (is_object($user_id)) {
             if (isset($user_id->userId)) {
                 $user_id = $user_id->userId;
@@ -799,9 +801,9 @@ trait CalcsTrait
 
     public static function wareUserVip($user_id, $type, $item)
     {
-       
 
-   
+
+
 
         if (gettype($user_id) == 'integer') {
             $user = User::query()->find($user_id);

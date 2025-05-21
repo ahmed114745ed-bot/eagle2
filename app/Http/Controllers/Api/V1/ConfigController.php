@@ -36,16 +36,24 @@ class ConfigController extends Controller
         if (!Admin::user()->can('*')){
             Permission::check('edit-'.$this->permission_name);
         }
+
         foreach($request->allFiles() as $input => $file){
 
-            $value = Common::upload('images', $file);
-            //$value = '3.jpg';
-
-                Config::updateOrCreate(['name' =>$input],[
+            if (is_array($file)) {
+                foreach ($file as $singleFile) {
+                    $value = Common::upload('images', $singleFile);
+                    Config::updateOrCreate(['name' => $input], [
+                        'value' => $value
+                    ]);
+                }
+            } else {
+                $value = Common::upload('images', $file);
+                Config::updateOrCreate(['name' => $input], [
                     'value' => $value
                 ]);
-
+            }
         }
+        settings()->set('badges-agency', true);
         return back();
     }
 

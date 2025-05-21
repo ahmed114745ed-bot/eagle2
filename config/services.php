@@ -49,6 +49,11 @@ return [
         "fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
     ],
 
+    'zinipay' => [
+        "api_key"          => env('ZINIPAY_API_KEY',"6ed92079-a485-4373-9453-505e20f6ef48"),
+        "url"              => env('ZINIPAY_URL','https://api.zinipay.com/v1/payment/create'),
+    ],
+
     'agora' => [
         'app_id' => env('AGORA_APP_ID'),
         'app_certificate' => env('AGORA_APP_CERTIFICATE'),

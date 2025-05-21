@@ -158,8 +158,6 @@ class AgencyController extends Controller
             'url' => 'nullable',
             'img' => 'required|mimes:jpeg,png,jpg',
             'contents' => 'nullable',
-            'Host_agency' => 'required|boolean',
-            'Shipping_agency' => 'required|boolean',
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
@@ -182,8 +180,7 @@ class AgencyController extends Controller
             'url' => 'nullable',
             'img' => 'required|mimes:jpeg,png,jpg',
             'contents' => 'nullable',
-            'Host_agency' => 'required|boolean',
-            'Shipping_agency' => 'required|boolean',
+          
         ]);
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
