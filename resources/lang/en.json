@@ -20,6 +20,15 @@
     "registered successfully": "Registered Successfully",
     "required": "Required",
     "exists": "Exists",
+    "delete user parent": "delete Users",
+     "edit user parent": "edit users",
+    "show user parent": "show users",
+     "update user parent": "update users",
+       "user parent": " users ",
+
+
+
+
     "this field is": "This field is",
     "validation errors": "Validation Errors",
     "credentials doesn't match": "Credentials don't match",
