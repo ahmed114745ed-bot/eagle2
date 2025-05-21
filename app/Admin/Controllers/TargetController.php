@@ -12,6 +12,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Request;
 use PDF;
 class TargetController extends MainController
 {
