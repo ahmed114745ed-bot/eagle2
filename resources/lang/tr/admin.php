@@ -413,6 +413,7 @@ return [
     'sslcommerz'    => 'sslcommerz',
     'google_pay'    => 'google_pay',
     'huawei_pay' => 'Huawei Pay',
+    "webhook_url" => "Webhook URL'si",
 
     "target_no" => 'Hedef Numarası',
     "diamonds" => 'Elmas Hedefi',

@@ -425,6 +425,7 @@ return [
     'sslcommerz'    => 'SSLCommerz',
     'google_pay'    => 'Google Pay',
     'huawei_pay'    => 'Huawei Pay',
+    "webhook_url" => "Webhook Url",
 
     "target_no" => 'Target Number',
     "diamonds" => 'Diamond Target',

@@ -1165,6 +1165,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="fawry_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                        <input type="text" id="fawry_webhook_url" name="fawry_webhook_url"
+                                                               placeholder="fawry_webhook_url"
+                                                               value="{{ $settings['fawry_webhook_url'] ?? '' }}"
+                                                               class="form-control" required>
+                                                    </div>
+                                                </div>
                                             @endif
                                             @if ($coin->type == 'strip')
                                                 <div class="col-md-6">
@@ -1218,6 +1227,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="stripe_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="stripe_webhook_url" name="stripe_webhook_url"
+                                                                   placeholder="stripe_webhook_url"
+                                                                   value="{{ $settings['stripe_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'cash_free')
                                                 <div class="col-md-6">
@@ -1261,6 +1279,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="opay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="opay_webhook_url" name="opay_webhook_url"
+                                                                   placeholder="opay_webhook_url"
+                                                                   value="{{ $settings['opay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'apple_pay')
                                                 <div class="col-md-6">
@@ -1317,6 +1344,15 @@
                                                             class="form-control">
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="apple_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="apple_webhook_url" name="apple_webhook_url"
+                                                                   placeholder="apple_webhook_url"
+                                                                   value="{{ $settings['apple_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'google_pay')
                                                 <div class="col-md-6">
@@ -1339,6 +1375,15 @@
                                                                    class="form-control" required>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="google_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="google_pay_webhook_url" name="google_pay_webhook_url"
+                                                                   placeholder="google_pay_webhook_url"
+                                                                   value="{{ $settings['google_pay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'huawei_pay')
                                                 <div class="col-md-6">
@@ -1351,6 +1396,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="huawei_pay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="huawei_pay_webhook_url" name="huawei_pay_webhook_url"
+                                                                   placeholder="huawei_pay_webhook_url"
+                                                                   value="{{ $settings['huawei_pay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'sky_pay')
                                                 <div class="col-md-6">
@@ -1393,6 +1447,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paysky_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paysky_webhook_url" name="paysky_webhook_url"
+                                                                   placeholder="paysky_webhook_url"
+                                                                   value="{{ $settings['paysky_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'opay')
                                                 <div class="col-md-6">
@@ -1455,6 +1518,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="opay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="opay_webhook_url" name="opay_webhook_url"
+                                                                   placeholder="opay_webhook_url"
+                                                                   value="{{ $settings['opay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'mada')
                                                 <div class="col-md-6">
@@ -1477,7 +1549,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1489,6 +1560,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="mada_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="mada_webhook_url" name="mada_webhook_url"
+                                                                   placeholder="mada_webhook_url"
+                                                                   value="{{ $settings['mada_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'liq_pay')
                                                 <div class="col-md-6">
@@ -1523,6 +1603,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="liqpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="liqpay_webhook_url" name="liqpay_webhook_url"
+                                                                   placeholder="liqpay_webhook_url"
+                                                                   value="{{ $settings['liqpay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'paypal')
                                                 <div class="col-md-6">
@@ -1558,6 +1647,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paypal_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paypal_webhook_url" name="paypal_webhook_url"
+                                                                   placeholder="paypal_webhook_url"
+                                                                   value="{{ $settings['paypal_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'paytm')
                                                 <div class="col-md-6">
@@ -1604,6 +1702,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paytm_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paytm_webhook_url" name="paytm_webhook_url"
+                                                                   placeholder="paytm_webhook_url"
+                                                                   value="{{ $settings['paytm_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'paytabs')
                                                 <div class="col-md-6">
@@ -1625,7 +1732,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1636,7 +1742,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1648,6 +1753,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paytabs_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paytabs_webhook_url" name="paytabs_webhook_url"
+                                                                   placeholder="paytabs_webhook_url"
+                                                                   value="{{ $settings['paytabs_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'bkash')
                                                 <div class="col-md-6">
@@ -1669,7 +1783,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1690,7 +1803,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1702,6 +1814,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="bkash_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="bkash_webhook_url" name="bkash_webhook_url"
+                                                                   placeholder="bkash_webhook_url"
+                                                                   value="{{ $settings['bkash_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'razor_pay')
                                                 <div class="col-md-6">
@@ -1724,9 +1845,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
-
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1738,6 +1856,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="razorpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="razorpay_webhook_url" name="razorpay_webhook_url"
+                                                                   placeholder="razorpay_webhook_url"
+                                                                   value="{{ $settings['razorpay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'senang_pay')
                                                 <div class="col-md-6">
@@ -1783,6 +1910,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="senangpay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="senangpay_webhook_url" name="senangpay_webhook_url"
+                                                                   placeholder="senangpay_webhook_url"
+                                                                   value="{{ $settings['senangpay_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'paymob_accept')
                                                 <div class="col-md-6">
@@ -1829,7 +1965,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1841,8 +1976,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1854,6 +1987,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paymob_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paymob_webhook_url" name="paymob_webhook_url"
+                                                                   placeholder="paymob_webhook_url"
+                                                                   value="{{ $settings['paymob_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'flutter_wave')
                                                 <div class="col-md-6">
@@ -1888,7 +2030,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1900,6 +2041,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="flutterwave_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="flutterwave_webhook_url" name="flutterwave_webhook_url"
+                                                                   placeholder="flutterwave_webhook_url"
+                                                                   value="{{ $settings['flutterwave_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'pay_stack')
                                                 <div class="col-md-6">
@@ -1957,6 +2107,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="paystack_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="paystack_webhook_url" name="paystack_webhook_url"
+                                                                   placeholder="paystack_webhook_url"
+                                                                   value="{{ $settings['paystack_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                             @if ($coin->type == 'ssl_commerz')
                                                 <div class="col-md-6">
@@ -1969,7 +2128,6 @@
                                                             class="form-control">
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1981,7 +2139,6 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label
@@ -1993,6 +2150,15 @@
                                                             class="form-control" required>
                                                     </div>
                                                 </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="sslcommerz_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="sslcommerz_webhook_url" name="sslcommerz_webhook_url"
+                                                                   placeholder="sslcommerz_webhook_url"
+                                                                   value="{{ $settings['sslcommerz_webhook_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
                                             @endif
                                                 @if ($coin->type == 'zinipay')
                                                     <div class="col-md-6">
@@ -2013,6 +2179,15 @@
                                                                    name="zinipay_url"
                                                                    placeholder="zinipay_url"
                                                                    value="{{ $settings['zinipay_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="zinipay_webhook_url">{{ __('admin.webhook_url') }}:</label>
+                                                            <input type="text" id="zinipay_webhook_url" name="zinipay_webhook_url"
+                                                                   placeholder="zinipay_webhook_url"
+                                                                   value="{{ $settings['zinipay_webhook_url'] ?? '' }}"
                                                                    class="form-control" required>
                                                         </div>
                                                     </div>
