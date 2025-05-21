@@ -417,7 +417,11 @@
                                         <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
                                             @foreach ($suffixes as $suffix)
                                                 @php
+                                                if ($suffix == 'badge'){
+                                                    $inputName = $language->code . '_' . $type;
+                                                }else{
                                                     $inputName = $language->code . '_' . $type . '_' . $suffix;
+                                                }
                                                     $row = $configAll->where('name', $inputName)->first();
                                                 @endphp
 
