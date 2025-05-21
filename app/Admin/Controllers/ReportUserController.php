@@ -10,6 +10,8 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Illuminate\Support\Facades\Request;
+use Carbon\Carbon;
 
 class ReportUserController extends MainController
 {
@@ -39,7 +41,7 @@ class ReportUserController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('Hosts Reports'))
             ->body($this->detail($id)));
     }
@@ -53,7 +55,7 @@ class ReportUserController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Hosts Reports'))
             ->body($this->form()->edit($id)));
     }
@@ -82,39 +84,38 @@ class ReportUserController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('uuid', __('uuid'));
-            });
-            $filter->where(function ($query) {
-                //   $year = Request::input('year');
 
-            }, __('Year'), 'year')->integer();
             $filter->where(function ($query) {
-                //  $month = Request::input('month');
+                $year = Request::input('year', now()->year); // Default to current year
+                $query->whereYear('created_at', $year);
+            }, __('Year'), 'year')->integer()->default(now()->year);
 
-            }, __('Month'), 'month')->integer();
+            $filter->where(function ($query) {
+                $month = Request::input('month', now()->month); // Default to current month
+                $query->whereMonth('created_at', $month);
+            }, __('Month'), 'month')->integer()->default(now()->month);
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter_with_owner_id());
             });
         });
+        if (request('agency_id')) {
+            $grid->column('id', __('Id'));
+            $grid->column('name', __('user'))->display(function ($name) {
+                $name = @$this->name ?? '';
+                $uid = @$this->uuid;
+                $path = @$this?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-        $grid->column('id', __('Id'));
-        $grid->column('name', __('user'))->display(function ($name) {
-            $name = @$this->name ?? '';
-            $uid = @$this->uuid;
-            $path = @$this?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this) ? url("admin/users/{$this->id}") : 0;
-            return "
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl =  ($this) ? url("admin/users/{$this->id}") : 0;
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -125,62 +126,60 @@ class ReportUserController extends MainController
                     </div>
                 </div>
             ";
-        });;
+            });;
 
-        $grid->column('total_days', __('total_days'))->display(function () {
-            $image = asset('images/day.jpg');
-            if (request()->year == null && request()->month == null) {
-                $days= $this->total_days;
-            } else {
-                // The subquery equivalent in Laravel
-                $subQuery = DB::table('live_times')
-                    ->select('uid', DB::raw('COUNT(*) AS entry_count'))
-                    ->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)
-                    ->where('uid', $this->id)
-                    ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
-                    ->havingRaw('SUM(hours) > 1')
-                    ->get(); // Having condition
+            $grid->column('total_days', __('total_days'))->display(function () {
+                $image = asset('images/day.jpg');
+                if (request()->year == null && request()->month == null) {
+                    $days = $this->total_days;
+                } else {
+                    // The subquery equivalent in Laravel
+                    $subQuery = DB::table('live_times')
+                        ->select('uid', DB::raw('COUNT(*) AS entry_count'))
+                        ->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)
+                        ->where('uid', $this->id)
+                        ->groupBy('uid', DB::raw('DATE(created_at)')) // Group by uid and date
+                        ->havingRaw('SUM(hours) > 1')
+                        ->get(); // Having condition
 
-                $days = $subQuery->count('entry_count');
+                    $days = $subQuery->count('entry_count');
+                }
+                return "<span style='color:green; font-weight: bold;'>{$days}</span>";
+            });
+            $grid->column(__('reals_count'))->display(function () {
 
+                $count = request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
+            });
+            $grid->column(__('moment_count'))->display(function () {
+                $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
+                return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
+            });
+            $grid->column(__('total_hours'))->display(function () {
+                $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
+                return "<span style='color:red; font-weight: bold;'>{$count}</span>";
+            });
 
-            }
-            return "<span style='color:green; font-weight: bold;'>{$days}</span>";
-        });
-        $grid->column(__('reals_count'))->display(function () {
-
-           $count = request()->year == null && request()->month == null ? $this->reals()->count() : $this->reals()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
-           return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
-        });
-        $grid->column(__('moment_count'))->display(function () {
-            $count= request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
-            return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
-        });
-        $grid->column(__('total_hours'))->display(function () {
-           $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
-           return "<span style='color:red; font-weight: bold;'>{$count}</span>";
-        });
-
-        $grid->column(__('Filtered salary'))->display(function () {
-            $usd =  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+            $grid->column(__('Filtered salary'))->display(function () {
+                $usd =  request()->year == null && request()->month == null ? $this->salary : $this->getSalary(request()->month, request()->year);
+                $image = asset('images/dollar.jpg'); // Adjust path as needed
+                return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
-        });
+            });
 
-        $grid->column(__('Current Salary'))->display(function () {
-            $usd =  $this->salary;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+            $grid->column(__('Current Salary'))->display(function () {
+                $usd =  $this->salary;
+                $image = asset('images/dollar.jpg'); // Adjust path as needed
+                return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
                           <img src='{$image}' alt='USD' width='20' height='20'>
                     </div>";
-        });
-
+            });
+        }
         $grid->disableActions();
         return $grid;
     }
