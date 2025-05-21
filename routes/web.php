@@ -141,14 +141,14 @@ Route::get('/clear_clear', function () {
 //    return "Seeded!";
 //});
 
-//Route::get('/change_agencies_type', function () {
-//
-//    DB::table('agencies')
-//        ->where('type', 0)
-//        ->update(['type' => 1]);
-//
-//    return "Done!";
-//});
+Route::get('/change_agencies_type_test', function () {
+
+    DB::table('agencies')
+        ->where('type', 0)
+        ->update(['type' => 1]);
+
+    return "Done!";
+});
 
 Route::get('/change_agencies_type', function () {
 
