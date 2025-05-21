@@ -2309,6 +2309,29 @@ use App\Models\Vip;
                                                     </div>
                                                 </div>
                                             @endif
+                                                @if ($coin->type == 'zinipay')
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label for="store id">{{ __('admin.api_key') }}:</label>
+                                                            <input type="text" id="zinipay_api_key"
+                                                                   name="zinipay_api_key"
+                                                                   placeholder="zinipay_api_key"
+                                                                   value="{{ $settings['zinipay_api_key'] ?? '' }}"
+                                                                   class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label
+                                                                for="store_password">{{ __('admin.url') }}:</label>
+                                                            <input type="text" id="zinipay_url"
+                                                                   name="zinipay_url"
+                                                                   placeholder="zinipay_url"
+                                                                   value="{{ $settings['zinipay_url'] ?? '' }}"
+                                                                   class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             {{--                                                @foreach ($coin->settings as $setting) --}}
                                             {{--                                                    <div class="col-md-6"> --}}
                                             {{--                                                        <div class="form-group"> --}}

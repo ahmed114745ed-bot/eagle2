@@ -398,6 +398,10 @@ return [
     //huaweiPay
     'huawei_pay_merchant_id' => 'معرّف التاجر',
 
+    // ziniPay
+    "zinipay" => "زيني باي",
+    "url" => "الرابط",
+
     'fawry'         => 'فوري',
     'skyPay'        => 'سكاي باي',
     'strip'         => 'سترايب',

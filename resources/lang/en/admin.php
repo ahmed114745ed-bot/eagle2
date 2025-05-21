@@ -401,6 +401,10 @@ return [
     //huaweiPay
     "huawei_pay_merchant_id" => "Merchant Id",
 
+    //ziniPay
+    "zinipay" => "ZiniPay",
+    "url" => "Url",
+
     'fawry'         => 'Fawry',
     'skyPay'        => 'Sky Pay',
     'strip'         => 'Stripe',

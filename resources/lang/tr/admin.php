@@ -390,6 +390,9 @@ return [
     //huaweiPay
     'huawei_pay_merchant_id' => 'Mağaza Kimliği',
 
+    "zinipay" => "ZiniPay",
+    "url" => "Bağlantı",
+
     'fawry'         => 'fawry',
     'skyPay'        => 'skyPay',
     'strip'         => 'stripe',

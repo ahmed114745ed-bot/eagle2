@@ -36,6 +36,7 @@ class PaymentGatewaysSeeder extends Seeder
             'sslcommerz.png',
             'googlepay.png',
             'huaweipay.png',
+            'zinipay.jpg',
         ];
 
         foreach ($images as $img) {
@@ -938,6 +939,39 @@ class PaymentGatewaysSeeder extends Seeder
             Setting::updateOrCreate([
                 'key' => $value['name'],
                 'item_id' => $huawei_pay_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],
+                'input_type' => $value['type']
+            ]);
+        }
+
+        //zinipay
+        $zinipay_id = PaymentCoin::updateOrCreate([
+            'title' => 'zinipay',
+        ], [
+            'photo' => 'images/zinipay.jpg',
+            'status' => 1,
+            'type' => 'zinipay',
+        ]);
+
+        $zinipay_fields = [
+            'new_1' => [
+                "name" => "zinipay_api_key",
+                "type" => "input",
+                "value" => "123"
+            ],
+            'new_2' => [
+                "name" => "zinipay_url",
+                "type" => "input",
+                "value" => "test"
+            ],
+        ];
+
+        foreach ($zinipay_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $zinipay_id->id,
                 'type' => 'payment'
             ], [
                 'value' => $value['value'],
